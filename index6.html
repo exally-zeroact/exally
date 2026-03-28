@@ -788,7 +788,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection#b3d6cbd2dfdfca9dc0c6c3c3dcc1c7f3d4ded2dadf9dd0dcde"><span class="__cf_email__" data-cfemail="cbaeb3aaa7a7b2e5b8bebbbba4b9bf8baca6aaa2a7e5a8a4a6">[email&#160;protected]</span></a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -858,7 +858,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 <div class="toast" id="toast"></div>
 
 <!-- ===== SCRIPTS ===== -->
-<script src="templates-config.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="templates-config.js"></script>
 <script src="quiz.js"></script>
 <script>
 // ===== STATE =====
@@ -1264,13 +1264,4 @@ function showToast(msg, duration){
   var examples = ['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
   var idx = 0;
   function rotate(){
-    var el = document.getElementById('msgInput');
-    if(!el || document.activeElement===el) return;
-    idx = (idx+1) % examples.length;
-    el.setAttribute('placeholder','例：'+examples[idx]);
-  }
-  setInterval(rotate, 3500);
-})();
-</script>
-</body>
-</html>
+    var e
