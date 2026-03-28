@@ -411,27 +411,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 /* ===== DM MONO ===== */
 .formula-text,.formula-chip,.code-block,pre,code{font-family:'DM Mono',monospace;}
-/* 2×2カードグリッド */
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:16px;}
-.cat-card{background:#fff;border:1.5px solid #E8F0EC;border-radius:16px;padding:14px 12px;cursor:pointer;transition:all 0.18s;text-align:left;position:relative;overflow:hidden;}
-.cat-card:active{transform:scale(0.97);}
-.cat-card.active{border-color:#52B788;background:#F0FAF4;}
-.cat-card-icon{font-size:22px;margin-bottom:6px;}
-.cat-card-title{font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:3px;}
-.cat-card-sub{font-size:10px;color:#7A9A87;line-height:1.5;}
-
-/* 質問例パネル */
-.q-panel{background:#fff;border:1.5px solid #E8F0EC;border-radius:16px;overflow:hidden;margin-top:4px;display:none;}
-.q-panel.show{display:block;}
-.q-panel-header{padding:10px 14px 8px;border-bottom:1px solid #F0FAF4;display:flex;align-items:center;justify-content:space-between;}
-.q-panel-label{font-size:11px;font-weight:700;color:#3D9E72;}
-.q-panel-close{font-size:18px;color:#B0C4BA;cursor:pointer;line-height:1;}
-.q-list{display:flex;flex-direction:column;}
-.q-btn{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:12px;font-weight:500;color:#2E4038;cursor:pointer;transition:background 0.12s;border-bottom:1px solid #F4F7F5;background:#fff;border-left:none;border-right:none;border-top:none;text-align:left;width:100%;}
-.q-btn:last-child{border-bottom:none;}
-.q-btn:hover{background:#F8FEFC;}
-.q-btn-icon{font-size:15px;flex-shrink:0;}
-.q-btn-arrow{margin-left:auto;color:#C8ECD8;font-size:14px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -602,43 +581,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         <div class="chat-wrap">
           <div class="chat-area" id="chatArea">
             <!-- ===== welcome-msg（mock2リデザイン反映済み） ===== -->
-            <div class="welcome" id="welcomeMsg">
-    <div class="welcome-icon">💬</div>
-    <div class="welcome-title">Excel専門AIに<br>質問しよう</div>
-    <div class="welcome-sub">わからない操作・エラー・表作りまで<br>何でも日本語で聞くだけでOK</div>
-
-    <div class="card-grid">
-      <div class="cat-card" id="card-ops" onclick="togglePanel('ops')">
-        <div class="cat-card-icon">🔧</div>
-        <div class="cat-card-title">操作・設定</div>
-        <div class="cat-card-sub">印刷・保護・<br>ショートカット</div>
-      </div>
-      <div class="cat-card" id="card-func" onclick="togglePanel('func')">
-        <div class="cat-card-icon">💡</div>
-        <div class="cat-card-title">関数・数式</div>
-        <div class="cat-card-sub">VLOOKUP・IF・<br>SUMIF など</div>
-      </div>
-      <div class="cat-card" id="card-err" onclick="togglePanel('err')">
-        <div class="cat-card-icon">❌</div>
-        <div class="cat-card-title">エラー解決</div>
-        <div class="cat-card-sub">#VALUE! #N/A<br>などを即解決</div>
-      </div>
-      <div class="cat-card" id="card-pay" onclick="togglePanel('pay')">
-        <div class="cat-card-icon">📋</div>
-        <div class="cat-card-title">書類・管理表</div>
-        <div class="cat-card-sub">明細・請求書・<br>集計表を作成</div>
-      </div>
-    </div>
-
-    <div class="q-panel" id="qPanel">
-      <div class="q-panel-header">
-        <div class="q-panel-label" id="qPanelLabel"></div>
-        <div class="q-panel-close" onclick="closePanel()">×</div>
-      </div>
-      <div class="q-list" id="qList"></div>
-    </div>
-
-  </div>
+            <div class="welcome-msg" id="welcomeMsg">
               <div class="welcome-icon">💬</div>
               <div class="welcome-title">Excel専門AIに質問しよう</div>
               <div class="welcome-sub">わからない操作・エラー・表作りまで<br>何でも日本語で聞くだけでOK</div>
@@ -917,68 +860,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 <div class="toast" id="toast"></div>
 
 <!-- ===== SCRIPTS ===== -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="templates-config.js">var currentCat = null;
-
-function togglePanel(cat){
-  if(currentCat === cat){ closePanel(); return; }
-  currentCat = cat;
-  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById('card-'+cat).classList.add('active');
-  var panel = document.getElementById('qPanel');
-  var label = document.getElementById('qPanelLabel');
-  var list = document.getElementById('qList');
-  var Q = {
-    ops:{label:'🔧 操作・設定',items:[
-      {icon:'🖨️',text:'印刷範囲を設定したい'},
-      {icon:'🔒',text:'セルを編集できないようにしたい（シート保護）'},
-      {icon:'📌',text:'行・列を固定してスクロールしたい'},
-      {icon:'🔎',text:'文字を一括で置換したい'},
-      {icon:'⌨️',text:'よく使うショートカットキーを知りたい'},
-    ]},
-    func:{label:'💡 関数・数式',items:[
-      {icon:'🔍',text:'別の表から値を引っ張りたい（VLOOKUP）'},
-      {icon:'➕',text:'条件付きで合計したい（SUMIF）'},
-      {icon:'🔀',text:'条件で表示を変えたい（IF）'},
-      {icon:'🔢',text:'条件に合うセルを数えたい（COUNTIF）'},
-      {icon:'🎂',text:'生年月日から年齢を自動計算したい'},
-    ]},
-    err:{label:'❌ エラー解決',items:[
-      {icon:'❌',text:'#VALUE! エラーが出ています'},
-      {icon:'❌',text:'#N/A エラーを消したい（IFERROR）'},
-      {icon:'❌',text:'#REF! エラーが出ています'},
-      {icon:'⚠️',text:'数式が合ってるのに結果がおかしい'},
-      {icon:'🔄',text:'循環参照エラーが出ています'},
-    ]},
-    pay:{label:'📋 書類・管理表',items:[
-      {icon:'💰',text:'給料明細を作りたい'},
-      {icon:'📄',text:'請求書・見積書を作りたい'},
-      {icon:'🧾',text:'経費精算書を作りたい'},
-      {icon:'⏰',text:'勤怠管理表を作りたい'},
-      {icon:'📈',text:'売上管理表（目標達成率の自動計算）'},
-    ]},
-  };
-  label.textContent = Q[cat].label;
-  list.innerHTML = Q[cat].items.map(q=>
-    '<button class="q-btn" onclick="setQ(\''+q.text.replace(/'/g,"\\'")+'\')">'
-    +'<span class="q-btn-icon">'+q.icon+'</span>'
-    +q.text
-    +'<span class="q-btn-arrow">›</span>'
-    +'</button>'
-  ).join('');
-  panel.classList.add('show');
-  setTimeout(function(){ panel.scrollIntoView({behavior:'smooth',block:'nearest'}); },50);
-}
-
-function closePanel(){
-  currentCat = null;
-  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById('qPanel').classList.remove('show');
-}
-
-function setQ(text){
-  document.getElementById('msgInput').value = text;
-  document.getElementById('msgInput').focus();
-}</script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="templates-config.js"></script>
 <script src="quiz.js"></script>
 <script>
 // ===== STATE =====
