@@ -154,12 +154,17 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .welcome-title{font-size:19px;font-weight:700;color:#1A2B22;margin-bottom:6px;}
 .welcome-sub{font-size:12px;color:#7A9A87;line-height:1.8;margin-bottom:20px;}
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:16px;}
-.cat-card{background:#fff;border:1.5px solid #E8F0EC;border-radius:16px;padding:14px 12px;cursor:pointer;transition:all 0.18s;text-align:left;position:relative;overflow:hidden;}
-.cat-card:active{transform:scale(0.97);}
+.cat-card{background:#fff;border:2px solid #E8F0EC;border-radius:20px;padding:20px 12px 16px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(30,60,40,0.08);}
+.cat-card:active{transform:scale(0.95);}
+.cat-card:hover{box-shadow:0 4px 16px rgba(30,60,40,0.13);transform:translateY(-2px);}
 .cat-card.active{border-color:#52B788;background:#F0FAF4;}
-.cat-card-icon{font-size:22px;margin-bottom:6px;}
-.cat-card-title{font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:3px;}
+.cat-card-icon{font-size:38px;margin-bottom:10px;display:block;line-height:1;}
+.cat-card-title{font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:4px;line-height:1.35;}
 .cat-card-sub{font-size:10px;color:#7A9A87;line-height:1.5;}
+.cat-card.ops-card{background:#fff;border-color:#C8ECD8;}
+.cat-card.func-card{background:#fff;border-color:#C8ECD8;}
+.cat-card.err-card{background:#fff;border-color:#C8ECD8;}
+.cat-card.pay-card{background:#fff;border-color:#C8ECD8;}
 .q-panel{background:#fff;border:1.5px solid #E8F0EC;border-radius:16px;overflow:hidden;margin-top:4px;display:none;width:100%;}
 .q-panel.show{display:block;}
 .q-panel-header{padding:10px 14px 8px;border-bottom:1px solid #F0FAF4;display:flex;align-items:center;justify-content:space-between;}
@@ -352,10 +357,18 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .tmpl-card-btn{display:block;width:100%;padding:8px;background:#52B788;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:center;}
 .formula-text,.formula-chip,.code-block,pre,code{font-family:'DM Mono',monospace;}
 
-.cat-card-wide{background:#fff;border:1.5px solid #52B788;border-radius:16px;padding:14px 16px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:0;background:linear-gradient(135deg,#F0FAF4,#E8F8F0);}
+.cat-card-wide{border:1.5px solid #52B788;border-radius:16px;padding:14px 16px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:space-between;width:100%;background:linear-gradient(135deg,#3D9E72,#52B788);box-shadow:0 3px 12px rgba(61,158,114,0.25);}
+.cat-card-wide .cat-card-title{color:#fff;}
+.cat-card-wide .cat-card-sub{color:rgba(255,255,255,0.85);}
+.cat-card-wide-arrow{font-size:20px;color:rgba(255,255,255,0.8);font-weight:700;}
 .cat-card-wide:active{transform:scale(0.98);}
 .cat-card-wide-left{display:flex;align-items:center;gap:10px;}
 .cat-card-wide-arrow{font-size:20px;color:#52B788;font-weight:700;}
+
+.arg-blue{color:#4A90D9;font-weight:700;}
+.arg-orange{color:#E8843A;font-weight:700;}
+.arg-purple{color:#9B5DE5;font-weight:700;}
+.arg-green{color:#2E9E6B;font-weight:700;}
 </style>
 </head>
 <body>
@@ -524,30 +537,30 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
               <div class="welcome-title">Excel専門AIに質問しよう</div>
               <div class="welcome-sub">わからない操作・エラー・表作りまで<br>何でも日本語で聞くだけでOK</div>
               <div class="cat-grid">
-                <div class="cat-card" id="card-ops" onclick="togglePanel('ops')">
-                  <div class="cat-card-icon">🔧</div>
+                <div class="cat-card ops-card" id="card-ops" onclick="togglePanel('ops')">
+                  <div class="cat-card-icon">💻</div>
                   <div class="cat-card-title">使い方がわからない</div>
                   <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
                 </div>
-                <div class="cat-card" id="card-func" onclick="togglePanel('func')">
-                  <div class="cat-card-icon">💡</div>
+                <div class="cat-card func-card" id="card-func" onclick="togglePanel('func')">
+                  <div class="cat-card-icon">🔢</div>
                   <div class="cat-card-title">自動で計算させたい</div>
                   <div class="cat-card-sub">合計・検索・<br>条件分け</div>
                 </div>
-                <div class="cat-card" id="card-err" onclick="togglePanel('err')">
-                  <div class="cat-card-icon">🆘</div>
+                <div class="cat-card err-card" id="card-err" onclick="togglePanel('err')">
+                  <div class="cat-card-icon">⚠️</div>
                   <div class="cat-card-title">エラーが出て困っている</div>
                   <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
                 </div>
-                <div class="cat-card" id="card-pay" onclick="togglePanel('pay')">
-                  <div class="cat-card-icon">📄</div>
+                <div class="cat-card pay-card" id="card-pay" onclick="togglePanel('pay')">
+                  <div class="cat-card-icon">📋</div>
                   <div class="cat-card-title">書類・表を作りたい</div>
                   <div class="cat-card-sub">給料明細・請求書・<br>集計表</div>
                 </div>
               </div>
               <div class="cat-card-wide" id="card-tips" onclick="togglePanel('tips')">
                 <div class="cat-card-wide-left">
-                  <div class="cat-card-icon" style="font-size:20px;margin-bottom:0;">✨</div>
+                  <div style="font-size:26px;">⚡</div>
                   <div>
                     <div class="cat-card-title">知ると仕事が速くなる</div>
                     <div class="cat-card-sub" style="margin-top:2px;">ショートカット・時短ワザ・条件付き書式・オートフィル</div>
@@ -764,62 +777,104 @@ window.addEventListener('load', loadChatHistory);
 
 // ===== mock2 カードパネル =====
 var CAT_Q = {
-  tips:{
-    label:'✨ 知ると仕事が速くなる',
-    items:[
-      {icon:'⌨️', text:'Ctrl+Dで上のセルを一瞬コピー（オートフィルより速い）'},
-      {icon:'⌨️', text:'Ctrl+Shift+Lでフィルターを一発ON/OFF'},
-      {icon:'⌨️', text:'Alt+Shift+=で縦横の合計を一瞬で出す'},
-      {icon:'🎨', text:'条件付き書式で数値が高いセルを自動で色付けしたい'},
-      {icon:'📋', text:'オートフィルで連続した数字・日付を一気に入力したい'},
-      {icon:'🔒', text:'F4キーで絶対参照（$マーク）を一発で付ける方法'},
-      {icon:'📊', text:'ピボットテーブルで大量データを秒で集計したい'}
-    ]
-  },
   ops:{
-    label:'🔧 操作・設定でよく聞かれること',
+    label:'💻 使い方がわからない',
     items:[
-      {icon:'🖨️', text:'印刷範囲を設定したい'},
-      {icon:'🔒', text:'セルを編集できないようにしたい（シート保護）'},
-      {icon:'📌', text:'行・列を固定してスクロールしたい'},
-      {icon:'🔎', text:'文字を一括で置換したい'},
-      {icon:'📊', text:'グラフを見やすく作りたい'},
-      {icon:'⌨️', text:'よく使うショートカットキーを知りたい'}
+      {icon:'🖨️', text:'印刷すると変なところで切れる・余白がおかしい'},
+      {icon:'🔒', text:'他の人に触られたくないセルをロックしたい'},
+      {icon:'📌', text:'スクロールしても一番上の行が消えないようにしたい'},
+      {icon:'🔎', text:'この文字を全部別の言葉に一括で変えたい'},
+      {icon:'📊', text:'見やすいグラフをパパっと作りたい'},
+      {icon:'⌨️', text:'マウスを使わず素早く操作するコツを知りたい'}
     ]
   },
   func:{
-    label:'💡 よく使う関数・数式',
+    label:'🔢 自動で計算させたい',
     items:[
-      {icon:'🔍', text:'別の表から値を引っ張りたい（VLOOKUP）'},
-      {icon:'➕', text:'条件付きで合計したい（SUMIF）'},
-      {icon:'🔀', text:'条件で表示を変えたい（IF）'},
-      {icon:'🔢', text:'条件に合うセルを数えたい（COUNTIF）'},
-      {icon:'📊', text:'複数条件で集計したい（SUMIFS）'},
-      {icon:'🎂', text:'生年月日から年齢を自動計算したい'}
+      {icon:'🔍', text:'別のシートから名前や金額を自動で持ってきたい（VLOOKUP）'},
+      {icon:'➕', text:'東京だけ・Aさんだけなど特定の項目を合計したい（SUMIF）'},
+      {icon:'🔀', text:'点数が80以上なら合格・未満なら不合格と自動で表示したい（IF）'},
+      {icon:'🔢', text:'条件に合うものが何個あるか数えたい（COUNTIF）'},
+      {icon:'📊', text:'複数の条件で絞り込んで合計したい（SUMIFS）'},
+      {icon:'🎂', text:'生年月日から今の年齢を自動で計算したい'}
     ]
   },
   err:{
-    label:'❌ エラーの原因と直し方',
+    label:'⚠️ エラーが出て困っている',
     items:[
-      {icon:'❌', text:'#VALUE! エラーが出ています'},
-      {icon:'❌', text:'#N/A エラーを消したい（IFERROR）'},
-      {icon:'❌', text:'#REF! エラーが出ています'},
-      {icon:'⚠️', text:'数式が合ってるのに結果がおかしい'},
-      {icon:'🔄', text:'循環参照エラーが出ています'}
+      {icon:'❌', text:'#VALUE!って出て計算できない。どうすれば直る？'},
+      {icon:'❌', text:'#N/Aが出て邪魔。空白か0に変えたい（IFERROR）'},
+      {icon:'❌', text:'#REF!が出た。セルを消したら出てきた'},
+      {icon:'⚠️', text:'数式は合ってるはずなのに答えがおかしい'},
+      {icon:'🔄', text:'循環参照のエラーが出た。意味がわからない'}
     ]
   },
   pay:{
-    label:'📋 書類・管理表を作る',
+    label:'📋 書類・表を作りたい',
     items:[
-      {icon:'💰', text:'給料明細を作りたい'},
-      {icon:'📄', text:'請求書・見積書を作りたい'},
-      {icon:'🧾', text:'経費精算書を作りたい'},
-      {icon:'⏰', text:'勤怠管理表を作りたい'},
-      {icon:'📈', text:'売上管理表（目標達成率の自動計算）'},
-      {icon:'📦', text:'在庫管理表（発注点アラート付き）'}
+      {icon:'💰', text:'給料明細を作りたい。自動で計算されるやつ'},
+      {icon:'📄', text:'請求書・見積書をExcelで作りたい'},
+      {icon:'🧾', text:'経費精算書を作りたい。交通費・飲食費など'},
+      {icon:'⏰', text:'勤怠管理表を作りたい。残業時間も自動計算で'},
+      {icon:'📈', text:'売上管理表を作りたい。目標達成率も出したい'},
+      {icon:'📦', text:'在庫管理表を作りたい。在庫が減ったら警告が出るやつ'}
+    ]
+  },
+  tips:{
+    label:'⚡ 知ると仕事が速くなる',
+    items:[
+      {icon:'⌨️', text:'Ctrl+Dで上のセルを一瞬でコピーできる（オートフィルより速い）'},
+      {icon:'⌨️', text:'Alt+Shift+=で縦横の合計を一瞬で出す裏技'},
+      {icon:'🎨', text:'数値が高いセルを自動で赤くしたい（条件付き書式）'},
+      {icon:'📋', text:'連続した数字・日付を一気に入力する方法（オートフィル）'},
+      {icon:'🔒', text:'数式のズレを防ぐ$マークの使い方（F4キーで一発）'},
+      {icon:'📊', text:'大量データを秒で集計したい（ピボットテーブル）'},
+      {icon:'🔢', text:'0が勝手に消える・先頭の0を表示させたい'}
     ]
   }
 };
+
+
+function colorizeFormula(text) {
+  // 括弧・カンマを全角半角両対応で正規化してから色付け
+  var lp = '[\\(（]';
+  var rp = '[\\)）]';
+  var cm = '[,，]';
+  // VLOOKUP
+  var reVL = new RegExp('=VLOOKUP' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^,，]+)' + cm + '\\s*(FALSE|TRUE)\\s*' + rp, 'gi');
+  text = text.replace(reVL, function(m,a1,a2,a3,a4){
+    return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';
+  });
+  // SUMIF
+  var reSI = new RegExp('=SUMIF' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
+  text = text.replace(reSI, function(m,a1,a2,a3){
+    return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
+  });
+  // IF
+  var reIF = new RegExp('=IF' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
+  text = text.replace(reIF, function(m,a1,a2,a3){
+    return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
+  });
+  // COUNTIF
+  var reCI = new RegExp('=COUNTIF' + lp + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
+  text = text.replace(reCI, function(m,a1,a2){
+    return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
+  });
+  // 説明行：絵文字+**テキスト**を対応色に
+  var b = String.fromCodePoint(0x1F535);
+  var o = String.fromCodePoint(0x1F7E0);
+  var p = String.fromCodePoint(0x1F7E3);
+  var g = String.fromCodePoint(0x1F7E2);
+  var reB = new RegExp(b + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
+  var reO = new RegExp(o + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
+  var reP = new RegExp(p + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
+  var reG = new RegExp(g + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
+  text = text.replace(reB, b+' <span class="arg-blue">$1</span>');
+  text = text.replace(reO, o+' <span class="arg-orange">$1</span>');
+  text = text.replace(reP, p+' <span class="arg-purple">$1</span>');
+  text = text.replace(reG, g+' <span class="arg-green">$1</span>');
+  return text;
+}
 
 var currentCat = null;
 
@@ -981,7 +1036,7 @@ function addAIMsg(rawText, tsvData) {
   var formulaMatch = rawText.match(/`?(=[A-Z][^\n`]{2,80})`?/g);
   var formula = formulaMatch ? formulaMatch[0].replace(/`/g,'') : null;
   var hasTSV = tsvData && tsvData.trim().length > 0;
-  var html = rawText
+  var html = colorizeFormula(rawText)
     .replace(/```[\w]*\n?([\s\S]*?)```/g, '<div class="formula-block">$1</div>')
     .replace(/`([^`]+)`/g, '<span class="inline-code">$1</span>')
     .replace(/\n/g, '<br>');
@@ -1028,11 +1083,11 @@ function addAIMsg(rawText, tsvData) {
 
 function addAIMsgFallback(question) {
   var fallbacks = [
-    {kw:['vlookup'], text:'VLOOKUPは別の表から値を検索する関数です。', formula:'=VLOOKUP(検索値, 範囲, 列番号, FALSE)'},
-    {kw:['#n/a','エラー'], text:'#N/Aエラーは検索値が見つからないときに起きます。', formula:'=IFERROR(VLOOKUP(A2,B:D,2,FALSE),"")'},
-    {kw:['合計','sum'], text:'SUM関数で合計を計算できます。', formula:'=SUM(A1:A10)'},
-    {kw:['if','条件'], text:'IF関数で条件分岐できます。', formula:'=IF(A1>=80,"合格","不合格")'},
-    {kw:['平均','average'], text:'AVERAGE関数で平均を計算できます。', formula:'=AVERAGE(A1:A10)'},
+    {kw:['vlookup'], text:'社員番号を入れたら名前が自動で出てくる、あの便利な関数だよ。\n\n=VLOOKUP(A2,B1:D20,2,FALSE)\n\n🔵 **A2** → 「この番号で探して」って渡すマス\n🟠 **B1:D20** → 探しに行く名簿の範囲\n🟣 **2** → 名前・金額など取り出したいものが何列目か（社員番号の隣の名前なら2、その隣の電話番号なら3）\n🟢 **FALSE** → ここはそのままでOK', formula:'=VLOOKUP(A2,B1:D20,2,FALSE)'},
+    {kw:['#n/a','iferror'], text:'エラーが出たときに、代わりに空白や「-」を表示してくれる関数だよ。\n\n=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),\"\")\n\n🔵 **VLOOKUP(...)** → まず試してほしい数式\n🟠 **\"\"** → エラーのとき代わりに表示するもの', formula:'=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),\"\")'},
+    {kw:['合計','sum','sumif'], text:'「東京の売上だけ合計して」みたいな、条件をつけた足し算ができる関数だよ。\n\n=SUMIF(A1:A20,\"東京\",B1:B20)\n\n🔵 **A1:A20** → 条件が入ってる列\n🟠 **\"東京\"** → この文字が入ってる行だけ計算\n🟣 **B1:B20** → 足し算したい数字の列', formula:'=SUMIF(A1:A20,\"東京\",B1:B20)'},
+    {kw:['if','条件'], text:'「80点以上なら合格、それ以下なら不合格」を自動で判定してくれる関数だよ。\n\n=IF(A1>=80,\"合格\",\"不合格\")\n\n🔵 **A1>=80** → 判定する条件\n🟠 **\"合格\"** → 条件を満たしたときの言葉\n🟣 **\"不合格\"** → 条件を満たさなかったときの言葉', formula:'=IF(A1>=80,\"合格\",\"不合格\")'},
+    {kw:['平均','average'], text:'選んだ範囲の平均を自動で出してくれる関数だよ。\n\n=AVERAGE(A1:A20)\n\n🔵 **A1:A20** → 平均を出したい数字の範囲', formula:'=AVERAGE(A1:A20)'},
   ];
   var q = question.toLowerCase();
   var match = fallbacks.find(function(f){ return f.kw.some(function(k){ return q.includes(k); }); })
@@ -1041,7 +1096,7 @@ function addAIMsgFallback(question) {
   var div = document.createElement('div');
   div.className = 'msg ai';
   div.innerHTML = '<div class="msg-avatar">Ex</div>'
-    +'<div class="msg-bubble">'+match.text
+    +'<div class="msg-bubble">'+colorizeFormula(match.text).replace(/\n/g,'<br>')
     +(match.formula?'<div class="formula-block">'+match.formula+'</div>':'')
     +'<div class="msg-actions">'
     +(match.formula?'<button class="copy-btn" onclick="copyText(this,\''+match.formula+'\')">📋 コピー</button>':'')
