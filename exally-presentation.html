@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Exally プレゼンテーション</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans JP',sans-serif;}
+.deck{width:100%;height:100dvh;position:relative;overflow:hidden;}
+.slides{display:flex;height:100%;transition:transform 0.45s cubic-bezier(.4,0,.2,1);}
+.slide{min-width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:52px 28px 40px;text-align:center;position:relative;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;gap:4px;padding:env(safe-area-inset-top,12px) 16px 10px;}
+.prog-dot{flex:1;height:3px;border-radius:2px;background:rgba(82,183,136,0.2);transition:background 0.3s;}
+.prog-dot.done{background:#52B788;}
+.slide-num{position:fixed;bottom:max(16px,env(safe-area-inset-bottom));right:16px;font-size:12px;color:#3D9E72;z-index:100;font-family:'DM Mono',monospace;background:rgba(255,255,255,0.9);padding:4px 10px;border-radius:20px;font-weight:500;}
+.mint{background:linear-gradient(150deg,#3D9E72 0%,#52B788 100%);}
+.mint .c1{position:absolute;width:280px;height:280px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);top:-80px;right:-80px;}
+.mint .c2{position:absolute;width:180px;height:180px;border-radius:50%;border:1px solid rgba(255,255,255,0.08);bottom:-50px;left:-50px;}
+.tag-w{font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:14px;color:rgba(255,255,255,0.65);}
+.title-w{font-weight:900;color:white;line-height:1.4;}
+.feat{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:11px;text-align:left;width:100%;max-width:340px;}
+.feat-i{font-size:20px;flex-shrink:0;margin-top:1px;}
+.feat-t{font-size:13px;color:white;font-weight:700;margin-bottom:2px;}
+.feat-s{font-size:10px;color:rgba(255,255,255,0.72);line-height:1.4;}
+.white{background:#F4F7F5;}
+.tag-g{font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:14px;color:#52B788;}
+.title-g{font-weight:900;color:#1A2B22;line-height:1.4;}
+.s1-logo{font-family:'DM Mono',monospace;font-size:58px;font-weight:500;color:white;letter-spacing:-2px;line-height:1;margin-bottom:6px;}
+.s1-ja{font-size:13px;color:rgba(255,255,255,0.55);letter-spacing:4px;margin-bottom:36px;}
+.s1-line{width:36px;height:2px;background:rgba(255,255,255,0.35);border-radius:2px;margin:0 auto 20px;}
+.s1-name{font-size:19px;font-weight:700;color:white;margin-bottom:5px;}
+.s1-co{font-size:12px;color:rgba(255,255,255,0.55);letter-spacing:1px;}
+.s2-title{font-size:21px;margin-bottom:20px;}
+.s2-title span{color:#52B788;}
+.s2-row{background:white;border-radius:13px;padding:13px 15px;border-left:3px solid #C8ECD8;display:flex;align-items:flex-start;gap:11px;margin-bottom:9px;text-align:left;width:100%;max-width:340px;}
+.s2-row.hl{border-left-color:#52B788;}
+.s2-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.s2-text{font-size:13px;color:#2E4038;line-height:1.6;}
+.s2-text strong{color:#3D9E72;}
+.s3-title{font-size:20px;margin-bottom:14px;}
+.s3-feats{display:flex;flex-direction:column;gap:8px;width:100%;}
+.s4-title{font-size:20px;margin-bottom:16px;}
+.s4-example{background:white;border-radius:13px;padding:13px 15px;border:1.5px solid #C8ECD8;text-align:left;width:100%;max-width:340px;margin-bottom:9px;}
+.s4-label{font-size:10px;color:#7A9A87;letter-spacing:1px;margin-bottom:8px;}
+.s4-msg{font-size:13px;font-weight:700;color:#1A2B22;line-height:1.6;background:#F0FAF4;border-radius:8px;padding:9px 11px;}
+.s4-arrow{font-size:16px;color:#7A9A87;margin:4px 0;}
+.s4-result{display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;}
+.s4-r{display:flex;align-items:center;gap:8px;font-size:12px;color:#2E4038;background:white;border-radius:10px;padding:9px 12px;border:1px solid #D4EDE1;}
+.s4-r span{color:#52B788;font-size:14px;flex-shrink:0;}
+.s4-note{font-size:11px;color:#7A9A87;margin-top:6px;text-align:center;width:100%;max-width:340px;}
+.s5-title{font-size:20px;margin-bottom:16px;}
+.s5-big{font-family:'DM Mono',monospace;font-size:56px;font-weight:500;color:white;line-height:1;margin-bottom:4px;}
+.s5-big-sub{font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:16px;}
+.s5-cards{display:flex;flex-direction:column;gap:8px;width:100%;}
+.s5-card{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;text-align:left;}
+.s5-ci{font-size:18px;flex-shrink:0;}
+.s5-ct{font-size:12px;color:white;line-height:1.5;}
+.s5-ct strong{font-weight:700;}
+.s6-title{font-size:20px;margin-bottom:16px;}
+.s6-box{background:white;border-radius:22px;padding:22px 20px;width:100%;max-width:310px;border:2px solid #C8ECD8;box-shadow:0 8px 28px rgba(82,183,136,0.12);}
+.s6-num{font-family:'DM Mono',monospace;font-size:54px;font-weight:500;color:#3D9E72;line-height:1;}
+.s6-u{font-size:13px;color:#7A9A87;margin-bottom:3px;}
+.s6-m{font-size:12px;color:#7A9A87;margin-bottom:14px;}
+.s6-div{width:100%;height:1px;background:#D4EDE1;margin-bottom:12px;}
+.s6-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;text-align:left;}
+.s6-ck{color:#52B788;font-size:14px;flex-shrink:0;}
+.s6-rt{font-size:12px;color:#2E4038;}
+.s6-free{background:#F0FAF4;border-radius:9px;padding:9px;margin-top:10px;font-size:12px;font-weight:700;color:#3D9E72;text-align:center;}
+.s7-title{font-size:20px;margin-bottom:6px;}
+.s7-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:14px;line-height:1.6;}
+.s7-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-bottom:10px;}
+.s7-item{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 10px;text-align:left;}
+.s7-ii{font-size:20px;margin-bottom:5px;}
+.s7-it{font-size:12px;font-weight:700;color:white;margin-bottom:2px;}
+.s7-id{font-size:10px;color:rgba(255,255,255,0.68);line-height:1.4;}
+.s7-vis{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 14px;width:100%;max-width:340px;text-align:left;}
+.s7-vis-t{font-size:12px;color:white;line-height:1.7;}
+.s8-btn{display:block;width:100%;max-width:310px;background:#52B788;color:white;text-decoration:none;border-radius:15px;padding:20px;text-align:center;box-shadow:0 4px 20px rgba(82,183,136,0.32);margin-bottom:16px;}
+.s8-bm{font-size:17px;font-weight:700;}
+.s8-sign{font-size:11px;color:#7A9A87;line-height:1.9;}
+.s8-sign strong{color:#1A2B22;}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="slide-num" id="slideNum">1 / 8</div>
+<div class="deck" id="deck">
+  <div class="slides" id="slides">
+    <div class="slide mint">
+      <div class="c1"></div><div class="c2"></div>
+      <div class="s1-logo">Exally</div>
+      <div class="s1-ja">エクサリー</div>
+      <div class="s1-line"></div>
+      <div class="s1-name">矢野 司</div>
+      <div class="s1-co">合同会社ZEROact</div>
+    </div>
+    <div class="slide white">
+      <div class="tag-g">MY STORY</div>
+      <h2 class="title-g s2-title">これは、<span>私自身の体験</span>から<br>始まりました。</h2>
+      <div class="s2-row hl"><div class="s2-icon">💻</div><div class="s2-text">パソコンすら触ったことがなかった私が、仕事でExcelを使わないといけなくなった。</div></div>
+      <div class="s2-row"><div class="s2-icon">😓</div><div class="s2-text">テンプレートもない。聞ける人もいない。<strong>AIに聞きながら表を一つ作るのに何時間もかかった。</strong></div></div>
+      <div class="s2-row"><div class="s2-icon">💡</div><div class="s2-text"><strong>テンプレートがあれば、パッと聞ける場所があれば</strong>——それだけで全然違う。そう思った。</div></div>
+    </div>
+    <div class="slide mint">
+      <div class="c1"></div><div class="c2"></div>
+      <div class="tag-w">SOLUTION</div>
+      <h2 class="title-w s3-title">だから作りました。<br>Excel専門AI「Exally」。</h2>
+      <div class="s3-feats">
+        <div class="feat"><div class="feat-i">💬</div><div><div class="feat-t">日本語で即解決</div><div class="feat-s">関数・エラー・VBA、そのまま話しかけるだけ</div></div></div>
+        <div class="feat"><div class="feat-i">🧾</div><div><div class="feat-t">テンプレートを即生成</div><div class="feat-s">業種・項目を伝えるだけで自分専用のフォーマットが完成</div></div></div>
+        <div class="feat"><div class="feat-i">💰</div><div><div class="feat-t">税務・給与計算サポート</div><div class="feat-s">雇用保険・所得税・社会保険料の自動計算まで対応</div></div></div>
+        <div class="feat"><div class="feat-i">📚</div><div><div class="feat-t">使うほど賢くなる</div><div class="feat-s">マイ数式帳・クイズ機能で自分だけの辞書に</div></div></div>
+      </div>
+    </div>
+    <div class="slide white">
+      <div class="tag-g">TEMPLATE</div>
+      <h2 class="title-g s4-title">業種・項目を伝えるだけで<br>数式ごと生成。</h2>
+      <div class="s4-example">
+        <div class="s4-label">AIへの指示（例）</div>
+        <div class="s4-msg">「飲食店の給与明細を作って。<br>基本給・残業代・雇用保険・所得税・<br>社会保険料を自動計算で」</div>
+      </div>
+      <div class="s4-arrow">↓</div>
+      <div class="s4-result">
+        <div class="s4-r"><span>✓</span>雇用保険・所得税・社会保険料の計算数式を生成</div>
+        <div class="s4-r"><span>✓</span>残業代・深夜手当も法定通りの数式で</div>
+        <div class="s4-r"><span>✓</span>Excelに貼り付けて数値を入れるだけで計算完了</div>
+      </div>
+      <div class="s4-note">請求書・勤怠管理・売上管理・経費精算も同様に作れます</div>
+    </div>
+    <div class="slide mint">
+      <div class="c1"></div><div class="c2"></div>
+      <div class="tag-w">MARKET</div>
+      <h2 class="title-w s5-title">同じ悩みを持つ人が<br>日本中にいます。</h2>
+      <div class="s5-big">3,000万人</div>
+      <div class="s5-big-sub">日本のExcelユーザー数（推計）</div>
+      <div class="s5-cards">
+        <div class="s5-card"><div class="s5-ci">🏢</div><div class="s5-ct">中小企業の事務・経理担当者の多くが<strong>Excelを独学</strong>で使っている</div></div>
+        <div class="s5-card"><div class="s5-ci">📊</div><div class="s5-ct">税理士・専門業者に頼むと高額。<strong>¥43/日のAIサポート</strong>は圧倒的に安い</div></div>
+        <div class="s5-card"><div class="s5-ci">🚀</div><div class="s5-ct">インボイス・電子帳簿など<strong>税務改正</strong>でExcel需要はさらに拡大中</div></div>
+      </div>
+    </div>
+    <div class="slide white">
+      <div class="tag-g">PRICING</div>
+      <h2 class="title-g s6-title">1日43円。<br>それだけで変わります。</h2>
+      <div class="s6-box">
+        <div class="s6-num">¥43</div>
+        <div class="s6-u">/ 日</div>
+        <div class="s6-m">月額 ¥1,280（税込）</div>
+        <div class="s6-div"></div>
+        <div class="s6-row"><span class="s6-ck">✓</span><span class="s6-rt">AIチャット無制限</span></div>
+        <div class="s6-row"><span class="s6-ck">✓</span><span class="s6-rt">インボイス対応テンプレート</span></div>
+        <div class="s6-row"><span class="s6-ck">✓</span><span class="s6-rt">給与・税務・勤怠テンプレート</span></div>
+        <div class="s6-row"><span class="s6-ck">✓</span><span class="s6-rt">雇用保険・所得税の自動計算</span></div>
+        <div class="s6-row"><span class="s6-ck">✓</span><span class="s6-rt">VBA・マクロ生成</span></div>
+        <div class="s6-free">✦ まず14日間、完全無料でお試し</div>
+      </div>
+    </div>
+    <div class="slide mint">
+      <div class="c1"></div><div class="c2"></div>
+      <div class="tag-w">NEXT VISION</div>
+      <h2 class="title-w s7-title">Exallyは、その第一歩。<br>私が本当にやりたいこと。</h2>
+      <div class="s7-sub">今治市の全店舗・観光地・イベントを<br>繋ぐサービスを作りたい。</div>
+      <div class="s7-grid">
+        <div class="s7-item"><div class="s7-ii">🏪</div><div class="s7-it">全店舗が対象</div><div class="s7-id">スーパー・薬局・飲食店・広告出店舗まで</div></div>
+        <div class="s7-item"><div class="s7-ii">🎪</div><div class="s7-it">イベント情報</div><div class="s7-id">今治市のイベントをリアルタイムで</div></div>
+        <div class="s7-item"><div class="s7-ii">🗺️</div><div class="s7-it">GPS経路案内</div><div class="s7-id">観光客も地元民も使いやすい</div></div>
+        <div class="s7-item"><div class="s7-ii">📅</div><div class="s7-it">毎日更新</div><div class="s7-id">セール・新着情報を随時反映</div></div>
+      </div>
+      <div class="s7-vis">
+        <div class="s7-vis-t">「ゼロから始まる、無限の可能性。」<br><span style="font-size:10px;font-weight:400;opacity:0.85;">全く新しいことをゼロから始めて、限界を設けずに挑戦し続ける企業の姿勢を表しています。</span></div>
+      </div>
+    </div>
+    <div class="slide white">
+      <a href="https://gleaming-horse-3d7a39.netlify.app/index4.html" class="s8-btn">
+        <div class="s8-bm">今すぐ試してみる →</div>
+      </a>
+      <div class="s8-sign">
+        <strong>矢野 司</strong>｜合同会社ZEROact<br>
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="354f50475a54564107011b02070c755a4041595a5a5e1b565a58">[email&#160;protected]</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const slides=document.getElementById('slides');
+const deck=document.getElementById('deck');
+const total=8;
+let current=0,startX=0,isDragging=false;
+const prog=document.getElementById('progress');
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='prog-dot';prog.appendChild(d);}
+function goTo(n){
+  if(n<0||n>=total)return;
+  current=n;
+  slides.style.transform=`translateX(-${current*100}%)`;
+  document.querySelectorAll('.prog-dot').forEach((d,i)=>d.classList.toggle('done',i<=current));
+  document.getElementById('slideNum').textContent=`${current+1} / ${total}`;
+}
+deck.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;isDragging=true;},{passive:true});
+deck.addEventListener('touchend',e=>{
+  if(!isDragging)return;
+  const diff=startX-e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50){if(diff>0)goTo(current+1);else goTo(current-1);}
+  isDragging=false;
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')goTo(current+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')

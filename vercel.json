@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/.netlify/functions/claude", "destination": "/api/claude" },
+    { "source": "/api/claude", "destination": "/api/claude" },
+    { "source": "/", "destination": "/index6.html" },
+    { "source": "/index.html", "destination": "/index6.html" }
+  ]
+}
