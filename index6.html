@@ -369,6 +369,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .arg-orange{color:#E8843A;font-weight:700;}
 .arg-purple{color:#9B5DE5;font-weight:700;}
 .arg-green{color:#2E9E6B;font-weight:700;}
+
+.memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;}
+@media(min-width:769px){.memory-bar{padding:4px 0 6px;}}
 </style>
 </head>
 <body>
@@ -468,6 +471,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             <div class="hero-cta-price">¥43<span>/日</span></div>
             <div class="hero-cta-copy">Excelの疑問を今すぐ解決しましょう。<br>日本語でそのまま質問できます。</div>
             <button class="hero-cta-btn">AIに質問する →</button>
+            </div>
           </div>
           <div class="social-proof">
             <div class="sp-avatars">
@@ -580,7 +584,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
           </div>
-          <div class="chat-input-wrap">
+          <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
+            <div class="memory-bar" id="memoryBar">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</div>
+            <div style="display:flex;gap:9px;align-items:flex-end;">
             <textarea class="chat-input" id="msgInput" placeholder="例：印刷範囲の設定方法は？　給料明細を作りたい" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
             <button class="send-btn" id="sendBtn" onclick="sendMessage()">
               <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -835,6 +841,13 @@ var CAT_Q = {
 };
 
 
+
+function updateMemoryBar(){
+  var bar = document.getElementById('memoryBar');
+  if(!bar) return;
+  var msg = talkCount === 0 ? 'まだ話してないよ' : talkCount+'回話したね';
+  bar.textContent = '✨ 直近20回分覚えてるよ　💬 '+msg;
+}
 function colorizeFormula(text) {
   // 括弧・カンマを全角半角両対応で正規化してから色付け
   var lp = '[\\(（]';
@@ -877,6 +890,8 @@ function colorizeFormula(text) {
 }
 
 var currentCat = null;
+var chatHistory = [];
+var talkCount = 0;
 
 function togglePanel(cat) {
   if (currentCat === cat) { closePanel(); return; }
@@ -994,12 +1009,17 @@ async function sendMessage() {
   try {
     var response = await fetch('/api/claude', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({message:text})
+      body: JSON.stringify({message:text, history:chatHistory})
     });
     removeTyping(typingId);
     if(!response.ok) throw new Error('API error');
     var data = await response.json();
     addAIMsg(data.text, data.tsv||'');
+    chatHistory.push({role:'user',content:text});
+    chatHistory.push({role:'assistant',content:data.text});
+    if(chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
+    talkCount++;
+    updateMemoryBar();
   } catch(err) {
     removeTyping(typingId);
     addAIMsgFallback(text);
