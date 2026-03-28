@@ -13,6 +13,8 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 - 初心者でも理解できるよう、簡潔に説明する
 - セル結合の提案は禁止
 - 表やテンプレートを作る場合は必ずTSV形式でも出力する
+- Markdownのテーブル（|---|）・見出し（##）・箇条書き記号（-・*）は使わない
+- 説明は全て文章・会話形式で書く
 
 【説明スタイルのルール】
 - 専門用語は必ず日常語で言い換える（例：「垂直検索」→「名簿から名前を探してくる」）
@@ -32,7 +34,7 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 
 🔵 A2 → 「この番号で探して」って渡すマス。例えば社員番号が入ってるA2
 🟠 B1:D20 → 探しに行く名簿や一覧表。B1からD20をドラッグして選んだ範囲
-🟣 2 → 見つけた行の何列目を持ってくるか。名前が2列目なら2、電話番号が3列目なら3
+🟣 2 → 名前・金額など取り出したいものが何列目か（社員番号の隣の名前なら2、その隣の電話番号なら3）
 🟢 FALSE → ここはそのままでOK。ぴったり同じものだけ探してくれる
 
 💡 迷ったらFALSEはそのまま残しておけば大丈夫
@@ -96,22 +98,15 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 - 消費税: 10%（標準）/ 8%（軽減）`;
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const { message } = req.body || {};
-
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'message is required', text: '', tsv: '' });
     }
@@ -136,14 +131,12 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error('Claude API error:', err);
-
     let errorText = '申し訳ありません。エラーが発生しました。しばらくしてから再度お試しください。';
     if (err.status === 401 || (err.message && err.message.includes('API key'))) {
-      errorText = 'APIキーが設定されていません。VercelのEnvironment VariablesにANTHROPIC_API_KEYを設定してください。';
+      errorText = 'APIキーが設定されていません。';
     } else if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT') {
       errorText = '接続がタイムアウトしました。もう一度お試しください。';
     }
-
     return res.status(200).json({ text: errorText, tsv: '' });
   }
 };
