@@ -977,6 +977,14 @@ function copyTSV(btn, msgId) {
   });
 }
 
+function addMsg(role, text){
+  var area = document.getElementById('chatArea');
+  var div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = '<div class="msg-avatar">'+(role==='ai'?'Ex':'矢')+'</div><div class="msg-bubble">'+text+'</div>';
+  area.appendChild(div); area.scrollTop = area.scrollHeight;
+}
+
 function addAIMsg(rawText, tsvData) {
   var area = document.getElementById('chatArea');
   var div = document.createElement('div');
