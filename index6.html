@@ -175,16 +175,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .quick-btns{display:flex;flex-direction:column;gap:8px;max-width:480px;margin:0 auto;}
 .quick-btn{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 12px;font-size:12px;color:#2E4038;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;font-weight:500;transition:all 0.18s;}
 .quick-btn:hover{background:#F0FAF4;border-color:#52B788;}
-.ptab-wrap{width:100%;max-width:480px;margin:0 auto;max-height:220px;overflow-y:auto;padding:0 16px;}
-.ptab-nav{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
-.ptab-nav::-webkit-scrollbar{display:none;}
-.ptab-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid #D4EDE1;background:#fff;font-size:12px;font-weight:700;color:#7A9A87;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;white-space:nowrap;}
-.ptab-btn.active{background:#52B788;border-color:#52B788;color:white;}
-.ptab-btn:hover:not(.active){background:#F0FAF4;border-color:#52B788;color:#3D9E72;}
-.ptab-panel{display:none;}
-.ptab-panel.active{display:flex;flex-direction:column;gap:8px;}
-.ptab-label{font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:4px;padding:0 2px;}
-.ptab-note{font-size:10px;color:#B0C4BA;padding:6px 2px;line-height:1.6;}
 .msg{display:flex;gap:9px;align-items:flex-end;max-width:85%;}
 .msg.user{flex-direction:row-reverse;align-self:flex-end;}
 .msg.ai{align-self:flex-start;}
@@ -361,6 +351,11 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .tmpl-card-tag.hot{border-color:#C8ECD8;color:#3D9E72;background:#F0FAF4;}
 .tmpl-card-btn{display:block;width:100%;padding:8px;background:#52B788;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:center;}
 .formula-text,.formula-chip,.code-block,pre,code{font-family:'DM Mono',monospace;}
+
+.cat-card-wide{background:#fff;border:1.5px solid #52B788;border-radius:16px;padding:14px 16px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:0;background:linear-gradient(135deg,#F0FAF4,#E8F8F0);}
+.cat-card-wide:active{transform:scale(0.98);}
+.cat-card-wide-left{display:flex;align-items:center;gap:10px;}
+.cat-card-wide-arrow{font-size:20px;color:#52B788;font-weight:700;}
 </style>
 </head>
 <body>
@@ -531,24 +526,34 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
               <div class="cat-grid">
                 <div class="cat-card" id="card-ops" onclick="togglePanel('ops')">
                   <div class="cat-card-icon">🔧</div>
-                  <div class="cat-card-title">操作・設定</div>
-                  <div class="cat-card-sub">印刷・保護・<br>ショートカット</div>
+                  <div class="cat-card-title">使い方がわからない</div>
+                  <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
                 </div>
                 <div class="cat-card" id="card-func" onclick="togglePanel('func')">
                   <div class="cat-card-icon">💡</div>
-                  <div class="cat-card-title">関数・数式</div>
-                  <div class="cat-card-sub">VLOOKUP・IF・<br>SUMIF など</div>
+                  <div class="cat-card-title">自動で計算させたい</div>
+                  <div class="cat-card-sub">合計・検索・<br>条件分け</div>
                 </div>
                 <div class="cat-card" id="card-err" onclick="togglePanel('err')">
-                  <div class="cat-card-icon">❌</div>
-                  <div class="cat-card-title">エラー解決</div>
-                  <div class="cat-card-sub">#VALUE! #N/A<br>などを即解決</div>
+                  <div class="cat-card-icon">🆘</div>
+                  <div class="cat-card-title">エラーが出て困っている</div>
+                  <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
                 </div>
                 <div class="cat-card" id="card-pay" onclick="togglePanel('pay')">
-                  <div class="cat-card-icon">📋</div>
-                  <div class="cat-card-title">書類・管理表</div>
-                  <div class="cat-card-sub">明細・請求書・<br>集計表を作成</div>
+                  <div class="cat-card-icon">📄</div>
+                  <div class="cat-card-title">書類・表を作りたい</div>
+                  <div class="cat-card-sub">給料明細・請求書・<br>集計表</div>
                 </div>
+              </div>
+              <div class="cat-card-wide" id="card-tips" onclick="togglePanel('tips')">
+                <div class="cat-card-wide-left">
+                  <div class="cat-card-icon" style="font-size:20px;margin-bottom:0;">✨</div>
+                  <div>
+                    <div class="cat-card-title">知ると仕事が速くなる</div>
+                    <div class="cat-card-sub" style="margin-top:2px;">ショートカット・時短ワザ・条件付き書式・オートフィル</div>
+                  </div>
+                </div>
+                <div class="cat-card-wide-arrow">›</div>
               </div>
               <div class="q-panel" id="qPanel">
                 <div class="q-panel-header">
@@ -558,62 +563,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
                 <div class="q-list" id="qList"></div>
               </div>
             </div>
-          </div>
-          <div class="ptab-wrap">
-            <div class="ptab-nav">
-              <button class="ptab-btn active" onclick="switchPTab('func',event)">💡 関数</button>
-              <button class="ptab-btn" onclick="switchPTab('err',event)">❌ エラー</button>
-              <button class="ptab-btn" onclick="switchPTab('ops',event)">🔧 操作・設定</button>
-              <button class="ptab-btn" onclick="switchPTab('pay',event)">💰 経費・書類</button>
-              <button class="ptab-btn" onclick="switchPTab('tax',event)">📋 税務・申告</button>
-              <button class="ptab-btn" onclick="switchPTab('biz',event)">📊 売上・管理</button>
-            </div>
-            <div class="ptab-panel active" id="ptab-func">
-              <div class="ptab-label">よく使う関数・検索数上位<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">数式をそのまま生成します</span></div>
-              <button class="quick-btn" onclick="sendQuick('別の表から商品名に対応する価格を自動で引っ張りたい。VLOOKUPかXLOOKUPで教えて。具体的な数式も書いて')">🔍 別の表から値を引っ張りたい（VLOOKUP）</button>
-              <button class="quick-btn" onclick="sendQuick('条件に合うデータだけを合計したい。例えば「東京」の売上だけ合計する方法をSUMIFで教えて。数式も書いて')">➕ 条件付きで合計したい（SUMIF）</button>
-              <button class="quick-btn" onclick="sendQuick('点数が80以上なら「合格」未満なら「不合格」と表示したい。IF関数の使い方を教えて。数式も書いて')">🔀 条件で表示を変えたい（IF）</button>
-              <button class="quick-btn" onclick="sendQuick('A列が「済」のセルだけ個数を数えたい。COUNTIFの使い方を数式付きで教えて')">🔢 条件に合うセルを数えたい（COUNTIF）</button>
-              <button class="quick-btn" onclick="sendQuick('複数条件でSUMIFSを使いたい。例えば「東京」かつ「A商品」の売上合計を出す数式を教えて')">📊 複数条件で集計したい（SUMIFS）</button>
-              <button class="quick-btn" onclick="sendQuick('生年月日から今日時点の年齢を自動計算したい。DATEDIF関数の使い方と数式を教えて')">🎂 生年月日から年齢を自動計算したい</button>
-            </div>
-            <div class="ptab-panel" id="ptab-err">
-              <div class="ptab-label">エラーの原因と直し方<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">原因を調べて即解決</span></div>
-              <button class="quick-btn" onclick="sendQuick('#VALUE!エラーが出て計算できません。原因と直し方を教えてください')">❌ #VALUE! エラーが出ています</button>
-              <button class="quick-btn" onclick="sendQuick('#N/Aエラーが出ています。VLOOKUPで検索しているのですがIFERRORで空白にする方法を数式付きで教えて')">❌ #N/A エラーを消したい（IFERROR）</button>
-              <button class="quick-btn" onclick="sendQuick('#REF!エラーが出ています。セルを削除したら出てきました。直し方を教えてください')">❌ #REF! エラーが出ています</button>
-              <button class="quick-btn" onclick="sendQuick('数式は合っているのに計算結果がおかしい。セルが文字列になっているかもしれない。確認と修正方法を教えて')">⚠️ 数式が合ってるのに結果がおかしい</button>
-              <button class="quick-btn" onclick="sendQuick('循環参照のエラーが出ています。原因と解決方法を教えてください')">🔄 循環参照エラーが出ています</button>
-            </div>
-            <div class="ptab-panel" id="ptab-pay">
-              <div class="ptab-label">書類・テンプレを作る<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">業務書類をAIが自動作成</span></div>
-              <button class="quick-btn" onclick="switchTab('template')" style="border-left:3px solid #3D9E72;color:#2E7D54;font-weight:700;">📋 テンプレートから作る → 給料明細・請求書</button>
-              <button class="quick-btn" onclick="sendQuick('経費精算書を作って。日付・品目・交通費・宿泊費・飲食費・その他・合計を含めて自動計算で。TSV形式で出力して')">🧾 経費精算書（交通費・宿泊・飲食）</button>
-              <button class="quick-btn" onclick="sendQuick('勤怠管理表を作って。出勤時間・退勤時間・休憩時間・実働時間・残業時間の列を含めて自動計算で。TSV形式で出力して')">⏰ 勤怠管理表（残業の自動計算）</button>
-            </div>
-            <div class="ptab-panel" id="ptab-tax">
-              <div class="ptab-label">確定申告・税務の集計準備に<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">申告書類の集計表を即生成</span></div>
-              <button class="quick-btn" onclick="sendQuick('医療費控除の集計表を作って。家族全員分の医療費明細（病院名・金額・支払日）と年間合計の自動計算で。TSV形式で出力して')">🏥 医療費控除の集計表（確定申告用）</button>
-              <button class="quick-btn" onclick="sendQuick('フリーランス向けの年間収支管理表を作って。月別の売上・経費・利益と科目別集計で。TSV形式で出力して')">📝 年間収支管理表（確定申告対応）</button>
-              <button class="quick-btn" onclick="sendQuick('個人事業主の経費帳を作って。日付・勘定科目・内容・金額・インボイス登録番号の列を含めて科目別自動集計で。TSV形式で出力して')">🗂 経費帳（インボイス対応・科目別集計）</button>
-              <button class="quick-btn" onclick="sendQuick('源泉徴収票の確認用Excelを作って。給与総額・社会保険料・所得税額を入力して課税所得と還付予測金額を自動計算で。TSV形式で出力して')">📄 源泉徴収票の確認・還付予測シート</button>
-            </div>
-            <div class="ptab-panel" id="ptab-biz">
-              <div class="ptab-label">日常業務の管理表を即生成<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">売上・在庫・進捗管理に</span></div>
-              <button class="quick-btn" onclick="sendQuick('月別の売上管理表を作って。商品名・単価・数量・売上・目標・達成率の列を含めて達成率は自動計算で。TSV形式で出力して')">📈 売上管理表（目標達成率の自動計算）</button>
-              <button class="quick-btn" onclick="sendQuick('在庫管理表を作って。商品名・入庫数・出庫数・現在庫・発注点の列を含めて現在庫は自動計算で。在庫が発注点を下回ったら警告表示で。TSV形式で出力して')">📦 在庫管理表（発注点アラート付き）</button>
-              <button class="quick-btn" onclick="sendQuick('プロジェクト進捗管理表を作って。タスク名・担当者・開始日・終了予定日・進捗率・ステータスの列を含めて。TSV形式で出力して')">✅ プロジェクト進捗管理表</button>
-            </div>
-            <div class="ptab-panel" id="ptab-ops">
-              <div class="ptab-label">よく使う操作・設定方法<span style="font-size:10px;font-weight:400;color:#7A9A87;margin-left:6px;">困ったらここから聞いてみよう</span></div>
-              <button class="quick-btn" onclick="sendQuick('Excelで印刷範囲を設定する方法を教えてください。特定のセル範囲だけ印刷したいです')">🖨️ 印刷範囲を設定したい</button>
-              <button class="quick-btn" onclick="sendQuick('Excelで特定のセルや行・列を編集できないようにロックしたい。シート保護の設定方法を教えてください')">🔒 セルを編集できないようにしたい（シート保護）</button>
-              <button class="quick-btn" onclick="sendQuick('Excelでスクロールしても見出し行・列が常に表示されるように固定したい。ウィンドウ枠の固定の方法を教えてください')">📌 行・列を固定してスクロールしたい</button>
-              <button class="quick-btn" onclick="sendQuick('Excelで特定の文字を別の文字に一括で置換したい。置換の使い方を教えてください')">🔎 文字を一括で置換したい</button>
-              <button class="quick-btn" onclick="sendQuick('Excelで見やすいグラフを作る方法を教えてください。棒グラフや折れ線グラフの基本的な作り方と見栄えをよくするコツも教えて')">📊 グラフを見やすく作りたい</button>
-              <button class="quick-btn" onclick="sendQuick('Excelのショートカットキーでよく使う便利なものを教えてください。コピー・貼り付け以外も知りたいです')">⌨️ よく使うショートカットキーを知りたい</button>
-            </div>
-          </div>
           <div class="limit-banner" id="limitBanner">
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
@@ -815,6 +764,18 @@ window.addEventListener('load', loadChatHistory);
 
 // ===== mock2 カードパネル =====
 var CAT_Q = {
+  tips:{
+    label:'✨ 知ると仕事が速くなる',
+    items:[
+      {icon:'⌨️', text:'Ctrl+Dで上のセルを一瞬コピー（オートフィルより速い）'},
+      {icon:'⌨️', text:'Ctrl+Shift+Lでフィルターを一発ON/OFF'},
+      {icon:'⌨️', text:'Alt+Shift+=で縦横の合計を一瞬で出す'},
+      {icon:'🎨', text:'条件付き書式で数値が高いセルを自動で色付けしたい'},
+      {icon:'📋', text:'オートフィルで連続した数字・日付を一気に入力したい'},
+      {icon:'🔒', text:'F4キーで絶対参照（$マーク）を一発で付ける方法'},
+      {icon:'📊', text:'ピボットテーブルで大量データを秒で集計したい'}
+    ]
+  },
   ops:{
     label:'🔧 操作・設定でよく聞かれること',
     items:[
@@ -865,7 +826,7 @@ var currentCat = null;
 function togglePanel(cat) {
   if (currentCat === cat) { closePanel(); return; }
   currentCat = cat;
-  document.querySelectorAll('#welcomeMsg .cat-card').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelectorAll('#welcomeMsg .cat-card, #welcomeMsg .cat-card-wide').forEach(function(c){ c.classList.remove('active'); });
   var cardEl = document.getElementById('card-' + cat);
   if (cardEl) cardEl.classList.add('active');
   var panel = document.getElementById('qPanel');
@@ -885,23 +846,13 @@ function togglePanel(cat) {
 
 function closePanel() {
   currentCat = null;
-  document.querySelectorAll('#welcomeMsg .cat-card').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelectorAll('#welcomeMsg .cat-card, #welcomeMsg .cat-card-wide').forEach(function(c){ c.classList.remove('active'); });
   var panel = document.getElementById('qPanel');
   if (panel) panel.classList.remove('show');
 }
 
-function setQ(text) {
-  document.getElementById('msgInput').value = text;
-  document.getElementById('msgInput').focus();
-}
+function setQ(text) { sendQuick(text); }
 
-function switchPTab(id, e) {
-  document.querySelectorAll('.ptab-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.ptab-btn').forEach(function(b){ b.classList.remove('active'); });
-  var panel = document.getElementById('ptab-' + id);
-  if(panel) panel.classList.add('active');
-  if(e && e.currentTarget) e.currentTarget.classList.add('active');
-}
 
 function obNext() {
   if(obSlide === 2){ skipOnboarding(); return; }
@@ -977,14 +928,7 @@ async function sendMessage() {
   if(usageCount >= MAX_FREE){ showUpgrade(); return; }
   var welcome = document.getElementById('welcomeMsg');
   if(welcome) welcome.style.display = 'none';
-  var ptab = document.querySelector('.ptab-wrap');
-  if(ptab && !ptab.dataset.collapsed){
-    ptab.dataset.full = ptab.innerHTML;
-    ptab.dataset.collapsed = '1';
-    ptab.innerHTML = '<button onclick="var p=this.parentElement;p.removeAttribute(\'data-collapsed\');p.innerHTML=p.dataset.full;p.style.maxHeight=\'220px\';" style="width:100%;background:none;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 12px;font-size:12px;color:#7A9A87;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;text-align:left;">💡 よく使う質問を見る ▼</button>';
-    ptab.style.maxHeight = 'none';
-  }
-  addMsg('user', text);
+    addMsg('user', text);
   input.value = ''; input.style.height = 'auto';
   usageCount++; updateUsage();
   if(usageCount >= 8) document.getElementById('limitBanner').classList.add('show');
