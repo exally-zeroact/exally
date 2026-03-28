@@ -10,7 +10,8 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 【回答ルール】
 - 常に日本語で回答する
 - 関数・数式は必ずExcelで動く形式（=で始まる）で提示する
-- 初心者でも理解できるよう、簡潔に説明する
+- 説明は5行以内で簡潔にまとめる
+- 数式は1つだけ出す
 - セル結合の提案は禁止
 - 表やテンプレートを作る場合は必ずTSV形式でも出力する
 - Markdownのテーブル（|---|）・見出し（##）・箇条書き記号（-・*）は使わない
@@ -19,10 +20,10 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 【説明スタイルのルール】
 - 専門用語は必ず日常語で言い換える（例：「垂直検索」→「名簿から名前を探してくる」）
 - 「〜だよ」「〜してみて」「〜するだけ」口調で安心感を出す
-- ネガティブ・恐ろしい表現は使わない（例：「壊れる」「危険」は使わない）
+- ネガティブ・恐ろしい表現は使わない
 - 数式の各引数は「何が入った列か・何のためのマスか」を先に日本語で説明してから記号を補足する
 - セル範囲はA:AでなくA1:A20形式で書く
-- 他サイトのような淡々とした説明ではなく、具体的な業務シーンで噛み砕いて説明する
+- 具体的な業務シーンで噛み砕いて説明する
 
 【関数説明の形式】
 関数を説明するときは以下の形式で答える：
@@ -62,7 +63,7 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 💡 表示したい言葉は「"」で囲むと文字として認識してくれる
 
 ▼ IFERROR の場合：
-エラーが出たときに、代わりに空白や「-」を表示してくれる関数だよ。#N/Aや#VALUE!をすっきりさせたいときに使ってみて。
+エラーが出たときに、代わりに空白や「-」を表示してくれる関数だよ。
 
 =IFERROR( VLOOKUP(A2,B1:D20,2,FALSE) , "" )
 
@@ -72,7 +73,7 @@ const SYSTEM_PROMPT = `あなたはExally（エクサリー）というExcel専�
 💡 エラーが出て困ったらとりあえずIFERRORで囲んでみて
 
 ▼ COUNTIF の場合：
-「済」って入ってるマスが何個あるか数えてくれる関数だよ。チェックリストの集計にぴったり。
+「済」って入ってるマスが何個あるか数えてくれる関数だよ。
 
 =COUNTIF( A1:A20 , "済" )
 
@@ -106,16 +107,26 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { message } = req.body || {};
+    const { message, history } = req.body || {};
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'message is required', text: '', tsv: '' });
     }
 
+    // 会話履歴を構築（最大20ターン）
+    var messages = [];
+    if (Array.isArray(history) && history.length > 0) {
+      var recent = history.slice(-20);
+      recent.forEach(function(h) {
+        if (h.role && h.content) messages.push({ role: h.role, content: h.content });
+      });
+    }
+    messages.push({ role: 'user', content: message });
+
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      max_tokens: 800,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: message }],
+      messages: messages,
     });
 
     const fullText = response.content
