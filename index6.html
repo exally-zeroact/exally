@@ -149,27 +149,28 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .chat-wrap{display:flex;flex-direction:column;height:100%;}
 .chat-area{flex:1;overflow-y:auto;padding:16px 16px 10px;display:flex;flex-direction:column;gap:12px;}
 @media(min-width:769px){.chat-area{padding:24px 40px 16px;max-width:680px;margin:0 auto;width:100%;}}
-.welcome-msg{text-align:center;padding:20px 16px 12px;}
-.welcome-icon{font-size:34px;margin-bottom:10px;}
-.welcome-title{font-size:19px;font-weight:700;color:#1A2B22;margin-bottom:6px;}
-.welcome-sub{font-size:12px;color:#7A9A87;line-height:1.8;margin-bottom:20px;}
-.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:16px;}
-.cat-card{background:#fff;border:2px solid #E8F0EC;border-radius:20px;padding:20px 12px 16px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(30,60,40,0.08);}
+.welcome-msg{text-align:center;padding:4px 16px 6px;}
+.welcome-sub{display:none;}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:8px;}
+.cat-card{background:#fff;border:2px solid #E8F0EC;border-radius:20px;padding:12px 10px 10px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(30,60,40,0.08);}
 .cat-card:active{transform:scale(0.95);}
 .cat-card:hover{box-shadow:0 4px 16px rgba(30,60,40,0.13);transform:translateY(-2px);}
 .cat-card.active{border-color:#52B788;background:#F0FAF4;}
-.cat-card-icon{font-size:38px;margin-bottom:10px;display:block;line-height:1;}
+.cat-card-icon{font-size:26px;margin-bottom:6px;display:block;line-height:1;}
 .cat-card-title{font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:4px;line-height:1.35;}
 .cat-card-sub{font-size:10px;color:#7A9A87;line-height:1.5;}
 .cat-card.ops-card{background:#fff;border-color:#C8ECD8;}
 .cat-card.func-card{background:#fff;border-color:#C8ECD8;}
 .cat-card.err-card{background:#fff;border-color:#C8ECD8;}
 .cat-card.pay-card{background:#fff;border-color:#C8ECD8;}
+.cat-card.data-card{background:#fff;border-color:#C8ECD8;}
+.cat-card.tips-card{background:#fff;border-color:#C8ECD8;}
 .q-panel{background:#fff;border:1.5px solid #E8F0EC;border-radius:16px;overflow:hidden;margin-top:4px;display:none;width:100%;}
 .q-panel.show{display:block;}
 .q-panel-header{padding:10px 14px 8px;border-bottom:1px solid #F0FAF4;display:flex;align-items:center;justify-content:space-between;}
 .q-panel-label{font-size:11px;font-weight:700;color:#3D9E72;}
 .q-panel-close{font-size:18px;color:#B0C4BA;cursor:pointer;line-height:1;}
+.q-panel-back{background:none;border:none;font-size:16px;color:#3D9E72;cursor:pointer;padding:0 8px 0 0;font-weight:700;line-height:1;}
 .q-list{display:flex;flex-direction:column;}
 .q-btn{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:12px;font-weight:500;color:#2E4038;cursor:pointer;transition:background 0.12s;border-bottom:1px solid #F4F7F5;background:#fff;border-left:none;border-right:none;border-top:none;text-align:left;width:100%;font-family:'Noto Sans JP',sans-serif;}
 .q-btn:last-child{border-bottom:none;}
@@ -372,6 +373,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 .memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;}
 @media(min-width:769px){.memory-bar{padding:4px 0 6px;}}
+
+.chat-back-bar{padding:8px 16px;background:#F8FEFC;border-bottom:1px solid #E8F0EC;flex-shrink:0;}
+.chat-back-btn{background:none;border:none;font-size:12px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0;}
 </style>
 </head>
 <body>
@@ -535,50 +539,53 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <!-- CHAT -->
       <div class="screen" id="screen-chat">
         <div class="chat-wrap">
+          <div class="chat-back-bar" id="chatBackBar" style="display:none;">
+            <button class="chat-back-btn" onclick="backToCards()">← 最初の画面に戻る</button>
+          </div>
           <div class="chat-area" id="chatArea">
             <div class="welcome-msg" id="welcomeMsg">
-              <div class="welcome-icon">💬</div>
-              <div class="welcome-title">Excel専門AIに質問しよう</div>
-              <div class="welcome-sub">わからない操作・エラー・表作りまで<br>何でも日本語で聞くだけでOK</div>
+              <div class="welcome-sub">わからない操作・エラー・表作りまで何でも日本語で聞くだけでOK</div>
               <div class="cat-grid">
-                <div class="cat-card ops-card" id="card-ops" onclick="togglePanel('ops')">
-                  <div class="cat-card-icon">💻</div>
-                  <div class="cat-card-title">使い方がわからない</div>
-                  <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
+                <div class="cat-card err-card" id="card-err" onclick="togglePanel('err')">
+                  <div class="cat-card-icon">⚠️</div>
+                  <div class="cat-card-title">エラーが出て困っている</div>
+                  <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
                 </div>
                 <div class="cat-card func-card" id="card-func" onclick="togglePanel('func')">
                   <div class="cat-card-icon">🔢</div>
                   <div class="cat-card-title">自動で計算させたい</div>
                   <div class="cat-card-sub">合計・検索・<br>条件分け</div>
                 </div>
-                <div class="cat-card err-card" id="card-err" onclick="togglePanel('err')">
-                  <div class="cat-card-icon">⚠️</div>
-                  <div class="cat-card-title">エラーが出て困っている</div>
-                  <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
+                <div class="cat-card data-card" id="card-data" onclick="togglePanel('data')">
+                  <div class="cat-card-icon">📊</div>
+                  <div class="cat-card-title">表を見せて質問する</div>
+                  <div class="cat-card-sub">自分のセルに合った<br>数式をそのまま作れるよ</div>
                 </div>
-                <div class="cat-card pay-card" id="card-pay" onclick="togglePanel('pay')">
+                <div class="cat-card pay-card" id="card-pay" onclick="switchTab('template')">
                   <div class="cat-card-icon">📋</div>
                   <div class="cat-card-title">書類・表を作りたい</div>
                   <div class="cat-card-sub">給料明細・請求書・<br>集計表</div>
                 </div>
-              </div>
-              <div class="cat-card-wide" id="card-tips" onclick="togglePanel('tips')">
-                <div class="cat-card-wide-left">
-                  <div style="font-size:26px;">⚡</div>
-                  <div>
-                    <div class="cat-card-title">知ると仕事が速くなる</div>
-                    <div class="cat-card-sub" style="margin-top:2px;">ショートカット・時短ワザ・条件付き書式・オートフィル</div>
-                  </div>
+                <div class="cat-card ops-card" id="card-ops" onclick="togglePanel('ops')">
+                  <div class="cat-card-icon">💻</div>
+                  <div class="cat-card-title">使い方がわからない</div>
+                  <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
                 </div>
-                <div class="cat-card-wide-arrow">›</div>
+                <div class="cat-card tips-card" id="card-tips" onclick="togglePanel('tips')">
+                  <div class="cat-card-icon">⚡</div>
+                  <div class="cat-card-title">知ると仕事が速くなる</div>
+                  <div class="cat-card-sub">ショートカット・<br>条件付き書式</div>
+                </div>
               </div>
               <div class="q-panel" id="qPanel">
                 <div class="q-panel-header">
+                  <button class="q-panel-back" onclick="closePanel()">←</button>
                   <div class="q-panel-label" id="qPanelLabel"></div>
                   <div class="q-panel-close" onclick="closePanel()">×</div>
                 </div>
                 <div class="q-list" id="qList"></div>
               </div>
+            </div>
             </div>
           <div class="limit-banner" id="limitBanner">
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
@@ -699,7 +706,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub">support@exally.jp</div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c0f090c0c130e083c19041d10100552160c">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -837,6 +844,16 @@ var CAT_Q = {
       {icon:'📊', text:'大量データを秒で集計したい（ピボットテーブル）'},
       {icon:'🔢', text:'0が勝手に消える・先頭の0を表示させたい'}
     ]
+  },
+  data:{
+    label:'📊 表を見せて質問する',
+    items:[
+      {icon:'📋', text:'この表でVLOOKUPを使いたい。数式を作って'},
+      {icon:'➕', text:'この表の特定の列だけ合計する数式を作って'},
+      {icon:'⚠️', text:'この表でエラーが出てる。直して'},
+      {icon:'📄', text:'この表を使って請求書の数式を作って'},
+      {icon:'🔢', text:'この表のデータを集計する方法を教えて'}
+    ]
   }
 };
 
@@ -847,6 +864,16 @@ function updateMemoryBar(){
   if(!bar) return;
   var msg = talkCount === 0 ? 'まだ話してないよ' : talkCount+'回話したね';
   bar.textContent = '✨ 直近20回分覚えてるよ　💬 '+msg;
+}
+
+function backToCards(){
+  var chatArea = document.getElementById('chatArea');
+  var welcomeMsg = document.getElementById('welcomeMsg');
+  var backBar = document.getElementById('chatBackBar');
+  if(chatArea) chatArea.innerHTML = '';
+  chatArea.appendChild(welcomeMsg);
+  welcomeMsg.style.display = '';
+  if(backBar) backBar.style.display = 'none';
 }
 function colorizeFormula(text) {
   // 括弧・カンマを全角半角両対応で正規化してから色付け
@@ -1015,6 +1042,8 @@ async function sendMessage() {
     if(!response.ok) throw new Error('API error');
     var data = await response.json();
     addAIMsg(data.text, data.tsv||'');
+    var backBar = document.getElementById('chatBackBar');
+    if(backBar) backBar.style.display = 'block';
     chatHistory.push({role:'user',content:text});
     chatHistory.push({role:'assistant',content:data.text});
     if(chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
@@ -1204,13 +1233,4 @@ function showToast(msg, duration){
 
 (function(){
   var examples = ['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
-  var idx = 0;
-  function rotate(){
-    var el = document.getElementById('msgInput');
-    if(el && !el.value){ el.placeholder = examples[idx % examples.length]; idx++; }
-  }
-  setInterval(rotate, 3500);
-})();
-</script>
-</body>
-</html>
+  var i
