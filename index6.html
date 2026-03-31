@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Exally（エクサリー）- デモ</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background:#F4F7F5;color:#2E4038;overflow:hidden;}
@@ -149,7 +149,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .chat-wrap{display:flex;flex-direction:column;height:100%;}
 .chat-area{flex:1;overflow-y:auto;padding:16px 16px 10px;display:flex;flex-direction:column;gap:12px;}
 @media(min-width:769px){.chat-area{padding:24px 40px 16px;max-width:680px;margin:0 auto;width:100%;}}
-.welcome-msg{text-align:center;padding:4px 16px 6px;}
+.welcome-msg{text-align:center;padding:16px 14px 14px;background:#ffffff;border-radius:20px;box-shadow:0 2px 12px rgba(30,60,40,0.08);}
 .welcome-sub{display:none;}
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:8px;}
 .cat-card{background:#fff;border:2px solid #E8F0EC;border-radius:20px;padding:12px 10px 10px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(30,60,40,0.08);}
@@ -347,7 +347,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:600px){.tmpl-cards-grid{grid-template-columns:repeat(3,1fr);}}
 .tmpl-card-item{background:#fff;border-radius:16px;overflow:hidden;border:1.5px solid #E0EDE6;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .tmpl-card-item:hover{border-color:#52B788;transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,60,40,0.12);}
-.tmpl-card-preview{height:130px;background:#F8FEFA;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+.tmpl-card-preview{height:200px;background:#F8FEFA;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
 .tmpl-card-preview-note{position:absolute;bottom:4px;right:6px;font-size:9px;color:#B0C4BA;}
 .tmpl-card-body{padding:10px 12px 12px;}
 .tmpl-card-name{font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:2px;}
@@ -586,7 +586,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
                 <div class="q-list" id="qList"></div>
               </div>
             </div>
-            </div>
           <div class="limit-banner" id="limitBanner">
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
@@ -664,7 +663,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="screen" id="screen-template">
         <div class="tmpl-gallery" id="tmplGallery">
           <div class="tmpl-gallery-title">📋 テンプレート</div>
-          <div class="tmpl-gallery-sub">書類を選んで項目をカスタマイズ → AIが自動生成</div>
+          <div class="tmpl-gallery-sub">項目を選ぶだけで自動完成</div>
           <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
         </div>
         <div class="tmpl-iframe-screen" id="tmplIframeScreen">
@@ -706,7 +705,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9deee8ededf2efe9ddf8e5fcf1f1e4b3f7ed">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="790a0c0909160b0d391c0118151500571309">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -727,6 +726,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     </nav>
 
   </div>
+</div>
 </div>
 
 <!-- SAVE MODAL -->
@@ -773,9 +773,33 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="templates-config.js"></script>
-<script src="quiz.js"></script>
 <script>
+var TEMPLATES = [
+  {
+    id: 'payslip',
+    name: '給料明細',
+    desc: '月給・時給に対応。控除の自動計算付き',
+    file: 'template-demo.html',
+    tags: ['給与系', '人気'],
+    hot: true,
+    previewHTML: '<div style="background:#fff;border:1px solid #ddd;width:90%;padding:8px;font-size:7px;color:#333;font-family:sans-serif;"><div style="text-align:center;font-weight:700;font-size:9px;letter-spacing:2px;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;">給 料 明 細 書</div><div style="background:#F0FAF4;padding:3px 5px;font-weight:700;font-size:7px;margin-bottom:2px;color:#3D9E72;">💰 支給</div><table style="width:100%;border-collapse:collapse;margin-bottom:4px;"><tr><td style="border:1px solid #ddd;padding:2px 3px;">基本給</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥250,000</td></tr><tr><td style="border:1px solid #ddd;padding:2px 3px;">残業代</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥15,000</td></tr></table><div style="background:#FFF5F5;padding:3px 5px;font-weight:700;font-size:7px;margin-bottom:2px;color:#C62828;">🔻 控除</div><table style="width:100%;border-collapse:collapse;margin-bottom:4px;"><tr><td style="border:1px solid #ddd;padding:2px 3px;">健康保険</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥13,700</td></tr></table><div style="background:#F8FEFC;border-top:2px solid #333;padding:3px 5px;display:flex;justify-content:space-between;font-weight:700;"><span>差引支給額</span><span style="color:#3D9E72;">¥231,520</span></div></div>'
+  },
+  {
+    id: 'invoice',
+    name: '請求書・見積書',
+    desc: 'インボイス対応。電子判子・控除明細付き',
+    file: 'invoice-template.html',
+    tags: ['請求系', '人気'],
+    hot: true,
+    previewHTML: '<div style="background:#fff;border:1px solid #ddd;width:90%;padding:8px;font-size:7px;color:#333;font-family:sans-serif;"><div style="text-align:center;font-weight:700;font-size:10px;letter-spacing:4px;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;">請 求 書</div><div style="border:2px solid #333;padding:3px 6px;display:inline-flex;gap:8px;margin-bottom:6px;"><span style="font-weight:700;">ご請求金額</span><span style="font-weight:700;">¥110,000</span></div><table style="width:100%;border-collapse:collapse;font-size:6px;"><tr style="background:#f0f0f0;"><th style="border:1px solid #ddd;padding:2px;">品名</th><th style="border:1px solid #ddd;padding:2px;">金額</th></tr><tr><td style="border:1px solid #ddd;padding:2px;">Webデザイン</td><td style="border:1px solid #ddd;padding:2px;text-align:right;">100,000</td></tr></table></div>'
+  }
+];
+window.TEMPLATES = TEMPLATES;
+
+// quiz.js stub（テストHTML用・Vercel上では quiz.js が正常読み込み）
+function startQuiz(level){ console.log('quiz:'+level); }
+function resetQuiz(){ console.log('resetQuiz'); }
+
 var score = 35;
 var usageCount = 0;
 var MAX_FREE = 10;
@@ -985,7 +1009,7 @@ function renderTmplGallery() {
   if(!grid || !window.TEMPLATES) return;
   grid.innerHTML = TEMPLATES.map(function(t){
     return '<div class="tmpl-card-item" onclick="openTmplIframe(\''+t.id+'\')">'
-      +'<div class="tmpl-card-preview">'+t.previewHTML
+      +'<div class="tmpl-card-preview" data-src="'+t.file+'">'
       +'<div class="tmpl-card-preview-note">※完成イメージ</div></div>'
       +'<div class="tmpl-card-body">'
       +'<div class="tmpl-card-name">'+(t.hot?'⭐ ':'')+t.name+'</div>'
@@ -996,6 +1020,12 @@ function renderTmplGallery() {
       +'<button class="tmpl-card-btn">使ってみる →</button>'
       +'</div></div>';
   }).join('');
+  document.querySelectorAll('.tmpl-card-preview[data-src]').forEach(function(el){
+    var f=el.getAttribute('data-src');
+    var ifr=document.createElement('iframe');
+    ifr.src=f; ifr.scrolling='no'; ifr.tabIndex=-1;
+    el.insertBefore(ifr, el.firstChild);
+  });
 }
 
 function openTmplIframe(id) {
@@ -1025,6 +1055,8 @@ async function sendMessage() {
   if(usageCount >= MAX_FREE){ showUpgrade(); return; }
   var welcome = document.getElementById('welcomeMsg');
   if(welcome) welcome.style.display = 'none';
+  var bar = document.getElementById('chatBackBar');
+  if(bar) bar.style.display = 'block';
     addMsg('user', text);
   input.value = ''; input.style.height = 'auto';
   usageCount++; updateUsage();
@@ -1171,6 +1203,16 @@ function copyText(btn, text){
   });
 }
 
+
+function backToWelcome(){
+  var welcome = document.getElementById('welcomeMsg');
+  var bar = document.getElementById('chatBackBar');
+  var area = document.getElementById('chatArea');
+  if(welcome) welcome.style.display = '';
+  if(bar) bar.style.display = 'none';
+  if(area){ var msgs = area.querySelectorAll('.msg'); msgs.forEach(function(m){ m.remove(); }); }
+  closePanel();
+}
 function updateUsage(){
   var pct = (usageCount/MAX_FREE)*100;
   document.getElementById('usageCount').textContent = usageCount+' / '+MAX_FREE+'回';
