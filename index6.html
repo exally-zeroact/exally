@@ -705,7 +705,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="790a0c0909160b0d391c0118151500571309">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub">exally.support@gmail.com</div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -1001,7 +1001,13 @@ function switchTab(tab) {
   if(mobileNav) mobileNav.classList.add('active');
   if(sideNav) sideNav.classList.add('active');
   if(tab === 'book') renderBook();
-  if(tab === 'template') renderTmplGallery();
+  if(tab === 'template') {
+    var ifs = document.getElementById('tmplIframeScreen');
+    if(ifs) ifs.classList.remove('show');
+    var tg = document.getElementById('tmplGallery');
+    if(tg) tg.style.display = 'block';
+    renderTmplGallery();
+  }
 }
 
 function renderTmplGallery() {
@@ -1030,12 +1036,12 @@ function renderTmplGallery() {
 }
 
 function openTmplIframe(id) {
-  var tmpl = TEMPLATES.find(function(t){ return t.id===id; });
-  if(!tmpl) return;
-  document.getElementById('tmplIframeTitle').textContent = tmpl.name;
-  document.getElementById('tmplIframe').src = tmpl.file;
-  document.getElementById('tmplIframeScreen').classList.add('show');
-  document.getElementById('tmplGallery').style.display = 'none';
+var tmpl = TEMPLATES.find(function(t){ return t.id===id; });
+if(!tmpl) return;
+document.getElementById('tmplIframeTitle').textContent = tmpl.name;
+document.getElementById('tmplIframe').src = tmpl.file;
+document.getElementById('tmplIframeScreen').classList.add('show');
+document.getElementById('tmplGallery').style.display = 'none';
 }
 
 function closeTmplIframe() {
