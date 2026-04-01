@@ -1024,6 +1024,7 @@ function renderTmplGallery() {
     var f=el.getAttribute('data-src');
     var ifr=document.createElement('iframe');
     ifr.src=f; ifr.scrolling='no'; ifr.tabIndex=-1;
+    ifr.style.cssText='position:absolute;top:0;left:0;width:200%;height:200%;border:none;pointer-events:none;transform:scale(0.5);transform-origin:top left;';
     el.insertBefore(ifr, el.firstChild);
   });
 }
