@@ -347,8 +347,13 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:600px){.tmpl-cards-grid{grid-template-columns:repeat(3,1fr);}}
 .tmpl-card-item{background:#fff;border-radius:16px;overflow:hidden;border:1.5px solid #E0EDE6;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .tmpl-card-item:hover{border-color:#52B788;transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,60,40,0.12);}
-.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
-.tmpl-card-preview-note{position:absolute;bottom:4px;right:6px;font-size:9px;color:#B0C4BA;}
+.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;}
+.tmpl-card-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,#F8FEFA);pointer-events:none;z-index:2;}
+.preview-inner{width:220px;position:absolute;top:0;left:50%;transform:translateX(-50%) scale(0.70);transform-origin:top center;pointer-events:none;z-index:1;}
+.preview-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#B0C4BA;gap:6px;}
+.preview-placeholder-icon{font-size:28px;}
+.preview-placeholder-text{font-size:10px;}
+.tmpl-card-preview-note{position:absolute;bottom:4px;right:6px;font-size:9px;color:#B0C4BA;z-index:3;}
 .tmpl-card-body{padding:4px 8px 4px;}
 .tmpl-card-name{font-size:12px;font-weight:700;color:#1A2B22;margin-bottom:0;}
 .tmpl-card-desc{display:none;}
@@ -708,7 +713,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub">exally.support@gmail.com</div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a1c4d9c0cdcdd88fd2d4d1d1ced3d5e1c6ccc0c8cd8fc2cecc">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -774,7 +779,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var TEMPLATES = [
   {
     id: 'payslip',
@@ -783,7 +788,7 @@ var TEMPLATES = [
     file: 'template-demo.html',
     tags: ['給与系', '人気'],
     hot: true,
-    previewHTML: '<div style="background:#fff;border:1px solid #ddd;width:90%;padding:8px;font-size:7px;color:#333;font-family:sans-serif;"><div style="text-align:center;font-weight:700;font-size:9px;letter-spacing:2px;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;">給 料 明 細 書</div><div style="background:#F0FAF4;padding:3px 5px;font-weight:700;font-size:7px;margin-bottom:2px;color:#3D9E72;">💰 支給</div><table style="width:100%;border-collapse:collapse;margin-bottom:4px;"><tr><td style="border:1px solid #ddd;padding:2px 3px;">基本給</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥250,000</td></tr><tr><td style="border:1px solid #ddd;padding:2px 3px;">残業代</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥15,000</td></tr></table><div style="background:#FFF5F5;padding:3px 5px;font-weight:700;font-size:7px;margin-bottom:2px;color:#C62828;">🔻 控除</div><table style="width:100%;border-collapse:collapse;margin-bottom:4px;"><tr><td style="border:1px solid #ddd;padding:2px 3px;">健康保険</td><td style="border:1px solid #ddd;padding:2px 3px;text-align:right;">¥13,700</td></tr></table><div style="background:#F8FEFC;border-top:2px solid #333;padding:3px 5px;display:flex;justify-content:space-between;font-weight:700;"><span>差引支給額</span><span style="color:#3D9E72;">¥231,520</span></div></div>'
+    previewHTML: '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:1.5px;">給 料 明 細 書</span><span style="font-size:9px;color:rgba(255,255,255,0.85);">2026年4月分</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:rgba(255,255,255,0.9);">○○株式会社</span><span style="font-size:10px;font-weight:700;color:#fff;">山田 太郎</span></div></div><div style="background:#F8FEFC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #C8ECD8;"><span style="font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;">差 引 支 給 額</span><span style="font-size:16px;font-weight:500;color:#3D9E72;">¥231,520</span></div><div style="display:grid;grid-template-columns:1fr 1fr;"><div style="padding:5px 8px;border-right:1px solid #E0EDE6;"><div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">基本給</span><span style="font-size:9px;color:#1A2B22;">¥250,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">残業代</span><span style="font-size:9px;color:#1A2B22;">¥15,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">交通費</span><span style="font-size:9px;color:#1A2B22;">¥12,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">資格手当</span><span style="font-size:9px;color:#1A2B22;">¥5,000</span></div></div><div style="padding:5px 8px;"><div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">🔻 控除</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">健康保険</span><span style="font-size:9px;color:#C62828;">¥13,700</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">厚生年金</span><span style="font-size:9px;color:#C62828;">¥25,620</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">所得税</span><span style="font-size:9px;color:#C62828;">¥6,160</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">住民税</span><span style="font-size:9px;color:#C62828;">¥10,000</span></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;background:#F8FEFC;border-top:1.5px solid #C8ECD8;"><div style="padding:4px 8px;text-align:center;border-right:1px solid #E0EDE6;"><div style="font-size:8px;color:#7A9A87;">総支給額</div><div style="font-size:10px;font-weight:700;color:#2E7D54;">¥282,000</div></div><div style="padding:4px 8px;text-align:center;"><div style="font-size:8px;color:#7A9A87;">控除合計</div><div style="font-size:10px;font-weight:700;color:#C62828;">¥55,480</div></div></div></div>'
   },
   {
     id: 'invoice',
@@ -792,7 +797,7 @@ var TEMPLATES = [
     file: 'invoice-template.html',
     tags: ['請求系', '人気'],
     hot: true,
-    previewHTML: '<div style="background:#fff;border:1px solid #ddd;width:90%;padding:8px;font-size:7px;color:#333;font-family:sans-serif;"><div style="text-align:center;font-weight:700;font-size:10px;letter-spacing:4px;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;">請 求 書</div><div style="border:2px solid #333;padding:3px 6px;display:inline-flex;gap:8px;margin-bottom:6px;"><span style="font-weight:700;">ご請求金額</span><span style="font-weight:700;">¥110,000</span></div><table style="width:100%;border-collapse:collapse;font-size:6px;"><tr style="background:#f0f0f0;"><th style="border:1px solid #ddd;padding:2px;">品名</th><th style="border:1px solid #ddd;padding:2px;">金額</th></tr><tr><td style="border:1px solid #ddd;padding:2px;">Webデザイン</td><td style="border:1px solid #ddd;padding:2px;text-align:right;">100,000</td></tr></table></div>'
+    previewHTML: '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:3px;">請 求 書</span></div><div style="background:#F0FAF4;padding:5px 10px;border-bottom:1px solid #C8ECD8;"><table style="width:100%;border-collapse:collapse;"><tr><td style="vertical-align:top;padding:2px 6px 2px 0;"><div style="font-weight:700;font-size:9px;color:#1A2B22;margin-bottom:2px;">○○株式会社 御中</div><div style="font-size:6px;color:#4A6B5A;margin-bottom:4px;">下記の通り御請求申し上げます。</div><div style="border-top:1px solid #C8ECD8;padding-top:4px;"><div style="font-size:7px;color:#4A6B5A;margin-bottom:1px;">ご請求金額（税込）</div><div style="font-size:13px;font-weight:700;color:#1A2B22;">¥110,000</div></div></td><td style="vertical-align:top;text-align:right;font-size:7px;color:#4A6B5A;line-height:1.7;padding:2px 0;width:80px;"><div>2026/04/01</div><div>No.INV-001</div><div style="font-weight:700;color:#1A2B22;">○○株式会社</div><div>東京都○○区</div><div>090-0000-0000</div></td></tr></table></div><table style="width:100%;border-collapse:collapse;font-size:8px;"><thead><tr style="background:#F0FAF4;"><th style="padding:3px 6px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:left;">品名</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:center;width:22px;">数量</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:right;width:52px;">金額</th></tr></thead><tbody><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">Webデザイン制作</td><td style="padding:3px 4px;text-align:center;">1</td><td style="padding:3px 4px;text-align:right;">100,000</td></tr><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">修正対応</td><td style="padding:3px 4px;text-align:center;">2</td><td style="padding:3px 4px;text-align:right;">0</td></tr></tbody></table><div style="padding:6px 10px;background:#F8FEFC;"><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>小計</span><span style="min-width:55px;text-align:right;">100,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>消費税（10%）</span><span style="min-width:55px;text-align:right;">10,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:9px;font-weight:700;color:#1A2B22;border-top:1.5px solid #1A2B22;padding-top:4px;"><span>合計（税込）</span><span style="min-width:55px;text-align:right;">110,000</span></div></div></div>'
   }
 ];
 TEMPLATES.push({
@@ -1031,22 +1036,18 @@ function renderTmplGallery() {
   var grid = document.getElementById('tmplCardsGrid');
   if(!grid || !window.TEMPLATES) return;
   grid.innerHTML = TEMPLATES.map(function(t){
+    var previewContent = t.previewHTML
+      ? '<div class="preview-inner">'+t.previewHTML+'</div>'
+      : '<div class="preview-placeholder"><div class="preview-placeholder-icon">📄</div><div class="preview-placeholder-text">準備中✨</div></div>';
     return '<div class="tmpl-card-item" onclick="openTmplIframe(\''+t.id+'\')">'
-      +'<div class="tmpl-card-preview" data-src="'+t.file+'">'
+      +'<div class="tmpl-card-preview">'
+      +previewContent
       +'<div class="tmpl-card-preview-note">※完成イメージ</div></div>'
       +'<div class="tmpl-card-body">'
       +'<div class="tmpl-card-name">'+(t.hot?'⭐ ':'')+t.name+'</div>'
       +'<div class="tmpl-card-desc">'+t.desc+'</div>'
-      
       +'</div></div>';
   }).join('');
-  document.querySelectorAll('.tmpl-card-preview[data-src]').forEach(function(el){
-    var f=el.getAttribute('data-src');
-    var ifr=document.createElement('iframe');
-    ifr.src=f; ifr.scrolling='no'; ifr.tabIndex=-1;
-    ifr.style.cssText='position:absolute;top:0;left:0;width:313%;height:313%;border:none;pointer-events:none;transform:scale(0.32);transform-origin:top left;';
-    el.insertBefore(ifr, el.firstChild);
-  });
 }
 
 function openTmplIframe(id) {
@@ -1299,13 +1300,4 @@ function showToast(msg, duration){
   var examples = ['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
   var idx = 0;
   function rotate(){
-    var el = document.getElementById('msgInput');
-    if(!el || document.activeElement===el) return;
-    idx = (idx+1) % examples.length;
-    el.setAttribute('placeholder','例：'+examples[idx]);
-  }
-  setInterval(rotate, 3500);
-})();
-</script>
-</body>
-</html>
+    var el = document.getEl
