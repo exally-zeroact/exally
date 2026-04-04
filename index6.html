@@ -1160,10 +1160,17 @@ function addAIMsg(rawText, tsvData) {
   var area = document.getElementById('chatArea');
   var div = document.createElement('div');
   div.className = 'msg ai';
-  // バッククォート囲みを最優先で検出、次に=で始まる行全体
-  var formulaMatch = rawText.match(/`(=[^`\n]{2,120})`/g)
-    || rawText.match(/(?:^|\n)(=[A-Za-z][^\n]{2,120})/gm);
-  var formula = formulaMatch ? formulaMatch[0].replace(/`/g,'').replace(/^\n/,'').trim() : null;
+  // 全数式を収集→使える数式（""内以外に日本語なし）を優先選択
+  var _allF = [];
+  var _m, _p1 = /`(=[^`\n]{2,120})`/g;
+  while((_m = _p1.exec(rawText)) !== null) _allF.push(_m[1]);
+  if(!_allF.length){
+    var _p2 = /(?:^|\n)(=[A-Za-z][^\n]{2,120})/gm;
+    while((_m = _p2.exec(rawText)) !== null) _allF.push(_m[1].trim());
+  }
+  function _isUsable(f){ var s=f.replace(/"[^"]*"/g,'""'); return !/[\u3040-\u9FFF]/.test(s); }
+  var _usable = _allF.filter(_isUsable);
+  var formula = (_usable.length ? _usable[0] : (_allF.length ? _allF[0] : null));
   var hasTSV = tsvData && tsvData.trim().length > 0;
   var html = colorizeFormula(rawText)
     .replace(/```[\w]*\n?([\s\S]*?)```/g, '<div class="formula-block">$1</div>')
