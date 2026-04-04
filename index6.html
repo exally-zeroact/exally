@@ -980,12 +980,14 @@ function colorizeFormula(text) {
 }
 
 var currentCat = null;
+var lastCat = null;
 var chatHistory = [];
 var talkCount = 0;
 
 function togglePanel(cat) {
   if (currentCat === cat) { closePanel(); return; }
   currentCat = cat;
+  lastCat = cat;
   document.querySelectorAll('#welcomeMsg .cat-card, #welcomeMsg .cat-card-wide').forEach(function(c){ c.classList.remove('active'); });
   var cardEl = document.getElementById('card-' + cat);
   if (cardEl) cardEl.classList.add('active');
@@ -1346,6 +1348,18 @@ function collapsePtab(){
   var expanded = document.getElementById('ptabExpanded');
   var btn = document.getElementById('ptabToggleBtn');
   if(wrap) wrap.style.display = '';
+  // カテゴリ別の質問を動的に表示
+  var catToUse = currentCat || lastCat;
+  if(expanded && catToUse && CAT_Q[catToUse]){
+    var items = CAT_Q[catToUse].items.slice(0,3);
+    var html = '<div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>';
+    items.forEach(function(q){
+      var safeText = q.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      html += '<button class="quick-btn" onclick="setQuestion(\'' + safeText + '\')">'
+        + q.icon + ' ' + q.text + '</button>';
+    });
+    expanded.innerHTML = html;
+  }
   if(expanded) expanded.style.display = 'none';
   if(btn){ btn.style.display = 'block'; btn.textContent = '💡 よく使う質問を見る ▼'; }
 }
