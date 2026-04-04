@@ -1160,8 +1160,10 @@ function addAIMsg(rawText, tsvData) {
   var area = document.getElementById('chatArea');
   var div = document.createElement('div');
   div.className = 'msg ai';
-  var formulaMatch = rawText.match(/`?(=[A-Z][^\n`]{2,80})`?/g);
-  var formula = formulaMatch ? formulaMatch[0].replace(/`/g,'') : null;
+  // バッククォート囲みを最優先で検出、次に=で始まる行全体
+  var formulaMatch = rawText.match(/`(=[^`\n]{2,120})`/g)
+    || rawText.match(/(?:^|\n)(=[A-Za-z][^\n]{2,120})/gm);
+  var formula = formulaMatch ? formulaMatch[0].replace(/`/g,'').replace(/^\n/,'').trim() : null;
   var hasTSV = tsvData && tsvData.trim().length > 0;
   var html = colorizeFormula(rawText)
     .replace(/```[\w]*\n?([\s\S]*?)```/g, '<div class="formula-block">$1</div>')
