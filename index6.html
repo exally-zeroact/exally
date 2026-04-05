@@ -761,6 +761,8 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <input class="modal-input" id="saveTitle" placeholder="例：VLOOKUP完全一致">
     <div class="modal-label">数式</div>
     <input class="modal-input" id="saveFormula" placeholder="=VLOOKUP(...)">
+    <div class="modal-label">メモ（任意）</div>
+    <input class="modal-input" id="saveMemo" placeholder="例：売上表のB列を検索する時に使う">
     <div class="modal-btns">
       <button class="modal-btn secondary" onclick="hideSaveModal()">キャンセル</button>
       <button class="modal-btn primary" onclick="saveToBook()">保存する</button>
@@ -1261,7 +1263,7 @@ function saveBarAction(barId, formula){
   var bar = document.getElementById(barId);
   if(!bar) return;
   var now = new Date();
-  var date = (now.getMonth()+1) + '/' + now.getDate();
+  var date = (now.getMonth()+1) + '月' + now.getDate() + '日';
   var title = formula.length > 15 ? formula.substring(0,15) + '…' : formula;
   savedFormulas.unshift({title:title, formula:formula, memo:'', date:date});
   try{ localStorage.setItem('savedFormulas', JSON.stringify(savedFormulas)); }catch(e){}
@@ -1307,6 +1309,7 @@ function renderBook(){
   el.innerHTML = '<div class="fb-list">'+savedFormulas.map(function(f,i){
     return '<div class="fb-item"><div class="fb-item-top"><div class="fb-item-title">'+f.title+'</div><div class="fb-item-date">'+f.date+'</div></div>'
       +'<div class="fb-item-formula">'+f.formula+'</div>'
+      +(f.memo?'<div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.6;">'+f.memo+'</div>':'')
       +'<div class="fb-item-actions">'
       +'<button class="fb-action-btn" onclick="copyForBook('+i+')">📋 コピー</button>'
       +'<button class="fb-action-btn fb-delete-btn" onclick="deleteFromBook('+i+')">🗑 削除</button>'
@@ -1316,16 +1319,19 @@ function renderBook(){
 function showSaveModal(formula, title){
   document.getElementById('saveFormula').value = formula||'';
   document.getElementById('saveTitle').value = title||'';
+  document.getElementById('saveMemo').value = '';
   document.getElementById('saveModal').classList.add('show');
 }
 function hideSaveModal(){ document.getElementById('saveModal').classList.remove('show'); }
 function saveToBook(){
   var title = document.getElementById('saveTitle').value.trim()||'保存した数式';
   var formula = document.getElementById('saveFormula').value.trim();
+  var memo = document.getElementById('saveMemo').value.trim();
   if(!formula){ showToast('⚠️ 数式を入力してください'); return; }
   var now = new Date();
-  savedFormulas.unshift({title:title, formula:formula, date:(now.getMonth()+1)+'/'+now.getDate()});
+  savedFormulas.unshift({title:title, formula:formula, memo:memo, date:(now.getMonth()+1)+'月'+now.getDate()+'日'});
   hideSaveModal();
+  renderBook();
   document.getElementById('bookNavBadge').classList.add('show');
   document.getElementById('bookBadge').style.display = 'inline-block';
   showToast('📚 数式帳に保存しました！');
