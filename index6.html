@@ -354,9 +354,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:600px){.tmpl-cards-grid{grid-template-columns:repeat(3,1fr);}}
 .tmpl-card-item{background:#fff;border-radius:16px;overflow:hidden;border:1.5px solid #E0EDE6;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .tmpl-card-item:hover{border-color:#52B788;transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,60,40,0.12);}
-.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;}
+.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;clip-path:inset(0);}
 .tmpl-card-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,#F8FEFA);pointer-events:none;z-index:2;}
-.preview-inner{width:220px;position:absolute;top:0;left:50%;transform:translateX(-50%) scale(0.70);transform-origin:top center;pointer-events:none;z-index:1;}
+.preview-scale-wrap{width:154px;height:170px;margin:0 auto;overflow:hidden;position:relative;z-index:1;}
+.preview-inner{width:220px;transform:scale(0.70);transform-origin:top left;pointer-events:none;}
 .preview-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#B0C4BA;gap:6px;}
 .preview-placeholder-icon{font-size:28px;}
 .preview-placeholder-text{font-size:10px;}
@@ -730,7 +731,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub">exally.support@gmail.com</div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="23465b424f4f5a0d505653534c515763444e424a4f0d404c4e">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -796,7 +797,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var TEMPLATES = [
   {
     id: 'payslip',
@@ -1060,7 +1061,7 @@ function renderTmplGallery() {
   if(!grid || !window.TEMPLATES) return;
   grid.innerHTML = TEMPLATES.map(function(t){
     var previewContent = t.previewHTML
-      ? '<div class="preview-inner">'+t.previewHTML+'</div>'
+      ? '<div class="preview-scale-wrap"><div class="preview-inner">'+t.previewHTML+'</div></div>'
       : '<div class="preview-placeholder"><div class="preview-placeholder-icon">📄</div><div class="preview-placeholder-text">準備中✨</div></div>';
     return '<div class="tmpl-card-item" onclick="openTmplIframe(\''+t.id+'\')">'
       +'<div class="tmpl-card-preview">'
@@ -1387,11 +1388,12 @@ function showToast(msg, duration){
   var examples = ['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
   var idx = 0;
   function rotate(){
-    var el = document.getElementById('chat-placeholder-text');
-    if(el){ el.textContent = examples[idx % examples.length]; idx++; }
+    var el = document.getElementById('msgInput');
+    if(!el || document.activeElement===el) return;
+    idx = (idx+1) % examples.length;
+    el.setAttribute('placeholder','例：'+examples[idx]);
   }
-  rotate();
-  setInterval(rotate, 3000);
+  setInterval(rotate, 3500);
 })();
 </script>
 </body>
