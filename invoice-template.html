@@ -823,6 +823,7 @@ body{padding-bottom:80px;}
 <!-- Canvas（判子処理用） -->
 <canvas id="procCanvas" style="display:none;"></canvas>
 
+<script src="shouhizei-ritsu.js"></script>
 <script>
 // ===== 状態管理 =====
 var docType = 'invoice';
@@ -1217,8 +1218,8 @@ function calcTotals(){
   rows.forEach(function(r){
     var a = Math.round(r.qty*r.price);
     sub += a;
-    if(r.tax==='10') t10 += Math.round(a*0.1);
-    else if(r.tax==='8') t8 += Math.round(a*0.08);
+    if(r.tax==='10') t10 += Math.round(a*SHOUHIZEI_RITSU.hyojun);
+    else if(r.tax==='8') t8 += Math.round(a*SHOUHIZEI_RITSU.keigen);
   });
   var mid = sub+t10+t8;
 
@@ -1284,8 +1285,8 @@ function buildDocPreviewHTML(){
   var sub=0, t10=0, t8=0;
   rows.forEach(function(r){
     var a=Math.round(r.qty*r.price); sub+=a;
-    if(r.tax==='10') t10+=Math.round(a*0.1);
-    else if(r.tax==='8') t8+=Math.round(a*0.08);
+    if(r.tax==='10') t10+=Math.round(a*SHOUHIZEI_RITSU.hyojun);
+    else if(r.tax==='8') t8+=Math.round(a*SHOUHIZEI_RITSU.keigen);
   });
   var mid=sub+t10+t8;
   var disc=0;
@@ -1390,7 +1391,7 @@ function buildDocPreviewHTML(){
     if(cfg.unit) h += '<td style="padding:3px 4px;text-align:center;">'+row.unit+'</td>';
     h += '<td style="padding:3px 4px;text-align:right;font-family:\'DM Mono\',monospace;white-space:nowrap;">'+row.price.toLocaleString()+'</td>';
     if(cfg.taxRow){
-      var taxAmt = row.tax==='10'?Math.round(amt*0.1):row.tax==='8'?Math.round(amt*0.08):0;
+      var taxAmt = row.tax==='10'?Math.round(amt*SHOUHIZEI_RITSU.hyojun):row.tax==='8'?Math.round(amt*SHOUHIZEI_RITSU.keigen):0;
       h += '<td style="padding:3px 4px;text-align:right;font-family:\'DM Mono\',monospace;white-space:nowrap;">'+(row.tax==='0'?'非課税':'¥'+taxAmt.toLocaleString())+'</td>';
     }
     h += '<td style="padding:3px 4px;text-align:right;font-family:\'DM Mono\',monospace;white-space:nowrap;">'+amt.toLocaleString()+'</td>';
@@ -1521,8 +1522,8 @@ function buildPrompt(){
   var sub=0,t10=0,t8=0;
   rows.forEach(function(r){
     var a=Math.round(r.qty*r.price);sub+=a;
-    if(r.tax==='10')t10+=Math.round(a*0.1);
-    else if(r.tax==='8')t8+=Math.round(a*0.08);
+    if(r.tax==='10')t10+=Math.round(a*SHOUHIZEI_RITSU.hyojun);
+    else if(r.tax==='8')t8+=Math.round(a*SHOUHIZEI_RITSU.keigen);
   });
   var mid=sub+t10+t8;
   var disc=0;
