@@ -432,6 +432,11 @@ body{padding-bottom:80px;}
   </div>
 </div>
 
+<script src="shakaihoken-hyo.js"></script>
+<script src="koyohoken-ritsu.js"></script>
+<script src="rouki-ritsu.js"></script>
+<script src="saitei-chingin.js"></script>
+<script src="shotokuzei-hyou.js"></script>
 <script>
 const MONTHLY=[
   {id:'attend',label:'出勤日数',type:'info',cat:'勤怠',default:true,canRemove:false,value:'__日 / 所定__日',formula:null,title:null,rates:null},
@@ -1863,6 +1868,24 @@ function closeGuideModal(){
   document.getElementById('spGuideModal').classList.remove('open');
   document.body.style.overflow='';
 }
+
+function initRates(){
+  if(typeof SHAKAIHOKEN_HYO === 'undefined' || typeof KOYOHOKEN_RITSU === 'undefined' || typeof ROUKI_RITSU === 'undefined' || typeof SAITEI_CHINGIN === 'undefined') return;
+  var setVal = function(id, key, val){
+    var item = MONTHLY.find(function(m){ return m.id===id; });
+    if(item && item.rates){ var r=item.rates.find(function(r){ return r.key===key; }); if(r) r.val=val; }
+  };
+  setVal('health',   'rate', SHAKAIHOKEN_HYO.KENKO_RITSU.tokyo.jugyoin);
+  setVal('pension',  'rate', SHAKAIHOKEN_HYO.KOSEI_NENKIN_RITSU_JUGYOIN);
+  setVal('employ',   'rate', KOYOHOKEN_RITSU.jugyoin.ippan);
+  setVal('h_health', 'rate', SHAKAIHOKEN_HYO.KENKO_RITSU.tokyo.jugyoin);
+  setVal('h_pension','rate', SHAKAIHOKEN_HYO.KOSEI_NENKIN_RITSU_JUGYOIN);
+  setVal('h_employ', 'rate', KOYOHOKEN_RITSU.jugyoin.ippan);
+  setVal('overtime', 'rate', ROUKI_RITSU.jikangai.tsujou);
+  setVal('h_ot',     'rate', ROUKI_RITSU.jikangai.tsujou);
+  setVal('h_wage',   'wage', SAITEI_CHINGIN.todofuken.tokyo.chingin);
+}
+document.addEventListener('DOMContentLoaded', initRates);
 </script>
 </body>
 </html>
