@@ -952,7 +952,12 @@ function removeRow(id){
 }
 function updateRow(id,k,v){
   var r = rows.find(function(r){return r.id===id;});
-  if(r){ r[k]=v; calcTotals(); saveState(); }
+  if(r){
+    r[k]=v; calcTotals(); saveState();
+    var idx = rows.indexOf(r);
+    var tr = document.getElementById('tblBody').querySelectorAll('tr')[idx];
+    if(tr){ var ac=tr.querySelector('.amt-td'); if(ac) ac.textContent='¥'+Math.round(r.qty*r.price).toLocaleString(); }
+  }
 }
 
 function renderRows(){
