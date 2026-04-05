@@ -761,8 +761,8 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <input class="modal-input" id="saveTitle" placeholder="例：VLOOKUP完全一致">
     <div class="modal-label">数式</div>
     <input class="modal-input" id="saveFormula" placeholder="=VLOOKUP(...)">
-    <div class="modal-label">メモ（任意）</div>
-    <input class="modal-input" id="saveMemo" placeholder="例：売上表のB列を検索する時に使う">
+    <div class="modal-label">説明（任意）</div>
+    <input class="modal-input" id="saveMemo" placeholder="例：売上表のB列から名前を引っ張る時に使う">
     <div class="modal-btns">
       <button class="modal-btn secondary" onclick="hideSaveModal()">キャンセル</button>
       <button class="modal-btn primary" onclick="saveToBook()">保存する</button>
@@ -1117,10 +1117,14 @@ async function sendMessage() {
   isAILoading = true;
   var typingId = addTyping();
   try {
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 5000);
     var response = await fetch('/api/claude', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({message:text, history:chatHistory})
+      body: JSON.stringify({message:text, history:chatHistory}),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     removeTyping(typingId);
     if(!response.ok) throw new Error('API error');
     var data = await response.json();
@@ -1215,7 +1219,7 @@ function addAIMsg(rawText, tsvData) {
     saveBar.className = 'save-bar';
     saveBar.id = barId;
     saveBar.innerHTML = '<span>💡 数式帳に保存する？</span>'
-      + '<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\')">保存する</button>';
+      + '<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\',\''+encodeURIComponent(rawText)+'\')">保存する</button>';
     bubble.appendChild(saveBar);
   }
   var avatar = document.createElement('div');
@@ -1244,7 +1248,7 @@ function addAIMsgFallback(question) {
     +'<div class="msg-actions">'
     +(match.formula?'<button class="copy-btn" onclick="copyText(this,\''+match.formula+'\')">📋 数式をコピー</button>':'')
     +'</div>'
-    +(match.formula?'<div class="save-bar" id="fbar_'+Date.now()+'"><span>💡 数式帳に保存する？</span><button class="save-bar-btn" onclick="saveBarAction(\'fbar_'+Date.now()+'\',\''+match.formula+'\')"  >保存する</button></div>':'')
+    +(match.formula?(function(){ var bid='fbar_'+Date.now(); return '<div class="save-bar" id="'+bid+'"><span>💡 数式帳に保存する？</span><button class="save-bar-btn" onclick="saveBarAction(\''+bid+'\',\''+match.formula+'\',\''+encodeURIComponent(match.text)+'\')"  >保存する</button></div>'; })():'')
     +'</div>';
   area.appendChild(div); area.scrollTop = area.scrollHeight;
 }
@@ -1259,19 +1263,18 @@ function addTyping(){
   return id;
 }
 function removeTyping(id){ var el=document.getElementById(id); if(el) el.remove(); }
-function saveBarAction(barId, formula){
+function saveBarAction(barId, formula, encodedText){
   var bar = document.getElementById(barId);
-  if(!bar) return;
+  var memo = encodedText ? decodeURIComponent(encodedText).replace(/<[^>]+>/g,'').trim() : '';
   var now = new Date();
   var date = (now.getMonth()+1) + '月' + now.getDate() + '日';
   var title = formula.length > 15 ? formula.substring(0,15) + '…' : formula;
-  savedFormulas.unshift({title:title, formula:formula, memo:'', date:date});
-  try{ localStorage.setItem('savedFormulas', JSON.stringify(savedFormulas)); }catch(e){}
+  savedFormulas.unshift({title:title, formula:formula, memo:memo, date:date});
+  renderBook();
   document.getElementById('bookNavBadge').classList.add('show');
   var badge = document.getElementById('bookBadge');
   if(badge) badge.style.display = 'inline-block';
-  bar.classList.add('saved');
-  bar.innerHTML = '<span>✅ 数式帳に保存済み</span>';
+  if(bar){ bar.classList.add('saved'); bar.innerHTML = '<span>✅ 数式帳に保存済み</span>'; }
   showToast('📚 保存したよ！数式帳で確認できるよ');
 }
 
@@ -1309,7 +1312,7 @@ function renderBook(){
   el.innerHTML = '<div class="fb-list">'+savedFormulas.map(function(f,i){
     return '<div class="fb-item"><div class="fb-item-top"><div class="fb-item-title">'+f.title+'</div><div class="fb-item-date">'+f.date+'</div></div>'
       +'<div class="fb-item-formula">'+f.formula+'</div>'
-      +(f.memo?'<div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.6;">'+f.memo+'</div>':'')
+      +(f.memo?'<div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.6;">'+colorizeFormula(f.memo).replace(/\n/g,'<br>')+'</div>':'')
       +'<div class="fb-item-actions">'
       +'<button class="fb-action-btn" onclick="copyForBook('+i+')">📋 コピー</button>'
       +'<button class="fb-action-btn fb-delete-btn" onclick="deleteFromBook('+i+')">🗑 削除</button>'
