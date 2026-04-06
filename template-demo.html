@@ -352,6 +352,12 @@ body{padding-bottom:80px;}
     <div class="paper-sec">
       <div class="sec-label">明細の設定</div>
 
+      <div style="margin-bottom:14px;">
+        <div class="paper-step-label">勤務地（健康保険料率・最低賃金に影響）</div>
+        <select id="prefSelect" onchange="onPrefChange()" style="width:100%;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;">
+        </select>
+      </div>
+
       <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
       <div style="margin-bottom:14px;">
         <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
@@ -1858,6 +1864,8 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
   init();
   updateFitCheck();
+  initRates();
+  initPrefSelect();
 });
 
 function openGuideModal(){
@@ -1868,6 +1876,74 @@ function closeGuideModal(){
   document.getElementById('spGuideModal').classList.remove('open');
   document.body.style.overflow='';
 }
+
+function initPrefSelect(){
+  var sel = document.getElementById('prefSelect');
+  if(!sel) return;
+  var prefs = [
+    {code:'hokkaido',name:'北海道'},{code:'aomori',name:'青森県'},{code:'iwate',name:'岩手県'},
+    {code:'miyagi',name:'宮城県'},{code:'akita',name:'秋田県'},{code:'yamagata',name:'山形県'},
+    {code:'fukushima',name:'福島県'},{code:'ibaraki',name:'茨城県'},{code:'tochigi',name:'栃木県'},
+    {code:'gunma',name:'群馬県'},{code:'saitama',name:'埼玉県'},{code:'chiba',name:'千葉県'},
+    {code:'tokyo',name:'東京都'},{code:'kanagawa',name:'神奈川県'},{code:'niigata',name:'新潟県'},
+    {code:'toyama',name:'富山県'},{code:'ishikawa',name:'石川県'},{code:'fukui',name:'福井県'},
+    {code:'yamanashi',name:'山梨県'},{code:'nagano',name:'長野県'},{code:'gifu',name:'岐阜県'},
+    {code:'shizuoka',name:'静岡県'},{code:'aichi',name:'愛知県'},{code:'mie',name:'三重県'},
+    {code:'shiga',name:'滋賀県'},{code:'kyoto',name:'京都府'},{code:'osaka',name:'大阪府'},
+    {code:'hyogo',name:'兵庫県'},{code:'nara',name:'奈良県'},{code:'wakayama',name:'和歌山県'},
+    {code:'tottori',name:'鳥取県'},{code:'shimane',name:'島根県'},{code:'okayama',name:'岡山県'},
+    {code:'hiroshima',name:'広島県'},{code:'yamaguchi',name:'山口県'},{code:'tokushima',name:'徳島県'},
+    {code:'kagawa',name:'香川県'},{code:'ehime',name:'愛媛県'},{code:'kochi',name:'高知県'},
+    {code:'fukuoka',name:'福岡県'},{code:'saga',name:'佐賀県'},{code:'nagasaki',name:'長崎県'},
+    {code:'kumamoto',name:'熊本県'},{code:'oita',name:'大分県'},{code:'miyazaki',name:'宮崎県'},
+    {code:'kagoshima',name:'鹿児島県'},{code:'okinawa',name:'沖縄県'}
+  ];
+  prefs.forEach(function(p){
+    var opt = document.createElement('option');
+    opt.value = p.code;
+    opt.textContent = p.name;
+    if(p.code === 'tokyo') opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onPrefChange(){
+  var code = document.getElementById('prefSelect').value;
+  if(!code) return;
+  var kenkoMap = {
+    hokkaido:0.05155,aomori:0.04925,iwate:0.04855,miyagi:0.05040,akita:0.05005,
+    yamagata:0.04920,fukushima:0.04900,ibaraki:0.04910,tochigi:0.04985,gunma:0.04910,
+    saitama:0.04940,chiba:0.04935,tokyo:0.04955,kanagawa:0.04950,niigata:0.04925,
+    toyama:0.04910,ishikawa:0.04940,fukui:0.04925,yamanashi:0.04935,nagano:0.04895,
+    gifu:0.05015,shizuoka:0.04930,aichi:0.05045,mie:0.05010,shiga:0.04985,
+    kyoto:0.05015,osaka:0.05100,hyogo:0.05090,nara:0.05035,wakayama:0.05065,
+    tottori:0.04940,shimane:0.05030,okayama:0.05125,hiroshima:0.05085,yamaguchi:0.05065,
+    tokushima:0.05130,kagawa:0.05140,ehime:0.05130,kochi:0.05155,fukuoka:0.05225,
+    saga:0.05390,nagasaki:0.05230,kumamoto:0.05110,oita:0.05125,miyazaki:0.05100,
+    kagoshima:0.05190,okinawa:0.04720
+  };
+  var chinginMap = {
+    hokkaido:1107,aomori:1055,iwate:1047,miyagi:1055,akita:1031,yamagata:1037,
+    fukushima:1028,ibaraki:1077,tochigi:1078,gunma:1057,saitama:1148,chiba:1145,
+    tokyo:1226,kanagawa:1225,niigata:1063,toyama:1072,ishikawa:1058,fukui:1049,
+    yamanashi:1055,nagano:1072,gifu:1068,shizuoka:1105,aichi:1145,mie:1092,
+    shiga:1082,kyoto:1124,osaka:1177,hyogo:1118,nara:1053,wakayama:1043,
+    tottori:1027,shimane:1032,okayama:1050,hiroshima:1090,yamaguchi:1043,
+    tokushima:1051,kagawa:1071,ehime:1023,kochi:1023,fukuoka:1065,saga:1024,
+    nagasaki:1020,kumamoto:1034,oita:1019,miyazaki:1023,kagoshima:1020,okinawa:1023
+  };
+  var kenkoRitsu = kenkoMap[code] || kenkoMap['tokyo'];
+  var chingin = chinginMap[code] || chinginMap['tokyo'];
+  var setVal = function(id, key, val){
+    var item = MONTHLY.find(function(m){ return m.id===id; });
+    if(item && item.rates){ var r=item.rates.find(function(r){ return r.key===key; }); if(r) r.val=val; }
+  };
+  if(cRates['health'])  cRates['health']['rate']  = kenkoRitsu;
+  if(cRates['h_health'])cRates['h_health']['rate'] = kenkoRitsu;
+  if(cRates['h_wage'])  cRates['h_wage']['wage']   = chingin;
+  render();
+}
+
 
 function initRates(){
   if(typeof SHAKAIHOKEN_HYO === 'undefined' || typeof KOYOHOKEN_RITSU === 'undefined' || typeof ROUKI_RITSU === 'undefined' || typeof SAITEI_CHINGIN === 'undefined') return;
@@ -1885,7 +1961,7 @@ function initRates(){
   setVal('h_ot',     'rate', ROUKI_RITSU.jikangai.tsujou);
   setVal('h_wage',   'wage', SAITEI_CHINGIN.todofuken.tokyo.chingin);
 }
-document.addEventListener('DOMContentLoaded', initRates);
+
 </script>
 </body>
 </html>
