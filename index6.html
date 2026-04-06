@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Exally（エクサリー）- デモ</title>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background:#F4F7F5;color:#2E4038;overflow:hidden;}
@@ -61,7 +60,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;}
 .mobile-logo-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;}
 .mobile-logo-ja{font-size:10px;color:#7A9A87;}
-.mobile-header-right{display:flex;gap:6px;}
+.mobile-header-right{display:flex;gap:6px;align-items:center;}
 .hbadge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .hbadge-warn{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
 .hbadge-mint{background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;}
@@ -147,7 +146,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .cancel-reassure p{font-size:12px;color:#7A9A87;line-height:1.8;}
 .cancel-reassure strong{color:#1A2B22;}
 .chat-wrap{display:flex;flex-direction:column;height:100%;}
-.chat-area{flex:1;overflow-y:auto;padding:16px 16px 10px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;}
+.chat-area{flex:1;overflow-y:auto;padding:16px 16px 10px;display:flex;flex-direction:column;gap:12px;}
 @media(min-width:769px){.chat-area{padding:24px 40px 16px;max-width:860px;margin:0 auto;width:100%;}}
 .welcome-msg{text-align:center;padding:16px 14px 14px;background:#ffffff;border-radius:20px;box-shadow:0 2px 12px rgba(30,60,40,0.08);}
 .welcome-sub{display:none;}
@@ -179,8 +178,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .q-btn-icon{font-size:15px;flex-shrink:0;}
 .q-btn-arrow{margin-left:auto;color:#C8ECD8;font-size:14px;flex-shrink:0;}
 .quick-btns{display:flex;flex-direction:column;gap:8px;max-width:480px;margin:0 auto;}
-.quick-btn{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 12px;font-size:12px;color:#2E4038;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;font-weight:500;transition:all 0.18s;}
-.quick-btn:hover{background:#F0FAF4;border-color:#52B788;}
+.quick-btn{background:#F0FAF4;border:1.5px solid #E0EDE6;border-radius:10px;padding:8px 12px;font-size:12px;color:#1A2B22;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;width:100%;}
 .msg{display:flex;gap:9px;align-items:flex-end;max-width:85%;}
 .msg.user{flex-direction:row-reverse;align-self:flex-end;}
 .msg.ai{align-self:flex-start;}
@@ -189,6 +187,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .msg.user .msg-avatar{background:#52B788;color:white;}
 .msg-bubble{background:#ffffff;border:1px solid #D4EDE1;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:13px;line-height:1.75;color:#2E4038;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .msg.user .msg-bubble{background:#52B788;border-color:#52B788;color:white;border-radius:16px 16px 4px 16px;}
+.msg.ai.memory-active .msg-bubble{background:#F0FAF4;border-color:#C8ECD8;}
 .formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;border-radius:8px;margin:10px 0;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
 .inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
 .msg-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
@@ -211,7 +210,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .ptab-wrap{flex-shrink:0;background:#fff;border-top:1px solid #E0EDE6;padding:4px 14px;}
 .ptab-toggle-btn{width:100%;background:none;border:none;color:#3D9E72;font-size:12px;font-weight:700;padding:5px 0;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;}
 .ptab-expanded{display:flex;flex-direction:column;gap:6px;}
-.quick-btn{background:#F0FAF4;border:1.5px solid #E0EDE6;border-radius:10px;padding:8px 12px;font-size:12px;color:#1A2B22;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;width:100%;}
 .chat-input-wrap{padding:10px 16px max(14px,env(safe-area-inset-bottom));background:#ffffff;border-top:1px solid #D4EDE1;display:flex;gap:9px;align-items:flex-end;position:sticky;bottom:0;z-index:10;flex-shrink:0;}
 @media(min-width:769px){.chat-input-wrap{padding:14px 40px 20px;max-width:860px;margin:0 auto;width:100%;border-top:none;}}
 .chat-input{flex:1;background:#F0FAF4;border:1.5px solid #D4EDE1;border-radius:12px;padding:11px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;outline:none;resize:none;min-height:44px;max-height:120px;transition:border-color 0.2s;line-height:1.5;}
@@ -338,7 +336,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#3D9E72;color:white;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;z-index:999;opacity:0;transition:all 0.3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(min-width:769px){.toast{bottom:30px;}}
-
 .tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:300;flex-direction:column;background:#F4F7F5;}
 .tmpl-iframe-screen.show{display:flex;}
 .tmpl-iframe-bar{background:#fff;border-bottom:1px solid #E0EDE6;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
@@ -354,10 +351,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:600px){.tmpl-cards-grid{grid-template-columns:repeat(3,1fr);}}
 .tmpl-card-item{background:#fff;border-radius:16px;overflow:hidden;border:1.5px solid #E0EDE6;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .tmpl-card-item:hover{border-color:#52B788;transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,60,40,0.12);}
-.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;clip-path:inset(0);}
+.tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;}
 .tmpl-card-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,#F8FEFA);pointer-events:none;z-index:2;}
-.preview-scale-wrap{width:154px;height:170px;margin:0 auto;overflow:hidden;position:relative;z-index:1;}
-.preview-inner{width:220px;transform:scale(0.70);transform-origin:top left;pointer-events:none;}
+.preview-inner{width:220px;position:absolute;top:0;left:50%;transform:translateX(-50%) scale(0.70);transform-origin:top center;pointer-events:none;z-index:1;}
 .preview-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#B0C4BA;gap:6px;}
 .preview-placeholder-icon{font-size:28px;}
 .preview-placeholder-text{font-size:10px;}
@@ -365,30 +361,23 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .tmpl-card-body{padding:4px 8px 4px;}
 .tmpl-card-name{font-size:12px;font-weight:700;color:#1A2B22;margin-bottom:0;}
 .tmpl-card-desc{display:none;}
-
-
-
-
 .formula-text,.formula-chip,.code-block,pre,code{font-family:'DM Mono',monospace;}
-
 .cat-card-wide{border:1.5px solid #52B788;border-radius:16px;padding:14px 16px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:space-between;width:100%;background:linear-gradient(135deg,#3D9E72,#52B788);box-shadow:0 3px 12px rgba(61,158,114,0.25);}
 .cat-card-wide .cat-card-title{color:#fff;}
 .cat-card-wide .cat-card-sub{color:rgba(255,255,255,0.85);}
 .cat-card-wide-arrow{font-size:20px;color:rgba(255,255,255,0.8);font-weight:700;}
 .cat-card-wide:active{transform:scale(0.98);}
 .cat-card-wide-left{display:flex;align-items:center;gap:10px;}
-.cat-card-wide-arrow{font-size:20px;color:#52B788;font-weight:700;}
-
 .arg-blue{color:#4A90D9;font-weight:700;}
 .arg-orange{color:#E8843A;font-weight:700;}
 .arg-purple{color:#9B5DE5;font-weight:700;}
 .arg-green{color:#2E9E6B;font-weight:700;}
-
-.memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;}
+.memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;justify-content:space-between;}
+.new-chat-link{font-size:11px;color:#7A9A87;cursor:pointer;white-space:nowrap;padding:2px 6px;border-radius:6px;transition:all 0.18s;display:none;background:none;border:none;font-family:'Noto Sans JP',sans-serif;}
+.new-chat-link:hover{color:#3D9E72;background:#F0FAF4;}
 @media(min-width:769px){.ptab-wrap{max-width:860px;margin:0 auto;width:100%;border-top:none;padding:4px 40px;}}
 @media(min-width:769px){.memory-bar{padding:4px 0 6px;}}
-
-.chat-back-bar{padding:8px 16px;background:#F8FEFC;border-bottom:1px solid #E8F0EC;flex-shrink:0;}
+.chat-back-bar{padding:6px 16px;background:#F8FEFC;border-top:1px solid #E8F0EC;flex-shrink:0;}
 .chat-back-btn{background:none;border:none;font-size:12px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0;}
 </style>
 </head>
@@ -425,10 +414,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         <h2 class="ob-title">あなたの<br>目的を教えて。</h2>
         <p class="ob-sub">あなたに合ったExcel学習を提案します。</p>
         <div class="ob-cats">
-          <div class="ob-cat" onclick="selectCat(this,'📊 データ分析')"><div class="ob-cat-icon">📊</div><div class="ob-cat-label">データ分析</div></div>
-          <div class="ob-cat" onclick="selectCat(this,'📋 事務・書類作成')"><div class="ob-cat-icon">📋</div><div class="ob-cat-label">事務・書類作成</div></div>
-          <div class="ob-cat" onclick="selectCat(this,'💰 財務・経理')"><div class="ob-cat-icon">💰</div><div class="ob-cat-label">財務・経理</div></div>
-          <div class="ob-cat" onclick="selectCat(this,'🚀 VBA・自動化')"><div class="ob-cat-icon">🚀</div><div class="ob-cat-label">VBA・自動化</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'データ分析')"><div class="ob-cat-icon">📊</div><div class="ob-cat-label">データ分析</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'事務・書類作成')"><div class="ob-cat-icon">📋</div><div class="ob-cat-label">事務・書類作成</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'財務・経理')"><div class="ob-cat-icon">💰</div><div class="ob-cat-label">財務・経理</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'VBA・自動化')"><div class="ob-cat-icon">🚀</div><div class="ob-cat-label">VBA・自動化</div></div>
         </div>
       </div>
     </div>
@@ -489,7 +478,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             <div class="hero-cta-price">¥43<span>/日</span></div>
             <div class="hero-cta-copy">Excelの疑問を今すぐ解決しましょう。<br>日本語でそのまま質問できます。</div>
             <button class="hero-cta-btn">AIに質問する →</button>
-            </div>
           </div>
           <div class="social-proof">
             <div class="sp-avatars">
@@ -548,13 +536,11 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             <p>🔒 <strong>クレジットカード不要</strong>で14日間お試しいただけます。<br>いつでもすぐに解約できます。</p>
           </div>
         </div>
+      </div>
 
       <!-- CHAT -->
       <div class="screen" id="screen-chat">
         <div class="chat-wrap">
-          <div class="chat-back-bar" id="chatBackBar" style="display:none;">
-            <button class="chat-back-btn" onclick="backToCards()">← 最初の画面に戻る</button>
-          </div>
           <div class="chat-area" id="chatArea">
             <div class="welcome-msg" id="welcomeMsg">
               <div class="welcome-sub">わからない操作・エラー・表作りまで何でも日本語で聞くだけでOK</div>
@@ -599,7 +585,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
                 <div class="q-list" id="qList"></div>
               </div>
             </div>
-          </div><!-- /chat-area -->
+          </div>
           <div class="ptab-wrap" id="ptabWrap" style="display:none;">
             <button class="ptab-toggle-btn" id="ptabToggleBtn" onclick="togglePtab()" style="display:none;">💡 よく使う質問を見る ▼</button>
             <div class="ptab-expanded" id="ptabExpanded">
@@ -613,17 +599,23 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
           </div>
+          <div class="chat-back-bar" id="chatBackBar" style="display:none;">
+            <button class="chat-back-btn" onclick="backToCards()">← カテゴリを選ぶ</button>
+          </div>
           <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
-            <div class="memory-bar" id="memoryBar">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</div>
+            <div class="memory-bar" id="memoryBar">
+              <span id="memoryBarText">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</span>
+              <button class="new-chat-link" id="newChatBtn" onclick="clearChatHistory()">🔄 新しい会話</button>
+            </div>
+            <div style="font-size:10px;color:#B0C4BA;padding:0 4px 4px;line-height:1.5;">色がついてる返答はAIが今覚えてるよ</div>
             <div style="display:flex;gap:9px;align-items:flex-end;">
-            <textarea class="chat-input" id="msgInput" placeholder="例：印刷範囲の設定方法は？　給料明細を作りたい" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+              <textarea class="chat-input" id="msgInput" placeholder="例：印刷範囲の設定方法は？　給料明細を作りたい" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+              <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
           </div>
         </div>
-
-    </div>
       </div>
 
       <!-- FORMULA BOOK -->
@@ -731,7 +723,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="23465b424f4f5a0d505653534c515763444e424a4f0d404c4e">[email&#160;protected]</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -741,6 +733,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         </div>
       </div>
 
+    </div>
 
     <nav class="bottom-nav">
       <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span></button>
@@ -761,8 +754,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <input class="modal-input" id="saveTitle" placeholder="例：VLOOKUP完全一致">
     <div class="modal-label">数式</div>
     <input class="modal-input" id="saveFormula" placeholder="=VLOOKUP(...)">
-    <div class="modal-label">説明（任意）</div>
-    <input class="modal-input" id="saveMemo" placeholder="例：売上表のB列から名前を引っ張る時に使う">
     <div class="modal-btns">
       <button class="modal-btn secondary" onclick="hideSaveModal()">キャンセル</button>
       <button class="modal-btn primary" onclick="saveToBook()">保存する</button>
@@ -799,49 +790,29 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+// ===== TEMPLATES =====
 var TEMPLATES = [
-  {
-    id: 'payslip',
-    name: '給料明細',
-    desc: '月給・時給に対応。控除の自動計算付き',
-    file: 'template-demo.html',
-    tags: ['給与系', '人気'],
-    hot: true,
-    previewHTML: '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:1.5px;">給 料 明 細 書</span><span style="font-size:9px;color:rgba(255,255,255,0.85);">2026年4月分</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:rgba(255,255,255,0.9);">○○株式会社</span><span style="font-size:10px;font-weight:700;color:#fff;">山田 太郎</span></div></div><div style="background:#F8FEFC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #C8ECD8;"><span style="font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;">差 引 支 給 額</span><span style="font-size:16px;font-weight:500;color:#3D9E72;">¥231,520</span></div><div style="display:grid;grid-template-columns:1fr 1fr;"><div style="padding:5px 8px;border-right:1px solid #E0EDE6;"><div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">基本給</span><span style="font-size:9px;color:#1A2B22;">¥250,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">残業代</span><span style="font-size:9px;color:#1A2B22;">¥15,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">交通費</span><span style="font-size:9px;color:#1A2B22;">¥12,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">資格手当</span><span style="font-size:9px;color:#1A2B22;">¥5,000</span></div></div><div style="padding:5px 8px;"><div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">🔻 控除</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">健康保険</span><span style="font-size:9px;color:#C62828;">¥13,700</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">厚生年金</span><span style="font-size:9px;color:#C62828;">¥25,620</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">所得税</span><span style="font-size:9px;color:#C62828;">¥6,160</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">住民税</span><span style="font-size:9px;color:#C62828;">¥10,000</span></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;background:#F8FEFC;border-top:1.5px solid #C8ECD8;"><div style="padding:4px 8px;text-align:center;border-right:1px solid #E0EDE6;"><div style="font-size:8px;color:#7A9A87;">総支給額</div><div style="font-size:10px;font-weight:700;color:#2E7D54;">¥282,000</div></div><div style="padding:4px 8px;text-align:center;"><div style="font-size:8px;color:#7A9A87;">控除合計</div><div style="font-size:10px;font-weight:700;color:#C62828;">¥55,480</div></div></div></div>'
-  },
-  {
-    id: 'invoice',
-    name: '請求書・見積書',
-    desc: 'インボイス対応。電子判子・控除明細付き',
-    file: 'invoice-template.html',
-    tags: ['請求系', '人気'],
-    hot: true,
-    previewHTML: '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:3px;">請 求 書</span></div><div style="background:#F0FAF4;padding:5px 10px;border-bottom:1px solid #C8ECD8;"><table style="width:100%;border-collapse:collapse;"><tr><td style="vertical-align:top;padding:2px 6px 2px 0;"><div style="font-weight:700;font-size:9px;color:#1A2B22;margin-bottom:2px;">○○株式会社 御中</div><div style="font-size:6px;color:#4A6B5A;margin-bottom:4px;">下記の通り御請求申し上げます。</div><div style="border-top:1px solid #C8ECD8;padding-top:4px;"><div style="font-size:7px;color:#4A6B5A;margin-bottom:1px;">ご請求金額（税込）</div><div style="font-size:13px;font-weight:700;color:#1A2B22;">¥110,000</div></div></td><td style="vertical-align:top;text-align:right;font-size:7px;color:#4A6B5A;line-height:1.7;padding:2px 0;width:80px;"><div>2026/04/01</div><div>No.INV-001</div><div style="font-weight:700;color:#1A2B22;">○○株式会社</div><div>東京都○○区</div><div>090-0000-0000</div></td></tr></table></div><table style="width:100%;border-collapse:collapse;font-size:8px;"><thead><tr style="background:#F0FAF4;"><th style="padding:3px 6px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:left;">品名</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:center;width:22px;">数量</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:right;width:52px;">金額</th></tr></thead><tbody><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">Webデザイン制作</td><td style="padding:3px 4px;text-align:center;">1</td><td style="padding:3px 4px;text-align:right;">100,000</td></tr><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">修正対応</td><td style="padding:3px 4px;text-align:center;">2</td><td style="padding:3px 4px;text-align:right;">0</td></tr></tbody></table><div style="padding:6px 10px;background:#F8FEFC;"><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>小計</span><span style="min-width:55px;text-align:right;">100,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>消費税（10%）</span><span style="min-width:55px;text-align:right;">10,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:9px;font-weight:700;color:#1A2B22;border-top:1.5px solid #1A2B22;padding-top:4px;"><span>合計（税込）</span><span style="min-width:55px;text-align:right;">110,000</span></div></div></div>'
-  }
+{
+  id:'payslip', name:'給料明細', desc:'月給・時給に対応。控除の自動計算付き',
+  file:'template-demo.html', tags:['給与系','人気'], hot:true,
+  previewHTML:'<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:1.5px;">給 料 明 細 書</span><span style="font-size:9px;color:rgba(255,255,255,0.85);">2026年4月分</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:rgba(255,255,255,0.9);">○○株式会社</span><span style="font-size:10px;font-weight:700;color:#fff;">山田 太郎</span></div></div><div style="background:#F8FEFC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #C8ECD8;"><span style="font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;">差 引 支 給 額</span><span style="font-size:16px;font-weight:500;color:#3D9E72;">¥231,520</span></div><div style="display:grid;grid-template-columns:1fr 1fr;"><div style="padding:5px 8px;border-right:1px solid #E0EDE6;"><div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">基本給</span><span style="font-size:9px;color:#1A2B22;">¥250,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">残業代</span><span style="font-size:9px;color:#1A2B22;">¥15,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">交通費</span><span style="font-size:9px;color:#1A2B22;">¥12,000</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">資格手当</span><span style="font-size:9px;color:#1A2B22;">¥5,000</span></div></div><div style="padding:5px 8px;"><div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">🔻 控除</div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">健康保険</span><span style="font-size:9px;color:#C62828;">¥13,700</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">厚生年金</span><span style="font-size:9px;color:#C62828;">¥25,620</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">所得税</span><span style="font-size:9px;color:#C62828;">¥6,160</span></div><div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:9px;color:#4A6B5A;">住民税</span><span style="font-size:9px;color:#C62828;">¥10,000</span></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;background:#F8FEFC;border-top:1.5px solid #C8ECD8;"><div style="padding:4px 8px;text-align:center;border-right:1px solid #E0EDE6;"><div style="font-size:8px;color:#7A9A87;">総支給額</div><div style="font-size:10px;font-weight:700;color:#2E7D54;">¥282,000</div></div><div style="padding:4px 8px;text-align:center;"><div style="font-size:8px;color:#7A9A87;">控除合計</div><div style="font-size:10px;font-weight:700;color:#C62828;">¥55,480</div></div></div></div>'
+},
+{
+  id:'invoice', name:'請求書・見積書', desc:'インボイス対応。電子判子・控除明細付き',
+  file:'invoice-template.html', tags:['請求系','人気'], hot:true,
+  previewHTML:'<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:3px;">請 求 書</span></div><div style="background:#F0FAF4;padding:5px 10px;border-bottom:1px solid #C8ECD8;"><table style="width:100%;border-collapse:collapse;"><tr><td style="vertical-align:top;padding:2px 6px 2px 0;"><div style="font-weight:700;font-size:9px;color:#1A2B22;margin-bottom:2px;">○○株式会社 御中</div><div style="font-size:6px;color:#4A6B5A;margin-bottom:4px;">下記の通り御請求申し上げます。</div><div style="border-top:1px solid #C8ECD8;padding-top:4px;"><div style="font-size:7px;color:#4A6B5A;margin-bottom:1px;">ご請求金額（税込）</div><div style="font-size:13px;font-weight:700;color:#1A2B22;">¥110,000</div></div></td><td style="vertical-align:top;text-align:right;font-size:7px;color:#4A6B5A;line-height:1.7;padding:2px 0;width:80px;"><div>2026/04/01</div><div>No.INV-001</div><div style="font-weight:700;color:#1A2B22;">○○株式会社</div><div>東京都○○区</div><div>090-0000-0000</div></td></tr></table></div><table style="width:100%;border-collapse:collapse;font-size:8px;"><thead><tr style="background:#F0FAF4;"><th style="padding:3px 6px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:left;">品名</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:center;width:22px;">数量</th><th style="padding:3px 4px;border-bottom:1px solid #C8ECD8;color:#3D9E72;text-align:right;width:52px;">金額</th></tr></thead><tbody><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">Webデザイン制作</td><td style="padding:3px 4px;text-align:center;">1</td><td style="padding:3px 4px;text-align:right;">100,000</td></tr><tr style="border-bottom:1px solid #E8F5EE;"><td style="padding:3px 6px;">修正対応</td><td style="padding:3px 4px;text-align:center;">2</td><td style="padding:3px 4px;text-align:right;">0</td></tr></tbody></table><div style="padding:6px 10px;background:#F8FEFC;"><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>小計</span><span style="min-width:55px;text-align:right;">100,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:8px;color:#4A6B5A;margin-bottom:2px;"><span>消費税（10%）</span><span style="min-width:55px;text-align:right;">10,000</span></div><div style="display:flex;justify-content:flex-end;gap:16px;font-size:9px;font-weight:700;color:#1A2B22;border-top:1.5px solid #1A2B22;padding-top:4px;"><span>合計（税込）</span><span style="min-width:55px;text-align:right;">110,000</span></div></div></div>'
+},
+{id:'attendance',name:'勤怠管理表',desc:'出退勤・残業時間を自動集計',file:'',tags:['勤怠系'],hot:false},
+{id:'expense',name:'経費精算書',desc:'交通費・飲食費など一括管理',file:'',tags:['経費系'],hot:false}
 ];
-TEMPLATES.push({
-    id: 'attendance',
-    name: '勤怠管理表',
-    desc: '出退勤・残業時間を自動集計',
-    file: '',
-    tags: ['勤怠系'],
-    hot: false
-  },
-  {
-    id: 'expense',
-    name: '経費精算書',
-    desc: '交通費・飲食費など一括管理',
-    file: '',
-    tags: ['経費系'],
-    hot: false
-  });
 window.TEMPLATES = TEMPLATES;
 
-// quiz.js stub（テストHTML用・Vercel上では quiz.js が正常読み込み）
+// quiz stub
 function startQuiz(level){ console.log('quiz:'+level); }
 function resetQuiz(){ console.log('resetQuiz'); }
 
+// ===== STATE =====
 var score = 35;
 var usageCount = 0;
 var MAX_FREE = 10;
@@ -849,560 +820,577 @@ var savedFormulas = [];
 var isAILoading = false;
 var obSlide = 0;
 var selectedCat = '';
+var chatHistory = [];
+var talkCount = 0;
+var currentCat = null;
+var lastCat = null;
 
-function saveChatHistory(){}
-function loadChatHistory(){ try{ localStorage.clear(); }catch(e){} }
+// ===== ONBOARDING SKIP FLAG =====
+try{ if(localStorage.getItem('exally_ob_done')==='1'){ document.getElementById('onboarding').classList.add('hide'); } }catch(e){}
+
+// ===== STORAGE KEYS =====
+var CHAT_STORAGE_KEY = 'exally_chat_v1';
+var CHAT_HISTORY_KEY = 'exally_chat_history_v1';
+
+// ===== CHAT PERSISTENCE =====
+function saveChatHistory(){
+  var area = document.getElementById('chatArea');
+  if(!area) return;
+  var msgs = [];
+  area.querySelectorAll('.msg').forEach(function(el){
+    msgs.push({html:el.outerHTML});
+  });
+  try{
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs));
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(chatHistory));
+  }catch(e){}
+}
+
+function loadChatHistory(){
+  try{
+    var savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    if(savedHistory){ var h=JSON.parse(savedHistory); if(Array.isArray(h)) chatHistory=h; }
+    var savedMsgs = localStorage.getItem(CHAT_STORAGE_KEY);
+    if(!savedMsgs) return;
+    var msgs = JSON.parse(savedMsgs);
+    if(!msgs||msgs.length===0) return;
+    var area = document.getElementById('chatArea');
+    if(!area) return;
+    var welcome = document.getElementById('welcomeMsg');
+    if(welcome) welcome.style.display='none';
+    msgs.forEach(function(m){
+      var wrapper = document.createElement('div');
+      wrapper.innerHTML = m.html;
+      if(wrapper.firstChild) area.appendChild(wrapper.firstChild);
+    });
+    area.scrollTop = area.scrollHeight;
+    talkCount = area.querySelectorAll('.msg.ai').length;
+    usageCount = area.querySelectorAll('.msg.user').length;
+    updateMemoryBar();
+    updateUsage();
+    var newBtn = document.getElementById('newChatBtn');
+    if(newBtn) newBtn.style.display='flex';
+    var backBar = document.getElementById('chatBackBar');
+    if(backBar) backBar.style.display='block';
+    collapsePtab();
+  }catch(e){
+    try{ localStorage.removeItem(CHAT_STORAGE_KEY); localStorage.removeItem(CHAT_HISTORY_KEY); }catch(e2){}
+  }
+}
+
+function clearChatHistory(){
+  try{ localStorage.removeItem(CHAT_STORAGE_KEY); localStorage.removeItem(CHAT_HISTORY_KEY); }catch(e){}
+  chatHistory=[]; talkCount=0; usageCount=0;
+  updateUsage(); updateMemoryBar();
+  var area=document.getElementById('chatArea');
+  var welcome=document.getElementById('welcomeMsg');
+  if(area){ area.innerHTML=''; if(welcome){ welcome.style.display=''; area.appendChild(welcome); } }
+  var newBtn=document.getElementById('newChatBtn'); if(newBtn) newBtn.style.display='none';
+  var backBar=document.getElementById('chatBackBar'); if(backBar) backBar.style.display='none';
+  var ptab=document.getElementById('ptabWrap');
+  if(ptab){
+    var expanded=document.getElementById('ptabExpanded');
+    var btn=document.getElementById('ptabToggleBtn');
+    if(expanded) expanded.style.display='flex';
+    if(btn) btn.style.display='none';
+    ptab.style.display='none';
+  }
+  var limitBanner=document.getElementById('limitBanner');
+  if(limitBanner) limitBanner.classList.remove('show');
+}
+
 window.addEventListener('load', loadChatHistory);
 
-// ===== mock2 カードパネル =====
+// ===== CAT Q DATA =====
 var CAT_Q = {
-  ops:{
-    label:'💻 使い方がわからない',
-    items:[
-      {icon:'🖨️', text:'印刷すると変なところで切れる・余白がおかしい'},
-      {icon:'🔒', text:'他の人に触られたくないセルをロックしたい'},
-      {icon:'📌', text:'スクロールしても一番上の行が消えないようにしたい'},
-      {icon:'🔎', text:'この文字を全部別の言葉に一括で変えたい'},
-      {icon:'📊', text:'見やすいグラフをパパっと作りたい'},
-      {icon:'⌨️', text:'マウスを使わず素早く操作するコツを知りたい'}
-    ]
-  },
-  func:{
-    label:'🔢 自動で計算させたい',
-    items:[
-      {icon:'🔍', text:'別のシートから名前や金額を自動で持ってきたい（VLOOKUP）'},
-      {icon:'➕', text:'東京だけ・Aさんだけなど特定の項目を合計したい（SUMIF）'},
-      {icon:'🔀', text:'点数が80以上なら合格・未満なら不合格と自動で表示したい（IF）'},
-      {icon:'🔢', text:'条件に合うものが何個あるか数えたい（COUNTIF）'},
-      {icon:'📊', text:'複数の条件で絞り込んで合計したい（SUMIFS）'},
-      {icon:'🎂', text:'生年月日から今の年齢を自動で計算したい'}
-    ]
-  },
-  err:{
-    label:'⚠️ エラーが出て困っている',
-    items:[
-      {icon:'❌', text:'#VALUE!って出て計算できない。どうすれば直る？'},
-      {icon:'❌', text:'#N/Aが出て邪魔。空白か0に変えたい（IFERROR）'},
-      {icon:'❌', text:'#REF!が出た。セルを消したら出てきた'},
-      {icon:'⚠️', text:'数式は合ってるはずなのに答えがおかしい'},
-      {icon:'🔄', text:'循環参照のエラーが出た。意味がわからない'}
-    ]
-  },
-  pay:{
-    label:'📋 書類・表を作りたい',
-    items:[
-      {icon:'💰', text:'給料明細を作りたい。自動で計算されるやつ'},
-      {icon:'📄', text:'請求書・見積書をExcelで作りたい'},
-      {icon:'🧾', text:'経費精算書を作りたい。交通費・飲食費など'},
-      {icon:'⏰', text:'勤怠管理表を作りたい。残業時間も自動計算で'},
-      {icon:'📈', text:'売上管理表を作りたい。目標達成率も出したい'},
-      {icon:'📦', text:'在庫管理表を作りたい。在庫が減ったら警告が出るやつ'}
-    ]
-  },
-  tips:{
-    label:'⚡ 知ると仕事が速くなる',
-    items:[
-      {icon:'⌨️', text:'Ctrl+Dで上のセルを一瞬でコピーできる（オートフィルより速い）'},
-      {icon:'⌨️', text:'Alt+Shift+=で縦横の合計を一瞬で出す裏技'},
-      {icon:'🎨', text:'数値が高いセルを自動で赤くしたい（条件付き書式）'},
-      {icon:'📋', text:'連続した数字・日付を一気に入力する方法（オートフィル）'},
-      {icon:'🔒', text:'数式のズレを防ぐ$マークの使い方（F4キーで一発）'},
-      {icon:'📊', text:'大量データを秒で集計したい（ピボットテーブル）'},
-      {icon:'🔢', text:'0が勝手に消える・先頭の0を表示させたい'}
-    ]
-  },
-  data:{
-    label:'📊 表を見せて質問する',
-    items:[
-      {icon:'📋', text:'この表でVLOOKUPを使いたい。数式を作って'},
-      {icon:'➕', text:'この表の特定の列だけ合計する数式を作って'},
-      {icon:'⚠️', text:'この表でエラーが出てる。直して'},
-      {icon:'📄', text:'この表を使って請求書の数式を作って'},
-      {icon:'🔢', text:'この表のデータを集計する方法を教えて'}
-    ]
-  }
+  ops:{label:'💻 使い方がわからない',items:[
+    {icon:'🖨️',text:'印刷すると変なところで切れる・余白がおかしい'},
+    {icon:'🔒',text:'他の人に触られたくないセルをロックしたい'},
+    {icon:'📌',text:'スクロールしても一番上の行が消えないようにしたい'},
+    {icon:'🔎',text:'この文字を全部別の言葉に一括で変えたい'},
+    {icon:'📊',text:'見やすいグラフをパパっと作りたい'},
+    {icon:'⌨️',text:'マウスを使わず素早く操作するコツを知りたい'}
+  ]},
+  func:{label:'🔢 自動で計算させたい',items:[
+    {icon:'🔍',text:'別のシートから名前や金額を自動で持ってきたい（VLOOKUP）'},
+    {icon:'➕',text:'東京だけ・Aさんだけなど特定の項目を合計したい（SUMIF）'},
+    {icon:'🔀',text:'点数が80以上なら合格・未満なら不合格と自動で表示したい（IF）'},
+    {icon:'🔢',text:'条件に合うものが何個あるか数えたい（COUNTIF）'},
+    {icon:'📊',text:'複数の条件で絞り込んで合計したい（SUMIFS）'},
+    {icon:'🎂',text:'生年月日から今の年齢を自動で計算したい'}
+  ]},
+  err:{label:'⚠️ エラーが出て困っている',items:[
+    {icon:'❌',text:'#VALUE!って出て計算できない。どうすれば直る？'},
+    {icon:'❌',text:'#N/Aが出て邪魔。空白か0に変えたい（IFERROR）'},
+    {icon:'❌',text:'#REF!が出た。セルを消したら出てきた'},
+    {icon:'⚠️',text:'数式は合ってるはずなのに答えがおかしい'},
+    {icon:'🔄',text:'循環参照のエラーが出た。意味がわからない'}
+  ]},
+  pay:{label:'📋 書類・表を作りたい',items:[
+    {icon:'💰',text:'給料明細を作りたい。自動で計算されるやつ'},
+    {icon:'📄',text:'請求書・見積書をExcelで作りたい'},
+    {icon:'🧾',text:'経費精算書を作りたい。交通費・飲食費など'},
+    {icon:'⏰',text:'勤怠管理表を作りたい。残業時間も自動計算で'},
+    {icon:'📈',text:'売上管理表を作りたい。目標達成率も出したい'},
+    {icon:'📦',text:'在庫管理表を作りたい。在庫が減ったら警告が出るやつ'}
+  ]},
+  tips:{label:'⚡ 知ると仕事が速くなる',items:[
+    {icon:'⌨️',text:'Ctrl+Dで上のセルを一瞬でコピーできる（オートフィルより速い）'},
+    {icon:'⌨️',text:'Alt+Shift+=で縦横の合計を一瞬で出す裏技'},
+    {icon:'🎨',text:'数値が高いセルを自動で赤くしたい（条件付き書式）'},
+    {icon:'📋',text:'連続した数字・日付を一気に入力する方法（オートフィル）'},
+    {icon:'🔒',text:'数式のズレを防ぐ$マークの使い方（F4キーで一発）'},
+    {icon:'📊',text:'大量データを秒で集計したい（ピボットテーブル）'},
+    {icon:'🔢',text:'0が勝手に消える・先頭の0を表示させたい'}
+  ]},
+  data:{label:'📊 表を見せて質問する',items:[
+    {icon:'📋',text:'この表でVLOOKUPを使いたい。数式を作って'},
+    {icon:'➕',text:'この表の特定の列だけ合計する数式を作って'},
+    {icon:'⚠️',text:'この表でエラーが出てる。直して'},
+    {icon:'📄',text:'この表を使って請求書の数式を作って'},
+    {icon:'🔢',text:'この表のデータを集計する方法を教えて'}
+  ]}
 };
 
-
-
+// ===== MEMORY BAR =====
 function updateMemoryBar(){
-  var bar = document.getElementById('memoryBar');
-  if(!bar) return;
+  var span = document.getElementById('memoryBarText');
+  if(!span) return;
   var msg = talkCount === 0 ? 'まだ話してないよ' : talkCount+'回話したね';
-  bar.textContent = '✨ 直近20回分覚えてるよ　💬 '+msg;
+  span.textContent = '✨ 直近20回分覚えてるよ　💬 '+msg;
 }
 
-function backToCards(){
-  var chatArea = document.getElementById('chatArea');
-  var welcomeMsg = document.getElementById('welcomeMsg');
-  var backBar = document.getElementById('chatBackBar');
-  if(chatArea) chatArea.innerHTML = '';
-  chatArea.appendChild(welcomeMsg);
-  welcomeMsg.style.display = '';
-  if(backBar) backBar.style.display = 'none';
-}
-function colorizeFormula(text) {
-  // 括弧・カンマを全角半角両対応で正規化してから色付け
-  var lp = '[\\(（]';
-  var rp = '[\\)）]';
-  var cm = '[,，]';
-  // VLOOKUP
-  var reVL = new RegExp('=VLOOKUP' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^,，]+)' + cm + '\\s*(FALSE|TRUE)\\s*' + rp, 'gi');
-  text = text.replace(reVL, function(m,a1,a2,a3,a4){
-    return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';
-  });
-  // SUMIF
-  var reSI = new RegExp('=SUMIF' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
-  text = text.replace(reSI, function(m,a1,a2,a3){
-    return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
-  });
-  // IF
-  var reIF = new RegExp('=IF' + lp + '([^,，]+)' + cm + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
-  text = text.replace(reIF, function(m,a1,a2,a3){
-    return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
-  });
-  // COUNTIF
-  var reCI = new RegExp('=COUNTIF' + lp + '([^,，]+)' + cm + '([^)）]+)' + rp, 'gi');
-  text = text.replace(reCI, function(m,a1,a2){
-    return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
-  });
-  // 説明行：絵文字+**テキスト**を対応色に
-  var b = String.fromCodePoint(0x1F535);
-  var o = String.fromCodePoint(0x1F7E0);
-  var p = String.fromCodePoint(0x1F7E3);
-  var g = String.fromCodePoint(0x1F7E2);
-  var reB = new RegExp(b + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
-  var reO = new RegExp(o + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
-  var reP = new RegExp(p + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
-  var reG = new RegExp(g + '\\s*\\*\\*([^*]+)\\*\\*', 'g');
-  text = text.replace(reB, b+' <span class="arg-blue">$1</span>');
-  text = text.replace(reO, o+' <span class="arg-orange">$1</span>');
-  text = text.replace(reP, p+' <span class="arg-purple">$1</span>');
-  text = text.replace(reG, g+' <span class="arg-green">$1</span>');
+// ===== FORMULA COLORIZER =====
+function colorizeFormula(text){
+  var lp='[\\(（]', rp='[\\)）]', cm='[,，]';
+  var reVL=new RegExp('=VLOOKUP'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^,，]+)'+cm+'\\s*(FALSE|TRUE)\\s*'+rp,'gi');
+  text=text.replace(reVL,function(m,a1,a2,a3,a4){return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
+  var reSI=new RegExp('=SUMIF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reSI,function(m,a1,a2,a3){return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reIF=new RegExp('=IF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reIF,function(m,a1,a2,a3){return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reCI=new RegExp('=COUNTIF'+lp+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reCI,function(m,a1,a2){return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  var b='\uD83D\uDD35',o='\uD83D\uDFE0',p='\uD83D\uDFE3',g='\uD83D\uDFE2';
+  text=text.replace(new RegExp(b+'\\s*\\*\\*([^*]+)\\*\\*','g'),b+' <span class="arg-blue">$1</span>');
+  text=text.replace(new RegExp(o+'\\s*\\*\\*([^*]+)\\*\\*','g'),o+' <span class="arg-orange">$1</span>');
+  text=text.replace(new RegExp(p+'\\s*\\*\\*([^*]+)\\*\\*','g'),p+' <span class="arg-purple">$1</span>');
+  text=text.replace(new RegExp(g+'\\s*\\*\\*([^*]+)\\*\\*','g'),g+' <span class="arg-green">$1</span>');
   return text;
 }
 
-var currentCat = null;
-var lastCat = null;
-var chatHistory = [];
-var talkCount = 0;
-
-function togglePanel(cat) {
-  if (currentCat === cat) { closePanel(); return; }
-  currentCat = cat;
-  lastCat = cat;
-  document.querySelectorAll('#welcomeMsg .cat-card, #welcomeMsg .cat-card-wide').forEach(function(c){ c.classList.remove('active'); });
-  var cardEl = document.getElementById('card-' + cat);
-  if (cardEl) cardEl.classList.add('active');
-  var panel = document.getElementById('qPanel');
-  var label = document.getElementById('qPanelLabel');
-  var list = document.getElementById('qList');
-  label.textContent = CAT_Q[cat].label;
-  list.innerHTML = CAT_Q[cat].items.map(function(q){
-    return '<button class="q-btn" onclick="setQ(\'' + q.text.replace(/'/g, "\\'") + '\')">'
-      + '<span class="q-btn-icon">' + q.icon + '</span>'
-      + q.text
-      + '<span class="q-btn-arrow">›</span>'
-      + '</button>';
+// ===== PANEL =====
+function togglePanel(cat){
+  if(currentCat===cat){ closePanel(); return; }
+  currentCat=cat; lastCat=cat;
+  document.querySelectorAll('#welcomeMsg .cat-card').forEach(function(c){ c.classList.remove('active'); });
+  var cardEl=document.getElementById('card-'+cat);
+  if(cardEl) cardEl.classList.add('active');
+  var panel=document.getElementById('qPanel');
+  var label=document.getElementById('qPanelLabel');
+  var list=document.getElementById('qList');
+  label.textContent=CAT_Q[cat].label;
+  list.innerHTML=CAT_Q[cat].items.map(function(q){
+    var safe=q.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<button class="q-btn" onclick="setQ(\''+safe+'\')"><span class="q-btn-icon">'+q.icon+'</span>'+q.text+'<span class="q-btn-arrow">›</span></button>';
   }).join('');
   panel.classList.add('show');
-  var ptab = document.getElementById('ptabWrap');
-  if(ptab) ptab.style.display = 'none';
-  setTimeout(function(){ panel.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 50);
+  var ptab=document.getElementById('ptabWrap');
+  if(ptab) ptab.style.display='none';
+  setTimeout(function(){ panel.scrollIntoView({behavior:'smooth',block:'nearest'}); },50);
 }
 
-function closePanel() {
-  currentCat = null;
-  document.querySelectorAll('#welcomeMsg .cat-card, #welcomeMsg .cat-card-wide').forEach(function(c){ c.classList.remove('active'); });
-  var panel = document.getElementById('qPanel');
-  if (panel) panel.classList.remove('show');
-  var ptab = document.getElementById('ptabWrap');
-  if(ptab) ptab.style.display = '';
+function closePanel(){
+  currentCat=null;
+  document.querySelectorAll('#welcomeMsg .cat-card').forEach(function(c){ c.classList.remove('active'); });
+  var panel=document.getElementById('qPanel');
+  if(panel) panel.classList.remove('show');
+  var ptab=document.getElementById('ptabWrap');
+  if(ptab) ptab.style.display='';
 }
 
-function setQ(text) { sendQuick(text); }
+function setQ(text){ sendQuick(text); }
 
-
-function obNext() {
-  if(obSlide === 2){ skipOnboarding(); return; }
-  document.getElementById('ob' + obSlide).style.display = 'none';
+// ===== ONBOARDING =====
+function obNext(){
+  if(obSlide===2){ skipOnboarding(); return; }
+  document.getElementById('ob'+obSlide).style.display='none';
   obSlide++;
-  document.getElementById('ob' + obSlide).style.display = 'block';
-  document.querySelectorAll('.ob-dot').forEach(function(d,i){ d.classList.toggle('active', i===obSlide); });
-  if(obSlide === 2) document.getElementById('obNextBtn').textContent = 'はじめる';
+  document.getElementById('ob'+obSlide).style.display='block';
+  document.querySelectorAll('.ob-dot').forEach(function(d,i){ d.classList.toggle('active',i===obSlide); });
+  if(obSlide===2) document.getElementById('obNextBtn').textContent='はじめる';
 }
-function skipOnboarding(){ document.getElementById('onboarding').classList.add('hide'); }
-function selectCat(el, cat){
+function skipOnboarding(){
+  document.getElementById('onboarding').classList.add('hide');
+  try{ localStorage.setItem('exally_ob_done','1'); }catch(e){}
+}
+function selectCat(el,cat){
   document.querySelectorAll('.ob-cat').forEach(function(c){ c.classList.remove('selected'); });
-  el.classList.add('selected');
-  selectedCat = cat;
-  setTimeout(function(){ skipOnboarding(); }, 400);
+  el.classList.add('selected'); selectedCat=cat;
+  setTimeout(function(){ skipOnboarding(); },400);
 }
 
-function switchTab(tab) {
+// ===== NAVIGATION =====
+function switchTab(tab){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   document.querySelectorAll('.sidebar-item').forEach(function(n){ n.classList.remove('active'); });
-  document.getElementById('screen-' + tab).classList.add('active');
-  var mobileNav = document.getElementById('nav-' + tab);
-  var sideNav = document.getElementById('snav-' + tab);
+  document.getElementById('screen-'+tab).classList.add('active');
+  var mobileNav=document.getElementById('nav-'+tab);
+  var sideNav=document.getElementById('snav-'+tab);
   if(mobileNav) mobileNav.classList.add('active');
   if(sideNav) sideNav.classList.add('active');
-  if(tab === 'book') renderBook();
-  if(tab === 'template') {
-    var ifs = document.getElementById('tmplIframeScreen');
+  if(tab==='book') renderBook();
+  if(tab==='template'){
+    var ifs=document.getElementById('tmplIframeScreen');
     if(ifs) ifs.classList.remove('show');
-    var tg = document.getElementById('tmplGallery');
-    if(tg) tg.style.display = 'block';
+    var tg=document.getElementById('tmplGallery');
+    if(tg) tg.style.display='block';
     renderTmplGallery();
   }
 }
 
-function renderTmplGallery() {
-  var grid = document.getElementById('tmplCardsGrid');
-  if(!grid || !window.TEMPLATES) return;
-  grid.innerHTML = TEMPLATES.map(function(t){
-    var previewContent = t.previewHTML
-      ? '<div class="preview-scale-wrap"><div class="preview-inner">'+t.previewHTML+'</div></div>'
-      : '<div class="preview-placeholder"><div class="preview-placeholder-icon">📄</div><div class="preview-placeholder-text">準備中✨</div></div>';
+// ===== TEMPLATE =====
+function renderTmplGallery(){
+  var grid=document.getElementById('tmplCardsGrid');
+  if(!grid||!window.TEMPLATES) return;
+  grid.innerHTML=TEMPLATES.map(function(t){
+    var previewContent=t.previewHTML
+      ?'<div class="preview-inner">'+t.previewHTML+'</div>'
+      :'<div class="preview-placeholder"><div class="preview-placeholder-icon">📄</div><div class="preview-placeholder-text">準備中✨</div></div>';
     return '<div class="tmpl-card-item" onclick="openTmplIframe(\''+t.id+'\')">'
-      +'<div class="tmpl-card-preview">'
-      +previewContent
-      +'<div class="tmpl-card-preview-note">※完成イメージ</div></div>'
-      +'<div class="tmpl-card-body">'
-      +'<div class="tmpl-card-name">'+(t.hot?'⭐ ':'')+t.name+'</div>'
-      +'<div class="tmpl-card-desc">'+t.desc+'</div>'
-      +'</div></div>';
+      +'<div class="tmpl-card-preview">'+previewContent+'<div class="tmpl-card-preview-note">※完成イメージ</div></div>'
+      +'<div class="tmpl-card-body"><div class="tmpl-card-name">'+(t.hot?'⭐ ':'')+t.name+'</div></div></div>';
   }).join('');
 }
 
-function openTmplIframe(id) {
-var tmpl = TEMPLATES.find(function(t){ return t.id===id; });
-if(!tmpl) return;
-if(!tmpl.file){ showToast("準備中だよ✨"); return; }
-document.getElementById('tmplIframeTitle').textContent = tmpl.name;
-document.getElementById('tmplIframe').src = tmpl.file;
-document.getElementById('tmplIframeScreen').classList.add('show');
-document.getElementById('tmplGallery').style.display = 'none';
+function openTmplIframe(id){
+  var tmpl=TEMPLATES.find(function(t){ return t.id===id; });
+  if(!tmpl) return;
+  if(!tmpl.file){ showToast('準備中だよ✨'); return; }
+  document.getElementById('tmplIframeTitle').textContent=tmpl.name;
+  document.getElementById('tmplIframe').src=tmpl.file;
+  document.getElementById('tmplIframeScreen').classList.add('show');
+  document.getElementById('tmplGallery').style.display='none';
 }
 
-function closeTmplIframe() {
+function closeTmplIframe(){
   document.getElementById('tmplIframeScreen').classList.remove('show');
-  document.getElementById('tmplIframe').src = '';
-  document.getElementById('tmplGallery').style.display = 'block';
+  document.getElementById('tmplIframe').src='';
+  document.getElementById('tmplGallery').style.display='block';
 }
 
-function sendQuick(t){ document.getElementById('msgInput').value = t; sendMessage(); }
-function setQuestion(t){ document.getElementById('msgInput').value = t; sendMessage(); }
+// ===== CHAT =====
+function sendQuick(t){ document.getElementById('msgInput').value=t; sendMessage(); }
+function setQuestion(t){ document.getElementById('msgInput').value=t; sendMessage(); }
 function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
 function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
 
-async function sendMessage() {
+async function sendMessage(){
   if(isAILoading) return;
-  var input = document.getElementById('msgInput');
-  var text = input.value.trim();
+  var input=document.getElementById('msgInput');
+  var text=input.value.trim();
   if(!text) return;
-  if(usageCount >= MAX_FREE){ showUpgrade(); return; }
-  var welcome = document.getElementById('welcomeMsg');
-  if(welcome) welcome.style.display = 'none';
+  if(usageCount>=MAX_FREE){ showUpgrade(); return; }
+  var welcome=document.getElementById('welcomeMsg');
+  if(welcome) welcome.style.display='none';
   collapsePtab();
-  var bar = document.getElementById('chatBackBar');
-  if(bar) bar.style.display = 'block';
-    addMsg('user', text);
-  input.value = ''; input.style.height = 'auto';
+  var bar=document.getElementById('chatBackBar');
+  if(bar) bar.style.display='block';
+  var newBtn=document.getElementById('newChatBtn');
+  if(newBtn) newBtn.style.display='flex';
+  addMsg('user',text);
+  input.value=''; input.style.height='auto';
   usageCount++; updateUsage();
-  if(usageCount >= 8) document.getElementById('limitBanner').classList.add('show');
-  var sendBtn = document.getElementById('sendBtn');
-  if(sendBtn) sendBtn.disabled = true;
-  isAILoading = true;
-  var typingId = addTyping();
-  try {
-    var controller = new AbortController();
-    var timeoutId = setTimeout(function(){ controller.abort(); }, 5000);
-    var response = await fetch('/api/claude', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({message:text, history:chatHistory}),
-      signal: controller.signal
+  if(usageCount>=8) document.getElementById('limitBanner').classList.add('show');
+  var sendBtn=document.getElementById('sendBtn');
+  if(sendBtn) sendBtn.disabled=true;
+  isAILoading=true;
+  var typingId=addTyping();
+  var area=document.getElementById('chatArea');
+  setTimeout(function(){ area.scrollTop=area.scrollHeight; },50);
+  try{
+    var response=await fetch('/api/claude',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text,history:chatHistory})
     });
-    clearTimeout(timeoutId);
     removeTyping(typingId);
     if(!response.ok) throw new Error('API error');
-    var data = await response.json();
-    addAIMsg(data.text, data.tsv||'');
-    var backBar = document.getElementById('chatBackBar');
-    if(backBar) backBar.style.display = 'block';
+    var data=await response.json();
+    addAIMsg(data.text,data.tsv||'');
     chatHistory.push({role:'user',content:text});
     chatHistory.push({role:'assistant',content:data.text});
-    if(chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
-    talkCount++;
-    updateMemoryBar();
-  } catch(err) {
+    if(chatHistory.length>40) chatHistory=chatHistory.slice(-40);
+    talkCount++; updateMemoryBar();
+    saveChatHistory();
+  }catch(err){
     removeTyping(typingId);
     addAIMsgFallback(text);
-  } finally {
-    if(sendBtn) sendBtn.disabled = false;
-    isAILoading = false;
+    saveChatHistory();
+  }finally{
+    if(sendBtn) sendBtn.disabled=false;
+    isAILoading=false;
   }
 }
 
-function copyTSV(btn, msgId) {
-  var el = document.getElementById(msgId);
-  if(!el) return;
-  var tsv = decodeURIComponent(el.getAttribute('data-tsv')||'');
-  if(!tsv){ showToast('データがありません'); return; }
-  navigator.clipboard.writeText(tsv).then(function(){
-    btn.textContent = '✅ コピー済み';
-    showToast('📋 コピーしたよ！ExcelのA1に貼り付けてみて');
-    setTimeout(function(){ btn.textContent = '📋 Excelにコピー'; }, 3000);
-  });
+function addMsg(role,text){
+  var area=document.getElementById('chatArea');
+  var div=document.createElement('div');
+  div.className='msg '+role;
+  div.innerHTML='<div class="msg-avatar">'+(role==='ai'?'Ex':'矢')+'</div><div class="msg-bubble">'+text+'</div>';
+  area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 
-function addMsg(role, text){
-  var area = document.getElementById('chatArea');
-  var div = document.createElement('div');
-  div.className = 'msg '+role;
-  div.innerHTML = '<div class="msg-avatar">'+(role==='ai'?'Ex':'矢')+'</div><div class="msg-bubble">'+text+'</div>';
-  area.appendChild(div); area.scrollTop = area.scrollHeight;
+function updateMemoryActive(area){
+  var aiMsgList=area.querySelectorAll('.msg.ai');
+  aiMsgList.forEach(function(el){ el.classList.remove('memory-active'); });
+  var idx=aiMsgList.length>20?aiMsgList.length-20:0;
+  if(aiMsgList[idx]) aiMsgList[idx].classList.add('memory-active');
 }
 
-function addAIMsg(rawText, tsvData) {
-  var area = document.getElementById('chatArea');
-  var div = document.createElement('div');
-  div.className = 'msg ai';
-  // 数式を収集→バッククォート囲みを優先、次に=で始まる行
-  var _allF = [];
-  var _m, _p1 = /`(=[^`\n]{2,120})`/g;
-  while((_m = _p1.exec(rawText)) !== null) _allF.push(_m[1]);
-  if(!_allF.length){
-    var _p2 = /(?:^|\n)(=[A-Za-z][^\n]{2,120})/gm;
-    while((_m = _p2.exec(rawText)) !== null) _allF.push(_m[1].trim());
-  }
-  var formula = _allF.length ? _allF[0] : null;
-  var hasTSV = tsvData && tsvData.trim().length > 0;
-  var html = colorizeFormula(rawText)
-    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<div class="formula-block">$1</div>')
-    .replace(/`([^`]+)`/g, '<span class="inline-code">$1</span>')
-    .replace(/\n/g, '<br>');
-  var safeFormula = formula ? formula.replace(/'/g,"&#39;") : '';
-  var msgId = 'msg_' + Date.now();
-  var bubble = document.createElement('div');
-  bubble.className = 'msg-bubble'; bubble.id = msgId;
-  bubble.innerHTML = html;
+function addAIMsg(rawText,tsvData){
+  var area=document.getElementById('chatArea');
+  var div=document.createElement('div');
+  div.className='msg ai';
+  var _allF=[];
+  var _m, _p1=/`(=[^`\n]{2,120})`/g;
+  while((_m=_p1.exec(rawText))!==null) _allF.push(_m[1]);
+  if(!_allF.length){ var _p2=/(?:^|\n)(=[A-Za-z][^\n]{2,120})/gm; while((_m=_p2.exec(rawText))!==null) _allF.push(_m[1].trim()); }
+  var formula=_allF.length?_allF[0]:null;
+  var hasTSV=tsvData&&tsvData.trim().length>0;
+  var html=colorizeFormula(rawText)
+    .replace(/```[\w]*\n?([\s\S]*?)```/g,'<div class="formula-block">$1</div>')
+    .replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>')
+    .replace(/\n/g,'<br>');
+  var safeFormula=formula?formula.replace(/'/g,"&#39;"):'';
+  var msgId='msg_'+Date.now();
+  var bubble=document.createElement('div');
+  bubble.className='msg-bubble'; bubble.id=msgId;
+  bubble.innerHTML=html;
   if(hasTSV){
-    bubble.setAttribute('data-tsv', encodeURIComponent(tsvData));
-    var tsvLines = tsvData.split('\n');
-    var preview = tsvLines.slice(0,6).map(function(r){ return r.replace(/\t/g,'  |  '); }).join('\n');
-    if(tsvLines.length > 6) preview += '\n...';
-    var tsvBlock = document.createElement('div');
-    tsvBlock.className = 'tsv-block';
-    tsvBlock.innerHTML = '<div class="tsv-block-label">Excel貼り付け用データ</div>' + preview;
-    var copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-tsv-btn';
-    copyBtn.textContent = '📋 Excelにコピー';
-    copyBtn.onclick = function(){ copyTSV(copyBtn, msgId); };
+    bubble.setAttribute('data-tsv',encodeURIComponent(tsvData));
+    var tsvLines=tsvData.split('\n');
+    var preview=tsvLines.slice(0,6).map(function(r){ return r.replace(/\t/g,'  |  '); }).join('\n');
+    if(tsvLines.length>6) preview+='\n…';
+    var tsvBlock=document.createElement('div');
+    tsvBlock.className='tsv-block';
+    tsvBlock.innerHTML='<div class="tsv-block-label">Excel貼り付け用データ</div>'+preview;
+    var copyBtn=document.createElement('button');
+    copyBtn.className='copy-tsv-btn'; copyBtn.textContent='📋 Excelにコピー';
+    copyBtn.onclick=function(){ copyTSV(copyBtn,msgId); };
     tsvBlock.appendChild(copyBtn);
     bubble.appendChild(tsvBlock);
   }
-  var actions = document.createElement('div');
-  actions.className = 'msg-actions';
-  if(!hasTSV && formula){
-    var cb = document.createElement('button');
-    cb.className = 'copy-btn';
-    cb.textContent = '📋 数式をコピー';
-    cb.onclick = function(){ copyText(cb, safeFormula); };
+  var actions=document.createElement('div');
+  actions.className='msg-actions';
+  if(!hasTSV&&formula){
+    var cb=document.createElement('button');
+    cb.className='copy-btn'; cb.textContent='📋 数式をコピー';
+    cb.onclick=function(){ copyText(cb,safeFormula); };
     actions.appendChild(cb);
   }
   bubble.appendChild(actions);
   if(formula){
-    var barId = 'bar_' + msgId;
-    var saveBar = document.createElement('div');
-    saveBar.className = 'save-bar';
-    saveBar.id = barId;
-    saveBar.innerHTML = '<span>💡 数式帳に保存する？</span>'
-      + '<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\',\''+encodeURIComponent(rawText)+'\')">保存する</button>';
+    var barId='bar_'+msgId;
+    var saveBar=document.createElement('div');
+    saveBar.className='save-bar'; saveBar.id=barId;
+    saveBar.innerHTML='<span>💡 数式帳に保存する？</span>'
+      +'<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\')">保存する</button>';
     bubble.appendChild(saveBar);
   }
-  var avatar = document.createElement('div');
-  avatar.className = 'msg-avatar'; avatar.textContent = 'Ex';
+  var avatar=document.createElement('div');
+  avatar.className='msg-avatar'; avatar.textContent='Ex';
   div.appendChild(avatar); div.appendChild(bubble);
-  area.appendChild(div); area.scrollTop = area.scrollHeight;
+  area.appendChild(div);
+  area.scrollTop=area.scrollHeight;
+  updateMemoryActive(area);
 }
 
-function addAIMsgFallback(question) {
-  var fallbacks = [
-    {kw:['vlookup'], text:'社員番号を入れたら名前が自動で出てくる、あの便利な関数だよ。\n\n=VLOOKUP(A2,B1:D20,2,FALSE)\n\n🔵 **A2** → 「この番号で探して」って渡すマス\n🟠 **B1:D20** → 探しに行く名簿の範囲\n🟣 **2** → 名前・金額など取り出したいものが何列目か（社員番号の隣の名前なら2、その隣の電話番号なら3）\n🟢 **FALSE** → ここはそのままでOK', formula:'=VLOOKUP(A2,B1:D20,2,FALSE)'},
-    {kw:['#n/a','iferror'], text:'エラーが出たときに、代わりに空白や「-」を表示してくれる関数だよ。\n\n=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),\"\")\n\n🔵 **VLOOKUP(...)** → まず試してほしい数式\n🟠 **\"\"** → エラーのとき代わりに表示するもの', formula:'=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),\"\")'},
-    {kw:['合計','sum','sumif'], text:'「東京の売上だけ合計して」みたいな、条件をつけた足し算ができる関数だよ。\n\n=SUMIF(A1:A20,\"東京\",B1:B20)\n\n🔵 **A1:A20** → 条件が入ってる列\n🟠 **\"東京\"** → この文字が入ってる行だけ計算\n🟣 **B1:B20** → 足し算したい数字の列', formula:'=SUMIF(A1:A20,\"東京\",B1:B20)'},
-    {kw:['if','条件'], text:'「80点以上なら合格、それ以下なら不合格」を自動で判定してくれる関数だよ。\n\n=IF(A1>=80,\"合格\",\"不合格\")\n\n🔵 **A1>=80** → 判定する条件\n🟠 **\"合格\"** → 条件を満たしたときの言葉\n🟣 **\"不合格\"** → 条件を満たさなかったときの言葉', formula:'=IF(A1>=80,\"合格\",\"不合格\")'},
-    {kw:['平均','average'], text:'選んだ範囲の平均を自動で出してくれる関数だよ。\n\n=AVERAGE(A1:A20)\n\n🔵 **A1:A20** → 平均を出したい数字の範囲', formula:'=AVERAGE(A1:A20)'},
+function addAIMsgFallback(question){
+  var fallbacks=[
+    {kw:['vlookup'],text:'社員番号を入れたら名前が自動で出てくる、あの便利な関数だよ。\n\n=VLOOKUP(A2,B1:D20,2,FALSE)\n\n🔵 **A2** → 「この番号で探して」って渡すマス\n🟠 **B1:D20** → 探しに行く名簿の範囲\n🟣 **2** → 取り出したいものが何列目か\n🟢 **FALSE** → ここはそのままでOK',formula:'=VLOOKUP(A2,B1:D20,2,FALSE)'},
+    {kw:['#n/a','iferror'],text:'エラーが出たときに空白や「-」を表示してくれる関数だよ。\n\n=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),"")\n\n🔵 **VLOOKUP(…)** → まず試してほしい数式\n🟠 **""** → エラーのとき代わりに表示するもの',formula:'=IFERROR(VLOOKUP(A2,B1:D20,2,FALSE),"")'},
+    {kw:['合計','sum','sumif'],text:'条件をつけた足し算ができる関数だよ。\n\n=SUMIF(A1:A20,"東京",B1:B20)\n\n🔵 **A1:A20** → 条件が入ってる列\n🟠 **"東京"** → この文字が入ってる行だけ計算\n🟣 **B1:B20** → 足し算したい数字の列',formula:'=SUMIF(A1:A20,"東京",B1:B20)'},
+    {kw:['if','条件'],text:'「80点以上なら合格」を自動で判定してくれる関数だよ。\n\n=IF(A1>=80,"合格","不合格")\n\n🔵 **A1>=80** → 判定する条件\n🟠 **"合格"** → 満たしたときの言葉\n🟣 **"不合格"** → 満たさなかったときの言葉',formula:'=IF(A1>=80,"合格","不合格")'},
+    {kw:['平均','average'],text:'選んだ範囲の平均を出してくれる関数だよ。\n\n=AVERAGE(A1:A20)\n\n🔵 **A1:A20** → 平均を出したい数字の範囲',formula:'=AVERAGE(A1:A20)'}
   ];
-  var q = question.toLowerCase();
-  var match = fallbacks.find(function(f){ return f.kw.some(function(k){ return q.includes(k); }); })
-    || {text:'現在AIに接続できません。しばらくしてからお試しください。', formula:null};
-  var area = document.getElementById('chatArea');
-  var div = document.createElement('div');
-  div.className = 'msg ai';
-  div.innerHTML = '<div class="msg-avatar">Ex</div>'
+  var q=question.toLowerCase();
+  var match=fallbacks.find(function(f){ return f.kw.some(function(k){ return q.includes(k); }); })
+    ||{text:'現在AIに接続できません。しばらくしてからお試しください。',formula:null};
+  var area=document.getElementById('chatArea');
+  var div=document.createElement('div');
+  div.className='msg ai';
+  var fid='fbar_'+Date.now();
+  div.innerHTML='<div class="msg-avatar">Ex</div>'
     +'<div class="msg-bubble">'+colorizeFormula(match.text).replace(/\n/g,'<br>')
     +(match.formula?'<div class="formula-block">'+match.formula+'</div>':'')
     +'<div class="msg-actions">'
-    +(match.formula?'<button class="copy-btn" onclick="copyText(this,\''+match.formula+'\')">📋 数式をコピー</button>':'')
+    +(match.formula?'<button class="copy-btn" onclick="copyText(this,\''+match.formula.replace(/'/g,"&#39;")+'\')">📋 数式をコピー</button>':'')
     +'</div>'
-    +(match.formula?(function(){ var bid='fbar_'+Date.now(); return '<div class="save-bar" id="'+bid+'"><span>💡 数式帳に保存する？</span><button class="save-bar-btn" onclick="saveBarAction(\''+bid+'\',\''+match.formula+'\',\''+encodeURIComponent(match.text)+'\')"  >保存する</button></div>'; })():'')
+    +(match.formula?'<div class="save-bar" id="'+fid+'"><span>💡 数式帳に保存する？</span><button class="save-bar-btn" onclick="saveBarAction(\''+fid+'\',\''+match.formula.replace(/'/g,"&#39;")+'\')">保存する</button></div>':'')
     +'</div>';
-  area.appendChild(div); area.scrollTop = area.scrollHeight;
+  area.appendChild(div); area.scrollTop=area.scrollHeight;
+  talkCount++; updateMemoryBar();
+  updateMemoryActive(area);
 }
 
 function addTyping(){
-  var area = document.getElementById('chatArea');
-  var id = 't'+Date.now();
-  var div = document.createElement('div');
-  div.className = 'msg ai'; div.id = id;
-  div.innerHTML = '<div class="msg-avatar">Ex</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
-  area.appendChild(div); area.scrollTop = area.scrollHeight;
+  var area=document.getElementById('chatArea');
+  var id='t'+Date.now();
+  var div=document.createElement('div');
+  div.className='msg ai'; div.id=id;
+  div.innerHTML='<div class="msg-avatar">Ex</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  area.appendChild(div); area.scrollTop=area.scrollHeight;
   return id;
 }
 function removeTyping(id){ var el=document.getElementById(id); if(el) el.remove(); }
-function saveBarAction(barId, formula, encodedText){
-  var bar = document.getElementById(barId);
-  var memo = encodedText ? decodeURIComponent(encodedText).replace(/<[^>]+>/g,'').trim() : '';
-  var now = new Date();
-  var date = (now.getMonth()+1) + '月' + now.getDate() + '日';
-  var title = formula.length > 15 ? formula.substring(0,15) + '…' : formula;
-  savedFormulas.unshift({title:title, formula:formula, memo:memo, date:date});
-  renderBook();
-  document.getElementById('bookNavBadge').classList.add('show');
-  var badge = document.getElementById('bookBadge');
-  if(badge) badge.style.display = 'inline-block';
-  if(bar){ bar.classList.add('saved'); bar.innerHTML = '<span>✅ 数式帳に保存済み</span>'; }
-  showToast('📚 保存したよ！数式帳で確認できるよ');
-}
 
-function copyText(btn, text){
-  navigator.clipboard.writeText(text).then(function(){
+function copyTSV(btn,msgId){
+  var el=document.getElementById(msgId);
+  if(!el) return;
+  var tsv=decodeURIComponent(el.getAttribute('data-tsv')||'');
+  if(!tsv){ showToast('データがありません'); return; }
+  navigator.clipboard.writeText(tsv).then(function(){
     btn.textContent='✅ コピー済み';
-    setTimeout(function(){ btn.textContent='📋 コピー'; }, 2000);
+    showToast('📋 コピーしたよ！ExcelのA1に貼り付けてみて');
+    setTimeout(function(){ btn.textContent='📋 Excelにコピー'; },3000);
   });
 }
 
-
-function backToWelcome(){
-  var welcome = document.getElementById('welcomeMsg');
-  var bar = document.getElementById('chatBackBar');
-  var area = document.getElementById('chatArea');
-  if(welcome) welcome.style.display = '';
-  if(bar) bar.style.display = 'none';
-  if(area){ var msgs = area.querySelectorAll('.msg'); msgs.forEach(function(m){ m.remove(); }); }
-  closePanel();
+function copyText(btn,text){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent='✅ コピー済み';
+    setTimeout(function(){ btn.textContent='📋 コピー'; },2000);
+  });
 }
+
+// ===== BACK TO CARDS =====
+function backToCards(){
+  var area=document.getElementById('chatArea');
+  var welcome=document.getElementById('welcomeMsg');
+  var backBar=document.getElementById('chatBackBar');
+  if(welcome) welcome.style.display='block';
+  if(area){
+    area.scrollTop=0;
+    if(welcome) welcome.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+// ===== PTAB =====
+function collapsePtab(){
+  var wrap=document.getElementById('ptabWrap');
+  var expanded=document.getElementById('ptabExpanded');
+  var btn=document.getElementById('ptabToggleBtn');
+  if(wrap) wrap.style.display='';
+  var catToUse=currentCat||lastCat;
+  if(expanded&&catToUse&&CAT_Q[catToUse]){
+    var items=CAT_Q[catToUse].items.slice(0,3);
+    var html='<div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>';
+    items.forEach(function(q){
+      var safe=q.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      html+='<button class="quick-btn" onclick="setQuestion(\''+safe+'\')">'+q.icon+' '+q.text+'</button>';
+    });
+    expanded.innerHTML=html;
+  }
+  if(expanded) expanded.style.display='none';
+  if(btn){ btn.style.display='block'; btn.textContent='💡 よく使う質問を見る ▼'; }
+}
+
+function togglePtab(){
+  var expanded=document.getElementById('ptabExpanded');
+  var btn=document.getElementById('ptabToggleBtn');
+  if(!expanded||!btn) return;
+  var isOpen=expanded.style.display!=='none';
+  if(isOpen){ expanded.style.display='none'; btn.textContent='💡 よく使う質問を見る ▼'; }
+  else{ expanded.style.display='flex'; btn.textContent='▲ 閉じる'; }
+}
+
+// ===== USAGE =====
 function updateUsage(){
-  var pct = (usageCount/MAX_FREE)*100;
-  document.getElementById('usageCount').textContent = usageCount+' / '+MAX_FREE+'回';
-  document.getElementById('usageBar').style.width = pct+'%';
-  document.getElementById('settingsUsage').textContent = usageCount+' / '+MAX_FREE+'回';
+  var pct=(usageCount/MAX_FREE)*100;
+  document.getElementById('usageCount').textContent=usageCount+' / '+MAX_FREE+'回';
+  document.getElementById('usageBar').style.width=pct+'%';
+  document.getElementById('settingsUsage').textContent=usageCount+' / '+MAX_FREE+'回';
+}
+
+// ===== FORMULA BOOK =====
+function saveBarAction(barId,formula){
+  var bar=document.getElementById(barId);
+  if(!bar) return;
+  var now=new Date();
+  var date=(now.getMonth()+1)+'/'+now.getDate();
+  var title=formula.length>15?formula.substring(0,15)+'…':formula;
+  savedFormulas.unshift({title:title,formula:formula,memo:'',date:date});
+  try{ localStorage.setItem('savedFormulas',JSON.stringify(savedFormulas)); }catch(e){}
+  document.getElementById('bookNavBadge').classList.add('show');
+  var badge=document.getElementById('bookBadge');
+  if(badge) badge.style.display='inline-block';
+  bar.classList.add('saved');
+  bar.innerHTML='<span>✅ 数式帳に保存済み</span>';
+  showToast('📚 保存したよ！数式帳で確認できるよ');
 }
 
 function renderBook(){
-  var el = document.getElementById('fbContent');
-  document.getElementById('fbCount').textContent = savedFormulas.length+'件';
+  var el=document.getElementById('fbContent');
+  document.getElementById('fbCount').textContent=savedFormulas.length+'件';
   if(!savedFormulas.length){
-    el.innerHTML = '<div class="fb-empty"><div class="fb-empty-icon">📭</div><h3>まだ保存されていません</h3><p>AIチャットで数式を受け取ったら<br>「📚 保存」ボタンで追加できます。</p></div>';
+    el.innerHTML='<div class="fb-empty"><div class="fb-empty-icon">📭</div><h3>まだ保存されていません</h3><p>AIチャットで数式を受け取ったら<br>「📚 保存」ボタンで追加できます。</p></div>';
     return;
   }
-  el.innerHTML = '<div class="fb-list">'+savedFormulas.map(function(f,i){
+  el.innerHTML='<div class="fb-list">'+savedFormulas.map(function(f,i){
     return '<div class="fb-item"><div class="fb-item-top"><div class="fb-item-title">'+f.title+'</div><div class="fb-item-date">'+f.date+'</div></div>'
       +'<div class="fb-item-formula">'+f.formula+'</div>'
-      +(f.memo?'<div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.6;">'+colorizeFormula(f.memo).replace(/\n/g,'<br>')+'</div>':'')
       +'<div class="fb-item-actions">'
       +'<button class="fb-action-btn" onclick="copyForBook('+i+')">📋 コピー</button>'
       +'<button class="fb-action-btn fb-delete-btn" onclick="deleteFromBook('+i+')">🗑 削除</button>'
       +'</div></div>';
   }).join('')+'</div>';
 }
-function showSaveModal(formula, title){
-  document.getElementById('saveFormula').value = formula||'';
-  document.getElementById('saveTitle').value = title||'';
-  document.getElementById('saveMemo').value = '';
-  document.getElementById('saveModal').classList.add('show');
-}
 function hideSaveModal(){ document.getElementById('saveModal').classList.remove('show'); }
 function saveToBook(){
-  var title = document.getElementById('saveTitle').value.trim()||'保存した数式';
-  var formula = document.getElementById('saveFormula').value.trim();
-  var memo = document.getElementById('saveMemo').value.trim();
+  var title=document.getElementById('saveTitle').value.trim()||'保存した数式';
+  var formula=document.getElementById('saveFormula').value.trim();
   if(!formula){ showToast('⚠️ 数式を入力してください'); return; }
-  var now = new Date();
-  savedFormulas.unshift({title:title, formula:formula, memo:memo, date:(now.getMonth()+1)+'月'+now.getDate()+'日'});
+  var now=new Date();
+  savedFormulas.unshift({title:title,formula:formula,date:(now.getMonth()+1)+'/'+now.getDate()});
   hideSaveModal();
-  renderBook();
   document.getElementById('bookNavBadge').classList.add('show');
-  document.getElementById('bookBadge').style.display = 'inline-block';
+  document.getElementById('bookBadge').style.display='inline-block';
   showToast('📚 数式帳に保存しました！');
 }
 function deleteFromBook(idx){
   savedFormulas.splice(idx,1); renderBook();
   if(!savedFormulas.length){
     document.getElementById('bookNavBadge').classList.remove('show');
-    document.getElementById('bookBadge').style.display = 'none';
+    document.getElementById('bookBadge').style.display='none';
   }
 }
 function copyForBook(idx){ navigator.clipboard.writeText(savedFormulas[idx].formula).then(function(){ showToast('📋 コピーしました'); }); }
 
+// ===== MODALS =====
 function showUpgrade(){ document.getElementById('upgradeModal').classList.add('show'); }
 function hideUpgrade(){ document.getElementById('upgradeModal').classList.remove('show'); }
-document.getElementById('upgradeModal').addEventListener('click', function(e){ if(e.target===document.getElementById('upgradeModal')) hideUpgrade(); });
-document.getElementById('saveModal').addEventListener('click', function(e){ if(e.target===document.getElementById('saveModal')) hideSaveModal(); });
+document.getElementById('upgradeModal').addEventListener('click',function(e){ if(e.target===document.getElementById('upgradeModal')) hideUpgrade(); });
+document.getElementById('saveModal').addEventListener('click',function(e){ if(e.target===document.getElementById('saveModal')) hideSaveModal(); });
 
-function collapsePtab(){
-  var wrap = document.getElementById('ptabWrap');
-  var expanded = document.getElementById('ptabExpanded');
-  var btn = document.getElementById('ptabToggleBtn');
-  if(wrap) wrap.style.display = '';
-  // カテゴリ別の質問を動的に表示
-  var catToUse = currentCat || lastCat;
-  if(expanded && catToUse && CAT_Q[catToUse]){
-    var items = CAT_Q[catToUse].items.slice(0,3);
-    var html = '<div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>';
-    items.forEach(function(q){
-      var safeText = q.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      html += '<button class="quick-btn" onclick="setQuestion(\'' + safeText + '\')">'
-        + q.icon + ' ' + q.text + '</button>';
-    });
-    expanded.innerHTML = html;
-  }
-  if(expanded) expanded.style.display = 'none';
-  if(btn){ btn.style.display = 'block'; btn.textContent = '💡 よく使う質問を見る ▼'; }
-}
-function togglePtab(){
-  var expanded = document.getElementById('ptabExpanded');
-  var btn = document.getElementById('ptabToggleBtn');
-  if(!expanded || !btn) return;
-  var isOpen = expanded.style.display !== 'none';
-  if(isOpen){
-    expanded.style.display = 'none';
-    btn.textContent = '💡 よく使う質問を見る ▼';
-  } else {
-    expanded.style.display = 'flex';
-    btn.textContent = '▲ 閉じる';
-  }
+// ===== TOAST =====
+function showToast(msg,duration){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },duration||2500);
 }
 
-function showToast(msg, duration){
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, duration||2500);
-}
-
+// ===== PLACEHOLDER ROTATION =====
 (function(){
-  var examples = ['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
-  var idx = 0;
+  var examples=['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
+  var idx=0;
   function rotate(){
-    var el = document.getElementById('msgInput');
-    if(!el || document.activeElement===el) return;
-    idx = (idx+1) % examples.length;
+    var el=document.getElementById('msgInput');
+    if(!el||document.activeElement===el) return;
+    idx=(idx+1)%examples.length;
     el.setAttribute('placeholder','例：'+examples[idx]);
   }
-  setInterval(rotate, 3500);
+  setInterval(rotate,3500);
 })();
 </script>
 </body>
