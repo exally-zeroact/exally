@@ -224,6 +224,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .book-scroll{padding:20px 16px 24px;max-width:680px;margin:0 auto;}
 @media(min-width:769px){.book-scroll{padding:32px 40px 40px;}}
 .save-bar{display:flex;align-items:center;justify-content:space-between;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:12px;color:#3D9E72;font-weight:700;}
+.related-hints{margin-top:8px;padding-top:8px;border-top:1px solid #E8F5EE;}
+.related-hints-label{font-size:10px;color:#7A9A87;font-weight:700;margin-bottom:4px;}
+.related-hint-btn{display:block;width:100%;background:#F8FEFC;border:1px solid #C8ECD8;border-radius:8px;padding:6px 10px;font-size:11px;color:#2E4038;cursor:pointer;text-align:left;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;margin-top:4px;}
+.related-hint-btn:hover{background:#F0FAF4;border-color:#52B788;color:#3D9E72;}
 .save-bar.saved{background:#F4F7F5;border-color:#E0EDE6;color:#9CA3AF;}
 .save-bar-btn{background:#52B788;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
 .fb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
@@ -971,6 +975,34 @@ var CAT_Q = {
   ]}
 };
 
+// ===== RELATED HINTS（AI返答後の関連ヒント） =====
+var RELATED_HINTS = {
+  ops:[
+    {icon:'⏰',text:'60時間超えたら残業代が1.5倍になるって本当？計算式が欲しい'},
+    {icon:'🍳',text:'飲食店の深夜手当・皆勤手当も含む給料明細を作りたい'}
+  ],
+  func:[
+    {icon:'👨‍👩‍👧',text:'扶養が1人と0人で所得税はいくら違う？自動計算したい'},
+    {icon:'📅',text:'シートを月別に作って全シートの合計を1枚に出したい'}
+  ],
+  err:[
+    {icon:'⏰',text:'60時間超えたら残業代が1.5倍になるって本当？計算式が欲しい'},
+    {icon:'📇',text:'名前を入れたら住所と電話番号が自動で出てくる表を作りたい'}
+  ],
+  pay:[
+    {icon:'⏰',text:'60時間超えたら残業代が1.5倍になるって本当？計算式が欲しい'},
+    {icon:'🧾',text:'請求書に登録番号（Tから始まる番号）を自動で入れたい'}
+  ],
+  tips:[
+    {icon:'⚡',text:'1つのセルに入力したら別シートにも自動で反映させる方法'},
+    {icon:'🏗️',text:'建設業の現場手当・危険手当の計算式が入った給料明細を作りたい'}
+  ],
+  data:[
+    {icon:'🍳',text:'飲食店の深夜手当・皆勤手当も含む給料明細を作りたい'},
+    {icon:'🧾',text:'請求書に登録番号（Tから始まる番号）を自動で入れたい'}
+  ]
+};
+
 // ===== MEMORY BAR =====
 function updateMemoryBar(){
   var span = document.getElementById('memoryBarText');
@@ -1228,6 +1260,25 @@ function addAIMsg(rawText,tsvData,question){
     saveBar.innerHTML='<span>💡 数式帳に保存する？</span>'
       +'<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\')">保存する</button>';
     bubble.appendChild(saveBar);
+  }
+  // 関連ヒント追加
+  var catToUse=window.lastCat||window.currentCat;
+  if(catToUse&&RELATED_HINTS[catToUse]){
+    var hints=RELATED_HINTS[catToUse];
+    var rDiv=document.createElement('div');
+    rDiv.className='related-hints';
+    var rLabel=document.createElement('div');
+    rLabel.className='related-hints-label';
+    rLabel.textContent='💬 こんなことも聞けるよ';
+    rDiv.appendChild(rLabel);
+    hints.forEach(function(h){
+      var btn=document.createElement('button');
+      btn.className='related-hint-btn';
+      btn.textContent=h.icon+' '+h.text;
+      btn.onclick=function(){ setQuestion(h.text); };
+      rDiv.appendChild(btn);
+    });
+    bubble.appendChild(rDiv);
   }
   var avatar=document.createElement('div');
   avatar.className='msg-avatar'; avatar.textContent='Ex';
