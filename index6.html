@@ -1030,6 +1030,36 @@ function colorizeFormula(text){
   return text;
 }
 
+// ===== FORMULA BLOCK COLORIZER（formula-block内専用・ネスト対応） =====
+function colorizeFormulaBlock(f){
+  // 内側から処理（ネスト対応）
+  // VLOOKUP（=なしでもマッチ）
+  f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){
+    return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';
+  });
+  // SUMIF
+  f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){
+    return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
+  });
+  // SUMIFS（引数多いため最初の3つ）
+  f=f.replace(/SUMIFS\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)/gi,function(m,a1,a2,a3){
+    return 'SUMIFS(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>';
+  });
+  // COUNTIF
+  f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){
+    return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
+  });
+  // IF
+  f=f.replace(/IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){
+    return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
+  });
+  // ROUND
+  f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){
+    return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
+  });
+  return f;
+}
+
 // ===== PANEL =====
 function togglePanel(cat){
   if(currentCat===cat){ closePanel(); return; }
@@ -1220,7 +1250,7 @@ function addAIMsg(rawText,tsvData,question){
   var formula=_allF.length?_allF[0]:null;
   var hasTSV=tsvData&&tsvData.trim().length>0;
   var html=colorizeFormula(rawText)
-    .replace(/```[\w]*\n?([\s\S]*?)```/g,'<div class="formula-block">$1</div>')
+    .replace(/```[\w]*\n?([\s\S]*?)```/g,function(m,c){return '<div class="formula-block">'+colorizeFormulaBlock(c.trim())+'</div>';})
     .replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>')
     .replace(/\n/g,'<br>');
   var safeFormula=formula?formula.replace(/'/g,"&#39;"):'';
@@ -1422,7 +1452,7 @@ function saveBarAction(barId,formula){
 
 function renderMemo(rawText){
   return colorizeFormula(rawText)
-    .replace(/```[\w]*\n?([\s\S]*?)```/g,'<div class="formula-block">$1</div>')
+    .replace(/```[\w]*\n?([\s\S]*?)```/g,function(m,c){return '<div class="formula-block">'+colorizeFormulaBlock(c.trim())+'</div>';})
     .replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>')
     .replace(/\n/g,'<br>');
 }
