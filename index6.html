@@ -794,13 +794,23 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script src="templates-config.js"></script>
-<script src="quiz.js"></script>
 <script>
 // ===== TEMPLATES =====
-
-
-
+var TEMPLATES = [
+{
+  id:'payslip', name:'給料明細', desc:'月給・時給に対応。控除の自動計算付き',
+  file:'template-demo.html', tags:['給与系','人気'], hot:true,
+  previewHTML:'<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;"><span style="font-size:10px;font-weight:700;color:#fff;">給 料 明 細 書</span></div><div style="background:#F8FEFC;padding:5px 10px;border-bottom:1px solid #C8ECD8;"><span style="font-size:9px;font-weight:700;color:#7A9A87;">差 引 支 給 額</span><span style="font-size:14px;font-weight:500;color:#3D9E72;">¥231,520</span></div></div>'
+},
+{
+  id:'invoice', name:'請求書・見積書', desc:'インボイス対応。電子判子付き',
+  file:'invoice-template.html', tags:['請求系','人気'], hot:true,
+  previewHTML:'<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;font-family:sans-serif;"><div style="background:#3D9E72;padding:5px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:3px;">請 求 書</span></div><div style="padding:5px 10px;"><div style="font-size:13px;font-weight:700;color:#1A2B22;">¥110,000</div></div></div>'
+},
+{id:'attendance',name:'勤怠管理表',desc:'出退勤・残業時間を自動集計',file:'',tags:['勤怠系'],hot:false},
+{id:'expense',name:'経費精算書',desc:'交通費・飲食費など一括管理',file:'',tags:['経費系'],hot:false}
+];
+window.TEMPLATES = TEMPLATES;
 
 // ===== STATE =====
 var score = 35;
