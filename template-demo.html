@@ -249,7 +249,7 @@ body{padding-bottom:80px;}
 </div>
 
 <!-- ===== 業種選択帯 ===== -->
-<div id="gyoshuBar" style="display:none;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:8px 16px;display:none;align-items:center;justify-content:space-between;">
+<div id="gyoshuBar" style="display:none;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:8px 16px;align-items:center;justify-content:space-between;">
   <span id="gyoshuBarLabel" style="font-size:12px;font-weight:700;color:#2E4038;"></span>
   <button onclick="changeGyoshu()" style="background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">業種を変更する →</button>
 </div>
@@ -2090,7 +2090,7 @@ function applyGyoshu(){
   if(preset && preset.on.length > 0){
     preset.on.forEach(function(id){
       if(!active.find(function(i){ return i.id === id; })){
-        var item = allItems.find(function(i){ return i.id === id; });
+        var item = base().find(function(i){ return i.id === id; });
         if(item) active.push(item);
       }
     });
