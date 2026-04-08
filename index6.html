@@ -353,7 +353,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .tmpl-card-item:hover{border-color:#52B788;transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,60,40,0.12);}
 .tmpl-card-preview{height:170px;background:#F8FEFA;overflow:hidden;position:relative;}
 .tmpl-card-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,#F8FEFA);pointer-events:none;z-index:2;}
-.preview-inner{width:220px;position:absolute;top:0;left:50%;transform:translateX(-50%) scale(0.70);transform-origin:top center;pointer-events:none;z-index:1;}
+.preview-inner{width:220px;position:absolute;top:0;left:50%;transform:translateX(-50%) scale(0.70);transform-origin:top center;pointer-events:none;z-index:1;overflow:hidden;}
 .preview-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#B0C4BA;gap:6px;}
 .preview-placeholder-icon{font-size:28px;}
 .preview-placeholder-text{font-size:10px;}
@@ -378,6 +378,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:769px){.ptab-wrap{max-width:860px;margin:0 auto;width:100%;border-top:none;padding:4px 40px;}}
 @media(min-width:769px){.memory-bar{padding:4px 0 6px;}}
 .chat-back-bar{padding:6px 16px;background:#F8FEFC;border-top:1px solid #E8F0EC;flex-shrink:0;}
+@media(min-width:769px){.chat-back-bar{max-width:860px;margin:0 auto;width:100%;padding:4px 40px 2px;}}
 .chat-back-btn{background:none;border:none;font-size:12px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0;}
 .fb-item-memo{font-size:13px;color:#2E4038;line-height:1.75;margin-bottom:8px;padding:10px 12px;background:#F8FEFC;border-radius:8px;border:1px solid #E0EDE6;}
 .fb-delete-btn{background:#F4F7F5;border:1px solid #D4EDE1;color:#E05555;border-radius:8px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;}
@@ -727,7 +728,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="/cdn-cgi/l/email-protection#a0c5d8c1ccccd98ed3d5d0d0cfd2d4e0c7cdc1c9cc8ec3cfcd"><span class="__cf_email__" data-cfemail="44213c2528283d6a373134342b3630042329252d286a272b29">[email&#160;protected]</span></a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -794,7 +795,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== TEMPLATES =====
 var TEMPLATES = [
 {
