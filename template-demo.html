@@ -2037,18 +2037,22 @@ var GYOSHU_PRESETS = {
 function initGyoshu(){
   try{
     var saved = localStorage.getItem(GYOSHU_STORAGE_KEY);
+    console.log('[Gyoshu] saved=', saved);
     if(!saved){
-      document.getElementById('gyoshuOverlay').classList.remove('hide');
+      var overlay = document.getElementById('gyoshuOverlay');
+      console.log('[Gyoshu] overlay=', overlay);
+      if(overlay) overlay.classList.remove('hide');
     } else if(saved !== 'skip'){
       var p = GYOSHU_PRESETS[saved];
       var bar = document.getElementById('gyoshuBar');
       var barLabel = document.getElementById('gyoshuBarLabel');
+      console.log('[Gyoshu] bar=', bar, 'p=', p);
       if(bar && barLabel && p){
         barLabel.textContent = p.icon + ' ' + saved + ' 選択中';
         bar.style.display = 'flex';
       }
     }
-  }catch(e){}
+  }catch(e){ console.error('[Gyoshu] error:', e); }
 }
 
 function selectGyoshuCard(el, name){
