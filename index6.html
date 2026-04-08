@@ -207,9 +207,11 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:769px){.limit-banner{margin:0 40px;max-width:640px;}}
 .limit-banner p{font-size:12px;color:#7A5500;flex:1;line-height:1.6;}
 .limit-btn{background:#52B788;color:white;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-.ptab-wrap{flex-shrink:0;background:#fff;border-top:1px solid #E0EDE6;padding:4px 14px;}
+.ptab-wrap{flex-shrink:0;background:#fff;border-top:1px solid #E0EDE6;padding:3px 14px;}
 .ptab-toggle-btn{width:100%;background:none;border:none;color:#3D9E72;font-size:12px;font-weight:700;padding:5px 0;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;}
-.ptab-expanded{display:flex;flex-direction:column;gap:6px;}
+.ptab-expanded{display:flex;flex-direction:row;overflow-x:auto;gap:8px;padding:4px 0;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.ptab-expanded::-webkit-scrollbar{display:none;}
+.ptab-expanded .quick-btn{white-space:nowrap;flex-shrink:0;padding:4px 12px;border-radius:20px;font-size:11px;width:auto;}
 .chat-input-wrap{padding:10px 16px max(14px,env(safe-area-inset-bottom));background:#ffffff;border-top:1px solid #D4EDE1;display:flex;gap:9px;align-items:flex-end;position:sticky;bottom:0;z-index:10;flex-shrink:0;}
 @media(min-width:769px){.chat-input-wrap{padding:14px 40px 20px;max-width:860px;margin:0 auto;width:100%;border-top:none;}}
 .chat-input{flex:1;background:#F0FAF4;border:1.5px solid #D4EDE1;border-radius:12px;padding:11px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;outline:none;resize:none;min-height:44px;max-height:120px;transition:border-color 0.2s;line-height:1.5;}
@@ -373,13 +375,19 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .arg-purple{color:#9B5DE5;font-weight:700;}
 .arg-green{color:#2E9E6B;font-weight:700;}
 .memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;justify-content:space-between;}
+.memory-label{font-size:10px;color:#3D9E72;font-weight:700;padding:6px 0 2px 44px;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;}
+.memory-label::after{content:'';flex:1;height:1px;background:#C8ECD8;}
 .new-chat-link{font-size:11px;color:#7A9A87;cursor:pointer;white-space:nowrap;padding:2px 6px;border-radius:6px;transition:all 0.18s;display:none;background:none;border:none;font-family:'Noto Sans JP',sans-serif;}
 .new-chat-link:hover{color:#3D9E72;background:#F0FAF4;}
 @media(min-width:769px){.ptab-wrap{max-width:860px;margin:0 auto;width:100%;border-top:none;padding:4px 40px;}}
-@media(min-width:769px){.memory-bar{padding:4px 0 6px;}}
+@media(min-width:769px){.memory-bar{padding:6px 0 8px;justify-content:flex-start;gap:20px;font-size:13px;}#memoryBarText{flex:none;}.chat-back-btn{font-size:13px;}.new-chat-link{font-size:12px;}.ptab-expanded .quick-btn{padding:7px 18px;font-size:13px;}}
+@media(min-width:769px){.chat-input{font-size:15px;padding:13px 16px;min-height:50px;}}
+@media(max-width:480px){.memory-bar{font-size:10px;gap:2px;}.chat-back-btn{font-size:11px;}.new-chat-link{font-size:10px;}#memoryBarText{flex:1;}}
 .chat-back-bar{padding:6px 16px;background:#F8FEFC;border-top:1px solid #E8F0EC;flex-shrink:0;}
 @media(min-width:769px){.chat-back-bar{max-width:860px;margin:0 auto;width:100%;padding:4px 40px 2px;}}
-.chat-back-btn{background:none;border:none;font-size:12px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0;}
+.chat-back-btn{background:none;border:none;font-size:12px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0;white-space:nowrap;flex-shrink:0;}
+.back-pc{display:none;}
+@media(min-width:481px){.back-mobile{display:none;}.back-pc{display:inline;}}
 .fb-item-memo{font-size:13px;color:#2E4038;line-height:1.75;margin-bottom:8px;padding:10px 12px;background:#F8FEFC;border-radius:8px;border:1px solid #E0EDE6;}
 .fb-delete-btn{background:#F4F7F5;border:1px solid #D4EDE1;color:#E05555;border-radius:8px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;}
 .fb-delete-btn:hover{background:#FFF0F0;}
@@ -593,26 +601,26 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="ptab-wrap" id="ptabWrap" style="display:none;">
             <button class="ptab-toggle-btn" id="ptabToggleBtn" onclick="togglePtab()" style="display:none;">💡 よく使う質問を見る ▼</button>
             <div class="ptab-expanded" id="ptabExpanded">
-              <div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>
-              <button class="quick-btn" onclick="setQuestion('別のシートから名前や金額を自動で持ってきたい（VLOOKUP）')">別シートから名前を自動で取得したい</button>
-              <button class="quick-btn" onclick="setQuestion('IFERRORでエラーを空白にしたい')">エラーを空白や「－」にしたい</button>
-              <button class="quick-btn" onclick="setQuestion('印刷範囲の設定方法は？')">印刷で変なところが切れる</button>
+              <button class="quick-btn" onclick="setQuestion('60時間超えたら残業代が1.5倍になるって本当？計算式が欲しい')">⏰ 60時間超えたら残業代1.5倍って本当？</button>
+              <button class="quick-btn" onclick="setQuestion('飲食店の深夜手当・皆勤手当も含む給料明細を作りたい')">🍳 飲食店の深夜手当・皆勤手当付き給料明細</button>
+              <button class="quick-btn" onclick="setQuestion('名前を入れたら住所と電話番号が自動で出てくる表を作りたい')">📇 名前を入れたら住所が自動で出てくる表</button>
+              <button class="quick-btn" onclick="setQuestion('建設業の現場手当・危険手当の計算式が入った給料明細を作りたい')">🏗️ 建設業の現場手当・危険手当付き給料明細</button>
+              <button class="quick-btn" onclick="setQuestion('請求書に登録番号（Tから始まる番号）を自動で入れたい')">🧾 請求書に登録番号を自動で入れたい</button>
+              <button class="quick-btn" onclick="setQuestion('1つのセルに入力したら別シートにも自動で反映させる方法')">⚡ 入力が別シートにも自動反映する方法</button>
             </div>
           </div>
           <div class="limit-banner" id="limitBanner">
             <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
           </div>
-          <div class="chat-back-bar" id="chatBackBar" style="display:none;">
-            <button class="chat-back-btn" onclick="backToCards()">← カテゴリを選ぶ</button>
-          </div>
           <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
             <div id="new-chat-confirm-bar" style="display:none;align-items:center;justify-content:space-between;background:#FFF0F0;border-top:1px solid #FFCDD2;padding:8px 16px;gap:8px;flex-shrink:0;"><span style="font-size:12px;color:#E05555;font-weight:700;">会話を全部消しますか？</span><div style="display:flex;gap:6px;"><button onclick="clearChatHistory()" style="background:#E05555;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">会話を消す</button><button onclick="hideNewChatConfirm()" style="background:#F4F7F5;border:1px solid #D4EDE1;color:#2E4038;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">キャンセル</button></div></div>
 <div class="memory-bar" id="memoryBar">
-              <span id="memoryBarText">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</span>
+              <button class="chat-back-btn" id="chatBackBar" onclick="backToCards()" style="display:none;"><span class="back-mobile">← 戻る</span><span class="back-pc">← カテゴリへ戻る</span></button>
+              <span id="memoryBarText" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</span>
               <button class="new-chat-link" id="newChatBtn" onclick="confirmNewChat()">🔄 新しい会話</button>
             </div>
-            <div style="font-size:10px;color:#B0C4BA;padding:0 4px 4px;line-height:1.5;">色がついてる返答はAIが今覚えてるよ</div>
+
             <div style="display:flex;gap:9px;align-items:flex-end;">
               <textarea class="chat-input" id="msgInput" placeholder="例：印刷範囲の設定方法は？　給料明細を作りたい" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
               <button class="send-btn" id="sendBtn" onclick="sendMessage()">
@@ -869,6 +877,7 @@ function loadChatHistory(){
     usageCount = area.querySelectorAll('.msg.user').length;
     updateMemoryBar();
     updateUsage();
+    updateMemoryActive(area);
     var newBtn = document.getElementById('newChatBtn');
     if(newBtn) newBtn.style.display='flex';
     var backBar = document.getElementById('chatBackBar');
@@ -914,20 +923,20 @@ window.addEventListener('load', loadChatHistory);
 // ===== CAT Q DATA =====
 var CAT_Q = {
   ops:{label:'💻 使い方がわからない',items:[
-    {icon:'🖨️',text:'印刷すると変なところで切れる・余白がおかしい'},
-    {icon:'🔒',text:'他の人に触られたくないセルをロックしたい'},
-    {icon:'📌',text:'スクロールしても一番上の行が消えないようにしたい'},
-    {icon:'🔎',text:'この文字を全部別の言葉に一括で変えたい'},
-    {icon:'📊',text:'見やすいグラフをパパっと作りたい'},
-    {icon:'⌨️',text:'マウスを使わず素早く操作するコツを知りたい'}
+    {icon:'🖨️',text:'印刷したら何ページにもなった。1枚に収める方法ある？'},
+    {icon:'🔒',text:'特定のセルだけ触れないようにロックできる？'},
+    {icon:'📌',text:'スクロールしても1行目の見出しが消えないようにしたい'},
+    {icon:'🔎',text:'入力ミスを一気に直したい。全部まとめて置換できる？'},
+    {icon:'📊',text:'棒グラフと折れ線グラフを1つのグラフに混ぜられる？'},
+    {icon:'⌨️',text:'Excelのショートカットで一番役立つのはどれ？'}
   ]},
   func:{label:'🔢 自動で計算させたい',items:[
-    {icon:'🔍',text:'別のシートから名前や金額を自動で持ってきたい（VLOOKUP）'},
-    {icon:'➕',text:'東京だけ・Aさんだけなど特定の項目を合計したい（SUMIF）'},
-    {icon:'🔀',text:'点数が80以上なら合格・未満なら不合格と自動で表示したい（IF）'},
-    {icon:'🔢',text:'条件に合うものが何個あるか数えたい（COUNTIF）'},
-    {icon:'📊',text:'複数の条件で絞り込んで合計したい（SUMIFS）'},
-    {icon:'🎂',text:'生年月日から今の年齢を自動で計算したい'}
+    {icon:'⏰',text:'60時間超えたら残業代が1.5倍になるって本当？計算式が欲しい'},
+    {icon:'👨‍👩‍👧',text:'扶養が1人と0人で所得税はいくら違う？自動計算したい'},
+    {icon:'📇',text:'名前を入れたら住所と電話番号が自動で出てくる表を作りたい'},
+    {icon:'🎂',text:'生年月日から今の年齢を自動で計算したい'},
+    {icon:'📅',text:'シートを月別に作って全シートの合計を1枚に出したい'},
+    {icon:'🏆',text:'勤続年数が長いほど自動で手当が増える計算式を作りたい'}
   ]},
   err:{label:'⚠️ エラーが出て困っている',items:[
     {icon:'❌',text:'#VALUE!って出て計算できない。どうすれば直る？'},
@@ -937,21 +946,21 @@ var CAT_Q = {
     {icon:'🔄',text:'循環参照のエラーが出た。意味がわからない'}
   ]},
   pay:{label:'📋 書類・表を作りたい',items:[
-    {icon:'💰',text:'給料明細を作りたい。自動で計算されるやつ'},
-    {icon:'📄',text:'請求書・見積書をExcelで作りたい'},
-    {icon:'🧾',text:'経費精算書を作りたい。交通費・飲食費など'},
-    {icon:'⏰',text:'勤怠管理表を作りたい。残業時間も自動計算で'},
-    {icon:'📈',text:'売上管理表を作りたい。目標達成率も出したい'},
-    {icon:'📦',text:'在庫管理表を作りたい。在庫が減ったら警告が出るやつ'}
+    {icon:'🍳',text:'飲食店の深夜手当・皆勤手当も含む給料明細を作りたい'},
+    {icon:'🏗️',text:'建設業の現場手当・危険手当の計算式が入った給料明細を作りたい'},
+    {icon:'🧾',text:'請求書に登録番号（Tから始まる番号）を自動で入れたい'},
+    {icon:'⏰',text:'勤怠管理表と給料明細をまとめて一気に作りたい'},
+    {icon:'🕐',text:'パートの時給計算付き給料明細を作りたい'},
+    {icon:'💼',text:'介護・医療職の夜勤手当・資格手当も含む給料明細を作りたい'}
   ]},
   tips:{label:'⚡ 知ると仕事が速くなる',items:[
-    {icon:'⌨️',text:'Ctrl+Dで上のセルを一瞬でコピーできる（オートフィルより速い）'},
+    {icon:'⚡',text:'1つのセルに入力したら別シートにも自動で反映させる方法'},
+    {icon:'⌨️',text:'Ctrl+Dで上のセルを一瞬コピー（オートフィルの10倍速い）'},
     {icon:'⌨️',text:'Alt+Shift+=で縦横の合計を一瞬で出す裏技'},
-    {icon:'🎨',text:'数値が高いセルを自動で赤くしたい（条件付き書式）'},
-    {icon:'📋',text:'連続した数字・日付を一気に入力する方法（オートフィル）'},
-    {icon:'🔒',text:'数式のズレを防ぐ$マークの使い方（F4キーで一発）'},
-    {icon:'📊',text:'大量データを秒で集計したい（ピボットテーブル）'},
-    {icon:'🔢',text:'0が勝手に消える・先頭の0を表示させたい'}
+    {icon:'🎨',text:'売上が目標を下回ったセルを自動で赤くする方法'},
+    {icon:'🔒',text:'数式がズレる原因と$マークの使い方（F4キー1発）'},
+    {icon:'📊',text:'1,000行のデータを秒で集計する方法（ピボットテーブル）'},
+    {icon:'🔢',text:'電話番号の先頭の0が消える問題を一発で直す方法'}
   ]},
   data:{label:'📊 表を見せて質問する',items:[
     {icon:'📋',text:'この表でVLOOKUPを使いたい。数式を作って'},
@@ -1153,9 +1162,19 @@ function addMsg(role,text){
 
 function updateMemoryActive(area){
   var aiMsgList=area.querySelectorAll('.msg.ai');
+  // 既存ラベルを全削除
+  area.querySelectorAll('.memory-label').forEach(function(el){ el.remove(); });
+  // memory-activeクラスを全削除
   aiMsgList.forEach(function(el){ el.classList.remove('memory-active'); });
   var idx=aiMsgList.length>20?aiMsgList.length-20:0;
-  if(aiMsgList[idx]) aiMsgList[idx].classList.add('memory-active');
+  if(aiMsgList[idx]){
+    aiMsgList[idx].classList.add('memory-active');
+    // ラベルをmemory-active要素の直前に挿入
+    var label=document.createElement('div');
+    label.className='memory-label';
+    label.textContent='📍 AIの記憶はここから';
+    aiMsgList[idx].parentNode.insertBefore(label, aiMsgList[idx]);
+  }
 }
 
 function addAIMsg(rawText,tsvData,question){
@@ -1301,16 +1320,16 @@ function collapsePtab(){
   if(wrap) wrap.style.display='';
   var catToUse=currentCat||lastCat;
   if(expanded&&catToUse&&CAT_Q[catToUse]){
-    var items=CAT_Q[catToUse].items.slice(0,3);
-    var html='<div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>';
+    var items=CAT_Q[catToUse].items;
+    var html='';
     items.forEach(function(q){
       var safe=q.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       html+='<button class="quick-btn" onclick="setQuestion(\''+safe+'\')">'+q.icon+' '+q.text+'</button>';
     });
     expanded.innerHTML=html;
   }
-  if(expanded) expanded.style.display='none';
-  if(btn){ btn.style.display='block'; btn.textContent='💡 よく使う質問を見る ▼'; }
+  if(expanded) expanded.style.display='flex';
+  if(btn) btn.style.display='none';
 }
 
 function togglePtab(){
