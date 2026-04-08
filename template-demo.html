@@ -2094,7 +2094,7 @@ function applyGyoshu(){
         if(item) active.push(item);
       }
     });
-    renderItems();
+    render();
     updateFitCheck();
   }
   try{ localStorage.setItem(GYOSHU_STORAGE_KEY, selectedGyoshuName); }catch(e){}
