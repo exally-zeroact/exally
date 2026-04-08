@@ -1917,18 +1917,8 @@ var GYOSHU_PRESETS = {
 };
 
 function initGyoshu(){
-  var saved = localStorage.getItem(GYOSHU_STORAGE_KEY);
-  if(!saved){
-    document.getElementById('gyoshuOverlay').classList.remove('hide');
-  } else if(saved !== 'skip'){
-    var p = GYOSHU_PRESETS[saved];
-    var bar = document.getElementById('gyoshuBar');
-    var barLabel = document.getElementById('gyoshuBarLabel');
-    if(bar && barLabel && p){
-      barLabel.textContent = p.icon + ' ' + saved + ' 選択中';
-      bar.style.display = 'flex';
-    }
-  }
+  // 【テスト】強制表示
+  document.getElementById('gyoshuOverlay').classList.remove('hide');
 }
 
 function selectGyoshuCard(el, name){
