@@ -8,7 +8,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:14px;-webkit-text-size-adjust:100%;}
-body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-height:100vh;padding-bottom:100px;}
+body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-height:100vh;padding-bottom:100px;position:relative;}
 :root{
   --mint:#52B788;--mint-d:#3D9E72;--mint-dd:#2E7D54;
   --mint-bg:#F0FAF4;--mint-border:#C8ECD8;
@@ -214,7 +214,7 @@ body{padding-bottom:80px;}
 .xl-pat b{color:#1A2B22;}
 .sec-div{font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin:16px 0 12px;}
 /* ===== 業種プリセット ===== */
-.gyoshu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.gyoshu-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
 .gyoshu-overlay.hide{display:none;}
 .gyoshu-sheet{background:#fff;border-radius:20px;width:100%;max-width:540px;padding:24px 16px 32px;max-height:90vh;overflow-y:auto;}
 .gyoshu-sheet-title{font-size:16px;font-weight:700;color:#1A2B22;margin-bottom:4px;}
@@ -2035,24 +2035,9 @@ var GYOSHU_PRESETS = {
 };
 
 function initGyoshu(){
-  try{
-    var saved = localStorage.getItem(GYOSHU_STORAGE_KEY);
-    console.log('[Gyoshu] saved=', saved);
-    if(!saved){
-      var overlay = document.getElementById('gyoshuOverlay');
-      console.log('[Gyoshu] overlay=', overlay);
-      if(overlay) overlay.classList.remove('hide');
-    } else if(saved !== 'skip'){
-      var p = GYOSHU_PRESETS[saved];
-      var bar = document.getElementById('gyoshuBar');
-      var barLabel = document.getElementById('gyoshuBarLabel');
-      console.log('[Gyoshu] bar=', bar, 'p=', p);
-      if(bar && barLabel && p){
-        barLabel.textContent = p.icon + ' ' + saved + ' 選択中';
-        bar.style.display = 'flex';
-      }
-    }
-  }catch(e){ console.error('[Gyoshu] error:', e); }
+  // テスト：強制的にオーバーレイを表示
+  var overlay = document.getElementById('gyoshuOverlay');
+  if(overlay) overlay.classList.remove('hide');
 }
 
 function selectGyoshuCard(el, name){
