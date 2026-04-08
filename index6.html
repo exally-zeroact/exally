@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -469,148 +468,145 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       </div>
     </header>
 
-```
-<div class="screen-area">
+    <div class="screen-area">
 
-  <!-- HOME -->
-  <div class="screen active" id="screen-home">
-    <div class="home-scroll">
-      <div class="hero-cta" onclick="switchTab('chat')">
-        <div class="hero-cta-top">
-          <span class="hero-cta-label">TODAY'S PLAN</span>
-          <span class="hero-free-tag">無料トライアル中</span>
-        </div>
-        <div class="hero-cta-price">¥43<span>/日</span></div>
-        <div class="hero-cta-copy">Excelの疑問を今すぐ解決しましょう。<br>日本語でそのまま質問できます。</div>
-        <button class="hero-cta-btn">AIに質問する →</button>
-      </div>
-      <div class="social-proof">
-        <div class="sp-avatars">
-          <div class="sp-avatar">田</div>
-          <div class="sp-avatar">鈴</div>
-          <div class="sp-avatar">山</div>
-        </div>
-        <div class="sp-text"><strong>ベータモニター募集中</strong><br>今ご登録で14日間完全無料</div>
-        <div class="sp-badge">残り87席</div>
-      </div>
-      <div class="score-card">
-        <div class="score-icon">🎓</div>
-        <div class="score-info">
-          <div class="score-label">Excel習熟度スコア</div>
-          <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBar" style="width:35%"></div></div>
-        </div>
-        <div class="score-right">
-          <div class="score-num" id="scoreNum">35</div>
-          <div class="score-num-label">/ 100</div>
-          <div class="score-rank" id="scoreRank">初中級</div>
-        </div>
-      </div>
-      <div class="usage-card">
-        <div class="usage-top">
-          <span class="usage-label">本日の使用回数</span>
-          <span class="usage-count" id="usageCount">0 / 10回</span>
-        </div>
-        <div class="usage-bar-bg"><div class="usage-bar-fill" id="usageBar" style="width:0%"></div></div>
-        <div id="firstUseHint" style="font-size:12px;color:#7A9A87;padding:8px 0 4px;line-height:1.7;">
-          💡 まず<strong style="color:#3D9E72;">AIチャット</strong>で「給料明細を作って」と話しかけてみてください
-        </div>
-        <div class="upgrade-cta" onclick="showUpgrade()">
-          <div class="upgrade-cta-left">有料プランで無制限に使う<span>月額¥1,280（1日43円）</span></div>
-          <button class="upgrade-cta-arrow">詳細 →</button>
-        </div>
-      </div>
-      <div class="streak-banner" onclick="switchTab('quiz')">
-        <div class="streak-icon">🔥</div>
-        <div class="streak-info">
-          <div class="streak-title">今日もクイズに挑戦！</div>
-          <div class="streak-sub">毎日続けることで習熟度が上がります</div>
-        </div>
-        <div class="streak-right">
-          <div class="streak-count" id="streakCount">1</div>
-          <div class="streak-label">日連続</div>
-        </div>
-      </div>
-      <div class="section-label">機能</div>
-      <div class="cards-grid">
-        <div class="card" onclick="switchTab('chat')"><span class="card-icon">💬</span><div class="card-title">AIチャット</div><div class="card-desc">Excel専門AIが日本語で即解決</div><span class="card-tag popular">人気No.1</span></div>
-        <div class="card" onclick="switchTab('book')"><span class="card-icon">📚</span><div class="card-title">マイ数式帳</div><div class="card-desc">保存した数式をいつでも参照</div><span class="card-tag" id="bookBadge" style="display:none;background:#FFF0F0;border-color:#FFCDD2;color:#E05555;">保存済み</span></div>
-        <div class="card" onclick="switchTab('quiz')"><span class="card-icon">🎯</span><div class="card-title">Excelクイズ</div><div class="card-desc">4段階レベルで腕試し</div><span class="card-tag quiz">学習機能</span></div>
-        <div class="card" onclick="showUpgrade()"><span class="card-icon">⚡</span><div class="card-title">VBA生成</div><div class="card-desc">マクロも日本語で作れる</div><span class="card-tag" style="background:#F0FAF4;border-color:#C8ECD8;color:#3D9E72;">PRO</span></div>
-      </div>
-      <div class="cancel-reassure">
-        <p>🔒 <strong>クレジットカード不要</strong>で14日間お試しいただけます。<br>いつでもすぐに解約できます。</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div class="screen" id="screen-chat">
-    <div class="chat-wrap">
-      <div class="chat-area" id="chatArea">
-        <div class="welcome-msg" id="welcomeMsg">
-          <div class="welcome-sub">わからない操作・エラー・表作りまで何でも日本語で聞くだけでOK</div>
-          <div class="cat-grid">
-            <div class="cat-card err-card" id="card-err" onclick="togglePanel('err')">
-              <div class="cat-card-icon">⚠️</div>
-              <div class="cat-card-title">エラーが出て困っている</div>
-              <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
+      <!-- HOME -->
+      <div class="screen active" id="screen-home">
+        <div class="home-scroll">
+          <div class="hero-cta" onclick="switchTab('chat')">
+            <div class="hero-cta-top">
+              <span class="hero-cta-label">TODAY'S PLAN</span>
+              <span class="hero-free-tag">無料トライアル中</span>
             </div>
-            <div class="cat-card func-card" id="card-func" onclick="togglePanel('func')">
-              <div class="cat-card-icon">🔢</div>
-              <div class="cat-card-title">自動で計算させたい</div>
-              <div class="cat-card-sub">合計・検索・<br>条件分け</div>
+            <div class="hero-cta-price">¥43<span>/日</span></div>
+            <div class="hero-cta-copy">Excelの疑問を今すぐ解決しましょう。<br>日本語でそのまま質問できます。</div>
+            <button class="hero-cta-btn">AIに質問する →</button>
+          </div>
+          <div class="social-proof">
+            <div class="sp-avatars">
+              <div class="sp-avatar">田</div>
+              <div class="sp-avatar">鈴</div>
+              <div class="sp-avatar">山</div>
             </div>
-            <div class="cat-card data-card" id="card-data" onclick="togglePanel('data')">
-              <div class="cat-card-icon">📊</div>
-              <div class="cat-card-title">表を見せて質問する</div>
-              <div class="cat-card-sub">自分のセルに合った<br>数式をそのまま作れるよ</div>
+            <div class="sp-text"><strong>ベータモニター募集中</strong><br>今ご登録で14日間完全無料</div>
+            <div class="sp-badge">残り87席</div>
+          </div>
+          <div class="score-card">
+            <div class="score-icon">🎓</div>
+            <div class="score-info">
+              <div class="score-label">Excel習熟度スコア</div>
+              <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBar" style="width:35%"></div></div>
             </div>
-            <div class="cat-card pay-card" id="card-pay" onclick="switchTab('template')">
-              <div class="cat-card-icon">📋</div>
-              <div class="cat-card-title">書類・表を作りたい</div>
-              <div class="cat-card-sub">給料明細・請求書・<br>集計表</div>
-            </div>
-            <div class="cat-card ops-card" id="card-ops" onclick="togglePanel('ops')">
-              <div class="cat-card-icon">💻</div>
-              <div class="cat-card-title">使い方がわからない</div>
-              <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
-            </div>
-            <div class="cat-card tips-card" id="card-tips" onclick="togglePanel('tips')">
-              <div class="cat-card-icon">⚡</div>
-              <div class="cat-card-title">知ると仕事が速くなる</div>
-              <div class="cat-card-sub">ショートカット・<br>条件付き書式</div>
+            <div class="score-right">
+              <div class="score-num" id="scoreNum">35</div>
+              <div class="score-num-label">/ 100</div>
+              <div class="score-rank" id="scoreRank">初中級</div>
             </div>
           </div>
-          <div class="q-panel" id="qPanel">
-            <div class="q-panel-header">
-              <button class="q-panel-back" onclick="closePanel()">←</button>
-              <div class="q-panel-label" id="qPanelLabel"></div>
-              <div class="q-panel-close" onclick="closePanel()">×</div>
+          <div class="usage-card">
+            <div class="usage-top">
+              <span class="usage-label">本日の使用回数</span>
+              <span class="usage-count" id="usageCount">0 / 10回</span>
             </div>
-            <div class="q-list" id="qList"></div>
+            <div class="usage-bar-bg"><div class="usage-bar-fill" id="usageBar" style="width:0%"></div></div>
+            <div id="firstUseHint" style="font-size:12px;color:#7A9A87;padding:8px 0 4px;line-height:1.7;">
+              💡 まず<strong style="color:#3D9E72;">AIチャット</strong>で「給料明細を作って」と話しかけてみてください
+            </div>
+            <div class="upgrade-cta" onclick="showUpgrade()">
+              <div class="upgrade-cta-left">有料プランで無制限に使う<span>月額¥1,280（1日43円）</span></div>
+              <button class="upgrade-cta-arrow">詳細 →</button>
+            </div>
+          </div>
+          <div class="streak-banner" onclick="switchTab('quiz')">
+            <div class="streak-icon">🔥</div>
+            <div class="streak-info">
+              <div class="streak-title">今日もクイズに挑戦！</div>
+              <div class="streak-sub">毎日続けることで習熟度が上がります</div>
+            </div>
+            <div class="streak-right">
+              <div class="streak-count" id="streakCount">1</div>
+              <div class="streak-label">日連続</div>
+            </div>
+          </div>
+          <div class="section-label">機能</div>
+          <div class="cards-grid">
+            <div class="card" onclick="switchTab('chat')"><span class="card-icon">💬</span><div class="card-title">AIチャット</div><div class="card-desc">Excel専門AIが日本語で即解決</div><span class="card-tag popular">人気No.1</span></div>
+            <div class="card" onclick="switchTab('book')"><span class="card-icon">📚</span><div class="card-title">マイ数式帳</div><div class="card-desc">保存した数式をいつでも参照</div><span class="card-tag" id="bookBadge" style="display:none;background:#FFF0F0;border-color:#FFCDD2;color:#E05555;">保存済み</span></div>
+            <div class="card" onclick="switchTab('quiz')"><span class="card-icon">🎯</span><div class="card-title">Excelクイズ</div><div class="card-desc">4段階レベルで腕試し</div><span class="card-tag quiz">学習機能</span></div>
+            <div class="card" onclick="showUpgrade()"><span class="card-icon">⚡</span><div class="card-title">VBA生成</div><div class="card-desc">マクロも日本語で作れる</div><span class="card-tag" style="background:#F0FAF4;border-color:#C8ECD8;color:#3D9E72;">PRO</span></div>
+          </div>
+          <div class="cancel-reassure">
+            <p>🔒 <strong>クレジットカード不要</strong>で14日間お試しいただけます。<br>いつでもすぐに解約できます。</p>
           </div>
         </div>
       </div>
-      <div class="ptab-wrap" id="ptabWrap" style="display:none;">
-        <button class="ptab-toggle-btn" id="ptabToggleBtn" onclick="togglePtab()" style="display:none;">💡 よく使う質問を見る ▼</button>
-        <div class="ptab-expanded" id="ptabExpanded">
-          <div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>
-          <button class="quick-btn" onclick="setQuestion('別のシートから名前や金額を自動で持ってきたい（VLOOKUP）')">別シートから名前を自動で取得したい</button>
-          <button class="quick-btn" onclick="setQuestion('IFERRORでエラーを空白にしたい')">エラーを空白や「－」にしたい</button>
-          <button class="quick-btn" onclick="setQuestion('印刷範囲の設定方法は？')">印刷で変なところが切れる</button>
-        </div>
-      </div>
-      <div class="limit-banner" id="limitBanner">
-        <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
-        <button class="limit-btn" onclick="showUpgrade()">詳細</button>
-      </div>
-      <div class="chat-back-bar" id="chatBackBar" style="display:none;">
-        <button class="chat-back-btn" onclick="backToCards()">← カテゴリを選ぶ</button>
-      </div>
-      <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
-        <div id="new-chat-confirm-bar" style="display:none;align-items:center;justify-content:space-between;background:#FFF0F0;border-top:1px solid #FFCDD2;padding:8px 16px;gap:8px;flex-shrink:0;"><span style="font-size:12px;color:#E05555;font-weight:700;">会話を全部消しますか？</span><div style="display:flex;gap:6px;"><button onclick="clearChatHistory()" style="background:#E05555;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">会話を消す</button><button onclick="hideNewChatConfirm()" style="background:#F4F7F5;border:1px solid #D4EDE1;color:#2E4038;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">キャンセル</button></div></div>
-```
 
+      <!-- CHAT -->
+      <div class="screen" id="screen-chat">
+        <div class="chat-wrap">
+          <div class="chat-area" id="chatArea">
+            <div class="welcome-msg" id="welcomeMsg">
+              <div class="welcome-sub">わからない操作・エラー・表作りまで何でも日本語で聞くだけでOK</div>
+              <div class="cat-grid">
+                <div class="cat-card err-card" id="card-err" onclick="togglePanel('err')">
+                  <div class="cat-card-icon">⚠️</div>
+                  <div class="cat-card-title">エラーが出て困っている</div>
+                  <div class="cat-card-sub">#N/A・#VALUE!・<br>赤い文字が出た</div>
+                </div>
+                <div class="cat-card func-card" id="card-func" onclick="togglePanel('func')">
+                  <div class="cat-card-icon">🔢</div>
+                  <div class="cat-card-title">自動で計算させたい</div>
+                  <div class="cat-card-sub">合計・検索・<br>条件分け</div>
+                </div>
+                <div class="cat-card data-card" id="card-data" onclick="togglePanel('data')">
+                  <div class="cat-card-icon">📊</div>
+                  <div class="cat-card-title">表を見せて質問する</div>
+                  <div class="cat-card-sub">自分のセルに合った<br>数式をそのまま作れるよ</div>
+                </div>
+                <div class="cat-card pay-card" id="card-pay" onclick="switchTab('template')">
+                  <div class="cat-card-icon">📋</div>
+                  <div class="cat-card-title">書類・表を作りたい</div>
+                  <div class="cat-card-sub">給料明細・請求書・<br>集計表</div>
+                </div>
+                <div class="cat-card ops-card" id="card-ops" onclick="togglePanel('ops')">
+                  <div class="cat-card-icon">💻</div>
+                  <div class="cat-card-title">使い方がわからない</div>
+                  <div class="cat-card-sub">印刷できない・固定・<br>置換・時短ワザ</div>
+                </div>
+                <div class="cat-card tips-card" id="card-tips" onclick="togglePanel('tips')">
+                  <div class="cat-card-icon">⚡</div>
+                  <div class="cat-card-title">知ると仕事が速くなる</div>
+                  <div class="cat-card-sub">ショートカット・<br>条件付き書式</div>
+                </div>
+              </div>
+              <div class="q-panel" id="qPanel">
+                <div class="q-panel-header">
+                  <button class="q-panel-back" onclick="closePanel()">←</button>
+                  <div class="q-panel-label" id="qPanelLabel"></div>
+                  <div class="q-panel-close" onclick="closePanel()">×</div>
+                </div>
+                <div class="q-list" id="qList"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ptab-wrap" id="ptabWrap" style="display:none;">
+            <button class="ptab-toggle-btn" id="ptabToggleBtn" onclick="togglePtab()" style="display:none;">💡 よく使う質問を見る ▼</button>
+            <div class="ptab-expanded" id="ptabExpanded">
+              <div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:2px;">よく使う質問</div>
+              <button class="quick-btn" onclick="setQuestion('別のシートから名前や金額を自動で持ってきたい（VLOOKUP）')">別シートから名前を自動で取得したい</button>
+              <button class="quick-btn" onclick="setQuestion('IFERRORでエラーを空白にしたい')">エラーを空白や「－」にしたい</button>
+              <button class="quick-btn" onclick="setQuestion('印刷範囲の設定方法は？')">印刷で変なところが切れる</button>
+            </div>
+          </div>
+          <div class="limit-banner" id="limitBanner">
+            <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
+            <button class="limit-btn" onclick="showUpgrade()">詳細</button>
+          </div>
+          <div class="chat-back-bar" id="chatBackBar" style="display:none;">
+            <button class="chat-back-btn" onclick="backToCards()">← カテゴリを選ぶ</button>
+          </div>
+          <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
+            <div id="new-chat-confirm-bar" style="display:none;align-items:center;justify-content:space-between;background:#FFF0F0;border-top:1px solid #FFCDD2;padding:8px 16px;gap:8px;flex-shrink:0;"><span style="font-size:12px;color:#E05555;font-weight:700;">会話を全部消しますか？</span><div style="display:flex;gap:6px;"><button onclick="clearChatHistory()" style="background:#E05555;border:none;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">会話を消す</button><button onclick="hideNewChatConfirm()" style="background:#F4F7F5;border:1px solid #D4EDE1;color:#2E4038;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">キャンセル</button></div></div>
 <div class="memory-bar" id="memoryBar">
               <span id="memoryBarText">✨ 直近20回分覚えてるよ　💬 まだ話してないよ</span>
               <button class="new-chat-link" id="newChatBtn" onclick="confirmNewChat()">🔄 新しい会話</button>
@@ -626,138 +622,135 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         </div>
       </div>
 
-```
-  <!-- FORMULA BOOK -->
-  <div class="screen" id="screen-book">
-    <div class="book-scroll">
-      <div class="fb-header">
-        <div class="fb-title">📚 マイ数式帳</div>
-        <div class="fb-count" id="fbCount">0件</div>
-      </div>
-      <div id="fbContent">
-        <div class="fb-empty">
-          <div class="fb-empty-icon">📭</div>
-          <h3>まだ保存されていません</h3>
-          <p>AIチャットで数式を受け取ったら<br>「📚 保存」ボタンで追加できます。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- QUIZ -->
-  <div class="screen" id="screen-quiz">
-    <div class="quiz-scroll">
-      <div id="quizLevelSelect">
-        <div class="quiz-title-area">
-          <div class="quiz-main-title">🎯 Excelクイズ</div>
-          <div class="quiz-main-sub">レベルを選んで腕試し。正解するたびに習熟度スコアが上がります。</div>
-        </div>
-        <div class="level-cards">
-          <div class="level-card" onclick="startQuiz('beginner')"><div class="level-icon">🌱</div><div class="level-info"><div class="level-name">入門</div><div class="level-desc">SUM・AVERAGE・IF など基本関数</div></div><span class="level-badge easy">かんたん</span></div>
-          <div class="level-card" onclick="startQuiz('basic')"><div class="level-icon">📊</div><div class="level-info"><div class="level-name">初級</div><div class="level-desc">VLOOKUP・SUMIF・IFERROR など</div></div><span class="level-badge medium">ふつう</span></div>
-          <div class="level-card" onclick="startQuiz('intermediate')"><div class="level-icon">⚡</div><div class="level-info"><div class="level-name">中級</div><div class="level-desc">INDEX/MATCH・配列・SUMPRODUCT</div></div><span class="level-badge hard">むずかしい</span></div>
-          <div class="level-card" onclick="startQuiz('advanced')"><div class="level-icon">🏆</div><div class="level-info"><div class="level-name">上級</div><div class="level-desc">動的配列・LAMBDA・Power Query</div></div><span class="level-badge expert">超むずかしい</span></div>
-        </div>
-      </div>
-      <div class="quiz-questions" id="quizQuestions">
-        <div class="quiz-top">
-          <span class="quiz-num" id="qNum">問題 1 / 3</span>
-          <span class="quiz-level-tag" id="qLevel">入門</span>
-        </div>
-        <div class="quiz-progress"><div class="quiz-bar" id="qProgress" style="width:33%"></div></div>
-        <div class="quiz-question">
-          <div class="quiz-q-text" id="qText"></div>
-          <div class="quiz-hint" id="qHint"></div>
-        </div>
-        <div class="quiz-choices" id="qChoices"></div>
-      </div>
-      <div class="quiz-result" id="quizResult">
-        <div class="qr-icon" id="qrIcon">🎉</div>
-        <div class="qr-title" id="qrTitle">全問正解！</div>
-        <div class="qr-score" id="qrScore">3/3</div>
-        <div class="qr-msg" id="qrMsg">すばらしい！</div>
-        <div class="qr-score-update" id="qrScoreUpdate">🎓 習熟度 +15pt</div>
-        <div class="qr-btns">
-          <button class="qr-btn secondary" onclick="resetQuiz()">もう一度</button>
-          <button class="qr-btn primary" onclick="switchTab('chat')">AIに質問する</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TEMPLATE -->
-  <div class="screen" id="screen-template">
-    <div class="tmpl-gallery" id="tmplGallery">
-      <button onclick="switchTab('chat')" style="background:none;border:none;font-size:13px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0 0 12px 0;display:flex;align-items:center;gap:4px;">← AIチャットに戻る</button>
-      <div class="tmpl-gallery-title">📋 テンプレート</div>
-      <div class="tmpl-gallery-sub">項目を選ぶだけで自動完成</div>
-      <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
-    </div>
-    <div class="tmpl-iframe-screen" id="tmplIframeScreen">
-      <div class="tmpl-iframe-bar">
-        <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
-        <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
-      </div>
-      <div class="tmpl-iframe-wrap">
-        <iframe id="tmplIframe" src="" title="テンプレート"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="screen" id="screen-settings">
-    <div class="settings-scroll">
-      <div class="settings-title">⚙️ 設定</div>
-      <div class="settings-section">
-        <div class="settings-section-title">プラン</div>
-        <div class="settings-card">
-          <div class="settings-item" onclick="showUpgrade()">
-            <div class="settings-item-left"><div class="settings-item-icon">⭐</div><div class="settings-item-text"><div class="settings-item-label">現在のプラン</div><div class="settings-item-sub">無料トライアル（14日間）</div></div></div>
-            <div class="settings-item-right"><span class="plan-badge">無料</span>›</div>
+      <!-- FORMULA BOOK -->
+      <div class="screen" id="screen-book">
+        <div class="book-scroll">
+          <div class="fb-header">
+            <div class="fb-title">📚 マイ数式帳</div>
+            <div class="fb-count" id="fbCount">0件</div>
           </div>
-          <div class="settings-item" onclick="showUpgrade()">
-            <div class="settings-item-left"><div class="settings-item-icon">💳</div><div class="settings-item-text"><div class="settings-item-label">有料プランにアップグレード</div><div class="settings-item-sub">月額¥1,280 · 1日43円</div></div></div>
-            <div class="settings-item-right" style="color:#3D9E72;font-weight:700;">›</div>
+          <div id="fbContent">
+            <div class="fb-empty">
+              <div class="fb-empty-icon">📭</div>
+              <h3>まだ保存されていません</h3>
+              <p>AIチャットで数式を受け取ったら<br>「📚 保存」ボタンで追加できます。</p>
+            </div>
           </div>
         </div>
       </div>
-      <div class="settings-section">
-        <div class="settings-section-title">使用状況</div>
-        <div class="settings-card">
-          <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">💬</div><div class="settings-item-text"><div class="settings-item-label">今日の使用回数</div></div></div><div class="settings-item-right" id="settingsUsage">0 / 10回</div></div>
-          <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🎓</div><div class="settings-item-text"><div class="settings-item-label">習熟度スコア</div></div></div><div class="settings-item-right" id="settingsScore">35pt</div></div>
-          <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🔥</div><div class="settings-item-text"><div class="settings-item-label">連続ログイン</div></div></div><div class="settings-item-right">1日連続</div></div>
+
+      <!-- QUIZ -->
+      <div class="screen" id="screen-quiz">
+        <div class="quiz-scroll">
+          <div id="quizLevelSelect">
+            <div class="quiz-title-area">
+              <div class="quiz-main-title">🎯 Excelクイズ</div>
+              <div class="quiz-main-sub">レベルを選んで腕試し。正解するたびに習熟度スコアが上がります。</div>
+            </div>
+            <div class="level-cards">
+              <div class="level-card" onclick="startQuiz('beginner')"><div class="level-icon">🌱</div><div class="level-info"><div class="level-name">入門</div><div class="level-desc">SUM・AVERAGE・IF など基本関数</div></div><span class="level-badge easy">かんたん</span></div>
+              <div class="level-card" onclick="startQuiz('basic')"><div class="level-icon">📊</div><div class="level-info"><div class="level-name">初級</div><div class="level-desc">VLOOKUP・SUMIF・IFERROR など</div></div><span class="level-badge medium">ふつう</span></div>
+              <div class="level-card" onclick="startQuiz('intermediate')"><div class="level-icon">⚡</div><div class="level-info"><div class="level-name">中級</div><div class="level-desc">INDEX/MATCH・配列・SUMPRODUCT</div></div><span class="level-badge hard">むずかしい</span></div>
+              <div class="level-card" onclick="startQuiz('advanced')"><div class="level-icon">🏆</div><div class="level-info"><div class="level-name">上級</div><div class="level-desc">動的配列・LAMBDA・Power Query</div></div><span class="level-badge expert">超むずかしい</span></div>
+            </div>
+          </div>
+          <div class="quiz-questions" id="quizQuestions">
+            <div class="quiz-top">
+              <span class="quiz-num" id="qNum">問題 1 / 3</span>
+              <span class="quiz-level-tag" id="qLevel">入門</span>
+            </div>
+            <div class="quiz-progress"><div class="quiz-bar" id="qProgress" style="width:33%"></div></div>
+            <div class="quiz-question">
+              <div class="quiz-q-text" id="qText"></div>
+              <div class="quiz-hint" id="qHint"></div>
+            </div>
+            <div class="quiz-choices" id="qChoices"></div>
+          </div>
+          <div class="quiz-result" id="quizResult">
+            <div class="qr-icon" id="qrIcon">🎉</div>
+            <div class="qr-title" id="qrTitle">全問正解！</div>
+            <div class="qr-score" id="qrScore">3/3</div>
+            <div class="qr-msg" id="qrMsg">すばらしい！</div>
+            <div class="qr-score-update" id="qrScoreUpdate">🎓 習熟度 +15pt</div>
+            <div class="qr-btns">
+              <button class="qr-btn secondary" onclick="resetQuiz()">もう一度</button>
+              <button class="qr-btn primary" onclick="switchTab('chat')">AIに質問する</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="settings-section">
-        <div class="settings-section-title">サポート</div>
-        <div class="settings-card">
-          <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
-          <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
+
+      <!-- TEMPLATE -->
+      <div class="screen" id="screen-template">
+        <div class="tmpl-gallery" id="tmplGallery">
+          <button onclick="switchTab('chat')" style="background:none;border:none;font-size:13px;color:#3D9E72;font-weight:700;cursor:pointer;padding:0 0 12px 0;display:flex;align-items:center;gap:4px;">← AIチャットに戻る</button>
+          <div class="tmpl-gallery-title">📋 テンプレート</div>
+          <div class="tmpl-gallery-sub">項目を選ぶだけで自動完成</div>
+          <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
+        </div>
+        <div class="tmpl-iframe-screen" id="tmplIframeScreen">
+          <div class="tmpl-iframe-bar">
+            <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
+            <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
+          </div>
+          <div class="tmpl-iframe-wrap">
+            <iframe id="tmplIframe" src="" title="テンプレート"></iframe>
+          </div>
         </div>
       </div>
-      <div style="text-align:center;padding:20px 0;font-size:11px;color:#7A9A87;line-height:1.8;">
-        Exally（エクサリー）デモ版<br>© 2026 合同会社ZEROact
+
+      <!-- SETTINGS -->
+      <div class="screen" id="screen-settings">
+        <div class="settings-scroll">
+          <div class="settings-title">⚙️ 設定</div>
+          <div class="settings-section">
+            <div class="settings-section-title">プラン</div>
+            <div class="settings-card">
+              <div class="settings-item" onclick="showUpgrade()">
+                <div class="settings-item-left"><div class="settings-item-icon">⭐</div><div class="settings-item-text"><div class="settings-item-label">現在のプラン</div><div class="settings-item-sub">無料トライアル（14日間）</div></div></div>
+                <div class="settings-item-right"><span class="plan-badge">無料</span>›</div>
+              </div>
+              <div class="settings-item" onclick="showUpgrade()">
+                <div class="settings-item-left"><div class="settings-item-icon">💳</div><div class="settings-item-text"><div class="settings-item-label">有料プランにアップグレード</div><div class="settings-item-sub">月額¥1,280 · 1日43円</div></div></div>
+                <div class="settings-item-right" style="color:#3D9E72;font-weight:700;">›</div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">使用状況</div>
+            <div class="settings-card">
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">💬</div><div class="settings-item-text"><div class="settings-item-label">今日の使用回数</div></div></div><div class="settings-item-right" id="settingsUsage">0 / 10回</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🎓</div><div class="settings-item-text"><div class="settings-item-label">習熟度スコア</div></div></div><div class="settings-item-right" id="settingsScore">35pt</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🔥</div><div class="settings-item-text"><div class="settings-item-label">連続ログイン</div></div></div><div class="settings-item-right">1日連続</div></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">サポート</div>
+            <div class="settings-card">
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:20px 0;font-size:11px;color:#7A9A87;line-height:1.8;">
+            Exally（エクサリー）デモ版<br>© 2026 合同会社ZEROact
+          </div>
+        </div>
       </div>
+
     </div>
-  </div>
 
-</div>
-
-<nav class="bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span></button>
-  <button class="nav-item" id="nav-chat" onclick="switchTab('chat')"><span class="nav-icon">💬</span><span class="nav-label">AIチャット</span><div class="nav-badge" id="chatBadge"></div></button>
-  <button class="nav-item" id="nav-template" onclick="switchTab('template')"><span class="nav-icon">📋</span><span class="nav-label">テンプレ</span></button>
-  <button class="nav-item" id="nav-book" onclick="switchTab('book')"><span class="nav-icon">📚</span><span class="nav-label">数式帳</span><div class="nav-badge" id="bookNavBadge"></div></button>
-  <button class="nav-item" id="nav-quiz" onclick="switchTab('quiz')"><span class="nav-icon">🎯</span><span class="nav-label">クイズ</span></button>
-</nav>
-```
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span></button>
+      <button class="nav-item" id="nav-chat" onclick="switchTab('chat')"><span class="nav-icon">💬</span><span class="nav-label">AIチャット</span><div class="nav-badge" id="chatBadge"></div></button>
+      <button class="nav-item" id="nav-template" onclick="switchTab('template')"><span class="nav-icon">📋</span><span class="nav-label">テンプレ</span></button>
+      <button class="nav-item" id="nav-book" onclick="switchTab('book')"><span class="nav-icon">📚</span><span class="nav-label">数式帳</span><div class="nav-badge" id="bookNavBadge"></div></button>
+      <button class="nav-item" id="nav-quiz" onclick="switchTab('quiz')"><span class="nav-icon">🎯</span><span class="nav-label">クイズ</span></button>
+    </nav>
 
   </div>
 </div>
 
 <!-- SAVE MODAL -->
-
 <div class="modal-overlay" id="saveModal">
   <div class="modal">
     <h3>📚 数式帳に保存</h3>
@@ -773,7 +766,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 </div>
 
 <!-- UPGRADE MODAL -->
-
 <div class="modal-overlay" id="upgradeModal">
   <div class="upgrade-modal">
     <div class="upgrade-modal-header">
@@ -1468,6 +1460,5 @@ function showToast(msg,duration){
   setInterval(rotate,3500);
 })();
 </script>
-
 </body>
 </html>
