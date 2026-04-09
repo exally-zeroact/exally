@@ -740,7 +740,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">サポート</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub">exally.support@gmail.com</div></div></div><div class="settings-item-right">›</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub"><a href="mailto:exally.support@gmail.com">exally.support@gmail.com</a></div></div></div><div class="settings-item-right">›</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
             </div>
           </div>
@@ -1589,12 +1589,15 @@ function showToast(msg,duration){
   var idx=0;
   function rotate(){
     var el=document.getElementById('msgInput');
-    if(!el||document.activeElement===el) return;
-    idx=(idx+1)%examples.length;
-    el.setAttribute('placeholder','例：'+examples[idx]);
+    if(el && document.activeElement !== el){
+      el.placeholder = examples[idx % examples.length];
+      idx++;
+    }
+    setTimeout(rotate, 3000);
   }
-  setInterval(rotate,3500);
+  rotate();
 })();
 </script>
+
 </body>
 </html>
