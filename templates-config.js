@@ -38,7 +38,7 @@ var TEMPLATES = [
     id: 'invoice',
     name: '請求書・見積書',
     desc: 'インボイス対応。電子判子・控除明細付き',
-    file: 'invoice-template.html',
+    file: 'seikyusyo-template.html',
     tags: ['請求系', '人気'],
     hot: true,
     previewHTML: `
