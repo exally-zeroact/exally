@@ -409,9 +409,7 @@ body{padding-bottom:80px;}
   <div class="sp-badges">
     <div class="sp-badge-item">✅ インボイス対応</div>
     <div class="sp-badge-item">🔏 電子判子つき</div>
-    <div class="sp-badge-item">📋 請求書＆見積書</div>
-    <div class="sp-badge-item">💰 控除明細対応</div>
-  </div>
+    </div>
   <div class="sp-steps-row">
     <div class="sp-step-item"><div class="sp-step-circle">1</div><span>入力する</span></div>
     <span class="sp-arrow">→</span>
@@ -437,7 +435,7 @@ body{padding-bottom:80px;}
       <div class="gp-steps">
         <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>入力欄を埋める</b><small>会社名・品目・金額を入力するだけ</small></div></div><div class="gp-hints"><div class="gp-hint">💡 品目は＋追加・×削除できるよ</div><div class="gp-hint">🔢 料率（例：0.006）は直接書き換えOK</div></div>
         <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の書類イメージで確認できる</small></div></div>
-        <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>AIチャットでExcel出力</b><small>TSVをExcelに貼り付け</small></div></div>
+        <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
       </div>
       <div class="sec-div">📊 Excelで印刷するには</div>
       <div class="xl-steps">
@@ -460,8 +458,8 @@ body{padding-bottom:80px;}
     <div class="feat-list">
       <div class="feat-item"><div class="feat-main">✅ インボイス対応</div><div class="feat-sub">登録番号入力だけ</div></div>
       <div class="feat-item"><div class="feat-main">🔏 電子判子</div><div class="feat-sub">画像アップOK</div></div>
-      <div class="feat-item"><div class="feat-main">📋 2種類作れる</div><div class="feat-sub">請求書&見積書</div></div>
-      <div class="feat-item"><div class="feat-main">💰 控除明細</div><div class="feat-sub">建設・フリーランス</div></div>
+      <div class="feat-item"></div>
+      <div class="feat-item"><div class="feat-sub">建設・フリーランス</div></div>
     </div>
   </div>
   <div class="gp-sec">
@@ -469,7 +467,7 @@ body{padding-bottom:80px;}
     <div class="gp-steps">
       <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>入力欄を埋める</b><small>会社名・品目・金額を入力するだけ</small></div></div><div class="gp-hints"><div class="gp-hint">💡 品目は＋追加・×削除できるよ</div><div class="gp-hint">🔢 料率（例：0.006）は直接書き換えOK</div></div>
       <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の書類イメージで確認できる</small></div></div>
-      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>AIチャットでExcel出力</b><small>TSVをExcelに貼り付け</small></div></div>
+      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
     </div>
   </div>
   <div class="gp-sec">
@@ -732,16 +730,16 @@ body{padding-bottom:80px;}
 
     <!-- プロンプト生成結果 -->
     <div class="result-sec" id="resultEl">
-      <div class="sec-label">生成されたプロンプト</div>
+      <div class="sec-label">📊 Excel用データ</div>
       <div class="result-box" id="resultBox"></div>
-      <div class="copy-hint">📋 コピー → AIチャットタブ → 長押しペースト → 送信</div>
-      <button class="copy-btn" onclick="copyPrompt()">📋 Excel用データをコピーする</button>
+      <div class="copy-hint">📋 コピー → Excelを開く → A1セルを選択 → 貼り付け</div>
+      <button class="copy-btn" id="copyPromptBtn" onclick="copyPrompt()">📋 ExcelにコピーしてA1に貼り付ける</button>
       <div class="nsteps" style="margin-top:14px;">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:10px;">コピーしたら次の手順</div>
-        <div class="nstep"><div class="nstep-n">1</div><div class="nstep-t"><b>AIチャットタブを開く</b><small>下のナビ「AIチャット」をタップ</small></div></div>
-        <div class="nstep"><div class="nstep-n">2</div><div class="nstep-t"><b>貼り付けて送信</b><small>入力欄を長押し → ペースト → 送信</small></div></div>
-        <div class="nstep"><div class="nstep-n">3</div><div class="nstep-t"><b>TSVをExcelに貼り付ける</b><small>AIの返答 → Excelのセルに貼り付け</small></div></div>
-        <div class="nstep"><div class="nstep-n">4</div><div class="nstep-t"><b>PDFに書き出す</b><small>ファイル → エクスポート → PDF</small></div></div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:10px;">📌 貼り付け手順</div>
+        <div class="nstep"><div class="nstep-n">1</div><div class="nstep-t"><b>上のボタンをタップしてコピー</b></div></div>
+        <div class="nstep"><div class="nstep-n">2</div><div class="nstep-t"><b>Excelを開いてA1セルを選択</b></div></div>
+        <div class="nstep"><div class="nstep-n">3</div><div class="nstep-t"><b>長押し → 貼り付け</b><small>数式も自動で入ります</small></div></div>
+        <div class="nstep"><div class="nstep-n">4</div><div class="nstep-t"><b>各項目の数値を入力</b><small>合計・税額が自動計算されます</small></div></div>
       </div>
     </div>
 
@@ -1397,25 +1395,18 @@ function buildDocPreviewHTML(){
     + '</div></div>'
     + '<div style="background:#F0FAF4;padding:8px 10px;border-top:1px solid #C8ECD8;display:flex;gap:8px;">'
     + '<button onclick="hidePreview()" style="background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">← 戻って修正</button>'
-    + '<button onclick="generateAndCopy();" style="margin-left:auto;padding:8px 14px;background:#3D9E72;border:none;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">Excel用データを生成する →</button>'
+    + '<button onclick="generateAndScroll();" style="margin-left:auto;padding:8px 14px;background:#3D9E72;border:none;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">Excel用データを生成する →</button>'
     + '</div>'
     + '<div style="font-size:11px;color:#7A9A87;padding:10px 10px 14px;line-height:1.7;">※このプレビューは完成イメージです。列幅・フォントなどの最終調整はExcel上でお願いします。このサイズは'+pc.label+'を想定しています。品名が長い場合は末尾が「…」で省略されますが、Excel出力には全文が反映されます。</div>'
     + '</div>';
 }
 
 // ===== プロンプト生成 =====
-function generateAndCopy(){
+function generateAndScroll(){
   hidePreview();
   buildPrompt();
-  var text = document.getElementById('resultBox').textContent;
-  if(!text) return;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(function(){ showToast('📋 Excel用データをコピーしました！'); });
-  } else {
-    var ta=document.createElement('textarea');ta.value=text;
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);showToast('📋 Excel用データをコピーしました！');
-  }
+  var el=document.getElementById('resultEl');
+  if(el) setTimeout(function(){ el.scrollIntoView({behavior:'smooth',block:'start'}); },100);
 }
 function buildPrompt(){
   var docName = docType==='invoice'?'請求書':'見積書';
@@ -1523,12 +1514,20 @@ function buildPrompt(){
 function copyPrompt(){
   var text = document.getElementById('resultBox').textContent;
   if(!text) return;
+  var btn=document.getElementById('copyPromptBtn');
   if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(function(){ showToast('📋 コピーしました！'); });
+    navigator.clipboard.writeText(text).then(function(){
+      if(btn) btn.textContent='✅ コピーしました！ExcelのA1に貼り付けてください';
+      showToast('📋 コピー完了！ExcelのA1セルを選択して貼り付けてください');
+      setTimeout(function(){ if(btn) btn.textContent='📋 ExcelにコピーしてA1に貼り付ける'; },4000);
+    });
   } else {
     var ta=document.createElement('textarea');ta.value=text;
     document.body.appendChild(ta);ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);showToast('📋 コピーしました！');
+    document.body.removeChild(ta);
+    if(btn) btn.textContent='✅ コピーしました！ExcelのA1に貼り付けてください';
+    showToast('📋 コピー完了！ExcelのA1セルを選択して貼り付けてください');
+    setTimeout(function(){ if(btn) btn.textContent='📋 ExcelにコピーしてA1に貼り付ける'; },4000);
   }
 }
 
