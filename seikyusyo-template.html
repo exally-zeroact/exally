@@ -402,7 +402,6 @@ body{padding-bottom:80px;}
   <button class="hd-back" onclick="if(window.parent&&window.parent.closeTmplIframe){window.parent.closeTmplIframe();}else{history.back();}">← 戻る</button>
   <span class="hd-logo">Exally</span>
   <span class="hd-title" id="hdTitle">請求書</span>
-    <a href="mitsumoriyo-template.html" style="font-size:12px;color:#3D9E72;font-weight:700;text-decoration:none;white-space:nowrap;">📄 見積書はこちら →</a>
 </div>
 
 <!-- ===== スマホ：上部stickyパネル ===== -->
@@ -490,10 +489,6 @@ body{padding-bottom:80px;}
 <!-- フォームパネル -->
 <div class="form-panel">
 
-  <!-- 書類タイプ -->
-  <div class="doc-tabs">
-    <button class="doc-tab active" id="tab-inv" onclick="switchDoc('invoice')">🧾 請求書</button>
-  </div>
 
   <!-- 合計バナー -->
   <div class="total-banner">
@@ -1382,13 +1377,26 @@ function buildDocPreviewHTML(){
     + '</div></div>'
     + '<div style="background:#F0FAF4;padding:8px 10px;border-top:1px solid #C8ECD8;display:flex;gap:8px;">'
     + '<button onclick="hidePreview()" style="background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">← 戻って修正</button>'
-    + '<button onclick="buildPrompt();hidePreview();" style="margin-left:auto;padding:8px 14px;background:#3D9E72;border:none;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">Excel用データを生成する →</button>'
+    + '<button onclick="generateAndCopy();" style="margin-left:auto;padding:8px 14px;background:#3D9E72;border:none;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;">Excel用データを生成する →</button>'
     + '</div>'
     + '<div style="font-size:11px;color:#7A9A87;padding:10px 10px 14px;line-height:1.7;">※このプレビューは完成イメージです。列幅・フォントなどの最終調整はExcel上でお願いします。このサイズは'+pc.label+'を想定しています。品名が長い場合は末尾が「…」で省略されますが、Excel出力には全文が反映されます。</div>'
     + '</div>';
 }
 
 // ===== プロンプト生成 =====
+function generateAndCopy(){
+  hidePreview();
+  buildPrompt();
+  var text = document.getElementById('resultBox').textContent;
+  if(!text) return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){ showToast('📋 Excel用データをコピーしました！'); });
+  } else {
+    var ta=document.createElement('textarea');ta.value=text;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);showToast('📋 Excel用データをコピーしました！');
+  }
+}
 function buildPrompt(){
   var docName = docType==='invoice'?'請求書':'見積書';
   var issuer  = document.getElementById('issuerName').value.trim();
