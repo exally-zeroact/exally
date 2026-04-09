@@ -1157,7 +1157,7 @@ function generateTSV(){
   // プレビューとUI更新
   document.getElementById('resultEl').classList.add('show');
   renderExcelPreview();
-  document.getElementById('tsvSectionLabel').scrollIntoView({behavior:'smooth',block:'start'});
+  var _tsvEl=document.getElementById('tsvSectionLabel');window.scrollTo({top:_tsvEl.getBoundingClientRect().top+window.pageYOffset-100,behavior:'smooth'});
   const sc = document.getElementById('stickyCta');
   if(sc) sc.style.display = 'none';
 }
