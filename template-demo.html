@@ -414,7 +414,7 @@ body{padding-bottom:80px;}
       <!-- Excelプレビュー -->
       <div id="excelPreview" style="margin-bottom:16px;"></div>
       <!-- TSV出力 -->
-      <div class="result-label">📊 Excel用データ（TSV）</div>
+      <div class="result-label" id="tsvSectionLabel">📊 Excel用データ（TSV）</div>
       <div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.7;">選択した項目・計算式を自動生成しました。<br>コピーしてExcelのA1セルに貼り付けてください。</div>
       <button class="copy-btn" id="copyTsvBtn" onclick="copyTSVDirect()">📋 ExcelにコピーしてA1に貼り付ける</button>
       <div class="next-steps" style="margin-top:14px;">
@@ -552,7 +552,7 @@ function flashRow(itemId){
   },50);
 }
 
-function render(){renderSort();renderAddable();const hasDeduct=active.some(i=>i.type==='deduct');const notice=document.getElementById('deductNotice');if(notice)notice.style.display=hasDeduct?'block':'none';updateFitCheck();
+function render(){MONTHLY_AMOUNT=calcApproxPayTotal();renderSort();renderAddable();const hasDeduct=active.some(i=>i.type==='deduct');const notice=document.getElementById('deductNotice');if(notice)notice.style.display=hasDeduct?'block':'none';updateFitCheck();
   // 生成済みの場合はプレビューも更新
   if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
 }
@@ -1157,7 +1157,7 @@ function generateTSV(){
   // プレビューとUI更新
   document.getElementById('resultEl').classList.add('show');
   renderExcelPreview();
-  document.getElementById('resultEl').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('tsvSectionLabel').scrollIntoView({behavior:'smooth',block:'start'});
   const sc = document.getElementById('stickyCta');
   if(sc) sc.style.display = 'none';
 }
