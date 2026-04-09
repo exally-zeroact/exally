@@ -107,6 +107,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .next-step-text{font-size:12px;color:var(--text-secondary);line-height:1.6;}
 .next-step-text strong{color:var(--text-primary);font-size:13px;}
 .next-step-text span{font-size:11px;color:var(--text-muted);}
+#tsvSectionLabel{scroll-margin-top:110px;}
 .copy-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--mint-d),var(--mint));border:none;border-radius:var(--radius-md);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:var(--shadow-md);transition:opacity 0.15s;}
 .copy-btn:active{opacity:0.85;}
 .gen-wrap{padding:16px;}
@@ -1157,7 +1158,9 @@ function generateTSV(){
   // プレビューとUI更新
   document.getElementById('resultEl').classList.add('show');
   renderExcelPreview();
-  var _tsvEl=document.getElementById('tsvSectionLabel');window.scrollTo({top:_tsvEl.getBoundingClientRect().top+window.pageYOffset-100,behavior:'smooth'});
+  setTimeout(function(){
+    document.getElementById('tsvSectionLabel').scrollIntoView({behavior:'smooth',block:'start'});
+  }, 80);
   const sc = document.getElementById('stickyCta');
   if(sc) sc.style.display = 'none';
 }
