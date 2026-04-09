@@ -522,7 +522,7 @@ const HOURLY=[
   {id:'h_income',label:'所得税',sub:'給与にかかる国税（年末調整あり）',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=課税所得×源泉税額表',formula:'=課税所得×源泉税額表',title:'所得税の計算式（時給制）',desc:'給与から社会保険料を引いた金額と扶養人数をもとに、国税庁の源泉徴収税額表で金額が決まるよ。',why:'給与から社会保険料を引いた金額がどの範囲かを国税庁の税額表で調べて、その金額をそのまま使うんだよ。従業員ごとの扶養人数・都道府県はExcelの設定エリアで変更してね。年末調整で最終的な金額に精算されるから安心してね。',rates:null},
 ];
 
-let cType='monthly',active=[],cRates={},popId=null,dragSrc=null;
+let cType='monthly',active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
 function base(){return cType==='monthly'?MONTHLY:HOURLY;}
 
 function init(){
@@ -570,8 +570,45 @@ function getVal(item){
   }
   if(r.unit==='%'){
     if(item.id==='income'||item.id==='h_income'){
-      var fuyou = (cRates[item.id]&&cRates[item.id]['fuyou']!==undefined)?cRates[item.id]['fuyou']:0;
-      return '=課税所得×源泉税額表（扶養'+fuyou+'人）';
+      // 所得税：JS側でSHOTOKUZEI_HYOUから確定金額を計算して表示
+      if(typeof SHOTOKUZEI_HYOU !== 'undefined'){
+        var fuyou = (cRates[item.id]&&cRates[item.id]['fuyou']!==undefined)?cRates[item.id]['fuyou']:0;
+        // 課税所得を概算（支給合計から社保を引く）
+        var payApprox = MONTHLY_AMOUNT || 0;
+        if(payApprox > 0){
+          var hRate = (cRates['health']&&cRates['health']['rate'])||0.04955;
+          var hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(payApprox);
+          var hAmt = Math.round(hyojun * hRate);
+          var pAmt = Math.round(hyojun * 0.0915);
+          var eAmt = Math.round(payApprox * ((cRates['employ']&&cRates['employ']['rate'])||0.0055));
+          var kazei = payApprox - hAmt - pAmt - eAmt;
+          if(kazei > 0){
+            var zei = SHOTOKUZEI_HYOU.getZei(kazei, fuyou);
+            if(zei !== null) return '¥'+zei.toLocaleString()+'（扶養'+fuyou+'人・税額表）';
+            return '¥－（税額表範囲外・要確認）';
+          }
+        }
+        return '=課税所得×源泉税額表（扶養'+fuyou+'人）';
+      }
+      var fuyou2 = (cRates[item.id]&&cRates[item.id]['fuyou']!==undefined)?cRates[item.id]['fuyou']:0;
+      return '=課税所得×源泉税額表（扶養'+fuyou2+'人）';
+    }
+    if(item.id==='health'||item.id==='h_health'){
+      // 健保：標準報酬月額から確定金額を計算
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        var hyojun2 = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        var hRate2 = v;
+        var hAmt2 = Math.round(hyojun2 * hRate2);
+        return '¥'+hAmt2.toLocaleString()+'（標準報酬¥'+hyojun2.toLocaleString()+'）';
+      }
+    }
+    if(item.id==='pension'||item.id==='h_pension'){
+      // 年金：標準報酬月額から確定金額を計算
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        var hyojun3 = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        var pAmt2 = Math.round(hyojun3 * 0.0915);
+        return '¥'+pAmt2.toLocaleString()+'（標準報酬¥'+hyojun3.toLocaleString()+'）';
+      }
     }
     return`=支給合計×${(v*100).toFixed(item.id.includes('employ')?2:3)}%`;
   }
@@ -850,6 +887,8 @@ function updateFitCheck(){
 }
 
 function generateTSV(){
+  // 支給合計の概算値を計算（健保・所得税の標準報酬計算用）
+  MONTHLY_AMOUNT = calcApproxPayTotal();
   const { canGenerate } = (() => {
     const { totalRows, limit } = checkFit();
     return { canGenerate: totalRows <= limit };
@@ -1032,10 +1071,21 @@ function generateTSV(){
     const rate = cRates[item.id] || {};
 
     if(item.id === 'health' || item.id === 'h_health'){
+      // 標準報酬月額から健保確定額を計算してExcelに数値で出力
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        const r = rate['rate'] ?? 0.04955;
+        return Math.round(hyojun * r).toString();
+      }
       const r = rate['rate'] ?? 0.04955;
       return `=ROUND(${payTotalCell}*${r},0)`;
     }
     if(item.id === 'pension' || item.id === 'h_pension'){
+      // 標準報酬月額から年金確定額を計算してExcelに数値で出力
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        return Math.round(hyojun * 0.0915).toString();
+      }
       return `=ROUND(${payTotalCell}*0.0915,0)`;
     }
     if(item.id === 'employ' || item.id === 'h_employ'){
@@ -1043,8 +1093,23 @@ function generateTSV(){
       return `=ROUND(${payTotalCell}*${r},0)`;
     }
     if(item.id === 'income' || item.id === 'h_income'){
-      // 所得税：支給合計から健保・年金・雇保を引いた課税所得×料率
-      // 各控除のセルを個別参照して循環参照を防ぐ
+      // 所得税：SHOTOKUZEI_HYOUのgetZeiで確定税額を計算して数値で出力
+      if(typeof SHOTOKUZEI_HYOU !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const fuyou = (rate['fuyou'] !== undefined) ? rate['fuyou'] : 0;
+        const hRate = (cRates['health']&&cRates['health']['rate'])||0.04955;
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        const hAmt = Math.round(hyojun * hRate);
+        const pAmt = Math.round(hyojun * 0.0915);
+        const eRate = (cRates['employ']&&cRates['employ']['rate'])||0.0055;
+        const eAmt = Math.round(MONTHLY_AMOUNT * eRate);
+        const kazei = MONTHLY_AMOUNT - hAmt - pAmt - eAmt;
+        if(kazei > 0){
+          const zei = SHOTOKUZEI_HYOU.getZei(kazei, fuyou);
+          if(zei !== null) return zei.toString();
+        }
+        return '0';
+      }
+      // フォールバック：セル参照式
       const healthCell = cellMap['health'] || cellMap['h_health'];
       const pensionCell = cellMap['pension'] || cellMap['h_pension'];
       const employCell = cellMap['employ'] || cellMap['h_employ'];
@@ -1355,10 +1420,27 @@ function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
   if(manualItems[item.id])return'0';
   if(!item.formula||item.formula==='手入力')return'0';
   const rate=cRates[item.id]||{};
-  if(item.id==='health'||item.id==='h_health'){const r=rate['rate']??0.04955;return`=ROUND(${payTotalCell}*${r},0)`;}
-  if(item.id==='pension'||item.id==='h_pension'){return`=ROUND(${payTotalCell}*0.0915,0)`;}
+  if(item.id==='health'||item.id==='h_health'){
+    if(typeof SHAKAIHOKEN_HYO!=='undefined'&&MONTHLY_AMOUNT>0){const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);const r=rate['rate']??0.04955;return Math.round(hy*r).toString();}
+    const r=rate['rate']??0.04955;return`=ROUND(${payTotalCell}*${r},0)`;
+  }
+  if(item.id==='pension'||item.id==='h_pension'){
+    if(typeof SHAKAIHOKEN_HYO!=='undefined'&&MONTHLY_AMOUNT>0){const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);return Math.round(hy*0.0915).toString();}
+    return`=ROUND(${payTotalCell}*0.0915,0)`;
+  }
   if(item.id==='employ'||item.id==='h_employ'){const r=rate['rate']??0.0055;return`=ROUND(${payTotalCell}*${r},0)`;}
   if(item.id==='income'||item.id==='h_income'){
+    if(typeof SHOTOKUZEI_HYOU!=='undefined'&&MONTHLY_AMOUNT>0){
+      const fuyou=(rate['fuyou']!==undefined)?rate['fuyou']:0;
+      const hRate=(cRates['health']&&cRates['health']['rate'])||0.04955;
+      const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+      const hA=Math.round(hy*hRate);const pA=Math.round(hy*0.0915);
+      const eR=(cRates['employ']&&cRates['employ']['rate'])||0.0055;
+      const eA=Math.round(MONTHLY_AMOUNT*eR);
+      const kazei=MONTHLY_AMOUNT-hA-pA-eA;
+      if(kazei>0){const zei=SHOTOKUZEI_HYOU.getZei(kazei,fuyou);if(zei!==null)return zei.toString();}
+      return'0';
+    }
     const hC=cellMap['health']||cellMap['h_health'];
     const pC=cellMap['pension']||cellMap['h_pension'];
     const eC=cellMap['employ']||cellMap['h_employ'];
@@ -2101,6 +2183,30 @@ function initRates(){
   if(!cRates['h_income'])cRates['h_income']= {};
   cRates['income']['fuyou']   = 0;
   cRates['h_income']['fuyou'] = 0;
+}
+
+function calcApproxPayTotal(){
+  // active配列の支給項目から概算合計を計算（TSV生成前に呼ぶ）
+  var total = 0;
+  active.forEach(function(item){
+    if(item.type !== 'pay') return;
+    var rate = cRates[item.id] || {};
+    // 基本給（月給制）
+    if(item.id === 'basic'){
+      total += rate['amount'] || 250000;
+      return;
+    }
+    // 基本給（時給制）
+    if(item.id === 'h_base'){
+      var wage = rate['wage'] || 1226;
+      var work = rate['work'] || 160;
+      total += Math.round(wage * work);
+      return;
+    }
+    // 固定手当
+    if(rate['amount']) total += rate['amount'];
+  });
+  return total > 0 ? total : 250000; // デフォルト250,000円
 }
 
 </script>
