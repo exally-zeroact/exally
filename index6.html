@@ -1587,4 +1587,15 @@ function showToast(msg,duration){
 (function(){
   var examples=['VLOOKUPの使い方を教えて','IF関数でエラーを回避したい','SUMIFで条件付き合計を出したい','#REF! エラーが出て困ってます','売上データを自動集計したい','IFERRORの使い方を教えて','重複データを削除したい'];
   var idx=0;
-  function rota
+  function rotate(){
+    var input=document.getElementById('msgInput');
+    if(input && document.activeElement!==input){
+      input.placeholder=examples[idx];
+      idx=(idx+1)%examples.length;
+    }
+  }
+  setInterval(rotate,3000);
+})();
+</script>
+</body>
+</html>
