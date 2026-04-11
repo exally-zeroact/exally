@@ -78,17 +78,27 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { message } = req.body || {};
+    const { message, history } = req.body || {};
 
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'message is required', text: '', tsv: '' });
     }
 
+    // 会話履歴のサニタイズ（不正エントリ除去・最大40メッセージ=20ターンに制限）
+    const sanitizedHistory = (Array.isArray(history) ? history : [])
+      .filter(m =>
+        m &&
+        (m.role === 'user' || m.role === 'assistant') &&
+        typeof m.content === 'string' &&
+        m.content.trim().length > 0
+      )
+      .slice(-40);
+
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: message }],
+      messages: [...sanitizedHistory, { role: 'user', content: message }],
     });
 
     const fullText = response.content
