@@ -518,8 +518,8 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           </div>
           <div class="usage-card">
             <div class="usage-top">
-              <span class="usage-label">本日の使用回数</span>
-              <span class="usage-count" id="usageCount">0 / 10回</span>
+              <span class="usage-label">今月の使用回数</span>
+              <span class="usage-count" id="usageCount">0 / 30回</span>
             </div>
             <div class="usage-bar-bg"><div class="usage-bar-fill" id="usageBar" style="width:0%"></div></div>
             <div id="firstUseHint" style="font-size:12px;color:#7A9A87;padding:8px 0 4px;line-height:1.7;">
@@ -614,7 +614,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
             </div>
           </div>
           <div class="limit-banner" id="limitBanner">
-            <p>無料プランの上限（10回）に近づいています。有料プランで無制限に使えます。</p>
+            <p>無料プランの上限（30回）に近づいています。有料プランで無制限に使えます。</p>
             <button class="limit-btn" onclick="showUpgrade()">詳細</button>
           </div>
           <div class="chat-input-wrap" style="flex-direction:column;align-items:stretch;">
@@ -732,7 +732,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
           <div class="settings-section">
             <div class="settings-section-title">使用状況</div>
             <div class="settings-card">
-              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">💬</div><div class="settings-item-text"><div class="settings-item-label">今日の使用回数</div></div></div><div class="settings-item-right" id="settingsUsage">0 / 10回</div></div>
+              <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">💬</div><div class="settings-item-text"><div class="settings-item-label">今月の使用回数</div></div></div><div class="settings-item-right" id="settingsUsage">0 / 30回</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🎓</div><div class="settings-item-text"><div class="settings-item-label">習熟度スコア</div></div></div><div class="settings-item-right" id="settingsScore">35pt</div></div>
               <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">🔥</div><div class="settings-item-text"><div class="settings-item-label">連続ログイン</div></div></div><div class="settings-item-right">1日連続</div></div>
             </div>
@@ -833,7 +833,7 @@ window.TEMPLATES = TEMPLATES;
 // ===== STATE =====
 var score = 35;
 var usageCount = 0;
-var MAX_FREE = 10;
+var MAX_FREE = 30;
 var savedFormulas = [];
 var isAILoading = false;
 var obSlide = 0;
@@ -849,6 +849,26 @@ try{ if(localStorage.getItem('exally_ob_done')==='1'){ document.getElementById('
 // ===== STORAGE KEYS =====
 var CHAT_STORAGE_KEY = 'exally_chat_v1';
 var CHAT_HISTORY_KEY = 'exally_chat_history_v1';
+var USAGE_MONTH_KEY  = 'exally_usage_month_v1';
+
+// ===== 月間カウントリセット =====
+function checkMonthlyReset(){
+  try{
+    var now = new Date();
+    var currentMonth = now.getFullYear()+'-'+(now.getMonth()+1);
+    var savedMonth = localStorage.getItem(USAGE_MONTH_KEY);
+    if(savedMonth !== currentMonth){
+      // 月が変わっていたらチャットカウントだけリセット（会話履歴は残す）
+      usageCount = 0;
+      localStorage.setItem(USAGE_MONTH_KEY, currentMonth);
+      localStorage.setItem('exally_usage_count_v1', '0');
+    } else {
+      // 同じ月ならlocalStorageから復元
+      var saved = parseInt(localStorage.getItem('exally_usage_count_v1')||'0', 10);
+      usageCount = isNaN(saved) ? 0 : saved;
+    }
+  }catch(e){}
+}
 
 // ===== CHAT PERSISTENCE =====
 function saveChatHistory(){
@@ -865,6 +885,7 @@ function saveChatHistory(){
 }
 
 function loadChatHistory(){
+  checkMonthlyReset();
   try{
     var savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
     if(savedHistory){ var h=JSON.parse(savedHistory); if(Array.isArray(h)) chatHistory=h; }
@@ -1222,7 +1243,8 @@ async function sendMessage(){
   var tmplMatch=detectTmplKeyword(text);
   if(tmplMatch){ addTmplGuideMsg(tmplMatch); return; }
   usageCount++; updateUsage();
-  if(usageCount>=8) document.getElementById('limitBanner').classList.add('show');
+  try{ localStorage.setItem('exally_usage_count_v1', String(usageCount)); }catch(e){}
+  if(usageCount>=24) document.getElementById('limitBanner').classList.add('show');
   var sendBtn=document.getElementById('sendBtn');
   if(sendBtn) sendBtn.disabled=true;
   isAILoading=true;
