@@ -107,7 +107,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .next-step-text{font-size:12px;color:var(--text-secondary);line-height:1.6;}
 .next-step-text strong{color:var(--text-primary);font-size:13px;}
 .next-step-text span{font-size:11px;color:var(--text-muted);}
-#tsvSectionLabel{scroll-margin-top:110px;}
 .copy-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--mint-d),var(--mint));border:none;border-radius:var(--radius-md);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:var(--shadow-md);transition:opacity 0.15s;}
 .copy-btn:active{opacity:0.85;}
 .gen-wrap{padding:16px;}
@@ -236,7 +235,11 @@ body{padding-bottom:80px;}
 .gyoshu-apply-btn{width:100%;padding:15px;background:#C8ECD8;color:#7A9A87;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:not-allowed;font-family:'Noto Sans JP',sans-serif;margin-bottom:10px;}
 .gyoshu-apply-btn.active{background:linear-gradient(135deg,#3D9E72,#52B788);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(61,158,114,0.3);}
 .gyoshu-skip{background:none;border:none;color:#7A9A87;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;width:100%;padding:6px;}
+@media print {
+  /* 新ウィンドウ印刷方式に変更したためこのCSSは使用しない */
+}
 </style>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -412,23 +415,33 @@ body{padding-bottom:80px;}
       </div>
     </div>
     <div class="result-sec" id="resultEl">
-      <!-- Excelプレビュー -->
-      <div id="excelPreview" style="margin-bottom:16px;"></div>
-      <!-- TSV出力 -->
-      <div class="result-label" id="tsvSectionLabel">📊 Excel用データ（TSV）</div>
-      <div style="font-size:11px;color:#7A9A87;margin-bottom:10px;line-height:1.7;">選択した項目・計算式を自動生成しました。<br>コピーしてExcelのA1セルに貼り付けてください。</div>
-      <button class="copy-btn" id="copyTsvBtn" onclick="copyTSVDirect()">📋 ExcelにコピーしてA1に貼り付ける</button>
-      <div class="next-steps" style="margin-top:14px;">
-        <div class="next-steps-title">📌 貼り付け手順</div>
-        <div class="next-step-row"><div class="next-step-num">1</div><div class="next-step-text"><strong>上のボタンをタップしてコピー</strong></div></div>
-        <div class="next-step-row"><div class="next-step-num">2</div><div class="next-step-text"><strong>Excelを開いてA1セルを選択</strong></div></div>
-        <div class="next-step-row"><div class="next-step-num">3</div><div class="next-step-text"><strong>長押し → 貼り付け</strong><br><span>数式も自動で入ります</span></div></div>
-        <div class="next-step-row"><div class="next-step-num">4</div><div class="next-step-text"><strong>基本給・交通費を入力</strong><br><span>残業代・控除が自動計算されます</span></div></div>
+
+      <!-- 保存・印刷エリア（主役・最上部） -->
+      <div id="save-print-area" style="margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:12px;">完成しました。保存・印刷してください</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button onclick="printPayslip()" style="width:100%;padding:13px;background:#3D9E72;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🖨️ 印刷する</button>
+          <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
+          <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
+        </div>
+        <div style="margin-top:12px;padding:14px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;">
+          <div style="font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:6px;">📋 賃金台帳に記録する</div>
+          <div style="font-size:11px;color:#7A9A87;line-height:1.7;margin-bottom:10px;">毎月このボタンを押してダウンロード→同じフォルダに保存していくと賃金台帳が完成します。<br><span style="color:#E05555;font-weight:700;">⚠️ 労働基準法で5年保存が義務です</span></div>
+          <button onclick="downloadKinmuDaichou()" style="width:100%;padding:12px;background:#3D9E72;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📋 賃金台帳をダウンロード</button>
+        </div>
       </div>
-      <div style="margin-top:14px;padding:12px;background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;">
+
+      <!-- AIチャット -->
+      <div id="ai-chat-area" style="margin-top:14px;padding:12px;background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;">
         <div style="font-size:11px;font-weight:700;color:#9A6000;margin-bottom:6px;">💬 AIチャットで調整したい場合</div>
         <div style="font-size:11px;color:#7A5500;margin-bottom:8px;line-height:1.6;">「残業時間の計算式を変えたい」など追加の調整はAIに相談できます。</div>
         <button onclick="openAIChat()" style="width:100%;padding:10px;background:#F4A942;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">AIチャットで相談する →</button>
+      </div>
+
+      <!-- Excelプレビュー（下部・スクロールして確認） -->
+      <div style="margin-top:20px;border-top:1px solid #E0EDE6;padding-top:14px;">
+        <div style="font-size:11px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:10px;">📊 完成イメージ（スクロールして確認）</div>
+        <div id="excelPreview"></div>
       </div>
     </div>
     <div class="gen-wrap">
@@ -1159,8 +1172,13 @@ function generateTSV(){
   document.getElementById('resultEl').classList.add('show');
   renderExcelPreview();
   setTimeout(function(){
-    document.getElementById('tsvSectionLabel').scrollIntoView({behavior:'smooth',block:'start'});
-  }, 80);
+    var el = document.getElementById('save-print-area');
+    var hd = document.querySelector('.header');
+    var sp = document.querySelector('.sp-top');
+    var offset = (hd ? hd.offsetHeight : 0) + (sp ? sp.offsetHeight : 0) + 8;
+    var top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({top: top, behavior: 'smooth'});
+  }, 400);
   const sc = document.getElementById('stickyCta');
   if(sc) sc.style.display = 'none';
 }
@@ -1458,10 +1476,7 @@ function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
 function copyTSVDirect(){
   if(!generatedTSV){ showToast('⚠️ 先にデータを生成してください'); return; }
   navigator.clipboard.writeText(generatedTSV).then(()=>{
-    const btn = document.getElementById('copyTsvBtn');
-    if(btn){ btn.textContent = '✅ コピーしました！ExcelのA1に貼り付けてください'; }
-    showToast('📋 コピー完了！ExcelのA1セルを選択して貼り付けてください');
-    setTimeout(()=>{ if(btn) btn.textContent = '📋 ExcelにコピーしてA1に貼り付ける'; }, 4000);
+    showToast('📋 コピー完了');
   });
 }
 
@@ -1651,7 +1666,7 @@ function showPayslipPreview(){
     '</div>' +
     '<div style="display:flex;gap:8px;padding:0 0 8px;">' +
       '<button onclick="hidePayslipPreview()" style="flex:1;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:#F0FAF4;border:none;color:#3D9E72;">← 戻って修正</button>' +
-      '<button onclick="hidePayslipPreview();generateTSV();" style="flex:2;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:linear-gradient(135deg,#3D9E72,#52B788);border:none;color:#fff;box-shadow:0 4px 16px rgba(61,158,114,0.35);">Excel用データを生成する →</button>' +
+      '<button onclick="hidePayslipPreview(true);generateTSV();" style="flex:2;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:linear-gradient(135deg,#3D9E72,#52B788);border:none;color:#fff;box-shadow:0 4px 16px rgba(61,158,114,0.35);">Excel用データを生成する →</button>' +
     '</div>';
   // excelPreviewの中身をpreviewAreaに移す
   var inner = document.getElementById('payslipPreviewInner');
@@ -1659,14 +1674,18 @@ function showPayslipPreview(){
   if(inner && src) inner.innerHTML = src.innerHTML;
   // スティッキー非表示
   document.getElementById('stickyCta').style.display = 'none';
-  area.scrollIntoView({behavior:'smooth', block:'start'});
+  var hd2 = document.querySelector('.header');
+  var sp2 = document.querySelector('.sp-top');
+  var offset2 = (hd2 ? hd2.offsetHeight : 0) + (sp2 ? sp2.offsetHeight : 0) + 8;
+  var top2 = area.getBoundingClientRect().top + window.pageYOffset - offset2;
+  window.scrollTo({top: top2, behavior: 'smooth'});
 }
-function hidePayslipPreview(){
+function hidePayslipPreview(noScroll){
   var area = document.getElementById('previewArea');
   area.style.display = 'none';
   area.innerHTML = '';
   document.getElementById('stickyCta').style.display = '';
-  window.scrollTo({top:0, behavior:'smooth'});
+  if(!noScroll) window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
@@ -2210,6 +2229,124 @@ function calcApproxPayTotal(){
     if(rate['amount']) total += rate['amount'];
   });
   return total > 0 ? total : 250000; // デフォルト250,000円
+}
+
+// ===== 印刷・保存・ダウンロード =====
+
+// 新ウィンドウでexcelPreviewだけを印刷
+function openPrintWindow(autoPrint) {
+  var content = document.getElementById('excelPreview');
+  if(!content || content.innerHTML.trim() === '') {
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+  var pw = window.open('', '_blank', 'width=900,height=700');
+  if(!pw) {
+    showToast('⚠️ ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
+  pw.document.write('<style>');
+  pw.document.write('*{box-sizing:border-box;margin:0;padding:0;}');
+  pw.document.write('@page{size:A4 portrait;margin:6mm;}');
+  pw.document.write('html,body{width:210mm;height:297mm;overflow:hidden;font-family:"Noto Sans JP",sans-serif;background:#fff;}');
+  pw.document.write('body>div{width:100%;height:100%;display:flex;align-items:flex-start;}');
+  pw.document.write('</style>');
+  pw.document.write('</head><body>');
+  pw.document.write(content.innerHTML);
+  pw.document.write('</body></html>');
+  pw.document.close();
+  pw.focus();
+  if(autoPrint) {
+    setTimeout(function(){ pw.print(); }, 1200);
+  }
+}
+
+// 印刷する
+function printPayslip(){
+  openPrintWindow(true);
+}
+
+// PDFで保存（印刷ダイアログ経由）
+function downloadPDF(){
+  showToast('📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。');
+  openPrintWindow(true);
+}
+
+// Excelでダウンロード（SheetJS）
+function downloadExcel(){
+  if(typeof XLSX === 'undefined'){
+    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
+    return;
+  }
+  if(!generatedTSV || generatedTSV.trim() === ''){
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+  // TSVを2次元配列に変換
+  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // 列幅の自動設定
+  var colWidths = [];
+  rows.forEach(function(row){
+    row.forEach(function(cell, i){
+      var len = cell ? String(cell).length * 2 : 8;
+      if(!colWidths[i] || colWidths[i] < len) colWidths[i] = len;
+    });
+  });
+  ws['!cols'] = colWidths.map(function(w){ return {wch: Math.min(w, 30)}; });
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '給料明細');
+
+  // ファイル名：給料明細_氏名_年月
+  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '';
+  var now = new Date();
+  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+  var fname = '給料明細' + (name ? '_'+name : '') + '_' + ym + '.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('📥 '+fname+' をダウンロードしました');
+}
+
+// 賃金台帳をダウンロード
+function downloadKinmuDaichou(){
+  if(typeof XLSX === 'undefined'){
+    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
+    return;
+  }
+  if(!generatedTSV || generatedTSV.trim() === ''){
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+
+  // TSVから支給合計・控除合計・差引支給額を取得
+  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
+  var shikyuGokei = '', kojogokei = '', sashihiki = '';
+  rows.forEach(function(r){
+    if(r[0] && r[0].indexOf('支給合計') !== -1) shikyuGokei = r[1] || '';
+    if(r[0] && r[0].indexOf('控除合計') !== -1) kojogokei = r[4] || r[1] || '';
+    if(r[0] && r[0].indexOf('差引') !== -1) sashihiki = r[1] || '';
+  });
+
+  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '氏名未入力';
+  var now = new Date();
+  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+
+  var daichouRow = [ym, name, shikyuGokei, kojogokei, sashihiki];
+  var ws = XLSX.utils.aoa_to_sheet([
+    ['対象月', '氏名', '支給合計', '控除合計', '差引支給額（手取り）'],
+    daichouRow
+  ]);
+  ws['!cols'] = [{wch:12},{wch:12},{wch:14},{wch:14},{wch:18}];
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '賃金台帳');
+
+  var fname = '賃金台帳_'+name+'_'+ym+'.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('📋 '+fname+' をダウンロードしました。同じフォルダに毎月保存してね。');
 }
 
 </script>
