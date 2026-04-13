@@ -535,6 +535,13 @@ function bindEvents(){
     else if(e.key==='Escape') cancelEdit();
   });
   ci.addEventListener('blur',commitEdit);
+  var ai = document.getElementById('ai-input');
+  ai.addEventListener('keydown', function(e){
+    if(e.key==='Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendToAI();
+    }
+  });
 }
 
 function cPos(e){ var r=canvas.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
@@ -664,6 +671,7 @@ function onTE(e){
 function onKD(e){
   if(editingCell) return;
   if(document.activeElement===document.getElementById('formula-input')) return;
+  if(document.activeElement===document.getElementById('ai-input')) return;
   var moved=false;
 
   // Shift+矢印：選択範囲拡張
@@ -869,7 +877,7 @@ async function sendToAI(){
       })
     });
     var data = await res.json();
-    var aiText = data.content?.[0]?.text || 'エラーが発生したよ';
+    var aiText = data.text || 'エラーが発生したよ';
 
     // セル書き込みアクションを検出
     var actionMatch = aiText.match(/\{[\s\S]*?"action"\s*:\s*"write"[\s\S]*?\}/);
