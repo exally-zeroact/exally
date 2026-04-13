@@ -481,22 +481,25 @@ function render() {
   ctx.stroke();
 
   // 8. ヘッダーテキスト
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  // 列（A,B,C...）
+  ctx.textBaseline='middle';
+  // 列（A,B,C...）中央揃え
+  ctx.textAlign='center';
   var fw=scale<0.75?'normal':'bold';
-  var fs=Math.max(9,Math.min(12,Math.round(11*scale)));
+  var fs=Math.max(9,Math.round(11*Math.min(scale,1.5)));
   ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
   for(var c=sC;c<=eC+1;c++){
     var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue;
     ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT;
     ctx.fillText(colLetter(c),x+w/2,HDR_H/2);
   }
-  // 行（1,2,3...）
-  ctx.font=Math.max(8,Math.min(12,Math.round(11*scale)))+'px "Noto Sans JP",sans-serif';
+  // 行（1,2,3...）右寄せ（Excelと同じ）
+  ctx.textAlign='right';
+  var rf=Math.max(9,Math.round(11*Math.min(scale,1.5)));
+  ctx.font=rf+'px "Noto Sans JP",sans-serif';
   for(var r=sR;r<=eR+1;r++){
     var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue;
     ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT;
-    ctx.fillText(r+1,HDR_W/2,y+h/2);
+    ctx.fillText(r+1,HDR_W-4,y+h/2);
   }
 
   // 9. 左上角
