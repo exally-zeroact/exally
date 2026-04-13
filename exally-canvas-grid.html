@@ -98,16 +98,17 @@ body {
 #ai-panel-wrap {
   flex-shrink:0;
   background:#fff;
-  border-top:1px solid #C8ECD8;
+  border-top:2px solid #3D9E72;
 }
 #ai-panel-handle {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:6px 12px;
+  padding:8px 12px;
   cursor:pointer;
   user-select:none;
-  max-width:700px;
+  background:#F0FAF4;
+  border-bottom:1px solid #C8ECD8;
 }
 #ai-panel-handle .ai-label {
   font-size:13px;
@@ -119,10 +120,100 @@ body {
 }
 #ai-panel-handle .ai-arrow { color:#3D9E72; font-size:11px; transition:transform 0.2s; }
 #ai-panel-wrap.open .ai-arrow { transform:rotate(180deg); }
-#ai-panel-body { display:none; padding:0 10px 8px; flex-direction:column; gap:6px; max-width:700px; }
+#ai-panel-body { display:none; padding:10px; flex-direction:column; gap:6px; }
 #ai-panel-wrap.open #ai-panel-body { display:flex; }
-#ai-response-area { display:none; max-height:180px; overflow-y:auto; background:#F8FEFC; border-radius:8px; padding:8px 10px; font-size:12px; }
+@media (max-width:768px) {
+  #ai-panel-wrap.open {
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    height:100vh;
+    z-index:600;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+  }
+  #ai-panel-wrap.open #ai-panel-body {
+    flex:1;
+    overflow:hidden;
+    flex-direction:column;
+    padding:10px;
+    gap:6px;
+  }
+  #ai-panel-wrap.open #ai-response-area {
+    flex:1;
+    max-height:none;
+    overflow-y:auto;
+  }
+  #ai-panel-wrap.open #ai-input-row { flex-shrink:0; }
+}
+#ai-response-area { display:none; max-height:220px; overflow-y:auto; background:#F8FEFC; border-radius:8px; padding:8px 10px; font-size:12px; }
 #ai-response-area.show { display:block; }
+
+/* PC：右パネル */
+#ai-float-btn { display:none; }
+@media (min-width:769px) {
+  #ai-float-btn {
+    display:flex;
+    position:fixed;
+    bottom:48px;
+    right:20px;
+    background:#3D9E72;
+    color:#fff;
+    border:none;
+    border-radius:24px;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    z-index:500;
+    align-items:center;
+    gap:6px;
+    box-shadow:0 2px 12px rgba(61,158,114,0.4);
+    font-family:'Noto Sans JP',sans-serif;
+    transition:background 0.2s;
+  }
+  #ai-float-btn:hover { background:#2E8A5F; }
+  #ai-panel-wrap {
+    position:fixed;
+    right:0; bottom:0;
+    width:420px;
+    height:92vh;
+    border:1px solid #C8ECD8;
+    border-radius:12px 0 0 0;
+    box-shadow:-4px 0 24px rgba(0,0,0,0.1);
+    z-index:500;
+    flex-shrink:unset;
+    transform:translateX(100%);
+    transition:transform 0.25s ease;
+    overflow:hidden;
+    display:block !important;
+    border-top:none;
+  }
+  #ai-panel-wrap.open {
+    transform:translateX(0);
+    height:92vh !important;
+  }
+  #ai-panel-handle {
+    border-bottom:1px solid #C8ECD8;
+    background:#F0FAF4;
+  }
+  #ai-panel-body {
+    display:flex !important;
+    flex-direction:column;
+    height:calc(92vh - 44px);
+    overflow:hidden;
+    padding:10px;
+    gap:6px;
+  }
+  #ai-response-area {
+    flex:1;
+    max-height:none !important;
+    overflow-y:auto;
+  }
+  #ai-input-row { flex-shrink:0; }
+}
+#ai-response-area { display:flex; flex-direction:column; max-height:180px; overflow-y:auto; background:#fff; border-radius:8px; padding:4px 6px; font-size:12px; }
+#ai-response-area.show { max-height:none; flex:1; }
 .arg-blue{color:#4A90D9;font-weight:600;}
 .arg-orange{color:#E8843A;font-weight:600;}
 .arg-purple{color:#9B5DE5;font-weight:600;}
@@ -267,6 +358,8 @@ body {
   <canvas id="grid-canvas"></canvas>
   <textarea id="cell-input" rows="1"></textarea>
 </div>
+
+<button id="ai-float-btn" onclick="toggleAiPanel()">💬 AIに話しかける</button>
 
 <div id="ai-panel-wrap">
   <div id="ai-panel-handle" onclick="toggleAiPanel()">
@@ -942,6 +1035,11 @@ function addSheet(){
 function toggleAiPanel(){
   var wrap = document.getElementById('ai-panel-wrap');
   wrap.classList.toggle('open');
+  // PCではフローティングボタンのテキストを切り替え
+  if(window.innerWidth >= 769){
+    var btn = document.getElementById('ai-float-btn');
+    if(btn) btn.textContent = wrap.classList.contains('open') ? '✕ 閉じる' : '💬 AIに話しかける';
+  }
 }
 
 // 選択範囲のデータを取得
@@ -1128,7 +1226,7 @@ function showWriteConfirm(cells){
   var list = cells.map(function(c){ return c.addr+' → '+c.value; }).join('\n');
   var modal = document.createElement('div');
   modal.id = 'write-confirm';
-  modal.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);width:90%;max-width:340px;background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:999;font-family:inherit;';
+  modal.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);width:90%;max-width:420px;background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:999;font-family:inherit;';
   modal.innerHTML = '<div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:10px;">✏️ このセルに書き込むよ</div>'
     +'<div style="font-size:12px;color:#3D9E72;background:#F0FAF4;border-radius:8px;padding:8px 10px;margin-bottom:12px;white-space:pre;">'+list+'</div>'
     +'<div style="display:flex;gap:8px;">'
