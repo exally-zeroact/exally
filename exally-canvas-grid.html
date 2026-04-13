@@ -122,12 +122,18 @@ body {
 #ai-panel-wrap.open #ai-panel-body { display:flex; }
 #ai-response-area { display:none; max-height:180px; overflow-y:auto; background:#F8FEFC; border-radius:8px; padding:8px 10px; font-size:12px; }
 #ai-response-area.show { display:block; }
-.ai-msg-user { text-align:right; margin-bottom:6px; clear:both; }
-.ai-msg-user span { background:#3D9E72; color:#fff; border-radius:10px 10px 2px 10px; padding:5px 10px; display:inline-block; max-width:85%; font-size:12px; }
-.ai-msg-ai { text-align:left; margin-bottom:6px; clear:both; }
-.ai-msg-ai span { background:#fff; border:1px solid #C8ECD8; border-radius:10px 10px 10px 2px; padding:6px 10px; display:inline-block; max-width:95%; font-size:12px; line-height:1.7; }
-.ai-msg-ai code { background:#C8ECD8; color:#1A4A2E; padding:1px 5px; border-radius:4px; font-family:'DM Mono',monospace; font-size:11px; }
-.ai-msg-ai pre { background:#C8ECD8; color:#1A4A2E; padding:8px; border-radius:6px; font-family:'DM Mono',monospace; font-size:11px; margin:6px 0; white-space:pre-wrap; }
+.arg-blue{color:#4A90D9;font-weight:700;}
+.arg-orange{color:#E8843A;font-weight:700;}
+.arg-purple{color:#9B5DE5;font-weight:700;}
+.arg-green{color:#2E9E6B;font-weight:700;}
+.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;border-radius:8px;margin:8px 0;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
+.inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
+.copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
+.copy-btn:hover{background:#3D9E72;color:white;}
+.ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
+.ai-msg-user span{background:#3D9E72;color:#fff;border-radius:10px 10px 2px 10px;padding:5px 10px;display:inline-block;max-width:85%;font-size:12px;}
+.ai-msg-ai{text-align:left;margin-bottom:8px;clear:both;}
+.ai-msg-ai span{background:#fff;border:1px solid #C8ECD8;border-radius:10px 10px 10px 2px;padding:8px 12px;display:inline-block;max-width:95%;font-size:13px;line-height:1.7;}
 #ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 #ai-input {
   flex:1;
@@ -338,8 +344,71 @@ function resize() {
 }
 
 // ===== データ =====
-function getCell(r,c){ return sheets[activeSheet].data[r+','+c] || {v:'',f:''}; }
-function setCell(r,c,v){ sheets[activeSheet].data[r+','+c] = {v:v,f:v}; }
+function getCell(r,c){ return sheets[activeSheet].data[r+','+c] || {v:'',f:'',d:''}; }
+function setCell(r,c,v){
+  var d = v; // 表示値
+  if(v && v[0]==='=') d = evalFormula(v, r, c);
+  sheets[activeSheet].data[r+','+c] = {v:v, f:v, d:String(d)};
+}
+
+// A1形式 → {r,c}
+function addrToRC(addr){
+  var m = addr.match(/^([A-Z]+)(\d+)$/i);
+  if(!m) return null;
+  var col=0; for(var i=0;i<m[1].length;i++) col=col*26+(m[1].toUpperCase().charCodeAt(i)-64);
+  return {r:parseInt(m[2])-1, c:col-1};
+}
+
+// セルの数値を取得
+function getCellNum(r,c){
+  var cell = getCell(r,c);
+  var v = cell.d || cell.v;
+  return parseFloat(v) || 0;
+}
+
+// 簡易計算エンジン
+function evalFormula(formula, selfR, selfC){
+  try {
+    var expr = formula.substring(1).trim();
+
+    // SUM(A1:C1) / AVERAGE(A1:C1)
+    var rangeFunc = expr.match(/^(SUM|AVERAGE|COUNT|MAX|MIN)\(([A-Z]+\d+):([A-Z]+\d+)\)$/i);
+    if(rangeFunc){
+      var fn = rangeFunc[1].toUpperCase();
+      var rc1 = addrToRC(rangeFunc[2]);
+      var rc2 = addrToRC(rangeFunc[3]);
+      if(!rc1||!rc2) return formula;
+      var vals=[];
+      for(var r=Math.min(rc1.r,rc2.r);r<=Math.max(rc1.r,rc2.r);r++)
+        for(var c=Math.min(rc1.c,rc2.c);c<=Math.max(rc1.c,rc2.c);c++)
+          vals.push(getCellNum(r,c));
+      if(fn==='SUM') return vals.reduce(function(a,b){return a+b;},0);
+      if(fn==='AVERAGE') return vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : 0;
+      if(fn==='COUNT') return vals.filter(function(v){return v!==0||getCell(r,c).v!=='';}).length;
+      if(fn==='MAX') return Math.max.apply(null,vals);
+      if(fn==='MIN') return Math.min.apply(null,vals);
+    }
+
+    // セル参照を数値に置換して評価（例：=A1+B1*C1）
+    expr = expr.replace(/([A-Z]+\d+)/gi, function(addr){
+      var rc = addrToRC(addr);
+      if(!rc) return 0;
+      // 循環参照防止
+      if(rc.r===selfR && rc.c===selfC) return 0;
+      return getCellNum(rc.r, rc.c);
+    });
+
+    // 数値式のみ評価（安全のためnumberのみ）
+    if(/^[\d\s\.\+\-\*\/\(\)]+$/.test(expr)){
+      var result = Function('"use strict";return ('+expr+')')();
+      return isNaN(result) ? formula : Math.round(result*10000)/10000;
+    }
+
+    return formula;
+  } catch(e) {
+    return '#ERR';
+  }
+}
 function cW(c){ return (sheets[activeSheet].colW[c] || COL_W) * scale; }
 function rH(r){ return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
 
@@ -443,12 +512,14 @@ function render() {
 function drawText(r,c){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
-  var cell=getCell(r,c); if(!cell.v) return;
+  var cell=getCell(r,c);
+  var display = (cell.d!==undefined && cell.d!=='') ? cell.d : cell.v;
+  if(!display) return;
   ctx.fillStyle=cell.f&&cell.f[0]==='='?C_FORMULA:C_CELL_TXT;
   ctx.font=Math.max(9,Math.min(13,Math.round(12*scale)))+'px "Noto Sans JP",sans-serif';
   ctx.textAlign='left'; ctx.textBaseline='middle';
   ctx.save(); ctx.rect(x+1,y,w-2,h); ctx.clip();
-  ctx.fillText(cell.v,x+4,y+h/2);
+  ctx.fillText(display,x+4,y+h/2);
   ctx.restore();
 }
 
@@ -857,7 +928,59 @@ function getSelectionData(){
 }
 
 // AI送信
-// JSONを括弧カウントで正確に抽出
+// index6.htmlと同じ colorizeFormula
+function colorizeFormula(text){
+  var lp='[\\(（]',rp='[\\)）]',cm='[,，]';
+  var reVL=new RegExp('=VLOOKUP'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^,，]+)'+cm+'\\s*(FALSE|TRUE)\\s*'+rp,'gi');
+  text=text.replace(reVL,function(m,a1,a2,a3,a4){return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
+  var reSI=new RegExp('=SUMIF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reSI,function(m,a1,a2,a3){return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reIF=new RegExp('=IF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reIF,function(m,a1,a2,a3){return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reCI=new RegExp('=COUNTIF'+lp+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reCI,function(m,a1,a2){return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  var b='\uD83D\uDD35',o='\uD83D\uDFE0',p='\uD83D\uDFE3',g='\uD83D\uDFE2';
+  text=text.replace(new RegExp(b+'\\s*\\*\\*([^*]+)\\*\\*','g'),b+' <span class="arg-blue">$1</span>');
+  text=text.replace(new RegExp(o+'\\s*\\*\\*([^*]+)\\*\\*','g'),o+' <span class="arg-orange">$1</span>');
+  text=text.replace(new RegExp(p+'\\s*\\*\\*([^*]+)\\*\\*','g'),p+' <span class="arg-purple">$1</span>');
+  text=text.replace(new RegExp(g+'\\s*\\*\\*([^*]+)\\*\\*','g'),g+' <span class="arg-green">$1</span>');
+  return text;
+}
+
+// index6.htmlと同じ colorizeFormulaBlock
+function colorizeFormulaBlock(f){
+  f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
+  f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  f=f.replace(/(?<![A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  return f;
+}
+
+// index6.htmlと同じ表示形式
+function formatAIText(text){
+  text = colorizeFormula(text);
+  // コードブロック → formula-block + コピーボタン
+  text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
+    var code = colorizeFormulaBlock(c.trim());
+    var raw = c.trim().replace(/'/g,"&#39;");
+    return '<div class="formula-block">'+code+'</div>'
+      +'<button class="copy-btn" onclick="copyText(this,\''+raw+'\')">📋 数式をコピー</button>';
+  });
+  // インラインコード → inline-code
+  text = text.replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>');
+  // 改行
+  text = text.replace(/\n/g,'<br>');
+  return text;
+}
+
+function copyText(btn, text){
+  if(navigator.clipboard) navigator.clipboard.writeText(text).then(function(){
+    var orig = btn.textContent;
+    btn.textContent = '✓ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  });
+}
 function extractWriteAction(text){
   var idx = text.indexOf('"action"');
   if(idx === -1) return null;
@@ -877,25 +1000,6 @@ function extractWriteAction(text){
     }
   }
   return null;
-}
-
-function formatAIText(text){
-  // コードブロック → preとコピーボタン
-  text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
-    var code = c.trim();
-    var id = 'cb_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
-    return '<div style="position:relative;margin:6px 0;">'
-      +'<pre id="'+id+'" style="background:#C8ECD8;color:#1A4A2E;padding:8px 28px 8px 8px;border-radius:6px;font-family:\'DM Mono\',monospace;font-size:11px;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById(\''+id+'\').innerText)">'
-      +code.replace(/</g,'&lt;')
-      +'</pre>'
-      +'<button onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById(\''+id+'\').innerText)" style="position:absolute;top:4px;right:4px;background:#3D9E72;color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer;font-family:inherit;">コピー</button>'
-      +'</div>';
-  });
-  // インラインコード → code
-  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // 改行
-  text = text.replace(/\n/g,'<br>');
-  return text;
 }
 
 var aiHistory = [];
