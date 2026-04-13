@@ -1009,7 +1009,7 @@ function formatAIText(text){
   text = text.replace(/\x00BLOCK(\d+)\x00/g, function(m,idx){
     var b = blocks[parseInt(idx)];
     var safeRaw = b.raw.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return '<div class="formula-block" style="max-width:100%;font-size:12px;">'+b.colored+'</div>'
+    return '<div class="formula-block">'+b.colored+'</div>'
       +'<button class="copy-btn" onclick="copyText(this,\''+safeRaw+'\')">📋 数式をコピー</button>';
   });
   return text;
