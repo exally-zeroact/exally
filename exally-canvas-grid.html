@@ -132,9 +132,9 @@ body {
 .copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
 .copy-btn:hover{background:#3D9E72;color:white;}
 .ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
-.ai-msg-user span{background:#3D9E72;color:#fff;border-radius:10px 10px 2px 10px;padding:5px 10px;display:inline-block;max-width:85%;font-size:12px;}
+.ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:10px 10px 2px 10px;padding:5px 10px;display:inline-block;max-width:85%;font-size:12px;}
 .ai-msg-ai{text-align:left;margin-bottom:8px;clear:both;}
-.ai-msg-ai span{background:#fff;border:1px solid #C8ECD8;border-radius:10px 10px 10px 2px;padding:8px 12px;display:inline-block;max-width:95%;font-size:13px;line-height:1.7;}
+.ai-msg-ai .ai-bubble{background:#fff;border:1px solid #C8ECD8;border-radius:10px 10px 10px 2px;padding:8px 12px;display:inline-block;max-width:95%;font-size:13px;line-height:1.7;}
 #ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 #ai-input {
   flex:1;
@@ -1050,13 +1050,14 @@ function addAIChatMsg(type, text){
   resp.classList.add('show');
   var div = document.createElement('div');
   div.className = 'ai-msg-' + type;
-  var span = document.createElement('span');
+  var bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
   if(type === 'ai'){
-    span.innerHTML = formatAIText(text);
+    bubble.innerHTML = formatAIText(text);
   } else {
-    span.textContent = text;
+    bubble.textContent = text;
   }
-  div.appendChild(span);
+  div.appendChild(bubble);
   resp.appendChild(div);
   resp.scrollTop = resp.scrollHeight;
 }
