@@ -515,7 +515,10 @@ function drawText(r,c){
   var cell=getCell(r,c);
   var display = (cell.d!==undefined && cell.d!=='') ? cell.d : cell.v;
   if(!display) return;
-  ctx.fillStyle=cell.f&&cell.f[0]==='='?C_FORMULA:C_CELL_TXT;
+  // 数式セルは計算結果を黒で表示（数式バーに数式を表示）
+  var isFormula = cell.f && cell.f[0]==='=';
+  var showRaw = isFormula && cell.d===cell.f; // 計算できなかった場合のみ青
+  ctx.fillStyle = showRaw ? C_FORMULA : C_CELL_TXT;
   ctx.font=Math.max(9,Math.min(13,Math.round(12*scale)))+'px "Noto Sans JP",sans-serif';
   ctx.textAlign='left'; ctx.textBaseline='middle';
   ctx.save(); ctx.rect(x+1,y,w-2,h); ctx.clip();
@@ -541,7 +544,13 @@ function drawSel(){
 // ===== ユーティリティ =====
 function colLetter(c){ var s=''; c+=1; while(c>0){ s=String.fromCharCode(64+((c-1)%26+1))+s; c=Math.floor((c-1)/26); } return s; }
 function cellAddr(r,c){ return colLetter(c)+(r+1); }
-function updateBar(){ document.getElementById('cell-addr').value=cellAddr(selR1,selC1); var cell=getCell(selR1,selC1); document.getElementById('formula-input').value=cell.f||''; }
+function updateBar(){
+  var addr = cellAddr(selR1,selC1);
+  var scaleStr = scale!==1 ? ' ×'+Math.round(scale*10)/10 : '';
+  document.getElementById('cell-addr').value = addr+scaleStr;
+  var cell=getCell(selR1,selC1);
+  document.getElementById('formula-input').value=cell.f||'';
+}
 var anchorR=0, anchorC=0; // Shift選択のアンカー（開始点）
 var activeR=0, activeC=0; // Shift選択の移動端
 
@@ -590,8 +599,27 @@ function bindEvents(){
   // ホイール
   canvas.addEventListener('wheel',function(e){
     e.preventDefault();
-    scrollTop=Math.max(0,scrollTop+e.deltaY);
-    scrollLeft=Math.max(0,scrollLeft+e.deltaX);
+    // deltaMode: 0=px, 1=行, 2=ページ
+    var mult = e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 300 : 1;
+    var dx = e.deltaX * mult;
+    var dy = e.deltaY * mult;
+
+    if(e.ctrlKey || e.metaKey){
+      // Ctrl+ホイール or タッチパッドピンチ → ズーム
+      var factor = dy > 0 ? 0.95 : 1.05;
+      var p = cPos(e);
+      var newScale = Math.max(0.5, Math.min(4, scale * factor));
+      var ratio = newScale / scale;
+      var cx = p.x - HDR_W;
+      var cy = p.y - HDR_H;
+      scrollLeft = Math.max(0, (scrollLeft + cx) * ratio - cx);
+      scrollTop  = Math.max(0, (scrollTop  + cy) * ratio - cy);
+      scale = newScale;
+    } else {
+      // 通常スクロール（マウス・タッチパッド2本指）
+      scrollTop  = Math.max(0, scrollTop  + dy);
+      scrollLeft = Math.max(0, scrollLeft + dx);
+    }
     render();
   },{passive:false});
   // タッチ
@@ -957,20 +985,29 @@ function colorizeFormulaBlock(f){
   return f;
 }
 
-// index6.htmlと同じ表示形式
+// index6.htmlと同じ表示形式（コードブロックを先に退避してからcolorize）
 function formatAIText(text){
-  text = colorizeFormula(text);
-  // コードブロック → formula-block + コピーボタン
+  var blocks = [];
+  // ① コードブロックを先に退避
   text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
-    var code = colorizeFormulaBlock(c.trim());
-    var raw = c.trim().replace(/'/g,"&#39;");
-    return '<div class="formula-block">'+code+'</div>'
-      +'<button class="copy-btn" onclick="copyText(this,\''+raw+'\')">📋 数式をコピー</button>';
+    var raw = c.trim();
+    var colored = colorizeFormulaBlock(raw);
+    blocks.push({colored:colored, raw:raw});
+    return '\x00BLOCK'+(blocks.length-1)+'\x00';
   });
-  // インラインコード → inline-code
+  // ② コードブロック外にcolorizeFormula適用
+  text = colorizeFormula(text);
+  // ③ インラインコード
   text = text.replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>');
-  // 改行
+  // ④ 改行
   text = text.replace(/\n/g,'<br>');
+  // ⑤ コードブロックを復元
+  text = text.replace(/\x00BLOCK(\d+)\x00/g, function(m,idx){
+    var b = blocks[parseInt(idx)];
+    var safeRaw = b.raw.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="formula-block" style="max-width:100%;font-size:12px;">'+b.colored+'</div>'
+      +'<button class="copy-btn" onclick="copyText(this,\''+safeRaw+'\')">📋 数式をコピー</button>';
+  });
   return text;
 }
 
