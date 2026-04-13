@@ -857,12 +857,39 @@ function getSelectionData(){
 }
 
 // AI送信
-var aiHistory = []; // チャット履歴
+// JSONを括弧カウントで正確に抽出
+function extractWriteAction(text){
+  var idx = text.indexOf('"action"');
+  if(idx === -1) return null;
+  var start = text.lastIndexOf('{', idx);
+  if(start === -1) return null;
+  var depth = 0;
+  for(var i = start; i < text.length; i++){
+    if(text[i] === '{') depth++;
+    else if(text[i] === '}'){
+      depth--;
+      if(depth === 0){
+        try {
+          var json = JSON.parse(text.substring(start, i+1));
+          if(json.action === 'write') return { json:json, start:start, end:i+1 };
+        } catch(e) { return null; }
+      }
+    }
+  }
+  return null;
+}
 
 function formatAIText(text){
-  // コードブロック → pre
+  // コードブロック → preとコピーボタン
   text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
-    return '<pre>'+c.trim().replace(/</g,'&lt;')+'</pre>';
+    var code = c.trim();
+    var id = 'cb_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    return '<div style="position:relative;margin:6px 0;">'
+      +'<pre id="'+id+'" style="background:#C8ECD8;color:#1A4A2E;padding:8px 28px 8px 8px;border-radius:6px;font-family:\'DM Mono\',monospace;font-size:11px;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById(\''+id+'\').innerText)">'
+      +code.replace(/</g,'&lt;')
+      +'</pre>'
+      +'<button onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById(\''+id+'\').innerText)" style="position:absolute;top:4px;right:4px;background:#3D9E72;color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer;font-family:inherit;">コピー</button>'
+      +'</div>';
   });
   // インラインコード → code
   text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -870,6 +897,8 @@ function formatAIText(text){
   text = text.replace(/\n/g,'<br>');
   return text;
 }
+
+var aiHistory = [];
 
 function addAIChatMsg(type, text){
   var resp = document.getElementById('ai-response-area');
@@ -897,21 +926,19 @@ async function sendToAI(){
     ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
     : '\n【選択セル:'+selData.addr+'（空）】';
 
-  // 書き込み指示をメッセージ末尾に追加
   var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
   var userMsg = text + ctxNote + writeInstruction;
 
-  // ユーザーメッセージをUIに追加
   addAIChatMsg('user', text);
   input.value = '';
   document.getElementById('ai-send').disabled = true;
 
-  // 考え中表示
   var thinkDiv = document.createElement('div');
   thinkDiv.className = 'ai-msg-ai';
   thinkDiv.id = 'ai-thinking';
   thinkDiv.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
   document.getElementById('ai-response-area').appendChild(thinkDiv);
+  document.getElementById('ai-response-area').scrollTop = 9999;
 
   try {
     var res = await fetch('/api/claude', {
@@ -922,28 +949,23 @@ async function sendToAI(){
     var data = await res.json();
     var aiText = data.text || 'エラーが発生したよ';
 
-    // 考え中を削除
     var th = document.getElementById('ai-thinking');
     if(th) th.remove();
 
-    // 書き込みJSONを検出・除去
-    var actionMatch = aiText.match(/\{[\s\S]*?"action"\s*:\s*"write"[\s\S]*?\}/);
-    var displayText = actionMatch
-      ? aiText.replace(actionMatch[0],'').trim()
+    // 括弧カウントでJSONを正確に抽出
+    var extracted = extractWriteAction(aiText);
+    var displayText = extracted
+      ? (aiText.substring(0, extracted.start) + aiText.substring(extracted.end)).trim()
       : aiText;
 
-    // AIメッセージをUIに追加
     addAIChatMsg('ai', displayText);
 
-    // 履歴に追加（20ターンまで）
     aiHistory.push({role:'user',content:text});
     aiHistory.push({role:'assistant',content:aiText});
     if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
 
-    // 書き込みモーダル
-    if(actionMatch){
-      try { showWriteConfirm(JSON.parse(actionMatch[0]).cells); } catch(e){}
-    }
+    if(extracted) showWriteConfirm(extracted.json.cells);
+
   } catch(e) {
     var th = document.getElementById('ai-thinking');
     if(th) th.remove();
