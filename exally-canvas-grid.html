@@ -864,8 +864,8 @@ async function sendToAI(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        messages:[{role:'user',content:userMsg}],
-        system:'あなたはExallyというExcel専門AIだよ。日本語でカジュアルに答えてね（〜だよ・〜してみて調）。セルに値を入れる場合は必ず最後に JSON形式で {"action":"write","cells":[{"addr":"A1","value":"値"}]} を含めてね。'
+        message: userMsg,
+        history: []
       })
     });
     var data = await res.json();
