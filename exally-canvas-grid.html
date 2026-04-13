@@ -120,8 +120,14 @@ body {
 #ai-panel-wrap.open .ai-arrow { transform:rotate(180deg); }
 #ai-panel-body { display:none; padding:0 12px 12px; flex-direction:column; gap:8px; }
 #ai-panel-wrap.open #ai-panel-body { display:flex; }
-#ai-response-area { display:none; background:#F0FAF4; border-radius:8px; padding:8px 12px; font-size:13px; color:#1A2B22; line-height:1.6; }
+#ai-response-area { display:none; max-height:180px; overflow-y:auto; background:#F8FEFC; border-radius:8px; padding:8px 10px; font-size:12px; }
 #ai-response-area.show { display:block; }
+.ai-msg-user { text-align:right; margin-bottom:6px; clear:both; }
+.ai-msg-user span { background:#3D9E72; color:#fff; border-radius:10px 10px 2px 10px; padding:5px 10px; display:inline-block; max-width:85%; font-size:12px; }
+.ai-msg-ai { text-align:left; margin-bottom:6px; clear:both; }
+.ai-msg-ai span { background:#fff; border:1px solid #C8ECD8; border-radius:10px 10px 10px 2px; padding:6px 10px; display:inline-block; max-width:95%; font-size:12px; line-height:1.7; }
+.ai-msg-ai code { background:#C8ECD8; color:#1A4A2E; padding:1px 5px; border-radius:4px; font-family:'DM Mono',monospace; font-size:11px; }
+.ai-msg-ai pre { background:#C8ECD8; color:#1A4A2E; padding:8px; border-radius:6px; font-family:'DM Mono',monospace; font-size:11px; margin:6px 0; white-space:pre-wrap; }
 #ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 #ai-input {
   flex:1;
@@ -692,7 +698,10 @@ function onKD(e){
   if(e.key==='c'&&(e.ctrlKey||e.metaKey)){ ctxCopy(); moved=true; }
   if(e.key==='v'&&(e.ctrlKey||e.metaKey)){ ctxPaste(); moved=true; }
   if(moved) e.preventDefault();
-  if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey) startEdit(selR1,selC1,e.key);
+  if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
+    e.preventDefault();
+    startEdit(selR1,selC1,e.key);
+  }
 }
 
 // コピペバッファ
@@ -848,51 +857,97 @@ function getSelectionData(){
 }
 
 // AI送信
+var aiHistory = []; // チャット履歴
+
+function formatAIText(text){
+  // コードブロック → pre
+  text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
+    return '<pre>'+c.trim().replace(/</g,'&lt;')+'</pre>';
+  });
+  // インラインコード → code
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // 改行
+  text = text.replace(/\n/g,'<br>');
+  return text;
+}
+
+function addAIChatMsg(type, text){
+  var resp = document.getElementById('ai-response-area');
+  resp.classList.add('show');
+  var div = document.createElement('div');
+  div.className = 'ai-msg-' + type;
+  var span = document.createElement('span');
+  if(type === 'ai'){
+    span.innerHTML = formatAIText(text);
+  } else {
+    span.textContent = text;
+  }
+  div.appendChild(span);
+  resp.appendChild(div);
+  resp.scrollTop = resp.scrollHeight;
+}
+
 async function sendToAI(){
   var input = document.getElementById('ai-input');
   var text = input.value.trim();
   if(!text) return;
 
-  var sel = getSelectionData();
-  var ctx_msg = sel.cells.length > 0
-    ? '\n\n【選択中のセル: '+sel.addr+'】\n'+sel.cells.join(', ')
-    : '\n\n【選択中のセル: '+sel.addr+'（空）】';
+  var selData = getSelectionData();
+  var ctxNote = selData.cells.length > 0
+    ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
+    : '\n【選択セル:'+selData.addr+'（空）】';
 
-  var userMsg = text + ctx_msg;
+  // 書き込み指示をメッセージ末尾に追加
+  var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
+  var userMsg = text + ctxNote + writeInstruction;
 
-  // UI更新
-  var resp = document.getElementById('ai-response-area');
-  resp.className = 'show';
-  resp.innerHTML = '<span style="color:#3D9E72">考え中...</span>';
+  // ユーザーメッセージをUIに追加
+  addAIChatMsg('user', text);
   input.value = '';
   document.getElementById('ai-send').disabled = true;
+
+  // 考え中表示
+  var thinkDiv = document.createElement('div');
+  thinkDiv.className = 'ai-msg-ai';
+  thinkDiv.id = 'ai-thinking';
+  thinkDiv.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
+  document.getElementById('ai-response-area').appendChild(thinkDiv);
 
   try {
     var res = await fetch('/api/claude', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: userMsg,
-        history: []
-      })
+      body: JSON.stringify({ message: userMsg, history: aiHistory })
     });
     var data = await res.json();
     var aiText = data.text || 'エラーが発生したよ';
 
-    // セル書き込みアクションを検出
+    // 考え中を削除
+    var th = document.getElementById('ai-thinking');
+    if(th) th.remove();
+
+    // 書き込みJSONを検出・除去
     var actionMatch = aiText.match(/\{[\s\S]*?"action"\s*:\s*"write"[\s\S]*?\}/);
-    var displayText = aiText.replace(/\{[\s\S]*?"action"\s*:\s*"write"[\s\S]*?\}/, '').trim();
+    var displayText = actionMatch
+      ? aiText.replace(actionMatch[0],'').trim()
+      : aiText;
 
-    resp.innerHTML = displayText.replace(/\n/g,'<br>');
+    // AIメッセージをUIに追加
+    addAIChatMsg('ai', displayText);
 
+    // 履歴に追加（20ターンまで）
+    aiHistory.push({role:'user',content:text});
+    aiHistory.push({role:'assistant',content:aiText});
+    if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
+
+    // 書き込みモーダル
     if(actionMatch){
-      try {
-        var action = JSON.parse(actionMatch[0]);
-        showWriteConfirm(action.cells);
-      } catch(e) {}
+      try { showWriteConfirm(JSON.parse(actionMatch[0]).cells); } catch(e){}
     }
   } catch(e) {
-    resp.innerHTML = 'AIに接続できなかったよ。しばらくしてからもう一度試してみてね。';
+    var th = document.getElementById('ai-thinking');
+    if(th) th.remove();
+    addAIChatMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
   }
   document.getElementById('ai-send').disabled = false;
 }
