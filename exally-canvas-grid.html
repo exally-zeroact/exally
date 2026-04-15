@@ -144,7 +144,7 @@ body {
 #ai-float-btn {
 display:flex;
 position:fixed;
-bottom:48px;
+bottom:calc(32px + 16px);
 right:20px;
 background:#3D9E72;
 color:#fff;
@@ -629,6 +629,7 @@ var sheets = [
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
 var scrollTop=0, scrollLeft=0;
+var initialInnerHeight = window.innerHeight; // キーボード出現前のinnerHeightを保存
 var scale=1;
 var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
 var editingCell=null;
@@ -636,6 +637,7 @@ var touchState=null;
 
 // ===== 初期化 =====
 window.addEventListener('resize', function(){
+  initialInnerHeight = window.innerHeight; // リサイズ時は更新
   dpr = window.devicePixelRatio || 1; resize(); render();
 });
 window.addEventListener('load', function() {
@@ -1400,30 +1402,17 @@ function onVisualVP(){
   var vv = window.visualViewport;
   document.body.style.top = Math.round(vv.offsetTop) + 'px';
   document.body.style.height = Math.round(vv.height) + 'px';
+  var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs){
-    tabs.style.bottom = Math.max(0, kbH) + 'px';
-    // デバッグ: sheet-tabsの実際の位置を表示
-    var tabRect = tabs.getBoundingClientRect();
-    tabs.title = 'bottom:'+Math.max(0,kbH)+'px rect.top:'+Math.round(tabRect.top)+' rect.bottom:'+Math.round(tabRect.bottom)+' vv.h:'+Math.round(vv.height)+' vv.ot:'+Math.round(vv.offsetTop)+' innerH:'+window.innerHeight+' kbH:'+Math.max(0,kbH);
-  }
-  // デバッグ表示（画面上部）
-  var dbg = document.getElementById('dbg');
-  if(dbg){
-    dbg.style.display='block';
-    dbg.textContent =
-      'h:'+Math.round(vv.height)+
-      ' ot:'+Math.round(vv.offsetTop)+
-      ' iH:'+window.innerHeight+
-      ' kbH:'+Math.max(0,kbH)+
-      ' tab.b:'+Math.max(0,kbH)+'px';
-  }
+  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
     var pt = parseFloat(popup.style.top) || 108;
     var ph = popup.getBoundingClientRect().height || 220;
-    var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - 10;
+    // sheet-tabs の上端より上に収まるよう maxBottom を計算
+    var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - SHEET_H - 10;
     if(pt + ph > maxBottom){
       popup.style.top = Math.max(60, maxBottom - ph) + 'px';
     }
@@ -1782,7 +1771,7 @@ function closeResponsePopup(){
   popup.style.display = '';
   popupVisible = false;
   savePopupState();
-
+  if(canvas) canvas.focus();
 }
 
 function savePopupState(){
@@ -1865,7 +1854,6 @@ function initPopupResize(){
 
 <div id="popup-overlay" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()" ontouchend="event.stopPropagation()"></div>
 </body>
-<div id="dbg" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,0.85);color:#fff;font-size:10px;padding:3px 6px;font-family:monospace;pointer-events:none;display:none;"></div>
 <div id="ai-response-popup">
   <div id="popup-header">
     <div id="popup-pill"></div>
