@@ -654,6 +654,7 @@ window.addEventListener('load', function() {
   dpr = window.devicePixelRatio || 1;
   resize(); render(); bindEvents();
   initPopupDrag(); initPopupResize();
+  canvas.focus();
   document.getElementById('loading').classList.add('hide');
   // スマホ：ボタン位置はCSS(position:fixed;bottom:52px)で制御
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
@@ -759,8 +760,8 @@ function cW(c){ return (sheets[activeSheet].colW[c] || COL_W) * scale; }
 function rH(r){ return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
 
 // ===== 座標 =====
-function colX(c){ var x=HDR_W-scrollLeft; for(var i=0;i<c;i++) x+=cW(i); return x; }
-function rowY(r){ var y=HDR_H-scrollTop;  for(var i=0;i<r;i++) y+=rH(i);  return y; }
+function colX(c){ return Math.round(HDR_W - scrollLeft + c * COL_W * scale); }
+function rowY(r){ return Math.round(HDR_H - scrollTop + r * ROW_H * scale); }
 function xToC(x){
   // 列幅変更がない場合はO(1)直接計算
   var colW_def = COL_W * scale;
