@@ -661,6 +661,7 @@ window.addEventListener('load', function() {
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
+    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
 });
 function resize() {
@@ -1205,8 +1206,13 @@ function onTE(e){
 // キー
 function onKD(e){
   if(editingCell) return;
-  // Ctrl+V: focusがどこにあっても貼り付け（copyBufferがある場合のみ）
   var ek0 = e.key.toLowerCase();
+  // Ctrl+C/V: focusがどこにあっても動作（Excelと同じ挙動）
+  if(ek0==='c' && (e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    ctxCopy();
+    return;
+  }
   if(ek0==='v' && (e.ctrlKey||e.metaKey) && copyBuffer){
     e.preventDefault();
     ctxPaste();
@@ -1409,23 +1415,14 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  // body高さは常に更新（keyboard出現時にグリッドをviewport内に収める）
-  document.body.style.height = Math.round(vv.height) + 'px';
-  if(popupVisible){
-    // popup visible時: popupがkeyboard上に収まるようtopを調整
-    var popup = document.getElementById('ai-response-popup');
-    if(popup){
-      var pTop = parseFloat(popup.style.top) || 108;
-      var pHeight = popup.getBoundingClientRect().height || 220;
-      var maxTop = Math.round(vv.height) - pHeight - 20;
-      if(pTop > maxTop && maxTop > 60){
-        popup.style.top = maxTop + 'px';
-        try{ localStorage.setItem('exally_popup_top', maxTop+'px'); }catch(e){}
-      }
-    }
-    return; // canvasのresize/renderはスキップ
-  }
-  dpr = window.devicePixelRatio || 1; resize(); render();
+  // iOSのpanning（visualViewport.offsetTop）を打ち消す
+  document.body.style.top = -Math.round(vv.offsetTop) + 'px';
+  document.body.style.height = Math.round(vv.height + vv.offsetTop) + 'px';
+  // resize()は常に実行（canvasバッファをDOMに合わせる）
+  dpr = window.devicePixelRatio || 1; resize();
+  // popup表示中はrender()のみスキップ
+  if(popupVisible) return;
+  render();
 }
 
 // 選択範囲のデータを取得
