@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: monospace; font-size: 14px; background: #f0faf4; }
+#log { padding: 10px; }
+.row { background: #fff; border: 1px solid #ccc; border-radius: 6px; margin: 6px 0; padding: 8px 10px; }
+.label { color: #666; font-size: 11px; }
+.val { font-size: 18px; font-weight: bold; color: #333; }
+.highlight { background: #fff3cd; }
+input { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #52B788; border-radius: 8px; margin: 10px 0; }
+#status { padding: 6px 10px; border-radius: 6px; margin: 6px 0; font-weight: bold; }
+</style>
+</head>
+<body>
+<div id="log">
+  <div class="row"><div class="label">window.innerHeight</div><div class="val" id="iH">-</div></div>
+  <div class="row"><div class="label">vv.height</div><div class="val" id="vH">-</div></div>
+  <div class="row"><div class="label">vv.offsetTop</div><div class="val" id="vOT">-</div></div>
+  <div class="row highlight"><div class="label">kbH = innerHeight - vv.height - vv.offsetTop</div><div class="val" id="kbH">-</div></div>
+  <div class="row"><div class="label">body.style.top (現在)</div><div class="val" id="bTop">-</div></div>
+  <div id="status">キーボード：未</div>
+  <input type="text" placeholder="ここをタップしてキーボードを出す（上）" id="inp1">
+</div>
+<div style="height:300px"></div>
+<div style="padding:10px">
+  <input type="text" placeholder="ここをタップ（中）" id="inp2">
+</div>
+<div style="height:300px"></div>
+<div style="padding:10px; padding-bottom:60px">
+  <input type="text" placeholder="ここをタップ（下）" id="inp3">
+</div>
+<script>
+function update(source) {
+  var vv = window.visualViewport;
+  if (!vv) return;
+  var iH = window.innerHeight;
+  var vH = Math.round(vv.height);
+  var vOT = Math.round(vv.offsetTop);
+  var kbH = iH - vH - vOT;
+  document.getElementById('iH').textContent = iH + 'px';
+  document.getElementById('vH').textContent = vH + 'px';
+  document.getElementById('vOT').textContent = vOT + 'px';
+  document.getElementById('kbH').textContent = kbH + 'px ← ' + (kbH > 100 ? '🔴キーボード' : '🟢URLバー/なし');
+  document.getElementById('bTop').textContent = document.body.style.top || '(CSS top:0)';
+  document.getElementById('status').textContent = 'イベント: ' + source + ' | kbH=' + kbH;
+  document.getElementById('status').style.background = kbH > 100 ? '#ffd' : '#dfd';
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', function(){ update('resize'); });
+  window.visualViewport.addEventListener('scroll', function(){ update('scroll'); });
+}
+['inp1','inp2','inp3'].forEach(function(id){
+  document.getElementById(id).addEventListener('focus', function(){
+    setTimeout(function(){ update('focus+400ms'); }, 400);
+  });
+});
+update('初期');
+</script>
+</body>
+</html>
