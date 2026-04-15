@@ -1397,21 +1397,21 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
+  // body を visual viewport に追従（panning時にヘッダーが消えるのを防ぐ）
+  document.body.style.top = Math.round(vv.offsetTop) + 'px';
   document.body.style.height = Math.round(vv.height) + 'px';
-
-  // iOS Safari: position:fixed の bottom:0 はlayout viewport底（キーボード下）になる
-  // → JS で sheet-tabs と popup の bottom を動的に設定してキーボード上に固定
-  var kbH = window.innerHeight - Math.round(vv.height);
+  // sheet-tabs をキーボード直上に固定（iOS Safari の fixed bottom:0 はキーボード下になる）
+  var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs) tabs.style.bottom = kbH + 'px';
-
-  // popup が keyboard に隠れる場合は上に移動
+  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  // popup がキーボードに隠れる場合は上に移動
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
     var pt = parseFloat(popup.style.top) || 108;
     var ph = popup.getBoundingClientRect().height || 220;
-    if(pt + ph > Math.round(vv.height) - 10){
-      popup.style.top = Math.max(60, Math.round(vv.height) - ph - 10) + 'px';
+    var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - 10;
+    if(pt + ph > maxBottom){
+      popup.style.top = Math.max(60, maxBottom - ph) + 'px';
     }
   }
   dpr = window.devicePixelRatio || 1; resize(); render();
