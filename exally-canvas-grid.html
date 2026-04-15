@@ -1223,7 +1223,11 @@ function onKD(e){
   var ek = e.key.toLowerCase();
   // 全Ctrlショートカット: focusがどこにあっても動作（Excelと同じ挙動）
   if(e.ctrlKey||e.metaKey){
-    if(ek==='c'){ e.preventDefault(); ctxCopy(); return; }
+    if(ek==='c'){
+      // テキスト選択中はブラウザのコピーに任せる
+      if(window.getSelection && window.getSelection().toString()) return;
+      e.preventDefault(); ctxCopy(); return;
+    }
     if(ek==='v' && copyBuffer){ e.preventDefault(); ctxPaste(); return; }
     if(ek==='z' && !e.shiftKey){ e.preventDefault(); doUndo(); return; }
     if(ek==='y' || (ek==='z' && e.shiftKey)){ e.preventDefault(); doRedo(); return; }
