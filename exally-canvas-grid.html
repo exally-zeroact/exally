@@ -276,7 +276,7 @@ bottom:0;
 left:0;
 right:0;
 height:32px;
-z-index:100;
+z-index:650;
 background:#F8FEFC;
 border-top:1px solid #C8ECD8;
 display:flex;
@@ -629,7 +629,6 @@ var sheets = [
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
 var scrollTop=0, scrollLeft=0;
-var popupTopBeforeKeyboard = null; // キーボード出現前のpopup位置保存用
 var initialInnerHeight = window.innerHeight; // キーボード出現前のinnerHeightを保存
 var scale=1;
 var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
@@ -1408,27 +1407,15 @@ function onVisualVP(){
   var tabs = document.getElementById('sheet-tabs');
   if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
   // popup が sheet-tabs に重ならないよう位置調整
-  // キーボード消去後は元の位置に戻す（戻さないとcanvas上部タッチがブロックされる）
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
-    if(kbH > 50){
-      // キーボード表示中：元位置を保存してからpopupを上に移動
-      var pt = parseFloat(popup.style.top) || 108;
-      var ph = popup.getBoundingClientRect().height || 220;
-      var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - SHEET_H - 10;
-      if(pt + ph > maxBottom){
-        if(popupTopBeforeKeyboard === null) popupTopBeforeKeyboard = pt;
-        popup.style.top = Math.max(60, maxBottom - ph) + 'px';
-      }
-    } else {
-      // キーボード消去：元位置に復元
-      if(popupTopBeforeKeyboard !== null){
-        popup.style.top = popupTopBeforeKeyboard + 'px';
-        popupTopBeforeKeyboard = null;
-      }
+    var pt = parseFloat(popup.style.top) || 108;
+    var ph = popup.getBoundingClientRect().height || 220;
+    // sheet-tabs の上端より上に収まるよう maxBottom を計算
+    var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - SHEET_H - 10;
+    if(pt + ph > maxBottom){
+      popup.style.top = Math.max(60, maxBottom - ph) + 'px';
     }
-  } else {
-    popupTopBeforeKeyboard = null;
   }
   dpr = window.devicePixelRatio || 1; resize(); render();
 }
