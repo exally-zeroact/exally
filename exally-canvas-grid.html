@@ -550,7 +550,10 @@ gap:8px;
 
 #grid-canvas:focus { outline: none; }
 </style>
-
+<script src="https://cdn.jsdelivr.net/npm/hyperformula@2.6.1/dist/hyperformula.full.min.js"></script>
+<script src="canvas-formula-engine.js"></script>
+<script src="canvas-ai.js"></script>
+<script src="canvas-renderer.js"></script>
 </head>
 <body>
 
@@ -648,6 +651,8 @@ window.addEventListener('load', function() {
   resize(); render(); bindEvents();
   initPopupDrag(); initPopupResize();
   canvas.focus();
+  // HyperFormula初期化
+  initFormulaEngine(sheets.map(function(s){return s.name;}));
   document.getElementById('loading').classList.add('hide');
   // スマホ：ボタン位置はCSS(position:fixed;bottom:52px)で制御
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
@@ -671,14 +676,21 @@ function setCell(r,c,v,noUndo){
   var prev = sheets[activeSheet].data[key] ? sheets[activeSheet].data[key].v : '';
   if(!noUndo){ undoStack.push({sheet:activeSheet,key:key,old:prev,new_:v}); redoStack=[]; }
   var d = v;
-  if(v && v[0]==='=') d = evalFormula(v, r, c);
+  var hfResult = setCellFormula(activeSheet, r, c, v);
+  if(hfResult !== null){ d = hfResult; }
+  else if(v && v[0]==='='){ d = evalFormula(v, r, c); }
   sheets[activeSheet].data[key] = {v:v, f:v, d:String(d)};
 }
 function doUndo(){
   if(!undoStack.length) return;
   var op = undoStack.pop();
   redoStack.push(op);
-  var d = op.old; if(d && d[0]==='=') d = evalFormula(d, parseInt(op.key), 0);
+  var parts = op.key.split(',');
+  var r = parseInt(parts[0]), c = parseInt(parts[1]);
+  var d = op.old;
+  var hfResult = undoCellFormula(op.sheet, r, c, op.old);
+  if(hfResult !== null){ d = hfResult; }
+  else if(d && d[0]==='='){ d = evalFormula(d, r, c); }
   sheets[op.sheet].data[op.key] = {v:op.old, f:op.old, d:String(d||'')};
   if(!op.old) delete sheets[op.sheet].data[op.key];
   render(); updateBar();
@@ -687,7 +699,8 @@ function doRedo(){
   if(!redoStack.length) return;
   var op = redoStack.pop();
   undoStack.push(op);
-  setCell(parseInt(op.key.split(',')[0]), parseInt(op.key.split(',')[1]), op.new_, true);
+  var parts = op.key.split(',');
+  setCell(parseInt(parts[0]), parseInt(parts[1]), op.new_, true);
   render(); updateBar();
 }
 
@@ -774,150 +787,8 @@ function yToR(y){
   return r;
 }
 
-// ===== 描画 =====
-function render() {
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,wrapW,wrapH);
-
-  // 表示範囲
-  var sC=xToC(HDR_W), sR=yToR(HDR_H), eC=sC, eR=sR;
-  while(colX(eC)<wrapW && eC<COLS-1) eC++;
-  while(rowY(eR)<wrapH && eR<ROWS-1) eR++;
-
-  // 1. セル白背景（一括）
-  ctx.fillStyle=C_CELL_BG;
-  ctx.fillRect(HDR_W,HDR_H,wrapW,wrapH);
-
-  // 2. 選択セル背景
-  ctx.fillStyle=C_SEL_BG;
-  for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
-    for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
-      ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
-
-  // 3. グリッド線（セルエリアのみ）
-  ctx.strokeStyle=C_CELL_LINE; ctx.lineWidth=0.5; ctx.beginPath();
-  for(var r=sR;r<=eR+2;r++){
-    var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue;
-    ctx.moveTo(HDR_W,ly); ctx.lineTo(wrapW,ly);
-  }
-  for(var c=sC;c<=eC+2;c++){
-    var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue;
-    ctx.moveTo(lx,HDR_H); ctx.lineTo(lx,wrapH);
-  }
-  ctx.stroke();
-
-  // 4. セルテキスト
-  for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++) drawText(r,c);
-
-  // 5. ヘッダー背景
-  ctx.fillStyle=C_HDR_BG;
-  ctx.fillRect(0,0,wrapW,HDR_H);   // 列ヘッダー行
-  ctx.fillRect(0,0,HDR_W,wrapH);   // 行ヘッダー列
-
-  // 6. 選択ヘッダー強調
-  ctx.fillStyle=C_SEL_HDR;
-  for(var c=selC1;c<=selC2;c++) ctx.fillRect(colX(c),0,cW(c),HDR_H);
-  for(var r=selR1;r<=selR2;r++) ctx.fillRect(0,rowY(r),HDR_W,rH(r));
-
-  // 7. ヘッダー線（ヘッダー背景の上に描く）
-  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.beginPath();
-  // 列ヘッダーの縦区切り
-  for(var c=sC;c<=eC+2;c++){
-    var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue;
-    ctx.moveTo(lx,0); ctx.lineTo(lx,HDR_H);
-  }
-  // 行ヘッダーの横区切り
-  for(var r=sR;r<=eR+2;r++){
-    var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue;
-    ctx.moveTo(0,ly); ctx.lineTo(HDR_W,ly);
-  }
-  // ヘッダー境界線（太め）
-  ctx.moveTo(HDR_W+0.5,0); ctx.lineTo(HDR_W+0.5,wrapH);
-  ctx.moveTo(0,HDR_H+0.5); ctx.lineTo(wrapW,HDR_H+0.5);
-  ctx.stroke();
-  // 最終列・最終行の終端境界線
-  var lastColX = Math.round(colX(COLS))+0.5;
-  var lastRowY = Math.round(rowY(ROWS))+0.5;
-  ctx.strokeStyle='#3D9E72'; ctx.lineWidth=1.5; ctx.beginPath();
-  if(lastColX>HDR_W && lastColX<=wrapW){ ctx.moveTo(lastColX,0); ctx.lineTo(lastColX,wrapH); }
-  if(lastRowY>HDR_H && lastRowY<=wrapH){ ctx.moveTo(0,lastRowY); ctx.lineTo(wrapW,lastRowY); }
-  ctx.stroke();
-
-  // 8. ヘッダーテキスト
-  ctx.textBaseline='middle';
-  // 列（A,B,C...）中央揃え
-  ctx.textAlign='center';
-  var fw=scale<0.75?'normal':'bold';
-  var fs=Math.max(9,Math.round(11*Math.min(scale,1.5)));
-  ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
-  for(var c=sC;c<=eC+1;c++){
-    var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue;
-    ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT;
-    ctx.fillText(colLetter(c),x+w/2,HDR_H/2);
-  }
-  // 行（1,2,3...）右寄せ（Excelと同じ）
-  ctx.textAlign='right';
-  var rf=Math.max(9,Math.round(11*Math.min(scale,1.5)));
-  ctx.font=rf+'px "Noto Sans JP",sans-serif';
-  for(var r=sR;r<=eR+1;r++){
-    var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue;
-    ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT;
-    ctx.fillText(r+1,HDR_W-4,y+h/2);
-  }
-
-  // 9. 左上角
-  ctx.fillStyle=C_HDR_BG;
-  ctx.fillRect(0,0,HDR_W,HDR_H);
-  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5;
-  ctx.strokeRect(0.5,0.5,HDR_W-0.5,HDR_H-0.5);
-
-  // 10. 選択枠（最前面）
-  drawSel();
-}
-
-function drawText(r,c){
-  var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
-  if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
-  var cell=getCell(r,c);
-  var display = (cell.d!==undefined && cell.d!=='') ? cell.d : cell.v;
-  if(!display) return;
-  // 数式セルは計算結果を黒で表示（数式バーに数式を表示）
-  var isFormula = cell.f && cell.f[0]==='=';
-  var showRaw = isFormula && cell.d===cell.f; // 計算できなかった場合のみ青
-  ctx.fillStyle = showRaw ? C_FORMULA : C_CELL_TXT;
-  ctx.font=Math.max(9,Math.min(13,Math.round(12*scale)))+'px "Noto Sans JP",sans-serif';
-  ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.save(); ctx.rect(x+1,y,w-2,h); ctx.clip();
-  ctx.fillText(display,x+4,y+h/2);
-  ctx.restore();
-}
-
-function drawSel(){
-  var x1=colX(selC1),y1=rowY(selR1);
-  var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
-  ctx.save();
-  ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
-  ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
-  ctx.strokeRect(x1+1,y1+1,x2-x1-2,y2-y1-2);
-  // ハンドル（右下）
-  ctx.fillStyle=C_SEL_BORDER;
-  ctx.beginPath(); ctx.arc(x2,y2,7,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#fff';
-  ctx.beginPath(); ctx.arc(x2,y2,3.5,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
-
 // ===== ユーティリティ =====
-function colLetter(c){ var s=''; c+=1; while(c>0){ s=String.fromCharCode(64+((c-1)%26+1))+s; c=Math.floor((c-1)/26); } return s; }
-function cellAddr(r,c){ return colLetter(c)+(r+1); }
-function updateBar(){
-  var addr = cellAddr(selR1,selC1);
-  var scaleStr = scale!==1 ? ' ×'+Math.round(scale*10)/10 : '';
-  document.getElementById('cell-addr').value = addr+scaleStr;
-  var cell=getCell(selR1,selC1);
-  document.getElementById('formula-input').value=cell.f||'';
-}
-var anchorR=0, anchorC=0; // Shift選択のアンカー（開始点）
+var anchorR=0, anchorC=0;
 var activeR=0, activeC=0; // Shift選択の移動端
 
 function sel(r1,c1,r2,c2){
@@ -1395,6 +1266,7 @@ function switchSheet(idx){
 function addSheet(){
   var idx=sheets.length;
   sheets.push({name:'Sheet'+(idx+1),data:{},colW:{},rowH:{}});
+  addSheetToEngine('Sheet'+(idx+1));
   var tabs=document.getElementById('sheet-tabs');
   var btn=document.createElement('button');
   btn.className='sheet-tab'; btn.textContent=sheets[idx].name;
@@ -1460,60 +1332,6 @@ function getSelectionData(){
 }
 
 // AI送信
-// index6.htmlと同じ colorizeFormula
-function colorizeFormula(text){
-  var lp='[\\(（]',rp='[\\)）]',cm='[,，]';
-  var reVL=new RegExp('=VLOOKUP'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^,，]+)'+cm+'\\s*(FALSE|TRUE)\\s*'+rp,'gi');
-  text=text.replace(reVL,function(m,a1,a2,a3,a4){return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
-  var reSI=new RegExp('=SUMIF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reSI,function(m,a1,a2,a3){return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  var reIF=new RegExp('=IF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reIF,function(m,a1,a2,a3){return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  var reCI=new RegExp('=COUNTIF'+lp+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reCI,function(m,a1,a2){return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
-  var b='\uD83D\uDD35',o='\uD83D\uDFE0',p='\uD83D\uDFE3',g='\uD83D\uDFE2';
-  text=text.replace(new RegExp(b+'\\s*\\*\\*([^*]+)\\*\\*','g'),b+' <span class="arg-blue">$1</span>');
-  text=text.replace(new RegExp(o+'\\s*\\*\\*([^*]+)\\*\\*','g'),o+' <span class="arg-orange">$1</span>');
-  text=text.replace(new RegExp(p+'\\s*\\*\\*([^*]+)\\*\\*','g'),p+' <span class="arg-purple">$1</span>');
-  text=text.replace(new RegExp(g+'\\s*\\*\\*([^*]+)\\*\\*','g'),g+' <span class="arg-green">$1</span>');
-  return text;
-}
-
-// index6.htmlと同じ colorizeFormulaBlock
-function colorizeFormulaBlock(f){
-  f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
-  f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
-  f=f.replace(/(?<![A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
-  return f;
-}
-
-// index6.htmlと同じ表示形式（コードブロックを先に退避してからcolorize）
-function formatAIText(text){
-  var blocks = [];
-  // ① コードブロックを先に退避
-  text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
-    var raw = c.trim();
-    var colored = colorizeFormulaBlock(raw);
-    blocks.push({colored:colored, raw:raw});
-    return '\x00BLOCK'+(blocks.length-1)+'\x00';
-  });
-  // ② コードブロック外にcolorizeFormula適用
-  text = colorizeFormula(text);
-  // ③ インラインコード
-  text = text.replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>');
-  // ④ 改行
-  text = text.replace(/\n/g,'<br>');
-  // ⑤ コードブロックを復元
-  text = text.replace(/\x00BLOCK(\d+)\x00/g, function(m,idx){
-    var b = blocks[parseInt(idx)];
-    var safeRaw = b.raw.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return '<div class="formula-block">'+b.colored+'</div>'
-      +'<button class="copy-btn" onclick="copyText(this,\''+safeRaw+'\')">📋 数式をコピー</button>';
-  });
-  return text;
-}
 
 function copyText(btn, text){
   // Ctrl+Vで貼り付けできるようcopyBufferにも保存
@@ -1539,27 +1357,6 @@ function copyText(btn, text){
     navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
   } else { fallback(); }
 }
-function extractWriteAction(text){
-  var idx = text.indexOf('"action"');
-  if(idx === -1) return null;
-  var start = text.lastIndexOf('{', idx);
-  if(start === -1) return null;
-  var depth = 0;
-  for(var i = start; i < text.length; i++){
-    if(text[i] === '{') depth++;
-    else if(text[i] === '}'){
-      depth--;
-      if(depth === 0){
-        try {
-          var json = JSON.parse(text.substring(start, i+1));
-          if(json.action === 'write') return { json:json, start:start, end:i+1 };
-        } catch(e) { return null; }
-      }
-    }
-  }
-  return null;
-}
-
 var aiHistory = [];
 
 function addAIChatMsg(type, text){
