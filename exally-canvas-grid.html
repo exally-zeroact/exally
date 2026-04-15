@@ -1020,6 +1020,18 @@ function bindEvents(){
       e.preventDefault();
       this.focus();
     }, { passive: false });
+    // 中段popup時にresizeが発火しない場合のtabs補正（focusのみ・blurなし）
+    popupInp.addEventListener('focus', function(){
+      setTimeout(function(){
+        var vv = window.visualViewport;
+        if(!vv) return;
+        var kbActual = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
+        if(kbActual > 100){
+          var tabs = document.getElementById('sheet-tabs');
+          if(tabs) tabs.style.bottom = kbActual + 'px';
+        }
+      }, 400);
+    });
   }
   var ai = document.getElementById('ai-input');
   ai.addEventListener('keydown', function(e){
@@ -1394,9 +1406,11 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
+  var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
+  // キーボード出現時(kbH>100)のみtop補正。URLバー変化(kbH<=100)では0に固定
+  document.body.style.top = kbH > 100 ? Math.round(vv.offsetTop) + 'px' : '0px';
   document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
-  var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
   if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
   // popup が sheet-tabs に重ならないよう位置調整
