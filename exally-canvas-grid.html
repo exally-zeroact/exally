@@ -1205,6 +1205,13 @@ function onTE(e){
 // キー
 function onKD(e){
   if(editingCell) return;
+  // Ctrl+V: focusがどこにあっても貼り付け（copyBufferがある場合のみ）
+  var ek0 = e.key.toLowerCase();
+  if(ek0==='v' && (e.ctrlKey||e.metaKey) && copyBuffer){
+    e.preventDefault();
+    ctxPaste();
+    return;
+  }
   if(document.activeElement===document.getElementById('formula-input')) return;
   if(document.activeElement===document.getElementById('ai-input')) return;
   if(document.activeElement===document.getElementById('popup-input')) return;
@@ -1402,9 +1409,22 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  // popup開いている間はレイアウト変化させない（シートが上がるバグ防止）
-  if(popupVisible) return;
+  // body高さは常に更新（keyboard出現時にグリッドをviewport内に収める）
   document.body.style.height = Math.round(vv.height) + 'px';
+  if(popupVisible){
+    // popup visible時: popupがkeyboard上に収まるようtopを調整
+    var popup = document.getElementById('ai-response-popup');
+    if(popup){
+      var pTop = parseFloat(popup.style.top) || 108;
+      var pHeight = popup.getBoundingClientRect().height || 220;
+      var maxTop = Math.round(vv.height) - pHeight - 20;
+      if(pTop > maxTop && maxTop > 60){
+        popup.style.top = maxTop + 'px';
+        try{ localStorage.setItem('exally_popup_top', maxTop+'px'); }catch(e){}
+      }
+    }
+    return; // canvasのresize/renderはスキップ
+  }
   dpr = window.devicePixelRatio || 1; resize(); render();
 }
 
