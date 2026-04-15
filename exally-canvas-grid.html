@@ -1124,11 +1124,25 @@ function onTS(e){
   if(nearHandle(x,y)){
     touchState={type:'handle'}; return;
   }
-  touchState={type:'pending',sx:t.clientX,sy:t.clientY,sst:scrollTop,ssl:scrollLeft,time:Date.now()};
+  var lpt = setTimeout(function(){
+    if(touchState && touchState.type==='pending'){
+      // 長押し判定 → 右クリックメニュー表示
+      var r2=canvas.getBoundingClientRect();
+      var lx=t.clientX-r2.left, ly=t.clientY-r2.top;
+      if(lx>HDR_W && ly>HDR_H){
+        sel(yToR(ly), xToC(lx), yToR(ly), xToC(lx));
+        showCtxMenu(t.clientX, t.clientY);
+        touchState=null;
+      }
+    }
+  }, 600);
+  touchState={type:'pending',sx:t.clientX,sy:t.clientY,sst:scrollTop,ssl:scrollLeft,time:Date.now(),lpt:lpt};
 }
 function onTM(e){
   e.preventDefault();
   if(!touchState) return;
+  // スクロール開始時に長押しタイマーキャンセル
+  if(touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
   if(e.touches.length>=2&&touchState.type!=='pinch'){
     var r=canvas.getBoundingClientRect();
     touchState={type:'pinch',dist:pDist(e),sc:scale,sst:scrollTop,ssl:scrollLeft,
@@ -1171,6 +1185,7 @@ function onTE(e){
        sy >= pr2.top  && sy <= pr2.bottom){ touchState=null; return; }
   }
   e.preventDefault();
+  if(touchState && touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
   if(!touchState||touchState.type!=='pending'){touchState=null;return;}
   var r=canvas.getBoundingClientRect();
   var x=touchState.sx-r.left,y=touchState.sy-r.top;
@@ -1701,12 +1716,15 @@ function toggleResponsePopup(){
 function openResponsePopup(){
   var popup = document.getElementById('ai-response-popup');
   if(!popup) return;
+  // popup位置を画面上部に強制（iOSのpanning防止）
+  var safeTop = 108;
+  popup.style.top = safeTop + 'px';
+  try { localStorage.setItem('exally_popup_top', safeTop+'px'); } catch(e){}
   loadPopupState();
   popup.classList.add('show');
   popup.style.display = 'flex';
   popupVisible = true;
-  // canvasのタッチを完全無効化（セルへの誤入力防止）
-  if(canvas) canvas.style.pointerEvents = 'none';
+  // pointerEventsはそのまま（onTSでスキップするため）
   var respArea = document.getElementById('popup-response-area');
   if(respArea) respArea.scrollTop = respArea.scrollHeight;
 }
@@ -1717,8 +1735,6 @@ function closeResponsePopup(){
   popup.classList.remove('show');
   popup.style.display = '';
   popupVisible = false;
-  // canvasのタッチを再有効化
-  if(canvas) canvas.style.pointerEvents = 'auto';
   savePopupState();
 
 }
