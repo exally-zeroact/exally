@@ -1018,15 +1018,6 @@ function bindEvents(){
     // touchend: focusのみ（grid高さはonVisualVPが一元管理）
     popupInp.addEventListener('touchend', function(e){
       e.preventDefault();
-      // iOS panning防止: focus前にpopupを上部へ移動（下部にあるとiOSが大きくpanningしてbodyがズレる）
-      var popup = document.getElementById('ai-response-popup');
-      if(popup){
-        var pt = parseFloat(popup.style.top) || 108;
-        if(pt > 250){
-          popup.style.top = '108px';
-          try { localStorage.setItem('exally_popup_top', '108px'); } catch(er){}
-        }
-      }
       this.focus();
     }, { passive: false });
   }
@@ -1408,7 +1399,10 @@ function onVisualVP(){
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  if(tabs){
+    tabs.style.bottom = Math.max(0, kbH) + 'px';
+    tabs.style.paddingBottom = kbH > 150 ? '0px' : '';
+  }
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
