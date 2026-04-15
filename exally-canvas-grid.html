@@ -7,6 +7,7 @@
 <title>Exally グリッド</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP&display=swap" rel="stylesheet">
 <style>
+html { background: #fff; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
   font-family:'Noto Sans JP',sans-serif;
@@ -74,6 +75,7 @@ body {
 }
 #grid-wrap {
   flex:1;
+  min-height:80px;
   position:relative;
   overflow:hidden;
 }
@@ -1209,18 +1211,23 @@ function onTE(e){
 // キー
 function onKD(e){
   if(editingCell) return;
-  var ek0 = e.key.toLowerCase();
-  // Ctrl+C/V: focusがどこにあっても動作（Excelと同じ挙動）
-  if(ek0==='c' && (e.ctrlKey||e.metaKey)){
-    e.preventDefault();
-    ctxCopy();
-    return;
+  var ek = e.key.toLowerCase();
+  // 全Ctrlショートカット: focusがどこにあっても動作（Excelと同じ挙動）
+  if(e.ctrlKey||e.metaKey){
+    if(ek==='c'){ e.preventDefault(); ctxCopy(); return; }
+    if(ek==='v' && copyBuffer){ e.preventDefault(); ctxPaste(); return; }
+    if(ek==='z' && !e.shiftKey){ e.preventDefault(); doUndo(); return; }
+    if(ek==='y' || (ek==='z' && e.shiftKey)){ e.preventDefault(); doRedo(); return; }
+    if(ek==='a'){ e.preventDefault(); sel(0,0,ROWS-1,COLS-1); render(); return; }
+    if(e.key==='Home'){ e.preventDefault(); sel(0,0,0,0); scrollTop=0; scrollLeft=0; render(); return; }
+    if(e.key==='End'){
+      var lr=0,lc=0;
+      var dat=sheets[activeSheet].data;
+      Object.keys(dat).forEach(function(k){ var p=k.split(','); var ri=parseInt(p[0]),ci=parseInt(p[1]); if(dat[k].v){if(ri>lr)lr=ri;if(ci>lc)lc=ci;} });
+      e.preventDefault(); sel(lr,lc,lr,lc); return;
+    }
   }
-  if(ek0==='v' && (e.ctrlKey||e.metaKey) && copyBuffer){
-    e.preventDefault();
-    ctxPaste();
-    return;
-  }
+  // 以下はfocusガードあり
   if(document.activeElement===document.getElementById('formula-input')) return;
   if(document.activeElement===document.getElementById('ai-input')) return;
   if(document.activeElement===document.getElementById('popup-input')) return;
@@ -1241,23 +1248,13 @@ function onKD(e){
 
   if(e.key==='Enter'){startEdit(selR1,selC1);moved=true;}
   if(e.key==='Delete'||e.key==='Backspace'){setCell(selR1,selC1,'');updateBar();render();moved=true;}
-  var ek=e.key.toLowerCase();
-  if(ek==='c'&&(e.ctrlKey||e.metaKey)){ ctxCopy(); moved=true; }
-  if(ek==='v'&&(e.ctrlKey||e.metaKey)){ if(canvas) canvas.focus(); ctxPaste(); moved=true; }
-  if(ek==='z'&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){ doUndo(); moved=true; }
-  if((ek==='y'&&(e.ctrlKey||e.metaKey))||(ek==='z'&&(e.ctrlKey||e.metaKey)&&e.shiftKey)){ doRedo(); moved=true; }
-  if(ek==='a'&&(e.ctrlKey||e.metaKey)){ sel(0,0,ROWS-1,COLS-1); moved=true; }
-  if(e.key==='Home'&&(e.ctrlKey||e.metaKey)){ sel(0,0,0,0); scrollTop=0; scrollLeft=0; render(); moved=true; }
-  if(e.key==='End'&&(e.ctrlKey||e.metaKey)){
-    var lr=0,lc=0;
-    var dat=sheets[activeSheet].data;
-    Object.keys(dat).forEach(function(k){ var p=k.split(','); var ri=parseInt(p[0]),ci=parseInt(p[1]); if(dat[k].v){if(ri>lr)lr=ri;if(ci>lc)lc=ci;} });
-    sel(lr,lc,lr,lc); moved=true;
-  }
-  if(e.key==='Home'&&!e.ctrlKey&&!e.metaKey){ sel(selR1,0,selR1,0); moved=true; }
-  if(e.key==='End'&&!e.ctrlKey&&!e.metaKey){ sel(selR1,COLS-1,selR1,COLS-1); moved=true; }
+  if(e.key==='Home'){ sel(selR1,0,selR1,0); moved=true; }
+  if(e.key==='End'){  sel(selR1,COLS-1,selR1,COLS-1); moved=true; }
+  if(e.key==='F2'){startEdit(selR1,selC1);moved=true;}
+  if(e.key==='Tab'&&!e.shiftKey){moveSel(0,1);moved=true;}
+  if(e.key==='Tab'&&e.shiftKey){moveSel(0,-1);moved=true;}
   if(moved) e.preventDefault();
-  if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
+  if(ek.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
     e.preventDefault();
     startEdit(selR1,selC1,e.key);
   }
