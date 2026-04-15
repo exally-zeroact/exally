@@ -1026,23 +1026,6 @@ function bindEvents(){
       e.preventDefault();
       this.focus();
     }, { passive: false });
-    // focus: 中段popup時にresizeが発火しない場合のtabs位置補正
-    popupInp.addEventListener('focus', function(){
-      setTimeout(function(){
-        var vv = window.visualViewport;
-        if(!vv) return;
-        var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
-        var tabs = document.getElementById('sheet-tabs');
-        if(tabs && kbH > 50) tabs.style.bottom = kbH + 'px';
-      }, 400);
-    });
-    // blur: tabs位置をリセット
-    popupInp.addEventListener('blur', function(){
-      setTimeout(function(){
-        var tabs = document.getElementById('sheet-tabs');
-        if(tabs) tabs.style.bottom = '0px';
-      }, 100);
-    });
   }
   var ai = document.getElementById('ai-input');
   ai.addEventListener('keydown', function(e){
