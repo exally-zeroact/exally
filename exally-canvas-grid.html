@@ -1025,11 +1025,15 @@ function bindEvents(){
       this.style.height='auto';
       this.style.height=Math.min(this.scrollHeight,80)+'px';
     });
-  }
-  var popupInp = document.getElementById('popup-input');
-  if(popupInp){
-    popupInp.addEventListener('keydown', function(e){
-      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendToAIMobile(); }
+    // focusされた時にpopupが下半分にあれば上部に移動（iOSのpanning防止）
+    popupInp.addEventListener('focus', function(){
+      var popup = document.getElementById('ai-response-popup');
+      if(!popup) return;
+      var curTop = parseFloat(popup.style.top) || 108;
+      if(curTop > window.innerHeight * 0.45){
+        popup.style.top = '108px';
+        try { localStorage.setItem('exally_popup_top', '108px'); } catch(e){}
+      }
     });
   }
   var ai = document.getElementById('ai-input');
