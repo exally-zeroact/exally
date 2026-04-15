@@ -7,11 +7,11 @@
 <title>Exally グリッド</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP&display=swap" rel="stylesheet">
 <style>
-html { background: #fff; }
+html { background: transparent; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
   font-family:'Noto Sans JP',sans-serif;
-  background:#F0FAF4;
+  background:transparent;
   height:100dvh;
   display:flex;
   flex-direction:column;
@@ -78,6 +78,7 @@ body {
   min-height:80px;
   position:relative;
   overflow:hidden;
+  background:#F0FAF4;
 }
 
 #grid-canvas {
@@ -1397,14 +1398,27 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  // body を visual viewport に追従（panning時にヘッダーが消えるのを防ぐ）
   document.body.style.top = Math.round(vv.offsetTop) + 'px';
   document.body.style.height = Math.round(vv.height) + 'px';
-  // sheet-tabs をキーボード直上に固定（iOS Safari の fixed bottom:0 はキーボード下になる）
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
-  // popup がキーボードに隠れる場合は上に移動
+  if(tabs){
+    tabs.style.bottom = Math.max(0, kbH) + 'px';
+    // デバッグ: sheet-tabsの実際の位置を表示
+    var tabRect = tabs.getBoundingClientRect();
+    tabs.title = 'bottom:'+Math.max(0,kbH)+'px rect.top:'+Math.round(tabRect.top)+' rect.bottom:'+Math.round(tabRect.bottom)+' vv.h:'+Math.round(vv.height)+' vv.ot:'+Math.round(vv.offsetTop)+' innerH:'+window.innerHeight+' kbH:'+Math.max(0,kbH);
+  }
+  // デバッグ表示（画面上部）
+  var dbg = document.getElementById('dbg');
+  if(dbg){
+    dbg.style.display='block';
+    dbg.textContent =
+      'h:'+Math.round(vv.height)+
+      ' ot:'+Math.round(vv.offsetTop)+
+      ' iH:'+window.innerHeight+
+      ' kbH:'+Math.max(0,kbH)+
+      ' tab.b:'+Math.max(0,kbH)+'px';
+  }
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
     var pt = parseFloat(popup.style.top) || 108;
@@ -1851,6 +1865,7 @@ function initPopupResize(){
 
 <div id="popup-overlay" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()" ontouchend="event.stopPropagation()"></div>
 </body>
+<div id="dbg" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,0.85);color:#fff;font-size:10px;padding:3px 6px;font-family:monospace;pointer-events:none;display:none;"></div>
 <div id="ai-response-popup">
   <div id="popup-header">
     <div id="popup-pill"></div>
