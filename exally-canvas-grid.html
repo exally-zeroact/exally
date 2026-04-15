@@ -1015,9 +1015,17 @@ function bindEvents(){
       this.style.height='auto';
       this.style.height=Math.min(this.scrollHeight,80)+'px';
     });
-    // touchend: focusのみ（grid高さはonVisualVPが一元管理）
+    // touchend: iOS panning防止 - focus前にpopupを上部へ移動
     popupInp.addEventListener('touchend', function(e){
       e.preventDefault();
+      var popup = document.getElementById('ai-response-popup');
+      if(popup){
+        var pt = parseFloat(popup.style.top) || 108;
+        if(pt > 250){
+          popup.style.top = '108px';
+          try { localStorage.setItem('exally_popup_top', '108px'); } catch(er){}
+        }
+      }
       this.focus();
     }, { passive: false });
   }
@@ -1401,7 +1409,7 @@ function onVisualVP(){
   var tabs = document.getElementById('sheet-tabs');
   if(tabs){
     tabs.style.bottom = Math.max(0, kbH) + 'px';
-    tabs.style.paddingBottom = kbH > 150 ? '0px' : '';
+    tabs.style.paddingBottom = kbH > 200 ? '0px' : '';
   }
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
