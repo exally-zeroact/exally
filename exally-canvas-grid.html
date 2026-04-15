@@ -654,7 +654,6 @@ window.addEventListener('load', function() {
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
-    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
 });
 function resize() {
