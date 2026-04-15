@@ -129,7 +129,7 @@ body {
     display:flex !important;
     /* bottom/rightはJS(window.load)で計算・設定 */
   }
-  /* width/border-radiusはJS（positionMobilePanel）で制御 */
+
 }
 #ai-response-area { display:none; max-height:220px; overflow-y:auto; background:#F8FEFC; border-radius:8px; padding:8px 10px; font-size:12px; }
 #ai-response-area.show { display:block; }
@@ -537,6 +537,8 @@ gap:8px;
   justify-content:center;
   font-family:inherit;
 }
+
+#grid-canvas:focus { outline: none; }
 </style>
 
 </head>
@@ -570,7 +572,7 @@ gap:8px;
 </div>
 
 <div id="grid-wrap">
-  <canvas id="grid-canvas"></canvas>
+  <canvas id="grid-canvas" tabindex="0"></canvas>
   <textarea id="cell-input" rows="1"></textarea>
 </div>
 
@@ -1037,6 +1039,7 @@ function nearHandle(x,y){
 // マウス
 function onMD(e){
   if(e.button!==0) return; commitEdit(); hideCtxMenu();
+  canvas.focus();
   var p=cPos(e);
 
   // 列ヘッダークリック → 列全体選択
@@ -1155,7 +1158,7 @@ function onTE(e){
   var r=canvas.getBoundingClientRect();
   var x=touchState.sx-r.left,y=touchState.sy-r.top;
   if(x>HDR_W&&y>HDR_H){
-    commitEdit();
+    commitEdit(); canvas.focus();
     var c=xToC(x),r2=yToR(y);
     if(selR1===r2&&selC1===c&&(Date.now()-touchState.time)<400){
       document.getElementById('formula-input').focus();
@@ -1188,11 +1191,12 @@ function onKD(e){
 
   if(e.key==='Enter'){startEdit(selR1,selC1);moved=true;}
   if(e.key==='Delete'||e.key==='Backspace'){setCell(selR1,selC1,'');updateBar();render();moved=true;}
-  if(e.key==='c'&&(e.ctrlKey||e.metaKey)){ ctxCopy(); moved=true; }
-  if(e.key==='v'&&(e.ctrlKey||e.metaKey)){ ctxPaste(); moved=true; }
-  if(e.key==='z'&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){ doUndo(); moved=true; }
-  if((e.key==='y'&&(e.ctrlKey||e.metaKey))||(e.key==='z'&&(e.ctrlKey||e.metaKey)&&e.shiftKey)){ doRedo(); moved=true; }
-  if(e.key==='a'&&(e.ctrlKey||e.metaKey)){ sel(0,0,ROWS-1,COLS-1); moved=true; }
+  var ek=e.key.toLowerCase();
+  if(ek==='c'&&(e.ctrlKey||e.metaKey)){ ctxCopy(); moved=true; }
+  if(ek==='v'&&(e.ctrlKey||e.metaKey)){ ctxPaste(); moved=true; }
+  if(ek==='z'&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){ doUndo(); moved=true; }
+  if((ek==='y'&&(e.ctrlKey||e.metaKey))||(ek==='z'&&(e.ctrlKey||e.metaKey)&&e.shiftKey)){ doRedo(); moved=true; }
+  if(ek==='a'&&(e.ctrlKey||e.metaKey)){ sel(0,0,ROWS-1,COLS-1); moved=true; }
   if(e.key==='Home'&&(e.ctrlKey||e.metaKey)){ sel(0,0,0,0); scrollTop=0; scrollLeft=0; render(); moved=true; }
   if(e.key==='End'&&(e.ctrlKey||e.metaKey)){
     var lr=0,lc=0;
@@ -1343,42 +1347,6 @@ function addSheet(){
 // AIパネル
 // overlayアプローチ（position:fixed）でグリッドを圧縮しない
 // B案：キーボード時にinputをflex先頭へorder変更 → iOS API依存なし・バージョン不問
-function positionMobilePanel(){
-  var wrap = document.getElementById('ai-panel-wrap');
-  if(!wrap.classList.contains('open')) return;
-  var btn = document.getElementById('ai-float-btn');
-  var vw = window.innerWidth;
-  var lh = window.innerHeight;
-  var visH = window.visualViewport ? window.visualViewport.height : lh;
-  var vvOffTop = window.visualViewport ? Math.round(window.visualViewport.offsetTop || 0) : 0;
-  var tabsH = 32;
-  var availH = visH - tabsH;
-  var panelW = Math.round(vw * 0.62);
-  var panelH = Math.max(Math.round(availH * 0.56), 200);
-  var bottom = Math.max(Math.round(lh - vvOffTop - visH + tabsH), 0);
-  wrap.style.cssText =
-    'position:fixed;right:0;bottom:'+bottom+'px;'+
-    'width:'+panelW+'px;height:'+panelH+'px;'+
-    'z-index:600;overflow:hidden;background:#fff;'+
-    'border:1px solid #C8ECD8;border-radius:12px 0 0 12px;'+
-    'box-shadow:-4px -2px 20px rgba(0,0,0,0.15);display:block;';
-  var panelBody = document.getElementById('ai-panel-body');
-  if(panelBody) panelBody.style.cssText =
-    'display:flex!important;flex-direction:column;height:'+(panelH-44)+'px;'+
-    'overflow:hidden;padding:8px;gap:6px;box-sizing:border-box;';
-  // キーボードあり判定 → inputをflex先頭に退避（iOS APIに依存しない純CSSのorder操作）
-  var keyboardUp = visH < lh * 0.75;
-  var inputRow = document.getElementById('ai-input-row');
-  var respArea = document.getElementById('ai-response-area');
-  if(keyboardUp){
-    if(inputRow) inputRow.style.order = '-1';
-    if(respArea){ respArea.style.order = '1'; respArea.style.display = 'none'; }
-  } else {
-    if(inputRow) inputRow.style.order = '';
-    if(respArea){ respArea.style.order = ''; respArea.style.display = ''; }
-  }
-  if(btn) btn.style.cssText = 'display:none!important;visibility:hidden;';
-}
 
 
 function handleAIBtn(){
@@ -1654,12 +1622,10 @@ async function _sendToAIMobile(text){
   var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
   var userMsg = text + ctxNote + writeInstruction;
 
-  var sendBtn = document.getElementById('ai-send-mobile');
+  var sendBtn = document.getElementById('popup-send');
   if(sendBtn) sendBtn.disabled = true;
 
   _addPopupMsg('user', text);
-  // 送信と同時にインライン返答エリアを開く
-  openInlineResponse();
 
   var respArea = document.getElementById('popup-response-area');
   var thinkEl = document.createElement('div');
@@ -1692,7 +1658,6 @@ async function _sendToAIMobile(text){
     var th2 = document.getElementById('popup-thinking');
     if(th2) th2.remove();
     _addPopupMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
-    showAIBadge();
   }
   if(sendBtn) sendBtn.disabled = false;
 }
@@ -1711,20 +1676,6 @@ function _addPopupMsg(type, text){
   resp.scrollTop = resp.scrollHeight;
 }
 
-function showAIBadge(){
-  openInlineResponse();
-  showToast('💬 AI返答が届きました');
-}
-
-var _toastTimer = null;
-function showToast(msg){
-  var toast = document.getElementById('ai-toast');
-  if(!toast) return;
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 4000);
-}
 
 function toggleResponsePopup(){
   if(popupVisible){ closeResponsePopup(); } else { openResponsePopup(); }
@@ -1739,8 +1690,6 @@ function openResponsePopup(){
   popupVisible = true;
   // canvasのタッチを完全無効化（セルへの誤入力防止）
   if(canvas) canvas.style.pointerEvents = 'none';
-  var badge = document.getElementById('ai-badge');
-  if(badge) badge.classList.remove('show');
   var respArea = document.getElementById('popup-response-area');
   if(respArea) respArea.scrollTop = respArea.scrollHeight;
 }
@@ -1828,139 +1777,8 @@ function initPopupResize(){
   handle.addEventListener('touchend', function(){ if(resizing){ resizing = false; savePopupState(); } });
 }
 
-function showFirstTimeGuide(){
-  var t = document.getElementById('guide-tooltip');
-  if(t) t.classList.add('show');
-}
-function dismissGuide(){
-  var t = document.getElementById('guide-tooltip');
-  if(t) t.classList.remove('show');
-  try { localStorage.setItem('exally_guide_shown','1'); } catch(e){}
-}
-function showGuideModal(){
-  var m = document.getElementById('guide-modal');
-  if(m) m.classList.add('show');
-}
-function closeGuideModal(){
-  var m = document.getElementById('guide-modal');
-  if(m) m.classList.remove('show');
-}
 
 
-// ===== モバイル インライン返答エリア =====
-var inlineRespOpen = false;
-var inlineRespH = 160;
-
-function openInlineResponse(){
-  if(window.innerWidth >= 769) return;
-  var area = document.getElementById('ai-response-area-inline');
-  var handle = document.getElementById('ai-resize-handle');
-  if(!area) return;
-  area.style.height = inlineRespH + 'px';
-  area.classList.add('open');
-  if(handle) handle.classList.add('open');
-  inlineRespOpen = true;
-
-  setTimeout(function(){ area.scrollTop = area.scrollHeight; }, 50);
-}
-
-function closeInlineResponse(){
-  if(window.innerWidth >= 769) return;
-  var area = document.getElementById('ai-response-area-inline');
-  var handle = document.getElementById('ai-resize-handle');
-  if(!area) return;
-  area.style.height = '0';
-  area.classList.remove('open');
-  if(handle) handle.classList.remove('open');
-  inlineRespOpen = false;
-
-}
-
-function toggleInlineResponse(){
-  if(inlineRespOpen){ closeInlineResponse(); } else { openInlineResponse(); }
-}
-
-function initInlineResize(){
-  var handle = document.getElementById('ai-resize-handle');
-  var area = document.getElementById('ai-response-area-inline');
-  if(!handle || !area) return;
-  var resizing = false, sy, sh;
-  handle.addEventListener('touchstart', function(e){
-    if(window.innerWidth >= 769) return;
-    resizing = true;
-    sy = e.touches[0].clientY;
-    sh = area.getBoundingClientRect().height;
-    e.preventDefault();
-  },{passive:false});
-  handle.addEventListener('touchmove', function(e){
-    if(!resizing) return;
-    e.preventDefault();
-    // 上ドラッグ→拡大、下ドラッグ→縮小
-    var dy = sy - e.touches[0].clientY;
-    var newH = Math.max(60, Math.min(400, sh + dy));
-    area.style.height = newH + 'px';
-    inlineRespH = newH;
-    sy = e.touches[0].clientY;
-    sh = newH;
-  },{passive:false});
-  handle.addEventListener('touchend', function(){ resizing = false; });
-}
-
-
-// ===== AI入力バー（上部） =====
-function sendAIQuery(){
-  var input = document.getElementById('ai-query-input');
-  var text = input.value.trim();
-  if(!text) return;
-  input.value = '';
-  // 送信後AIモードを閉じる
-  _sendToAIInline(text);
-}
-
-async function _sendToAIInline(text){
-  var selData = getSelectionData();
-  var ctxNote = selData.cells.length > 0
-    ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
-    : '\n【選択セル:'+selData.addr+'（空）】';
-  var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
-  var userMsg = text + ctxNote + writeInstruction;
-
-  openInlineResponse();
-  _addPopupMsg('user', text);
-
-  var respArea = document.getElementById('ai-response-area-inline');
-  var thinkEl = document.createElement('div');
-  thinkEl.id = 'inline-thinking';
-  thinkEl.className = 'ai-msg-ai';
-  thinkEl.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
-  if(respArea){ respArea.appendChild(thinkEl); respArea.scrollTop = 9999; }
-
-  try {
-    var res = await fetch('/api/claude', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message: userMsg, history: aiHistory })
-    });
-    var data = await res.json();
-    var aiText = data.text || 'エラーが発生したよ';
-    var th = document.getElementById('inline-thinking');
-    if(th) th.remove();
-    var extracted = extractWriteAction(aiText);
-    var displayText = extracted
-      ? (aiText.substring(0, extracted.start) + aiText.substring(extracted.end)).trim()
-      : aiText;
-    _addPopupMsg('ai', displayText);
-    aiHistory.push({role:'user',content:text});
-    aiHistory.push({role:'assistant',content:aiText});
-    if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
-    if(extracted) showWriteConfirm(extracted.json.cells);
-    if(respArea) respArea.scrollTop = respArea.scrollHeight;
-  } catch(e){
-    var th2 = document.getElementById('inline-thinking');
-    if(th2) th2.remove();
-    _addPopupMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
-  }
-}
 
 </script>
 
