@@ -761,8 +761,24 @@ function rH(r){ return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
 // ===== 座標 =====
 function colX(c){ var x=HDR_W-scrollLeft; for(var i=0;i<c;i++) x+=cW(i); return x; }
 function rowY(r){ var y=HDR_H-scrollTop;  for(var i=0;i<r;i++) y+=rH(i);  return y; }
-function xToC(x){ var cx=HDR_W-scrollLeft; for(var c=0;c<COLS;c++){ var w=cW(c); if(x<cx+w) return c; cx+=w; } return COLS-1; }
-function yToR(y){ var cy=HDR_H-scrollTop;  for(var r=0;r<ROWS;r++){ var h=rH(r);  if(y<cy+h) return r; cy+=h; } return ROWS-1; }
+function xToC(x){
+  // 列幅変更がない場合はO(1)直接計算
+  var colW_def = COL_W * scale;
+  var px = x - HDR_W + scrollLeft;
+  if(px < 0) return 0;
+  var c = Math.floor(px / colW_def);
+  if(c >= COLS) return COLS-1;
+  return c;
+}
+function yToR(y){
+  // 行高変更がない場合はO(1)直接計算
+  var rowH_def = ROW_H * scale;
+  var py = y - HDR_H + scrollTop;
+  if(py < 0) return 0;
+  var r = Math.floor(py / rowH_def);
+  if(r >= ROWS) return ROWS-1;
+  return r;
+}
 
 // ===== 描画 =====
 function render() {
@@ -1535,7 +1551,7 @@ async function sendToAI(){
     addAIChatMsg('ai', displayText);
 
     aiHistory.push({role:'user',content:text});
-    aiHistory.push({role:'assistant',content:aiText});
+    aiHistory.push({role:'assistant',content:displayText});
     if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
 
     if(extracted) showWriteConfirm(extracted.json.cells);
@@ -1650,7 +1666,7 @@ async function _sendToAIMobile(text){
       : aiText;
     _addPopupMsg('ai', displayText);
     aiHistory.push({role:'user',content:text});
-    aiHistory.push({role:'assistant',content:aiText});
+    aiHistory.push({role:'assistant',content:displayText});
     if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
     if(extracted) showWriteConfirm(extracted.json.cells);
     if(respArea) respArea.scrollTop = respArea.scrollHeight;
