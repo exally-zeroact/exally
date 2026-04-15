@@ -233,9 +233,9 @@ font-family:'Noto Sans JP',sans-serif;
 .copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
 .copy-btn:hover{background:#3D9E72;color:white;}
 .ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
-.ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;}
+.ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;user-select:text;}
 .ai-msg-ai{text-align:left;margin-bottom:8px;clear:both;}
-.ai-msg-ai .ai-bubble{background:#fff;border:1px solid #C8ECD8;border-radius:8px 8px 8px 2px;padding:5px 8px;display:inline-block;max-width:95%;font-size:11px;line-height:1.6;}
+.ai-msg-ai .ai-bubble{background:#fff;border:1px solid #C8ECD8;border-radius:8px 8px 8px 2px;padding:5px 8px;display:inline-block;max-width:95%;font-size:11px;line-height:1.6;user-select:text;}
 #ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 #ai-input {
 flex:1;
@@ -454,6 +454,7 @@ gap:8px;
   gap:3px;
   background:#fafafa;
   font-size:10px;
+  user-select:text;
 }
 #popup-resize-handle::before {
   content:"";
@@ -1226,7 +1227,7 @@ function onKD(e){
   if(e.key==='Delete'||e.key==='Backspace'){setCell(selR1,selC1,'');updateBar();render();moved=true;}
   var ek=e.key.toLowerCase();
   if(ek==='c'&&(e.ctrlKey||e.metaKey)){ ctxCopy(); moved=true; }
-  if(ek==='v'&&(e.ctrlKey||e.metaKey)){ ctxPaste(); moved=true; }
+  if(ek==='v'&&(e.ctrlKey||e.metaKey)){ if(canvas) canvas.focus(); ctxPaste(); moved=true; }
   if(ek==='z'&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){ doUndo(); moved=true; }
   if((ek==='y'&&(e.ctrlKey||e.metaKey))||(ek==='z'&&(e.ctrlKey||e.metaKey)&&e.shiftKey)){ doRedo(); moved=true; }
   if(ek==='a'&&(e.ctrlKey||e.metaKey)){ sel(0,0,ROWS-1,COLS-1); moved=true; }
@@ -1273,6 +1274,8 @@ function ctxCopy(){
   copyBuffer={r1:selR1,c1:selC1,r2:selR2,c2:selC2,text:text};
   if(navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
   hideCtxMenu();
+  // clipboard操作後にfocusが剥奪される場合があるため再取得
+  setTimeout(function(){ if(canvas) canvas.focus(); }, 50);
 }
 
 function ctxPaste(){
@@ -1399,9 +1402,9 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  document.body.style.height = Math.round(vv.height) + 'px';
-  // popup開いている間はcanvas再描画スキップ（スクロールバグ防止）
+  // popup開いている間はレイアウト変化させない（シートが上がるバグ防止）
   if(popupVisible) return;
+  document.body.style.height = Math.round(vv.height) + 'px';
   dpr = window.devicePixelRatio || 1; resize(); render();
 }
 
