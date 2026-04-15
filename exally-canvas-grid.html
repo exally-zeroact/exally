@@ -546,7 +546,7 @@ gap:8px;
 
 <div id="loading"><div class="spinner"></div><p>グリッドを起動中...</p></div>
 
-<div id="ctx-menu">
+<div id="ctx-menu" ontouchstart="event.stopPropagation()">
   <div class="ctx-item" onclick="ctxCopy()">📋 コピー <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+C</span></div>
   <div class="ctx-item" onclick="ctxPaste()">📌 貼り付け <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+V</span></div>
   <div class="ctx-item" onclick="ctxDelete()">🗑️ 削除 <span style="color:#aaa;font-size:11px;margin-left:auto">Del</span></div>
@@ -969,6 +969,7 @@ function bindEvents(){
     showCtxMenu(e.clientX,e.clientY);
   });
   document.addEventListener('click',function(){ hideCtxMenu(); });
+  document.addEventListener('touchstart',function(){ hideCtxMenu(); });
   // ホイール
   canvas.addEventListener('wheel',function(e){
     e.preventDefault();
@@ -1476,11 +1477,26 @@ function formatAIText(text){
 }
 
 function copyText(btn, text){
-  if(navigator.clipboard) navigator.clipboard.writeText(text).then(function(){
-    var orig = btn.textContent;
+  var orig = btn.textContent;
+  function onSuccess(){
     btn.textContent = '✓ コピーしました';
     setTimeout(function(){ btn.textContent = orig; }, 1500);
-  });
+  }
+  function fallback(){
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      onSuccess();
+    } catch(e){}
+  }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
+  } else { fallback(); }
 }
 function extractWriteAction(text){
   var idx = text.indexOf('"action"');
@@ -1532,7 +1548,7 @@ async function sendToAI(){
     ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
     : '\n【選択セル:'+selData.addr+'（空）】';
 
-  var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
+  var writeInstruction = '\nルール：ユーザーが「〜を入れて」「〜を書いて」「〜に設定して」など明示的にセルへの書き込みを求めた場合のみ、返答の最後に {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。説明・解説・使い方を教えるだけの質問ではJSONを出力しないこと。';
   var userMsg = text + ctxNote + writeInstruction;
 
   addAIChatMsg('user', text);
@@ -1651,7 +1667,7 @@ async function _sendToAIMobile(text){
   var ctxNote = selData.cells.length > 0
     ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
     : '\n【選択セル:'+selData.addr+'（空）】';
-  var writeInstruction = '\nセルに値や数式を入れる場合は返答の最後に必ず {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。';
+  var writeInstruction = '\nルール：ユーザーが「〜を入れて」「〜を書いて」「〜に設定して」など明示的にセルへの書き込みを求めた場合のみ、返答の最後に {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。説明・解説・使い方を教えるだけの質問ではJSONを出力しないこと。';
   var userMsg = text + ctxNote + writeInstruction;
 
   var sendBtn = document.getElementById('popup-send');
@@ -1716,15 +1732,17 @@ function toggleResponsePopup(){
 function openResponsePopup(){
   var popup = document.getElementById('ai-response-popup');
   if(!popup) return;
-  // popup位置を画面上部に強制（iOSのpanning防止）
-  var safeTop = 108;
-  popup.style.top = safeTop + 'px';
-  try { localStorage.setItem('exally_popup_top', safeTop+'px'); } catch(e){}
   loadPopupState();
+  // 画面下半分にある場合は上部に強制（iOSのpanning防止）
+  var safeTop = 108;
+  var curTop = parseFloat(popup.style.top) || safeTop;
+  if(curTop > window.innerHeight * 0.45) {
+    popup.style.top = safeTop + 'px';
+    try { localStorage.setItem('exally_popup_top', safeTop+'px'); } catch(e){}
+  }
   popup.classList.add('show');
   popup.style.display = 'flex';
   popupVisible = true;
-  // pointerEventsはそのまま（onTSでスキップするため）
   var respArea = document.getElementById('popup-response-area');
   if(respArea) respArea.scrollTop = respArea.scrollHeight;
 }
