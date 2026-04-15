@@ -661,7 +661,6 @@ window.addEventListener('load', function() {
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
-    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
 });
 function resize() {
@@ -1285,10 +1284,7 @@ function ctxCopy(){
   }
   var text=rows.join('\n');
   copyBuffer={r1:selR1,c1:selC1,r2:selR2,c2:selC2,text:text};
-  if(navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
   hideCtxMenu();
-  // clipboard操作後にfocusが剥奪される場合があるため再取得
-  setTimeout(function(){ if(canvas) canvas.focus(); }, 50);
 }
 
 function ctxPaste(){
@@ -1411,13 +1407,11 @@ function toggleAiPanel(){
 
 // 【アップ修正】iOS visual viewport panning 対策
 // キーボード出現時にvisualViewport.offsetTop > 0 になり body が「上に消えた」ように見える
-// body.style.top = offsetTop でbodyをずれに追従させる
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  // iOSのpanning（visualViewport.offsetTop）を打ち消す
-  document.body.style.top = -Math.round(vv.offsetTop) + 'px';
-  document.body.style.height = Math.round(vv.height + vv.offsetTop) + 'px';
+  // body高さを更新（keyboard出現時にグリッドをviewport内に収める）
+  document.body.style.height = Math.round(vv.height) + 'px';
   // resize()は常に実行（canvasバッファをDOMに合わせる）
   dpr = window.devicePixelRatio || 1; resize();
   // popup表示中はrender()のみスキップ
@@ -1497,6 +1491,8 @@ function formatAIText(text){
 }
 
 function copyText(btn, text){
+  // Ctrl+Vで貼り付けできるようcopyBufferにも保存
+  copyBuffer = {r1:selR1, c1:selC1, r2:selR1, c2:selC1, text:text};
   var orig = btn.textContent;
   function onSuccess(){
     btn.textContent = '✓ コピーしました';
