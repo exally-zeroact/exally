@@ -550,11 +550,200 @@ font-family:inherit;
 
 <script src="https://cdn.jsdelivr.net/npm/hyperformula@2.6.1/dist/hyperformula.full.min.js"></script>
 
-<script src="canvas-formula-engine.js"></script>
+<script>
+/* ===== canvas-formula-engine.js (inlined) ===== */
+var hf = null;
+var HF_ERR = {
+  'DIV_BY_ZERO':'#DIV/0!','NUM':'#NUM!','NA':'#N/A','VALUE':'#VALUE!',
+  'REF':'#REF!','NAME':'#NAME?','CYCLE':'#CYCLE!','NULL':'#NULL!',
+  'SPILL':'#SPILL!','GETTING_DATA':'#GETTING_DATA'
+};
+function initFormulaEngine(sheetNames) {
+  if(typeof HyperFormula === 'undefined') return;
+  hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3'});
+  for(var i=0;i<sheetNames.length;i++) hf.addSheet(sheetNames[i]);
+}
+function _hfGetDisplay(sheet, r, c) {
+  try {
+    var val = hf.getCellValue({sheet:sheet, row:r, col:c});
+    if(val===null||val===undefined) return '';
+    if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
+    return String(val);
+  } catch(e) { return '#ERR'; }
+}
+function setCellFormula(sheet, r, c, v) {
+  if(!hf) return null;
+  try {
+    hf.setCellContents({sheet:sheet, row:r, col:c}, (v===''||v===null||v===undefined) ? null : v);
+    return _hfGetDisplay(sheet, r, c);
+  } catch(e) { return null; }
+}
+function undoCellFormula(sheet, r, c, v) {
+  return setCellFormula(sheet, r, c, v);
+}
+function addSheetToEngine(name) {
+  if(!hf) return;
+  try { hf.addSheet(name); } catch(e) {}
+}
+function recalcSheet(sheetIdx, data) {
+  if(!hf) return;
+  var keys = Object.keys(data);
+  for(var i=0;i<keys.length;i++){
+    var cell = data[keys[i]];
+    if(cell.f && cell.f[0]==='='){
+      var parts = keys[i].split(',');
+      cell.d = _hfGetDisplay(sheetIdx, parseInt(parts[0]), parseInt(parts[1]));
+    }
+  }
+}
 
-<script src="canvas-ai.js"></script>
+/* ===== canvas-ai.js (inlined) ===== */
+function colorizeFormula(text){
+  var lp='[\\(（]',rp='[\\)）]',cm='[,，]';
+  var reVL=new RegExp('=VLOOKUP'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^,，]+)'+cm+'\\s*(FALSE|TRUE)\\s*'+rp,'gi');
+  text=text.replace(reVL,function(m,a1,a2,a3,a4){return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
+  var reSI=new RegExp('=SUMIF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reSI,function(m,a1,a2,a3){return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reIF=new RegExp('=IF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reIF,function(m,a1,a2,a3){return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  var reCI=new RegExp('=COUNTIF'+lp+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
+  text=text.replace(reCI,function(m,a1,a2){return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  var b='\uD83D\uDD35',o='\uD83D\uDFE0',p='\uD83D\uDFE3',g='\uD83D\uDFE2';
+  text=text.replace(new RegExp(b+'\\s*\\*\\*([^*]+)\\*\\*','g'),b+' <span class="arg-blue">$1</span>');
+  text=text.replace(new RegExp(o+'\\s*\\*\\*([^*]+)\\*\\*','g'),o+' <span class="arg-orange">$1</span>');
+  text=text.replace(new RegExp(p+'\\s*\\*\\*([^*]+)\\*\\*','g'),p+' <span class="arg-purple">$1</span>');
+  text=text.replace(new RegExp(g+'\\s*\\*\\*([^*]+)\\*\\*','g'),g+' <span class="arg-green">$1</span>');
+  return text;
+}
+function colorizeFormulaBlock(f){
+  f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
+  f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  f=f.replace(/(?<![A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  return f;
+}
+function formatAIText(text){
+  var blocks = [];
+  text = text.replace(/```[\w]*\n?([\s\S]*?)```/g, function(m,c){
+    var raw = c.trim();
+    var colored = colorizeFormulaBlock(raw);
+    blocks.push({colored:colored, raw:raw});
+    return '\x00BLOCK'+(blocks.length-1)+'\x00';
+  });
+  text = colorizeFormula(text);
+  text = text.replace(/`([^`]+)`/g,'<span class="inline-code">$1</span>');
+  text = text.replace(/\n/g,'<br>');
+  text = text.replace(/\x00BLOCK(\d+)\x00/g, function(m,idx){
+    var b = blocks[parseInt(idx)];
+    var safeRaw = b.raw.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="formula-block">'+b.colored+'</div>'
+      +'<button class="copy-btn" onclick="copyText(this,\''+safeRaw+'\')">📋 数式をコピー</button>';
+  });
+  return text;
+}
+function extractWriteAction(text){
+  var idx = text.indexOf('"action"');
+  if(idx === -1) return null;
+  var start = text.lastIndexOf('{', idx);
+  if(start === -1) return null;
+  var depth = 0;
+  for(var i = start; i < text.length; i++){
+    if(text[i] === '{') depth++;
+    else if(text[i] === '}'){
+      depth--;
+      if(depth === 0){
+        try {
+          var json = JSON.parse(text.substring(start, i+1));
+          if(json.action === 'write') return { json:json, start:start, end:i+1 };
+        } catch(e) { return null; }
+      }
+    }
+  }
+  return null;
+}
 
-<script src="canvas-renderer.js"></script>
+/* ===== canvas-renderer.js (inlined) ===== */
+function colLetter(c){ var s=''; c+=1; while(c>0){ s=String.fromCharCode(64+((c-1)%26+1))+s; c=Math.floor((c-1)/26); } return s; }
+function cellAddr(r,c){ return colLetter(c)+(r+1); }
+function updateBar(){
+  var addr = cellAddr(selR1,selC1);
+  var scaleStr = scale!==1 ? ' ×'+Math.round(scale*10)/10 : '';
+  document.getElementById('cell-addr').value = addr+scaleStr;
+  var cell=getCell(selR1,selC1);
+  document.getElementById('formula-input').value=cell.f||'';
+}
+function render() {
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,wrapW,wrapH);
+  var sC=xToC(HDR_W), sR=yToR(HDR_H), eC=sC, eR=sR;
+  while(colX(eC)<wrapW && eC<COLS-1) eC++;
+  while(rowY(eR)<wrapH && eR<ROWS-1) eR++;
+  ctx.fillStyle=C_CELL_BG; ctx.fillRect(HDR_W,HDR_H,wrapW,wrapH);
+  ctx.fillStyle=C_SEL_BG;
+  for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
+    for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
+      ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
+  ctx.strokeStyle=C_CELL_LINE; ctx.lineWidth=0.5; ctx.beginPath();
+  for(var r=sR;r<=eR+2;r++){ var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue; ctx.moveTo(HDR_W,ly); ctx.lineTo(wrapW,ly); }
+  for(var c=sC;c<=eC+2;c++){ var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue; ctx.moveTo(lx,HDR_H); ctx.lineTo(lx,wrapH); }
+  ctx.stroke();
+  for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++) drawText(r,c);
+  ctx.fillStyle=C_HDR_BG; ctx.fillRect(0,0,wrapW,HDR_H); ctx.fillRect(0,0,HDR_W,wrapH);
+  ctx.fillStyle=C_SEL_HDR;
+  for(var c=selC1;c<=selC2;c++) ctx.fillRect(colX(c),0,cW(c),HDR_H);
+  for(var r=selR1;r<=selR2;r++) ctx.fillRect(0,rowY(r),HDR_W,rH(r));
+  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.beginPath();
+  for(var c=sC;c<=eC+2;c++){ var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue; ctx.moveTo(lx,0); ctx.lineTo(lx,HDR_H); }
+  for(var r=sR;r<=eR+2;r++){ var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue; ctx.moveTo(0,ly); ctx.lineTo(HDR_W,ly); }
+  ctx.moveTo(HDR_W+0.5,0); ctx.lineTo(HDR_W+0.5,wrapH);
+  ctx.moveTo(0,HDR_H+0.5); ctx.lineTo(wrapW,HDR_H+0.5);
+  ctx.stroke();
+  var lastColX=Math.round(colX(COLS))+0.5, lastRowY=Math.round(rowY(ROWS))+0.5;
+  ctx.strokeStyle='#3D9E72'; ctx.lineWidth=1.5; ctx.beginPath();
+  if(lastColX>HDR_W&&lastColX<=wrapW){ ctx.moveTo(lastColX,0); ctx.lineTo(lastColX,wrapH); }
+  if(lastRowY>HDR_H&&lastRowY<=wrapH){ ctx.moveTo(0,lastRowY); ctx.lineTo(wrapW,lastRowY); }
+  ctx.stroke();
+  ctx.textBaseline='middle'; ctx.textAlign='center';
+  var fw=scale<0.75?'normal':'bold', fs=Math.max(9,Math.round(11*Math.min(scale,1.5)));
+  ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
+  for(var c=sC;c<=eC+1;c++){ var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue; ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT; ctx.fillText(colLetter(c),x+w/2,HDR_H/2); }
+  ctx.textAlign='right';
+  ctx.font=Math.max(9,Math.round(11*Math.min(scale,1.5)))+'px "Noto Sans JP",sans-serif';
+  for(var r=sR;r<=eR+1;r++){ var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue; ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT; ctx.fillText(r+1,HDR_W-4,y+h/2); }
+  ctx.fillStyle=C_HDR_BG; ctx.fillRect(0,0,HDR_W,HDR_H);
+  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.strokeRect(0.5,0.5,HDR_W-0.5,HDR_H-0.5);
+  drawSel();
+}
+function drawText(r,c){
+  var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
+  if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
+  var cell=getCell(r,c);
+  var display=(cell.d!==undefined&&cell.d!=='')?cell.d:cell.v;
+  if(!display) return;
+  var isFormula=cell.f&&cell.f[0]==='=';
+  var showRaw=isFormula&&cell.d===cell.f;
+  ctx.fillStyle=showRaw?C_FORMULA:C_CELL_TXT;
+  ctx.font=Math.max(9,Math.min(13,Math.round(12*scale)))+'px "Noto Sans JP",sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.save(); ctx.rect(x+1,y,w-2,h); ctx.clip();
+  ctx.fillText(display,x+4,y+h/2);
+  ctx.restore();
+}
+function drawSel(){
+  var x1=colX(selC1),y1=rowY(selR1);
+  var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
+  ctx.save();
+  ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
+  ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
+  ctx.strokeRect(x1+1,y1+1,x2-x1-2,y2-y1-2);
+  ctx.fillStyle=C_SEL_BORDER;
+  ctx.beginPath(); ctx.arc(x2,y2,7,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.arc(x2,y2,3.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+</script>
 
 </head>
 <body>
@@ -643,21 +832,29 @@ window.addEventListener('resize', function(){
   dpr = window.devicePixelRatio || 1; resize(); render();
 });
 window.addEventListener('load', function() {
-  canvas = document.getElementById('grid-canvas');
-  ctx = canvas.getContext('2d');
-  wrap = document.getElementById('grid-wrap');
-  dpr = window.devicePixelRatio || 1;
-  resize(); render(); bindEvents();
-  initPopupDrag(); initPopupResize();
-  canvas.focus();
-  // HyperFormula初期化
-  initFormulaEngine(sheets.map(function(s){return s.name;}));
+  try {
+    canvas = document.getElementById('grid-canvas');
+    ctx = canvas.getContext('2d');
+    wrap = document.getElementById('grid-wrap');
+    dpr = window.devicePixelRatio || 1;
+    resize();
+    if(typeof render === 'function') render();
+    bindEvents();
+    initPopupDrag(); initPopupResize();
+    canvas.focus();
+    if(typeof initFormulaEngine === 'function'){
+      initFormulaEngine(sheets.map(function(s){return s.name;}));
+    }
+  } catch(e) {
+    console.error('Exally init error:', e);
+  }
+  // エラーが起きても必ずスピナーを消す
   document.getElementById('loading').classList.add('hide');
-  // スマホ：ボタン位置はCSS(position:fixed;bottom:52px)で制御
-  setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); render(); }, 150);
+  if(typeof render === 'function') render();
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
   }
+  setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
 function resize() {
   wrapW = wrap.clientWidth; wrapH = wrap.clientHeight;
