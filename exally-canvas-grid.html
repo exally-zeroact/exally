@@ -19,6 +19,8 @@ body {
   user-select:none;
   position:fixed;
   width:100%; top:0; left:0;
+  padding-bottom:36px;
+  box-sizing:border-box;
 }
 #header {
   background:#3D9E72;
@@ -79,6 +81,7 @@ body {
   position:relative;
   overflow:hidden;
 }
+
 #grid-canvas {
   position:absolute;
   top:0; left:0;
@@ -269,14 +272,20 @@ justify-content:center;
 flex-shrink:0;
 }
 #sheet-tabs {
+position:fixed;
+bottom:0;
+bottom:max(0px, env(safe-area-inset-bottom));
+left:0;
+right:0;
 height:32px;
+z-index:100;
 background:#F8FEFC;
 border-top:1px solid #C8ECD8;
 display:flex;
 align-items:flex-end;
-padding:0 8px;
+padding:0 8px 0 8px;
+padding-bottom:max(4px, env(safe-area-inset-bottom));
 gap:2px;
-flex-shrink:0;
 overflow-x:auto;
 }
 .sheet-tab {
@@ -580,20 +589,6 @@ gap:8px;
 </div>
 
 
-<div id="ai-response-popup">
-  <div id="popup-header">
-    <div id="popup-pill"></div>
-    <span style="font-size:9px;font-weight:700;color:#3D9E72;">💬 AIに聞く</span>
-    <span style="font-size:8px;color:#aaa;margin-left:1px;">長押しで移動</span>
-    <button id="popup-close" onclick="closeResponsePopup()">✕</button>
-  </div>
-  <div id="popup-input-row">
-    <textarea id="popup-input" rows="1" placeholder="AIに質問してね..."></textarea>
-    <button id="popup-send" onclick="sendToAIMobile()">▶</button>
-  </div>
-  <div id="popup-response-area"></div>
-  <div id="popup-resize-handle"></div>
-</div>
 
 <button id="ai-float-btn" onclick="handleAIBtn()">💬 AIに話しかける</button>
 
@@ -611,11 +606,6 @@ gap:8px;
   </div>
 </div>
 
-<div id="sheet-tabs">
-  <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
-  <button class="sheet-tab" onclick="switchSheet(1)">Sheet2</button>
-  <button id="add-sheet-btn" onclick="addSheet()">＋</button>
-</div>
 
 <script>
 // ===== 定数 =====
@@ -972,7 +962,11 @@ function bindEvents(){
     showCtxMenu(e.clientX,e.clientY);
   });
   document.addEventListener('click',function(){ hideCtxMenu(); });
-  document.addEventListener('touchstart',function(){ hideCtxMenu(); });
+  document.addEventListener('touchstart',function(e){
+    var tabs = document.getElementById('sheet-tabs');
+    if(tabs && tabs.contains(e.target)) return; // sheet-tabs内はスクロール優先
+    hideCtxMenu();
+  });
   // ホイール
   canvas.addEventListener('wheel',function(e){
     e.preventDefault();
@@ -1027,16 +1021,11 @@ function bindEvents(){
       this.style.height='auto';
       this.style.height=Math.min(this.scrollHeight,80)+'px';
     });
-    // focusされた時にpopupが下半分にあれば上部に移動（iOSのpanning防止）
-    popupInp.addEventListener('focus', function(){
-      var popup = document.getElementById('ai-response-popup');
-      if(!popup) return;
-      var curTop = parseFloat(popup.style.top) || 108;
-      if(curTop > window.innerHeight * 0.45){
-        popup.style.top = '108px';
-        try { localStorage.setItem('exally_popup_top', '108px'); } catch(e){}
-      }
-    });
+    // touchend: focusのみ（grid高さはonVisualVPが一元管理）
+    popupInp.addEventListener('touchend', function(e){
+      e.preventDefault();
+      this.focus();
+    }, { passive: false });
   }
   var ai = document.getElementById('ai-input');
   ai.addEventListener('keydown', function(e){
@@ -1411,10 +1400,17 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  // body高さを更新（keyboard出現時にグリッドをviewport内に収める）
+  // body.style.top は触らない
   document.body.style.height = Math.round(vv.height) + 'px';
-  // resize()とrender()を常に実行
-  // （popupVisible時にskipするとcanvasが消去されたまま緑背景になる）
+  // popup が keyboard に隠れる場合は上に移動
+  var popup = document.getElementById('ai-response-popup');
+  if(popup && popup.classList.contains('show')){
+    var pt = parseFloat(popup.style.top) || 108;
+    var ph = popup.getBoundingClientRect().height || 220;
+    if(pt + ph > vv.height - 10){
+      popup.style.top = Math.max(60, Math.round(vv.height) - ph - 10) + 'px';
+    }
+  }
   dpr = window.devicePixelRatio || 1; resize(); render();
 }
 
@@ -1852,4 +1848,23 @@ function initPopupResize(){
 
 <div id="popup-overlay" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()" ontouchend="event.stopPropagation()"></div>
 </body>
+<div id="ai-response-popup">
+  <div id="popup-header">
+    <div id="popup-pill"></div>
+    <span style="font-size:9px;font-weight:700;color:#3D9E72;">💬 AIに聞く</span>
+    <span style="font-size:8px;color:#aaa;margin-left:1px;">長押しで移動</span>
+    <button id="popup-close" onclick="closeResponsePopup()">✕</button>
+  </div>
+  <div id="popup-input-row">
+    <textarea id="popup-input" rows="1" placeholder="AIに質問してね..."></textarea>
+    <button id="popup-send" onclick="sendToAIMobile()">▶</button>
+  </div>
+  <div id="popup-response-area"></div>
+  <div id="popup-resize-handle"></div>
+</div>
+<div id="sheet-tabs">
+  <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
+  <button class="sheet-tab" onclick="switchSheet(1)">Sheet2</button>
+  <button id="add-sheet-btn" onclick="addSheet()">＋</button>
+</div>
 </html>
