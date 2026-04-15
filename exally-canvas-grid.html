@@ -1400,6 +1400,7 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
+  if(window.scrollY > 0) window.scrollTo(0, 0);
   document.body.style.top = Math.round(vv.offsetTop) + 'px';
   document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
@@ -1753,7 +1754,7 @@ function openResponsePopup(){
   // 画面下半分にある場合は上部に強制（iOSのpanning防止）
   var safeTop = 108;
   var curTop = parseFloat(popup.style.top) || safeTop;
-  if(curTop > window.innerHeight * 0.45) {
+  if(curTop > 350) {
     popup.style.top = safeTop + 'px';
     try { localStorage.setItem('exally_popup_top', safeTop+'px'); } catch(e){}
   }
