@@ -1413,11 +1413,9 @@ function onVisualVP(){
   var vv = window.visualViewport;
   // body高さを更新（keyboard出現時にグリッドをviewport内に収める）
   document.body.style.height = Math.round(vv.height) + 'px';
-  // resize()は常に実行（canvasバッファをDOMに合わせる）
-  dpr = window.devicePixelRatio || 1; resize();
-  // popup表示中はrender()のみスキップ
-  if(popupVisible) return;
-  render();
+  // resize()とrender()を常に実行
+  // （popupVisible時にskipするとcanvasが消去されたまま緑背景になる）
+  dpr = window.devicePixelRatio || 1; resize(); render();
 }
 
 // 選択範囲のデータを取得
