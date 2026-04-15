@@ -1400,13 +1400,12 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  if(window.scrollY > 0) window.scrollTo(0, 0);
   document.body.style.top = Math.round(vv.offsetTop) + 'px';
   document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  if(tabs){ tabs.style.top = Math.round(vv.height + vv.offsetTop - 36) + 'px'; tabs.style.bottom = 'auto'; }
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
@@ -1754,7 +1753,7 @@ function openResponsePopup(){
   // 画面下半分にある場合は上部に強制（iOSのpanning防止）
   var safeTop = 108;
   var curTop = parseFloat(popup.style.top) || safeTop;
-  if(curTop > 350) {
+  if(curTop > window.innerHeight * 0.45) {
     popup.style.top = safeTop + 'px';
     try { localStorage.setItem('exally_popup_top', safeTop+'px'); } catch(e){}
   }
