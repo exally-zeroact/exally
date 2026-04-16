@@ -1755,9 +1755,30 @@ function _doRender() {
       ctx.textBaseline='middle';
       var align=cell.align||'left';
       var indentPx=(cell.indent||0)*12;
-      if(align==='center'){ctx.textAlign='center';ctx.fillText(display,x+w/2,y+h/2);}
-      else if(align==='right'){ctx.textAlign='right';ctx.fillText(display,x+w-4-indentPx,y+h/2);}
-      else{ctx.textAlign='left';ctx.fillText(display,x+4+indentPx,y+h/2);}
+      var hasBreak=String(display).indexOf('\n')>=0;
+      if(cell.wrap||hasBreak){
+        var maxW2=w-8-indentPx;
+        var wLines2=[]; var paras=String(display).split('\n');
+        for(var pi2=0;pi2<paras.length;pi2++){
+          var chars2=paras[pi2].split(''),wl2='';
+          for(var wi2=0;wi2<chars2.length;wi2++){
+            var t2=wl2+chars2[wi2];
+            if(ctx.measureText(t2).width>maxW2&&wl2){wLines2.push(wl2);wl2=chars2[wi2];}
+            else wl2=t2;
+          }
+          wLines2.push(wl2);
+        }
+        var lh2=fs*1.4; var startY2=y+Math.max(lh2/2,(h-wLines2.length*lh2)/2+lh2/2);
+        if(align==='center') ctx.textAlign='center';
+        else if(align==='right') ctx.textAlign='right';
+        else ctx.textAlign='left';
+        var tx2=align==='center'?x+w/2:align==='right'?x+w-4-indentPx:x+4+indentPx;
+        for(var li2=0;li2<wLines2.length;li2++) ctx.fillText(wLines2[li2],tx2,startY2+li2*lh2);
+      } else {
+        if(align==='center'){ctx.textAlign='center';ctx.fillText(display,x+w/2,y+h/2);}
+        else if(align==='right'){ctx.textAlign='right';ctx.fillText(display,x+w-4-indentPx,y+h/2);}
+        else{ctx.textAlign='left';ctx.fillText(display,x+4+indentPx,y+h/2);}
+      }
     }
 
     if(r>=selR1&&r<=selR2&&c>=selC1&&c<=selC2){
