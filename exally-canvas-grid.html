@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -1810,6 +1810,7 @@ window.addEventListener('load', function() {
   if(typeof render === 'function') render();
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
+    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
@@ -2611,8 +2612,6 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  document.body.style.top = Math.round(vv.offsetTop) + 'px';
-  document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
