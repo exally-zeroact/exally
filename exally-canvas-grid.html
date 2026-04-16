@@ -1810,7 +1810,6 @@ window.addEventListener('load', function() {
   if(typeof render === 'function') render();
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
-    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
@@ -2612,18 +2611,12 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
+  document.body.style.top = Math.round(vv.offsetTop) + 'px';
+  document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
   if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
-  // ===== DEBUG OVERLAY (削除予定) =====
-  var dbg = document.getElementById('_dbg');
-  if(!dbg){ dbg=document.createElement('div'); dbg.id='_dbg';
-    dbg.style.cssText='position:fixed;top:60px;left:4px;background:rgba(0,0,0,0.75);color:#0f0;font-size:11px;font-family:monospace;padding:4px 7px;border-radius:6px;z-index:99999;line-height:1.7;pointer-events:none;';
-    document.body.appendChild(dbg); }
-  var rect = tabs ? tabs.getBoundingClientRect() : null;
-  dbg.innerHTML='innerH: '+window.innerHeight+'<br>vv.h: '+Math.round(vv.height)+'<br>vv.off: '+Math.round(vv.offsetTop)+'<br>kbH: '+kbH+'<br>tabs.bot: '+(tabs?tabs.style.bottom:'?')+'<br>rect.bottom: '+(rect?Math.round(rect.bottom):'?')+'<br>diff: '+(rect?Math.round(rect.bottom)-Math.round(vv.height):'?');
-  // ===== /DEBUG =====
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
