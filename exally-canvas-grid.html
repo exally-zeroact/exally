@@ -1977,37 +1977,115 @@ function drawSel(){
 
 <!-- カスタムキーボード（formula編集モード時に表示） -->
 
-<div id="formula-kb" style="display:none;">
-  <div class="fkb-row">
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('=')"><b>=</b></button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('+')">+</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('-')">−</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('*')">×</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('/')">÷</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert('(')">(</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert(')')">)</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert(':')">:</button>
-    <button class="fkb-btn fkb-op" onclick="fkbInsert(',')">,</button>
+<div id="formula-kb" style="display:none;background:#F0FAF4;border-top:1px solid #C8ECD8;">
+  <!-- タブ -->
+  <div style="display:flex;border-bottom:1px solid #C8ECD8;">
+    <button id="fkb-tab-num" onclick="fkbTab('num')" style="flex:1;padding:6px 0;font-size:13px;font-weight:700;border:none;background:#52B788;color:#fff;cursor:pointer;">123</button>
+    <button id="fkb-tab-abc" onclick="fkbTab('abc')" style="flex:1;padding:6px 0;font-size:13px;border:none;background:#E8F5EE;color:#3D9E72;cursor:pointer;">ABC</button>
+    <button id="fkb-tab-sym" onclick="fkbTab('sym')" style="flex:1;padding:6px 0;font-size:13px;border:none;background:#E8F5EE;color:#3D9E72;cursor:pointer;">記号</button>
   </div>
-  <div class="fkb-row">
-    <button class="fkb-btn" onclick="fkbInsert('7')">7</button>
-    <button class="fkb-btn" onclick="fkbInsert('8')">8</button>
-    <button class="fkb-btn" onclick="fkbInsert('9')">9</button>
-    <button class="fkb-btn" onclick="fkbInsert('4')">4</button>
-    <button class="fkb-btn" onclick="fkbInsert('5')">5</button>
-    <button class="fkb-btn" onclick="fkbInsert('6')">6</button>
-    <button class="fkb-btn" onclick="fkbInsert('1')">1</button>
-    <button class="fkb-btn" onclick="fkbInsert('2')">2</button>
-    <button class="fkb-btn" onclick="fkbInsert('3')">3</button>
-    <button class="fkb-btn" onclick="fkbInsert('0')">0</button>
-    <button class="fkb-btn" onclick="fkbInsert('.')">.</button>
-    <button class="fkb-btn fkb-del" onclick="fkbDelete()" style="max-width:none;flex:1;">⌫</button>
-    <button class="fkb-btn fkb-commit" onclick="fkbCommit()" style="max-width:none;flex:1;background:#52B788;color:#fff;font-weight:700;">✓</button>
+  <!-- 数字・演算子 (2行11等分) -->
+  <div id="fkb-panel-num" style="padding:6px 4px;">
+    <div style="display:grid;grid-template-columns:repeat(11,1fr);gap:3px;margin-bottom:3px;">
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('=')" style="max-width:none;"><b>=</b></button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('+')" style="max-width:none;">+</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('-')" style="max-width:none;">−</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('*')" style="max-width:none;">×</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('/')" style="max-width:none;">÷</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('(')" style="max-width:none;">(</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(')')" style="max-width:none;">)</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(':')" style="max-width:none;">:</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(',')" style="max-width:none;">,</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('.')" style="max-width:none;">.</button>
+      <button class="fkb-btn fkb-del" onclick="fkbDelete()" style="max-width:none;">⌫</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(9,1fr) 1fr 1fr;gap:3px;">
+      <button class="fkb-btn" onclick="fkbInsert('1')" style="max-width:none;">1</button>
+      <button class="fkb-btn" onclick="fkbInsert('2')" style="max-width:none;">2</button>
+      <button class="fkb-btn" onclick="fkbInsert('3')" style="max-width:none;">3</button>
+      <button class="fkb-btn" onclick="fkbInsert('4')" style="max-width:none;">4</button>
+      <button class="fkb-btn" onclick="fkbInsert('5')" style="max-width:none;">5</button>
+      <button class="fkb-btn" onclick="fkbInsert('6')" style="max-width:none;">6</button>
+      <button class="fkb-btn" onclick="fkbInsert('7')" style="max-width:none;">7</button>
+      <button class="fkb-btn" onclick="fkbInsert('8')" style="max-width:none;">8</button>
+      <button class="fkb-btn" onclick="fkbInsert('9')" style="max-width:none;">9</button>
+      <button class="fkb-btn" onclick="fkbInsert('0')" style="max-width:none;">0</button>
+      <button class="fkb-btn fkb-commit" onclick="fkbCommit()" style="max-width:none;background:#52B788;color:#fff;font-weight:700;">✓</button>
+    </div>
   </div>
-
+  <!-- アルファベット -->
+  <div id="fkb-panel-abc" style="display:none;padding:6px 4px;">
+    <div class="fkb-row">
+      <button class="fkb-btn" onclick="fkbInsertAlpha('A')">A</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('B')">B</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('C')">C</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('D')">D</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('E')">E</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('F')">F</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('G')">G</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('H')">H</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('I')">I</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('J')">J</button>
+    </div>
+    <div class="fkb-row">
+      <button class="fkb-btn" onclick="fkbInsertAlpha('K')">K</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('L')">L</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('M')">M</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('N')">N</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('O')">O</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('P')">P</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('Q')">Q</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('R')">R</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('S')">S</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('T')">T</button>
+    </div>
+    <div class="fkb-row">
+      <button class="fkb-btn" onclick="fkbInsertAlpha('U')">U</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('V')">V</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('W')">W</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('X')">X</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('Y')">Y</button>
+      <button class="fkb-btn" onclick="fkbInsertAlpha('Z')">Z</button>
+      <button id="fkb-caps-btn" class="fkb-btn" onclick="fkbToggleCaps()" style="flex:1;max-width:none;font-weight:700;color:#3D9E72;">ABC</button>
+      <button class="fkb-btn fkb-del" onclick="fkbDelete()" style="flex:1;max-width:none;">⌫</button>
+      <button class="fkb-btn fkb-commit" onclick="fkbCommit()" style="flex:1;max-width:none;background:#52B788;color:#fff;font-weight:700;">✓</button>
+    </div>
+  </div>
+  <!-- 記号 -->
+  <div id="fkb-panel-sym" style="display:none;padding:6px 4px;">
+    <div class="fkb-row">
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('&quot;')">"</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('&amp;')">&amp;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('$')">$</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('%')">%</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('^')">^</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('!')">!</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('~')">~</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('?')">?</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('*')">*</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('@')">@</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('_')">_</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('#')">#</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(';')">;</button>
+    </div>
+    <div class="fkb-row">
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('>')">></button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('<')">&lt;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('>=')" style="font-size:11px;">>=</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('<=')" style="font-size:11px;">&lt;=</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('<>')" style="font-size:11px;">&lt;></button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('{')">&#123;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('}')">&#125;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert('[')">&#91;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(']')">&#93;</button>
+      <button class="fkb-btn fkb-op" onclick="fkbInsert(&quot;'&quot;)">'</button>
+      <button class="fkb-btn fkb-del" onclick="fkbDelete()" style="flex:1;max-width:none;">⌫</button>
+      <button class="fkb-btn fkb-commit" onclick="fkbCommit()" style="flex:1;max-width:none;background:#52B788;color:#fff;font-weight:700;">✓</button>
+    </div>
+  </div>
 </div>
 
-<!-- ツールバー1段目（常時表示） -->
+<!-- ツールバー1段目<!-- ツールバー1段目（常時表示） -->
 
 <div id="fmt-bar1">
   <!-- 文字スタイル -->
@@ -2037,9 +2115,9 @@ function drawSel(){
   </div>
   <div class="fmt-sep"></div>
   <!-- 文字揃え -->
-  <button class="fmt-btn active" id="fmt-align-left"   onclick="applyFormat('align','left')"   title="左揃え">≡</button>
-  <button class="fmt-btn"        id="fmt-align-center" onclick="applyFormat('align','center')" title="中央揃え">≡</button>
-  <button class="fmt-btn"        id="fmt-align-right"  onclick="applyFormat('align','right')"  title="右揃え">≡</button>
+  <button class="fmt-btn active" id="fmt-align-left"   onclick="applyFormat('align','left')"   title="左揃え"><svg width="14" height="12" viewBox="0 0 14 12"><line x1="0" y1="2" x2="14" y2="2" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/></svg></button>
+  <button class="fmt-btn"        id="fmt-align-center" onclick="applyFormat('align','center')" title="中央揃え"><svg width="14" height="12" viewBox="0 0 14 12"><line x1="0" y1="2" x2="14" y2="2" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/></svg></button>
+  <button class="fmt-btn"        id="fmt-align-right"  onclick="applyFormat('align','right')"  title="右揃え"><svg width="14" height="12" viewBox="0 0 14 12"><line x1="0" y1="2" x2="14" y2="2" stroke="currentColor" stroke-width="1.5"/><line x1="4" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/></svg></button>
   <div class="fmt-sep"></div>
   <!-- 数値書式 -->
   <button class="fmt-btn" onclick="applyFormat('numFmt','0%')"    title="パーセント">%</button>
@@ -3224,6 +3302,32 @@ function fkbHide(){
   _canvasBCRDirty=true;
   refMode=false; refStartR=-1;
   var chip=document.getElementById('ref-chip-bar'); if(chip) chip.style.display='none';
+}
+var _fkbCaps=true; // true=大文字, false=小文字
+function fkbToggleCaps(){
+  _fkbCaps=!_fkbCaps;
+  var btn=document.getElementById('fkb-caps-btn');
+  if(btn) btn.textContent=_fkbCaps?'ABC':'abc';
+  // ボタンラベルを更新
+  var abcKB=document.getElementById('formula-kb-abc');
+  if(!abcKB) return;
+  var btns=abcKB.querySelectorAll('[onclick^="fkbInsertAlpha"]');
+  btns.forEach(function(b){
+    var c=b.textContent;
+    b.textContent=_fkbCaps?c.toUpperCase():c.toLowerCase();
+  });
+}
+function fkbInsertAlpha(c){
+  fkbInsert(_fkbCaps?c.toUpperCase():c.toLowerCase());
+}
+function fkbTab(tab){
+  ['num','abc','sym'].forEach(function(t){
+    var panel=document.getElementById('fkb-panel-'+t);
+    var btn=document.getElementById('fkb-tab-'+t);
+    if(panel) panel.style.display=(t===tab)?'block':'none';
+    if(btn){ btn.style.background=(t===tab)?'#52B788':'#E8F5EE'; btn.style.color=(t===tab)?'#fff':'#3D9E72'; }
+  });
+  _canvasBCRDirty=true; render();
 }
 function fkbToggle(){
   var kb=document.getElementById('formula-kb');
