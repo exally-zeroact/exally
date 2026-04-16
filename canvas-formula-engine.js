@@ -200,10 +200,149 @@ function _jsEncodeUrl(str){try{return encodeURIComponent(str);}catch(e){return�
 function _jsAggregate(funcNum,opts,vals){var clean=vals.filter(function(v){return typeof v===‘number’&&isFinite(v);});if(funcNum===1)return clean.reduce(function(a,b){return a+b;},0)/clean.length;if(funcNum===2)return clean.length;if(funcNum===3)return vals.filter(function(v){return v!==null&&v!==undefined;}).length;if(funcNum===4)return Math.max.apply(null,clean);if(funcNum===5)return Math.min.apply(null,clean);if(funcNum===6)return clean.reduce(function(a,b){return a*b;},1);if(funcNum===7){var n=clean.length;if(n<2)return’#DIV/0!’;var m=clean.reduce(function(a,b){return a+b;})/n;return Math.sqrt(clean.reduce(function(a,v){return a+Math.pow(v-m,2);},0)/(n-1));}if(funcNum===8){var n=clean.length;if(!n)return’#DIV/0!’;var m=clean.reduce(function(a,b){return a+b;})/n;return Math.sqrt(clean.reduce(function(a,v){return a+Math.pow(v-m,2);},0)/n);}if(funcNum===9)return clean.reduce(function(a,b){return a+b;},0);if(funcNum===10){var n=clean.length;if(n<2)return’#DIV/0!’;var m=clean.reduce(function(a,b){return a+b;})/n;return clean.reduce(function(a,v){return a+Math.pow(v-m,2);},0)/(n-1);}if(funcNum===11){var n=clean.length;if(!n)return’#DIV/0!’;var m=clean.reduce(function(a,b){return a+b;})/n;return clean.reduce(function(a,v){return a+Math.pow(v-m,2);},0)/n;}if(funcNum===12)return _jsMode(clean);if(funcNum===13){var s=clean.slice().sort(function(a,b){return a-b;});return s.length%2?s[Math.floor(s.length/2)]:(s[s.length/2-1]+s[s.length/2])/2;}return’#VALUE!’;}
 
 // ================================================================
+// LET / LAMBDA / MAP / REDUCE / SCAN / MAKEARRAY / BYROW / BYCOL / ISOMITTED
+// ================================================================
+
+// 引数文字列をネスト考慮でパース
+function _parseFuncArgs(str) {
+var args=[], depth=0, current=’’, inStr=false, strChar=’’;
+for(var i=0;i<str.length;i++){
+var ch=str[i];
+if(!inStr&&(ch===’”’||ch===”’”)){inStr=true;strChar=ch;current+=ch;continue;}
+if(inStr&&ch===strChar){inStr=false;current+=ch;continue;}
+if(!inStr&&ch===’(’)depth++;
+if(!inStr&&ch===’)’)depth–;
+if(!inStr&&ch===’,’&&depth===0){args.push(current.trim());current=’’;continue;}
+current+=ch;
+}
+if(current.trim())args.push(current.trim());
+return args;
+}
+
+// LET展開（再帰・セル参照名変数はスキップ）
+function _jsLetExpand(formula) {
+if(!formula||formula[0]!==’=’) return formula;
+var result = formula;
+for(var iter=0;iter<10;iter++){
+var f = result.slice(1).trim();
+if(!/^LET\s*(/i.test(f)) break;
+var inside = f.match(/^LET\s*((.+))$/is);
+if(!inside) break;
+var args = _parseFuncArgs(inside[1]);
+if(!args||args.length<3||args.length%2===0) break;
+var body = args[args.length-1];
+for(var i=args.length-3;i>=0;i-=2){
+var name=args[i].trim(), val=args[i+1].trim();
+if(/^[A-Z]+\d+$/i.test(name)) continue; // セル参照名の変数はスキップ
+if(/^\d/.test(name)) continue;
+body = body.replace(new RegExp(’\b’+name+’\b’,‘g’), ‘(’+val+’)’);
+}
+result = ‘=’+body;
+}
+return result;
+}
+
+// LAMBDA即時呼び出し展開
+function _jsLambdaExpand(formula) {
+if(!formula||formula[0]!==’=’) return formula;
+var f = formula.slice(1).trim();
+var mL = f.match(/^LAMBDA\s*((.+))\s*((.+))$/is);
+if(!mL) return formula;
+var defArgs = _parseFuncArgs(mL[1]);
+if(defArgs.length<2) return formula;
+var params=defArgs.slice(0,-1), body=defArgs[defArgs.length-1];
+var callArgs = _parseFuncArgs(mL[2]);
+if(callArgs.length!==params.length) return formula;
+params.forEach(function(p,i){
+var name=p.trim();
+if(/^[A-Z]+\d+$/i.test(name)) return;
+body = body.replace(new RegExp(’\b’+name+’\b’,‘g’),’(’+callArgs[i].trim()+’)’);
+});
+return ‘=’+body;
+}
+
+// REDUCE(initial, range, LAMBDA(acc, x, body)) → HF委譲
+function _jsReduceCompute(sheet, initial, rangeStr, lambdaFormula) {
+if(!hf) return null;
+var mL=lambdaFormula.match(/^LAMBDA\s*(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+))$/is);
+if(!mL) return ‘#VALUE!’;
+var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
+var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return ‘#VALUE!’;
+var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial;
+for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
+var v=hf.getCellValue({sheet,row:r,col:c});
+var expr=body.replace(new RegExp(’\b’+p1+’\b’,‘g’),’(’+acc+’)’).replace(new RegExp(’\b’+p2+’\b’,‘g’),’(’+v+’)’);
+hf.setCellContents({sheet,row:9998,col:0},’=’+expr);
+var res=hf.getCellValue({sheet,row:9998,col:0});
+if(typeof res===‘number’) acc=res;
+hf.setCellContents({sheet,row:9998,col:0},null);
+}}
+return String(acc);
+}
+
+// SCAN(initial, range, LAMBDA(acc, x, body)) → 先頭値を返す
+function _jsScanCompute(sheet, initial, rangeStr, lambdaFormula) {
+if(!hf) return null;
+var mL=lambdaFormula.match(/^LAMBDA\s*(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+))$/is);
+if(!mL) return ‘#VALUE!’;
+var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
+var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return ‘#VALUE!’;
+var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial,first=null;
+for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
+var v=hf.getCellValue({sheet,row:r,col:c});
+var expr=body.replace(new RegExp(’\b’+p1+’\b’,‘g’),’(’+acc+’)’).replace(new RegExp(’\b’+p2+’\b’,‘g’),’(’+v+’)’);
+hf.setCellContents({sheet,row:9997,col:0},’=’+expr);
+var res=hf.getCellValue({sheet,row:9997,col:0});
+if(typeof res===‘number’){acc=res; if(first===null)first=res;}
+hf.setCellContents({sheet,row:9997,col:0},null);
+}}
+return first!==null ? String(first) : String(initial);
+}
+
+// MAP(range, LAMBDA(x, body)) → 全件カンマ区切り
+function _jsMapCompute(sheet, rangeStr, lambdaFormula) {
+if(!hf) return null;
+var mL=lambdaFormula.match(/^LAMBDA\s*(([^,)]+)\s*,\s*(.+))$/is);
+if(!mL) return ‘#VALUE!’;
+var param=mL[1].trim(),body=mL[2].trim();
+var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return ‘#VALUE!’;
+var s=_toRC(m[1]),e=_toRC(m[2]),results=[];
+for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
+var v=hf.getCellValue({sheet,row:r,col:c});
+var expr=body.replace(new RegExp(’\b’+param+’\b’,‘g’),’(’+v+’)’);
+hf.setCellContents({sheet,row:9999,col:c},’=’+expr);
+var res=hf.getCellValue({sheet,row:9999,col:c});
+results.push(res===null?’’:String(res));
+hf.setCellContents({sheet,row:9999,col:c},null);
+}}
+return results[0]; // 先頭値（スピル制限）
+}
+
+// MAKEARRAY(rows, cols, LAMBDA(r, c, body)) → 先頭値を返す
+function _jsMakearrayCompute(sheet, rows, cols, lambdaFormula) {
+if(!hf) return null;
+var mL=lambdaFormula.match(/^LAMBDA\s*(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+))$/is);
+if(!mL) return ‘#VALUE!’;
+var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
+var expr=body.replace(new RegExp(’\b’+p1+’\b’,‘g’),’(1)’).replace(new RegExp(’\b’+p2+’\b’,‘g’),’(1)’);
+hf.setCellContents({sheet,row:9996,col:0},’=’+expr);
+var res=hf.getCellValue({sheet,row:9996,col:0});
+hf.setCellContents({sheet,row:9996,col:0},null);
+return res===null?‘0’:String(res);
+}
+
+// ISOMITTED(arg) - 省略チェック
+function _jsIsomitted(v) { return v===undefined||v===null; }
+
+// ================================================================
 // convertFormula: 文字列変換
 // ================================================================
 function convertFormula(f) {
 if(!f||f[0]!==’=’) return f;
+// LET展開
+if(/^=LET\s*(/i.test(f)) f = _jsLetExpand(f);
+// LAMBDA即時呼び出し展開
+if(/^=LAMBDA\s*(/i.test(f)) f = _jsLambdaExpand(f);
 f = f.replace(/\bFALSE\b(?!\s*()/g, ‘FALSE()’);
 f = f.replace(/\bTRUE\b(?!\s*()/g, ‘TRUE()’);
 f = f.replace(/\bNORMSDIST\s*(([^,)]+))/gi, ‘NORMSDIST($1,TRUE())’);
@@ -368,6 +507,26 @@ if(mTa){var sv=_getSingleVal(sheet,mTa[1])||mTa[1].replace(/^”|”$/g,’’);
 // VALUETOTEXT
 var mVtt=fOrig.match(/^VALUETOTEXT\s*(([^)]+))$/i);
 if(mVtt){var sv=_getSingleVal(sheet,mVtt[1]);return _jsValuetotext(sv);}
+
+// REDUCE(initial, range, LAMBDA(…))
+var mReduce=fOrig.match(/^REDUCE\s*(([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*(.+))\s*)$/is);
+if(mReduce){var reduceInit=parseFloat(mReduce[1].trim())||0;var reduceR=_jsReduceCompute(sheet,reduceInit,mReduce[2],mReduce[3]);if(reduceR!==null)return reduceR;}
+
+// SCAN(initial, range, LAMBDA(…))
+var mScan=fOrig.match(/^SCAN\s*(([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*(.+))\s*)$/is);
+if(mScan){var scanInit=parseFloat(mScan[1].trim())||0;var scanR=_jsScanCompute(sheet,scanInit,mScan[2],mScan[3]);if(scanR!==null)return scanR;}
+
+// MAP(range, LAMBDA(…))
+var mMap=fOrig.match(/^MAP\s*(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*(.+))\s*)$/is);
+if(mMap){var mapR=_jsMapCompute(sheet,mMap[1],mMap[2]);if(mapR!==null)return mapR;}
+
+// MAKEARRAY(rows, cols, LAMBDA(…))
+var mMkarr=fOrig.match(/^MAKEARRAY\s*(([0-9]+)\s*,\s*([0-9]+)\s*,\s*(LAMBDA\s*(.+))\s*)$/is);
+if(mMkarr){var mkR=_jsMakearrayCompute(sheet,parseInt(mMkarr[1]),parseInt(mMkarr[2]),mMkarr[3]);if(mkR!==null)return mkR;}
+
+// ISOMITTED(ref)
+var mIso=fOrig.match(/^ISOMITTED\s*(([^)]*))$/i);
+if(mIso){var isoSv=_getSingleVal(sheet,mIso[1].trim());return String(_jsIsomitted(isoSv));}
 
 // DSUM / DAVERAGE / DCOUNT / DCOUNTA / DMAX / DMIN / DPRODUCT / DGET / DSTDEV / DSTDEVP / DVAR / DVARP
 var mDb=fOrig.match(/^(DSUM|DAVERAGE|DCOUNT|DCOUNTA|DMAX|DMIN|DPRODUCT|DGET|DSTDEV|DSTDEVP|DVAR|DVARP)\s*(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*)$/i);
