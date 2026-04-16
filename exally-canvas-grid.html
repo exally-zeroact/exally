@@ -23,11 +23,10 @@ body {
 #header {
   background:#3D9E72;
   color:#fff;
-  height:48px;
+  height:36px;
   padding:0 12px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
   flex-shrink:0;
 }
 .header-btns { display:flex; gap:6px; }
@@ -48,25 +47,62 @@ body {
   border-bottom:1px solid #C8ECD8;
   display:flex;
   align-items:center;
-  padding:0 8px;
-  gap:8px;
+  padding:0 6px;
+  gap:4px;
   flex-shrink:0;
 }
-#format-bar {
+.undo-btn {
+  height:26px;
+  min-width:28px;
+  border:1px solid #C8ECD8;
+  border-radius:4px;
+  background:#F8FEFC;
+  color:#4A6B5A;
+  font-size:14px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  padding:0;
+}
+.undo-btn:active { background:#C8ECD8; }
+/* ===== ツールバー ===== */
+#fmt-bar1 {
   height:32px;
   background:#F8FEFC;
   border-bottom:1px solid #C8ECD8;
   display:flex;
   align-items:center;
-  padding:0 6px;
-  gap:2px;
+  padding:0 3px;
+  gap:0;
   flex-shrink:0;
+  overflow-x:scroll;
+  overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
+#fmt-bar1::-webkit-scrollbar { display:none; }
+#fmt-bar2 {
+  background:#F0FAF4;
+  border-bottom:1px solid #C8ECD8;
+  display:none;
+  align-items:center;
+  padding:0 3px;
+  gap:0;
+  flex-shrink:0;
+  overflow-x:scroll;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  height:32px;
+}
+#fmt-bar2::-webkit-scrollbar { display:none; }
+#fmt-bar2.open { display:flex; }
 .fmt-btn {
-  height:24px;
-  min-width:24px;
-  padding:0 5px;
+  height:26px;
+  min-width:22px;
+  padding:0 3px;
   border:1px solid transparent;
   border-radius:4px;
   background:transparent;
@@ -78,33 +114,31 @@ body {
   align-items:center;
   justify-content:center;
   flex-shrink:0;
+  white-space:nowrap;
 }
-.fmt-btn:hover { background:#E8F5EE; border-color:#C8ECD8; }
-.fmt-btn.active { background:#C8ECD8; border-color:#3D9E72; color:#3D9E72; }
+.fmt-btn:active { background:#C8ECD8; }
+.fmt-btn.active { background:#C8ECD8; border-color:#3D9E72; color:#1A7A50; }
 .fmt-sep { width:1px; height:18px; background:#C8ECD8; margin:0 2px; flex-shrink:0; }
 .fmt-btn-b { font-weight:700; }
 .fmt-btn-i { font-style:italic; }
 .fmt-btn-u { text-decoration:underline; }
+.fmt-btn-s { text-decoration:line-through; }
 #fmt-font-size {
-  width:40px; height:22px; border:1px solid #C8ECD8; border-radius:4px;
+  width:32px; height:24px; border:1px solid #C8ECD8; border-radius:4px;
   font-size:11px; text-align:center; background:#fff; font-family:inherit;
-  color:#1A2B22;
+  color:#1A2B22; flex-shrink:0;
 }
-#fmt-color-wrap, #fmt-bg-wrap {
-  position:relative; width:24px; height:24px; cursor:pointer;
+.fmt-color-wrap {
+  position:relative; width:26px; height:26px; cursor:pointer; flex-shrink:0;
 }
-#fmt-color, #fmt-bg {
+.fmt-color-wrap input[type=color] {
   position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
 }
 .fmt-color-icon {
-  width:22px; height:22px; border-radius:3px; border:1px solid #C8ECD8;
+  width:24px; height:24px; border-radius:3px; border:1px solid #C8ECD8;
   display:flex; align-items:center; justify-content:center;
   font-size:11px; font-weight:700; pointer-events:none;
-}
-#fmt-numfmt {
-  height:22px; border:1px solid #C8ECD8; border-radius:4px;
-  font-size:11px; background:#fff; font-family:inherit; color:#1A2B22;
-  padding:0 3px;
+  background:#fff;
 }
 #cell-addr {
   width:64px;
@@ -1494,17 +1528,25 @@ function drawText(r,c){
 
   ctx.fillText(display, tx, y+h/2);
 
-  // 下線
-  if(cell.underline){
+  // 下線・取り消し線
+  if(cell.underline||cell.strike){
     var metrics = ctx.measureText(display);
     var ux = align==='center' ? x+w/2-metrics.width/2 :
              align==='right'  ? x+w-4-metrics.width : x+4;
     ctx.strokeStyle = cell.color||C_CELL_TXT;
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(ux, y+h/2+fontSize*0.6);
-    ctx.lineTo(ux+metrics.width, y+h/2+fontSize*0.6);
-    ctx.stroke();
+    if(cell.underline){
+      ctx.beginPath();
+      ctx.moveTo(ux, y+h/2+fontSize*0.6);
+      ctx.lineTo(ux+metrics.width, y+h/2+fontSize*0.6);
+      ctx.stroke();
+    }
+    if(cell.strike){
+      ctx.beginPath();
+      ctx.moveTo(ux, y+h/2);
+      ctx.lineTo(ux+metrics.width, y+h/2);
+      ctx.stroke();
+    }
   }
 
   ctx.restore();
@@ -1557,41 +1599,40 @@ function drawSel(){
 
 <div id="header">
   <div style="display:flex;align-items:center;gap:6px;">
-    <span style="font-size:18px;">⚡</span>
-    <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#fff;letter-spacing:-0.5px;">Exally</span>
-  </div>
-  <div class="header-btns">
-    <button class="hbtn" onclick="saveXlsx()">💾</button>
-    <button class="hbtn primary" onclick="handleAIBtn()">💬 AIに聞く</button>
+    <span style="font-size:16px;">⚡</span>
+    <span style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#fff;letter-spacing:-0.5px;">Exally</span>
   </div>
 </div>
 
 <div id="formula-bar">
   <input id="cell-addr" type="text" value="A1" readonly>
   <input id="formula-input" type="text" placeholder="値や数式を入力してね">
+  <button class="undo-btn" onclick="doUndo()" title="元に戻す">↩</button>
+  <button class="undo-btn" onclick="doRedo()" title="やり直す">↪</button>
 </div>
 
-<div id="format-bar">
-  <!-- 太字・斜体・下線 -->
+<!-- ツールバー1段目（常時表示） -->
+
+<div id="fmt-bar1">
+  <!-- 文字スタイル -->
   <button class="fmt-btn fmt-btn-b" id="fmt-bold"      onclick="toggleFormat('bold')"      title="太字">B</button>
   <button class="fmt-btn fmt-btn-i" id="fmt-italic"    onclick="toggleFormat('italic')"    title="斜体">I</button>
   <button class="fmt-btn fmt-btn-u" id="fmt-underline" onclick="toggleFormat('underline')" title="下線">U</button>
+  <button class="fmt-btn fmt-btn-s" id="fmt-strike"    onclick="toggleFormat('strike')"    title="取り消し線">S</button>
   <div class="fmt-sep"></div>
   <!-- フォントサイズ -->
   <input id="fmt-font-size" type="number" value="12" min="6" max="72" title="フォントサイズ"
-    onchange="applyFormat('fontSize',parseInt(this.value)||12)" onblur="applyFormat('fontSize',parseInt(this.value)||12)">
+    onchange="applyFormat('fontSize',parseInt(this.value)||12)">
   <div class="fmt-sep"></div>
   <!-- 文字色 -->
-  <div class="fmt-color-icon" id="fmt-color-icon" style="color:#1A2B22;" title="文字色">A
-    <div class="fmt-color-wrap" style="position:absolute;inset:0;">
-      <input type="color" id="fmt-color" value="#1A2B22" onchange="applyFormat('color',this.value)" title="文字色">
-    </div>
+  <div class="fmt-color-wrap" title="文字色">
+    <div class="fmt-color-icon" id="fmt-color-icon">A</div>
+    <input type="color" id="fmt-color" value="#1A2B22" onchange="applyFormat('color',this.value)">
   </div>
   <!-- 背景色 -->
-  <div class="fmt-color-icon" id="fmt-bg-icon" style="background:#fff;position:relative;" title="背景色">☐
-    <div class="fmt-color-wrap" style="position:absolute;inset:0;">
-      <input type="color" id="fmt-bg" value="#ffffff" onchange="applyFormat('bgColor',this.value)" title="背景色">
-    </div>
+  <div class="fmt-color-wrap" title="背景色">
+    <div class="fmt-color-icon" id="fmt-bg-icon" style="font-size:13px;">🎨</div>
+    <input type="color" id="fmt-bg" value="#ffffff" onchange="applyFormat('bgColor',this.value)">
   </div>
   <div class="fmt-sep"></div>
   <!-- 文字揃え -->
@@ -1599,21 +1640,30 @@ function drawSel(){
   <button class="fmt-btn"        id="fmt-align-center" onclick="applyFormat('align','center')" title="中央揃え">≡</button>
   <button class="fmt-btn"        id="fmt-align-right"  onclick="applyFormat('align','right')"  title="右揃え">≡</button>
   <div class="fmt-sep"></div>
-  <!-- 罫線 -->
-  <button class="fmt-btn" onclick="applyBorderAll(1)" title="全罫線（細）">⊞</button>
-  <button class="fmt-btn" onclick="applyBorderAll(2)" title="全罫線（太）">⊟</button>
-  <button class="fmt-btn" onclick="applyBorderAll(0)" title="罫線クリア">✕</button>
+  <!-- 数値書式 -->
+  <button class="fmt-btn" onclick="applyFormat('numFmt','0%')"    title="パーセント">%</button>
+  <button class="fmt-btn" onclick="applyFormat('numFmt','#,##0')" title="桁区切り">,</button>
+  <button class="fmt-btn" onclick="toggleDecimal()"               title="小数点増減">.0</button>
+  <button class="fmt-btn" onclick="applyFormat('numFmt','¥#,##0')" title="通貨(¥)">¥</button>
   <div class="fmt-sep"></div>
-  <!-- 数値フォーマット -->
-  <select id="fmt-numfmt" onchange="applyFormat('numFmt',this.value)" title="数値フォーマット">
-    <option value="">標準</option>
-    <option value="#,##0">桁区切り</option>
-    <option value="#,##0.00">小数2桁</option>
-    <option value="0%">パーセント</option>
-    <option value="0.00%">パーセント(小数)</option>
-    <option value="¥#,##0">通貨(¥)</option>
-    <option value="YYYY/MM/DD">日付</option>
-  </select>
+  <!-- 2段目展開ボタン -->
+  <button class="fmt-btn" id="fmt-toggle" onclick="toggleFmtBar2()" title="その他書式">▼</button>
+</div>
+
+<!-- ツールバー2段目（折りたたみ） -->
+
+<div id="fmt-bar2">
+  <!-- 罫線 -->
+  <button class="fmt-btn" onclick="applyBorderAll(1)"    title="全罫線">⊞全</button>
+  <button class="fmt-btn" onclick="applyBorderOuter(1)"  title="外枠罫線">⊟外</button>
+  <button class="fmt-btn" onclick="applyBorderInner(1)"  title="内側罫線">⊠内</button>
+  <button class="fmt-btn" onclick="applyBorderAll(0)"    title="罫線なし">✕</button>
+  <div class="fmt-sep"></div>
+  <!-- 配置 -->
+  <button class="fmt-btn" onclick="applyMergeCells()"    title="セル結合">⊡結合</button>
+  <button class="fmt-btn" id="fmt-wrap" onclick="toggleFormat('wrap')" title="折り返し">↵</button>
+  <button class="fmt-btn" onclick="applyIndent(1)"       title="インデント増">▷+</button>
+  <button class="fmt-btn" onclick="applyIndent(-1)"      title="インデント減">◁−</button>
 </div>
 
 <div id="grid-wrap">
@@ -2350,6 +2400,90 @@ function addSheet(){
 
 
 // ===== セル書式 =====
+
+// 2段目ツールバー折りたたみ
+function toggleFmtBar2() {
+  var bar2 = document.getElementById('fmt-bar2');
+  var btn = document.getElementById('fmt-toggle');
+  var open = bar2.classList.toggle('open');
+  if(btn) btn.textContent = open ? '▲' : '▼';
+}
+
+// 小数点桁数増減
+function toggleDecimal() {
+  var cell = getCell(selR1, selC1);
+  var fmt = cell.numFmt || '';
+  var newFmt;
+  if(!fmt || fmt === '#,##0') newFmt = '#,##0.0';
+  else if(fmt === '#,##0.0') newFmt = '#,##0.00';
+  else if(fmt === '#,##0.00') newFmt = '#,##0';
+  else if(fmt === '0') newFmt = '0.0';
+  else if(fmt === '0.0') newFmt = '0.00';
+  else if(fmt === '0.00') newFmt = '0';
+  else newFmt = '#,##0.0';
+  applyFormat('numFmt', newFmt);
+}
+
+// 外枠罫線
+function applyBorderOuter(style) {
+  var snap = [];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c;
+    var old=sheets[activeSheet].data[k]?(sheets[activeSheet].data[k].border||{}):{}; 
+    snap.push({key:k,prop:'border',old:old});
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    var b = Object.assign({}, sheets[activeSheet].data[k].border||{});
+    if(r===selR1) b.top=style; if(r===selR2) b.bottom=style;
+    if(c===selC1) b.left=style; if(c===selC2) b.right=style;
+    sheets[activeSheet].data[k].border = style===0?{}:b;
+  }
+  undoStack.push({type:'format',snap:snap}); redoStack=[];
+  render();
+}
+
+// 内側罫線
+function applyBorderInner(style) {
+  var snap = [];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c;
+    var old=sheets[activeSheet].data[k]?(sheets[activeSheet].data[k].border||{}):{}; 
+    snap.push({key:k,prop:'border',old:old});
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    var b = Object.assign({}, sheets[activeSheet].data[k].border||{});
+    if(r>selR1) b.top=style; if(r<selR2) b.bottom=style;
+    if(c>selC1) b.left=style; if(c<selC2) b.right=style;
+    sheets[activeSheet].data[k].border = b;
+  }
+  undoStack.push({type:'format',snap:snap}); redoStack=[];
+  render();
+}
+
+// セル結合（選択範囲の左上に値を集約・表示は左上のみ）
+function applyMergeCells() {
+  if(selR1===selR2&&selC1===selC2) return; // 単一セルは無視
+  var topLeft = getCell(selR1,selC1);
+  var snap = [];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    if(r===selR1&&c===selC1) continue;
+    var k=r+','+c;
+    snap.push({key:k,prop:'merged',old:sheets[activeSheet].data[k]});
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    sheets[activeSheet].data[k].merged={r:selR1,c:selC1};
+  }
+  undoStack.push({type:'format',snap:snap}); redoStack=[];
+  render();
+}
+
+// インデント
+function applyIndent(delta) {
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c;
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    var cur = sheets[activeSheet].data[k].indent||0;
+    sheets[activeSheet].data[k].indent = Math.max(0, cur+delta);
+  }
+  render();
+}
 
 // 単一プロパティを選択範囲全体に適用
 function applyFormat(key, value) {
