@@ -1516,7 +1516,7 @@ function updateBar(){
   var scaleStr = scale!==1 ? ' ×'+Math.round(scale*10)/10 : '';
   document.getElementById('cell-addr').value = addr+scaleStr;
   var cell=getCell(selR1,selC1);
-  document.getElementById('formula-input').value=cell.f||'';
+  document.getElementById('formula-input').value=(cell.f||'').replace(/\n/g,' ↵ ');
   updateFormulaDisplay(cell.f||'');
   updateFormatBar(cell);
   updateActionBtn();
@@ -1774,11 +1774,37 @@ function drawText(r,c){
   ctx.rect(x+1,y,w-2,h); ctx.clip();
 
   var tx;
+  var indentPx = (cell.indent||0) * 12;
   if(align==='center') { ctx.textAlign='center'; tx=x+w/2; }
-  else if(align==='right') { ctx.textAlign='right'; tx=x+w-4; }
-  else { ctx.textAlign='left'; tx=x+4; }
+  else if(align==='right') { ctx.textAlign='right'; tx=x+w-4-indentPx; }
+  else { ctx.textAlign='left'; tx=x+4+indentPx; }
 
-  ctx.fillText(display, tx, y+h/2);
+  // 改行・折り返し描画
+  var hasBreak = String(display).indexOf('\n') >= 0;
+  if(cell.wrap || hasBreak){
+    var maxW = w - 8 - indentPx;
+    var wLines = [];
+    var paragraphs = String(display).split('\n');
+    for(var pi=0;pi<paragraphs.length;pi++){
+      var chars = paragraphs[pi].split('');
+      var wLine = '';
+      for(var wi=0;wi<chars.length;wi++){
+        var test2 = wLine + chars[wi];
+        if(ctx.measureText(test2).width > maxW && wLine){
+          wLines.push(wLine); wLine = chars[wi];
+        } else { wLine = test2; }
+      }
+      wLines.push(wLine); // 段落末（空でも追加）
+    }
+    var lh = fontSize * 1.4;
+    var totalH = wLines.length * lh;
+    var startY = y + Math.max(lh/2, (h - totalH)/2 + lh/2);
+    for(var li=0;li<wLines.length;li++){
+      ctx.fillText(wLines[li], tx, startY + li*lh);
+    }
+  } else {
+    ctx.fillText(display, tx, y+h/2);
+  }
 
   // 下線・取り消し線
   if(cell.underline||cell.strike){
@@ -2140,7 +2166,9 @@ function drawSel(){
   <div class="fmt-sep"></div>
   <!-- 配置 -->
   <button class="fmt-btn" onclick="applyMergeCells()"    title="セル結合">⊡結合</button>
-  <button class="fmt-btn" id="fmt-wrap" onclick="toggleFormat('wrap')" title="折り返し">↵</button>
+  <button class="fmt-btn" id="fmt-wrap" onclick="toggleFormat('wrap')" title="折り返して全体を表示">↵</button>
+  <div class="fmt-sep"></div>
+  <button class="fmt-btn" onclick="insertLineBreak()" title="任意改行（Alt+Enter）" style="font-size:11px;letter-spacing:-0.5px;">改行</button>
   <button class="fmt-btn" onclick="applyIndent(1)"       title="インデント増">▷+</button>
   <button class="fmt-btn" onclick="applyIndent(-1)"      title="インデント減">◁−</button>
 </div>
@@ -2588,8 +2616,12 @@ function bindEvents(){
     var v=this.value;
     refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
     _currentRefs=extractRefs(v);
+    _fiCursorPos=this.selectionStart||0;
     render();
   });
+  fi.addEventListener('click',function(){ _fiCursorPos=this.selectionStart||0; });
+  fi.addEventListener('keyup',function(){ _fiCursorPos=this.selectionStart||0; });
+  fi.addEventListener('blur',function(){ _fiCursorPos=this.selectionStart||_fiCursorPos; });
   fi.addEventListener('keydown',function(e){
     if(e.key==='Enter'){e.preventDefault();fkbCommit();}
     else if(e.key==='Escape'){fkbCancel();}
@@ -2603,7 +2635,7 @@ function bindEvents(){
     if(kb.style.display==='none'||!kb.style.display){
       _editMode=false;
       var stored=getCell(selR1,selC1).f||'';
-      if(this.value!==stored) setCell(selR1,selC1,this.value);
+      var actual=this.value.replace(/ ↵ /g,'\n'); if(actual!==stored) setCell(selR1,selC1,actual);
       render();
     }
   });
@@ -3485,6 +3517,15 @@ function applyBorderInner(style) {
 }
 
 // セル結合（選択範囲の左上に値を集約・表示は左上のみ）
+function insertLineBreak(){
+  var fi=document.getElementById('formula-input');
+  var cur=fi?fi.value:'';
+  var pos=fi?(_fiCursorPos||fi.selectionStart||cur.length):cur.length;
+  var newVal=cur.substring(0,pos)+'\n'+cur.substring(pos);
+  if(fi){ fi.value=newVal; fi.setSelectionRange(pos+1,pos+1); _fiCursorPos=pos+1; }
+  setCell(selR1,selC1,newVal);
+  updateBar(); render();
+}
 function applyMergeCells() {
   if(selR1===selR2&&selC1===selC2) return; // 単一セルは無視
   var topLeft = getCell(selR1,selC1);
