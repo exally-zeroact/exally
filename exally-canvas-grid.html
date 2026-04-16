@@ -431,6 +431,74 @@ user-select:none;
 -webkit-user-select:none;
 }
 #cell-action-btn:active { background:#C8ECD8; }
+/* 解説ポップアップ */
+#explain-popup {
+position:fixed;
+left:50%; transform:translateX(-50%);
+bottom:80px;
+width:calc(100% - 32px);
+max-width:360px;
+background:#fff;
+border:1.5px solid #52B788;
+border-radius:12px;
+box-shadow:0 4px 20px rgba(61,158,114,0.18);
+z-index:200;
+overflow:hidden;
+font-family:‘Noto Sans JP’,sans-serif;
+display:none;
+}
+#explain-popup.show { display:block; }
+.explain-header {
+background:#3D9E72;
+color:#fff;
+padding:10px 14px;
+font-size:13px;
+font-weight:700;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.explain-header button {
+background:none;
+border:none;
+color:#fff;
+font-size:16px;
+cursor:pointer;
+padding:0;
+line-height:1;
+}
+.explain-body {
+padding:12px 14px;
+background:#F0FAF4;
+max-height:200px;
+overflow-y:auto;
+}
+.explain-text {
+font-size:13px;
+color:#1A2B22;
+line-height:1.7;
+margin-top:8px;
+}
+.explain-footer {
+display:flex;
+gap:8px;
+padding:10px 14px;
+border-top:1px solid #C8ECD8;
+background:#fff;
+}
+.explain-footer button {
+flex:1;
+padding:7px 0;
+border:1px solid #52B788;
+border-radius:6px;
+background:#fff;
+color:#3D9E72;
+font-size:12px;
+font-family:‘Noto Sans JP’,sans-serif;
+cursor:pointer;
+font-weight:600;
+}
+.explain-footer button:active { background:#C8ECD8; }
 /* 右クリックメニュー */
 #ctx-menu {
 position:fixed;
@@ -1417,16 +1485,16 @@ function updateBar(){
   updateFormatBar(cell);
   updateActionBtn();
 }
+var _canvasBCR=null, _canvasBCRDirty=true;
+function _getCanvasBCR(){ if(_canvasBCRDirty||!_canvasBCR){_canvasBCR=canvas.getBoundingClientRect();_canvasBCRDirty=false;} return _canvasBCR; }
 function updateActionBtn(){
   var btn = document.getElementById('cell-action-btn');
   if(!btn) return;
   var x2 = colX(selC2)+cW(selC2);
   var y2 = rowY(selR2)+rH(selR2);
-  // canvasのページ上の位置を加算
-  var cr = canvas.getBoundingClientRect();
+  var cr = _getCanvasBCR();
   var bx = cr.left + x2 + 10;
   var by = cr.top  + y2 - 30;
-  // 画面外クランプ
   bx = Math.min(bx, window.innerWidth  - 34);
   bx = Math.max(bx, cr.left + HDR_W + 2);
   by = Math.max(by, cr.top  + HDR_H + 2);
@@ -1486,7 +1554,21 @@ function applyNumFmt(val, fmt) {
   return val;
 }
 
-function render() {
+var _renderPending=false;
+// ユーティリティ
+function _debounce(fn,ms){var t;return function(){var a=arguments,s=this;clearTimeout(t);t=setTimeout(function(){fn.apply(s,a);},ms);};}
+function _throttle(fn,ms){var last=0;return function(){var now=Date.now();if(now-last>=ms){last=now;fn.apply(this,arguments);}};}
+var _recalcTimer={};
+function _scheduleRecalc(sheet,data){
+  clearTimeout(_recalcTimer[sheet]);
+  _recalcTimer[sheet]=setTimeout(function(){ recalcSheet(sheet,data); render(); },150);
+}
+function render(){
+  if(_renderPending) return;
+  _renderPending=true;
+  requestAnimationFrame(function(){ _renderPending=false; _doRender(); });
+}
+function _doRender() {
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,wrapW,wrapH);
 
@@ -1715,16 +1797,27 @@ function drawBorder(r,c){
 
 // ===== セル参照入力モード =====
 function checkRefMode(){
-  var el=document.getElementById('cell-input');
-  if(editingCell&&el&&el.style.display!=='none'){
-    refMode = el.value.length>0 && (el.value[0]==='='||el.value[0]==='＝');
-    return;
+  var ci=document.getElementById('cell-input');
+  if(editingCell&&ci&&ci.style.display!=='none'){
+    if(ci.value.length>0&&(ci.value[0]==='='||ci.value[0]==='＝')){
+      refMode=true; _refTargetEl=ci; return;
+    }
+    refMode=false; _refTargetEl=null; return;
   }
-  refMode=false;
+  var fi=document.getElementById('formula-input');
+  if(fi&&document.activeElement===fi){
+    if(fi.value.length>0&&(fi.value[0]==='='||fi.value[0]==='＝')){
+      refMode=true; _refTargetEl=fi; return;
+    }
+  }
+  refMode=false; _refTargetEl=null;
 }
 function getRefInput(){
-  var el=document.getElementById('cell-input');
-  if(editingCell&&el&&el.style.display!=='none') return el;
+  // focusに依存せず_refTargetElを返す
+  if(_refTargetEl) return _refTargetEl;
+  // フォールバック: cell-input
+  var ci=document.getElementById('cell-input');
+  if(editingCell&&ci&&ci.style.display!=='none') return ci;
   return null;
 }
 function insertRefAddr(r1,c1,r2,c2){
@@ -1733,8 +1826,9 @@ function insertRefAddr(r1,c1,r2,c2){
     :(cellAddr(Math.min(r1,r2),Math.min(c1,c2))+':'+cellAddr(Math.max(r1,r2),Math.max(c1,c2)));
   var s=el.selectionStart, e=el.selectionEnd;
   el.value=el.value.substring(0,s)+addr+el.value.substring(e);
-  el.selectionStart=el.selectionEnd=s+addr.length;
-  el.focus();
+  var newPos=s+addr.length;
+  el.focus({preventScroll:true});
+  el.setSelectionRange(newPos,newPos);
   refStartR=r1; refStartC=c1;
   render();
 }
@@ -1771,6 +1865,23 @@ function drawSel(){
 <div id="loading"><div class="spinner"></div><p>グリッドを起動中...</p></div>
 
 <button id="cell-action-btn" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation();event.preventDefault();onActionBtn(event);" onclick="onActionBtn(event)">▼</button>
+
+<!-- 解説ポップアップ -->
+
+<div id="explain-popup">
+  <div class="explain-header">
+    <span id="explain-title">🤖 解説</span>
+    <button onclick="closeExplainPopup()">✕</button>
+  </div>
+  <div class="explain-body">
+    <div id="explain-formula"></div>
+    <div id="explain-text" class="explain-text"></div>
+  </div>
+  <div class="explain-footer">
+    <button onclick="copyExplain()">📋 コピー</button>
+    <button onclick="deepDiveExplain()">💬 深掘り</button>
+  </div>
+</div>
 
 <div id="ctx-menu" ontouchstart="event.stopPropagation()">
   <div class="ctx-item" onclick="explainCell()" style="color:#3D9E72;font-weight:700;">🤖 AIに解説させる</div>
@@ -1918,6 +2029,7 @@ var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
 var editingCell=null;
 var refMode=false;       // セル参照入力モード
 var refStartR=-1, refStartC=-1; // ドラッグ開始セル
+var _refTargetEl=null;   // refMode中の入力ターゲット（focusに依存しない）
 var touchState=null;
 
 // ===== 初期化 =====
@@ -1946,12 +2058,14 @@ window.addEventListener('load', function() {
   document.getElementById('loading').classList.add('hide');
   if(typeof render === 'function') render();
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', onVisualVP);
-    window.visualViewport.addEventListener('scroll', onVisualVP);
+    var _throttledVP=_throttle(onVisualVP,100);
+    window.visualViewport.addEventListener('resize', _throttledVP);
+    window.visualViewport.addEventListener('scroll', _throttledVP);
   }
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
 function resize() {
+  _canvasBCRDirty=true; // BCRキャッシュを無効化
   dpr = window.devicePixelRatio || 1;
   wrapW = wrap.clientWidth; wrapH = wrap.clientHeight;
   canvas.width  = Math.round(wrapW * dpr);
@@ -1983,7 +2097,10 @@ function setCell(r,c,v,noUndo){
   var existing = sheets[activeSheet].data[key] || {};
   sheets[activeSheet].data[key] = Object.assign({}, existing, {v:v, f:v, d:String(d)});
   // 依存セルの再計算（数値変更→数式セルに即反映）
-  if(hfResult !== null) recalcSheet(activeSheet, sheets[activeSheet].data);
+  if(hfResult !== null){
+    var _s=activeSheet, _d=sheets[activeSheet].data;
+    _scheduleRecalc(_s,_d);
+  }
 }
 function doUndo(){
   if(!undoStack.length) return;
@@ -2259,14 +2376,41 @@ function bindEvents(){
   document.addEventListener('keydown',onKD);
   // 数式バー
   var fi=document.getElementById('formula-input');
-  fi.addEventListener('input',function(){ setCell(selR1,selC1,this.value); render(); });
-  fi.addEventListener('keydown',function(e){ if(e.key==='Enter'){this.blur();render();} });
+  var _fiComposing=false;
+  fi.addEventListener('compositionstart',function(){ _fiComposing=true; });
+  fi.addEventListener('compositionend',function(){ _fiComposing=false; });
+  fi.addEventListener('input',function(){
+    if(_fiComposing) return; // IME変換中はスキップ
+    var v=this.value;
+    if(v.length>0&&(v[0]==='='||v[0]==='＝')){
+      refMode=true; render(); return;
+    }
+    refMode=false;
+    setCell(selR1,selC1,v); render();
+  });
+  fi.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      setCell(selR1,selC1,this.value);
+      refMode=false; this.blur(); render();
+    } else if(e.key==='Escape'){
+      refMode=false;
+      this.value=document.getElementById('cell-input')?getCell(selR1,selC1).f||'':'';
+      this.blur();
+    }
+  });
+  fi.addEventListener('blur',function(){
+    if(refMode) return;
+    var stored=getCell(selR1,selC1).f||'';
+    if(this.value===stored) return; // 変化なしはスキップ
+    setCell(selR1,selC1,this.value); render();
+  });
   // セル入力
   var ci=document.getElementById('cell-input');
   ci.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(1,0);}
-    else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(0,1);}
-    else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;_refTargetEl=null;commitEdit();moveSel(1,0);}
+    else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;_refTargetEl=null;commitEdit();moveSel(0,1);}
+    else if(e.key==='Escape'){refMode=false;refStartR=-1;_refTargetEl=null;cancelEdit();}
   });
   ci.addEventListener('input',function(){ checkRefMode(); if(!refMode){refStartR=-1;} render(); });
   // blur: IMEの変換中はcommitしない（compositionend後にcommit）
@@ -2629,7 +2773,8 @@ function onTE(e){
   // 列幅・行高リサイズ確定（undo付き）
   // refsel終了: フォーカスを入力欄に戻す
   if(touchState && touchState.type==='refsel'){
-    var el=getRefInput(); if(el) el.focus();
+    var el=getRefInput();
+    if(el){ el.focus({preventScroll:true}); el.setSelectionRange(el.value.length,el.value.length); }
     touchState=null; render(); return;
   }
   // resizecheck中にタッチ終了（ほぼ動かなかった） → キャンセルしてtap扱い
@@ -3180,30 +3325,28 @@ function copyText(btn, text){
     navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
   } else { fallback(); }
 }
-// ===== AI セル解説 =====
+// ===== AI セル解説ポップアップ =====
+var _explainAddr='', _explainFormula='', _explainText='';
+
 function explainCell(){
   hideCtxMenu();
-
-  var addr, prompt;
-  var isRange = !(selR1===selR2&&selC1===selC2);
-
+  var addr, prompt, formula=null;
+  var isRange=!(selR1===selR2&&selC1===selC2);
   if(isRange){
-    // 範囲選択: 選択範囲内の値を一覧化
     var cells=[];
     for(var r=selR1;r<=Math.min(selR2,selR1+9);r++)
       for(var c=selC1;c<=Math.min(selC2,selC1+9);c++){
         var nc=getCell(r,c);
         if(nc&&nc.v) cells.push(cellAddr(r,c)+':'+nc.v);
       }
-    addr = cellAddr(selR1,selC1)+':'+cellAddr(selR2,selC2);
-    prompt = '【範囲解説リクエスト】\n範囲: '+addr+'\n';
-    if(cells.length) prompt += 'セル内容: '+cells.join(', ')+'\n';
-    prompt += 'この範囲のデータが何を表しているか1〜3行で簡潔に解説してね。書き込みは不要。';
+    addr=cellAddr(selR1,selC1)+':'+cellAddr(selR2,selC2);
+    prompt='【範囲解説リクエスト】\n範囲: '+addr+'\n';
+    if(cells.length) prompt+='セル内容: '+cells.join(', ')+'\n';
+    prompt+='この範囲が何を表しているか1〜3行で簡潔に解説してね。書き込み不要。';
   } else {
-    // 単一セル
     var cell=getCell(selR1,selC1);
     addr=cellAddr(selR1,selC1);
-    var formula=(cell.f&&cell.f[0]==='=')?cell.f:null;
+    formula=(cell.f&&cell.f[0]==='=')?cell.f:null;
     var val=cell.v||'';
     var context=[];
     for(var r=Math.max(0,selR1-2);r<=selR1+2;r++)
@@ -3216,43 +3359,65 @@ function explainCell(){
     if(formula){ prompt+='数式: '+formula+'\n計算結果: '+val+'\n'; }
     else { prompt+='値: '+(val||'（空）')+'\n'; }
     if(context.length) prompt+='周囲のセル: '+context.slice(0,8).join(', ')+'\n';
-    prompt+='このセルが何をしているか1〜3行で簡潔に解説してね。書き込みは不要。';
+    prompt+='このセルが何をしているか1〜3行で簡潔に解説してね。書き込み不要。';
   }
-
-  // パネルを開いてから直接送信
+  _explainAddr=addr; _explainFormula=formula||''; _explainText='';
+  showExplainPopup(addr,formula,null);
+  _sendExplain(prompt);
+}
+function showExplainPopup(addr,formula,aiText){
+  var popup=document.getElementById('explain-popup');
+  document.getElementById('explain-title').textContent='🤖 '+addr+'の解説';
+  var fEl=document.getElementById('explain-formula');
+  if(formula&&formula[0]==='='){
+    var colored=colorizeFormulaBlock(formula.slice(1));
+    fEl.innerHTML='<div class="formula-block">='+colored+'</div>';
+  } else { fEl.innerHTML=''; }
+  var tEl=document.getElementById('explain-text');
+  if(aiText===null){
+    tEl.innerHTML='<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
+  } else {
+    tEl.innerHTML=formatAIText(aiText);
+    _explainText=aiText;
+  }
+  popup.classList.add('show');
+}
+function closeExplainPopup(){
+  document.getElementById('explain-popup').classList.remove('show');
+}
+function copyExplain(){
+  var text=(_explainFormula?_explainFormula+'\n':'')+_explainText;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text); }
+  else {
+    var ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;top:-9999px;';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  var btn=document.querySelector('#explain-popup .explain-footer button');
+  if(btn){ var orig=btn.textContent; btn.textContent='✓ コピーしました'; setTimeout(function(){btn.textContent=orig;},1500); }
+}
+function deepDiveExplain(){
+  closeExplainPopup();
   var panel=document.getElementById('ai-panel-wrap');
   if(panel&&!panel.classList.contains('open')) handleAIBtn();
-  setTimeout(function(){ _sendExplain(prompt); }, 150);
+  var prompt='セル'+_explainAddr;
+  if(_explainFormula) prompt+='（'+_explainFormula+'）';
+  prompt+='についてもっと詳しく教えて。\n【解説内容】'+_explainText;
+  setTimeout(function(){
+    var input=document.getElementById('ai-input');
+    if(input){ input.value=prompt; document.getElementById('ai-send').click(); }
+  },150);
 }
 async function _sendExplain(prompt){
-  var input=document.getElementById('ai-input');
-  if(!input) return;
-  input.value=prompt;
-  // sendToAIと同じフローで送信（プロンプトをそのまま渡す）
-  var text=prompt;
-  addAIChatMsg('user','🤖 '+cellAddr(selR1,selC1)+' を解説中...');
-  input.value='';
-  document.getElementById('ai-send').disabled=true;
-  var thinkDiv=document.createElement('div');
-  thinkDiv.className='ai-msg-ai'; thinkDiv.id='ai-thinking';
-  thinkDiv.innerHTML='<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
-  document.getElementById('ai-response-area').appendChild(thinkDiv);
-  document.getElementById('ai-response-area').scrollTop=9999;
   try{
     var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text,history:aiHistory})});
+      body:JSON.stringify({message:prompt,history:[]})});
     var data=await res.json();
-    var th=document.getElementById('ai-thinking'); if(th) th.remove();
-    var aiText=data.text||'エラーが発生したよ';
-    addAIChatMsg('ai',aiText);
-    aiHistory.push({role:'user',content:text});
-    aiHistory.push({role:'assistant',content:aiText});
-    if(aiHistory.length>40) aiHistory=aiHistory.slice(-40);
+    showExplainPopup(_explainAddr,_explainFormula,data.text||'エラーが発生したよ');
   }catch(e){
-    var th=document.getElementById('ai-thinking'); if(th) th.remove();
-    addAIChatMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
+    showExplainPopup(_explainAddr,_explainFormula,'AIに接続できなかったよ。もう一度試してみてね。');
   }
-  document.getElementById('ai-send').disabled=false;
 }
 var aiHistory = [];
 
