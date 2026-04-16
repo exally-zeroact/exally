@@ -1359,12 +1359,25 @@ function updateBar(){
 // 書式ツールバーの状態を更新
 function updateFormatBar(cell) {
   var el;
-  if((el=document.getElementById('fmt-bold')))    el.classList.toggle('active',!!cell.bold);
-  if((el=document.getElementById('fmt-italic')))  el.classList.toggle('active',!!cell.italic);
-  if((el=document.getElementById('fmt-underline')))el.classList.toggle('active',!!cell.underline);
-  if((el=document.getElementById('fmt-align-left')))  el.classList.toggle('active',(cell.align||'left')==='left');
-  if((el=document.getElementById('fmt-align-center')))el.classList.toggle('active',cell.align==='center');
-  if((el=document.getElementById('fmt-align-right'))) el.classList.toggle('active',cell.align==='right');
+  if((el=document.getElementById('fmt-bold')))       el.classList.toggle('active',!!cell.bold);
+  if((el=document.getElementById('fmt-italic')))     el.classList.toggle('active',!!cell.italic);
+  if((el=document.getElementById('fmt-underline')))  el.classList.toggle('active',!!cell.underline);
+  if((el=document.getElementById('fmt-strike')))     el.classList.toggle('active',!!cell.strike);
+  if((el=document.getElementById('fmt-wrap')))       el.classList.toggle('active',!!cell.wrap);
+  if((el=document.getElementById('fmt-align-left')))   el.classList.toggle('active',(cell.align||'left')==='left');
+  if((el=document.getElementById('fmt-align-center'))) el.classList.toggle('active',cell.align==='center');
+  if((el=document.getElementById('fmt-align-right')))  el.classList.toggle('active',cell.align==='right');
+  // フォントサイズ
+  if((el=document.getElementById('fmt-font-size'))){
+    var fs = cell.fontSize||12;
+    if(parseInt(el.value)!==fs) el.value=String(fs);
+  }
+  // 文字色アイコン
+  var colorIcon=document.getElementById('fmt-color-icon');
+  if(colorIcon) colorIcon.style.color=cell.color||'#1A2B22';
+  // 背景色アイコン
+  var bgIcon=document.getElementById('fmt-bg-icon');
+  if(bgIcon) bgIcon.style.background=cell.bgColor||'#ffffff';
 }
 
 // 数値フォーマット適用
@@ -1648,10 +1661,9 @@ function drawSel(){
   <div class="fmt-sep"></div>
   <!-- フォントサイズ -->
   <input id="fmt-font-size" type="number" value="12" min="6" max="72" title="フォントサイズ"
-    oninput="applyFormat('fontSize',parseInt(this.value)||12)"
-    onchange="applyFormat('fontSize',parseInt(this.value)||12)"
-    ontouchend="event.stopPropagation()"
-    onclick="this.select()">
+    onfocus="window._fsCell=[selR1,selC1]; this.select()"
+    onblur="(function(el){var r=window._fsCell[0],cc=window._fsCell[1],sz=parseInt(el.value)||12;if(!window._toolbarUpdating){var k=r+','+cc;if(!sheets[activeSheet].data[k])sheets[activeSheet].data[k]={v:'',f:'',d:''};sheets[activeSheet].data[k].fontSize=sz;render();updateBar();}})(this)"
+    ontouchend="event.stopPropagation()">
   <div class="fmt-sep"></div>
   <!-- 文字色 -->
   <div class="fmt-color-wrap" title="文字色">
@@ -1799,7 +1811,9 @@ function setCell(r,c,v,noUndo){
   var hfResult = setCellFormula(activeSheet, r, c, v);
   if(hfResult !== null){ d = hfResult; }
   else if(v && v[0]==='='){ d = evalFormula(v, r, c); }
-  sheets[activeSheet].data[key] = {v:v, f:v, d:String(d)};
+  // 既存の書式プロパティを保持してv/f/dのみ更新
+  var existing = sheets[activeSheet].data[key] || {};
+  sheets[activeSheet].data[key] = Object.assign({}, existing, {v:v, f:v, d:String(d)});
   // 依存セルの再計算（数値変更→数式セルに即反映）
   if(hfResult !== null) recalcSheet(activeSheet, sheets[activeSheet].data);
 }
