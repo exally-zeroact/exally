@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -1517,6 +1517,7 @@ function updateBar(){
   document.getElementById('cell-addr').value = addr+scaleStr;
   var cell=getCell(selR1,selC1);
   document.getElementById('formula-input').value=cell.f||'';
+  updateFormulaDisplay(cell.f||'');
   updateFormatBar(cell);
   updateActionBtn();
 }
@@ -1737,6 +1738,7 @@ function _doRender() {
   } else if(getRefInput()&&refStartR>=0){
     drawRefHighlightColor(refStartR,refStartC,REF_COLORS[0]);
   }
+
   // ⋮ボタン位置を更新
   if(typeof updateActionBtn==='function') updateActionBtn();
 }
@@ -1963,13 +1965,15 @@ function drawSel(){
 <div id="formula-bar">
   <input id="cell-addr" type="text" value="A1" readonly>
   <input id="formula-input" type="text" placeholder="値や数式を入力してね">
-  <button id="fkb-ok"  class="undo-btn" onclick="fkbCommit()" style="display:none;color:#3D9E72;font-weight:700;" title="確定">✓</button>
-  <button id="fkb-ng"  class="undo-btn" onclick="fkbCancel()" style="display:none;color:#E53935;" title="キャンセル">✗</button>
   <button id="fkb-toggle" class="undo-btn" onclick="fkbToggle()" title="キーボード切り替え">⌨️</button>
   <button class="undo-btn" onclick="doUndo()" title="元に戻す">↩</button>
   <button class="undo-btn" onclick="doRedo()" title="やり直す">↪</button>
   <div id="ref-chip-bar" style="display:none;padding:2px 8px;background:#FFF8E1;border-bottom:1px solid #FFE0B2;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:#E65100;"></div>
 </div>
+
+<!-- 色付き数式表示行（カスタムKBモード+数式入力時のみ表示） -->
+
+<div id="formula-color-bar" style="display:none;padding:2px 8px;background:#fff;border-bottom:1px solid #E8F5EE;font-size:15px;font-family:'DM Mono',monospace;line-height:24px;white-space:nowrap;overflow-x:auto;"></div>
 
 <!-- カスタムキーボード（formula編集モード時に表示） -->
 
@@ -1997,7 +2001,8 @@ function drawSel(){
     <button class="fkb-btn" onclick="fkbInsert('3')">3</button>
     <button class="fkb-btn" onclick="fkbInsert('0')">0</button>
     <button class="fkb-btn" onclick="fkbInsert('.')">.</button>
-    <button class="fkb-btn fkb-del" onclick="fkbDelete()">⌫</button>
+    <button class="fkb-btn fkb-del" onclick="fkbDelete()" style="max-width:none;flex:1;">⌫</button>
+    <button class="fkb-btn fkb-commit" onclick="fkbCommit()" style="max-width:none;flex:1;background:#52B788;color:#fff;font-weight:700;">✓</button>
   </div>
 
 </div>
@@ -2116,7 +2121,41 @@ var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
 var editingCell=null;
 var refMode=false; // セル参照入力モード
 var REF_COLORS=['#1E88E5','#E53935','#8E24AA','#00897B','#F4511E'];
-var _currentRefs=[]; // 現在の数式の参照セルリスト
+var _currentRefs=[];
+function extractRefs(formula){
+  if(!formula||formula[0]!=='=') return [];
+  var matches=formula.match(/(?<![A-Za-z])\$?[A-Za-z]{1,3}\$?[0-9]{1,7}(?![0-9A-Za-z])/g);
+  if(!matches) return [];
+  return matches.filter(function(v,i,a){return a.indexOf(v)===i;})
+    .map(function(a){return a.replace(/\$/g,'');});
+}
+function buildDisplayHtml(formula){
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  if(!formula||formula[0]!=='=') return esc(formula);
+  var refs=extractRefs(formula);
+  var html=esc(formula);
+  refs.forEach(function(addr,i){
+    var c=REF_COLORS[i%REF_COLORS.length];
+    html=html.replace(new RegExp('(?<![A-Za-z])'+addr+'(?![0-9A-Za-z])','g'),
+      '<span style="color:'+c+';font-weight:700">'+addr+'</span>');
+  });
+  return html;
+}
+function updateFormulaDisplay(formula){
+  _currentRefs=extractRefs(formula);
+  var bar=document.getElementById('formula-color-bar');
+  if(!bar) return;
+  var kb=document.getElementById('formula-kb');
+  var isCustomKB=kb&&kb.style.display==='block';
+  if(isCustomKB&&formula&&(formula[0]==='='||formula[0]==='＝')){
+    bar.innerHTML=buildDisplayHtml(formula);
+    bar.style.display='block';
+    _canvasBCRDirty=true;
+  } else {
+    bar.style.display='none';
+    if(bar.style.display==='none') _canvasBCRDirty=true;
+  }
+} // 現在の数式の参照セルリスト
 var refStartR=-1, refStartC=-1;
 var _editMode=false;    // カスタムKB表示中
 var _fiCursorPos=0;     // formula-inputのカーソル位置
@@ -2485,8 +2524,6 @@ function bindEvents(){
     var kb=document.getElementById('formula-kb');
     if(kb.style.display==='none'||!kb.style.display){
       _editMode=false;
-      document.getElementById('fkb-ok').style.display='none';
-      document.getElementById('fkb-ng').style.display='none';
       var stored=getCell(selR1,selC1).f||'';
       if(this.value!==stored) setCell(selR1,selC1,this.value);
       render();
@@ -3174,8 +3211,6 @@ function startEdit(r,c,init){
 // ===== カスタムキーボード =====
 function fkbShow(){
   _editMode=true;
-  document.getElementById('fkb-ok').style.display='';
-  document.getElementById('fkb-ng').style.display='';
   var fi=document.getElementById('formula-input');
   _fiCursorPos=fi.value.length;
   refMode=(fi.value.length>0&&(fi.value[0]==='='||fi.value[0]==='＝'));
@@ -3183,8 +3218,6 @@ function fkbShow(){
 function fkbHide(){
   _editMode=false;
   document.getElementById('formula-kb').style.display='none';
-  document.getElementById('fkb-ok').style.display='none';
-  document.getElementById('fkb-ng').style.display='none';
   document.getElementById('fkb-toggle').textContent='⌨️';
   var fi=document.getElementById('formula-input');
   fi.removeAttribute('readonly');
@@ -3211,6 +3244,7 @@ function fkbToggle(){
     btn.textContent='⌨️';
     _canvasBCRDirty=true;
   }
+  updateFormulaDisplay(fi.value);
   render();
 }
 function fkbInsert(char){
@@ -3220,7 +3254,7 @@ function fkbInsert(char){
   _fiCursorPos+=char.length;
   fi.value=v;
   refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
-  _currentRefs=extractRefs(v);
+  updateFormulaDisplay(v);
   render();
 }
 function fkbDelete(){
@@ -3231,7 +3265,7 @@ function fkbDelete(){
   _fiCursorPos--;
   fi.value=v;
   refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
-  _currentRefs=extractRefs(v);
+  updateFormulaDisplay(v);
   render();
 }
 function fkbCommit(){
