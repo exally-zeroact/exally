@@ -1281,17 +1281,30 @@ function _jsComputeFormula(sheet, v) {
 // ================================================================
 // setCellFormula / undoCellFormula / recalcSheet
 // ================================================================
+// HFに渡す値の型変換（文字列の数値→number、空→null）
+function toHFVal(v){
+  if(v===''||v===null||v===undefined) return null;
+  if(typeof v==='string'&&v[0]==='=') return v; // 数式はそのまま
+  if(typeof v==='string'&&v.trim()!==''&&!isNaN(v)) return parseFloat(v); // 数値文字列→number
+  return v;
+}
 function setCellFormula(sheet, r, c, v) {
   if(!hf) return null;
   try {
     var jsResult = _jsComputeFormula(sheet, v);
     if(jsResult !== null) {
-      hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, (v===''||v===null||v===undefined)?null:v);
+      hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, toHFVal(v));
       return jsResult;
     }
     var converted = (v&&v[0]==='=') ? convertFormula(v) : v;
-    hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, (converted===''||converted===null||converted===undefined)?null:converted);
-    return _hfGetDisplay(sheet, r, c);
+    hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, toHFVal(converted));
+    var hfDisp = _hfGetDisplay(sheet, r, c);
+    // HFがエラーを返した場合はJS evalFormulaで再試行
+    if(hfDisp && typeof hfDisp==='string' && hfDisp[0]==='#' && v && v[0]==='='){
+      var jsRetry = evalFormula(v, r, c);
+      if(jsRetry !== v && jsRetry !== '#ERR' && String(jsRetry)[0]!=='#') return String(jsRetry);
+    }
+    return hfDisp;
   } catch(e) { return null; }
 }
 function undoCellFormula(sheet, r, c, v) { return setCellFormula(sheet, r, c, v); }
@@ -1704,7 +1717,7 @@ function drawBorder(r,c){
 function checkRefMode(){
   var el=document.getElementById('cell-input');
   if(editingCell&&el&&el.style.display!=='none'){
-    refMode = el.value.length>0 && el.value[0]==='=';
+    refMode = el.value.length>0 && (el.value[0]==='='||el.value[0]==='＝');
     return;
   }
   refMode=false;
@@ -1952,6 +1965,13 @@ function resize() {
 function getCell(r,c){ return sheets[activeSheet].data[r+','+c] || {v:'',f:'',d:''}; }
 var undoStack = [], redoStack = [];
 function setCell(r,c,v,noUndo){
+  // 全角→半角正規化（日本語IMEキーボード対応）
+  if(v && typeof v==='string'){
+    v = v.replace(/[！-～]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
+    v = v.replace(/\u3000/g, ' ');
+  }
+  // 不完全数式（=のみ）は空として扱う
+  if(v==='=') v='';
   var key = r+','+c;
   var prev = sheets[activeSheet].data[key] ? sheets[activeSheet].data[key].v : '';
   if(!noUndo){ undoStack.push({sheet:activeSheet,key:key,old:prev,new_:v}); redoStack=[]; }
@@ -2249,7 +2269,21 @@ function bindEvents(){
     else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
   });
   ci.addEventListener('input',function(){ checkRefMode(); if(!refMode){refStartR=-1;} render(); });
-  ci.addEventListener('blur',function(){ if(!refMode) commitEdit(); });
+  // blur: IMEの変換中はcommitしない（compositionend後にcommit）
+  var _composing = false;
+  ci.addEventListener('compositionstart', function(){ _composing=true; });
+  ci.addEventListener('compositionend', function(){
+    _composing=false;
+    checkRefMode(); render();
+  });
+  ci.addEventListener('blur', function(){
+    if(_composing) return;      // IME変換中はスキップ
+    if(refMode) return;         // refMode中はスキップ
+    // 少し待ってからcommit（refselのfocus復帰を待つ）
+    setTimeout(function(){
+      if(!refMode && editingCell) commitEdit();
+    }, 100);
+  });
   // モバイル入力欄ハンドラ
   var popupInp = document.getElementById('popup-input');
   if(popupInp){
@@ -2638,6 +2672,13 @@ function onTE(e){
   var r=canvas.getBoundingClientRect();
   var x=touchState.sx-r.left,y=touchState.sy-r.top;
   if(x>HDR_W&&y>HDR_H){
+    if(refMode){
+      // refMode中: セルタップ→参照アドレス挿入
+      var tr=yToR(y),tc=xToC(x);
+      refStartR=tr; refStartC=tc;
+      insertRefAddr(tr,tc,tr,tc);
+      touchState=null; return;
+    }
     commitEdit(); canvas.focus();
     var c=xToC(x),r2=yToR(y);
     if(selR1===r2&&selC1===c&&(Date.now()-touchState.time)<400){
