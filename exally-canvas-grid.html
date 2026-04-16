@@ -409,6 +409,28 @@ animation:spin 0.7s linear infinite;
 @keyframes spin { to { transform:rotate(360deg); } }
 #loading p { color:#3D9E72; font-size:13px; font-weight:700; }
 
+/* セル操作ボタン（選択セル右下） */
+#cell-action-btn {
+position:fixed;
+display:none;
+min-width:24px;
+height:22px;
+padding:0 4px;
+background:#fff;
+color:#4A6B5A;
+border:1px solid #C8ECD8;
+border-radius:4px;
+font-size:11px;
+font-family:inherit;
+cursor:pointer;
+z-index:80;
+box-shadow:0 1px 4px rgba(0,0,0,0.10);
+line-height:22px;
+text-align:center;
+user-select:none;
+-webkit-user-select:none;
+}
+#cell-action-btn:active { background:#C8ECD8; }
 /* 右クリックメニュー */
 #ctx-menu {
 position:fixed;
@@ -1375,6 +1397,30 @@ function updateBar(){
   var cell=getCell(selR1,selC1);
   document.getElementById('formula-input').value=cell.f||'';
   updateFormatBar(cell);
+  updateActionBtn();
+}
+function updateActionBtn(){
+  var btn = document.getElementById('cell-action-btn');
+  if(!btn) return;
+  var x2 = colX(selC2)+cW(selC2);
+  var y2 = rowY(selR2)+rH(selR2);
+  // canvasのページ上の位置を加算
+  var cr = canvas.getBoundingClientRect();
+  var bx = cr.left + x2 + 10;
+  var by = cr.top  + y2 - 30;
+  // 画面外クランプ
+  bx = Math.min(bx, window.innerWidth  - 34);
+  bx = Math.max(bx, cr.left + HDR_W + 2);
+  by = Math.max(by, cr.top  + HDR_H + 2);
+  by = Math.min(by, window.innerHeight - 34);
+  btn.style.left = Math.round(bx) + 'px';
+  btn.style.top  = Math.round(by) + 'px';
+  btn.style.display = 'block';
+}
+function onActionBtn(e){
+  e.stopPropagation();
+  var btn = document.getElementById('cell-action-btn');
+  showCtxMenu(parseFloat(btn.style.left), parseFloat(btn.style.top)+26);
 }
 
 // 書式ツールバーの状態を更新
@@ -1545,6 +1591,8 @@ function render() {
 
   // 10. 選択枠（最前面）
   drawSel();
+  // ⋮ボタン位置を更新
+  if(typeof updateActionBtn==='function') updateActionBtn();
 }
 
 function drawText(r,c){
@@ -1666,13 +1714,24 @@ function drawSel(){
 
 <div id="loading"><div class="spinner"></div><p>グリッドを起動中...</p></div>
 
+<button id="cell-action-btn" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation();event.preventDefault();onActionBtn(event);" onclick="onActionBtn(event)">▼</button>
+
 <div id="ctx-menu" ontouchstart="event.stopPropagation()">
+  <div class="ctx-item" onclick="explainCell()" style="color:#3D9E72;font-weight:700;">🤖 AIに解説させる</div>
+  <div class="ctx-divider"></div>
   <div class="ctx-item" onclick="ctxCopy()">📋 コピー <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+C</span></div>
   <div class="ctx-item" onclick="ctxPaste()">📌 貼り付け <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+V</span></div>
   <div class="ctx-item" onclick="ctxDelete()">🗑️ 削除 <span style="color:#aaa;font-size:11px;margin-left:auto">Del</span></div>
   <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="ctxInsertRow()">➕ 行を挿入</div>
-  <div class="ctx-item" onclick="ctxInsertCol()">➕ 列を挿入</div>
+  <div class="ctx-item" onclick="ctxInsertRow()">➕ 行を挿入（上）</div>
+  <div class="ctx-item" onclick="ctxInsertCol()">➕ 列を挿入（左）</div>
+  <div class="ctx-item" onclick="ctxDeleteRow()">🗑️ 行を削除</div>
+  <div class="ctx-item" onclick="ctxDeleteCol()">🗑️ 列を削除</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="ctxHideRow()">👁️ 行を非表示</div>
+  <div class="ctx-item" onclick="ctxHideCol()">👁️ 列を非表示</div>
+  <div class="ctx-item" id="ctx-unhide-row" style="display:none" onclick="ctxUnhideRow()">👁️ 行を再表示</div>
+  <div class="ctx-item" id="ctx-unhide-col" style="display:none" onclick="ctxUnhideCol()">👁️ 列を再表示</div>
 </div>
 
 <div id="header">
@@ -1791,8 +1850,8 @@ var C_FORMULA    = '#1565C0';
 
 // ===== 状態 =====
 var sheets = [
-  { name:'Sheet1', data:{}, colW:{}, rowH:{} },
-  { name:'Sheet2', data:{}, colW:{}, rowH:{} }
+  { name:'Sheet1', data:{}, colW:{}, rowH:{}, hiddenRows:{}, hiddenCols:{} },
+  { name:'Sheet2', data:{}, colW:{}, rowH:{}, hiddenRows:{}, hiddenCols:{} }
 ];
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
@@ -1864,7 +1923,11 @@ function setCell(r,c,v,noUndo){
 function doUndo(){
   if(!undoStack.length) return;
   var op = undoStack.pop();
-  redoStack.push(op);
+  redoStack.push({type:op.type, snap:op.type==='rowcol'?JSON.parse(JSON.stringify(sheets[activeSheet])):op.snap, kind:op.kind, sheet:op.sheet, idx:op.idx, old:op.old, nw:op.nw, key:op.key, new_:op.new_});
+  // 行列操作Undo（スナップショット復元）
+  if(op.type==='rowcol'){
+    sheets[activeSheet]=op.snap; render(); updateBar(); return;
+  }
   // リサイズUndo
   if(op.type==='resize'){
     if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.old;
@@ -1903,6 +1966,10 @@ function doRedo(){
   if(!redoStack.length) return;
   var op = redoStack.pop();
   undoStack.push(op);
+  // 行列操作Redo
+  if(op.type==='rowcol'){
+    sheets[activeSheet]=op.snap; render(); updateBar(); return;
+  }
   // リサイズRedo
   if(op.type==='resize'){
     if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.nw;
@@ -1980,8 +2047,8 @@ function evalFormula(formula, selfR, selfC){
     return '#ERR';
   }
 }
-function cW(c){ return (sheets[activeSheet].colW[c] || COL_W) * scale; }
-function rH(r){ return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
+function cW(c){ if(sheets[activeSheet].hiddenCols&&sheets[activeSheet].hiddenCols[c]) return 0; return (sheets[activeSheet].colW[c] || COL_W) * scale; }
+function rH(r){ if(sheets[activeSheet].hiddenRows&&sheets[activeSheet].hiddenRows[r]) return 0; return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
 
 // ===== 座標 =====
 function colX(c){
@@ -2329,19 +2396,20 @@ function onTS(e){
   if(nearHandle(x,y)){
     touchState={type:'handle', origR2:selR2, origC2:selC2}; return;
   }
-  var lpt = setTimeout(function(){
-    if(touchState && touchState.type==='pending'){
-      // 長押し判定 → 右クリックメニュー表示
+  touchState={type:'pending',sx:t.clientX,sy:t.clientY,sst:scrollTop,ssl:scrollLeft,time:Date.now(),lpt:null};
+  // 長押し500ms → AI解説
+  var _lpt = setTimeout(function(){
+    if(touchState&&touchState.type==='pending'){
       var r2=canvas.getBoundingClientRect();
       var lx=t.clientX-r2.left, ly=t.clientY-r2.top;
-      if(lx>HDR_W && ly>HDR_H){
-        sel(yToR(ly), xToC(lx), yToR(ly), xToC(lx));
-        showCtxMenu(t.clientX, t.clientY);
+      if(lx>HDR_W&&ly>HDR_H){
+        sel(yToR(ly),xToC(lx),yToR(ly),xToC(lx));
+        explainCell();
         touchState=null;
       }
     }
-  }, 600);
-  touchState={type:'pending',sx:t.clientX,sy:t.clientY,sst:scrollTop,ssl:scrollLeft,time:Date.now(),lpt:lpt};
+  },500);
+  touchState.lpt=_lpt;
 }
 function onTM(e){
   e.preventDefault();
@@ -2535,7 +2603,13 @@ var copyBuffer = null;
 function showCtxMenu(x,y){
   var m=document.getElementById('ctx-menu');
   m.style.left=x+'px'; m.style.top=y+'px';
-  // 画面外にはみ出さないように調整
+  // 再表示ボタン: 選択範囲内/近辺に非表示行列があれば表示
+  var hr=sheets[activeSheet].hiddenRows||{}, hc=sheets[activeSheet].hiddenCols||{};
+  var hasHR=false, hasHC=false;
+  for(var r=Math.max(0,selR1-1);r<=Math.min(ROWS-1,selR2+1);r++) if(hr[r]){hasHR=true;break;}
+  for(var c=Math.max(0,selC1-1);c<=Math.min(COLS-1,selC2+1);c++) if(hc[c]){hasHC=true;break;}
+  document.getElementById('ctx-unhide-row').style.display=hasHR?'block':'none';
+  document.getElementById('ctx-unhide-col').style.display=hasHC?'block':'none';
   m.classList.add('show');
   var rect=m.getBoundingClientRect();
   if(rect.right>window.innerWidth) m.style.left=(x-rect.width)+'px';
@@ -2582,28 +2656,115 @@ function ctxDelete(){
   updateBar(); render(); hideCtxMenu();
 }
 
+function _snapRowCol(){
+  return JSON.parse(JSON.stringify(sheets[activeSheet]));
+}
+function _pushRowColUndo(){
+  undoStack.push({type:'rowcol', snap:_snapRowCol()});
+  redoStack=[];
+}
 function ctxInsertRow(){
-  // 選択行より下を1行シフト
-  var data=sheets[activeSheet].data;
-  var newData={};
-  Object.keys(data).forEach(function(k){
-    var parts=k.split(','); var r=parseInt(parts[0]),c=parseInt(parts[1]);
-    if(r>=selR1) newData[(r+1)+','+c]=data[k];
-    else newData[k]=data[k];
+  _pushRowColUndo();
+  var s=sheets[activeSheet], nd={}, nrh={};
+  Object.keys(s.data).forEach(function(k){
+    var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);
+    nd[(r>=selR1?r+1:r)+','+c]=s.data[k];
   });
-  sheets[activeSheet].data=newData;
+  Object.keys(s.rowH).forEach(function(k){
+    var r=parseInt(k); nrh[r>=selR1?r+1:r]=s.rowH[k];
+  });
+  var nhr={};
+  Object.keys(s.hiddenRows||{}).forEach(function(k){
+    var r=parseInt(k); nhr[r>=selR1?r+1:r]=true;
+  });
+  s.data=nd; s.rowH=nrh; s.hiddenRows=nhr;
   render(); hideCtxMenu();
 }
-
 function ctxInsertCol(){
-  var data=sheets[activeSheet].data;
-  var newData={};
-  Object.keys(data).forEach(function(k){
-    var parts=k.split(','); var r=parseInt(parts[0]),c=parseInt(parts[1]);
-    if(c>=selC1) newData[r+','+(c+1)]=data[k];
-    else newData[k]=data[k];
+  _pushRowColUndo();
+  var s=sheets[activeSheet], nd={}, ncw={};
+  Object.keys(s.data).forEach(function(k){
+    var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);
+    nd[r+','+(c>=selC1?c+1:c)]=s.data[k];
   });
-  sheets[activeSheet].data=newData;
+  Object.keys(s.colW).forEach(function(k){
+    var c=parseInt(k); ncw[c>=selC1?c+1:c]=s.colW[k];
+  });
+  var nhc={};
+  Object.keys(s.hiddenCols||{}).forEach(function(k){
+    var c=parseInt(k); nhc[c>=selC1?c+1:c]=true;
+  });
+  s.data=nd; s.colW=ncw; s.hiddenCols=nhc;
+  render(); hideCtxMenu();
+}
+function ctxDeleteRow(){
+  _pushRowColUndo();
+  var s=sheets[activeSheet], nd={}, nrh={};
+  Object.keys(s.data).forEach(function(k){
+    var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);
+    if(r>=selR1&&r<=selR2) return;
+    nd[(r>selR2?r-(selR2-selR1+1):r)+','+c]=s.data[k];
+  });
+  Object.keys(s.rowH).forEach(function(k){
+    var r=parseInt(k);
+    if(r>=selR1&&r<=selR2) return;
+    nrh[r>selR2?r-(selR2-selR1+1):r]=s.rowH[k];
+  });
+  var nhr={};
+  Object.keys(s.hiddenRows||{}).forEach(function(k){
+    var r=parseInt(k);
+    if(r>=selR1&&r<=selR2) return;
+    nhr[r>selR2?r-(selR2-selR1+1):r]=true;
+  });
+  s.data=nd; s.rowH=nrh; s.hiddenRows=nhr;
+  sel(Math.max(0,selR1),selC1,Math.max(0,selR1),selC2);
+  render(); hideCtxMenu();
+}
+function ctxDeleteCol(){
+  _pushRowColUndo();
+  var s=sheets[activeSheet], nd={}, ncw={};
+  Object.keys(s.data).forEach(function(k){
+    var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);
+    if(c>=selC1&&c<=selC2) return;
+    nd[r+','+(c>selC2?c-(selC2-selC1+1):c)]=s.data[k];
+  });
+  Object.keys(s.colW).forEach(function(k){
+    var c=parseInt(k);
+    if(c>=selC1&&c<=selC2) return;
+    ncw[c>selC2?c-(selC2-selC1+1):c]=s.colW[k];
+  });
+  var nhc={};
+  Object.keys(s.hiddenCols||{}).forEach(function(k){
+    var c=parseInt(k);
+    if(c>=selC1&&c<=selC2) return;
+    nhc[c>selC2?c-(selC2-selC1+1):c]=true;
+  });
+  s.data=nd; s.colW=ncw; s.hiddenCols=nhc;
+  sel(selR1,Math.max(0,selC1),selR2,Math.max(0,selC1));
+  render(); hideCtxMenu();
+}
+function ctxHideRow(){
+  _pushRowColUndo();
+  if(!sheets[activeSheet].hiddenRows) sheets[activeSheet].hiddenRows={};
+  for(var r=selR1;r<=selR2;r++) sheets[activeSheet].hiddenRows[r]=true;
+  render(); hideCtxMenu();
+}
+function ctxHideCol(){
+  _pushRowColUndo();
+  if(!sheets[activeSheet].hiddenCols) sheets[activeSheet].hiddenCols={};
+  for(var c=selC1;c<=selC2;c++) sheets[activeSheet].hiddenCols[c]=true;
+  render(); hideCtxMenu();
+}
+function ctxUnhideRow(){
+  _pushRowColUndo();
+  var hr=sheets[activeSheet].hiddenRows||{};
+  for(var r=Math.max(0,selR1-1);r<=Math.min(ROWS-1,selR2+1);r++) delete hr[r];
+  render(); hideCtxMenu();
+}
+function ctxUnhideCol(){
+  _pushRowColUndo();
+  var hc=sheets[activeSheet].hiddenCols||{};
+  for(var c=Math.max(0,selC1-1);c<=Math.min(COLS-1,selC2+1);c++) delete hc[c];
   render(); hideCtxMenu();
 }
 function moveSel(dr,dc){
@@ -2876,6 +3037,80 @@ function copyText(btn, text){
   if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
   } else { fallback(); }
+}
+// ===== AI セル解説 =====
+function explainCell(){
+  hideCtxMenu();
+
+  var addr, prompt;
+  var isRange = !(selR1===selR2&&selC1===selC2);
+
+  if(isRange){
+    // 範囲選択: 選択範囲内の値を一覧化
+    var cells=[];
+    for(var r=selR1;r<=Math.min(selR2,selR1+9);r++)
+      for(var c=selC1;c<=Math.min(selC2,selC1+9);c++){
+        var nc=getCell(r,c);
+        if(nc&&nc.v) cells.push(cellAddr(r,c)+':'+nc.v);
+      }
+    addr = cellAddr(selR1,selC1)+':'+cellAddr(selR2,selC2);
+    prompt = '【範囲解説リクエスト】\n範囲: '+addr+'\n';
+    if(cells.length) prompt += 'セル内容: '+cells.join(', ')+'\n';
+    prompt += 'この範囲のデータが何を表しているか1〜3行で簡潔に解説してね。書き込みは不要。';
+  } else {
+    // 単一セル
+    var cell=getCell(selR1,selC1);
+    addr=cellAddr(selR1,selC1);
+    var formula=(cell.f&&cell.f[0]==='=')?cell.f:null;
+    var val=cell.v||'';
+    var context=[];
+    for(var r=Math.max(0,selR1-2);r<=selR1+2;r++)
+      for(var c=Math.max(0,selC1-2);c<=selC1+2;c++){
+        if(r===selR1&&c===selC1) continue;
+        var nc=getCell(r,c);
+        if(nc&&nc.v) context.push(cellAddr(r,c)+':'+nc.v);
+      }
+    prompt='【セル解説リクエスト】\nセル: '+addr+'\n';
+    if(formula){ prompt+='数式: '+formula+'\n計算結果: '+val+'\n'; }
+    else { prompt+='値: '+(val||'（空）')+'\n'; }
+    if(context.length) prompt+='周囲のセル: '+context.slice(0,8).join(', ')+'\n';
+    prompt+='このセルが何をしているか1〜3行で簡潔に解説してね。書き込みは不要。';
+  }
+
+  // パネルを開いてから直接送信
+  var panel=document.getElementById('ai-panel-wrap');
+  if(panel&&!panel.classList.contains('open')) handleAIBtn();
+  setTimeout(function(){ _sendExplain(prompt); }, 150);
+}
+async function _sendExplain(prompt){
+  var input=document.getElementById('ai-input');
+  if(!input) return;
+  input.value=prompt;
+  // sendToAIと同じフローで送信（プロンプトをそのまま渡す）
+  var text=prompt;
+  addAIChatMsg('user','🤖 '+cellAddr(selR1,selC1)+' を解説中...');
+  input.value='';
+  document.getElementById('ai-send').disabled=true;
+  var thinkDiv=document.createElement('div');
+  thinkDiv.className='ai-msg-ai'; thinkDiv.id='ai-thinking';
+  thinkDiv.innerHTML='<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
+  document.getElementById('ai-response-area').appendChild(thinkDiv);
+  document.getElementById('ai-response-area').scrollTop=9999;
+  try{
+    var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text,history:aiHistory})});
+    var data=await res.json();
+    var th=document.getElementById('ai-thinking'); if(th) th.remove();
+    var aiText=data.text||'エラーが発生したよ';
+    addAIChatMsg('ai',aiText);
+    aiHistory.push({role:'user',content:text});
+    aiHistory.push({role:'assistant',content:aiText});
+    if(aiHistory.length>40) aiHistory=aiHistory.slice(-40);
+  }catch(e){
+    var th=document.getElementById('ai-thinking'); if(th) th.remove();
+    addAIChatMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
+  }
+  document.getElementById('ai-send').disabled=false;
 }
 var aiHistory = [];
 
