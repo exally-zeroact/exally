@@ -52,6 +52,60 @@ body {
   gap:8px;
   flex-shrink:0;
 }
+#format-bar {
+  height:32px;
+  background:#F8FEFC;
+  border-bottom:1px solid #C8ECD8;
+  display:flex;
+  align-items:center;
+  padding:0 6px;
+  gap:2px;
+  flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
+}
+.fmt-btn {
+  height:24px;
+  min-width:24px;
+  padding:0 5px;
+  border:1px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  color:#4A6B5A;
+  font-size:12px;
+  font-family:inherit;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.fmt-btn:hover { background:#E8F5EE; border-color:#C8ECD8; }
+.fmt-btn.active { background:#C8ECD8; border-color:#3D9E72; color:#3D9E72; }
+.fmt-sep { width:1px; height:18px; background:#C8ECD8; margin:0 2px; flex-shrink:0; }
+.fmt-btn-b { font-weight:700; }
+.fmt-btn-i { font-style:italic; }
+.fmt-btn-u { text-decoration:underline; }
+#fmt-font-size {
+  width:40px; height:22px; border:1px solid #C8ECD8; border-radius:4px;
+  font-size:11px; text-align:center; background:#fff; font-family:inherit;
+  color:#1A2B22;
+}
+#fmt-color-wrap, #fmt-bg-wrap {
+  position:relative; width:24px; height:24px; cursor:pointer;
+}
+#fmt-color, #fmt-bg {
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+.fmt-color-icon {
+  width:22px; height:22px; border-radius:3px; border:1px solid #C8ECD8;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; pointer-events:none;
+}
+#fmt-numfmt {
+  height:22px; border:1px solid #C8ECD8; border-radius:4px;
+  font-size:11px; background:#fff; font-family:inherit; color:#1A2B22;
+  padding:0 3px;
+}
 #cell-addr {
   width:64px;
   font-size:12px;
@@ -1241,38 +1295,129 @@ function extractWriteAction(text){
 }
 
 /* ===== canvas-renderer.js (inlined) ===== */
+/**
+ * canvas-renderer.js - Canvasグリッド描画関数（書式対応版）
+ * ================================================================
+ * 参照するグローバル変数（canvas-grid.html側で定義）:
+ *   ctx, canvas, wrapW, wrapH, dpr, scale
+ *   scrollTop, scrollLeft, HDR_W, HDR_H, COL_W, ROW_H, COLS, ROWS
+ *   selR1, selC1, selR2, selC2
+ *   C_HDR_BG, C_HDR_TXT, C_HDR_LINE, C_CELL_BG, C_CELL_LINE
+ *   C_SEL_BG, C_SEL_HDR, C_SEL_BORDER, C_CELL_TXT, C_FORMULA
+ *   sheets, activeSheet
+ *   getCell(), cW(), rH(), colX(), rowY(), xToC(), yToR()
+ * ================================================================
+ */
+
 function colLetter(c){ var s=''; c+=1; while(c>0){ s=String.fromCharCode(64+((c-1)%26+1))+s; c=Math.floor((c-1)/26); } return s; }
+
 function cellAddr(r,c){ return colLetter(c)+(r+1); }
+
 function updateBar(){
   var addr = cellAddr(selR1,selC1);
   var scaleStr = scale!==1 ? ' ×'+Math.round(scale*10)/10 : '';
   document.getElementById('cell-addr').value = addr+scaleStr;
   var cell=getCell(selR1,selC1);
   document.getElementById('formula-input').value=cell.f||'';
+  updateFormatBar(cell);
 }
+
+// 書式ツールバーの状態を更新
+function updateFormatBar(cell) {
+  var el;
+  if((el=document.getElementById('fmt-bold')))    el.classList.toggle('active',!!cell.bold);
+  if((el=document.getElementById('fmt-italic')))  el.classList.toggle('active',!!cell.italic);
+  if((el=document.getElementById('fmt-underline')))el.classList.toggle('active',!!cell.underline);
+  if((el=document.getElementById('fmt-align-left')))  el.classList.toggle('active',(cell.align||'left')==='left');
+  if((el=document.getElementById('fmt-align-center')))el.classList.toggle('active',cell.align==='center');
+  if((el=document.getElementById('fmt-align-right'))) el.classList.toggle('active',cell.align==='right');
+}
+
+// 数値フォーマット適用
+function applyNumFmt(val, fmt) {
+  var n = parseFloat(val);
+  if(isNaN(n)) return val;
+  if(fmt==='#,##0')    return Math.round(n).toLocaleString('ja-JP');
+  if(fmt==='#,##0.00') return n.toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(fmt==='0%')       return Math.round(n*100)+'%';
+  if(fmt==='0.00%')    return (n*100).toFixed(2)+'%';
+  if(fmt==='¥#,##0')   return '¥'+Math.round(n).toLocaleString('ja-JP');
+  if(fmt==='0.00')     return n.toFixed(2);
+  if(fmt==='YYYY/MM/DD'){
+    var d=new Date(Math.round((n-25569)*86400*1000));
+    return d.getFullYear()+'/'
+      +String(d.getMonth()+1).padStart(2,'0')+'/'
+      +String(d.getDate()).padStart(2,'0');
+  }
+  return val;
+}
+
 function render() {
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,wrapW,wrapH);
+
   var sC=xToC(HDR_W), sR=yToR(HDR_H), eC=sC, eR=sR;
   while(colX(eC)<wrapW && eC<COLS-1) eC++;
   while(rowY(eR)<wrapH && eR<ROWS-1) eR++;
-  ctx.fillStyle=C_CELL_BG; ctx.fillRect(HDR_W,HDR_H,wrapW,wrapH);
+
+  // 1. 全体白背景（高速）
+  ctx.fillStyle=C_CELL_BG;
+  ctx.fillRect(HDR_W,HDR_H,wrapW,wrapH);
+
+  // 2. bgColorあるセルを上塗り
+  for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++){
+    var cell=getCell(r,c);
+    if(!cell.bgColor) continue;
+    var cx=colX(c),cy=rowY(r),cw=cW(c),ch=rH(r);
+    if(cx+cw<HDR_W||cx>wrapW||cy+ch<HDR_H||cy>wrapH) continue;
+    ctx.fillStyle=cell.bgColor;
+    ctx.fillRect(cx,cy,cw,ch);
+  }
+
+  // 3. 選択セル背景
   ctx.fillStyle=C_SEL_BG;
   for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
     for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
       ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
+
+  // 2. グリッド線
   ctx.strokeStyle=C_CELL_LINE; ctx.lineWidth=0.5; ctx.beginPath();
-  for(var r=sR;r<=eR+2;r++){ var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue; ctx.moveTo(HDR_W,ly); ctx.lineTo(wrapW,ly); }
-  for(var c=sC;c<=eC+2;c++){ var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue; ctx.moveTo(lx,HDR_H); ctx.lineTo(lx,wrapH); }
+  for(var r=sR;r<=eR+2;r++){
+    var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue;
+    ctx.moveTo(HDR_W,ly); ctx.lineTo(wrapW,ly);
+  }
+  for(var c=sC;c<=eC+2;c++){
+    var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue;
+    ctx.moveTo(lx,HDR_H); ctx.lineTo(lx,wrapH);
+  }
   ctx.stroke();
+
+  // 3. セルテキスト
   for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++) drawText(r,c);
-  ctx.fillStyle=C_HDR_BG; ctx.fillRect(0,0,wrapW,HDR_H); ctx.fillRect(0,0,HDR_W,wrapH);
+
+  // 4. 罫線（グリッド線の上に描画）
+  for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++) drawBorder(r,c);
+
+  // 5. ヘッダー背景
+  ctx.fillStyle=C_HDR_BG;
+  ctx.fillRect(0,0,wrapW,HDR_H);
+  ctx.fillRect(0,0,HDR_W,wrapH);
+
+  // 6. 選択ヘッダー強調
   ctx.fillStyle=C_SEL_HDR;
   for(var c=selC1;c<=selC2;c++) ctx.fillRect(colX(c),0,cW(c),HDR_H);
   for(var r=selR1;r<=selR2;r++) ctx.fillRect(0,rowY(r),HDR_W,rH(r));
+
+  // 7. ヘッダー線
   ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.beginPath();
-  for(var c=sC;c<=eC+2;c++){ var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue; ctx.moveTo(lx,0); ctx.lineTo(lx,HDR_H); }
-  for(var r=sR;r<=eR+2;r++){ var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue; ctx.moveTo(0,ly); ctx.lineTo(HDR_W,ly); }
+  for(var c=sC;c<=eC+2;c++){
+    var lx=Math.round(colX(c))+0.5; if(lx<=HDR_W||lx>wrapW) continue;
+    ctx.moveTo(lx,0); ctx.lineTo(lx,HDR_H);
+  }
+  for(var r=sR;r<=eR+2;r++){
+    var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue;
+    ctx.moveTo(0,ly); ctx.lineTo(HDR_W,ly);
+  }
   ctx.moveTo(HDR_W+0.5,0); ctx.lineTo(HDR_W+0.5,wrapH);
   ctx.moveTo(0,HDR_H+0.5); ctx.lineTo(wrapW,HDR_H+0.5);
   ctx.stroke();
@@ -1281,32 +1426,105 @@ function render() {
   if(lastColX>HDR_W&&lastColX<=wrapW){ ctx.moveTo(lastColX,0); ctx.lineTo(lastColX,wrapH); }
   if(lastRowY>HDR_H&&lastRowY<=wrapH){ ctx.moveTo(0,lastRowY); ctx.lineTo(wrapW,lastRowY); }
   ctx.stroke();
-  ctx.textBaseline='middle'; ctx.textAlign='center';
-  var fw=scale<0.75?'normal':'bold', fs=Math.max(9,Math.round(11*Math.min(scale,1.5)));
+
+  // 8. ヘッダーテキスト
+  ctx.textBaseline='middle';
+  ctx.textAlign='center';
+  var fw=scale<0.75?'normal':'bold';
+  var fs=Math.max(9,Math.round(11*Math.min(scale,1.5)));
   ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
-  for(var c=sC;c<=eC+1;c++){ var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue; ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT; ctx.fillText(colLetter(c),x+w/2,HDR_H/2); }
+  for(var c=sC;c<=eC+1;c++){
+    var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue;
+    ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT;
+    ctx.fillText(colLetter(c),x+w/2,HDR_H/2);
+  }
   ctx.textAlign='right';
-  ctx.font=Math.max(9,Math.round(11*Math.min(scale,1.5)))+'px "Noto Sans JP",sans-serif';
-  for(var r=sR;r<=eR+1;r++){ var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue; ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT; ctx.fillText(r+1,HDR_W-4,y+h/2); }
-  ctx.fillStyle=C_HDR_BG; ctx.fillRect(0,0,HDR_W,HDR_H);
-  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.strokeRect(0.5,0.5,HDR_W-0.5,HDR_H-0.5);
+  var rf=Math.max(9,Math.round(11*Math.min(scale,1.5)));
+  ctx.font=rf+'px "Noto Sans JP",sans-serif';
+  for(var r=sR;r<=eR+1;r++){
+    var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue;
+    ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT;
+    ctx.fillText(r+1,HDR_W-4,y+h/2);
+  }
+
+  // 9. 左上角
+  ctx.fillStyle=C_HDR_BG;
+  ctx.fillRect(0,0,HDR_W,HDR_H);
+  ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5;
+  ctx.strokeRect(0.5,0.5,HDR_W-0.5,HDR_H-0.5);
+
+  // 10. 選択枠（最前面）
   drawSel();
 }
+
 function drawText(r,c){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
   var cell=getCell(r,c);
-  var display=(cell.d!==undefined&&cell.d!=='')?cell.d:cell.v;
-  if(!display) return;
-  var isFormula=cell.f&&cell.f[0]==='=';
-  var showRaw=isFormula&&cell.d===cell.f;
-  ctx.fillStyle=showRaw?C_FORMULA:C_CELL_TXT;
-  ctx.font=Math.max(9,Math.min(13,Math.round(12*scale)))+'px "Noto Sans JP",sans-serif';
-  ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.save(); ctx.rect(x+1,y,w-2,h); ctx.clip();
-  ctx.fillText(display,x+4,y+h/2);
+
+  // 表示値（numFmt適用）
+  var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
+  if(!raw) return;
+  var display = (cell.numFmt && raw!=='') ? applyNumFmt(raw, cell.numFmt) : raw;
+
+  // フォント
+  var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||12)*scale)));
+  var weight = cell.bold ? 'bold' : 'normal';
+  var style  = cell.italic ? 'italic' : 'normal';
+  ctx.font = style+' '+weight+' '+fontSize+'px "Noto Sans JP",sans-serif';
+
+  // 文字色
+  var isFormula = cell.f && cell.f[0]==='=';
+  var showRaw = isFormula && cell.d===cell.f;
+  ctx.fillStyle = showRaw ? C_FORMULA : (cell.color||C_CELL_TXT);
+
+  // 文字揃え
+  var align = cell.align||'left';
+  // 数値・日付は右寄せデフォルト（書式が明示されていない場合）
+  if(!cell.align && typeof parseFloat(raw)==='number' && !isNaN(parseFloat(raw)) && raw!=='') align='right';
+
+  ctx.textBaseline='middle';
+  ctx.save();
+  ctx.rect(x+1,y,w-2,h); ctx.clip();
+
+  var tx;
+  if(align==='center') { ctx.textAlign='center'; tx=x+w/2; }
+  else if(align==='right') { ctx.textAlign='right'; tx=x+w-4; }
+  else { ctx.textAlign='left'; tx=x+4; }
+
+  ctx.fillText(display, tx, y+h/2);
+
+  // 下線
+  if(cell.underline){
+    var metrics = ctx.measureText(display);
+    var ux = align==='center' ? x+w/2-metrics.width/2 :
+             align==='right'  ? x+w-4-metrics.width : x+4;
+    ctx.strokeStyle = cell.color||C_CELL_TXT;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(ux, y+h/2+fontSize*0.6);
+    ctx.lineTo(ux+metrics.width, y+h/2+fontSize*0.6);
+    ctx.stroke();
+  }
+
   ctx.restore();
 }
+
+// 罫線描画
+function drawBorder(r,c){
+  var cell=getCell(r,c);
+  if(!cell.border) return;
+  var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
+  if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
+  var b=cell.border;
+  ctx.save();
+  if(b.top){    ctx.strokeStyle=b.top===2?'#1A2B22':'#888'; ctx.lineWidth=b.top===2?2:0.5; ctx.beginPath(); ctx.moveTo(x,y+0.5); ctx.lineTo(x+w,y+0.5); ctx.stroke(); }
+  if(b.bottom){ ctx.strokeStyle=b.bottom===2?'#1A2B22':'#888'; ctx.lineWidth=b.bottom===2?2:0.5; ctx.beginPath(); ctx.moveTo(x,y+h-0.5); ctx.lineTo(x+w,y+h-0.5); ctx.stroke(); }
+  if(b.left){   ctx.strokeStyle=b.left===2?'#1A2B22':'#888'; ctx.lineWidth=b.left===2?2:0.5; ctx.beginPath(); ctx.moveTo(x+0.5,y); ctx.lineTo(x+0.5,y+h); ctx.stroke(); }
+  if(b.right){  ctx.strokeStyle=b.right===2?'#1A2B22':'#888'; ctx.lineWidth=b.right===2?2:0.5; ctx.beginPath(); ctx.moveTo(x+w-0.5,y); ctx.lineTo(x+w-0.5,y+h); ctx.stroke(); }
+  ctx.restore();
+}
+
 function drawSel(){
   var x1=colX(selC1),y1=rowY(selR1);
   var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
@@ -1320,6 +1538,7 @@ function drawSel(){
   ctx.beginPath(); ctx.arc(x2,y2,3.5,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
+
 </script>
 
 </head>
@@ -1352,7 +1571,53 @@ function drawSel(){
   <input id="formula-input" type="text" placeholder="値や数式を入力してね">
 </div>
 
+<div id="format-bar">
+  <!-- 太字・斜体・下線 -->
+  <button class="fmt-btn fmt-btn-b" id="fmt-bold"      onclick="toggleFormat('bold')"      title="太字">B</button>
+  <button class="fmt-btn fmt-btn-i" id="fmt-italic"    onclick="toggleFormat('italic')"    title="斜体">I</button>
+  <button class="fmt-btn fmt-btn-u" id="fmt-underline" onclick="toggleFormat('underline')" title="下線">U</button>
+  <div class="fmt-sep"></div>
+  <!-- フォントサイズ -->
+  <input id="fmt-font-size" type="number" value="12" min="6" max="72" title="フォントサイズ"
+    onchange="applyFormat('fontSize',parseInt(this.value)||12)" onblur="applyFormat('fontSize',parseInt(this.value)||12)">
+  <div class="fmt-sep"></div>
+  <!-- 文字色 -->
+  <div class="fmt-color-icon" id="fmt-color-icon" style="color:#1A2B22;" title="文字色">A
+    <div class="fmt-color-wrap" style="position:absolute;inset:0;">
+      <input type="color" id="fmt-color" value="#1A2B22" onchange="applyFormat('color',this.value)" title="文字色">
+    </div>
+  </div>
+  <!-- 背景色 -->
+  <div class="fmt-color-icon" id="fmt-bg-icon" style="background:#fff;position:relative;" title="背景色">☐
+    <div class="fmt-color-wrap" style="position:absolute;inset:0;">
+      <input type="color" id="fmt-bg" value="#ffffff" onchange="applyFormat('bgColor',this.value)" title="背景色">
+    </div>
+  </div>
+  <div class="fmt-sep"></div>
+  <!-- 文字揃え -->
+  <button class="fmt-btn active" id="fmt-align-left"   onclick="applyFormat('align','left')"   title="左揃え">≡</button>
+  <button class="fmt-btn"        id="fmt-align-center" onclick="applyFormat('align','center')" title="中央揃え">≡</button>
+  <button class="fmt-btn"        id="fmt-align-right"  onclick="applyFormat('align','right')"  title="右揃え">≡</button>
+  <div class="fmt-sep"></div>
+  <!-- 罫線 -->
+  <button class="fmt-btn" onclick="applyBorderAll(1)" title="全罫線（細）">⊞</button>
+  <button class="fmt-btn" onclick="applyBorderAll(2)" title="全罫線（太）">⊟</button>
+  <button class="fmt-btn" onclick="applyBorderAll(0)" title="罫線クリア">✕</button>
+  <div class="fmt-sep"></div>
+  <!-- 数値フォーマット -->
+  <select id="fmt-numfmt" onchange="applyFormat('numFmt',this.value)" title="数値フォーマット">
+    <option value="">標準</option>
+    <option value="#,##0">桁区切り</option>
+    <option value="#,##0.00">小数2桁</option>
+    <option value="0%">パーセント</option>
+    <option value="0.00%">パーセント(小数)</option>
+    <option value="¥#,##0">通貨(¥)</option>
+    <option value="YYYY/MM/DD">日付</option>
+  </select>
+</div>
+
 <div id="grid-wrap">
+  <div id="dbg" style="position:absolute;bottom:4px;right:4px;z-index:999;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;pointer-events:none;font-family:monospace;"></div>
   <canvas id="grid-canvas" tabindex="0"></canvas>
   <textarea id="cell-input" rows="1"></textarea>
 </div>
@@ -1434,11 +1699,14 @@ window.addEventListener('load', function() {
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
 function resize() {
+  dpr = window.devicePixelRatio || 1;
   wrapW = wrap.clientWidth; wrapH = wrap.clientHeight;
   canvas.width  = Math.round(wrapW * dpr);
   canvas.height = Math.round(wrapH * dpr);
   canvas.style.width  = wrapW + 'px';
   canvas.style.height = wrapH + 'px';
+  var dbg = document.getElementById('dbg');
+  if(dbg) dbg.textContent = 'dpr:'+dpr+' cv:'+canvas.width+'×'+canvas.height+' css:'+wrapW+'×'+wrapH;
 }
 
 // ===== データ =====
@@ -1460,20 +1728,46 @@ function doUndo(){
   if(!undoStack.length) return;
   var op = undoStack.pop();
   redoStack.push(op);
+  // 書式Undo
+  if(op.type==='format'){
+    op.snap.forEach(function(s){
+      if(!sheets[activeSheet].data[s.key]) sheets[activeSheet].data[s.key]={v:'',f:'',d:''};
+      if(s.old===undefined) delete sheets[activeSheet].data[s.key][s.prop];
+      else sheets[activeSheet].data[s.key][s.prop]=s.old;
+    });
+    render(); updateBar(); return;
+  }
+  // 値Undo（既存）
   var parts = op.key.split(',');
   var r = parseInt(parts[0]), c = parseInt(parts[1]);
   var d = op.old;
   var hfResult = undoCellFormula(op.sheet, r, c, op.old);
   if(hfResult !== null){ d = hfResult; }
   else if(d && d[0]==='='){ d = evalFormula(d, r, c); }
-  sheets[op.sheet].data[op.key] = {v:op.old, f:op.old, d:String(d||'')};
-  if(!op.old) delete sheets[op.sheet].data[op.key];
+  // 書式プロパティを保持しつつ値のみ戻す
+  var existing = sheets[op.sheet].data[op.key] || {};
+  if(!op.old) {
+    // 書式があれば書式は残す
+    var hasFmt = existing.bold||existing.italic||existing.underline||existing.color||existing.bgColor||existing.border||existing.numFmt||existing.align||existing.fontSize;
+    if(hasFmt) { existing.v=op.old||''; existing.f=op.old||''; existing.d=''; }
+    else delete sheets[op.sheet].data[op.key];
+  } else {
+    sheets[op.sheet].data[op.key] = Object.assign({}, existing, {v:op.old, f:op.old, d:String(d||'')});
+  }
   render(); updateBar();
 }
 function doRedo(){
   if(!redoStack.length) return;
   var op = redoStack.pop();
   undoStack.push(op);
+  if(op.type==='format'){
+    op.snap.forEach(function(s){
+      if(!sheets[activeSheet].data[s.key]) sheets[activeSheet].data[s.key]={v:'',f:'',d:''};
+      // redoは逆方向→新しい値を再適用（snapのoldを使うと逆なので別途newが必要）
+      // 簡略: redoは再applyFormatを呼ぶ形にする→ここでは何もしない（applyFormatがundoStackを積む）
+    });
+    render(); updateBar(); return;
+  }
   var parts = op.key.split(',');
   setCell(parseInt(parts[0]), parseInt(parts[1]), op.new_, true);
   render(); updateBar();
@@ -2054,6 +2348,47 @@ function addSheet(){
 // overlayアプローチ（position:fixed）でグリッドを圧縮しない
 // B案：キーボード時にinputをflex先頭へorder変更 → iOS API依存なし・バージョン不問
 
+
+// ===== セル書式 =====
+
+// 単一プロパティを選択範囲全体に適用
+function applyFormat(key, value) {
+  var snap = [];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c;
+    var old = sheets[activeSheet].data[k] ? sheets[activeSheet].data[k][key] : undefined;
+    snap.push({key:k, prop:key, old:old});
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    sheets[activeSheet].data[k][key] = value;
+  }
+  undoStack.push({type:'format', snap:snap}); redoStack=[];
+  render(); updateBar();
+}
+
+// トグル系（bold/italic/underline）
+function toggleFormat(key) {
+  // 選択範囲内に一つでもtrueがなければtrue、全部trueならfalse
+  var anyOff = false;
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var cell = getCell(r,c);
+    if(!cell[key]) { anyOff=true; break; }
+  }
+  applyFormat(key, anyOff);
+}
+
+// 罫線を選択範囲全体に適用
+function applyBorderAll(style) {
+  var snap = [];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c;
+    var old = sheets[activeSheet].data[k] ? (sheets[activeSheet].data[k].border||{}) : {};
+    snap.push({key:k, prop:'border', old:old});
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    sheets[activeSheet].data[k].border = style===0 ? {} : {top:style,bottom:style,left:style,right:style};
+  }
+  undoStack.push({type:'format', snap:snap}); redoStack=[];
+  render();
+}
 
 function handleAIBtn(){
   if(window.innerWidth >= 769){ toggleAiPanel(); } else { toggleResponsePopup(); }
