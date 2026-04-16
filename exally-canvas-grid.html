@@ -1444,8 +1444,8 @@ function render() {
     ctx.fillRect(cx,cy,cw,ch);
   }
 
-  // 3. 選択セル背景
-  ctx.fillStyle=C_SEL_BG;
+  // 3. 選択セル背景（半透明: bgColorが透けて見える）
+  ctx.fillStyle='rgba(30,136,229,0.18)';
   for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
     for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
       ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
@@ -1522,6 +1522,26 @@ function render() {
   ctx.fillRect(0,0,HDR_W,HDR_H);
   ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5;
   ctx.strokeRect(0.5,0.5,HDR_W-0.5,HDR_H-0.5);
+
+  // 9.5 列リサイズハンドル（列ヘッダー境界に細い縦線）
+  ctx.strokeStyle='#7DB89A'; ctx.lineWidth=1;
+  var sC2=xToC(HDR_W), eC2=xToC(wrapW);
+  for(var c=sC2;c<=eC2+1;c++){
+    var bx=colX(c)+cW(c);
+    if(bx<=HDR_W||bx>wrapW) continue;
+    var hy1=Math.round(HDR_H*0.2), hy2=Math.round(HDR_H*0.8);
+    ctx.beginPath(); ctx.moveTo(bx-1,hy1); ctx.lineTo(bx-1,hy2);
+    ctx.moveTo(bx+1,hy1); ctx.lineTo(bx+1,hy2); ctx.stroke();
+  }
+  // 9.6 行リサイズグリップ（行ヘッダー下端中央に横線）
+  ctx.strokeStyle='#9EC8B0'; ctx.lineWidth=1;
+  var sR2=yToR(HDR_H), eR2=yToR(wrapH);
+  var gx1=Math.round(HDR_W*0.25), gx2=Math.round(HDR_W*0.75);
+  for(var r=sR2;r<=eR2+1;r++){
+    var gby=rowY(r)+rH(r)-1;
+    if(gby<=HDR_H||gby>wrapH) continue;
+    ctx.beginPath(); ctx.moveTo(gx1,gby); ctx.lineTo(gx2,gby); ctx.stroke();
+  }
 
   // 10. 選択枠（最前面）
   drawSel();
@@ -1810,6 +1830,7 @@ window.addEventListener('load', function() {
   if(typeof render === 'function') render();
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', onVisualVP);
+    window.visualViewport.addEventListener('scroll', onVisualVP);
   }
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
 });
@@ -1844,6 +1865,12 @@ function doUndo(){
   if(!undoStack.length) return;
   var op = undoStack.pop();
   redoStack.push(op);
+  // リサイズUndo
+  if(op.type==='resize'){
+    if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.old;
+    else sheets[op.sheet].rowH[op.idx]=op.old;
+    render(); return;
+  }
   // 書式Undo
   if(op.type==='format'){
     op.snap.forEach(function(s){
@@ -1876,6 +1903,12 @@ function doRedo(){
   if(!redoStack.length) return;
   var op = redoStack.pop();
   undoStack.push(op);
+  // リサイズRedo
+  if(op.type==='resize'){
+    if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.nw;
+    else sheets[op.sheet].rowH[op.idx]=op.nw;
+    render(); return;
+  }
   if(op.type==='format'){
     op.snap.forEach(function(s){
       if(!sheets[activeSheet].data[s.key]) sheets[activeSheet].data[s.key]={v:'',f:'',d:''};
@@ -1951,25 +1984,47 @@ function cW(c){ return (sheets[activeSheet].colW[c] || COL_W) * scale; }
 function rH(r){ return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
 
 // ===== 座標 =====
-function colX(c){ return Math.round(HDR_W - scrollLeft + c * COL_W * scale); }
-function rowY(r){ return Math.round(HDR_H - scrollTop + r * ROW_H * scale); }
+function colX(c){
+  var x = HDR_W - scrollLeft + c * COL_W * scale;
+  var cw = sheets[activeSheet].colW;
+  for(var k in cw){ if(parseInt(k) < c) x += (cw[k] - COL_W) * scale; }
+  return Math.round(x);
+}
+function rowY(r){
+  var y = HDR_H - scrollTop + r * ROW_H * scale;
+  var rh = sheets[activeSheet].rowH;
+  for(var k in rh){ if(parseInt(k) < r) y += (rh[k] - ROW_H) * scale; }
+  return Math.round(y);
+}
 function xToC(x){
-  // 列幅変更がない場合はO(1)直接計算
-  var colW_def = COL_W * scale;
   var px = x - HDR_W + scrollLeft;
   if(px < 0) return 0;
-  var c = Math.floor(px / colW_def);
-  if(c >= COLS) return COLS-1;
-  return c;
+  var cw = sheets[activeSheet].colW;
+  if(!Object.keys(cw).length){ return Math.min(Math.floor(px / (COL_W * scale)), COLS-1); }
+  var est = Math.max(0, Math.floor(px / (COL_W * scale)) - 5);
+  var cx = colX(est);
+  for(var c = est; c < COLS; c++){
+    var w = cW(c);
+    if(x >= cx && x < cx + w) return c;
+    if(cx > x) return Math.max(0, c - 1);
+    cx += w;
+  }
+  return COLS - 1;
 }
 function yToR(y){
-  // 行高変更がない場合はO(1)直接計算
-  var rowH_def = ROW_H * scale;
   var py = y - HDR_H + scrollTop;
   if(py < 0) return 0;
-  var r = Math.floor(py / rowH_def);
-  if(r >= ROWS) return ROWS-1;
-  return r;
+  var rh = sheets[activeSheet].rowH;
+  if(!Object.keys(rh).length){ return Math.min(Math.floor(py / (ROW_H * scale)), ROWS-1); }
+  var est = Math.max(0, Math.floor(py / (ROW_H * scale)) - 5);
+  var ry = rowY(est);
+  for(var r = est; r < ROWS; r++){
+    var h = rH(r);
+    if(y >= ry && y < ry + h) return r;
+    if(ry > y) return Math.max(0, r - 1);
+    ry += h;
+  }
+  return ROWS - 1;
 }
 
 // ===== ユーティリティ =====
@@ -2008,7 +2063,21 @@ function bindEvents(){
   // マウス
   canvas.addEventListener('mousedown',onMD);
   canvas.addEventListener('mousemove',onMM);
-  document.addEventListener('mouseup',function(){ if(touchState&&touchState.type==='msel') touchState=null; });
+  document.addEventListener('mouseup',function(){
+    if(!touchState) return;
+    if(touchState.type==='colresize'){
+      var nw=Math.max(10,Math.round(sheets[activeSheet].colW[touchState.col]||COL_W));
+      sheets[activeSheet].colW[touchState.col]=touchState.origW; // 一旦戻す
+      setColW(touchState.col, nw); // undo付きで確定
+      canvas.style.cursor='default';
+    } else if(touchState.type==='rowresize'){
+      var nh=Math.max(15,Math.round(sheets[activeSheet].rowH[touchState.row]||ROW_H));
+      sheets[activeSheet].rowH[touchState.row]=touchState.origH;
+      setRowH(touchState.row, nh);
+      canvas.style.cursor='default';
+    }
+    if(touchState.type==='msel'||touchState.type==='colresize'||touchState.type==='rowresize') touchState=null;
+  });
   canvas.addEventListener('dblclick',function(e){
     var p=cPos(e); if(p.x>HDR_W&&p.y>HDR_H) startEdit(selR1,selC1);
   });
@@ -2106,11 +2175,72 @@ function nearHandle(x,y){
   return Math.hypot(x-bx,y-by)<30;
 }
 
+// ===== 列幅・行高リサイズ =====
+function getColResizeBorder(x, y, threshold){
+  threshold = threshold || 4;
+  if(y >= HDR_H || x < HDR_W) return -1;
+  var cw = sheets[activeSheet].colW;
+  var start = Object.keys(cw).length === 0
+    ? Math.max(0, Math.floor((x + scrollLeft - HDR_W) / (COL_W * scale)) - 2)
+    : 0;
+  for(var c = start; c < COLS; c++){
+    var bx = colX(c) + cW(c);
+    if(bx < HDR_W - threshold) continue;
+    if(bx > x + threshold + 100) break;
+    if(Math.abs(x - bx) <= threshold) return c;
+  }
+  return -1;
+}
+function getRowResizeBorder(x, y, threshold){
+  threshold = threshold || 4;
+  if(x >= HDR_W || y < HDR_H) return -1;
+  var rh = sheets[activeSheet].rowH;
+  var start = Object.keys(rh).length === 0
+    ? Math.max(0, Math.floor((y + scrollTop - HDR_H) / (ROW_H * scale)) - 2)
+    : 0;
+  for(var r = start; r < ROWS; r++){
+    var by = rowY(r) + rH(r);
+    if(by < HDR_H - threshold) continue;
+    if(by > y + threshold + 100) break;
+    if(Math.abs(y - by) <= threshold) return r;
+  }
+  return -1;
+}
+function setColW(c, w){
+  var old = sheets[activeSheet].colW[c] || COL_W;
+  var nw = Math.max(20, Math.round(w));
+  undoStack.push({type:'resize', kind:'col', sheet:activeSheet, idx:c, old:old, nw:nw});
+  redoStack = [];
+  sheets[activeSheet].colW[c] = nw;
+}
+function setRowH(r, h){
+  var old = sheets[activeSheet].rowH[r] || ROW_H;
+  var nw = Math.max(15, Math.round(h));
+  undoStack.push({type:'resize', kind:'row', sheet:activeSheet, idx:r, old:old, nw:nw});
+  redoStack = [];
+  sheets[activeSheet].rowH[r] = nw;
+}
+
 // マウス
 function onMD(e){
   if(e.button!==0) return; commitEdit(); hideCtxMenu();
   canvas.focus();
   var p=cPos(e);
+
+  // 列幅リサイズ検出（列ヘッダー境界）
+  var rc = getColResizeBorder(p.x, p.y, 4);
+  if(rc >= 0){
+    touchState={type:'colresize', col:rc, startX:p.x, origW:sheets[activeSheet].colW[rc]||COL_W};
+    canvas.style.cursor='col-resize';
+    return;
+  }
+  // 行高リサイズ検出（行ヘッダー境界）
+  var rr = getRowResizeBorder(p.x, p.y, 4);
+  if(rr >= 0){
+    touchState={type:'rowresize', row:rr, startY:p.y, origH:sheets[activeSheet].rowH[rr]||ROW_H};
+    canvas.style.cursor='row-resize';
+    return;
+  }
 
   // 列ヘッダークリック → 列全体選択
   if(p.y<HDR_H&&p.x>=HDR_W){
@@ -2149,8 +2279,25 @@ function onMD(e){
   touchState={type:'msel',startR:r,startC:c};
 }
 function onMM(e){
+  var p=cPos(e);
+  if(touchState&&touchState.type==='colresize'){
+    var nw=Math.max(10, touchState.origW+(p.x-touchState.startX)/scale);
+    sheets[activeSheet].colW[touchState.col]=nw;
+    render(); return;
+  }
+  if(touchState&&touchState.type==='rowresize'){
+    var nh=Math.max(15, touchState.origH+(p.y-touchState.startY)/scale);
+    sheets[activeSheet].rowH[touchState.row]=nh;
+    render(); return;
+  }
+  // カーソル変更（ドラッグなし時）
+  if(!touchState){
+    var rc=getColResizeBorder(p.x,p.y,4);
+    var rr=getRowResizeBorder(p.x,p.y,4);
+    canvas.style.cursor = rc>=0?'col-resize':rr>=0?'row-resize':'default';
+  }
   if(!touchState||touchState.type!=='msel') return;
-  var p=cPos(e); if(p.x<HDR_W||p.y<HDR_H) return;
+  if(p.x<HDR_W||p.y<HDR_H) return;
   selR2=yToR(p.y); selC2=xToC(p.x); updateBar(); render();
 }
 
@@ -2174,6 +2321,11 @@ function onTS(e){
   }
   var t=e.touches[0],r=canvas.getBoundingClientRect();
   var x=t.clientX-r.left,y=t.clientY-r.top;
+  // 列幅・行高リサイズ検出（タッチは閾値8px）→ resizecheck状態で保留
+  var rc=getColResizeBorder(x,y,8);
+  if(rc>=0){ touchState={type:'resizecheck',kind:'col',idx:rc,startX:t.clientX,startY:t.clientY,origW:sheets[activeSheet].colW[rc]||COL_W,ssl:scrollLeft,sst:scrollTop}; return; }
+  var rr=getRowResizeBorder(x,y,8);
+  if(rr>=0){ touchState={type:'resizecheck',kind:'row',idx:rr,startX:t.clientX,startY:t.clientY,origH:sheets[activeSheet].rowH[rr]||ROW_H,ssl:scrollLeft,sst:scrollTop}; return; }
   if(nearHandle(x,y)){
     touchState={type:'handle', origR2:selR2, origC2:selC2}; return;
   }
@@ -2196,6 +2348,36 @@ function onTM(e){
   if(!touchState) return;
   // スクロール開始時に長押しタイマーキャンセル
   if(touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
+  // resizecheck: 最初の動き方向でリサイズかスクロールか決定
+  if(touchState.type==='resizecheck'){
+    var t0=e.touches[0];
+    var dx=Math.abs(t0.clientX-touchState.startX), dy=Math.abs(t0.clientY-touchState.startY);
+    if(dx<4&&dy<4) return; // まだ動いていない
+    if(touchState.kind==='col'&&dx>=dy){
+      // 横方向 → リサイズ確定
+      touchState={type:'colresize',col:touchState.idx,startX:touchState.startX,origW:touchState.origW};
+    } else if(touchState.kind==='row'&&dy>=dx){
+      // 縦方向 → リサイズ確定
+      touchState={type:'rowresize',row:touchState.idx,startY:touchState.startY,origH:touchState.origH};
+    } else {
+      // 逆方向 → スクロールに切り替え
+      touchState={type:'scroll',sx:touchState.startX,sy:touchState.startY,ssl:touchState.ssl,sst:touchState.sst};
+    }
+    return;
+  }
+  // 列幅・行高リサイズドラッグ
+  if(touchState.type==='colresize'){
+    var t0=e.touches[0];
+    var nw=Math.max(20, touchState.origW+(t0.clientX-touchState.startX)/scale);
+    sheets[activeSheet].colW[touchState.col]=nw;
+    render(); return;
+  }
+  if(touchState.type==='rowresize'){
+    var t0=e.touches[0];
+    var nh=Math.max(15, touchState.origH+(t0.clientY-touchState.startY)/scale);
+    sheets[activeSheet].rowH[touchState.row]=nh;
+    render(); return;
+  }
   if(e.touches.length>=2&&touchState.type!=='pinch'){
     var r=canvas.getBoundingClientRect();
     touchState={type:'pinch',dist:pDist(e),sc:scale,sst:scrollTop,ssl:scrollLeft,
@@ -2239,6 +2421,23 @@ function onTE(e){
   }
   e.preventDefault();
   if(touchState && touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
+  // 列幅・行高リサイズ確定（undo付き）
+  // resizecheck中にタッチ終了（ほぼ動かなかった） → キャンセルしてtap扱い
+  if(touchState && touchState.type==='resizecheck'){
+    touchState=null; return;
+  }
+  if(touchState && touchState.type==='colresize'){
+    var nw=Math.max(20,Math.round(sheets[activeSheet].colW[touchState.col]||COL_W));
+    sheets[activeSheet].colW[touchState.col]=touchState.origW;
+    setColW(touchState.col, nw);
+    touchState=null; render(); return;
+  }
+  if(touchState && touchState.type==='rowresize'){
+    var nh=Math.max(15,Math.round(sheets[activeSheet].rowH[touchState.row]||ROW_H));
+    sheets[activeSheet].rowH[touchState.row]=touchState.origH;
+    setRowH(touchState.row, nh);
+    touchState=null; render(); return;
+  }
   // フィルハンドルドラッグ終了: 元の選択範囲から拡張範囲へフィル
   if(touchState && touchState.type==='handle'){
     var oR2=touchState.origR2, oC2=touchState.origC2;
@@ -2611,12 +2810,18 @@ function toggleAiPanel(){
 // resize + scroll 両方をハンドル（scrollがpanning検知の核心）
 function onVisualVP(){
   var vv = window.visualViewport;
-  document.body.style.top = Math.round(vv.offsetTop) + 'px';
-  document.body.style.height = Math.round(vv.height) + 'px';
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
   if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  // ===== DEBUG OVERLAY (削除予定) =====
+  var dbg = document.getElementById('_dbg');
+  if(!dbg){ dbg=document.createElement('div'); dbg.id='_dbg';
+    dbg.style.cssText='position:fixed;top:60px;left:4px;background:rgba(0,0,0,0.75);color:#0f0;font-size:11px;font-family:monospace;padding:4px 7px;border-radius:6px;z-index:99999;line-height:1.7;pointer-events:none;';
+    document.body.appendChild(dbg); }
+  var rect = tabs ? tabs.getBoundingClientRect() : null;
+  dbg.innerHTML='innerH: '+window.innerHeight+'<br>vv.h: '+Math.round(vv.height)+'<br>vv.off: '+Math.round(vv.offsetTop)+'<br>kbH: '+kbH+'<br>tabs.bot: '+(tabs?tabs.style.bottom:'?')+'<br>rect.bottom: '+(rect?Math.round(rect.bottom):'?')+'<br>diff: '+(rect?Math.round(rect.bottom)-Math.round(vv.height):'?');
+  // ===== /DEBUG =====
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
