@@ -1552,7 +1552,7 @@ function drawText(r,c){
   ctx.restore();
 }
 
-// 罫線描画
+// 罫線描画（二重線防止: top/leftのみ描画。bottom=下隣のtop、right=右隣のleftで代替）
 function drawBorder(r,c){
   var cell=getCell(r,c);
   if(!cell.border) return;
@@ -1560,10 +1560,36 @@ function drawBorder(r,c){
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
   var b=cell.border;
   ctx.save();
-  if(b.top){    ctx.strokeStyle=b.top===2?'#1A2B22':'#888'; ctx.lineWidth=b.top===2?2:0.5; ctx.beginPath(); ctx.moveTo(x,y+0.5); ctx.lineTo(x+w,y+0.5); ctx.stroke(); }
-  if(b.bottom){ ctx.strokeStyle=b.bottom===2?'#1A2B22':'#888'; ctx.lineWidth=b.bottom===2?2:0.5; ctx.beginPath(); ctx.moveTo(x,y+h-0.5); ctx.lineTo(x+w,y+h-0.5); ctx.stroke(); }
-  if(b.left){   ctx.strokeStyle=b.left===2?'#1A2B22':'#888'; ctx.lineWidth=b.left===2?2:0.5; ctx.beginPath(); ctx.moveTo(x+0.5,y); ctx.lineTo(x+0.5,y+h); ctx.stroke(); }
-  if(b.right){  ctx.strokeStyle=b.right===2?'#1A2B22':'#888'; ctx.lineWidth=b.right===2?2:0.5; ctx.beginPath(); ctx.moveTo(x+w-0.5,y); ctx.lineTo(x+w-0.5,y+h); ctx.stroke(); }
+  // top: このセルのtop線
+  if(b.top){
+    ctx.strokeStyle=b.top===2?'#1A2B22':'#888888';
+    ctx.lineWidth=b.top===2?2:1;
+    ctx.beginPath(); ctx.moveTo(x,y+0.5); ctx.lineTo(x+w,y+0.5); ctx.stroke();
+  }
+  // left: このセルのleft線
+  if(b.left){
+    ctx.strokeStyle=b.left===2?'#1A2B22':'#888888';
+    ctx.lineWidth=b.left===2?2:1;
+    ctx.beginPath(); ctx.moveTo(x+0.5,y); ctx.lineTo(x+0.5,y+h); ctx.stroke();
+  }
+  // bottom: 下隣セルにborderがない場合のみ描画（最下行など）
+  if(b.bottom){
+    var below=getCell(r+1,c);
+    if(!below.border||!below.border.top){
+      ctx.strokeStyle=b.bottom===2?'#1A2B22':'#888888';
+      ctx.lineWidth=b.bottom===2?2:1;
+      ctx.beginPath(); ctx.moveTo(x,y+h-0.5); ctx.lineTo(x+w,y+h-0.5); ctx.stroke();
+    }
+  }
+  // right: 右隣セルにborderがない場合のみ描画
+  if(b.right){
+    var next=getCell(r,c+1);
+    if(!next.border||!next.border.left){
+      ctx.strokeStyle=b.right===2?'#1A2B22':'#888888';
+      ctx.lineWidth=b.right===2?2:1;
+      ctx.beginPath(); ctx.moveTo(x+w-0.5,y); ctx.lineTo(x+w-0.5,y+h); ctx.stroke();
+    }
+  }
   ctx.restore();
 }
 
@@ -1622,7 +1648,10 @@ function drawSel(){
   <div class="fmt-sep"></div>
   <!-- フォントサイズ -->
   <input id="fmt-font-size" type="number" value="12" min="6" max="72" title="フォントサイズ"
-    onchange="applyFormat('fontSize',parseInt(this.value)||12)">
+    oninput="applyFormat('fontSize',parseInt(this.value)||12)"
+    onchange="applyFormat('fontSize',parseInt(this.value)||12)"
+    ontouchend="event.stopPropagation()"
+    onclick="this.select()">
   <div class="fmt-sep"></div>
   <!-- 文字色 -->
   <div class="fmt-color-wrap" title="文字色">
@@ -1813,8 +1842,8 @@ function doRedo(){
   if(op.type==='format'){
     op.snap.forEach(function(s){
       if(!sheets[activeSheet].data[s.key]) sheets[activeSheet].data[s.key]={v:'',f:'',d:''};
-      // redoは逆方向→新しい値を再適用（snapのoldを使うと逆なので別途newが必要）
-      // 簡略: redoは再applyFormatを呼ぶ形にする→ここでは何もしない（applyFormatがundoStackを積む）
+      if(s.nw===undefined) delete sheets[activeSheet].data[s.key][s.prop];
+      else sheets[activeSheet].data[s.key][s.prop]=s.nw;
     });
     render(); updateBar(); return;
   }
@@ -2231,9 +2260,9 @@ function onKD(e){
     }
   }
   // 以下はfocusガードあり
-  if(document.activeElement===document.getElementById('formula-input')) return;
-  if(document.activeElement===document.getElementById('ai-input')) return;
-  if(document.activeElement===document.getElementById('popup-input')) return;
+  // 入力欄にフォーカスがある場合はキャンバスのキー処理をスキップ
+  var _ae = document.activeElement;
+  if(_ae && (_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'||_ae.tagName==='SELECT')) return;
   var moved=false;
 
   // Shift+矢印：選択範囲拡張
@@ -2488,10 +2517,10 @@ function applyIndent(delta) {
 // 単一プロパティを選択範囲全体に適用
 function applyFormat(key, value) {
   var snap = [];
-  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
-    var k=r+','+c;
+  for(var r=selR1;r<=selR2;r++) for(var c2=selC1;c2<=selC2;c2++){
+    var k=r+','+c2;
     var old = sheets[activeSheet].data[k] ? sheets[activeSheet].data[k][key] : undefined;
-    snap.push({key:k, prop:key, old:old});
+    snap.push({key:k, prop:key, old:old, nw:value});
     if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
     sheets[activeSheet].data[k][key] = value;
   }
