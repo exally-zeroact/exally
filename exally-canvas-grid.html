@@ -2657,6 +2657,10 @@ function bindEvents(){
     refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
     _currentRefs=extractRefs(v);
     _fiCursorPos=this.selectionStart||0;
+    // リアルタイムプレビュー
+    var k=selR1+','+selC1;
+    if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
+    sheets[activeSheet].data[k].d=v.replace(/ ↵ /g,'\n');
     render();
   });
   fi.addEventListener('click',function(){ _fiCursorPos=this.selectionStart||0; });
@@ -3559,12 +3563,15 @@ function applyBorderInner(style) {
 // セル結合（選択範囲の左上に値を集約・表示は左上のみ）
 function insertLineBreak(){
   var fi=document.getElementById('formula-input');
-  var cur=fi?fi.value:'';
-  var pos=fi?(_fiCursorPos||fi.selectionStart||cur.length):cur.length;
-  var newVal=cur.substring(0,pos)+'\n'+cur.substring(pos);
-  if(fi){ fi.value=newVal; fi.setSelectionRange(pos+1,pos+1); _fiCursorPos=pos+1; }
-  setCell(selR1,selC1,newVal);
-  updateBar(); render();
+  var displayVal=fi?fi.value:'';
+  var pos=_fiCursorPos||0;
+  // fi.value上に' ↵ 'を挿入（input要素は\nを除去するため）
+  var newDisplay=displayVal.substring(0,pos)+' ↵ '+displayVal.substring(pos);
+  if(fi){ fi.value=newDisplay; _fiCursorPos=pos+3; }
+  // setCellには実際の\nを渡す
+  var actualVal=newDisplay.replace(/ ↵ /g,'\n');
+  setCell(selR1,selC1,actualVal);
+  render();
 }
 function applyMergeCells() {
   if(selR1===selR2&&selC1===selC2) return;
