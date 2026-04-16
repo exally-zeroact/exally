@@ -2616,7 +2616,17 @@ function onVisualVP(){
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
-  if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  if(tabs){
+    if(kbH > 50){
+      tabs.style.top = Math.round(vv.height + vv.offsetTop) + 'px';
+      tabs.style.bottom = 'auto';
+      tabs.style.transform = 'translateY(-100%)';
+    } else {
+      tabs.style.top = '';
+      tabs.style.bottom = '';
+      tabs.style.transform = '';
+    }
+  }
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
