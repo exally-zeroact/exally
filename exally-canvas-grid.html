@@ -1729,6 +1729,43 @@ function _doRender() {
   drawSel();
   // 11. refMode中: 参照セルハイライト
   // 複数参照ハイライト（Excelスタイル）
+  // 結合セル描画パス（通常描画の上から上書き）
+  var sheetData=sheets[activeSheet].data;
+  Object.keys(sheetData).forEach(function(k){
+    var cell=sheetData[k];
+    if(!cell||!cell.mergeEnd) return;
+    var parts=k.split(',');
+    var r=parseInt(parts[0]),c=parseInt(parts[1]);
+    var r2=cell.mergeEnd.r,c2=cell.mergeEnd.c;
+    var x=colX(c),y=rowY(r),w=0,h=0;
+    for(var cc=c;cc<=c2;cc++) w+=cW(cc);
+    for(var rr=r;rr<=r2;rr++) h+=rH(rr);
+    if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
+    ctx.save();
+    ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H);
+    ctx.clip();
+    ctx.fillStyle=cell.bgColor||C_CELL_BG;
+    ctx.fillRect(x,y,w,h);
+    var raw=(cell.d!==undefined&&cell.d!=='')?cell.d:cell.v;
+    if(raw){
+      var display=cell.numFmt?applyNumFmt(raw,cell.numFmt):String(raw);
+      var fs=Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)));
+      ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px "Noto Sans JP",sans-serif';
+      ctx.fillStyle=cell.color||C_CELL_TXT;
+      ctx.textBaseline='middle';
+      var align=cell.align||'left';
+      var indentPx=(cell.indent||0)*12;
+      if(align==='center'){ctx.textAlign='center';ctx.fillText(display,x+w/2,y+h/2);}
+      else if(align==='right'){ctx.textAlign='right';ctx.fillText(display,x+w-4-indentPx,y+h/2);}
+      else{ctx.textAlign='left';ctx.fillText(display,x+4+indentPx,y+h/2);}
+    }
+
+    if(r>=selR1&&r<=selR2&&c>=selC1&&c<=selC2){
+      ctx.fillStyle='rgba(30,136,229,0.18)'; ctx.fillRect(x,y,w,h);
+    }
+    ctx.restore();
+  });
+
   if(getRefInput()&&_currentRefs.length>0){
     _currentRefs.forEach(function(addr,i){
       var color=REF_COLORS[i%REF_COLORS.length];
@@ -1747,6 +1784,9 @@ function drawText(r,c){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
   var cell=getCell(r,c);
+
+  // 結合子セルはスキップ
+  if(cell.merged) return;
 
   // 表示値（numFmt適用）
   var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
@@ -3527,16 +3567,22 @@ function insertLineBreak(){
   updateBar(); render();
 }
 function applyMergeCells() {
-  if(selR1===selR2&&selC1===selC2) return; // 単一セルは無視
-  var topLeft = getCell(selR1,selC1);
-  var snap = [];
+  if(selR1===selR2&&selC1===selC2) return;
+  var snap=[];
+  // 子セルにmerged設定
   for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
     if(r===selR1&&c===selC1) continue;
     var k=r+','+c;
-    snap.push({key:k,prop:'merged',old:sheets[activeSheet].data[k]});
+    snap.push({key:k,prop:'merged',old:sheets[activeSheet].data[k]?sheets[activeSheet].data[k].merged:undefined});
     if(!sheets[activeSheet].data[k]) sheets[activeSheet].data[k]={v:'',f:'',d:''};
     sheets[activeSheet].data[k].merged={r:selR1,c:selC1};
   }
+  // 親セルにmergeEnd設定・中央揃え
+  var pk=selR1+','+selC1;
+  if(!sheets[activeSheet].data[pk]) sheets[activeSheet].data[pk]={v:'',f:'',d:''};
+  snap.push({key:pk,prop:'mergeEnd',old:sheets[activeSheet].data[pk].mergeEnd});
+  sheets[activeSheet].data[pk].mergeEnd={r:selR2,c:selC2};
+  sheets[activeSheet].data[pk].align='center';
   undoStack.push({type:'format',snap:snap}); redoStack=[];
   render();
 }
