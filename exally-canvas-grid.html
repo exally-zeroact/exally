@@ -2617,6 +2617,13 @@ function onVisualVP(){
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   var tabs = document.getElementById('sheet-tabs');
   if(tabs) tabs.style.bottom = Math.max(0, kbH) + 'px';
+  // ===== DEBUG OVERLAY (削除予定) =====
+  var dbg = document.getElementById('_dbg');
+  if(!dbg){ dbg=document.createElement('div'); dbg.id='_dbg';
+    dbg.style.cssText='position:fixed;top:60px;left:4px;background:rgba(0,0,0,0.75);color:#0f0;font-size:11px;font-family:monospace;padding:4px 7px;border-radius:6px;z-index:99999;line-height:1.7;pointer-events:none;';
+    document.body.appendChild(dbg); }
+  dbg.innerHTML='innerH: '+window.innerHeight+'<br>vv.h: '+Math.round(vv.height)+'<br>vv.off: '+Math.round(vv.offsetTop)+'<br>kbH: '+kbH+'<br>tabs.bot: '+(tabs?tabs.style.bottom:'?');
+  // ===== /DEBUG =====
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
