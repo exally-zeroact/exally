@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -161,8 +161,9 @@ body {
   border:none;
   outline:none;
   font-family:inherit;
-  color:#1A2B22;
+  padding:0 4px;
   background:transparent;
+  color:#1A2B22;
 }
 #grid-wrap {
   flex:1;
@@ -727,6 +728,40 @@ font-family:inherit;
 }
 
 #grid-canvas:focus { outline: none; }
+
+/* カスタムキーボード */
+#formula-kb {
+background:#F0FAF4;
+border-top:1px solid #C8ECD8;
+padding:6px 4px;
+position:relative;
+z-index:10;
+}
+.fkb-row {
+display:flex;
+gap:3px;
+margin-bottom:3px;
+justify-content:center;
+}
+.fkb-btn {
+flex:1;
+max-width:36px;
+height:36px;
+background:#fff;
+border:1px solid #C8ECD8;
+border-radius:6px;
+font-size:15px;
+font-family:‘Noto Sans JP’,sans-serif;
+color:#1A2B22;
+cursor:pointer;
+touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
+}
+.fkb-btn:active { background:#E8F5EE; }
+.fkb-op { color:#3D9E72; font-weight:600; }
+.fkb-del { background:#FFF0F0; color:#E53935; max-width:48px; }
+.fkb-cancel { flex:2; max-width:120px; background:#FFF0F0; color:#E53935; font-size:13px; }
+.fkb-commit { flex:2; max-width:120px; background:#52B788; color:#fff; font-size:13px; font-weight:600; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/hyperformula@2.6.1/dist/hyperformula.full.min.js"></script>
@@ -1692,7 +1727,16 @@ function _doRender() {
   // 10. 選択枠（最前面）
   drawSel();
   // 11. refMode中: 参照セルハイライト
-  if(refMode&&refStartR>=0) drawRefHighlight(refStartR,refStartC);
+  // 複数参照ハイライト（Excelスタイル）
+  if(getRefInput()&&_currentRefs.length>0){
+    _currentRefs.forEach(function(addr,i){
+      var color=REF_COLORS[i%REF_COLORS.length];
+      var parsed=parseAddr(addr);
+      if(parsed) drawRefHighlightColor(parsed.r,parsed.c,color);
+    });
+  } else if(getRefInput()&&refStartR>=0){
+    drawRefHighlightColor(refStartR,refStartC,REF_COLORS[0]);
+  }
   // ⋮ボタン位置を更新
   if(typeof updateActionBtn==='function') updateActionBtn();
 }
@@ -1796,53 +1840,61 @@ function drawBorder(r,c){
 }
 
 // ===== セル参照入力モード =====
-function checkRefMode(){
+function getRefInput(){
+  // カスタムKB編集中でrefModeならformula-inputを返す
+  if(_editMode&&refMode){
+    var fi=document.getElementById('formula-input');
+    if(fi) return fi;
+  }
+  // cell-input（ダブルタップ編集）
   var ci=document.getElementById('cell-input');
   if(editingCell&&ci&&ci.style.display!=='none'){
-    if(ci.value.length>0&&(ci.value[0]==='='||ci.value[0]==='＝')){
-      refMode=true; _refTargetEl=ci; return;
-    }
-    refMode=false; _refTargetEl=null; return;
+    var v=ci.value;
+    if(v.length>0&&(v[0]==='='||v[0]==='＝')) return ci;
   }
-  var fi=document.getElementById('formula-input');
-  if(fi&&document.activeElement===fi){
-    if(fi.value.length>0&&(fi.value[0]==='='||fi.value[0]==='＝')){
-      refMode=true; _refTargetEl=fi; return;
-    }
-  }
-  refMode=false; _refTargetEl=null;
-}
-function getRefInput(){
-  // focusに依存せず_refTargetElを返す
-  if(_refTargetEl) return _refTargetEl;
-  // フォールバック: cell-input
-  var ci=document.getElementById('cell-input');
-  if(editingCell&&ci&&ci.style.display!=='none') return ci;
   return null;
 }
+function extractRefs(formula){
+  if(!formula||formula[0]!=='=') return [];
+  var pattern=/(?<![A-Za-z])\$?[A-Za-z]{1,3}\$?[0-9]{1,7}(?![0-9A-Za-z])/g;
+  var matches=formula.match(pattern);
+  if(!matches) return [];
+  return matches.filter(function(v,i,a){return a.indexOf(v)===i;})
+    .map(function(a){return a.replace(/\$/g,'');});
+}
 function insertRefAddr(r1,c1,r2,c2){
-  var el=getRefInput(); if(!el) return;
   var addr=(r1===r2&&c1===c2)?cellAddr(r1,c1)
     :(cellAddr(Math.min(r1,r2),Math.min(c1,c2))+':'+cellAddr(Math.max(r1,r2),Math.max(c1,c2)));
-  var s=el.selectionStart, e=el.selectionEnd;
-  el.value=el.value.substring(0,s)+addr+el.value.substring(e);
-  var newPos=s+addr.length;
-  el.focus({preventScroll:true});
-  el.setSelectionRange(newPos,newPos);
+  fkbInsert(addr);
   refStartR=r1; refStartC=c1;
-  render();
 }
-function drawRefHighlight(r,c){
-  // 参照セルに破線ハイライト
+function parseAddr(addr){
+  var m=addr.match(/^([A-Za-z]{1,3})([0-9]{1,7})$/);
+  if(!m) return null;
+  var col=0; var s=m[1].toUpperCase();
+  for(var i=0;i<s.length;i++) col=col*26+(s.charCodeAt(i)-64);
+  return {r:parseInt(m[2])-1, c:col-1};
+}
+function drawRefHighlightColor(r,c,color){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   if(x+w<HDR_W||y+h<HDR_H) return;
-  ctx.save(); ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
-  ctx.strokeStyle='#1E88E5'; ctx.lineWidth=1.5;
-  ctx.setLineDash([4,3]);
-  ctx.strokeRect(x+1,y+1,w-2,h-2);
+  ctx.save();
+  ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H);
+  ctx.clip();
+  // 色付き薄塗り
+  ctx.fillStyle=color.replace(')',',0.12)').replace('rgb','rgba');
+  // hex色を簡易変換
+  ctx.fillStyle='rgba(0,0,0,0.0)'; // 塗りなし（枠のみ）
+  ctx.fillRect(x,y,w,h);
+  // 色付き太枠
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2;
   ctx.setLineDash([]);
+  ctx.strokeRect(x+1,y+1,w-2,h-2);
   ctx.restore();
 }
+function drawRefHighlight(r,c){ drawRefHighlightColor(r,c,REF_COLORS[0]); }
+
 function drawSel(){
   var x1=colX(selC1),y1=rowY(selR1);
   var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
@@ -1911,8 +1963,43 @@ function drawSel(){
 <div id="formula-bar">
   <input id="cell-addr" type="text" value="A1" readonly>
   <input id="formula-input" type="text" placeholder="値や数式を入力してね">
+  <button id="fkb-ok"  class="undo-btn" onclick="fkbCommit()" style="display:none;color:#3D9E72;font-weight:700;" title="確定">✓</button>
+  <button id="fkb-ng"  class="undo-btn" onclick="fkbCancel()" style="display:none;color:#E53935;" title="キャンセル">✗</button>
+  <button id="fkb-toggle" class="undo-btn" onclick="fkbToggle()" title="キーボード切り替え">⌨️</button>
   <button class="undo-btn" onclick="doUndo()" title="元に戻す">↩</button>
   <button class="undo-btn" onclick="doRedo()" title="やり直す">↪</button>
+  <div id="ref-chip-bar" style="display:none;padding:2px 8px;background:#FFF8E1;border-bottom:1px solid #FFE0B2;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:#E65100;"></div>
+</div>
+
+<!-- カスタムキーボード（formula編集モード時に表示） -->
+
+<div id="formula-kb" style="display:none;">
+  <div class="fkb-row">
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('=')"><b>=</b></button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('+')">+</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('-')">−</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('*')">×</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('/')">÷</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert('(')">(</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert(')')">)</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert(':')">:</button>
+    <button class="fkb-btn fkb-op" onclick="fkbInsert(',')">,</button>
+  </div>
+  <div class="fkb-row">
+    <button class="fkb-btn" onclick="fkbInsert('7')">7</button>
+    <button class="fkb-btn" onclick="fkbInsert('8')">8</button>
+    <button class="fkb-btn" onclick="fkbInsert('9')">9</button>
+    <button class="fkb-btn" onclick="fkbInsert('4')">4</button>
+    <button class="fkb-btn" onclick="fkbInsert('5')">5</button>
+    <button class="fkb-btn" onclick="fkbInsert('6')">6</button>
+    <button class="fkb-btn" onclick="fkbInsert('1')">1</button>
+    <button class="fkb-btn" onclick="fkbInsert('2')">2</button>
+    <button class="fkb-btn" onclick="fkbInsert('3')">3</button>
+    <button class="fkb-btn" onclick="fkbInsert('0')">0</button>
+    <button class="fkb-btn" onclick="fkbInsert('.')">.</button>
+    <button class="fkb-btn fkb-del" onclick="fkbDelete()">⌫</button>
+  </div>
+
 </div>
 
 <!-- ツールバー1段目（常時表示） -->
@@ -2027,9 +2114,12 @@ var initialInnerHeight = window.innerHeight; // キーボード出現前のinner
 var scale=1;
 var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
 var editingCell=null;
-var refMode=false;       // セル参照入力モード
-var refStartR=-1, refStartC=-1; // ドラッグ開始セル
-var _refTargetEl=null;   // refMode中の入力ターゲット（focusに依存しない）
+var refMode=false; // セル参照入力モード
+var REF_COLORS=['#1E88E5','#E53935','#8E24AA','#00897B','#F4511E'];
+var _currentRefs=[]; // 現在の数式の参照セルリスト
+var refStartR=-1, refStartC=-1;
+var _editMode=false;    // カスタムKB表示中
+var _fiCursorPos=0;     // formula-inputのカーソル位置
 var touchState=null;
 
 // ===== 初期化 =====
@@ -2376,54 +2466,54 @@ function bindEvents(){
   document.addEventListener('keydown',onKD);
   // 数式バー
   var fi=document.getElementById('formula-input');
-  var _fiComposing=false;
-  fi.addEventListener('compositionstart',function(){ _fiComposing=true; });
-  fi.addEventListener('compositionend',function(){ _fiComposing=false; });
+  // formula-inputイベント（iOSキーボードモード）
   fi.addEventListener('input',function(){
-    if(_fiComposing) return; // IME変換中はスキップ
     var v=this.value;
-    if(v.length>0&&(v[0]==='='||v[0]==='＝')){
-      refMode=true; render(); return;
-    }
-    refMode=false;
-    setCell(selR1,selC1,v); render();
+    refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
+    _currentRefs=extractRefs(v);
+    render();
   });
   fi.addEventListener('keydown',function(e){
-    if(e.key==='Enter'){
-      e.preventDefault();
-      setCell(selR1,selC1,this.value);
-      refMode=false; this.blur(); render();
-    } else if(e.key==='Escape'){
-      refMode=false;
-      this.value=document.getElementById('cell-input')?getCell(selR1,selC1).f||'':'';
-      this.blur();
-    }
+    if(e.key==='Enter'){e.preventDefault();fkbCommit();}
+    else if(e.key==='Escape'){fkbCancel();}
+  });
+  fi.addEventListener('focus',function(){
+    fkbShow();
   });
   fi.addEventListener('blur',function(){
-    if(refMode) return;
-    var stored=getCell(selR1,selC1).f||'';
-    if(this.value===stored) return; // 変化なしはスキップ
-    setCell(selR1,selC1,this.value); render();
+    // カスタムKBモードでなければ確定
+    var kb=document.getElementById('formula-kb');
+    if(kb.style.display==='none'||!kb.style.display){
+      _editMode=false;
+      document.getElementById('fkb-ok').style.display='none';
+      document.getElementById('fkb-ng').style.display='none';
+      var stored=getCell(selR1,selC1).f||'';
+      if(this.value!==stored) setCell(selR1,selC1,this.value);
+      render();
+    }
   });
   // セル入力
   var ci=document.getElementById('cell-input');
   ci.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;_refTargetEl=null;commitEdit();moveSel(1,0);}
-    else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;_refTargetEl=null;commitEdit();moveSel(0,1);}
-    else if(e.key==='Escape'){refMode=false;refStartR=-1;_refTargetEl=null;cancelEdit();}
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(1,0);}
+    else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(0,1);}
+    else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
   });
-  ci.addEventListener('input',function(){ checkRefMode(); if(!refMode){refStartR=-1;} render(); });
+  ci.addEventListener('input',function(){
+    var v=this.value;
+    refMode=(editingCell&&this.style.display!=='none'&&v.length>0&&(v[0]==='='||v[0]==='＝'));
+    if(!refMode){refStartR=-1;} render();
+  });
   // blur: IMEの変換中はcommitしない（compositionend後にcommit）
   var _composing = false;
   ci.addEventListener('compositionstart', function(){ _composing=true; });
   ci.addEventListener('compositionend', function(){
     _composing=false;
-    checkRefMode(); render();
+    render();
   });
   ci.addEventListener('blur', function(){
-    if(_composing) return;      // IME変換中はスキップ
-    if(refMode) return;         // refMode中はスキップ
-    // 少し待ってからcommit（refselのfocus復帰を待つ）
+    if(_composing) return;
+    if(refMode) return;
     setTimeout(function(){
       if(!refMode && editingCell) commitEdit();
     }, 100);
@@ -2517,10 +2607,10 @@ function setRowH(r, h){
 function onMD(e){
   if(e.button!==0) return;
   // refMode中はcommitEditしない・セル参照挿入
-  if(refMode){
-    var p=cPos(e);
-    if(p.x>HDR_W&&p.y>HDR_H){
-      var tr=yToR(p.y),tc=xToC(p.x);
+  if(getRefInput()){
+    var p2=cPos(e);
+    if(p2.x>HDR_W&&p2.y>HDR_H){
+      var tr=yToR(p2.y),tc=xToC(p2.x);
       insertRefAddr(tr,tc,tr,tc);
       touchState={type:'mrefsel',startR:tr,startC:tc};
       return;
@@ -2636,8 +2726,9 @@ function onTS(e){
   }
   var t=e.touches[0],r=canvas.getBoundingClientRect();
   var x=t.clientX-r.left,y=t.clientY-r.top;
-  // refMode中: セルタップで参照アドレスを挿入
-  if(refMode&&x>HDR_W&&y>HDR_H){
+  // refMode中: セルタップで参照アドレスを挿入（DOM直接チェック）
+  var _refEl=getRefInput();
+  if(_refEl&&x>HDR_W&&y>HDR_H){
     var tr=yToR(y),tc=xToC(x);
     refStartR=tr; refStartC=tc;
     insertRefAddr(tr,tc,tr,tc);
@@ -2773,8 +2864,7 @@ function onTE(e){
   // 列幅・行高リサイズ確定（undo付き）
   // refsel終了: フォーカスを入力欄に戻す
   if(touchState && touchState.type==='refsel'){
-    var el=getRefInput();
-    if(el){ el.focus({preventScroll:true}); el.setSelectionRange(el.value.length,el.value.length); }
+    // カスタムKB方式: focus不要
     touchState=null; render(); return;
   }
   // resizecheck中にタッチ終了（ほぼ動かなかった） → キャンセルしてtap扱い
@@ -3081,18 +3171,96 @@ function startEdit(r,c,init){
   if(init!==undefined) el.setSelectionRange(init.length,init.length);
   else el.setSelectionRange(el.value.length,el.value.length);
 }
+// ===== カスタムキーボード =====
+function fkbShow(){
+  _editMode=true;
+  document.getElementById('fkb-ok').style.display='';
+  document.getElementById('fkb-ng').style.display='';
+  var fi=document.getElementById('formula-input');
+  _fiCursorPos=fi.value.length;
+  refMode=(fi.value.length>0&&(fi.value[0]==='='||fi.value[0]==='＝'));
+}
+function fkbHide(){
+  _editMode=false;
+  document.getElementById('formula-kb').style.display='none';
+  document.getElementById('fkb-ok').style.display='none';
+  document.getElementById('fkb-ng').style.display='none';
+  document.getElementById('fkb-toggle').textContent='⌨️';
+  var fi=document.getElementById('formula-input');
+  fi.removeAttribute('readonly');
+  _canvasBCRDirty=true;
+  refMode=false; refStartR=-1;
+  var chip=document.getElementById('ref-chip-bar'); if(chip) chip.style.display='none';
+}
+function fkbToggle(){
+  var kb=document.getElementById('formula-kb');
+  var fi=document.getElementById('formula-input');
+  var btn=document.getElementById('fkb-toggle');
+  if(kb.style.display==='none'||!kb.style.display){
+    kb.style.display='block';
+    fi.setAttribute('readonly','');
+    fi.blur();
+    btn.textContent='📝';
+    _canvasBCRDirty=true;
+    _editMode=true;
+    _fiCursorPos=fi.value.length;
+  } else {
+    kb.style.display='none';
+    fi.removeAttribute('readonly');
+    fi.focus();
+    btn.textContent='⌨️';
+    _canvasBCRDirty=true;
+  }
+  render();
+}
+function fkbInsert(char){
+  var fi=document.getElementById('formula-input');
+  var v=fi.value;
+  v=v.substring(0,_fiCursorPos)+char+v.substring(_fiCursorPos);
+  _fiCursorPos+=char.length;
+  fi.value=v;
+  refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
+  _currentRefs=extractRefs(v);
+  render();
+}
+function fkbDelete(){
+  var fi=document.getElementById('formula-input');
+  var v=fi.value;
+  if(_fiCursorPos===0) return;
+  v=v.substring(0,_fiCursorPos-1)+v.substring(_fiCursorPos);
+  _fiCursorPos--;
+  fi.value=v;
+  refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
+  _currentRefs=extractRefs(v);
+  render();
+}
+function fkbCommit(){
+  setCell(selR1,selC1,document.getElementById('formula-input').value);
+  fkbHide();
+  updateBar(); render();
+}
+function fkbCancel(){
+  var stored=getCell(selR1,selC1).f||'';
+  document.getElementById('formula-input').value=stored;
+  _fiCursorPos=stored.length;
+  fkbHide();
+  render();
+}
+// ===========================
+
 function commitEdit(){
   if(!editingCell) return;
   var el=document.getElementById('cell-input');
   setCell(editingCell.r,editingCell.c,el.value);
   el.style.display='none'; el.value='';
-  editingCell=null; updateBar(); render();
+  editingCell=null; refMode=false;
+  updateBar(); render();
 }
 function cancelEdit(){
   if(!editingCell) return;
   document.getElementById('cell-input').style.display='none';
   document.getElementById('cell-input').value='';
-  editingCell=null;
+  editingCell=null; refMode=false;
 }
 
 // シート
