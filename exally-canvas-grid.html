@@ -690,6 +690,11 @@ function initFormulaEngine(sheetNames) {
   hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3'});
   for(var i=0;i<sheetNames.length;i++) hf.addSheet(sheetNames[i]);
 }
+// シート名→HF数値IDに変換（HFはindex番号を要求）
+function _hfSid(sheet){
+  if(typeof sheet==='number') return sheet;
+  try{ var id=hf.getSheetId(sheet); return (id!==null&&id!==undefined)?id:0; }catch(e){return 0;}
+}
 function addSheetToEngine(name) {
   if(!hf) return;
   try { hf.addSheet(name); } catch(e) {}
@@ -700,7 +705,7 @@ function addSheetToEngine(name) {
 // ================================================================
 function _hfGetDisplay(sheet, r, c) {
   try {
-    var val = hf.getCellValue({sheet:sheet, row:r, col:c});
+    var val = hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
     if(val===null||val===undefined) return '';
     if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
     return String(val);
@@ -719,7 +724,7 @@ function _getRangeVals(sheet, rangeStr) {
   var s=_toRC(m[1]),e=_toRC(m[2]),vals=[];
   for(var r=s.r;r<=e.r;r++)
     for(var c=s.c;c<=e.c;c++){
-      var v=hf.getCellValue({sheet,row:r,col:c});
+      var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
       if(typeof v==='number') vals.push(v);
     }
   return vals;
@@ -730,13 +735,13 @@ function _getRangeAll(sheet, rangeStr) {
   var s=_toRC(m[1]),e=_toRC(m[2]),vals=[];
   for(var r=s.r;r<=e.r;r++)
     for(var c=s.c;c<=e.c;c++)
-      vals.push(hf.getCellValue({sheet,row:r,col:c}));
+      vals.push(hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c}));
   return vals;
 }
 function _getSingleVal(sheet, ref) {
   var rc=_toRC(ref);
   if(!rc||!hf) return null;
-  return hf.getCellValue({sheet,row:rc.r,col:rc.c});
+  return hf.getCellValue({sheet:_hfSid(sheet),row:rc.r,col:rc.c});
 }
 
 // ================================================================
@@ -817,8 +822,8 @@ function _jsType(v){if(typeof v==='number')return 1;if(typeof v==='string')retur
 function _jsCell(infoType,val){if(infoType==='type'){if(val===''||val===null||val===undefined)return'b';if(typeof val==='number')return'n';return'l';}if(infoType==='contents')return val;return'';}
 
 // --- 参照 ---
-function _jsIndirect(sheet,refStr){var rc=_toRC(refStr.trim());if(rc&&hf){var v=hf.getCellValue({sheet,row:rc.r,col:rc.c});return v===null||v===undefined?'':v;}return'#REF!';}
-function _jsOffset(sheet,ref,dr,dc){var rc=_toRC(ref.trim());if(!rc||!hf)return'#REF!';var nr=rc.r+dr,nc=rc.c+dc;if(nr<0||nc<0)return'#REF!';var v=hf.getCellValue({sheet,row:nr,col:nc});return v===null||v===undefined?'':v;}
+function _jsIndirect(sheet,refStr){var rc=_toRC(refStr.trim());if(rc&&hf){var v=hf.getCellValue({sheet:_hfSid(sheet),row:rc.r,col:rc.c});return v===null||v===undefined?'':v;}return'#REF!';}
+function _jsOffset(sheet,ref,dr,dc){var rc=_toRC(ref.trim());if(!rc||!hf)return'#REF!';var nr=rc.r+dr,nc=rc.c+dc;if(nr<0||nc<0)return'#REF!';var v=hf.getCellValue({sheet:_hfSid(sheet),row:nr,col:nc});return v===null||v===undefined?'':v;}
 function _jsLookup(val,lookupVals,resultVals){var found=-1;for(var i=0;i<lookupVals.length;i++){if(lookupVals[i]<=val)found=i;else break;}return found>=0?resultVals[found]:'#N/A';}
 function _jsXlookup(val,lookupVals,returnVals,notFound){for(var i=0;i<lookupVals.length;i++){if(String(lookupVals[i])===String(val))return returnVals[i];}return notFound!==undefined?notFound:'#N/A';}
 function _jsXmatch(val,arr,mode){if(!mode||mode===0){for(var i=0;i<arr.length;i++)if(String(arr[i])===String(val))return i+1;return'#N/A';}if(mode===1){var found=-1;for(var i=0;i<arr.length;i++)if(arr[i]<=val)found=i;return found>=0?found+1:'#N/A';}return'#N/A';}
@@ -855,7 +860,7 @@ function _jsConvert(num,from,to){var u={'g':1,'kg':1000,'mg':0.001,'lbm':453.592
 function _jsGestep(num,step){return num>=(step||0)?1:0;}
 
 // --- データベース ---
-function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(hf.getCellValue({sheet,row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);if(fieldIdx<0)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]);var critField=hf.getCellValue({sheet,row:cs.r,col:cs.c});var critVal=hf.getCellValue({sheet,row:cs.r+1,col:cs.c});var critFieldIdx=headers.indexOf(critField);var results=[];for(var r=s.r+1;r<=e.r;r++){if(String(hf.getCellValue({sheet,row:r,col:s.c+critFieldIdx}))===String(critVal)){results.push(hf.getCellValue({sheet,row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';if(func==='PROD')return nums.reduce(function(a,b){return a*b;},1);if(func==='GET')return results.length===1?results[0]:'#NUM!';if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
+function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(hf.getCellValue({sheet:_hfSid(sheet),row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);if(fieldIdx<0)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]);var critField=hf.getCellValue({sheet:_hfSid(sheet),row:cs.r,col:cs.c});var critVal=hf.getCellValue({sheet:_hfSid(sheet),row:cs.r+1,col:cs.c});var critFieldIdx=headers.indexOf(critField);var results=[];for(var r=s.r+1;r<=e.r;r++){if(String(hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+critFieldIdx}))===String(critVal)){results.push(hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';if(func==='PROD')return nums.reduce(function(a,b){return a*b;},1);if(func==='GET')return results.length===1?results[0]:'#NUM!';if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
 
 // --- Web ---
 function _jsEncodeUrl(str){try{return encodeURIComponent(str);}catch(e){return'#VALUE!';}}
@@ -934,12 +939,12 @@ function _jsReduceCompute(sheet, initial, rangeStr, lambdaFormula) {
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial;
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet,row:r,col:c});
+    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'('+acc+')').replace(new RegExp('\\b'+p2+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet,row:9998,col:0},'='+expr);
-    var res=hf.getCellValue({sheet,row:9998,col:0});
+    hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},'='+expr);
+    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9998,col:0});
     if(typeof res==='number') acc=res;
-    hf.setCellContents({sheet,row:9998,col:0},null);
+    hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},null);
   }}
   return String(acc);
 }
@@ -953,12 +958,12 @@ function _jsScanCompute(sheet, initial, rangeStr, lambdaFormula) {
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial,first=null;
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet,row:r,col:c});
+    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'('+acc+')').replace(new RegExp('\\b'+p2+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet,row:9997,col:0},'='+expr);
-    var res=hf.getCellValue({sheet,row:9997,col:0});
+    hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},'='+expr);
+    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9997,col:0});
     if(typeof res==='number'){acc=res; if(first===null)first=res;}
-    hf.setCellContents({sheet,row:9997,col:0},null);
+    hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},null);
   }}
   return first!==null ? String(first) : String(initial);
 }
@@ -972,12 +977,12 @@ function _jsMapCompute(sheet, rangeStr, lambdaFormula) {
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),results=[];
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet,row:r,col:c});
+    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+param+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet,row:9999,col:c},'='+expr);
-    var res=hf.getCellValue({sheet,row:9999,col:c});
+    hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},'='+expr);
+    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9999,col:c});
     results.push(res===null?'':String(res));
-    hf.setCellContents({sheet,row:9999,col:c},null);
+    hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},null);
   }}
   return results[0]; // 先頭値（スピル制限）
 }
@@ -989,9 +994,9 @@ function _jsMakearrayCompute(sheet, rows, cols, lambdaFormula) {
   if(!mL) return '#VALUE!';
   var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
   var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'(1)').replace(new RegExp('\\b'+p2+'\\b','g'),'(1)');
-  hf.setCellContents({sheet,row:9996,col:0},'='+expr);
-  var res=hf.getCellValue({sheet,row:9996,col:0});
-  hf.setCellContents({sheet,row:9996,col:0},null);
+  hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},'='+expr);
+  var res=hf.getCellValue({sheet:_hfSid(sheet),row:9996,col:0});
+  hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},null);
   return res===null?'0':String(res);
 }
 
@@ -1240,7 +1245,7 @@ function _jsComputeFormula(sheet, v) {
 
   // MDETERM
   var mMd=fOrig.match(/^MDETERM\s*\(([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mMd){var m2=mMd[1].match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(m2){var s=_toRC(m2[1]),e=_toRC(m2[2]),n=e.r-s.r+1,mat=[];for(var r=0;r<n;r++){mat.push([]);for(var c=0;c<n;c++)mat[r].push(hf.getCellValue({sheet,row:s.r+r,col:s.c+c})||0);}return String(Math.round(_jsMdeterm(mat)*10000)/10000);}}
+  if(mMd){var m2=mMd[1].match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(m2){var s=_toRC(m2[1]),e=_toRC(m2[2]),n=e.r-s.r+1,mat=[];for(var r=0;r<n;r++){mat.push([]);for(var c=0;c<n;c++)mat[r].push(hf.getCellValue({sheet:_hfSid(sheet),row:s.r+r,col:s.c+c})||0);}return String(Math.round(_jsMdeterm(mat)*10000)/10000);}}
 
   // IRR / XIRR (既存)
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
@@ -1281,11 +1286,11 @@ function setCellFormula(sheet, r, c, v) {
   try {
     var jsResult = _jsComputeFormula(sheet, v);
     if(jsResult !== null) {
-      hf.setCellContents({sheet,row:r,col:c}, (v===''||v===null||v===undefined)?null:v);
+      hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, (v===''||v===null||v===undefined)?null:v);
       return jsResult;
     }
     var converted = (v&&v[0]==='=') ? convertFormula(v) : v;
-    hf.setCellContents({sheet,row:r,col:c}, (converted===''||converted===null||converted===undefined)?null:converted);
+    hf.setCellContents({sheet:_hfSid(sheet),row:r,col:c}, (converted===''||converted===null||converted===undefined)?null:converted);
     return _hfGetDisplay(sheet, r, c);
   } catch(e) { return null; }
 }
@@ -1591,6 +1596,8 @@ function render() {
 
   // 10. 選択枠（最前面）
   drawSel();
+  // 11. refMode中: 参照セルハイライト
+  if(refMode&&refStartR>=0) drawRefHighlight(refStartR,refStartC);
   // ⋮ボタン位置を更新
   if(typeof updateActionBtn==='function') updateActionBtn();
 }
@@ -1693,6 +1700,42 @@ function drawBorder(r,c){
   ctx.restore();
 }
 
+// ===== セル参照入力モード =====
+function checkRefMode(){
+  var el=document.getElementById('cell-input');
+  if(editingCell&&el&&el.style.display!=='none'){
+    refMode = el.value.length>0 && el.value[0]==='=';
+    return;
+  }
+  refMode=false;
+}
+function getRefInput(){
+  var el=document.getElementById('cell-input');
+  if(editingCell&&el&&el.style.display!=='none') return el;
+  return null;
+}
+function insertRefAddr(r1,c1,r2,c2){
+  var el=getRefInput(); if(!el) return;
+  var addr=(r1===r2&&c1===c2)?cellAddr(r1,c1)
+    :(cellAddr(Math.min(r1,r2),Math.min(c1,c2))+':'+cellAddr(Math.max(r1,r2),Math.max(c1,c2)));
+  var s=el.selectionStart, e=el.selectionEnd;
+  el.value=el.value.substring(0,s)+addr+el.value.substring(e);
+  el.selectionStart=el.selectionEnd=s+addr.length;
+  el.focus();
+  refStartR=r1; refStartC=c1;
+  render();
+}
+function drawRefHighlight(r,c){
+  // 参照セルに破線ハイライト
+  var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
+  if(x+w<HDR_W||y+h<HDR_H) return;
+  ctx.save(); ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
+  ctx.strokeStyle='#1E88E5'; ctx.lineWidth=1.5;
+  ctx.setLineDash([4,3]);
+  ctx.strokeRect(x+1,y+1,w-2,h-2);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
 function drawSel(){
   var x1=colX(selC1),y1=rowY(selR1);
   var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
@@ -1860,6 +1903,8 @@ var initialInnerHeight = window.innerHeight; // キーボード出現前のinner
 var scale=1;
 var canvas, ctx, wrap, wrapW, wrapH, dpr=1;
 var editingCell=null;
+var refMode=false;       // セル参照入力モード
+var refStartR=-1, refStartC=-1; // ドラッグ開始セル
 var touchState=null;
 
 // ===== 初期化 =====
@@ -2143,6 +2188,7 @@ function bindEvents(){
       setRowH(touchState.row, nh);
       canvas.style.cursor='default';
     }
+    if(touchState.type==='mrefsel'){ var el2=getRefInput(); if(el2) el2.focus(); touchState=null; render(); return; }
     if(touchState.type==='msel'||touchState.type==='colresize'||touchState.type==='rowresize') touchState=null;
   });
   canvas.addEventListener('dblclick',function(e){
@@ -2198,11 +2244,12 @@ function bindEvents(){
   // セル入力
   var ci=document.getElementById('cell-input');
   ci.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();commitEdit();moveSel(1,0);}
-    else if(e.key==='Tab'){e.preventDefault();commitEdit();moveSel(0,1);}
-    else if(e.key==='Escape') cancelEdit();
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(1,0);}
+    else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(0,1);}
+    else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
   });
-  ci.addEventListener('blur',commitEdit);
+  ci.addEventListener('input',function(){ checkRefMode(); if(!refMode){refStartR=-1;} render(); });
+  ci.addEventListener('blur',function(){ if(!refMode) commitEdit(); });
   // モバイル入力欄ハンドラ
   var popupInp = document.getElementById('popup-input');
   if(popupInp){
@@ -2290,7 +2337,18 @@ function setRowH(r, h){
 
 // マウス
 function onMD(e){
-  if(e.button!==0) return; commitEdit(); hideCtxMenu();
+  if(e.button!==0) return;
+  // refMode中はcommitEditしない・セル参照挿入
+  if(refMode){
+    var p=cPos(e);
+    if(p.x>HDR_W&&p.y>HDR_H){
+      var tr=yToR(p.y),tc=xToC(p.x);
+      insertRefAddr(tr,tc,tr,tc);
+      touchState={type:'mrefsel',startR:tr,startC:tc};
+      return;
+    }
+  }
+  commitEdit(); hideCtxMenu();
   canvas.focus();
   var p=cPos(e);
 
@@ -2347,6 +2405,18 @@ function onMD(e){
 }
 function onMM(e){
   var p=cPos(e);
+  if(touchState&&touchState.type==='mrefsel'&&p.x>HDR_W&&p.y>HDR_H){
+    var tr=yToR(p.y),tc=xToC(p.x);
+    var el=getRefInput(); if(!el) return;
+    var addr=(touchState.startR===tr&&touchState.startC===tc)
+      ?cellAddr(touchState.startR,touchState.startC)
+      :(cellAddr(Math.min(touchState.startR,tr),Math.min(touchState.startC,tc))+':'+cellAddr(Math.max(touchState.startR,tr),Math.max(touchState.startC,tc)));
+    var oldAddr=cellAddr(refStartR,refStartC);
+    var pos=el.value.lastIndexOf(oldAddr);
+    if(pos>=0) el.value=el.value.substring(0,pos)+addr+el.value.substring(pos+oldAddr.length);
+    refStartR=tr; refStartC=tc;
+    render(); return;
+  }
   if(touchState&&touchState.type==='colresize'){
     var nw=Math.max(10, touchState.origW+(p.x-touchState.startX)/scale);
     sheets[activeSheet].colW[touchState.col]=nw;
@@ -2388,6 +2458,14 @@ function onTS(e){
   }
   var t=e.touches[0],r=canvas.getBoundingClientRect();
   var x=t.clientX-r.left,y=t.clientY-r.top;
+  // refMode中: セルタップで参照アドレスを挿入
+  if(refMode&&x>HDR_W&&y>HDR_H){
+    var tr=yToR(y),tc=xToC(x);
+    refStartR=tr; refStartC=tc;
+    insertRefAddr(tr,tc,tr,tc);
+    touchState={type:'refsel',startR:tr,startC:tc,r:canvas.getBoundingClientRect()};
+    return;
+  }
   // 列幅・行高リサイズ検出（タッチは閾値8px）→ resizecheck状態で保留
   var rc=getColResizeBorder(x,y,8);
   if(rc>=0){ touchState={type:'resizecheck',kind:'col',idx:rc,startX:t.clientX,startY:t.clientY,origW:sheets[activeSheet].colW[rc]||COL_W,ssl:scrollLeft,sst:scrollTop}; return; }
@@ -2416,6 +2494,31 @@ function onTM(e){
   if(!touchState) return;
   // スクロール開始時に長押しタイマーキャンセル
   if(touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
+  // refsel: 参照範囲ドラッグ
+  if(touchState.type==='refsel'){
+    var t0=e.touches[0];
+    var cr=touchState.r;
+    var x=t0.clientX-cr.left, y=t0.clientY-cr.top;
+    if(x>HDR_W&&y>HDR_H){
+      var tr=yToR(y),tc=xToC(x);
+      // 入力欄の既存アドレスを新しい範囲で置換
+      var el=getRefInput(); if(!el) return;
+      var addr=(touchState.startR===tr&&touchState.startC===tc)
+        ?cellAddr(touchState.startR,touchState.startC)
+        :(cellAddr(Math.min(touchState.startR,tr),Math.min(touchState.startC,tc))+':'+cellAddr(Math.max(touchState.startR,tr),Math.max(touchState.startC,tc)));
+      // 最後に挿入したアドレスを新アドレスで置換
+      var oldAddr=(refStartR===touchState.startR&&refStartC===touchState.startC)
+        ?cellAddr(refStartR,refStartC)
+        :(cellAddr(Math.min(touchState.startR,refStartR),Math.min(touchState.startC,refStartC))+':'+cellAddr(Math.max(touchState.startR,refStartR),Math.max(touchState.startC,refStartC)));
+      var pos=el.value.lastIndexOf(oldAddr);
+      if(pos>=0) el.value=el.value.substring(0,pos)+addr+el.value.substring(pos+oldAddr.length);
+      refStartR=tr; refStartC=tc;
+      el.selectionStart=el.selectionEnd=el.value.length;
+      el.focus();
+      render();
+    }
+    return;
+  }
   // resizecheck: 最初の動き方向でリサイズかスクロールか決定
   if(touchState.type==='resizecheck'){
     var t0=e.touches[0];
@@ -2490,6 +2593,11 @@ function onTE(e){
   e.preventDefault();
   if(touchState && touchState.lpt){ clearTimeout(touchState.lpt); touchState.lpt=null; }
   // 列幅・行高リサイズ確定（undo付き）
+  // refsel終了: フォーカスを入力欄に戻す
+  if(touchState && touchState.type==='refsel'){
+    var el=getRefInput(); if(el) el.focus();
+    touchState=null; render(); return;
+  }
   // resizecheck中にタッチ終了（ほぼ動かなかった） → キャンセルしてtap扱い
   if(touchState && touchState.type==='resizecheck'){
     touchState=null; return;
