@@ -997,6 +997,24 @@ function convertFormula(f) {
 // ================================================================
 function _jsComputeFormula(sheet, v) {
   if(!v||v[0]!=='='||!hf) return null;
+
+  // 🚀 早期return: 関数名でJS処理対象外をHFに早送り（55regex→O(1)）
+  var _f0 = v.slice(1).trim();
+  var _fn = _f0.match(/^([A-Z][A-Z0-9.]*)\s*\(/i);
+  if(!_fn) return null; // 関数形式でない（=A1+B1等）→ HFへ
+  var _fnBase = _fn[1].toUpperCase().split('.')[0];
+  var _jsSet = {TEXT:1,VALUE:1,NUMBERVALUE:1,RANK:1,PERCENTILE:1,QUARTILE:1,
+    MODE:1,TRIMMEAN:1,PERCENTRANK:1,KURT:1,INTERCEPT:1,FORECAST:1,IRR:1,XIRR:1,
+    DATEVALUE:1,DATESTRING:1,INDIRECT:1,OFFSET:1,XLOOKUP:1,XMATCH:1,LOOKUP:1,
+    CONCAT:1,TEXTJOIN:1,FIXED:1,DOLLAR:1,YEN:1,N:1,TYPE:1,ENCODEURL:1,
+    CONVERT:1,GESTEP:1,TEXTBEFORE:1,TEXTAFTER:1,VALUETOTEXT:1,
+    DSUM:1,DAVERAGE:1,DCOUNT:1,DCOUNTA:1,DMAX:1,DMIN:1,DPRODUCT:1,
+    DGET:1,DSTDEV:1,DSTDEVP:1,DVAR:1,DVARP:1,
+    AGGREGATE:1,LINEST:1,PERMUT:1,PERMUTATIONA:1,BINOM:1,FREQUENCY:1,
+    MDETERM:1,REDUCE:1,SCAN:1,MAP:1,MAKEARRAY:1,ISOMITTED:1,
+    LENB:1,LEFTB:1,RIGHTB:1,MIDB:1,ASC:1,JIS:1};
+  if(!_jsSet[_fnBase]) return null; // JS非対象 → HFへ
+
   var f = v.slice(1).trim().toUpperCase();
   var fOrig = v.slice(1).trim();
 
@@ -1565,39 +1583,35 @@ function drawText(r,c){
   ctx.restore();
 }
 
-// 罫線描画（二重線防止: top/leftのみ描画。bottom=下隣のtop、right=右隣のleftで代替）
+// 罫線描画（最適化版：border持つセルのみ処理・二重線防止）
 function drawBorder(r,c){
   var cell=getCell(r,c);
-  if(!cell.border) return;
+  if(!cell.border) return; // borderなし → 即return（最適化）
+  var b=cell.border;
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
-  var b=cell.border;
   ctx.save();
-  // top: このセルのtop線
   if(b.top){
     ctx.strokeStyle=b.top===2?'#1A2B22':'#888888';
     ctx.lineWidth=b.top===2?2:1;
     ctx.beginPath(); ctx.moveTo(x,y+0.5); ctx.lineTo(x+w,y+0.5); ctx.stroke();
   }
-  // left: このセルのleft線
   if(b.left){
     ctx.strokeStyle=b.left===2?'#1A2B22':'#888888';
     ctx.lineWidth=b.left===2?2:1;
     ctx.beginPath(); ctx.moveTo(x+0.5,y); ctx.lineTo(x+0.5,y+h); ctx.stroke();
   }
-  // bottom: 下隣セルにborderがない場合のみ描画（最下行など）
   if(b.bottom){
-    var below=getCell(r+1,c);
-    if(!below.border||!below.border.top){
+    var nxtB=getCell(r+1,c);
+    if(!nxtB.border||!nxtB.border.top){
       ctx.strokeStyle=b.bottom===2?'#1A2B22':'#888888';
       ctx.lineWidth=b.bottom===2?2:1;
       ctx.beginPath(); ctx.moveTo(x,y+h-0.5); ctx.lineTo(x+w,y+h-0.5); ctx.stroke();
     }
   }
-  // right: 右隣セルにborderがない場合のみ描画
   if(b.right){
-    var next=getCell(r,c+1);
-    if(!next.border||!next.border.left){
+    var nxtR=getCell(r,c+1);
+    if(!nxtR.border||!nxtR.border.left){
       ctx.strokeStyle=b.right===2?'#1A2B22':'#888888';
       ctx.lineWidth=b.right===2?2:1;
       ctx.beginPath(); ctx.moveTo(x+w-0.5,y); ctx.lineTo(x+w-0.5,y+h); ctx.stroke();
