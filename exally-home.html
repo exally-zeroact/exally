@@ -177,6 +177,33 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 @media(min-width:769px){.b-s-t{font-size:14px;margin-bottom:2px;line-height:1.25;}}
 .b-s-meta{font-family:'DM Mono',monospace;font-size:8px;color:#7A9A87;letter-spacing:0.3px;}
 @media(min-width:769px){.b-s-meta{font-size:10px;}}
+/* クリック無効化（未実装機能用） */
+.nav-disabled{cursor:not-allowed!important;opacity:0.55;pointer-events:none;}
+/* Excelバージョン選択モーダル */
+.vm-ov{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.vm-ov.show{display:flex;}
+.vm-cd{background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.vm-hd{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.vm-tt{font-size:16px;font-weight:700;color:#1A4A2E;}
+.vm-cl{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.vm-bd{padding:14px 18px 18px;overflow-y:auto;min-height:0;}
+.vm-ht{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5;margin-bottom:12px;}
+.vm-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vm-op{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.vm-op:hover{border-color:#52B788;background:#F0FAF4;}
+.vm-op.current{border-color:#52B788;background:#F0FAF4;}
+.vm-op-ic{font-size:20px;margin-bottom:3px;}
+.vm-op-lb{font-size:11px;font-weight:700;color:#1A4A2E;}
+.vm-op.current .vm-op-lb{color:#3D9E72;}
+.vm-ft{padding:12px 18px 16px;border-top:1px solid #D4EDE1;background:#ffffff;display:flex;flex-direction:column;gap:8px;}
+.vm-fn{width:100%;padding:12px;background:#52B788;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background 0.2s;}
+.vm-fn:hover{background:#3D9E72;}
+.vm-sk{display:block;text-align:center;font-size:12px;color:#7A9A87;cursor:pointer;padding:6px;}
+.vm-sk:hover{color:#3D9E72;}
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#3D9E72;color:white;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;z-index:1300;opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(min-width:769px){.toast{bottom:30px;}}
 </style>
 </head>
 <body>
@@ -274,14 +301,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
     <div class="sb-logo"><span class="sb-en">Exally</span><span class="sb-ja">エクサリー</span></div>
     <nav class="sb-nav">
       <button class="sb-it active"><span class="sb-ic"><span class="sb-ic-emoji">🏠</span></span>ホーム</button>
-      <button class="sb-it"><span class="sb-ic"><span class="sb-ic-emoji">🤖</span></span>AIチャット</button>
-      <button class="sb-it"><span class="sb-ic"><svg><use href="#grid-sm"/></svg></span>ブック</button>
-      <button class="sb-it"><span class="sb-ic"><svg><use href="#template-sm"/></svg></span>テンプレ</button>
-      <button class="sb-it"><span class="sb-ic"><svg><use href="#stamp-sm"/></svg></span>電子ハンコ</button>
-      <button class="sb-it"><span class="sb-ic"><svg><use href="#book-sm"/></svg></span>数式帳</button>
-      <button class="sb-it"><span class="sb-ic"><span class="sb-ic-emoji">🎯</span></span>クイズ</button>
-      <button class="sb-it"><span class="sb-ic"><span class="sb-ic-emoji">📊</span></span>Excelバージョン</button>
-      <button class="sb-it"><span class="sb-ic"><span class="sb-ic-emoji">⚙️</span></span>設定</button>
+      <button class="sb-it" onclick="location.href='index6.html'"><span class="sb-ic"><span class="sb-ic-emoji">🤖</span></span>AIチャット</button>
+      <button class="sb-it" onclick="location.href='exally-canvas-grid.html'"><span class="sb-ic"><svg><use href="#grid-sm"/></svg></span>ブック</button>
+      <button class="sb-it" onclick="location.href='index6.html'"><span class="sb-ic"><svg><use href="#template-sm"/></svg></span>テンプレ</button>
+      <button class="sb-it nav-disabled"><span class="sb-ic"><svg><use href="#stamp-sm"/></svg></span>電子ハンコ</button>
+      <button class="sb-it" onclick="location.href='index6.html'"><span class="sb-ic"><svg><use href="#book-sm"/></svg></span>数式帳</button>
+      <button class="sb-it" onclick="location.href='index6.html'"><span class="sb-ic"><span class="sb-ic-emoji">🎯</span></span>クイズ</button>
+      <button class="sb-it" onclick="openVerModal()"><span class="sb-ic"><span class="sb-ic-emoji">📊</span></span>Excelバージョン</button>
+      <button class="sb-it" onclick="location.href='index6.html'"><span class="sb-ic"><span class="sb-ic-emoji">⚙️</span></span>設定</button>
     </nav>
     <div class="sb-ft">
       <span class="sb-bd sb-bd-d">デモ版</span>
@@ -294,12 +321,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
     <header class="mh">
       <div class="mh-lg"><span class="mh-en">Exally</span><span class="mh-ja">エクサリー</span></div>
       <div class="mh-r">
-        <span class="vbm">📊 365 ▼</span>
+        <span class="vbm" onclick="openVerModal()">📊 <span id="vbmLabel">365</span> ▼</span>
         <span class="hb hb-d">デモ版</span>
         <span class="hb hb-t">14日間無料</span>
       </div>
     </header>
-    <span class="vbp">📊 365 ▼</span>
+    <span class="vbp" onclick="openVerModal()">📊 <span id="vbpLabel">365</span> ▼</span>
 
     <div class="sc">
       <div class="ct">
@@ -312,17 +339,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
           <div class="b-srch-w">
             <div class="b-srch">
               <span class="b-srch-ic">💬</span>
-              <input type="text" placeholder="例：VLOOKUPの使い方は？">
-              <button class="b-srch-btn">→</button>
+              <input type="text" placeholder="例：VLOOKUPの使い方は？" onkeydown="if(event.key==='Enter')location.href='index6.html'">
+              <button class="b-srch-btn" onclick="location.href='index6.html'">→</button>
             </div>
             <div class="b-chips-row">
-              <span class="b-ch">📈 VLOOKUP教えて</span>
-              <span class="b-ch">💰 給料明細作って</span>
-              <span class="b-ch">📋 請求書テンプレ</span>
+              <span class="b-ch" onclick="location.href='index6.html'">📈 VLOOKUP教えて</span>
+              <span class="b-ch" onclick="location.href='index6.html'">💰 給料明細作って</span>
+              <span class="b-ch" onclick="location.href='index6.html'">📋 請求書テンプレ</span>
             </div>
             <div class="b-chips-row b-chips-row-2">
-              <span class="b-ch">⚠️ エラーを直したい</span>
-              <span class="b-ch">📊 グラフを作って</span>
+              <span class="b-ch" onclick="location.href='index6.html'">⚠️ エラーを直したい</span>
+              <span class="b-ch" onclick="location.href='index6.html'">📊 グラフを作って</span>
             </div>
           </div>
         </div>
@@ -334,7 +361,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
           <div class="b-pc-col">
             <div class="b-sec b-sec-pc">CREATE</div>
             <div class="b-cs">
-              <div class="b-c">
+              <div class="b-c" onclick="location.href='exally-canvas-grid.html'">
                 <div class="b-c-top">
                   <div class="b-c-ic"><svg><use href="#grid-icon"/></svg></div>
                   <div class="b-c-text">
@@ -347,7 +374,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
                   <span class="b-c-ar">OPEN →</span>
                 </div>
               </div>
-              <div class="b-c">
+              <div class="b-c nav-disabled">
                 <div class="b-c-top">
                   <div class="b-c-ic"><svg><use href="#import-icon"/></svg></div>
                   <div class="b-c-text">
@@ -364,21 +391,21 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 
             <div class="b-sec b-sec-pc" style="margin-top:22px;">TOOLS</div>
             <div class="b-ss">
-              <div class="b-s">
+              <div class="b-s" onclick="location.href='index6.html'">
                 <div class="b-s-ic"><svg><use href="#template-icon"/></svg></div>
                 <div class="b-s-text">
                   <div class="b-s-t">テンプレ</div>
                   <div class="b-s-meta">— 12種類</div>
                 </div>
               </div>
-              <div class="b-s">
+              <div class="b-s nav-disabled">
                 <div class="b-s-ic"><svg><use href="#stamp-icon"/></svg></div>
                 <div class="b-s-text">
                   <div class="b-s-t">電子判子<br>作成</div>
                   <div class="b-s-meta">— PDF対応</div>
                 </div>
               </div>
-              <div class="b-s">
+              <div class="b-s" onclick="location.href='index6.html'">
                 <div class="b-s-ic"><svg><use href="#book-icon"/></svg></div>
                 <div class="b-s-text">
                   <div class="b-s-t">数式帳</div>
@@ -396,27 +423,27 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
               <span class="b-rc-m">すべて見る →</span>
             </div>
             <div class="b-rc-list">
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">売上管理.xlsx</div>
                 <div class="b-rc-it-d">TODAY</div>
               </div>
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">給料明細_4月.xlsx</div>
                 <div class="b-rc-it-d">YESTERDAY</div>
               </div>
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">顧客リスト.xlsx</div>
                 <div class="b-rc-it-d">3 DAYS AGO</div>
               </div>
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">請求書_山田商事.xlsx</div>
                 <div class="b-rc-it-d">1 WEEK AGO</div>
               </div>
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">経費精算_3月.xlsx</div>
                 <div class="b-rc-it-d">1 WEEK AGO</div>
               </div>
-              <div class="b-rc-it">
+              <div class="b-rc-it nav-disabled">
                 <div class="b-rc-it-t">シフト表_4月.xlsx</div>
                 <div class="b-rc-it-d">2 WEEKS AGO</div>
               </div>
@@ -431,17 +458,92 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
     <!-- モバイル固定ボトムナビ（8項目） -->
     <nav class="bn">
       <button class="bn-i active"><span class="bn-ic"><span class="bn-ic-emoji">🏠</span></span><span class="bn-lb">ホーム</span></button>
-      <button class="bn-i"><span class="bn-ic"><span class="bn-ic-emoji">🤖</span></span><span class="bn-lb">AI</span></button>
-      <button class="bn-i"><span class="bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="bn-lb">ブック</span></button>
-      <button class="bn-i"><span class="bn-ic"><svg><use href="#template-sm"/></svg></span><span class="bn-lb">テンプレ</span></button>
-      <button class="bn-i"><span class="bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="bn-lb">電子ハンコ</span></button>
-      <button class="bn-i"><span class="bn-ic"><svg><use href="#book-sm"/></svg></span><span class="bn-lb">数式帳</span></button>
-      <button class="bn-i"><span class="bn-ic"><span class="bn-ic-emoji">🎯</span></span><span class="bn-lb">クイズ</span></button>
-      <button class="bn-i"><span class="bn-ic"><span class="bn-ic-emoji">⚙️</span></span><span class="bn-lb">設定</span></button>
+      <button class="bn-i" onclick="location.href='index6.html'"><span class="bn-ic"><span class="bn-ic-emoji">🤖</span></span><span class="bn-lb">AI</span></button>
+      <button class="bn-i" onclick="location.href='exally-canvas-grid.html'"><span class="bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="bn-lb">ブック</span></button>
+      <button class="bn-i" onclick="location.href='index6.html'"><span class="bn-ic"><svg><use href="#template-sm"/></svg></span><span class="bn-lb">テンプレ</span></button>
+      <button class="bn-i nav-disabled"><span class="bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="bn-lb">電子ハンコ</span></button>
+      <button class="bn-i" onclick="location.href='index6.html'"><span class="bn-ic"><svg><use href="#book-sm"/></svg></span><span class="bn-lb">数式帳</span></button>
+      <button class="bn-i" onclick="location.href='index6.html'"><span class="bn-ic"><span class="bn-ic-emoji">🎯</span></span><span class="bn-lb">クイズ</span></button>
+      <button class="bn-i" onclick="location.href='index6.html'"><span class="bn-ic"><span class="bn-ic-emoji">⚙️</span></span><span class="bn-lb">設定</span></button>
     </nav>
 
   </div>
 </div>
+
+<!-- Excelバージョン選択モーダル -->
+<div class="vm-ov" id="verModal">
+  <div class="vm-cd">
+    <div class="vm-hd">
+      <div class="vm-tt">Excelバージョンを選んでね</div>
+      <button class="vm-cl" onclick="closeVerModal()">×</button>
+    </div>
+    <div class="vm-bd">
+      <div class="vm-ht">💡 後で変えられる・Excelなくても使える</div>
+      <div class="vm-gr">
+        <div class="vm-op" data-ver="excel_365" onclick="selectVer('excel_365')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 365</div></div>
+        <div class="vm-op" data-ver="excel_2024" onclick="selectVer('excel_2024')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 2024</div></div>
+        <div class="vm-op" data-ver="excel_2021" onclick="selectVer('excel_2021')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2021</div></div>
+        <div class="vm-op" data-ver="excel_2019" onclick="selectVer('excel_2019')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2019</div></div>
+        <div class="vm-op" data-ver="excel_2016" onclick="selectVer('excel_2016')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2016</div></div>
+        <div class="vm-op" data-ver="excel_mac" onclick="selectVer('excel_mac')"><div class="vm-op-ic">🍎</div><div class="vm-op-lb">Excel for Mac</div></div>
+        <div class="vm-op" data-ver="excel_online" onclick="selectVer('excel_online')"><div class="vm-op-ic">☁️</div><div class="vm-op-lb">Excel Online</div></div>
+        <div class="vm-op" data-ver="excel_none" onclick="selectVer('excel_none')"><div class="vm-op-ic">✨</div><div class="vm-op-lb">Excelなし</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Excelバージョン管理（localStorageキー：exally_excel_version・index6.htmlと共有）
+var VER_LABEL_MAP = {
+  excel_365:'365', excel_2024:'2024', excel_2021:'2021', excel_2019:'2019',
+  excel_2016:'2016', excel_mac:'Mac', excel_online:'Online', excel_none:'なし'
+};
+function getVerKey(){
+  try{ var v=localStorage.getItem('exally_excel_version'); return (typeof v==='string' && v.length>0) ? v : 'excel_365'; }
+  catch(e){ return 'excel_365'; }
+}
+function updateVerBadges(){
+  var v=getVerKey();
+  var label=VER_LABEL_MAP[v]||'365';
+  var m=document.getElementById('vbmLabel');
+  var p=document.getElementById('vbpLabel');
+  if(m) m.textContent=label;
+  if(p) p.textContent=label;
+}
+function openVerModal(){
+  var current=getVerKey();
+  document.querySelectorAll('.vm-op').forEach(function(el){
+    el.classList.toggle('current', el.getAttribute('data-ver')===current);
+  });
+  document.getElementById('verModal').classList.add('show');
+}
+function closeVerModal(){
+  document.getElementById('verModal').classList.remove('show');
+}
+function selectVer(verKey){
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  updateVerBadges();
+  closeVerModal();
+  showToast('Excelバージョンを'+(VER_LABEL_MAP[verKey]||verKey)+'に変更したよ');
+}
+function showToast(msg){
+  var t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+// モーダル外クリックで閉じる
+document.getElementById('verModal').addEventListener('click', function(e){
+  if(e.target===this) closeVerModal();
+});
+// 起動時：バージョンバッジを更新
+window.addEventListener('load', updateVerBadges);
+</script>
 
 </body>
 </html>
