@@ -9,8 +9,8 @@
 html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background:#F4F7F5;color:#2E4038;overflow:hidden;}
 .ob-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;}
 .ob-overlay.hide{display:none;}
-.ob-card{background:#ffffff;border-radius:24px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;}
-.ob-body{flex:1;padding:20px 24px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.ob-card{background:#ffffff;border-radius:24px;width:100%;max-width:440px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;}
+.ob-body{flex:1;padding:20px 24px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;overflow-y:auto;min-height:0;}
 .ob-icon{font-size:44px;margin-bottom:10px;}
 .ob-badge{display:inline-block;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:8px;}
 .ob-title{font-size:20px;font-weight:700;color:#1A2B22;line-height:1.4;margin-bottom:8px;}
@@ -31,6 +31,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .ob-cat.selected{border-color:#52B788;background:#F0FAF4;}
 .ob-cat-icon{font-size:26px;margin-bottom:6px;}
 .ob-cat-label{font-size:12px;font-weight:700;color:#1A2B22;}
+#ob0 .ob-cats{gap:8px;margin-top:10px;}
+#ob0 .ob-cat{padding:10px 8px;}
+#ob0 .ob-cat-icon{font-size:20px;margin-bottom:3px;}
+#ob0 .ob-cat-label{font-size:11px;}
 .ob-footer{padding:12px 20px 16px;border-top:1px solid #D4EDE1;background:#ffffff;}
 .ob-dots{display:flex;justify-content:center;gap:6px;margin-bottom:12px;}
 .ob-dot{width:6px;height:6px;border-radius:3px;background:#D4EDE1;transition:all 0.3s;}
