@@ -188,7 +188,11 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .msg-bubble{background:#ffffff;border:1px solid #D4EDE1;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:13px;line-height:1.75;color:#2E4038;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
 .msg.user .msg-bubble{background:#52B788;border-color:#52B788;color:white;border-radius:16px 16px 4px 16px;}
 .msg.ai.memory-active .msg-bubble{background:#F0FAF4;border-color:#C8ECD8;}
-.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;border-radius:8px;margin:10px 0;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
+.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;border-radius:8px;margin:10px 0 6px 0;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
+.formula-actions{display:flex;gap:7px;margin:0 0 10px 0;flex-wrap:wrap;}
+.formula-actions .copy-btn,.formula-actions .save-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;}
+.formula-actions .copy-btn:hover,.formula-actions .save-btn:hover{background:#3D9E72;color:white;}
+.formula-actions .save-btn.saved{background:#B0C4BA;color:#4A6B5A;cursor:default;}
 .inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
 .msg-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
 .copy-btn,.save-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;}
@@ -1348,20 +1352,21 @@ function addAIMsg(rawText,tsvData,question){
   }
   var actions=document.createElement('div');
   actions.className='msg-actions';
-  if(!hasTSV&&formula){
-    var cb=document.createElement('button');
-    cb.className='copy-btn'; cb.textContent='📋 数式をコピー';
-    cb.onclick=function(){ copyText(cb,safeFormula); };
-    actions.appendChild(cb);
-  }
   bubble.appendChild(actions);
-  if(formula){
-    var barId='bar_'+msgId;
-    var saveBar=document.createElement('div');
-    saveBar.className='save-bar'; saveBar.id=barId;
-    saveBar.innerHTML='<span>💡 数式帳に保存する？</span>'
-      +'<button class="save-bar-btn" onclick="saveBarAction(\''+barId+'\',\''+safeFormula+'\')">保存する</button>';
-    bubble.appendChild(saveBar);
+  // 各 formula-block 直下にコピー/保存ボタンを挿入（複数数式対応）
+  if(!hasTSV){
+    var fblocks=bubble.querySelectorAll('.formula-block');
+    fblocks.forEach(function(fb, idx){
+      var rawF=fb.textContent||'';
+      if(!rawF||rawF.length<3) return;
+      var fSafe=rawF.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+      var fActs=document.createElement('div');
+      fActs.className='formula-actions';
+      var fBarId='bar_'+msgId+'_'+idx;
+      fActs.innerHTML='<button class="copy-btn" onclick="copyText(this,\''+fSafe+'\')">📋 数式をコピー</button>'
+        +'<button class="save-btn" id="'+fBarId+'" onclick="saveBarAction(\''+fBarId+'\',\''+fSafe+'\')">📚 数式帳に保存</button>';
+      fb.parentNode.insertBefore(fActs, fb.nextSibling);
+    });
   }
   // 関連ヒント追加
   var catToUse=window.lastCat||window.currentCat;
@@ -1511,21 +1516,34 @@ function updateUsage(){
 
 // ===== FORMULA BOOK =====
 function saveBarAction(barId,formula){
-  var bar=document.getElementById(barId);
-  if(!bar) return;
-  var bubble=bar.closest('.msg-bubble');
+  var btn=document.getElementById(barId);
+  if(!btn) return;
+  // 旧 save-bar (div) と新 save-btn (button) の両対応
+  var bubble=btn.closest('.msg-bubble');
   var rawText=bubble?decodeURIComponent(bubble.getAttribute('data-raw')||''):'';
   var question=bubble?(bubble.getAttribute('data-question')||''):'';
   var now=new Date();
   var date=(now.getMonth()+1)+'月'+now.getDate()+'日';
   var title=question||formula;
-  savedFormulas.unshift({title:title,formula:formula,memo:rawText,date:date});
+  // 数式の " が HTML エンティティになってる場合は戻す
+  var cleanFormula=formula.replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+  savedFormulas.unshift({title:title,formula:cleanFormula,memo:rawText,date:date});
   try{ localStorage.setItem('savedFormulas',JSON.stringify(savedFormulas)); }catch(e){}
   document.getElementById('bookNavBadge').classList.add('show');
   var badge=document.getElementById('bookBadge');
   if(badge) badge.style.display='inline-block';
-  bar.classList.add('saved');
-  bar.innerHTML='<span>✅ 数式帳に保存済み</span>';
+  // 旧 save-bar (div)
+  if(btn.classList.contains('save-bar')){
+    btn.classList.add('saved');
+    btn.innerHTML='<span>✅ 数式帳に保存済み</span>';
+  }
+  // 新 save-btn (button)
+  else if(btn.tagName==='BUTTON'){
+    btn.classList.add('saved');
+    btn.textContent='✅ 保存済み';
+    btn.disabled=true;
+    btn.onclick=null;
+  }
   showToast('📚 保存したよ！数式帳で確認できるよ');
 }
 
