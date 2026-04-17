@@ -382,6 +382,12 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .arg-orange{color:#E8843A;font-weight:700;}
 .arg-purple{color:#9B5DE5;font-weight:700;}
 .arg-green{color:#2E9E6B;font-weight:700;}
+.arg-red{color:#D9484A;font-weight:700;}
+.arg-yellow{color:#C9A02D;font-weight:700;}
+.arg-pink{color:#D93AC8;font-weight:700;}
+.arg-cyan{color:#2EA9C9;font-weight:700;}
+.arg-brown{color:#8B5A3C;font-weight:700;}
+.arg-gray{color:#6B7573;font-weight:700;}
 .memory-bar{font-size:11px;color:#3D9E72;padding:4px 4px 6px;display:flex;align-items:center;gap:4px;flex-shrink:0;width:100%;justify-content:space-between;}
 .memory-label{font-size:10px;color:#3D9E72;font-weight:700;padding:6px 0 2px 44px;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;}
 .memory-label::after{content:'';flex:1;height:1px;background:#C8ECD8;}
@@ -1071,34 +1077,71 @@ function colorizeFormula(text){
   return text;
 }
 
-// ===== FORMULA BLOCK COLORIZER（formula-block内専用・ネスト対応） =====
+// ===== FORMULA BLOCK COLORIZER（汎用・全関数対応・ネスト対応） =====
+// 引数順に色を割り当て：1=青 2=橙 3=紫 4=緑 5=赤 6=黄 7=桃 8=水 9=茶 10=灰 11番目以降はループ
+var COLORIZE_COLORS=['arg-blue','arg-orange','arg-purple','arg-green','arg-red','arg-yellow','arg-pink','arg-cyan','arg-brown','arg-gray'];
+function colorizeEscapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function colorizeMatchFunc(text,i){
+  var sub=text.substring(i);
+  var m=sub.match(/^([A-Za-z][A-Za-z0-9_\.]*)\s*\(/);
+  if(!m) return null;
+  var name=m[1];
+  var openIdx=i+m[0].length-1;
+  var depth=1,inStr=false,closeIdx=-1;
+  for(var j=openIdx+1;j<text.length;j++){
+    var c=text[j];
+    if(inStr){ if(c==='"') inStr=false; }
+    else{
+      if(c==='"') inStr=true;
+      else if(c==='(') depth++;
+      else if(c===')'){ depth--; if(depth===0){ closeIdx=j; break; } }
+    }
+  }
+  if(closeIdx===-1) return null;
+  return {name:name,argsStr:text.substring(openIdx+1,closeIdx),endIdx:closeIdx+1};
+}
+function colorizeSplitArgs(argsStr){
+  if(!argsStr.trim()) return [];
+  var args=[],cur='',depth=0,inStr=false;
+  for(var j=0;j<argsStr.length;j++){
+    var c=argsStr[j];
+    if(inStr){ if(c==='"') inStr=false; cur+=c; }
+    else{
+      if(c==='"'){ inStr=true; cur+=c; }
+      else if(c==='('){ depth++; cur+=c; }
+      else if(c===')'){ depth--; cur+=c; }
+      else if(c===','&&depth===0){ args.push(cur.trim()); cur=''; }
+      else cur+=c;
+    }
+  }
+  if(cur.trim()) args.push(cur.trim());
+  return args;
+}
 function colorizeFormulaBlock(f){
-  // 内側から処理（ネスト対応）
-  // VLOOKUP（=なしでもマッチ）
-  f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){
-    return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';
-  });
-  // SUMIF
-  f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){
-    return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
-  });
-  // SUMIFS（引数多いため最初の3つ）
-  f=f.replace(/SUMIFS\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)/gi,function(m,a1,a2,a3){
-    return 'SUMIFS(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>';
-  });
-  // COUNTIF
-  f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){
-    return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
-  });
-  // IF
-  f=f.replace(/(?<![A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){
-    return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';
-  });
-  // ROUND
-  f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){
-    return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';
-  });
-  return f;
+  // 再帰的に関数呼び出しを検出・色分け
+  return colorizeFormulaProcess(f);
+}
+function colorizeFormulaProcess(text){
+  var result='',i=0;
+  while(i<text.length){
+    var fm=colorizeMatchFunc(text,i);
+    if(fm){
+      result+=colorizeEscapeHtml(fm.name)+'(';
+      var args=colorizeSplitArgs(fm.argsStr);
+      var coloredArgs=args.map(function(arg,idx){
+        var color=COLORIZE_COLORS[idx%COLORIZE_COLORS.length];
+        var inner=colorizeFormulaProcess(arg);
+        return '<span class="'+color+'">'+inner+'</span>';
+      });
+      result+=coloredArgs.join(', ');
+      result+=')';
+      i=fm.endIdx;
+    } else {
+      result+=colorizeEscapeHtml(text[i]);
+      i++;
+    }
+  }
+  return result;
 }
 
 // ===== PANEL =====
@@ -1518,21 +1561,20 @@ function updateUsage(){
 function saveBarAction(barId,formula){
   var btn=document.getElementById(barId);
   if(!btn) return;
-  // 旧 save-bar (div) と新 save-btn (button) の両対応
   var bubble=btn.closest('.msg-bubble');
   var rawText=bubble?decodeURIComponent(bubble.getAttribute('data-raw')||''):'';
   var question=bubble?(bubble.getAttribute('data-question')||''):'';
   var now=new Date();
   var date=(now.getMonth()+1)+'月'+now.getDate()+'日';
   var title=question||formula;
-  // 数式の " が HTML エンティティになってる場合は戻す
+  // HTMLエンティティを戻す
   var cleanFormula=formula.replace(/&quot;/g,'"').replace(/&#39;/g,"'");
   savedFormulas.unshift({title:title,formula:cleanFormula,memo:rawText,date:date});
   try{ localStorage.setItem('savedFormulas',JSON.stringify(savedFormulas)); }catch(e){}
   document.getElementById('bookNavBadge').classList.add('show');
   var badge=document.getElementById('bookBadge');
   if(badge) badge.style.display='inline-block';
-  // 旧 save-bar (div)
+  // 旧 save-bar (div) 互換
   if(btn.classList.contains('save-bar')){
     btn.classList.add('saved');
     btn.innerHTML='<span>✅ 数式帳に保存済み</span>';
