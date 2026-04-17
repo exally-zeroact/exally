@@ -1060,15 +1060,8 @@ function updateMemoryBar(){
 
 // ===== FORMULA COLORIZER =====
 function colorizeFormula(text){
-  var lp='[\\(（]', rp='[\\)）]', cm='[,，]';
-  var reVL=new RegExp('=VLOOKUP'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^,，]+)'+cm+'\\s*(FALSE|TRUE)\\s*'+rp,'gi');
-  text=text.replace(reVL,function(m,a1,a2,a3,a4){return '=VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
-  var reSI=new RegExp('=SUMIF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reSI,function(m,a1,a2,a3){return '=SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  var reIF=new RegExp('=IF'+lp+'([^,，]+)'+cm+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reIF,function(m,a1,a2,a3){return '=IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
-  var reCI=new RegExp('=COUNTIF'+lp+'([^,，]+)'+cm+'([^)）]+)'+rp,'gi');
-  text=text.replace(reCI,function(m,a1,a2){return '=COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
+  // 数式内の引数色分けは colorizeFormulaBlock() に一元化（formula-block内専用）
+  // ここでは本文の🔵🟠🟣🟢マーカー色分けのみ処理
   var b='\uD83D\uDD35',o='\uD83D\uDFE0',p='\uD83D\uDFE3',g='\uD83D\uDFE2';
   text=text.replace(new RegExp(b+'\\s*\\*\\*([^*]+)\\*\\*','g'),b+' <span class="arg-blue">$1</span>');
   text=text.replace(new RegExp(o+'\\s*\\*\\*([^*]+)\\*\\*','g'),o+' <span class="arg-orange">$1</span>');
@@ -1093,8 +1086,8 @@ function colorizeMatchFunc(text,i){
     if(inStr){ if(c==='"') inStr=false; }
     else{
       if(c==='"') inStr=true;
-      else if(c==='(') depth++;
-      else if(c===')'){ depth--; if(depth===0){ closeIdx=j; break; } }
+      else if(c==='('||c==='{') depth++;
+      else if(c===')'||c==='}'){ depth--; if(depth===0){ closeIdx=j; break; } }
     }
   }
   if(closeIdx===-1) return null;
@@ -1108,8 +1101,8 @@ function colorizeSplitArgs(argsStr){
     if(inStr){ if(c==='"') inStr=false; cur+=c; }
     else{
       if(c==='"'){ inStr=true; cur+=c; }
-      else if(c==='('){ depth++; cur+=c; }
-      else if(c===')'){ depth--; cur+=c; }
+      else if(c==='('||c==='{'){ depth++; cur+=c; }
+      else if(c===')'||c==='}'){ depth--; cur+=c; }
       else if(c===','&&depth===0){ args.push(cur.trim()); cur=''; }
       else cur+=c;
     }
@@ -1122,8 +1115,22 @@ function colorizeFormulaBlock(f){
   return colorizeFormulaProcess(f);
 }
 function colorizeFormulaProcess(text){
-  var result='',i=0;
+  var result='',i=0,inStr=false;
   while(i<text.length){
+    var c=text[i];
+    // 文字列""内はそのままエスケープして出力（関数検出をスキップ）
+    if(inStr){
+      result+=colorizeEscapeHtml(c);
+      if(c==='"') inStr=false;
+      i++;
+      continue;
+    }
+    if(c==='"'){
+      result+=colorizeEscapeHtml(c);
+      inStr=true;
+      i++;
+      continue;
+    }
     var fm=colorizeMatchFunc(text,i);
     if(fm){
       result+=colorizeEscapeHtml(fm.name)+'(';
@@ -1137,7 +1144,7 @@ function colorizeFormulaProcess(text){
       result+=')';
       i=fm.endIdx;
     } else {
-      result+=colorizeEscapeHtml(text[i]);
+      result+=colorizeEscapeHtml(c);
       i++;
     }
   }
