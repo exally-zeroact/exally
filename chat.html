@@ -71,11 +71,12 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 #screen-chat.active{display:flex!important;flex-direction:column;height:100%!important;overflow:hidden;}
 #screen-template.active{display:flex!important;flex-direction:column;}
 .bottom-nav{background:#ffffff;border-top:1px solid #D4EDE1;display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(30,60,40,0.06);}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;position:relative;}
-.nav-icon{font-size:21px;line-height:1;margin-bottom:2px;}
-.nav-label{font-size:10px;color:#7A9A87;font-weight:500;}
+.nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 1px 5px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;position:relative;}
+.nav-item .nav-icon{font-size:15px;line-height:1;}
+.nav-item .nav-label{font-size:9px;letter-spacing:-0.3px;color:#7A9A87;margin-top:2px;white-space:nowrap;}
 .nav-item.active .nav-label{color:#3D9E72;font-weight:700;}
-.nav-badge{position:absolute;top:6px;right:calc(50% - 16px);width:7px;height:7px;background:#E05555;border-radius:50%;border:2px solid #ffffff;display:none;}
+.nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.nav-badge{position:absolute;top:4px;right:calc(50% - 12px);width:6px;height:6px;background:#E05555;border-radius:50%;border:1.5px solid #ffffff;display:none;}
 .nav-badge.show{display:block;}
 @media(min-width:769px){.bottom-nav{display:none;}}
 .chat-wrap{display:flex;flex-direction:column;height:100%;}
@@ -391,7 +392,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <nav class="sidebar-nav">
       <button class="sidebar-item" id="snav-home" onclick="location.href='home.html'"><span class="sidebar-item-icon">🏠</span>ホーム</button>
       <button class="sidebar-item active" id="snav-chat" onclick="switchTab('chat')"><span class="sidebar-item-icon">💬</span>AIチャット</button>
+      <button class="sidebar-item" id="snav-booklink" onclick="location.href='book.html'"><span class="sidebar-item-icon">📊</span>ブック</button>
       <button class="sidebar-item" id="snav-template" onclick="switchTab('template')"><span class="sidebar-item-icon">📋</span>テンプレ</button>
+      <button class="sidebar-item nav-disabled" id="snav-stamp"><span class="sidebar-item-icon">🖋️</span>電子ハンコ</button>
       <button class="sidebar-item" id="snav-book" onclick="switchTab('book')"><span class="sidebar-item-icon">📚</span>数式帳</button>
       <button class="sidebar-item" id="snav-quiz" onclick="switchTab('quiz')"><span class="sidebar-item-icon">🎯</span>クイズ</button>
       <button class="sidebar-item" id="snav-settings" onclick="switchTab('settings')"><span class="sidebar-item-icon">⚙️</span>設定</button>
@@ -616,10 +619,13 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
     <nav class="bottom-nav">
       <button class="nav-item" id="nav-home" onclick="location.href='home.html'"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span></button>
-      <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')"><span class="nav-icon">💬</span><span class="nav-label">AIチャット</span><div class="nav-badge" id="chatBadge"></div></button>
+      <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')"><span class="nav-icon">💬</span><span class="nav-label">AI</span><div class="nav-badge" id="chatBadge"></div></button>
+      <button class="nav-item" id="nav-booklink" onclick="location.href='book.html'"><span class="nav-icon">📊</span><span class="nav-label">ブック</span></button>
       <button class="nav-item" id="nav-template" onclick="switchTab('template')"><span class="nav-icon">📋</span><span class="nav-label">テンプレ</span></button>
+      <button class="nav-item nav-disabled" id="nav-stamp"><span class="nav-icon">🖋️</span><span class="nav-label">ハンコ</span></button>
       <button class="nav-item" id="nav-book" onclick="switchTab('book')"><span class="nav-icon">📚</span><span class="nav-label">数式帳</span><div class="nav-badge" id="bookNavBadge"></div></button>
       <button class="nav-item" id="nav-quiz" onclick="switchTab('quiz')"><span class="nav-icon">🎯</span><span class="nav-label">クイズ</span></button>
+      <button class="nav-item" id="nav-settings" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">設定</span></button>
     </nav>
 
   </div>
@@ -816,6 +822,29 @@ function clearChatHistory(){
 }
 
 window.addEventListener('load', loadChatHistory);
+
+// home.htmlから ?q=質問文 で来た時、自動入力して送信
+window.addEventListener('load', function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var q=p.get('q');
+    if(q && q.trim()){
+      var inp=document.getElementById('msgInput');
+      if(inp){
+        inp.value=q.trim();
+        // オンボーディングが無ければ即送信、あれば待つ
+        var ob=document.querySelector('.onboarding-overlay.show');
+        if(!ob){
+          setTimeout(function(){ if(typeof sendMessage==='function') sendMessage(); }, 300);
+        }
+      }
+      // URLからクエリを消す（リロード時の再送信防止）
+      if(history.replaceState){
+        history.replaceState(null, '', location.pathname);
+      }
+    }
+  }catch(e){ console.warn('q param error', e); }
+});
 
 // ===== CAT Q DATA =====
 var CAT_Q = {
