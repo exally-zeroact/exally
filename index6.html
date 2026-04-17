@@ -43,32 +43,56 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .ob-next:hover{background:#3D9E72;}
 .ob-skip{display:block;text-align:center;margin-top:10px;font-size:12px;color:#7A9A87;cursor:pointer;}
 .ob-skip:hover{color:#3D9E72;}
+.ver-modal{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.ver-modal.show{display:flex;}
+.ver-modal-card{background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.ver-modal-head{padding:18px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.ver-modal-title{font-size:16px;font-weight:700;color:#1A2B22;}
+.ver-modal-close{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.ver-modal-body{padding:14px 18px 18px;overflow-y:auto;min-height:0;}
+.ver-modal-hint{background:#FFF8E1;border:1px solid #F5DC8A;color:#8A6D1F;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5;margin-bottom:12px;}
+.ver-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ver-opt{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.ver-opt:hover{border-color:#52B788;background:#F0FAF4;}
+.ver-opt.current{border-color:#52B788;background:#F0FAF4;}
+.ver-opt-icon{font-size:20px;margin-bottom:3px;}
+.ver-opt-label{font-size:11px;font-weight:700;color:#1A2B22;}
+.ver-opt.current .ver-opt-label{color:#3D9E72;}
 .layout{display:flex;height:100dvh;width:100%;}
 .sidebar{display:none;}
 @media(min-width:769px){
 .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:24px 0;height:100dvh;flex-shrink:0;}
-.sidebar-logo{padding:0 20px 28px;display:flex;align-items:baseline;gap:5px;text-decoration:none;}
+.sidebar-logo{padding:0 20px 20px;display:flex;align-items:baseline;gap:5px;text-decoration:none;}
+.sidebar-logo-wrap{padding:0 20px 20px;display:flex;align-items:center;justify-content:space-between;}
+.sidebar-logo-inner{display:flex;align-items:baseline;gap:5px;text-decoration:none;}
 .sidebar-logo-en{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
 .sidebar-logo-ja{font-size:10px;color:#7A9A87;}
+.ver-badge{display:inline-flex;align-items:center;gap:3px;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:4px 9px;border-radius:14px;cursor:pointer;transition:all 0.15s;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+.ver-badge:hover{background:#C8ECD8;border-color:#3D9E72;}
+.ver-badge-arrow{font-size:9px;opacity:0.7;}
 .sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:4px;}
 .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#7A9A87;font-size:13px;font-weight:500;transition:all 0.18s;}
 .sidebar-item:hover{background:#F0FAF4;color:#2E4038;}
 .sidebar-item.active{background:#F0FAF4;color:#3D9E72;font-weight:700;}
 .sidebar-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0;}
-.sidebar-footer{padding:16px 20px;border-top:1px solid #D4EDE1;display:flex;flex-direction:column;gap:8px;}
+.sidebar-footer{padding:14px 20px;border-top:1px solid #D4EDE1;display:flex;flex-direction:column;gap:8px;}
+.sidebar-ver-btn{background:#ffffff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:12px;font-weight:700;padding:9px 12px;border-radius:10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;}
+.sidebar-ver-btn:hover{background:#F0FAF4;border-color:#3D9E72;}
 .sidebar-badge{font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;text-align:center;}
 .demo-badge-s{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
 .trial-badge-s{background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;}
 }
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100dvh;}
-.mobile-header{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;}
+.mobile-header{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 12px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px;}
+.mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;flex-shrink:0;}
 .mobile-logo-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;}
 .mobile-logo-ja{font-size:10px;color:#7A9A87;}
-.mobile-header-right{display:flex;gap:6px;align-items:center;}
-.hbadge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.mobile-header-center{flex:1;display:flex;justify-content:center;min-width:0;}
+.mobile-header-right{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.hbadge{font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;white-space:nowrap;}
 .hbadge-warn{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
 .hbadge-mint{background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;}
+@media(max-width:480px){.hbadge-mint{display:none;}}
 @media(min-width:769px){.mobile-header{display:none;}}
 .screen-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#F4F7F5;}
 .screen{display:none;}
@@ -472,10 +496,13 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="layout">
   <aside class="sidebar">
-    <a href="#" class="sidebar-logo">
-      <span class="sidebar-logo-en">Exally</span>
-      <span class="sidebar-logo-ja">エクサリー</span>
-    </a>
+    <div class="sidebar-logo-wrap">
+      <a href="#" class="sidebar-logo-inner">
+        <span class="sidebar-logo-en">Exally</span>
+        <span class="sidebar-logo-ja">エクサリー</span>
+      </a>
+      <span class="ver-badge" id="sidebarVerBadge" onclick="openVersionModal()">📊 <span id="sidebarVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
+    </div>
     <nav class="sidebar-nav">
       <button class="sidebar-item active" id="snav-home" onclick="switchTab('home')"><span class="sidebar-item-icon">🏠</span>ホーム</button>
       <button class="sidebar-item" id="snav-chat" onclick="switchTab('chat')"><span class="sidebar-item-icon">💬</span>AIチャット</button>
@@ -485,6 +512,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <button class="sidebar-item" id="snav-settings" onclick="switchTab('settings')"><span class="sidebar-item-icon">⚙️</span>設定</button>
     </nav>
     <div class="sidebar-footer">
+      <button class="sidebar-ver-btn" onclick="openVersionModal()">📊 Excelバージョン変更</button>
       <span class="sidebar-badge demo-badge-s">デモ版</span>
       <span class="sidebar-badge trial-badge-s">14日間無料トライアル中</span>
     </div>
@@ -496,6 +524,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         <span class="mobile-logo-en">Exally</span>
         <span class="mobile-logo-ja">エクサリー</span>
       </a>
+      <div class="mobile-header-center">
+        <span class="ver-badge" id="mobileVerBadge" onclick="openVersionModal()">📊 <span id="mobileVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
+      </div>
       <div class="mobile-header-right">
         <span class="hbadge hbadge-warn">デモ版</span>
         <span class="hbadge hbadge-mint">14日間無料</span>
@@ -835,6 +866,28 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="toast" id="toast"></div>
 
+<div class="ver-modal" id="verModal">
+  <div class="ver-modal-card">
+    <div class="ver-modal-head">
+      <div class="ver-modal-title">📊 Excelバージョンを変更</div>
+      <button class="ver-modal-close" onclick="closeVersionModal()">×</button>
+    </div>
+    <div class="ver-modal-body">
+      <div class="ver-modal-hint">💡 いつでも変えられる・Excelなくても使える</div>
+      <div class="ver-grid">
+        <div class="ver-opt" data-verkey="excel_365" onclick="changeVersion('excel_365')"><div class="ver-opt-icon">🟢</div><div class="ver-opt-label">Excel 365</div></div>
+        <div class="ver-opt" data-verkey="excel_2024" onclick="changeVersion('excel_2024')"><div class="ver-opt-icon">🟢</div><div class="ver-opt-label">Excel 2024</div></div>
+        <div class="ver-opt" data-verkey="excel_2021" onclick="changeVersion('excel_2021')"><div class="ver-opt-icon">🔵</div><div class="ver-opt-label">Excel 2021</div></div>
+        <div class="ver-opt" data-verkey="excel_2019" onclick="changeVersion('excel_2019')"><div class="ver-opt-icon">🔵</div><div class="ver-opt-label">Excel 2019</div></div>
+        <div class="ver-opt" data-verkey="excel_2016" onclick="changeVersion('excel_2016')"><div class="ver-opt-icon">🔵</div><div class="ver-opt-label">Excel 2016</div></div>
+        <div class="ver-opt" data-verkey="excel_mac" onclick="changeVersion('excel_mac')"><div class="ver-opt-icon">🍎</div><div class="ver-opt-label">Excel for Mac</div></div>
+        <div class="ver-opt" data-verkey="excel_online" onclick="changeVersion('excel_online')"><div class="ver-opt-icon">☁️</div><div class="ver-opt-label">Excel Online</div></div>
+        <div class="ver-opt" data-verkey="excel_none" onclick="changeVersion('excel_none')"><div class="ver-opt-icon">✨</div><div class="ver-opt-label">Excelなし</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== TEMPLATES =====
 var TEMPLATES = [
@@ -981,6 +1034,7 @@ function clearChatHistory(){
 }
 
 window.addEventListener('load', loadChatHistory);
+window.addEventListener('load', updateVerBadges);
 
 // ===== CAT Q DATA =====
 var CAT_Q = {
@@ -1216,6 +1270,7 @@ function selectVersion(el,verKey){
   document.querySelectorAll('#ob0 .ob-cat').forEach(function(c){ c.classList.remove('selected'); });
   el.classList.add('selected');
   try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  updateVerBadges();
   setTimeout(function(){ obNext(); },400);
 }
 
@@ -1315,6 +1370,46 @@ function getExcelVersion(){
     var v=localStorage.getItem('exally_excel_version');
     return (typeof v==='string' && v.length>0) ? v : 'excel_365';
   }catch(e){ return 'excel_365'; }
+}
+
+// ===== バージョン短縮ラベルマップ =====
+var VERSION_LABEL_MAP = {
+  excel_365:    '365',
+  excel_2024:   '2024',
+  excel_2021:   '2021',
+  excel_2019:   '2019',
+  excel_2016:   '2016',
+  excel_mac:    'Mac',
+  excel_online: 'Online',
+  excel_none:   'なし'
+};
+
+// ===== バージョンバッジ表示更新 =====
+function updateVerBadges(){
+  var v=getExcelVersion();
+  var label=VERSION_LABEL_MAP[v]||'365';
+  var sEl=document.getElementById('sidebarVerLabel');
+  var mEl=document.getElementById('mobileVerLabel');
+  if(sEl) sEl.textContent=label;
+  if(mEl) mEl.textContent=label;
+}
+
+// ===== バージョン変更モーダル =====
+function openVersionModal(){
+  var current=getExcelVersion();
+  document.querySelectorAll('.ver-opt').forEach(function(el){
+    el.classList.toggle('current', el.getAttribute('data-verkey')===current);
+  });
+  document.getElementById('verModal').classList.add('show');
+}
+function closeVersionModal(){
+  document.getElementById('verModal').classList.remove('show');
+}
+function changeVersion(verKey){
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  updateVerBadges();
+  closeVersionModal();
+  showToast('Excelバージョンを'+(VERSION_LABEL_MAP[verKey]||verKey)+'に変更したよ');
 }
 
 async function sendMessage(){
