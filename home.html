@@ -541,8 +541,17 @@ function showToast(msg){
 document.getElementById('verModal').addEventListener('click', function(e){
   if(e.target===this) closeVerModal();
 });
-// 起動時：バージョンバッジを更新
-window.addEventListener('load', updateVerBadges);
+// 起動時：バージョンバッジを更新・初回訪問ならバージョン選択を自動表示
+window.addEventListener('load', function(){
+  updateVerBadges();
+  // localStorage に exally_excel_version が未保存なら、初回訪問と判断してモーダル表示
+  try{
+    var saved = localStorage.getItem('exally_excel_version');
+    if(!saved){
+      setTimeout(function(){ openVerModal(); }, 400);
+    }
+  }catch(e){}
+});
 
 // 検索バー→chat.htmlへクエリ付き遷移
 function gotoChat(){
