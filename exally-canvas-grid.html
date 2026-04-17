@@ -2281,6 +2281,7 @@ var sheets = [
 ];
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
+var selRanges = [{r1:0, c1:0, r2:0, c2:0, sheet:0}]; // 複数選択用（STEP2以降で描画・追加操作に使用）
 var scrollTop=0, scrollLeft=0;
 var initialInnerHeight = window.innerHeight; // キーボード出現前のinnerHeightを保存
 var scale=1;
@@ -2582,6 +2583,7 @@ function sel(r1,c1,r2,c2){
   // 通常選択ではアンカーを更新
   anchorR=r1; anchorC=c1;
   activeR=r2; activeC=c2;
+  _syncSelRanges();
   scrollToCell(selR1,selC1); updateBar(); render();
 }
 
@@ -2591,7 +2593,20 @@ function selShift(ar,ac){
   activeC=Math.max(0,Math.min(COLS-1,ac));
   selR1=Math.min(anchorR,activeR); selC1=Math.min(anchorC,activeC);
   selR2=Math.max(anchorR,activeR); selC2=Math.max(anchorC,activeC);
+  _syncSelRanges();
   scrollToCell(activeR,activeC); updateBar(); render();
+}
+
+// selRanges の最後の要素を selR1/C1/R2/C2 と同期する
+// （STEP1では単純に最後の要素を上書き。STEP3以降で複数選択モード時にpush動作に拡張）
+function _syncSelRanges(){
+  if(selRanges.length===0){
+    selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:activeSheet});
+  } else {
+    var last = selRanges[selRanges.length-1];
+    last.r1=selR1; last.c1=selC1; last.r2=selR2; last.c2=selC2;
+    last.sheet=activeSheet;
+  }
 }
 
 // ===== スクロール =====
