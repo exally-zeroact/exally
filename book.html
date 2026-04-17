@@ -11,7 +11,7 @@ html { background: transparent; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
   font-family:'Noto Sans JP',sans-serif;
-  background:transparent;
+  background:#F8FEFC;
   height:100dvh;
   display:flex;
   flex-direction:column;
@@ -19,10 +19,6 @@ body {
   user-select:none;
   position:fixed;
   width:100%; top:0; left:0;
-  padding-bottom:86px;
-}
-@media(min-width:769px){
-  body{padding-bottom:32px;}
 }
 #header {
   background:#3D9E72;
@@ -176,6 +172,10 @@ body {
   position:relative;
   overflow:hidden;
   background:#F0FAF4;
+  margin-bottom:86px;
+}
+@media(min-width:769px){
+  #grid-wrap{margin-bottom:32px;}
 }
 
 #grid-canvas {
@@ -303,7 +303,7 @@ overflow-y:auto;
 #ai-float-btn {
 display:flex !important;
 position:fixed;
-bottom:52px;
+bottom:96px;
 right:16px;
 background:#3D9E72;
 color:#fff;
@@ -574,7 +574,7 @@ gap:8px;
 #ai-float-btn {
 display:flex !important;
 position:fixed;
-bottom:52px;
+bottom:96px;
 right:16px;
 background:#3D9E72;
 color:#fff;
