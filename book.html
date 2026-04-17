@@ -175,7 +175,7 @@ body {
   margin-bottom:calc(86px + env(safe-area-inset-bottom));
 }
 @media(min-width:769px){
-  #grid-wrap{margin-bottom:32px;}
+  #grid-wrap{margin-bottom:calc(32px + env(safe-area-inset-bottom));}
 }
 
 #grid-canvas {
@@ -367,13 +367,25 @@ align-items:center;
 justify-content:center;
 flex-shrink:0;
 }
-#sheet-tabs {
+/* ===== ボトム統合スタック（Sheetタブ＋ボトムナビ一体化） ===== */
+.bottom-stack {
 position:fixed;
-bottom:54px;
-left:0;
-right:0;
-height:32px;
+bottom:0;
+left:0; right:0;
 z-index:100;
+display:flex;
+flex-direction:column;
+background:#ffffff;
+padding-bottom:env(safe-area-inset-bottom);
+box-shadow:0 -2px 10px rgba(30,60,40,0.06);
+}
+@media(min-width:769px){
+.bottom-stack{padding-bottom:max(4px, env(safe-area-inset-bottom));}
+}
+
+#sheet-tabs {
+position:relative;
+height:32px;
 background:#F8FEFC;
 border-top:1px solid #C8ECD8;
 display:flex;
@@ -382,23 +394,14 @@ padding:0 8px 0 8px;
 gap:2px;
 overflow-x:auto;
 }
-@media(min-width:769px){
-#sheet-tabs{bottom:0;padding-bottom:max(4px, env(safe-area-inset-bottom));}
-}
 
-/* モバイル用ボトムナビ（8タブ） */
+/* モバイル用ボトムナビ（8タブ・.bottom-stack内に配置） */
 .book-bn{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
+position:relative;
 height:54px;
 background:#ffffff;
 border-top:1px solid #D4EDE1;
 display:flex;
-z-index:101;
-padding-bottom:env(safe-area-inset-bottom);
-box-shadow:0 -2px 10px rgba(30,60,40,0.06);
 }
 .book-bn-i{
 flex:1;
@@ -421,7 +424,13 @@ text-decoration:none;
 .book-bn-ic{font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;height:16px;}
 .book-bn-ic svg{width:15px;height:15px;}
 .book-bn-lb{font-size:9px;letter-spacing:-0.3px;margin-top:2px;white-space:nowrap;color:inherit;}
-@media(min-width:769px){.book-bn{display:none;}}
+
+/* PC: ボトムナビは非表示、Sheet1タブだけ画面下に固定 */
+@media(min-width:769px){
+.book-bn{display:none;}
+.bottom-stack{box-shadow:none;background:transparent;}
+#sheet-tabs{border-bottom:none;}
+}
 .sheet-tab {
 padding:5px 14px;
 font-size:12px;
@@ -3857,29 +3866,24 @@ function toggleAiPanel(){
 
 // 【アップ修正】iOS visual viewport panning 対策
 // キーボード出現時にvisualViewport.offsetTop > 0 になり body が「上に消えた」ように見える
-// resize + scroll 両方をハンドル（scrollがpanning検知の核心）
-// book-bn（ボトムナビ・safe-area含む実寸）の上にsheet-tabsを固定する
+// bottom-stack（Sheet1タブ+ボトムナビ一体）をキーボード上端に動かす
 function onVisualVP(){
   var vv = window.visualViewport;
   var SHEET_H = 36;
   var kbH = window.innerHeight - Math.round(vv.height) - Math.round(vv.offsetTop);
   document.body.style.height = Math.round(vv.height) + 'px';
-  var tabs = document.getElementById('sheet-tabs');
-  if(tabs){
-    // キーボード出現時はキーボード上端、通常時は book-bn の実寸高さ分上に配置
-    var isPC = window.innerWidth >= 769;
-    var bookBn = document.querySelector('.book-bn');
-    // safe-area込みの実寸高さを取得（display:noneのPC時は0）
-    var bnH = (bookBn && !isPC) ? Math.round(bookBn.getBoundingClientRect().height) : 0;
-    var bottomVal = kbH > 0 ? kbH : bnH;
-    tabs.style.bottom = bottomVal + 'px';
+
+  var stack = document.querySelector('.bottom-stack');
+  if(stack){
+    // キーボード出現時だけキーボード上端へ、通常時は bottom:0（CSSデフォルト）
+    stack.style.bottom = (kbH > 0 ? kbH : 0) + 'px';
   }
+
   // popup が sheet-tabs に重ならないよう位置調整
   var popup = document.getElementById('ai-response-popup');
   if(popup && popup.classList.contains('show')){
     var pt = parseFloat(popup.style.top) || 108;
     var ph = popup.getBoundingClientRect().height || 220;
-    // sheet-tabs の上端より上に収まるよう maxBottom を計算
     var maxBottom = Math.round(vv.offsetTop) + Math.round(vv.height) - SHEET_H - 10;
     if(pt + ph > maxBottom){
       popup.style.top = Math.max(60, maxBottom - ph) + 'px';
@@ -4354,22 +4358,23 @@ function initPopupResize(){
   <div id="popup-resize-handle"></div>
 </div>
 
-<!-- モバイル用ボトムナビ（8タブ統一・book.html独自） -->
+<!-- モバイル用ボトム統合スタック（Sheetタブ＋ボトムナビ一体化） -->
 
-<nav class="book-bn">
-  <a href="home.html" class="book-bn-i"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></a>
-  <a href="chat.html" class="book-bn-i"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></a>
-  <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
-  <a href="chat.html?tab=template" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></a>
-  <button class="book-bn-i book-bn-disabled"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
-  <a href="chat.html?tab=book" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></a>
-  <a href="chat.html?tab=quiz" class="book-bn-i"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></a>
-  <a href="chat.html?tab=settings" class="book-bn-i"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></a>
-</nav>
-
-<div id="sheet-tabs">
-  <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
-  <button class="sheet-tab" onclick="switchSheet(1)">Sheet2</button>
-  <button id="add-sheet-btn" onclick="addSheet()">＋</button>
+<div class="bottom-stack">
+  <div id="sheet-tabs">
+    <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
+    <button class="sheet-tab" onclick="switchSheet(1)">Sheet2</button>
+    <button id="add-sheet-btn" onclick="addSheet()">＋</button>
+  </div>
+  <nav class="book-bn">
+    <a href="home.html" class="book-bn-i"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></a>
+    <a href="chat.html" class="book-bn-i"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></a>
+    <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
+    <a href="chat.html?tab=template" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></a>
+    <button class="book-bn-i book-bn-disabled"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
+    <a href="chat.html?tab=book" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></a>
+    <a href="chat.html?tab=quiz" class="book-bn-i"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></a>
+    <a href="chat.html?tab=settings" class="book-bn-i"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></a>
+  </nav>
 </div>
 </html>
