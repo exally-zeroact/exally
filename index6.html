@@ -15,6 +15,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .ob-badge{display:inline-block;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:8px;}
 .ob-title{font-size:20px;font-weight:700;color:#1A2B22;line-height:1.4;margin-bottom:8px;}
 .ob-sub{font-size:12px;color:#7A9A87;line-height:1.7;margin-bottom:0;}
+.ob-hint{margin-top:10px;background:#FFF8E1;border:1px solid #F5DC8A;color:#8A6D1F;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;width:100%;line-height:1.5;}
 .ob-price{margin-top:12px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:16px;padding:12px 16px;text-align:center;width:100%;}
 .ob-price-main{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:#3D9E72;}
 .ob-price-sub{font-size:11px;color:#7A9A87;margin-top:4px;line-height:1.6;}
@@ -414,13 +415,19 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <div class="ob-body" id="obBody">
       <div id="ob0">
         <div class="ob-icon">📊</div>
-        <div class="ob-badge">Excel専門AI</div>
-        <h2 class="ob-title">1日43円で、<br>Excel上級者と<br>同じ仕事ができる。</h2>
-        <p class="ob-sub">わからない瞬間に、すぐそこにいる。<br>日本語でそのまま質問するだけ。</p>
-        <div class="ob-price">
-          <div class="ob-price-main">¥43<span style="font-size:18px;opacity:0.7;">/日</span></div>
-          <div class="ob-price-sub">月額¥1,280（税込）<br>Excelの疑問が無制限に解決</div>
-          <div class="ob-free-note">✦ まず14日間、無料でお試しいただけます</div>
+        <div class="ob-badge">はじめに</div>
+        <h2 class="ob-title">Excelバージョンを<br>選んでね</h2>
+        <p class="ob-sub">バージョンに合わせて答えを変えるよ</p>
+        <div class="ob-hint">💡 後で変えられる・Excelなくても使える</div>
+        <div class="ob-cats">
+          <div class="ob-cat" onclick="selectVersion(this,'excel_365')"><div class="ob-cat-icon">🟢</div><div class="ob-cat-label">Excel 365</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_2024')"><div class="ob-cat-icon">🟢</div><div class="ob-cat-label">Excel 2024</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_2021')"><div class="ob-cat-icon">🔵</div><div class="ob-cat-label">Excel 2021</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_2019')"><div class="ob-cat-icon">🔵</div><div class="ob-cat-label">Excel 2019</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_2016')"><div class="ob-cat-icon">🔵</div><div class="ob-cat-label">Excel 2016</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_mac')"><div class="ob-cat-icon">🍎</div><div class="ob-cat-label">Excel for Mac</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_online')"><div class="ob-cat-icon">☁️</div><div class="ob-cat-label">Excel Online</div></div>
+          <div class="ob-cat" onclick="selectVersion(this,'excel_none')"><div class="ob-cat-icon">✨</div><div class="ob-cat-label">Excelなし</div></div>
         </div>
       </div>
       <div id="ob1" style="display:none;">
@@ -1197,9 +1204,15 @@ function skipOnboarding(){
   try{ localStorage.setItem('exally_ob_done','1'); }catch(e){}
 }
 function selectCat(el,cat){
-  document.querySelectorAll('.ob-cat').forEach(function(c){ c.classList.remove('selected'); });
+  document.querySelectorAll('#ob2 .ob-cat').forEach(function(c){ c.classList.remove('selected'); });
   el.classList.add('selected'); selectedCat=cat;
   setTimeout(function(){ skipOnboarding(); },400);
+}
+function selectVersion(el,verKey){
+  document.querySelectorAll('#ob0 .ob-cat').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  setTimeout(function(){ obNext(); },400);
 }
 
 // ===== NAVIGATION =====
@@ -1290,6 +1303,16 @@ function setQuestion(t){ document.getElementById('msgInput').value=t; sendMessag
 function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
 function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
 
+// ===== Excelバージョン取得（claude.jsへ送信用） =====
+// localStorage に未設定・アクセスエラー時は 'excel_365' にフォールバック
+// 有効な値: excel_365 / excel_2024 / excel_2021 / excel_2019 / excel_2016 / excel_mac / excel_online / excel_none
+function getExcelVersion(){
+  try{
+    var v=localStorage.getItem('exally_excel_version');
+    return (typeof v==='string' && v.length>0) ? v : 'excel_365';
+  }catch(e){ return 'excel_365'; }
+}
+
 async function sendMessage(){
   if(isAILoading) return;
   var input=document.getElementById('msgInput');
@@ -1319,7 +1342,7 @@ async function sendMessage(){
   try{
     var response=await fetch('/api/claude',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text,history:chatHistory})
+      body:JSON.stringify({message:text,history:chatHistory,excelVersion:getExcelVersion()})
     });
     removeTyping(typingId);
     if(!response.ok) throw new Error('API error');
