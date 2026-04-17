@@ -35,6 +35,12 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 #ob0 .ob-cat{padding:10px 8px;}
 #ob0 .ob-cat-icon{font-size:20px;margin-bottom:3px;}
 #ob0 .ob-cat-label{font-size:11px;}
+.ob-title-compact{font-size:18px;font-weight:700;color:#1A2B22;line-height:1.3;margin:2px 0 4px;letter-spacing:-0.3px;}
+.ob-sub-compact{font-size:11px;color:#7A9A87;line-height:1.5;margin:0;}
+.ob-hint-compact{margin-top:10px;background:#FFF8E1;border:1px solid #F5DC8A;color:#8A6D1F;font-size:10px;font-weight:600;padding:6px 10px;border-radius:8px;text-align:center;width:100%;line-height:1.4;}
+#ob0 .ob-cat{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 6px;transition:all 0.15s;}
+#ob0 .ob-cat:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(82,183,136,0.18);}
+#ob0 .ob-cat.selected{border-color:#52B788;background:#F0FAF4;box-shadow:0 2px 8px rgba(82,183,136,0.22);}
 .ob-footer{padding:12px 20px 16px;border-top:1px solid #D4EDE1;background:#ffffff;}
 .ob-dots{display:flex;justify-content:center;gap:6px;margin-bottom:12px;}
 .ob-dot{width:6px;height:6px;border-radius:3px;background:#D4EDE1;transition:all 0.3s;}
@@ -63,8 +69,6 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:769px){
 .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:24px 0;height:100dvh;flex-shrink:0;}
 .sidebar-logo{padding:0 20px 20px;display:flex;align-items:baseline;gap:5px;text-decoration:none;}
-.sidebar-logo-wrap{padding:0 20px 20px;display:flex;align-items:center;justify-content:space-between;}
-.sidebar-logo-inner{display:flex;align-items:baseline;gap:5px;text-decoration:none;}
 .sidebar-logo-en{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
 .sidebar-logo-ja{font-size:10px;color:#7A9A87;}
 .ver-badge{display:inline-flex;align-items:center;gap:3px;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:4px 9px;border-radius:14px;cursor:pointer;transition:all 0.15s;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
@@ -82,17 +86,20 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .demo-badge-s{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
 .trial-badge-s{background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;}
 }
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100dvh;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100dvh;position:relative;}
+.ver-badge-floating{display:none;position:absolute;top:18px;right:24px;z-index:50;background:#ffffff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:12px;font-weight:700;padding:7px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 2px 8px rgba(82,183,136,0.12);align-items:center;gap:4px;white-space:nowrap;transition:all 0.15s;}
+.ver-badge-floating:hover{background:#F0FAF4;border-color:#3D9E72;box-shadow:0 3px 12px rgba(82,183,136,0.18);}
+@media(min-width:769px){.ver-badge-floating{display:inline-flex;}}
 .mobile-header{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 12px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px;}
 .mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;flex-shrink:0;}
 .mobile-logo-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;}
 .mobile-logo-ja{font-size:10px;color:#7A9A87;}
-.mobile-header-center{flex:1;display:flex;justify-content:center;min-width:0;}
-.mobile-header-right{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.mobile-header-right{display:flex;gap:5px;align-items:center;flex-shrink:0;flex-wrap:nowrap;}
 .hbadge{font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;white-space:nowrap;}
 .hbadge-warn{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
 .hbadge-mint{background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;}
 @media(max-width:480px){.hbadge-mint{display:none;}}
+@media(max-width:380px){.hbadge-warn{display:none;}}
 @media(min-width:769px){.mobile-header{display:none;}}
 .screen-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#F4F7F5;}
 .screen{display:none;}
@@ -442,11 +449,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
   <div class="ob-card">
     <div class="ob-body" id="obBody">
       <div id="ob0">
-        <div class="ob-icon">📊</div>
-        <div class="ob-badge">はじめに</div>
-        <h2 class="ob-title">Excelバージョンを<br>選んでね</h2>
-        <p class="ob-sub">バージョンに合わせて答えを変えるよ</p>
-        <div class="ob-hint">💡 後で変えられる・Excelなくても使える</div>
+        <h2 class="ob-title-compact">Excelバージョンを選んでね</h2>
+        <p class="ob-sub-compact">バージョンに合わせて答えを変えるよ</p>
+        <div class="ob-hint-compact">💡 後で変えられる・Excelなくても使える</div>
         <div class="ob-cats">
           <div class="ob-cat" onclick="selectVersion(this,'excel_365')"><div class="ob-cat-icon">🟢</div><div class="ob-cat-label">Excel 365</div></div>
           <div class="ob-cat" onclick="selectVersion(this,'excel_2024')"><div class="ob-cat-icon">🟢</div><div class="ob-cat-label">Excel 2024</div></div>
@@ -496,13 +501,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-logo-wrap">
-      <a href="#" class="sidebar-logo-inner">
-        <span class="sidebar-logo-en">Exally</span>
-        <span class="sidebar-logo-ja">エクサリー</span>
-      </a>
-      <span class="ver-badge" id="sidebarVerBadge" onclick="openVersionModal()">📊 <span id="sidebarVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
-    </div>
+    <a href="#" class="sidebar-logo">
+      <span class="sidebar-logo-en">Exally</span>
+      <span class="sidebar-logo-ja">エクサリー</span>
+    </a>
     <nav class="sidebar-nav">
       <button class="sidebar-item active" id="snav-home" onclick="switchTab('home')"><span class="sidebar-item-icon">🏠</span>ホーム</button>
       <button class="sidebar-item" id="snav-chat" onclick="switchTab('chat')"><span class="sidebar-item-icon">💬</span>AIチャット</button>
@@ -524,14 +526,14 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
         <span class="mobile-logo-en">Exally</span>
         <span class="mobile-logo-ja">エクサリー</span>
       </a>
-      <div class="mobile-header-center">
-        <span class="ver-badge" id="mobileVerBadge" onclick="openVersionModal()">📊 <span id="mobileVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
-      </div>
       <div class="mobile-header-right">
+        <span class="ver-badge" id="mobileVerBadge" onclick="openVersionModal()">📊 <span id="mobileVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
         <span class="hbadge hbadge-warn">デモ版</span>
         <span class="hbadge hbadge-mint">14日間無料</span>
       </div>
     </header>
+
+    <span class="ver-badge-floating" id="pcVerBadge" onclick="openVersionModal()">📊 <span id="pcVerLabel">365</span> <span class="ver-badge-arrow">▼</span></span>
 
     <div class="screen-area">
 
@@ -1388,9 +1390,9 @@ var VERSION_LABEL_MAP = {
 function updateVerBadges(){
   var v=getExcelVersion();
   var label=VERSION_LABEL_MAP[v]||'365';
-  var sEl=document.getElementById('sidebarVerLabel');
+  var pcEl=document.getElementById('pcVerLabel');
   var mEl=document.getElementById('mobileVerLabel');
-  if(sEl) sEl.textContent=label;
+  if(pcEl) pcEl.textContent=label;
   if(mEl) mEl.textContent=label;
 }
 
