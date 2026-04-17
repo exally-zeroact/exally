@@ -303,12 +303,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
       <button class="sb-it active"><span class="sb-ic"><span class="sb-ic-emoji">🏠</span></span>ホーム</button>
       <button class="sb-it" onclick="location.href='chat.html'"><span class="sb-ic"><span class="sb-ic-emoji">🤖</span></span>AIチャット</button>
       <button class="sb-it" onclick="location.href='book.html'"><span class="sb-ic"><svg><use href="#grid-sm"/></svg></span>ブック</button>
-      <button class="sb-it" onclick="location.href='chat.html'"><span class="sb-ic"><svg><use href="#template-sm"/></svg></span>テンプレ</button>
+      <button class="sb-it" onclick="location.href='chat.html?tab=template'"><span class="sb-ic"><svg><use href="#template-sm"/></svg></span>テンプレ</button>
       <button class="sb-it nav-disabled"><span class="sb-ic"><svg><use href="#stamp-sm"/></svg></span>電子ハンコ</button>
-      <button class="sb-it" onclick="location.href='chat.html'"><span class="sb-ic"><svg><use href="#book-sm"/></svg></span>数式帳</button>
-      <button class="sb-it" onclick="location.href='chat.html'"><span class="sb-ic"><span class="sb-ic-emoji">🎯</span></span>クイズ</button>
+      <button class="sb-it" onclick="location.href='chat.html?tab=book'"><span class="sb-ic"><svg><use href="#book-sm"/></svg></span>数式帳</button>
+      <button class="sb-it" onclick="location.href='chat.html?tab=quiz'"><span class="sb-ic"><span class="sb-ic-emoji">🎯</span></span>クイズ</button>
       <button class="sb-it" onclick="openVerModal()"><span class="sb-ic"><span class="sb-ic-emoji">📊</span></span>Excelバージョン</button>
-      <button class="sb-it" onclick="location.href='chat.html'"><span class="sb-ic"><span class="sb-ic-emoji">⚙️</span></span>設定</button>
+      <button class="sb-it" onclick="location.href='chat.html?tab=settings'"><span class="sb-ic"><span class="sb-ic-emoji">⚙️</span></span>設定</button>
     </nav>
     <div class="sb-ft">
       <span class="sb-bd sb-bd-d">デモ版</span>
@@ -391,7 +391,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 
             <div class="b-sec b-sec-pc" style="margin-top:22px;">TOOLS</div>
             <div class="b-ss">
-              <div class="b-s" onclick="location.href='chat.html'">
+              <div class="b-s" onclick="location.href='chat.html?tab=template'">
                 <div class="b-s-ic"><svg><use href="#template-icon"/></svg></div>
                 <div class="b-s-text">
                   <div class="b-s-t">テンプレ</div>
@@ -405,7 +405,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
                   <div class="b-s-meta">— PDF対応</div>
                 </div>
               </div>
-              <div class="b-s" onclick="location.href='chat.html'">
+              <div class="b-s" onclick="location.href='chat.html?tab=book'">
                 <div class="b-s-ic"><svg><use href="#book-icon"/></svg></div>
                 <div class="b-s-text">
                   <div class="b-s-t">数式帳</div>
@@ -460,11 +460,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
       <button class="bn-i active"><span class="bn-ic"><span class="bn-ic-emoji">🏠</span></span><span class="bn-lb">ホーム</span></button>
       <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><span class="bn-ic-emoji">🤖</span></span><span class="bn-lb">AI</span></button>
       <button class="bn-i" onclick="location.href='book.html'"><span class="bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="bn-lb">ブック</span></button>
-      <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><svg><use href="#template-sm"/></svg></span><span class="bn-lb">テンプレ</span></button>
+      <button class="bn-i" onclick="location.href='chat.html?tab=template'"><span class="bn-ic"><svg><use href="#template-sm"/></svg></span><span class="bn-lb">テンプレ</span></button>
       <button class="bn-i nav-disabled"><span class="bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="bn-lb">電子ハンコ</span></button>
-      <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><svg><use href="#book-sm"/></svg></span><span class="bn-lb">数式帳</span></button>
-      <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><span class="bn-ic-emoji">🎯</span></span><span class="bn-lb">クイズ</span></button>
-      <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><span class="bn-ic-emoji">⚙️</span></span><span class="bn-lb">設定</span></button>
+      <button class="bn-i" onclick="location.href='chat.html?tab=book'"><span class="bn-ic"><svg><use href="#book-sm"/></svg></span><span class="bn-lb">数式帳</span></button>
+      <button class="bn-i" onclick="location.href='chat.html?tab=quiz'"><span class="bn-ic"><span class="bn-ic-emoji">🎯</span></span><span class="bn-lb">クイズ</span></button>
+      <button class="bn-i" onclick="location.href='chat.html?tab=settings'"><span class="bn-ic"><span class="bn-ic-emoji">⚙️</span></span><span class="bn-lb">設定</span></button>
     </nav>
 
   </div>
