@@ -18,7 +18,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .sb{display:flex;flex-direction:column;width:210px;min-width:210px;background:#ffffff;border-right:1px solid #D4EDE1;padding:20px 0;flex-shrink:0;height:100%;}
 .sb-logo{padding:0 18px 16px;display:flex;align-items:baseline;gap:5px;}
 .sb-en{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
-.sb-ja{font-size:10px;color:#B0C4BA;}
+.sb-ja{font-size:10px;color:#4A6B5A;}
 .sb-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
 .sb-it{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:9px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#2E4038;font-size:12px;font-weight:500;transition:all 0.18s;}
 .sb-it:hover{background:#F0FAF4;color:#2E4038;}
@@ -41,7 +41,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .mh{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 12px;height:48px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-shrink:0;}
 .mh-lg{display:flex;align-items:baseline;gap:4px;}
 .mh-en{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#52B788;}
-.mh-ja{font-size:10px;color:#B0C4BA;}
+.mh-ja{font-size:10px;color:#4A6B5A;}
 .mh-r{display:flex;gap:4px;align-items:center;}
 .vbm{display:inline-flex;align-items:center;gap:5px;background:#F0FAF4;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:12px;font-weight:700;padding:5px 13px;border-radius:16px;}
 .hb{font-size:9px;font-weight:700;padding:3px 7px;border-radius:18px;}
@@ -339,17 +339,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
           <div class="b-srch-w">
             <div class="b-srch">
               <span class="b-srch-ic">💬</span>
-              <input type="text" placeholder="例：VLOOKUPの使い方は？" onkeydown="if(event.key==='Enter')location.href='chat.html'">
-              <button class="b-srch-btn" onclick="location.href='chat.html'">→</button>
+              <input type="text" id="srchInput" placeholder="例：VLOOKUPの使い方は？" onkeydown="if(event.key==='Enter')gotoChat()">
+              <button class="b-srch-btn" onclick="gotoChat()">→</button>
             </div>
             <div class="b-chips-row">
-              <span class="b-ch" onclick="location.href='chat.html'">📈 VLOOKUP教えて</span>
-              <span class="b-ch" onclick="location.href='chat.html'">💰 給料明細作って</span>
-              <span class="b-ch" onclick="location.href='chat.html'">📋 請求書テンプレ</span>
+              <span class="b-ch" onclick="gotoChatWith('VLOOKUPの使い方を教えて')">📈 VLOOKUP教えて</span>
+              <span class="b-ch" onclick="gotoChatWith('給料明細を作って')">💰 給料明細作って</span>
+              <span class="b-ch" onclick="gotoChatWith('請求書テンプレを作って')">📋 請求書テンプレ</span>
             </div>
             <div class="b-chips-row b-chips-row-2">
-              <span class="b-ch" onclick="location.href='chat.html'">⚠️ エラーを直したい</span>
-              <span class="b-ch" onclick="location.href='chat.html'">📊 グラフを作って</span>
+              <span class="b-ch" onclick="gotoChatWith('エラーを直したい')">⚠️ エラーを直したい</span>
+              <span class="b-ch" onclick="gotoChatWith('グラフを作って')">📊 グラフを作って</span>
             </div>
           </div>
         </div>
@@ -543,6 +543,20 @@ document.getElementById('verModal').addEventListener('click', function(e){
 });
 // 起動時：バージョンバッジを更新
 window.addEventListener('load', updateVerBadges);
+
+// 検索バー→chat.htmlへクエリ付き遷移
+function gotoChat(){
+  var inp=document.getElementById('srchInput');
+  var q=(inp&&inp.value)?inp.value.trim():'';
+  if(q){
+    location.href='chat.html?q='+encodeURIComponent(q);
+  }else{
+    location.href='chat.html';
+  }
+}
+function gotoChatWith(q){
+  location.href='chat.html?q='+encodeURIComponent(q);
+}
 </script>
 
 </body>
