@@ -50,7 +50,8 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#7A9A87;font-size:13px;font-weight:500;transition:all 0.18s;}
 .sidebar-item:hover{background:#F0FAF4;color:#2E4038;}
 .sidebar-item.active{background:#F0FAF4;color:#3D9E72;font-weight:700;}
-.sidebar-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0;}
+.sidebar-item-icon{font-size:18px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;text-align:center;flex-shrink:0;}
+.sidebar-item-icon svg{width:20px;height:20px;display:block;}
 .sidebar-footer{padding:16px 20px;border-top:1px solid #D4EDE1;display:flex;flex-direction:column;gap:8px;}
 .sidebar-badge{font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;text-align:center;}
 .demo-badge-s{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
@@ -331,7 +332,25 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .fb-item-memo{font-size:13px;color:#2E4038;line-height:1.75;margin-bottom:8px;padding:10px 12px;background:#F8FEFC;border-radius:8px;border:1px solid #E0EDE6;}
 .fb-delete-btn{background:#F4F7F5;border:1px solid #D4EDE1;color:#E05555;border-radius:8px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;}
 .fb-delete-btn:hover{background:#FFF0F0;}
+
+/* Excelバージョン選択モーダル（home.htmlと同じ） */
+.vm-ov{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.vm-ov.show{display:flex;}
+.vm-cd{background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.vm-hd{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.vm-tt{font-size:16px;font-weight:700;color:#1A4A2E;}
+.vm-cl{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.vm-bd{padding:14px 18px 18px;overflow-y:auto;min-height:0;}
+.vm-ht{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5;margin-bottom:12px;}
+.vm-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vm-op{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.vm-op:hover{border-color:#52B788;background:#F0FAF4;}
+.vm-op.current{border-color:#52B788;background:#F0FAF4;}
+.vm-op-ic{font-size:20px;margin-bottom:3px;}
+.vm-op-lb{font-size:11px;font-weight:700;color:#1A4A2E;}
+.vm-op.current .vm-op-lb{color:#3D9E72;}
 </style>
+
 </head>
 <body>
 
@@ -483,12 +502,13 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     </a>
     <nav class="sidebar-nav">
       <button class="sidebar-item" id="snav-home" onclick="location.href='home.html'"><span class="sidebar-item-icon">🏠</span>ホーム</button>
-      <button class="sidebar-item active" id="snav-chat" onclick="switchTab('chat')"><span class="sidebar-item-icon">💬</span>AIチャット</button>
-      <button class="sidebar-item" id="snav-booklink" onclick="location.href='book.html'"><span class="sidebar-item-icon">📊</span>ブック</button>
-      <button class="sidebar-item" id="snav-template" onclick="switchTab('template')"><span class="sidebar-item-icon">📋</span>テンプレ</button>
-      <button class="sidebar-item nav-disabled" id="snav-stamp"><span class="sidebar-item-icon">🖋️</span>電子ハンコ</button>
-      <button class="sidebar-item" id="snav-book" onclick="switchTab('book')"><span class="sidebar-item-icon">📚</span>数式帳</button>
+      <button class="sidebar-item active" id="snav-chat" onclick="switchTab('chat')"><span class="sidebar-item-icon">🤖</span>AIチャット</button>
+      <button class="sidebar-item" id="snav-booklink" onclick="location.href='book.html'"><span class="sidebar-item-icon"><svg><use href="#grid-sm"/></svg></span>ブック</button>
+      <button class="sidebar-item" id="snav-template" onclick="switchTab('template')"><span class="sidebar-item-icon"><svg><use href="#template-sm"/></svg></span>テンプレ</button>
+      <button class="sidebar-item nav-disabled" id="snav-stamp"><span class="sidebar-item-icon"><svg><use href="#stamp-sm"/></svg></span>電子ハンコ</button>
+      <button class="sidebar-item" id="snav-book" onclick="switchTab('book')"><span class="sidebar-item-icon"><svg><use href="#book-sm"/></svg></span>数式帳</button>
       <button class="sidebar-item" id="snav-quiz" onclick="switchTab('quiz')"><span class="sidebar-item-icon">🎯</span>クイズ</button>
+      <button class="sidebar-item" id="snav-verexcel" onclick="openVerModal()"><span class="sidebar-item-icon">📊</span>Excelバージョン</button>
       <button class="sidebar-item" id="snav-settings" onclick="switchTab('settings')"><span class="sidebar-item-icon">⚙️</span>設定</button>
     </nav>
     <div class="sidebar-footer">
@@ -769,6 +789,30 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
     <div class="upgrade-cancel-note">クレジットカード不要 · いつでも解約できます</div>
     <div style="text-align:center;margin-top:14px;">
       <span onclick="hideUpgrade()" style="font-size:13px;color:#7A9A87;cursor:pointer;padding:8px 16px;display:inline-block;">あとで</span>
+    </div>
+  </div>
+</div>
+
+<!-- Excelバージョン選択モーダル（home.htmlと共有） -->
+
+<div class="vm-ov" id="verModal">
+  <div class="vm-cd">
+    <div class="vm-hd">
+      <div class="vm-tt">Excelバージョンを選んでね</div>
+      <button class="vm-cl" onclick="closeVerModal()">×</button>
+    </div>
+    <div class="vm-bd">
+      <div class="vm-ht">💡 後で変えられる・Excelなくても使える</div>
+      <div class="vm-gr">
+        <div class="vm-op" data-ver="excel_365" onclick="selectVer('excel_365')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 365</div></div>
+        <div class="vm-op" data-ver="excel_2024" onclick="selectVer('excel_2024')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 2024</div></div>
+        <div class="vm-op" data-ver="excel_2021" onclick="selectVer('excel_2021')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2021</div></div>
+        <div class="vm-op" data-ver="excel_2019" onclick="selectVer('excel_2019')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2019</div></div>
+        <div class="vm-op" data-ver="excel_2016" onclick="selectVer('excel_2016')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2016</div></div>
+        <div class="vm-op" data-ver="excel_mac" onclick="selectVer('excel_mac')"><div class="vm-op-ic">🍎</div><div class="vm-op-lb">Excel for Mac</div></div>
+        <div class="vm-op" data-ver="excel_online" onclick="selectVer('excel_online')"><div class="vm-op-ic">☁️</div><div class="vm-op-lb">Excel Online</div></div>
+        <div class="vm-op" data-ver="excel_none" onclick="selectVer('excel_none')"><div class="vm-op-ic">✨</div><div class="vm-op-lb">Excelなし</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1709,6 +1753,39 @@ function showToast(msg,duration){
   }else{
     runInit();
   }
+})();
+</script>
+
+<script>
+// ===== Excelバージョン管理（home.htmlと共有：localStorageキー exally_excel_version） =====
+var VER_LABEL_MAP = {
+  excel_365:'365', excel_2024:'2024', excel_2021:'2021', excel_2019:'2019',
+  excel_2016:'2016', excel_mac:'Mac', excel_online:'Online', excel_none:'なし'
+};
+function getVerKey(){
+  try{ var v=localStorage.getItem('exally_excel_version'); return (typeof v==='string' && v.length>0) ? v : 'excel_365'; }
+  catch(e){ return 'excel_365'; }
+}
+function openVerModal(){
+  var current=getVerKey();
+  document.querySelectorAll('.vm-op').forEach(function(el){
+    el.classList.toggle('current', el.getAttribute('data-ver')===current);
+  });
+  document.getElementById('verModal').classList.add('show');
+}
+function closeVerModal(){
+  document.getElementById('verModal').classList.remove('show');
+}
+function selectVer(verKey){
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  closeVerModal();
+  // chat.html既存showToast(msg, duration)を流用
+  if(typeof showToast === 'function') showToast('Excelバージョンを'+(VER_LABEL_MAP[verKey]||verKey)+'に変更したよ', 2500);
+}
+// モーダル外クリックで閉じる
+(function(){
+  var vm = document.getElementById('verModal');
+  if(vm) vm.addEventListener('click', function(e){ if(e.target===this) closeVerModal(); });
 })();
 </script>
 
