@@ -2262,7 +2262,11 @@ var FILL_SEQS=[
   {list:['日','月','火','水','木','金','土'], name:'wdJPshort'},
   {list:['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'], name:'wdJPlong'},
   {list:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], name:'wdENshort'},
-  {list:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], name:'wdENlong'}
+  {list:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], name:'wdENlong'},
+  // 月（12循環）: 1月〜12月
+  {list:(function(){var a=[];for(var i=1;i<=12;i++)a.push(i+'月');return a;})(), name:'monthJP'},
+  // 日（31循環）: 1日〜31日
+  {list:(function(){var a=[];for(var i=1;i<=31;i++)a.push(i+'日');return a;})(), name:'dayJP'}
 ];
 // 値配列がどのシーケンスに属するか判定し、等差かチェック
 function detectSequencePattern(values){
