@@ -436,11 +436,12 @@ text-decoration:none;
 /* PC用 ヘッダーナビ（7個・自分＝ブックを除く他画面への導線） */
 .book-header-nav{display:none;}
 @media(min-width:769px){
-.book-header-nav{display:flex;gap:4px;align-items:center;}
-.book-header-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.book-header-nav{display:flex;gap:2px;align-items:center;}
+.book-header-nav-item{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#4A6B5A;font-size:17px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
 .book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item.active{background:#F0FAF4;color:#3D9E72;}
 .book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
-.book-header-nav-item svg{width:22px;height:22px;}
+.book-header-nav-item svg{width:18px;height:18px;}
 }
 .sheet-tab {
 padding:5px 14px;
@@ -2204,10 +2205,12 @@ function drawSel(){
   <nav class="book-header-nav" aria-label="他画面への移動">
     <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
     <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+    <span class="book-header-nav-item active" title="ブック（このページ）"><svg><use href="#grid-sm"/></svg></span>
     <a href="chat.html?tab=template" class="book-header-nav-item" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
     <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
     <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
     <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+    <button class="book-header-nav-item" onclick="openBookVerModal()" title="Excelバージョン">📊</button>
     <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
   </nav>
   <div style="display:flex;align-items:center;gap:6px;">
