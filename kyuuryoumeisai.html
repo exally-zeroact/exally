@@ -23,27 +23,39 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 /* ===== ヘッダー（2段構造・統一仕様） ===== */
 .header{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E0EDE6;box-shadow:0 1px 4px rgba(30,60,40,0.08);}
 /* 1段目：ロゴ + アイコンnav */
-.header-top{display:flex;align-items:center;padding:10px 16px;gap:12px;border-bottom:1px solid #F0FAF4;min-height:52px;}
-.header-logo-wrap{display:flex;align-items:baseline;gap:5px;flex:1;text-decoration:none;}
-.header-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
+.header-top{display:flex;align-items:center;padding:8px 14px;gap:10px;border-bottom:1px solid #F0FAF4;min-height:44px;}
+.header-logo-wrap{display:flex;align-items:baseline;gap:5px;text-decoration:none;flex-shrink:0;}
+.header-logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
 .header-logo-ja{font-size:10px;color:#4A6B5A;margin-left:-3px;}
+/* SP専用タイトル（1段目右端） */
+.header-title-sp{font-size:12px;font-weight:700;color:#4A6B5A;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(min-width:769px){.header-title-sp{display:none;}}
 .book-header-nav{display:none;}
-@media(min-width:769px){.book-header-nav{display:flex;gap:4px;align-items:center;}}
+@media(min-width:769px){.book-header-nav{display:flex;gap:4px;align-items:center;margin-left:auto;}}
 .book-header-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
 .book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
 .book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
 .book-header-nav-item.active{background:#F0FAF4;color:#3D9E72;}
 .book-header-nav-item svg{width:22px;height:22px;}
+/* PC1段目は余裕持たせる */
+@media(min-width:769px){.header-top{padding:10px 16px;gap:12px;min-height:52px;}.header-logo{font-size:20px;}}
 /* 2段目：戻る + タイトル + 業種 */
 .header-sub{display:flex;align-items:center;padding:8px 16px;gap:12px;flex-wrap:nowrap;min-height:48px;}
 .header-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;transition:all 0.15s;}
 .header-back:hover{background:#F0FAF4;border-color:#C8ECD8;}
-.header-title{font-size:13px;font-weight:700;color:#4A6B5A;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-title{font-size:13px;font-weight:700;color:#4A6B5A;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(max-width:768px){.header-title{display:none;}}
 .header-gyoshu-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.header-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;white-space:nowrap;}
-.header-gyoshu-btn{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-/* 幅が狭い時は2段目の業種を下に折り返し */
-@media(max-width:600px){.header-sub{flex-wrap:wrap;}.header-gyoshu-wrap{width:100%;padding-top:4px;border-top:1px solid #F0FAF4;margin-top:4px;}}
+.header-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-gyoshu-btn{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;}
+/* スマホ：2段目を1行に圧縮（ボタン小さめ・ラベル省略対応） */
+@media(max-width:768px){
+  .header-sub{padding:6px 12px;gap:8px;flex-wrap:nowrap;min-height:40px;}
+  .header-back{font-size:11px;padding:4px 10px;}
+  .header-gyoshu-wrap{gap:6px;flex:1;min-width:0;justify-content:flex-end;}
+  .header-gyoshu-label{font-size:11px;min-width:0;}
+  .header-gyoshu-btn{font-size:10px;padding:3px 9px;}
+}
 .main{max-width:600px;margin:0 auto;padding:16px 12px;}
 .type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
 .type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
@@ -356,6 +368,8 @@ body{padding-bottom:80px;}
       <span class="header-logo">Exally</span>
       <span class="header-logo-ja">エクサリー</span>
     </a>
+    <!-- SP専用タイトル（1段目右端） -->
+    <span class="header-title-sp js-title">給料明細（月給制）</span>
     <nav class="book-header-nav" aria-label="他画面への移動">
       <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
       <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
@@ -369,7 +383,7 @@ body{padding-bottom:80px;}
   <!-- 2段目：戻る + タイトル + 業種 -->
   <div class="header-sub">
     <button class="header-back" onclick="location.href='chat.html?tab=template'">← テンプレ一覧に戻る</button>
-    <span class="header-title" id="cardTitle">給料明細（月給制）</span>
+    <span class="header-title js-title" id="cardTitle">給料明細（月給制）</span>
     <div class="header-gyoshu-wrap" id="gyoshuBar">
       <span class="header-gyoshu-label" id="gyoshuBarLabel">業種未選択</span>
       <button class="header-gyoshu-btn" id="gyoshuChangeBtn" onclick="changeGyoshu()">業種を選ぶ →</button>
@@ -671,7 +685,7 @@ function init(){
 function switchType(t){
   cType=t;
   document.querySelectorAll('.type-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='monthly')||(i===1&&t==='hourly')));
-  document.getElementById('cardTitle').textContent=t==='monthly'?'給料明細（月給制）':'給料明細（時給制）';
+  document.querySelectorAll('.js-title').forEach(function(el){el.textContent=t==='monthly'?'給料明細（月給制）':'給料明細（時給制）';});
   document.getElementById('noticeEl').innerHTML=t==='monthly'
     ?'⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
     :'⚠️ <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
