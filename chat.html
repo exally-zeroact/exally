@@ -1215,10 +1215,8 @@ function openTmplIframe(id){
   var tmpl=TEMPLATES.find(function(t){ return t.id===id; });
   if(!tmpl) return;
   if(!tmpl.file){ showToast('準備中だよ✨'); return; }
-  document.getElementById('tmplIframeTitle').textContent=tmpl.name;
-  document.getElementById('tmplIframe').src=tmpl.file+'?t='+Date.now();
-  document.getElementById('tmplIframeScreen').classList.add('show');
-  document.getElementById('tmplGallery').style.display='none';
+  // iframeではなく直接遷移（URLが変わる・他ページと一貫）
+  location.href=tmpl.file;
 }
 
 function closeTmplIframe(){
