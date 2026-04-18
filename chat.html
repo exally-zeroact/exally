@@ -1,4 +1,4 @@
-　<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -8,6 +8,37 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background:#F4F7F5;color:#2E4038;overflow:hidden;}
+.ob-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;}
+.ob-overlay.hide{display:none;}
+.ob-card{background:#ffffff;border-radius:24px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;}
+.ob-body{flex:1;padding:20px 24px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.ob-icon{font-size:44px;margin-bottom:10px;}
+.ob-badge{display:inline-block;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:8px;}
+.ob-title{font-size:20px;font-weight:700;color:#1A2B22;line-height:1.4;margin-bottom:8px;}
+.ob-sub{font-size:12px;color:#7A9A87;line-height:1.7;margin-bottom:0;}
+.ob-price{margin-top:12px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:16px;padding:12px 16px;text-align:center;width:100%;}
+.ob-price-main{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:#3D9E72;}
+.ob-price-sub{font-size:11px;color:#7A9A87;margin-top:4px;line-height:1.6;}
+.ob-free-note{margin-top:8px;font-size:11px;color:#3D9E72;font-weight:700;}
+.ob-steps{width:100%;margin-top:10px;}
+.ob-step{display:flex;align-items:flex-start;gap:10px;background:#F0FAF4;border-radius:10px;padding:9px 12px;margin-bottom:7px;text-align:left;border:1px solid #D4EDE1;}
+.ob-step-num{width:24px;height:24px;border-radius:50%;background:#52B788;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.ob-step-text{font-size:12px;color:#2E4038;line-height:1.4;}
+.ob-step-text strong{color:#1A2B22;}
+.ob-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:14px;}
+.ob-cat{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.18s;}
+.ob-cat:hover{border-color:#52B788;background:#F0FAF4;}
+.ob-cat.selected{border-color:#52B788;background:#F0FAF4;}
+.ob-cat-icon{font-size:26px;margin-bottom:6px;}
+.ob-cat-label{font-size:12px;font-weight:700;color:#1A2B22;}
+.ob-footer{padding:12px 20px 16px;border-top:1px solid #D4EDE1;background:#ffffff;}
+.ob-dots{display:flex;justify-content:center;gap:6px;margin-bottom:12px;}
+.ob-dot{width:6px;height:6px;border-radius:3px;background:#D4EDE1;transition:all 0.3s;}
+.ob-dot.active{width:20px;background:#52B788;}
+.ob-next{width:100%;padding:14px;background:#52B788;color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
+.ob-next:hover{background:#3D9E72;}
+.ob-skip{display:block;text-align:center;margin-top:10px;font-size:12px;color:#7A9A87;cursor:pointer;}
+.ob-skip:hover{color:#3D9E72;}
 .layout{display:flex;height:100dvh;width:100%;}
 .sidebar{display:none;}
 @media(min-width:769px){
@@ -249,23 +280,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:769px){.toast{bottom:30px;}}
 .tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:300;flex-direction:column;background:#F4F7F5;}
 .tmpl-iframe-screen.show{display:flex;}
-/* 下段：戻る + タイトル + 業種帯 */
 .tmpl-iframe-bar{background:#fff;border-bottom:1px solid #E0EDE6;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .tmpl-iframe-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .tmpl-iframe-title{font-size:13px;font-weight:700;color:#4A6B5A;}
-.tmpl-gyoshu-area{margin-left:auto;display:none;align-items:center;gap:8px;}
-.tmpl-gyoshu-area.active{display:flex;}
-.tmpl-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;}
-.tmpl-gyoshu-change{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-.tmpl-iframe-topbar{display:none;}
-@media(min-width:769px){
-  .tmpl-iframe-topbar{background:#ffffff;border-bottom:1px solid #D4EDE1;height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-}
-.tmpl-topbar-nav{display:flex;gap:4px;align-items:center;}
-.tmpl-topbar-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
-.tmpl-topbar-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
-.tmpl-topbar-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
-.tmpl-topbar-nav-item svg{width:22px;height:22px;}
 .tmpl-iframe-wrap{flex:1;overflow:clip;}
 .tmpl-iframe-wrap iframe{width:100%;height:100%;border:none;}
 .tmpl-gallery{padding:20px 16px 20px;max-width:860px;margin:0 auto;}
@@ -407,6 +424,56 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 
   </defs>
 </svg>
+
+<div class="ob-overlay" id="onboarding">
+  <div class="ob-card">
+    <div class="ob-body" id="obBody">
+      <div id="ob0">
+        <div class="ob-icon">📊</div>
+        <div class="ob-badge">Excel専門AI</div>
+        <h2 class="ob-title">1日43円で、<br>Excel上級者と<br>同じ仕事ができる。</h2>
+        <p class="ob-sub">わからない瞬間に、すぐそこにいる。<br>日本語でそのまま質問するだけ。</p>
+        <div class="ob-price">
+          <div class="ob-price-main">¥43<span style="font-size:18px;opacity:0.7;">/日</span></div>
+          <div class="ob-price-sub">月額¥1,280（税込）<br>Excelの疑問が無制限に解決</div>
+          <div class="ob-free-note">✦ まず14日間、無料でお試しいただけます</div>
+        </div>
+      </div>
+      <div id="ob1" style="display:none;">
+        <div class="ob-icon">💬</div>
+        <div class="ob-badge">使い方</div>
+        <h2 class="ob-title">日本語で<br>話しかけるだけ。</h2>
+        <p class="ob-sub">専門用語はいりません。<br>「VLOOKUPが使いたい」「エラーが出る」<br>そのまま伝えるだけで解決します。</p>
+        <div class="ob-steps">
+          <div class="ob-step"><div class="ob-step-num">1</div><div class="ob-step-text"><strong>日本語で質問する</strong><br>困ったことをそのまま入力</div></div>
+          <div class="ob-step"><div class="ob-step-num">2</div><div class="ob-step-text"><strong>AIがすぐ答える</strong><br>数式・解説・コピペ用コードを生成</div></div>
+          <div class="ob-step"><div class="ob-step-num">3</div><div class="ob-step-text"><strong>マイ数式帳に保存</strong><br>使った数式をいつでも参照</div></div>
+        </div>
+      </div>
+      <div id="ob2" style="display:none;">
+        <div class="ob-icon">🎯</div>
+        <div class="ob-badge">カテゴリ選択</div>
+        <h2 class="ob-title">あなたの<br>目的を教えて。</h2>
+        <p class="ob-sub">あなたに合ったExcel学習を提案します。</p>
+        <div class="ob-cats">
+          <div class="ob-cat" onclick="selectCat(this,'データ分析')"><div class="ob-cat-icon">📊</div><div class="ob-cat-label">データ分析</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'事務・書類作成')"><div class="ob-cat-icon">📋</div><div class="ob-cat-label">事務・書類作成</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'財務・経理')"><div class="ob-cat-icon">💰</div><div class="ob-cat-label">財務・経理</div></div>
+          <div class="ob-cat" onclick="selectCat(this,'VBA・自動化')"><div class="ob-cat-icon">🚀</div><div class="ob-cat-label">VBA・自動化</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ob-footer">
+      <div class="ob-dots">
+        <div class="ob-dot active" id="dot0"></div>
+        <div class="ob-dot" id="dot1"></div>
+        <div class="ob-dot" id="dot2"></div>
+      </div>
+      <button class="ob-next" id="obNextBtn" onclick="obNext()">次へ</button>
+      <span class="ob-skip" onclick="skipOnboarding()">スキップ</span>
+    </div>
+  </div>
+</div>
 
 <div class="layout">
   <aside class="sidebar">
@@ -595,29 +662,9 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
     </div>
     <div class="tmpl-iframe-screen" id="tmplIframeScreen">
-      <div class="tmpl-iframe-topbar">
-        <div style="display:flex;align-items:baseline;gap:5px;">
-          <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;">Exally</span>
-          <span style="font-size:10px;color:#4A6B5A;">エクサリー</span>
-        </div>
-        <nav class="tmpl-topbar-nav" aria-label="他画面への移動">
-          <a href="home.html" class="tmpl-topbar-nav-item" title="ホーム">🏠</a>
-          <a href="chat.html" class="tmpl-topbar-nav-item" title="AIチャット">🤖</a>
-          <a href="book.html" class="tmpl-topbar-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
-          <span class="tmpl-topbar-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
-          <a href="chat.html?tab=book" class="tmpl-topbar-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
-          <a href="chat.html?tab=quiz" class="tmpl-topbar-nav-item" title="クイズ">🎯</a>
-          <a href="chat.html?tab=settings" class="tmpl-topbar-nav-item" title="設定">⚙️</a>
-        </nav>
-      </div>
-      <!-- 下段：戻る + タイトル + 業種帯 -->
       <div class="tmpl-iframe-bar">
         <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
         <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
-        <div class="tmpl-gyoshu-area" id="tmplGyoshuArea">
-          <span class="tmpl-gyoshu-label" id="tmplGyoshuLabel"></span>
-          <button class="tmpl-gyoshu-change" onclick="changeTmplGyoshu()">業種を変更する →</button>
-        </div>
       </div>
       <div class="tmpl-iframe-wrap">
         <iframe id="tmplIframe" src="" title="テンプレート"></iframe>
@@ -759,10 +806,15 @@ var writeCount = 0;
 var MAX_WRITE_FREE = 5;
 var savedFormulas = [];
 var isAILoading = false;
+var obSlide = 0;
+var selectedCat = '';
 var chatHistory = [];
 var talkCount = 0;
 var currentCat = null;
 var lastCat = null;
+
+// ===== ONBOARDING SKIP FLAG =====
+try{ if(localStorage.getItem('exally_ob_done')==='1'){ document.getElementById('onboarding').classList.add('hide'); } }catch(e){}
 
 // ===== STORAGE KEYS =====
 var CHAT_STORAGE_KEY = 'exally_chat_v1';
@@ -891,7 +943,11 @@ window.addEventListener('load', function(){
       var inp=document.getElementById('msgInput');
       if(inp){
         inp.value=q.trim();
-        setTimeout(function(){ if(typeof sendMessage==='function') sendMessage(); }, 300);
+        // オンボーディングが無ければ即送信、あれば待つ
+        var ob=document.querySelector('.onboarding-overlay.show');
+        if(!ob){
+          setTimeout(function(){ if(typeof sendMessage==='function') sendMessage(); }, 300);
+        }
       }
     }
 
@@ -1070,6 +1126,25 @@ function closePanel(){
 
 function setQ(text){ sendQuick(text); }
 
+// ===== ONBOARDING =====
+function obNext(){
+  if(obSlide===2){ skipOnboarding(); return; }
+  document.getElementById('ob'+obSlide).style.display='none';
+  obSlide++;
+  document.getElementById('ob'+obSlide).style.display='block';
+  document.querySelectorAll('.ob-dot').forEach(function(d,i){ d.classList.toggle('active',i===obSlide); });
+  if(obSlide===2) document.getElementById('obNextBtn').textContent='はじめる';
+}
+function skipOnboarding(){
+  document.getElementById('onboarding').classList.add('hide');
+  try{ localStorage.setItem('exally_ob_done','1'); }catch(e){}
+}
+function selectCat(el,cat){
+  document.querySelectorAll('.ob-cat').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected'); selectedCat=cat;
+  setTimeout(function(){ skipOnboarding(); },400);
+}
+
 // ===== NAVIGATION =====
 function switchTab(tab){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -1141,56 +1216,9 @@ function openTmplIframe(id){
   if(!tmpl) return;
   if(!tmpl.file){ showToast('準備中だよ✨'); return; }
   document.getElementById('tmplIframeTitle').textContent=tmpl.name;
-  var iframe=document.getElementById('tmplIframe');
-  iframe.src=tmpl.file;
-  // リセット：前回の業種帯を消す
-  var area=document.getElementById('tmplGyoshuArea');
-  if(area) area.classList.remove('active');
-  // iframe読み込み完了後：内部ヘッダー非表示（常時）、業種帯はPCのみ連動
-  iframe.onload=function(){
-    try{
-      var doc=iframe.contentDocument;
-      if(!doc) return;
-      var isPC=window.innerWidth>=769;
-      // iframe内のヘッダー(.header/.hd)は常に非表示（親の2段目がある）
-      var hdr=doc.querySelector('.header');
-      if(hdr) hdr.style.display='none';
-      var hdr2=doc.querySelector('.hd');
-      if(hdr2) hdr2.style.display='none';
-      // 業種帯はPCのみ連動、スマホはiframe内で表示
-      var gBar=doc.querySelector('#gyoshuBar');
-      if(isPC){
-        if(gBar) gBar.style.display='none';
-        var updateFromIframe=function(){
-          var lb=doc.querySelector('#gyoshuBarLabel');
-          if(lb && lb.textContent && lb.textContent.trim()){
-            document.getElementById('tmplGyoshuLabel').textContent=lb.textContent;
-            document.getElementById('tmplGyoshuArea').classList.add('active');
-          }else{
-            document.getElementById('tmplGyoshuArea').classList.remove('active');
-          }
-        };
-        updateFromIframe();
-        var labelEl=doc.querySelector('#gyoshuBarLabel');
-        if(labelEl){
-          var obs=new MutationObserver(updateFromIframe);
-          obs.observe(labelEl,{childList:true,characterData:true,subtree:true});
-        }
-      }else{
-        // スマホ：iframe内業種帯はiframe側の初期設定に任せる（親側は非表示）
-        document.getElementById('tmplGyoshuArea').classList.remove('active');
-      }
-    }catch(e){}
-  };
+  document.getElementById('tmplIframe').src=tmpl.file;
   document.getElementById('tmplIframeScreen').classList.add('show');
   document.getElementById('tmplGallery').style.display='none';
-}
-
-function changeTmplGyoshu(){
-  var iframe=document.getElementById('tmplIframe');
-  if(iframe && iframe.contentWindow && iframe.contentWindow.changeGyoshu){
-    iframe.contentWindow.changeGyoshu();
-  }
 }
 
 function closeTmplIframe(){
@@ -1618,13 +1646,11 @@ function showToast(msg,duration){
 <!-- ===== 逆転発想：DOM内の見えない``` を強制除去 ===== -->
 
 <style>
-/* フォントligature無効化（万一DM Monoレンダリング由来なら解決） */
 *{font-feature-settings:"liga" 0,"dlig" 0,"calt" 0,"clig" 0!important;font-variant-ligatures:none!important;-webkit-font-feature-settings:"liga" 0,"dlig" 0,"calt" 0!important;}
 </style>
 
 <script>
 (function(){
-  // テキストノードから ``` を削除（ただしscript/style/code系は除外）
   function cleanDots(root){
     if(!root) return;
     try{
@@ -1633,9 +1659,7 @@ function showToast(msg,duration){
           var p=n.parentNode;
           if(!p) return NodeFilter.FILTER_REJECT;
           var tag=p.tagName;
-          // script/style/textarea/input は触らない
           if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='INPUT') return NodeFilter.FILTER_REJECT;
-          // formula-block/inline-code/tsv-block内は触らない（正式なコード表示）
           var el=p;
           while(el && el!==document.body){
             if(el.classList && (el.classList.contains('formula-block')||el.classList.contains('inline-code')||el.classList.contains('tsv-block'))) return NodeFilter.FILTER_REJECT;
@@ -1651,10 +1675,8 @@ function showToast(msg,duration){
       });
     }catch(e){}
   }
-  // 初回実行（DOM読み込み後）
   function runInit(){
     cleanDots(document.body);
-    // MutationObserverで監視（動的に追加される要素にも対応）
     try{
       var observer=new MutationObserver(function(muts){
         muts.forEach(function(m){
