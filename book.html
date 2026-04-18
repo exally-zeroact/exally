@@ -3320,6 +3320,36 @@ function bindEvents(){
     refMode=(editingCell&&this.classList.contains('editing')&&v.length>0&&(v[0]==='='||v[0]==='＝'));
     if(!refMode){refStartR=-1;} render();
   });
+  // 外部クリップボードからの貼り付け対応
+  ci.addEventListener('paste', function(e){
+    // 編集モード中は通常の貼り付け（textarea にテキスト挿入）→ スキップしてデフォルトへ
+    if(editingCell) return;
+    var cd = e.clipboardData || window.clipboardData;
+    if(!cd) return;
+    var text = cd.getData('text/plain') || cd.getData('text') || '';
+    if(!text) return;
+    e.preventDefault();
+    // 末尾の改行を削除
+    text = text.replace(/\r?\n$/, '');
+    var rows = text.split(/\r?\n/).map(function(r){ return r.split('\t'); });
+    if(rows.length===1 && rows[0].length===1){
+      // 単一値 → 選択セルに直接貼り付け
+      setCell(selR1, selC1, rows[0][0]);
+    } else {
+      // 複数値 → 選択位置から範囲展開
+      for(var ri=0; ri<rows.length; ri++){
+        for(var cii=0; cii<rows[ri].length; cii++){
+          if(selR1+ri<ROWS && selC1+cii<COLS){
+            setCell(selR1+ri, selC1+cii, rows[ri][cii]);
+          }
+        }
+      }
+      selR2=Math.min(ROWS-1, selR1+rows.length-1);
+      selC2=Math.min(COLS-1, selC1+(rows[0].length-1));
+    }
+    this.value='';
+    updateBar(); render();
+  });
   // blur: IMEの変換中はcommitしない（compositionend後にcommit）
   var _composing = false;
   ci.addEventListener('compositionstart', function(){ _composing=true; });
