@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -433,16 +433,14 @@ text-decoration:none;
 #sheet-tabs{border-bottom:none;}
 }
 
-/* PC用 細いサイドバー（48px・アイコンのみ） */
-.book-sidebar{display:none;}
+/* PC用 ヘッダーナビ（7個・自分＝ブックを除く他画面への導線） */
+.book-header-nav{display:none;}
 @media(min-width:769px){
-.book-sidebar{display:flex;flex-direction:column;position:fixed;top:0;left:0;width:48px;height:100dvh;background:#ffffff;border-right:1px solid #D4EDE1;padding:12px 0;z-index:100;align-items:center;gap:4px;}
-body{padding-left:48px;}
-.book-sidebar-item{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;border:none;background:none;color:#7A9A87;font-size:16px;transition:all 0.18s;text-decoration:none;flex-shrink:0;}
-.book-sidebar-item:hover{background:#F0FAF4;color:#3D9E72;}
-.book-sidebar-item.active{background:#F0FAF4;color:#3D9E72;}
-.book-sidebar-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
-.book-sidebar-item svg{width:18px;height:18px;}
+.book-header-nav{display:flex;gap:2px;align-items:center;}
+.book-header-nav-item{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#7A9A87;font-size:14px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.book-header-nav-item svg{width:16px;height:16px;}
 }
 .sheet-tab {
 padding:5px 14px;
@@ -2159,19 +2157,6 @@ function drawSel(){
   </defs>
 </svg>
 
-<!-- PC用 細いサイドバー（アイコンのみ・他画面への導線） -->
-
-<aside class="book-sidebar" aria-label="ナビゲーション">
-  <a href="home.html" class="book-sidebar-item" title="ホーム">🏠</a>
-  <a href="chat.html" class="book-sidebar-item" title="AIチャット">🤖</a>
-  <a href="book.html" class="book-sidebar-item active" title="ブック"><svg><use href="#grid-sm"/></svg></a>
-  <a href="chat.html?tab=template" class="book-sidebar-item" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
-  <span class="book-sidebar-item nav-disabled" title="電子ハンコ"><svg><use href="#stamp-sm"/></svg></span>
-  <a href="chat.html?tab=book" class="book-sidebar-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
-  <a href="chat.html?tab=quiz" class="book-sidebar-item" title="クイズ">🎯</a>
-  <a href="chat.html?tab=settings" class="book-sidebar-item" title="設定">⚙️</a>
-</aside>
-
 <div id="loading"><div class="spinner"></div><p>グリッドを起動中...</p></div>
 
 <button id="cell-action-btn" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation();event.preventDefault();onActionBtn(event);" onclick="onActionBtn(event)">▼</button>
@@ -2216,6 +2201,15 @@ function drawSel(){
     <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;">Exally</span>
     <span style="font-size:10px;color:#4A6B5A;">エクサリー</span>
   </div>
+  <nav class="book-header-nav" aria-label="他画面への移動">
+    <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
+    <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+    <a href="chat.html?tab=template" class="book-header-nav-item" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
+    <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
+    <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+    <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+    <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
+  </nav>
   <div style="display:flex;align-items:center;gap:6px;">
     <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
   </div>
