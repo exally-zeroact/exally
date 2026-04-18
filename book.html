@@ -104,6 +104,11 @@ body {
 }
 #fmt-bar2::-webkit-scrollbar { display:none; }
 #fmt-bar2.open { display:flex; }
+/* PC(769px以上)では常時展開表示（Excelと同様） */
+@media(min-width:769px){
+  #fmt-bar2 { display:flex; }
+  #fmt-toggle { display:none; }
+}
 .fmt-btn {
   height:26px;
   min-width:22px;
