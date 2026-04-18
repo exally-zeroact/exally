@@ -1896,8 +1896,6 @@ function drawText(r,c){
 
   // 文字揃え
   var align = cell.align||'left';
-  // 数値・日付は右寄せデフォルト（書式が明示されていない場合）
-  if(!cell.align && typeof parseFloat(raw)==='number' && !isNaN(parseFloat(raw)) && raw!=='') align='right';
 
   ctx.textBaseline='middle';
   ctx.save();
