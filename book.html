@@ -1795,6 +1795,7 @@ function _doRender() {
 
   // 10. 選択枠（最前面）
   drawSel();
+  drawFillPreview();
   // 11. refMode中: 参照セルハイライト
   // 複数参照ハイライト（Excelスタイル）
   // 結合セル描画パス（通常描画の上から上書き）
@@ -2066,6 +2067,64 @@ function drawSel(){
   ctx.fillStyle=C_SEL_BORDER;
   ctx.fillRect(x2-FH/2, y2-FH/2, FH, FH); // 緑本体
   ctx.restore();
+}
+
+// オートフィル プレビュー枠（グレー点線）
+function drawFillPreview(){
+  if(!fillPreview) return;
+  var x1=colX(fillPreview.c1),y1=rowY(fillPreview.r1);
+  var x2=colX(fillPreview.c2)+cW(fillPreview.c2),y2=rowY(fillPreview.r2)+rH(fillPreview.r2);
+  ctx.save();
+  ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
+  ctx.strokeStyle='#7A9A87'; ctx.lineWidth=1.5;
+  ctx.setLineDash([4,3]);
+  ctx.strokeRect(x1+1,y1+1,x2-x1-2,y2-y1-2);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// ===== オートフィル パターン検出 =====
+// 値配列から等差数列の step を検出。失敗時は null
+function detectNumericPattern(values){
+  if(!values||values.length===0) return null;
+  // 全部数値か？ 単一セルは連番しない（Excel互換：1つなら単純コピー）
+  if(values.length<2) return null;
+  var nums=[];
+  for(var i=0;i<values.length;i++){
+    var v=values[i];
+    if(v===''||v===null||v===undefined) return null;
+    var n=Number(v);
+    if(isNaN(n)) return null;
+    nums.push(n);
+  }
+  // 等差チェック
+  var step=nums[1]-nums[0];
+  for(var j=2;j<nums.length;j++){
+    if(Math.abs((nums[j]-nums[j-1])-step)>1e-9) return null;
+  }
+  return {nums:nums, step:step};
+}
+
+// ソース値を基に count 個の値を生成
+// パターン検出できれば等差数列、できなければ循環コピー
+function generateFillValues(sourceVals, count){
+  var pat=detectNumericPattern(sourceVals);
+  var out=[];
+  if(pat){
+    var last=pat.nums[pat.nums.length-1];
+    for(var i=0;i<count;i++){
+      last+=pat.step;
+      // 小数誤差を丸める（15桁丸め）
+      last=Math.round(last*1e12)/1e12;
+      out.push(String(last));
+    }
+  } else {
+    // 循環コピー
+    for(var k=0;k<count;k++){
+      out.push(sourceVals[k%sourceVals.length]);
+    }
+  }
+  return out;
 }
 
 </script>
@@ -2537,6 +2596,8 @@ var refStartR=-1, refStartC=-1;
 var _editMode=false;    // カスタムKB表示中
 var _fiCursorPos=0;     // formula-inputのカーソル位置
 var touchState=null;
+// オートフィル: ドラッグ中のプレビュー範囲 {r1,c1,r2,c2} または null
+var fillPreview=null;
 
 // ===== 初期化 =====
 window.addEventListener('resize', function(){
@@ -2832,6 +2893,35 @@ function bindEvents(){
       canvas.style.cursor='default';
     }
     if(touchState.type==='mrefsel'){ var el2=getRefInput(); if(el2) el2.focus(); touchState=null; render(); return; }
+    // フィルハンドルドラッグ終了: fillPreview を確定して値コピー
+    if(touchState.type==='handle'){
+      if(fillPreview){
+        var oR2=touchState.origR2, oC2=touchState.origC2;
+        var tR2=fillPreview.r2, tC2=fillPreview.c2;
+        if(tR2>oR2){
+          // 下方向フィル：列ごとにパターン検出 → 値生成
+          for(var fc=selC1;fc<=oC2;fc++){
+            var src=[];
+            for(var sr=selR1;sr<=oR2;sr++) src.push(getCell(sr,fc).v||'');
+            var gen=generateFillValues(src, tR2-oR2);
+            for(var gi=0;gi<gen.length;gi++) setCell(oR2+1+gi, fc, gen[gi]);
+          }
+          selR2=tR2;
+        }
+        if(tC2>oC2){
+          // 右方向フィル：行ごとにパターン検出 → 値生成
+          for(var fr2=selR1;fr2<=selR2;fr2++){
+            var src2=[];
+            for(var sc2=selC1;sc2<=oC2;sc2++) src2.push(getCell(fr2,sc2).v||'');
+            var gen2=generateFillValues(src2, tC2-oC2);
+            for(var gi2=0;gi2<gen2.length;gi2++) setCell(fr2, oC2+1+gi2, gen2[gi2]);
+          }
+          selC2=tC2;
+        }
+        fillPreview=null; updateBar();
+      }
+      canvas.style.cursor='default'; touchState=null; render(); return;
+    }
     if(touchState.type==='msel'||touchState.type==='colresize'||touchState.type==='rowresize') touchState=null;
   });
   canvas.addEventListener('dblclick',function(e){
@@ -3082,6 +3172,12 @@ function onMD(e){
   }
 
   if(p.x<HDR_W||p.y<HDR_H) return;
+  // フィルハンドル判定（選択範囲内のクリックより先に）
+  if(nearHandle(p.x,p.y)){
+    touchState={type:'handle', origR2:selR2, origC2:selC2};
+    canvas.style.cursor='crosshair';
+    return;
+  }
   var c=xToC(p.x),r=yToR(p.y);
 
   // Shift+セルクリック：範囲拡張
@@ -3117,11 +3213,25 @@ function onMM(e){
     sheets[activeSheet].rowH[touchState.row]=nh;
     render(); return;
   }
+  // フィルハンドルドラッグ中: プレビュー更新
+  if(touchState&&touchState.type==='handle'){
+    if(p.x>HDR_W&&p.y>HDR_H){
+      var tr=Math.max(selR1,yToR(p.y)), tc=Math.max(selC1,xToC(p.x));
+      var dR=tr-selR2, dC=tc-selC2;
+      if(dR>=dC){ fillPreview={r1:selR1,c1:selC1,r2:tr,c2:selC2}; }
+      else{ fillPreview={r1:selR1,c1:selC1,r2:selR2,c2:tc}; }
+      render();
+    }
+    return;
+  }
   // カーソル変更（ドラッグなし時）
   if(!touchState){
     var rc=getColResizeBorder(p.x,p.y,4);
     var rr=getRowResizeBorder(p.x,p.y,4);
-    canvas.style.cursor = rc>=0?'col-resize':rr>=0?'row-resize':'default';
+    if(rc>=0) canvas.style.cursor='col-resize';
+    else if(rr>=0) canvas.style.cursor='row-resize';
+    else if(nearHandle(p.x,p.y)) canvas.style.cursor='crosshair';
+    else canvas.style.cursor='default';
   }
   if(!touchState||touchState.type!=='msel') return;
   if(p.x<HDR_W||p.y<HDR_H) return;
@@ -3267,8 +3377,12 @@ function onTM(e){
     var r=canvas.getBoundingClientRect();
     var x=t.clientX-r.left,y=t.clientY-r.top;
     if(x>HDR_W&&y>HDR_H){
-      selR2=Math.max(selR1,yToR(y)); selC2=Math.max(selC1,xToC(x));
-      updateBar(); render();
+      var tr=Math.max(selR1,yToR(y)), tc=Math.max(selC1,xToC(x));
+      // 縦横どちらか大きい方向に伸ばす（Excel 風）
+      var dR=tr-selR2, dC=tc-selC2;
+      if(dR>=dC){ fillPreview={r1:selR1,c1:selC1,r2:tr,c2:selC2}; }
+      else{ fillPreview={r1:selR1,c1:selC1,r2:selR2,c2:tc}; }
+      render();
     }
   }
 }
@@ -3305,23 +3419,32 @@ function onTE(e){
     setRowH(touchState.row, nh);
     touchState=null; render(); return;
   }
-  // フィルハンドルドラッグ終了: 元の選択範囲から拡張範囲へフィル
+  // フィルハンドルドラッグ終了: fillPreview の範囲へフィル（値コピー）
   if(touchState && touchState.type==='handle'){
-    var oR2=touchState.origR2, oC2=touchState.origC2;
-    var srcRows=oR2-selR1+1, srcCols=oC2-selC1+1;
-    if(selR2>oR2){ // 下方向フィル
-      for(var fr=oR2+1;fr<=selR2;fr++)
+    if(fillPreview){
+      var oR2=touchState.origR2, oC2=touchState.origC2;
+      var tR2=fillPreview.r2, tC2=fillPreview.c2;
+      if(tR2>oR2){
+        // 下方向フィル：列ごとにパターン検出
         for(var fc=selC1;fc<=oC2;fc++){
-          var sv=getCell(selR1+(fr-selR1)%srcRows,fc).v;
-          if(sv!==undefined)setCell(fr,fc,sv);
+          var src=[];
+          for(var sr=selR1;sr<=oR2;sr++) src.push(getCell(sr,fc).v||'');
+          var gen=generateFillValues(src, tR2-oR2);
+          for(var gi=0;gi<gen.length;gi++) setCell(oR2+1+gi, fc, gen[gi]);
         }
-    }
-    if(selC2>oC2){ // 右方向フィル
-      for(var fc2=oC2+1;fc2<=selC2;fc2++)
+        selR2=tR2;
+      }
+      if(tC2>oC2){
+        // 右方向フィル：行ごとにパターン検出
         for(var fr2=selR1;fr2<=selR2;fr2++){
-          var sv2=getCell(fr2,selC1+(fc2-selC1)%srcCols).v;
-          if(sv2!==undefined)setCell(fr2,fc2,sv2);
+          var src2=[];
+          for(var sc2=selC1;sc2<=oC2;sc2++) src2.push(getCell(fr2,sc2).v||'');
+          var gen2=generateFillValues(src2, tC2-oC2);
+          for(var gi2=0;gi2<gen2.length;gi2++) setCell(fr2, oC2+1+gi2, gen2[gi2]);
         }
+        selC2=tC2;
+      }
+      fillPreview=null; updateBar();
     }
     render(); touchState=null; return;
   }
