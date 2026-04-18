@@ -185,10 +185,10 @@ body{padding-bottom:80px;}
 /* sticky-ctaを非表示 */
 .sticky-cta{display:none!important;}
 
-/* PC 左ガイドパネル（固定サイドバー形式） */
+/* PC 左ガイドパネル（他ページのサイドバー仕様と統一：白背景・角丸なし・左端固定） */
 .guide-panel{display:none;}
 @media(min-width:769px){
-.guide-panel{display:block;width:240px;flex-shrink:0;position:sticky;top:0;height:calc(100vh - 49px);overflow-y:auto;background:#F8FEFC;border-right:1px solid #D4EDE1;border-radius:0;box-shadow:none;}
+.guide-panel{display:flex;flex-direction:column;width:220px;min-width:220px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;background:#ffffff;border-right:1px solid #D4EDE1;border-radius:0;box-shadow:none;padding:24px 0;}
 }
 .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
 .gp-sec:last-child{border-bottom:none;}
