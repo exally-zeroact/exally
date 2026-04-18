@@ -45,7 +45,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:24px 0;height:100dvh;flex-shrink:0;}
 .sidebar-logo{padding:0 20px 28px;display:flex;align-items:baseline;gap:5px;text-decoration:none;}
 .sidebar-logo-en{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
-.sidebar-logo-ja{font-size:10px;color:#4A6B5A;}
+.sidebar-logo-ja{font-size:10px;color:#7A9A87;}
 .sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:4px;}
 .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#7A9A87;font-size:13px;font-weight:500;transition:all 0.18s;}
 .sidebar-item:hover{background:#F0FAF4;color:#2E4038;}
@@ -60,7 +60,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .mobile-header{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;}
 .mobile-logo-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;}
-.mobile-logo-ja{font-size:10px;color:#4A6B5A;}
+.mobile-logo-ja{font-size:10px;color:#7A9A87;}
 .mobile-header-right{display:flex;gap:6px;align-items:center;}
 .hbadge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .hbadge-warn{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
@@ -701,7 +701,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="settings-section">
         <div class="settings-section-title">サポート</div>
         <div class="settings-card">
-          <a href="mailto:exally.support@gmail.com" style="text-decoration:none;display:block;"><div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub" style="color:#3D9E72;">exally.support@gmail.com</div></div></div><div class="settings-item-right">›</div></div></a>
+          <a href="javascript:void(0)" onclick="window.location.href='mail'+'to:'+'exally.support'+'@'+'gmail.com'" style="text-decoration:none;display:block;"><div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📧</div><div class="settings-item-text"><div class="settings-item-label">お問い合わせ</div><div class="settings-item-sub" style="color:#3D9E72;" data-cfemail-disable><span id="supportEmail"></span></div></div></div><div class="settings-item-right">›</div></div></a>
           <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon">📄</div><div class="settings-item-text"><div class="settings-item-label">利用規約・プライバシーポリシー</div></div></div><div class="settings-item-right">›</div></div>
         </div>
       </div>
@@ -1640,6 +1640,9 @@ function showToast(msg,duration){
     }
   }
   setInterval(rotate,3000);
+  // メールアドレス表示（Cloudflare Email Protection回避のためJSで動的に設定）
+  var em=document.getElementById('supportEmail');
+  if(em){ em.textContent='exally.support'+'@'+'gmail.com'; }
 })();
 </script>
 
