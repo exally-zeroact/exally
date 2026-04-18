@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <title>Exally グリッド</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP&display=swap" rel="stylesheet">
 <style>
 html { background: transparent; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -32,6 +32,9 @@ body {
   border-bottom:1px solid #D4EDE1;
 }
 .header-btns { display:flex; gap:6px; }
+.exally-logo-en{font-family:monospace;font-size:22px;font-weight:800;color:#52B788;letter-spacing:-0.5px;}
+.exally-logo-ja{font-size:10px;font-weight:600;color:#4A6B5A;}
+@media(max-width:768px){.exally-logo-en{font-size:20px;}}
 .hbtn {
   background:rgba(255,255,255,0.2);
   border:1px solid rgba(255,255,255,0.35);
@@ -2199,8 +2202,8 @@ function drawSel(){
 
 <div id="header">
   <div style="display:flex;align-items:baseline;gap:5px;flex:1;">
-    <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;">Exally</span>
-    <span style="font-size:10px;color:#4A6B5A;">エクサリー</span>
+    <span class="exally-logo-en">Exally</span>
+    <span class="exally-logo-ja">エクサリー</span>
   </div>
   <nav class="book-header-nav" aria-label="他画面への移動">
     <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
