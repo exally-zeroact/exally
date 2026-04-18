@@ -21,13 +21,60 @@ body{font-family:'Noto Sans JP','DM Sans',sans-serif;background:#F4F7F5;color:#1
 }
 
 /* HEADER */
-.hd{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--border);
-  padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh);}
-.hd-back{background:none;border:1.5px solid var(--border);color:var(--mint-d);
-  font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;
-  font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-.hd-logo{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;color:var(--mint-d);}
-.hd-title{font-size:13px;font-weight:700;color:var(--text2);margin-left:auto;}
+/* ===== ヘッダー（2段構造・統一仕様／業種バーなし） ===== */
+.header{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E0EDE6;box-shadow:0 1px 4px rgba(30,60,40,0.08);}
+.header-top{display:flex;align-items:center;padding:8px 14px;gap:10px;border-bottom:1px solid #F0FAF4;min-height:44px;}
+.header-logo-wrap{display:flex;align-items:baseline;gap:5px;text-decoration:none;flex-shrink:0;}
+.header-logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
+.header-logo-ja{font-size:10px;color:#4A6B5A;margin-left:-3px;}
+.header-title-sp{font-size:12px;font-weight:700;color:#4A6B5A;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(min-width:769px){.header-title-sp{display:none;}}
+.book-header-nav{display:none;}
+@media(min-width:769px){.book-header-nav{display:flex;gap:4px;align-items:center;margin-left:auto;}}
+.book-header-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.book-header-nav-item.active{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item svg{width:22px;height:22px;}
+@media(min-width:769px){.header-top{padding:10px 16px;gap:12px;min-height:52px;}.header-logo{font-size:20px;}}
+.header-sub{display:flex;align-items:center;padding:8px 16px;gap:12px;flex-wrap:nowrap;min-height:48px;}
+.header-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;transition:all 0.15s;}
+.header-back:hover{background:#F0FAF4;border-color:#C8ECD8;}
+.header-title{font-size:13px;font-weight:700;color:#4A6B5A;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(max-width:768px){.header-title{display:none;}}
+@media(max-width:768px){
+  .header-sub{padding:6px 12px;gap:8px;flex-wrap:nowrap;min-height:40px;}
+  .header-back{font-size:10px;padding:3px 9px;}
+}
+
+/* ===== ページ全体レイアウト（PC: サイドバー + メイン） ===== */
+.page-wrap{display:flex;flex-direction:column;min-height:100vh;}
+@media(min-width:769px){.page-wrap{flex-direction:row;align-items:flex-start;}}
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+/* ===== 左サイドバー（PC専用・隙間なし） ===== */
+.sidebar{display:none;}
+@media(min-width:769px){
+  .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:16px 0;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+}
+.sidebar .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
+.sidebar .gp-sec:last-child{border-bottom:none;}
+
+/* ===== スマホ下部アンダーバー ===== */
+.mobile-bottombar{display:none;}
+@media(max-width:768px){
+  .mobile-bottombar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #D4EDE1;z-index:300;justify-content:space-around;padding:6px 0 8px;box-shadow:0 -2px 8px rgba(0,0,0,0.05);}
+}
+.mbb-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;text-decoration:none;color:#7A9A87;font-family:'Noto Sans JP',sans-serif;background:none;border:none;cursor:pointer;transition:color 0.15s;}
+.mbb-item:hover{color:#3D9E72;}
+.mbb-item.active{color:#3D9E72;}
+.mbb-item.nav-disabled{opacity:0.45;cursor:not-allowed;pointer-events:none;}
+.mbb-item-icon{font-size:18px;line-height:1;}
+.mbb-item-icon svg{width:18px;height:18px;}
+.mbb-item-label{font-size:9px;font-weight:500;}
+
+/* 旧 .guide-panel 完全非表示（中身はサイドバーに移植済み） */
+.guide-panel{display:none!important;}
 
 /* MAIN */
 .main{max-width:920px;margin:0;padding:12px 12px 0;}
@@ -322,12 +369,12 @@ body{padding-bottom:80px;}
 /* layout */
 .layout-wrap{display:flex;flex-direction:column;}
 @media(min-width:769px){
-  .layout-wrap{flex-direction:row;align-items:flex-start;gap:24px;}
   .form-panel{flex:1;min-width:0;}
+}
 }
 
 /* スマホ上部sticky */
-.sp-top{position:sticky;top:48px;z-index:200;background:#fff;border-bottom:2px solid #C8ECD8;}
+.sp-top{background:#fff;border-bottom:2px solid #C8ECD8;}
 @media(min-width:769px){.sp-top{display:none;}}
 
 .sp-badges{display:flex;gap:6px;padding:7px 12px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #F0FAF4;}
@@ -398,10 +445,94 @@ body{padding-bottom:80px;}
 </head>
 <body>
 
-<div class="hd">
-  <button class="hd-back" onclick="if(window.parent&&window.parent.closeTmplIframe){window.parent.closeTmplIframe();}else{history.back();}">← 戻る</button>
-  <span class="hd-logo">Exally</span>
-  <span class="hd-title" id="hdTitle">請求書</span>
+<!-- ===== SVG symbol defs (book.htmlから流用) ===== -->
+<svg style="display:none;" aria-hidden="true">
+  <defs>
+    <symbol id="template-sm" viewBox="0 0 20 20">
+      <rect x="4" y="3" width="12" height="15" rx="1.5" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
+      <rect x="7" y="2" width="6" height="3" rx="1" fill="#52B788"/>
+      <line x1="6" y1="9" x2="14" y2="9" stroke="#C8ECD8" stroke-width="1.2"/>
+      <line x1="6" y1="12" x2="14" y2="12" stroke="#C8ECD8" stroke-width="1.2"/>
+      <line x1="6" y1="15" x2="11" y2="15" stroke="#C8ECD8" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="stamp-sm" viewBox="0 0 20 20">
+      <rect x="3" y="3" width="14" height="14" fill="none" stroke="#E53935" stroke-width="1.5"/>
+      <text x="10" y="12" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-weight="900" font-size="4.3" font-style="italic" fill="#E53935">Exally</text>
+    </symbol>
+    <symbol id="book-sm" viewBox="0 0 20 20">
+      <path d="M3 4 C3 3.5 3.5 3 4 3 L9 3 C9.5 3 10 3.5 10 4 L10 16.5 L4 16.5 C3.5 16.5 3 16 3 15.5 Z" fill="#52B788"/>
+      <path d="M10 4 C10 3.5 10.5 3 11 3 L16 3 C16.5 3 17 3.5 17 4 L17 15.5 C17 16 16.5 16.5 16 16.5 L10 16.5 Z" fill="#3D9E72"/>
+      <line x1="4.5" y1="5.5" x2="8.5" y2="5.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="4.5" y1="7.5" x2="8.5" y2="7.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="11.5" y1="5.5" x2="15.5" y2="5.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="11.5" y1="7.5" x2="15.5" y2="7.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page-wrap">
+
+<!-- ===== PC左サイドバー（画面端ベタ付け・隙間なし） ===== -->
+<aside class="sidebar" aria-label="テンプレートガイド">
+  <div class="gp-sec">
+    <div class="gp-title">✨ このテンプレでできること</div>
+    <div class="feat-list">
+      <div class="feat-item"><div class="feat-main">✅ インボイス対応</div><div class="feat-sub">登録番号入力だけ</div></div>
+      <div class="feat-item"><div class="feat-main">🔏 電子判子</div><div class="feat-sub">画像アップOK</div></div>
+      <div class="feat-item"></div>
+      <div class="feat-item"><div class="feat-main">💰 控除明細</div><div class="feat-sub">建設・フリーランス</div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📋 使い方</div>
+    <div class="gp-steps">
+      <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>入力欄を埋める</b><small>会社名・品目・金額を入力するだけ</small></div></div>
+      <div class="gp-hints"><div class="gp-hint">💡 品目は＋追加・×削除できるよ</div><div class="gp-hint">🔢 料率（例：0.006）は直接書き換えOK</div></div>
+      <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の書類イメージで確認できる</small></div></div>
+      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <button class="gp-preview-btn" onclick="showPreview()">👁 プレビューを確認する</button>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📊 Excelで印刷するには</div>
+    <div class="xl-steps">
+      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線（- - -）が現れる＝印刷範囲の目安</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+
+<!-- ===== ヘッダー（2段構造／業種バーなし） ===== -->
+<div class="header">
+  <!-- 1段目：ロゴ + PCアイコンnav -->
+  <div class="header-top">
+    <a href="home.html" class="header-logo-wrap">
+      <span class="header-logo">Exally</span>
+      <span class="header-logo-ja">エクサリー</span>
+    </a>
+    <!-- SP専用タイトル（1段目右端） -->
+    <span class="header-title-sp">請求書</span>
+    <nav class="book-header-nav" aria-label="他画面への移動">
+      <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
+      <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+      <a href="chat.html?tab=template" class="book-header-nav-item active" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
+      <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
+      <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+      <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+      <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
+    </nav>
+  </div>
+  <!-- 2段目：戻る + タイトル（PC） -->
+  <div class="header-sub">
+    <button class="header-back" onclick="location.href='chat.html?tab=template'">← テンプレ一覧に戻る</button>
+    <span class="header-title" id="hdTitle">請求書</span>
+  </div>
 </div>
 
 <!-- ===== スマホ：上部stickyパネル ===== -->
@@ -768,7 +899,19 @@ body{padding-bottom:80px;}
 <!-- Canvas（判子処理用） -->
 <canvas id="procCanvas" style="display:none;"></canvas>
 
-<script src="shouhizei-ritsu.js"></script>
+</div><!-- /main-wrap -->
+</div><!-- /page-wrap -->
+
+<!-- ===== スマホ下部アンダーバー ===== -->
+<nav class="mobile-bottombar" aria-label="下部ナビゲーション">
+  <a href="home.html" class="mbb-item"><span class="mbb-item-icon">🏠</span><span class="mbb-item-label">ホーム</span></a>
+  <a href="chat.html" class="mbb-item"><span class="mbb-item-icon">🤖</span><span class="mbb-item-label">チャット</span></a>
+  <a href="chat.html?tab=template" class="mbb-item active"><span class="mbb-item-icon"><svg><use href="#template-sm"/></svg></span><span class="mbb-item-label">テンプレ</span></a>
+  <a href="chat.html?tab=book" class="mbb-item"><span class="mbb-item-icon"><svg><use href="#book-sm"/></svg></span><span class="mbb-item-label">数式帳</span></a>
+  <a href="chat.html?tab=settings" class="mbb-item"><span class="mbb-item-icon">⚙️</span><span class="mbb-item-label">設定</span></a>
+</nav>
+
+<script src="shouhizei-ritsu.js" charset="UTF-8"></script>
 <script>
 // ===== 状態管理 =====
 var docType = 'invoice';
@@ -808,8 +951,6 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('docDate').value = today;
   var due = new Date(); due.setDate(due.getDate()+30);
   document.getElementById('dueDate').value = due.toISOString().split('T')[0];
-  var valid = new Date(); valid.setDate(valid.getDate()+30);
-  document.getElementById('validDate').value = valid.toISOString().split('T')[0];
   loadState();
   if(rows.length===0){ addRow(); addRow(); addRow(); }
   if(banks.length===0){ addBank(''); }
