@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -22,10 +23,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 }
 .header{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E0EDE6;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(30,60,40,0.08);}
 .header-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-.header-logo{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;color:#3D9E72;letter-spacing:-0.5px;}
+.header-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
+.header-logo-ja{font-size:10px;color:#4A6B5A;margin-left:-3px;}
 .header-title{font-size:13px;font-weight:700;color:#4A6B5A;margin-left:auto;}
-.main{max-width:600px;margin:0 auto;padding:16px 12px;}
-.type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.main{max-width:600px;margin:0 auto;padding:8px 12px;}
+.type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
 .type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
 .type-tab.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
 .step-guide{background:#fff;border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
@@ -150,9 +152,9 @@ body{padding-bottom:80px;}
 /* layout */
 .layout-wrap{display:flex;flex-direction:column;}
 @media(min-width:769px){
-  .layout-wrap{flex-direction:row;align-items:flex-start;gap:24px;}
-  .form-panel{flex:1;min-width:0;}
-  .main{max-width:none;margin:0;padding:32px 40px 40px 24px;}
+.layout-wrap{flex-direction:row;align-items:flex-start;gap:0;}
+.form-panel{flex:1;min-width:0;}
+.main{max-width:none;margin:0;padding:24px 32px 40px 32px;}
 }
 
 /* スマホ上部sticky */
@@ -166,9 +168,9 @@ body{padding-bottom:80px;}
 .sp-step-item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#4A6B5A;white-space:nowrap;}
 .sp-step-circle{width:18px;height:18px;border-radius:50%;background:#52B788;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sp-arrow{color:#C8ECD8;font-size:10px;flex-shrink:0;}
-.sp-how-btn{flex:1;margin-left:6px;background:#fff;border:2px solid #52B788;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;text-align:center;}
+.sp-how-btn{flex:1;margin-left:6px;background:#fff;border:2px solid #52B788;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;white-space:nowrap;text-align:center;}
 .sp-preview-row{padding:7px 12px 8px;}
-.sp-preview-row button{width:100%;padding:11px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);}
+.sp-preview-row button{width:100%;padding:11px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);}
 
 /* モーダル */
 .sp-modal-ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.4);}
@@ -176,17 +178,17 @@ body{padding-bottom:80px;}
 .sp-modal-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:82vh;overflow-y:auto;padding-bottom:32px;}
 .sp-modal-hd{position:sticky;top:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #E0EDE6;z-index:10;}
 .sp-modal-title{font-size:14px;font-weight:700;color:#1A2B22;}
-.sp-modal-close{background:none;border:1.5px solid #E0EDE6;color:#7A9A87;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.sp-modal-close{background:none;border:1.5px solid #E0EDE6;color:#7A9A87;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;}
 .sp-modal-body{padding:16px;}
 @media(min-width:769px){.sp-modal-ov{display:none!important;}}
 
 /* sticky-ctaを非表示 */
 .sticky-cta{display:none!important;}
 
-/* PC 左ガイドパネル */
+/* PC 左ガイドパネル（固定サイドバー形式） */
 .guide-panel{display:none;}
 @media(min-width:769px){
-  .guide-panel{display:block;width:200px;flex-shrink:0;position:sticky;top:60px;max-height:calc(100vh - 80px);overflow-y:auto;background:#fff;border:1px solid #E0EDE6;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.guide-panel{display:block;width:240px;flex-shrink:0;position:sticky;top:0;height:calc(100vh - 49px);overflow-y:auto;background:#F8FEFC;border-right:1px solid #D4EDE1;border-radius:0;box-shadow:none;}
 }
 .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
 .gp-sec:last-child{border-bottom:none;}
@@ -203,7 +205,7 @@ body{padding-bottom:80px;}
 .gp-text small{font-size:9px;color:#7A9A87;}
 .gp-hints{margin-top:4px;display:flex;flex-direction:column;gap:3px;}
 .gp-hint{font-size:9px;color:#3D9E72;font-weight:700;background:#F0FAF4;border-radius:5px;padding:3px 6px;line-height:1.4;}
-.gp-preview-btn{width:100%;padding:10px 6px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);white-space:nowrap;}
+.gp-preview-btn{width:100%;padding:10px 6px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);white-space:nowrap;}
 .xl-steps{display:flex;flex-direction:column;gap:8px;}
 .xl-step{border-left:2px solid #C8ECD8;padding-left:8px;}
 .xl-step-lbl{font-size:9px;font-weight:700;color:#3D9E72;margin-bottom:2px;}
@@ -232,31 +234,35 @@ body{padding-bottom:80px;}
 .gyoshu-preset-tags{display:flex;flex-wrap:wrap;gap:6px;}
 .gyoshu-preset-tag{background:#fff;border:1px solid #C8ECD8;border-radius:20px;padding:3px 10px;font-size:11px;color:#2E4038;font-weight:500;}
 .gyoshu-preset-tag.on{background:#3D9E72;border-color:#3D9E72;color:#fff;}
-.gyoshu-apply-btn{width:100%;padding:15px;background:#C8ECD8;color:#7A9A87;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:not-allowed;font-family:'Noto Sans JP',sans-serif;margin-bottom:10px;}
+.gyoshu-apply-btn{width:100%;padding:15px;background:#C8ECD8;color:#7A9A87;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:not-allowed;font-family:‘Noto Sans JP’,sans-serif;margin-bottom:10px;}
 .gyoshu-apply-btn.active{background:linear-gradient(135deg,#3D9E72,#52B788);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(61,158,114,0.3);}
-.gyoshu-skip{background:none;border:none;color:#7A9A87;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;width:100%;padding:6px;}
+.gyoshu-skip{background:none;border:none;color:#7A9A87;font-size:12px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;width:100%;padding:6px;}
 @media print {
-  /* 新ウィンドウ印刷方式に変更したためこのCSSは使用しない */
+/* 新ウィンドウ印刷方式に変更したためこのCSSは使用しない */
 }
 </style>
+
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 </head>
 <body>
 
 <div class="header">
   <!-- ★修正箇所：onclick追加 -->
   <button class="header-back" onclick="if(window.parent&&window.parent.closeTmplIframe){window.parent.closeTmplIframe();}else{history.back();}">← 戻る</button>
-  <span class="header-logo">Exally</span>
+  <span class="header-logo">Exally</span><span class="header-logo-ja">エクサリー</span>
   <span class="header-title" id="cardTitle">給料明細（月給制）</span>
 </div>
 
 <!-- ===== 業種帯 ===== -->
+
 <div id="gyoshuBar" style="display:none;position:sticky;top:49px;z-index:199;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:7px 16px;align-items:center;gap:12px;">
   <span id="gyoshuBarLabel" style="font-size:12px;font-weight:700;color:#2E4038;"></span>
   <button onclick="changeGyoshu()" style="background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">業種を変更する →</button>
 </div>
 
 <!-- ===== スマホ：上部stickyパネル ===== -->
+
 <div class="sp-top">
   <div class="sp-badges">
     <div class="sp-badge-item">📅 月給・時給対応</div>
@@ -278,6 +284,7 @@ body{padding-bottom:80px;}
 </div>
 
 <!-- スマホ：使い方モーダル -->
+
 <div class="sp-modal-ov" id="spGuideModal" onclick="if(event.target===this)closeGuideModal()">
   <div class="sp-modal-box">
     <div class="sp-modal-hd">
@@ -307,6 +314,7 @@ body{padding-bottom:80px;}
 <div class="layout-wrap">
 
 <!-- PC：左ガイドパネル -->
+
 <div class="guide-panel">
   <div class="gp-sec">
     <div class="gp-title">✨ このテンプレでできること</div>
@@ -341,6 +349,7 @@ body{padding-bottom:80px;}
 </div>
 
 <!-- フォームパネル -->
+
 <div class="form-panel">
   <div class="type-tabs">
     <button class="type-tab active" onclick="switchType('monthly')">📅 月給制</button>
@@ -384,71 +393,74 @@ body{padding-bottom:80px;}
     <div class="paper-sec">
       <div class="sec-label">明細の設定</div>
 
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">勤務地（健康保険料率・最低賃金に影響）</div>
-        <select id="prefSelect" onchange="onPrefChange()" style="width:100%;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;">
-        </select>
-      </div>
+```
+  <div style="margin-bottom:14px;">
+    <div class="paper-step-label">勤務地（健康保険料率・最低賃金に影響）</div>
+    <select id="prefSelect" onchange="onPrefChange()" style="width:100%;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;">
+    </select>
+  </div>
 
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">扶養人数</div>
-        <div style="font-size:11px;color:#7A9A87;margin-bottom:8px;line-height:1.7;">養っている家族（収入のない配偶者・子ども・親など）の人数を入れてね。わからなければ0人のままでOK。年末調整で自動的に精算されるから安心してね。</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="fuyouInput" min="0" max="7" value="0" onchange="onFuyouChange()" style="width:80px;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;text-align:center;">
-          <span style="font-size:13px;color:#7A9A87;">人</span>
-        </div>
-      </div>
-
-      <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
-        <div class="paper-row">
-          <button class="paper-chip active" id="deliver-paper" onclick="setDeliver('paper')">📄 紙で手渡し・封筒配布</button>
-          <button class="paper-chip" id="deliver-pdf" onclick="setDeliver('pdf')">💻 PDFでメール・電子配信</button>
-        </div>
-      </div>
-      <div>
-        <div class="paper-step-label">STEP 2｜用紙サイズを選んでください</div>
-        <div class="paper-rank-list" id="paperRankList"></div>
-        <div class="paper-note" id="paperNote"></div>
-        <div id="paperPreview" style="margin-top:14px;"></div>
-      </div>
+  <div style="margin-bottom:14px;">
+    <div class="paper-step-label">扶養人数</div>
+    <div style="font-size:11px;color:#7A9A87;margin-bottom:8px;line-height:1.7;">養っている家族（収入のない配偶者・子ども・親など）の人数を入れてね。わからなければ0人のままでOK。年末調整で自動的に精算されるから安心してね。</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="number" id="fuyouInput" min="0" max="7" value="0" onchange="onFuyouChange()" style="width:80px;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;text-align:center;">
+      <span style="font-size:13px;color:#7A9A87;">人</span>
     </div>
-    <div class="result-sec" id="resultEl">
+  </div>
 
-      <!-- 保存・印刷エリア（主役・最上部） -->
-      <div id="save-print-area" style="margin-bottom:20px;">
-        <div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:12px;">完成しました。保存・印刷してください</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <button onclick="printPayslip()" style="width:100%;padding:13px;background:#3D9E72;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🖨️ 印刷する</button>
-          <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
-          <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
-        </div>
-        <div style="margin-top:12px;padding:14px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;">
-          <div style="font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:6px;">📋 賃金台帳に記録する</div>
-          <div style="font-size:11px;color:#7A9A87;line-height:1.7;margin-bottom:10px;">毎月このボタンを押してダウンロード→同じフォルダに保存していくと賃金台帳が完成します。<br><span style="color:#E05555;font-weight:700;">⚠️ 労働基準法で5年保存が義務です</span></div>
-          <button onclick="downloadKinmuDaichou()" style="width:100%;padding:12px;background:#3D9E72;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📋 賃金台帳をダウンロード</button>
-        </div>
-      </div>
-
-      <!-- AIチャット -->
-      <div id="ai-chat-area" style="margin-top:14px;padding:12px;background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;">
-        <div style="font-size:11px;font-weight:700;color:#9A6000;margin-bottom:6px;">💬 AIチャットで調整したい場合</div>
-        <div style="font-size:11px;color:#7A5500;margin-bottom:8px;line-height:1.6;">「残業時間の計算式を変えたい」など追加の調整はAIに相談できます。</div>
-        <button onclick="openAIChat()" style="width:100%;padding:10px;background:#F4A942;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">AIチャットで相談する →</button>
-      </div>
-
-      <!-- Excelプレビュー（下部・スクロールして確認） -->
-      <div style="margin-top:20px;border-top:1px solid #E0EDE6;padding-top:14px;">
-        <div style="font-size:11px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:10px;">📊 完成イメージ（スクロールして確認）</div>
-        <div id="excelPreview"></div>
-      </div>
+  <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
+  <div style="margin-bottom:14px;">
+    <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
+    <div class="paper-row">
+      <button class="paper-chip active" id="deliver-paper" onclick="setDeliver('paper')">📄 紙で手渡し・封筒配布</button>
+      <button class="paper-chip" id="deliver-pdf" onclick="setDeliver('pdf')">💻 PDFでメール・電子配信</button>
     </div>
-    <div class="gen-wrap">
-      <div id="fitCheckMsg" style="margin-bottom:10px;"></div>
-      <button class="gen-btn" id="genMainBtn" onclick="generateTSV()">Excel用データを生成する →</button>
-      <div class="gen-sub">選択・並び替えした項目で計算式付きTSVを自動生成します</div>
+  </div>
+  <div>
+    <div class="paper-step-label">STEP 2｜用紙サイズを選んでください</div>
+    <div class="paper-rank-list" id="paperRankList"></div>
+    <div class="paper-note" id="paperNote"></div>
+    <div id="paperPreview" style="margin-top:14px;"></div>
+  </div>
+</div>
+<div class="result-sec" id="resultEl">
+
+  <!-- 保存・印刷エリア（主役・最上部） -->
+  <div id="save-print-area" style="margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:12px;">完成しました。保存・印刷してください</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="printPayslip()" style="width:100%;padding:13px;background:#3D9E72;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🖨️ 印刷する</button>
+      <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
+      <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
     </div>
+    <div style="margin-top:12px;padding:14px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;">
+      <div style="font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:6px;">📋 賃金台帳に記録する</div>
+      <div style="font-size:11px;color:#7A9A87;line-height:1.7;margin-bottom:10px;">毎月このボタンを押してダウンロード→同じフォルダに保存していくと賃金台帳が完成します。<br><span style="color:#E05555;font-weight:700;">⚠️ 労働基準法で5年保存が義務です</span></div>
+      <button onclick="downloadKinmuDaichou()" style="width:100%;padding:12px;background:#3D9E72;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📋 賃金台帳をダウンロード</button>
+    </div>
+  </div>
+
+  <!-- AIチャット -->
+  <div id="ai-chat-area" style="margin-top:14px;padding:12px;background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;">
+    <div style="font-size:11px;font-weight:700;color:#9A6000;margin-bottom:6px;">💬 AIチャットで調整したい場合</div>
+    <div style="font-size:11px;color:#7A5500;margin-bottom:8px;line-height:1.6;">「残業時間の計算式を変えたい」など追加の調整はAIに相談できます。</div>
+    <button onclick="openAIChat()" style="width:100%;padding:10px;background:#F4A942;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">AIチャットで相談する →</button>
+  </div>
+
+  <!-- Excelプレビュー（下部・スクロールして確認） -->
+  <div style="margin-top:20px;border-top:1px solid #E0EDE6;padding-top:14px;">
+    <div style="font-size:11px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:10px;">📊 完成イメージ（スクロールして確認）</div>
+    <div id="excelPreview"></div>
+  </div>
+</div>
+<div class="gen-wrap">
+  <div id="fitCheckMsg" style="margin-bottom:10px;"></div>
+  <button class="gen-btn" id="genMainBtn" onclick="generateTSV()">Excel用データを生成する →</button>
+  <div class="gen-sub">選択・並び替えした項目で計算式付きTSVを自動生成します</div>
+</div>
+```
+
   </div>
   <div id="noticeEl" style="font-size:11px;color:var(--text-muted);padding:4px 4px 16px;line-height:1.7;"></div>
 </div>
@@ -461,6 +473,7 @@ body{padding-bottom:80px;}
 </div><!-- /layout-wrap -->
 
 <!-- プレビューエリア -->
+
 <div id="previewArea" style="display:none;max-width:600px;margin:0 auto 12px;padding:0 12px;"></div>
 <div class="toast" id="toast"></div>
 
@@ -490,10 +503,15 @@ body{padding-bottom:80px;}
 </div>
 
 <script src="shakaihoken-hyo.js"></script>
+
 <script src="koyohoken-ritsu.js"></script>
+
 <script src="rouki-ritsu.js"></script>
+
 <script src="saitei-chingin.js"></script>
+
 <script src="shotokuzei-hyou.js"></script>
+
 <script>
 const MONTHLY=[
   {id:'attend',label:'出勤日数',type:'info',cat:'勤怠',default:true,canRemove:false,value:'__日 / 所定__日',formula:null,title:null,rates:null},
@@ -2253,105 +2271,107 @@ function openPrintWindow(autoPrint) {
   pw.document.write('html,body{width:210mm;height:297mm;overflow:hidden;font-family:"Noto Sans JP",sans-serif;background:#fff;}');
   pw.document.write('body>div{width:100%;height:100%;display:flex;align-items:flex-start;}');
   pw.document.write('</style>');
-  pw.document.write('</head><body>');
-  pw.document.write(content.innerHTML);
-  pw.document.write('</body></html>');
-  pw.document.close();
-  pw.focus();
-  if(autoPrint) {
-    setTimeout(function(){ pw.print(); }, 1200);
-  }
+
+pw.document.write(’</head><body>’);
+pw.document.write(content.innerHTML);
+pw.document.write(’</body></html>’);
+pw.document.close();
+pw.focus();
+if(autoPrint) {
+setTimeout(function(){ pw.print(); }, 1200);
+}
 }
 
 // 印刷する
 function printPayslip(){
-  openPrintWindow(true);
+openPrintWindow(true);
 }
 
 // PDFで保存（印刷ダイアログ経由）
 function downloadPDF(){
-  showToast('📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。');
-  openPrintWindow(true);
+showToast(‘📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’);
+openPrintWindow(true);
 }
 
 // Excelでダウンロード（SheetJS）
 function downloadExcel(){
-  if(typeof XLSX === 'undefined'){
-    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
-    return;
-  }
-  if(!generatedTSV || generatedTSV.trim() === ''){
-    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
-    return;
-  }
-  // TSVを2次元配列に変換
-  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
-  var ws = XLSX.utils.aoa_to_sheet(rows);
+if(typeof XLSX === ‘undefined’){
+showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+return;
+}
+if(!generatedTSV || generatedTSV.trim() === ‘’){
+showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
+return;
+}
+// TSVを2次元配列に変換
+var rows = generatedTSV.split(’\n’).map(function(r){ return r.split(’\t’); });
+var ws = XLSX.utils.aoa_to_sheet(rows);
 
-  // 列幅の自動設定
-  var colWidths = [];
-  rows.forEach(function(row){
-    row.forEach(function(cell, i){
-      var len = cell ? String(cell).length * 2 : 8;
-      if(!colWidths[i] || colWidths[i] < len) colWidths[i] = len;
-    });
-  });
-  ws['!cols'] = colWidths.map(function(w){ return {wch: Math.min(w, 30)}; });
+// 列幅の自動設定
+var colWidths = [];
+rows.forEach(function(row){
+row.forEach(function(cell, i){
+var len = cell ? String(cell).length * 2 : 8;
+if(!colWidths[i] || colWidths[i] < len) colWidths[i] = len;
+});
+});
+ws[’!cols’] = colWidths.map(function(w){ return {wch: Math.min(w, 30)}; });
 
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '給料明細');
+var wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, ‘給料明細’);
 
-  // ファイル名：給料明細_氏名_年月
-  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '';
-  var now = new Date();
-  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
-  var fname = '給料明細' + (name ? '_'+name : '') + '_' + ym + '.xlsx';
-  XLSX.writeFile(wb, fname);
-  showToast('📥 '+fname+' をダウンロードしました');
+// ファイル名：給料明細_氏名_年月
+var name = (document.getElementById(‘nameInput’) && document.getElementById(‘nameInput’).value) || ‘’;
+var now = new Date();
+var ym = now.getFullYear()+‘年’+(now.getMonth()+1)+‘月’;
+var fname = ‘給料明細’ + (name ? ‘*’+name : ‘’) + ’*’ + ym + ‘.xlsx’;
+XLSX.writeFile(wb, fname);
+showToast(‘📥 ‘+fname+’ をダウンロードしました’);
 }
 
 // 賃金台帳をダウンロード
 function downloadKinmuDaichou(){
-  if(typeof XLSX === 'undefined'){
-    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
-    return;
-  }
-  if(!generatedTSV || generatedTSV.trim() === ''){
-    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
-    return;
-  }
+if(typeof XLSX === ‘undefined’){
+showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+return;
+}
+if(!generatedTSV || generatedTSV.trim() === ‘’){
+showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
+return;
+}
 
-  // TSVから支給合計・控除合計・差引支給額を取得
-  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
-  var shikyuGokei = '', kojogokei = '', sashihiki = '';
-  rows.forEach(function(r){
-    if(r[0] && r[0].indexOf('支給合計') !== -1) shikyuGokei = r[1] || '';
-    if(r[0] && r[0].indexOf('控除合計') !== -1) kojogokei = r[4] || r[1] || '';
-    if(r[0] && r[0].indexOf('差引') !== -1) sashihiki = r[1] || '';
-  });
+// TSVから支給合計・控除合計・差引支給額を取得
+var rows = generatedTSV.split(’\n’).map(function(r){ return r.split(’\t’); });
+var shikyuGokei = ‘’, kojogokei = ‘’, sashihiki = ‘’;
+rows.forEach(function(r){
+if(r[0] && r[0].indexOf(‘支給合計’) !== -1) shikyuGokei = r[1] || ‘’;
+if(r[0] && r[0].indexOf(‘控除合計’) !== -1) kojogokei = r[4] || r[1] || ‘’;
+if(r[0] && r[0].indexOf(‘差引’) !== -1) sashihiki = r[1] || ‘’;
+});
 
-  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '氏名未入力';
-  var now = new Date();
-  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+var name = (document.getElementById(‘nameInput’) && document.getElementById(‘nameInput’).value) || ‘氏名未入力’;
+var now = new Date();
+var ym = now.getFullYear()+‘年’+(now.getMonth()+1)+‘月’;
 
-  var daichouRow = [ym, name, shikyuGokei, kojogokei, sashihiki];
-  var ws = XLSX.utils.aoa_to_sheet([
-    ['対象月', '氏名', '支給合計', '控除合計', '差引支給額（手取り）'],
-    daichouRow
-  ]);
-  ws['!cols'] = [{wch:12},{wch:12},{wch:14},{wch:14},{wch:18}];
+var daichouRow = [ym, name, shikyuGokei, kojogokei, sashihiki];
+var ws = XLSX.utils.aoa_to_sheet([
+[‘対象月’, ‘氏名’, ‘支給合計’, ‘控除合計’, ‘差引支給額（手取り）’],
+daichouRow
+]);
+ws[’!cols’] = [{wch:12},{wch:12},{wch:14},{wch:14},{wch:18}];
 
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '賃金台帳');
+var wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, ‘賃金台帳’);
 
-  var fname = '賃金台帳_'+name+'_'+ym+'.xlsx';
-  XLSX.writeFile(wb, fname);
-  showToast('📋 '+fname+' をダウンロードしました。同じフォルダに毎月保存してね。');
+var fname = ‘賃金台帳_’+name+’_’+ym+’.xlsx’;
+XLSX.writeFile(wb, fname);
+showToast(‘📋 ‘+fname+’ をダウンロードしました。同じフォルダに毎月保存してね。’);
 }
 
 </script>
 
 <!-- ===== 業種選択オーバーレイ ===== -->
+
 <div class="gyoshu-overlay hide" id="gyoshuOverlay">
   <div class="gyoshu-sheet">
     <div class="gyoshu-sheet-title">あなたの業種はどれですか？</div>
@@ -2374,6 +2394,65 @@ function downloadKinmuDaichou(){
     <button class="gyoshu-skip" onclick="skipGyoshu()">業種を選ばずに始める</button>
   </div>
 </div>
+
+<!-- ===== DOM内の見えない``` を強制除去 ===== -->
+
+<style>
+*{font-feature-settings:"liga" 0,"dlig" 0,"calt" 0,"clig" 0!important;font-variant-ligatures:none!important;-webkit-font-feature-settings:"liga" 0,"dlig" 0,"calt" 0!important;}
+</style>
+
+<script>
+(function(){
+  function cleanDots(root){
+    if(!root) return;
+    try{
+      var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+        acceptNode:function(n){
+          var p=n.parentNode;
+          if(!p) return NodeFilter.FILTER_REJECT;
+          var tag=p.tagName;
+          if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='INPUT') return NodeFilter.FILTER_REJECT;
+          return n.nodeValue && n.nodeValue.indexOf('`')!==-1 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes=[],n;
+      while(n=walker.nextNode()) nodes.push(n);
+      nodes.forEach(function(node){
+        node.nodeValue=node.nodeValue.replace(/`+/g,'');
+      });
+    }catch(e){}
+  }
+  function runInit(){
+    cleanDots(document.body);
+    try{
+      var observer=new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          if(m.type==='characterData'){
+            if(m.target.nodeValue && m.target.nodeValue.indexOf('`')!==-1){
+              var p=m.target.parentNode;
+              if(p && p.tagName!=='SCRIPT' && p.tagName!=='STYLE') m.target.nodeValue=m.target.nodeValue.replace(/`+/g,'');
+            }
+          }else if(m.addedNodes && m.addedNodes.length){
+            m.addedNodes.forEach(function(node){
+              if(node.nodeType===1) cleanDots(node);
+              else if(node.nodeType===3 && node.nodeValue && node.nodeValue.indexOf('`')!==-1){
+                var p=node.parentNode;
+                if(p && p.tagName!=='SCRIPT' && p.tagName!=='STYLE') node.nodeValue=node.nodeValue.replace(/`+/g,'');
+              }
+            });
+          }
+        });
+      });
+      observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',runInit);
+  }else{
+    runInit();
+  }
+})();
+</script>
 
 </body>
 </html>
