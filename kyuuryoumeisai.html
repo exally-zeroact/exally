@@ -143,19 +143,20 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .manual-switch-btn{width:100%;padding:11px;margin-bottom:8px;background:#FFF8EE;border:1.5px solid #F4D090;border-radius:var(--radius-md);font-size:13px;font-weight:700;color:#9A6000;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:opacity 0.15s;}
 .manual-restore-btn{width:100%;padding:11px;margin-bottom:8px;background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);font-size:13px;font-weight:700;color:var(--mint-dd);cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .manual-warn{background:#FFF8EE;border:1px solid #F4D090;border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.7;margin-bottom:10px;}
-@media(min-width:600px){.main{padding:20px 16px;}.drag-table{font-size:13px;}.drag-table td{padding:12px 10px;}.item-val{max-width:220px;}.dh{font-size:20px;}}
+@media(min-width:600px) and (max-width:768px){.main{padding:20px 16px;}.drag-table{font-size:13px;}.drag-table td{padding:12px 10px;}.item-val{max-width:220px;}.dh{font-size:20px;}}
 
 /* ===== ガイドパネル追加CSS ===== */
 body{padding-bottom:80px;}
-@media(min-width:769px){body{padding-bottom:0;}}
 
 /* layout */
 .layout-wrap{display:flex;flex-direction:column;}
 @media(min-width:769px){
-body{padding-bottom:0;overflow:hidden;height:100dvh;min-height:0;}
-.main{max-width:none;margin:0;padding:0;height:calc(100dvh - 49px);overflow:hidden;display:flex;flex-direction:column;}
+body{padding-bottom:0!important;overflow:hidden;height:100dvh;min-height:0;}
+.main{max-width:none!important;margin:0!important;padding:0!important;height:calc(100dvh - 49px);overflow:hidden;display:flex;flex-direction:column;}
 .layout-wrap{flex-direction:row;align-items:stretch;gap:0;flex:1;min-height:0;}
 .form-panel{flex:1;min-width:0;overflow-y:auto;padding:24px 32px 40px 32px;}
+.drag-table{font-size:13px;}
+.drag-table td{padding:12px 10px;}
 }
 
 /* スマホ上部sticky */
@@ -255,9 +256,9 @@ body{padding-bottom:0;overflow:hidden;height:100dvh;min-height:0;}
   <span class="header-title" id="cardTitle">給料明細（月給制）</span>
 </div>
 
-<!-- ===== 業種帯（常時表示） ===== -->
+<!-- ===== 業種帯（常時表示・ヘッダー直下にsticky） ===== -->
 
-<div id="gyoshuBar" style="display:flex;position:sticky;top:0;z-index:199;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:7px 16px;align-items:center;gap:12px;">
+<div id="gyoshuBar" style="display:flex;position:sticky;top:49px;z-index:198;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:7px 16px;align-items:center;gap:12px;">
   <span id="gyoshuBarLabel" style="font-size:12px;font-weight:700;color:#2E4038;">業種未選択</span>
   <button id="gyoshuChangeBtn" onclick="changeGyoshu()" style="background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">業種を選ぶ →</button>
 </div>
