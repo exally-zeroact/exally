@@ -45,7 +45,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:24px 0;height:100dvh;flex-shrink:0;}
 .sidebar-logo{padding:0 20px 28px;display:flex;align-items:baseline;gap:5px;text-decoration:none;}
 .sidebar-logo-en{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
-.sidebar-logo-ja{font-size:10px;color:#7A9A87;}
+.sidebar-logo-ja{font-size:10px;color:#4A6B5A;}
 .sidebar-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:4px;}
 .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#7A9A87;font-size:13px;font-weight:500;transition:all 0.18s;}
 .sidebar-item:hover{background:#F0FAF4;color:#2E4038;}
@@ -60,7 +60,7 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .mobile-header{background:#ffffff;border-bottom:1px solid #D4EDE1;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .mobile-header-logo{display:flex;align-items:baseline;gap:4px;text-decoration:none;}
 .mobile-logo-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;}
-.mobile-logo-ja{font-size:10px;color:#7A9A87;}
+.mobile-logo-ja{font-size:10px;color:#4A6B5A;}
 .mobile-header-right{display:flex;gap:6px;align-items:center;}
 .hbadge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .hbadge-warn{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
@@ -1643,88 +1643,82 @@ function showToast(msg,duration){
 })();
 </script>
 
-<!-- ===== デバッグv7：疑似要素特定版 ===== -->
+<!-- ===== 逆転発想：DOM内の見えない``` を強制除去 ===== -->
 
-<div id="__debug_panel__" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(229,57,53,0.95);color:#fff;font-size:11px;font-family:monospace;padding:8px 10px;max-height:60vh;overflow:auto;line-height:1.4;">DEBUG v7: 起動中</div>
+<style>
+/* フォントligature無効化（万一DM Monoレンダリング由来なら解決） */
+*{font-feature-settings:"liga" 0,"dlig" 0,"calt" 0,"clig" 0!important;font-variant-ligatures:none!important;-webkit-font-feature-settings:"liga" 0,"dlig" 0,"calt" 0!important;}
+</style>
 
-<script data-cfasync="false">
-var B = String.fromCharCode(96);
-var B3 = B+B+B;
-
-setTimeout(function(){
-  var hits = [];
-  var all = document.getElementsByTagName('*');
-  for (var i = 0; i < all.length; i++) {
-    var el = all[i];
-    var tag = el.tagName;
-    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
-    if (el.id === '__debug_panel__') continue;
-    var tc = el.textContent || '';
-    var it = el.innerText || '';
-    // innerTextに``` あるがtextContentには無い = 疑似要素由来
-    var inIT = it.indexOf(B3) !== -1;
-    var inTC = tc.indexOf(B3) !== -1;
-    if (inIT && !inTC) {
-      // この要素の ::before / ::after をチェック
-      var beforeContent = '';
-      var afterContent = '';
-      try {
-        var cs1 = window.getComputedStyle(el, '::before');
-        beforeContent = cs1.content || '';
-        var cs2 = window.getComputedStyle(el, '::after');
-        afterContent = cs2.content || '';
-      } catch(e) {}
-      hits.push({
-        tag: tag,
-        id: el.id || '',
-        cls: (el.className || '').toString().substring(0, 40),
-        before: beforeContent,
-        after: afterContent,
-        preview: el.outerHTML ? el.outerHTML.substring(0, 150) : ''
+<script>
+(function(){
+  // テキストノードから ``` を削除（ただしscript/style/code系は除外）
+  function cleanDots(root){
+    if(!root) return;
+    try{
+      var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+        acceptNode:function(n){
+          var p=n.parentNode;
+          if(!p) return NodeFilter.FILTER_REJECT;
+          var tag=p.tagName;
+          // script/style/textarea/input は触らない
+          if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='INPUT') return NodeFilter.FILTER_REJECT;
+          // formula-block/inline-code/tsv-block内は触らない（正式なコード表示）
+          var el=p;
+          while(el && el!==document.body){
+            if(el.classList && (el.classList.contains('formula-block')||el.classList.contains('inline-code')||el.classList.contains('tsv-block'))) return NodeFilter.FILTER_REJECT;
+            el=el.parentNode;
+          }
+          return n.nodeValue && n.nodeValue.indexOf('`')!==-1 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
       });
-      if (hits.length >= 10) break;
-    }
-  }
-  
-  var html = '<b>v7: 疑似要素由来 ' + hits.length + '件</b><br>';
-  if (hits.length === 0) {
-    html += '疑似要素由来なし。通常テキストノードを確認中...<br>';
-    // 通常テキストノード（textContentで見つかる）も出す
-    for (var j = 0; j < all.length && hits.length < 5; j++) {
-      var el2 = all[j];
-      if (el2.id === '__debug_panel__') continue;
-      var tc2 = el2.textContent || '';
-      if (tc2.indexOf(B3) === -1) continue;
-      // 子要素も同じものを持ってるなら親は除外（深い方だけ残す）
-      var hasChild = false;
-      for (var k = 0; k < el2.children.length; k++) {
-        if ((el2.children[k].textContent || '').indexOf(B3) !== -1) { hasChild = true; break; }
-      }
-      if (hasChild) continue;
-      hits.push({
-        tag: el2.tagName,
-        id: el2.id || '',
-        cls: (el2.className || '').toString().substring(0, 40),
-        preview: el2.outerHTML ? el2.outerHTML.substring(0, 200).split('<').join('&lt;').split('>').join('&gt;') : ''
+      var nodes=[],n;
+      while(n=walker.nextNode()) nodes.push(n);
+      nodes.forEach(function(node){
+        node.nodeValue=node.nodeValue.replace(/`+/g,'');
       });
-    }
-    html = '<b>v7: ' + hits.length + '件（textContent由来）</b><br>';
+    }catch(e){}
   }
-  
-  for (var m = 0; m < hits.length; m++) {
-    var h = hits[m];
-    html += '<div style="border-top:1px solid rgba(255,255,255,0.3);padding-top:3px;margin-top:3px;">';
-    html += '[' + m + '] ' + h.tag + (h.id ? '#' + h.id : '') + ' .' + h.cls + '<br>';
-    if (h.before) html += 'before:' + h.before + '<br>';
-    if (h.after) html += 'after:' + h.after + '<br>';
-    html += '<span style="color:#FFD;font-size:10px;">' + (h.preview || '').split(B).join('[BQ]') + '</span>';
-    html += '</div>';
+  // 初回実行（DOM読み込み後）
+  function runInit(){
+    cleanDots(document.body);
+    // MutationObserverで監視（動的に追加される要素にも対応）
+    try{
+      var observer=new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          if(m.type==='characterData'){
+            if(m.target.nodeValue && m.target.nodeValue.indexOf('`')!==-1){
+              var p=m.target.parentNode;
+              if(p && p.tagName!=='SCRIPT' && p.tagName!=='STYLE'){
+                var skip=false, el=p;
+                while(el && el!==document.body){
+                  if(el.classList && (el.classList.contains('formula-block')||el.classList.contains('inline-code')||el.classList.contains('tsv-block'))){skip=true;break;}
+                  el=el.parentNode;
+                }
+                if(!skip) m.target.nodeValue=m.target.nodeValue.replace(/`+/g,'');
+              }
+            }
+          }else if(m.addedNodes && m.addedNodes.length){
+            m.addedNodes.forEach(function(node){
+              if(node.nodeType===1) cleanDots(node);
+              else if(node.nodeType===3 && node.nodeValue && node.nodeValue.indexOf('`')!==-1){
+                var p=node.parentNode;
+                if(p && p.tagName!=='SCRIPT' && p.tagName!=='STYLE') node.nodeValue=node.nodeValue.replace(/`+/g,'');
+              }
+            });
+          }
+        });
+      });
+      observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
   }
-  document.getElementById('__debug_panel__').innerHTML = html;
-}, 1000);
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',runInit);
+  }else{
+    runInit();
+  }
+})();
 </script>
 
-</body>
-</html>
 </body>
 </html>
