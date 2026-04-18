@@ -2059,10 +2059,12 @@ function drawSel(){
   ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
   ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
   ctx.strokeRect(x1+1,y1+1,x2-x1-2,y2-y1-2);
-  ctx.fillStyle=C_SEL_BORDER;
-  ctx.beginPath(); ctx.arc(x2,y2,7,0,Math.PI*2); ctx.fill();
+  // フィルハンドル（Excel 互換・右下の小さい四角）
+  var FH=6; // 四角サイズ 6x6
   ctx.fillStyle='#fff';
-  ctx.beginPath(); ctx.arc(x2,y2,3.5,0,Math.PI*2); ctx.fill();
+  ctx.fillRect(x2-FH/2-1, y2-FH/2-1, FH+2, FH+2); // 白枠
+  ctx.fillStyle=C_SEL_BORDER;
+  ctx.fillRect(x2-FH/2, y2-FH/2, FH, FH); // 緑本体
   ctx.restore();
 }
 
