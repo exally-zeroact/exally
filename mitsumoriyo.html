@@ -441,6 +441,23 @@ body{padding-bottom:80px;}
 
 /* PC プレビューボタン */
 .gp-preview-btn{width:100%;padding:10px 6px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);white-space:nowrap;}
+
+/* Excelバージョン選択モーダル（home.htmlと共有） */
+.vm-ov{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.vm-ov.show{display:flex;}
+.vm-cd{background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.vm-hd{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.vm-tt{font-size:16px;font-weight:700;color:#1A4A2E;}
+.vm-cl{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.vm-bd{padding:14px 18px 18px;overflow-y:auto;min-height:0;}
+.vm-ht{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5;margin-bottom:12px;}
+.vm-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vm-op{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.vm-op:hover{border-color:#52B788;background:#F0FAF4;}
+.vm-op.current{border-color:#52B788;background:#F0FAF4;}
+.vm-op-ic{font-size:20px;margin-bottom:3px;}
+.vm-op-lb{font-size:11px;font-weight:700;color:#1A4A2E;}
+.vm-op.current .vm-op-lb{color:#3D9E72;}
 </style>
 </head>
 <body>
@@ -448,6 +465,14 @@ body{padding-bottom:80px;}
 <!-- ===== SVG symbol defs (book.htmlから流用) ===== -->
 <svg style="display:none;" aria-hidden="true">
   <defs>
+    <symbol id="grid-sm" viewBox="0 0 20 20">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
+      <rect x="2" y="2" width="16" height="5" rx="2" fill="#52B788"/>
+      <rect x="2" y="5" width="16" height="2" fill="#52B788"/>
+      <line x1="8" y1="7" x2="8" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="14" y1="7" x2="14" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="2" y1="12" x2="18" y2="12" stroke="#C8ECD8" stroke-width="1"/>
+    </symbol>
     <symbol id="template-sm" viewBox="0 0 20 20">
       <rect x="4" y="3" width="12" height="15" rx="1.5" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
       <rect x="7" y="2" width="6" height="3" rx="1" fill="#52B788"/>
@@ -521,10 +546,12 @@ body{padding-bottom:80px;}
     <nav class="book-header-nav" aria-label="他画面への移動">
       <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
       <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+      <a href="book.html" class="book-header-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
       <a href="chat.html?tab=template" class="book-header-nav-item active" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
       <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
       <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
       <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+      <button class="book-header-nav-item" onclick="openVerModal()" title="Excelバージョン">📊</button>
       <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
     </nav>
   </div>
@@ -907,6 +934,29 @@ body{padding-bottom:80px;}
 <div id="previewArea" style="display:none;max-width:600px;margin:0 auto 12px;padding:0 12px;"></div>
 
 <!-- トースト -->
+<!-- Excelバージョン選択モーダル（home.htmlと共有） -->
+<div class="vm-ov" id="verModal">
+  <div class="vm-cd">
+    <div class="vm-hd">
+      <div class="vm-tt">Excelバージョンを選んでね</div>
+      <button class="vm-cl" onclick="closeVerModal()">×</button>
+    </div>
+    <div class="vm-bd">
+      <div class="vm-ht">💡 後で変えられる・Excelなくても使える</div>
+      <div class="vm-gr">
+        <div class="vm-op" data-ver="excel_365" onclick="selectVer('excel_365')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 365</div></div>
+        <div class="vm-op" data-ver="excel_2024" onclick="selectVer('excel_2024')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 2024</div></div>
+        <div class="vm-op" data-ver="excel_2021" onclick="selectVer('excel_2021')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2021</div></div>
+        <div class="vm-op" data-ver="excel_2019" onclick="selectVer('excel_2019')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2019</div></div>
+        <div class="vm-op" data-ver="excel_2016" onclick="selectVer('excel_2016')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2016</div></div>
+        <div class="vm-op" data-ver="excel_mac" onclick="selectVer('excel_mac')"><div class="vm-op-ic">🍎</div><div class="vm-op-lb">Excel for Mac</div></div>
+        <div class="vm-op" data-ver="excel_online" onclick="selectVer('excel_online')"><div class="vm-op-ic">☁️</div><div class="vm-op-lb">Excel Online</div></div>
+        <div class="vm-op" data-ver="excel_none" onclick="selectVer('excel_none')"><div class="vm-op-ic">✨</div><div class="vm-op-lb">Excelなし</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <!-- Canvas（判子処理用） -->
 <canvas id="procCanvas" style="display:none;"></canvas>
@@ -918,9 +968,12 @@ body{padding-bottom:80px;}
 <!-- ===== スマホ下部アンダーバー ===== -->
 <nav class="mobile-bottombar" aria-label="下部ナビゲーション">
   <a href="home.html" class="mbb-item"><span class="mbb-item-icon">🏠</span><span class="mbb-item-label">ホーム</span></a>
-  <a href="chat.html" class="mbb-item"><span class="mbb-item-icon">🤖</span><span class="mbb-item-label">チャット</span></a>
+  <a href="chat.html" class="mbb-item"><span class="mbb-item-icon">🤖</span><span class="mbb-item-label">AI</span></a>
+  <a href="book.html" class="mbb-item"><span class="mbb-item-icon"><svg><use href="#grid-sm"/></svg></span><span class="mbb-item-label">ブック</span></a>
   <a href="chat.html?tab=template" class="mbb-item active"><span class="mbb-item-icon"><svg><use href="#template-sm"/></svg></span><span class="mbb-item-label">テンプレ</span></a>
+  <span class="mbb-item nav-disabled"><span class="mbb-item-icon"><svg><use href="#stamp-sm"/></svg></span><span class="mbb-item-label">ハンコ</span></span>
   <a href="chat.html?tab=book" class="mbb-item"><span class="mbb-item-icon"><svg><use href="#book-sm"/></svg></span><span class="mbb-item-label">数式帳</span></a>
+  <a href="chat.html?tab=quiz" class="mbb-item"><span class="mbb-item-icon">🎯</span><span class="mbb-item-label">クイズ</span></a>
   <a href="chat.html?tab=settings" class="mbb-item"><span class="mbb-item-icon">⚙️</span><span class="mbb-item-label">設定</span></a>
 </nav>
 
@@ -1781,5 +1834,37 @@ function closeGuideModal(){
   document.body.style.overflow = '';
 }
 </script>
+
+<script>
+// ===== Excelバージョン管理（home.htmlと共有：localStorageキー exally_excel_version） =====
+var VER_LABEL_MAP = {
+  excel_365:'365', excel_2024:'2024', excel_2021:'2021', excel_2019:'2019',
+  excel_2016:'2016', excel_mac:'Mac', excel_online:'Online', excel_none:'なし'
+};
+function getVerKey(){
+  try{ var v=localStorage.getItem('exally_excel_version'); return (typeof v==='string' && v.length>0) ? v : 'excel_365'; }
+  catch(e){ return 'excel_365'; }
+}
+function openVerModal(){
+  var current=getVerKey();
+  document.querySelectorAll('.vm-op').forEach(function(el){
+    el.classList.toggle('current', el.getAttribute('data-ver')===current);
+  });
+  document.getElementById('verModal').classList.add('show');
+}
+function closeVerModal(){
+  document.getElementById('verModal').classList.remove('show');
+}
+function selectVer(verKey){
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  closeVerModal();
+  if(typeof showToast === 'function') showToast('Excelバージョンを'+(VER_LABEL_MAP[verKey]||verKey)+'に変更したよ');
+}
+(function(){
+  var vm = document.getElementById('verModal');
+  if(vm) vm.addEventListener('click', function(e){ if(e.target===this) closeVerModal(); });
+})();
+</script>
+
 </body>
 </html>
