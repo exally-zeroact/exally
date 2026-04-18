@@ -1,8 +1,19 @@
 <!DOCTYPE html>
 
+<!-- 
+=============================================
+ Exally 給料明細テンプレート
+ Version: 2026.04.18-v3
+ Build Timestamp: 1776504994000
+=============================================
+-->
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>給料明細テンプレート | Exally</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
@@ -659,7 +670,7 @@ function renderSort(){
     if(item.cat!==lastCat){
       const trDiv=document.createElement('tr');
       trDiv.className='cat-divider'+(item.type==='pay'?' cat-pay':item.type==='deduct'?' cat-deduct':'');
-      const catLabel=item.type==='info'?'⏱ 勤怠':item.type==='pay'?'💰 支給':'🔻 控除';
+      const catLabel=item.type==='info'?'⏱ 勤怠':item.type==='pay'?'\ud83d\udcb0 支給':'🔻 控除';
       trDiv.innerHTML='<td colspan="4">'+catLabel+'</td>';
       tbody.appendChild(trDiv);
       lastCat=item.cat;
@@ -1496,7 +1507,7 @@ function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
 function copyTSVDirect(){
   if(!generatedTSV){ showToast('\u26a0\ufe0f 先にデータを生成してください'); return; }
   navigator.clipboard.writeText(generatedTSV).then(()=>{
-    showToast('📋 コピー完了');
+    showToast('\ud83d\udccb コピー完了');
   });
 }
 
@@ -1508,7 +1519,7 @@ function openAIChat(){
 
 function copyPrompt(){
   navigator.clipboard.writeText(generatedTSV)
-    .then(()=>showToast('📋 コピーしました'));
+    .then(()=>showToast('\ud83d\udccb コピーしました'));
 }
 
 // ===== Excelプレビュー生成 =====
@@ -1555,7 +1566,7 @@ function renderExcelPreview(){
         </div>
         <table style="width:100%;border-collapse:collapse;">
           ${infoRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">⏱ 勤怠</td></tr>${infoRows}`:''}
-          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">💰 支給</td></tr>
+          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">\ud83d\udcb0 支給</td></tr>
           ${payRows}
           ${dedRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#C62828;background:#FFF5F5;border-bottom:1px solid #FFCDD2;">🔻 控除</td></tr>${dedRows}`:''}
           <tr style="background:#F8FEFC;">
@@ -1606,7 +1617,7 @@ function renderExcelPreview(){
         <!-- 支給・控除2カラム -->
         <div style="display:grid;grid-template-columns:1fr 1fr;">
           <div style="padding:5px 8px;border-right:1px solid #E0EDE6;">
-            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div>
+            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">\ud83d\udcb0 支給</div>
             ${payRows}
           </div>
           <div style="padding:5px 8px;">
@@ -1666,7 +1677,7 @@ function renderExcelPreview(){
   el.innerHTML=`
     <div style="background:#F8FEFC;border:1.5px solid #C8ECD8;border-radius:12px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;color:#3D9E72;letter-spacing:1px;">📊 完成イメージ（${paperLabel}）</div>
+        <div style="font-size:11px;font-weight:700;color:#3D9E72;letter-spacing:1px;">\ud83d\udcca 完成イメージ（${paperLabel}）</div>
         <div style="font-size:9px;color:#B0C4BA;">※完成イメージです</div>
       </div>
       ${sheetsHTML}
@@ -2301,7 +2312,7 @@ setTimeout(function(){ pw.print(); }, 1200);
 
 // 印刷する
 function printPayslip(){ openPrintWindow(true); }
-function downloadPDF(){ showToast(‘📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’); openPrintWindow(true); }
+function downloadPDF(){ showToast(’\ud83d\udcc4 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’); openPrintWindow(true); }
 
 // Excelでダウンロード（SheetJS）
 function downloadExcel(){
@@ -2375,7 +2386,7 @@ XLSX.utils.book_append_sheet(wb, ws, ‘賃金台帳’);
 
 var fname = ‘賃金台帳_’+name+’_’+ym+’.xlsx’;
 XLSX.writeFile(wb, fname);
-showToast(‘📋 ‘+fname+’ をダウンロードしました。同じフォルダに毎月保存してね。’);
+showToast(’\ud83d\udccb ‘+fname+’ をダウンロードしました。同じフォルダに毎月保存してね。’);
 }
 
 </script>
