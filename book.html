@@ -2245,8 +2245,46 @@ function detectDatePattern(values){
   return null;
 }
 
+// ===== 曜日・順序シーケンス パターン検出 =====
+// 対応シーケンス：日本語曜日短/長・英語曜日短/長・月（日本語・英語短/長）
+var FILL_SEQS=[
+  {list:['日','月','火','水','木','金','土'], name:'wdJPshort'},
+  {list:['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'], name:'wdJPlong'},
+  {list:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], name:'wdENshort'},
+  {list:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], name:'wdENlong'}
+];
+// 値配列がどのシーケンスに属するか判定し、等差かチェック
+function detectSequencePattern(values){
+  if(!values||values.length===0) return null;
+  // 単一セル → コピー扱いなので null
+  if(values.length<2) return null;
+  for(var si=0;si<FILL_SEQS.length;si++){
+    var seq=FILL_SEQS[si], L=seq.list.length;
+    var idxs=[];
+    var allIn=true;
+    for(var vi=0;vi<values.length;vi++){
+      var p=seq.list.indexOf(values[vi]);
+      if(p<0){ allIn=false; break; }
+      idxs.push(p);
+    }
+    if(!allIn) continue;
+    // 等差チェック（mod L で比較：Sat→Sun は step +1）
+    var step=((idxs[1]-idxs[0])%L+L)%L;
+    // step=0 は単純コピー扱いで検出しない
+    if(step===0) continue;
+    var ok=true;
+    for(var j=2;j<idxs.length;j++){
+      var d=((idxs[j]-idxs[j-1])%L+L)%L;
+      if(d!==step){ ok=false; break; }
+    }
+    if(!ok) continue;
+    return {seq:seq, idxs:idxs, step:step, length:L};
+  }
+  return null;
+}
+
 // ソース値を基に count 個の値を生成
-// 優先順：① 日付パターン → ② 数値パターン → ③ 循環コピー
+// 優先順：① 日付パターン → ② 曜日/順序 → ③ 数値パターン → ④ 循環コピー
 function generateFillValues(sourceVals, count){
   // ① 日付パターン
   var dp=detectDatePattern(sourceVals);
@@ -2266,19 +2304,30 @@ function generateFillValues(sourceVals, count){
     }
     return dOut;
   }
-  // ② 数値パターン
+  // ② 曜日・順序シーケンス
+  var sp=detectSequencePattern(sourceVals);
+  if(sp){
+    var sOut=[];
+    var lastIdx=sp.idxs[sp.idxs.length-1];
+    for(var ii=0;ii<count;ii++){
+      lastIdx=(lastIdx+sp.step)%sp.length;
+      sOut.push(sp.seq.list[lastIdx]);
+    }
+    return sOut;
+  }
+  // ③ 数値パターン
   var pat=detectNumericPattern(sourceVals);
   var out=[];
   if(pat){
     var lastN=pat.nums[pat.nums.length-1];
-    for(var ii=0;ii<count;ii++){
+    for(var iii=0;iii<count;iii++){
       lastN+=pat.step;
       // 小数誤差を丸める（15桁丸め）
       lastN=Math.round(lastN*1e12)/1e12;
       out.push(String(lastN));
     }
   } else {
-    // ③ 循環コピー
+    // ④ 循環コピー
     for(var k=0;k<count;k++){
       out.push(sourceVals[k%sourceVals.length]);
     }
@@ -3721,9 +3770,18 @@ function onKD(e){
   if(e.key==='Tab'&&!e.shiftKey){moveSel(0,1);moved=true;}
   if(e.key==='Tab'&&e.shiftKey){moveSel(0,-1);moved=true;}
   if(moved) e.preventDefault();
-  if(ek.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
+  // IME入力中: 独自判定でstartEditして入力欄にfocus移譲
+  // (ek.length===1 判定より前に置く。'Process' などは length>1 で来るため)
+  if(e.isComposing || e.keyCode===229 || e.key==='Process'){
     e.preventDefault();
-    startEdit(selR1,selC1,e.key);
+    startEdit(selR1,selC1,'');
+    // 次のkeydownは cell-input にfocusされた状態で来るのでIMEが正常動作
+    return;
+  }
+  if(ek.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
+    // 通常文字キー: preventDefault せずに空で編集開始し、キー入力を cell-input に委譲
+    // これにより半角英数もIMEも同じ流れで動作
+    startEdit(selR1,selC1,'');
   }
 }
 
