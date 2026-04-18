@@ -21,14 +21,15 @@ body {
   width:100%; top:0; left:0;
 }
 #header {
-  background:#3D9E72;
-  color:#fff;
-  height:36px;
-  padding:0 12px;
+  background:#ffffff;
+  color:#2E4038;
+  height:52px;
+  padding:0 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   flex-shrink:0;
+  border-bottom:1px solid #D4EDE1;
 }
 .header-btns { display:flex; gap:6px; }
 .hbtn {
@@ -2186,13 +2187,12 @@ function drawSel(){
 </div>
 
 <div id="header">
-  <div style="display:flex;align-items:center;gap:6px;flex:1;">
-    <span style="font-size:16px;">⚡</span>
-    <span style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#fff;letter-spacing:-0.5px;">Exally</span>
-    <span style="font-size:10px;color:#4A6B5A;background:#fff;padding:2px 6px;border-radius:8px;">エクサリー</span>
+  <div style="display:flex;align-items:baseline;gap:5px;flex:1;">
+    <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;">Exally</span>
+    <span style="font-size:10px;color:#4A6B5A;">エクサリー</span>
   </div>
   <div style="display:flex;align-items:center;gap:6px;">
-    <button onclick="openBookVerModal()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:12px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
+    <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
   </div>
 </div>
 
