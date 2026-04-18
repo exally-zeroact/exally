@@ -1643,116 +1643,109 @@ function showToast(msg,duration){
 })();
 </script>
 
-<!-- ===== デバッグv3：Cloudflare注入耐性版 ===== -->
+<!-- ===== デバッグv4：Cloudflare Email Obfuscation 回避版 ===== -->
 
-<div id="__debug_panel__" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(229,57,53,0.95);color:#fff;font-size:11px;font-family:monospace;padding:6px 10px;max-height:40vh;overflow:auto;line-height:1.4;">DEBUG v3: 起動中...</div>
-<script>
+<div id="__debug_panel__" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(229,57,53,0.95);color:#fff;font-size:11px;font-family:monospace;padding:6px 10px;max-height:40vh;overflow:auto;line-height:1.4;">DEBUG v4: 起動中...</div>
+<!--email_off-->
+<script data-cfasync="false">
 (function(){
-  // バッククォートを動的生成（文字コード96 = バッククォート）
   var BQ = String.fromCharCode(96);
   var BQ3 = BQ + BQ + BQ;
 
 function getPath(el){
-var chain = [];
-var depth = 0;
-while(el && el !== document.body && depth < 10){
-var desc = el.tagName;
-if(el.id) desc = desc + ‘#’ + el.id;
-if(el.className && typeof el.className === ‘string’){
-desc = desc + ‘.’ + el.className.split(’ ‘).slice(0,2).join(’.’);
-}
-chain.push(desc);
+var parts = [];
+var d = 0;
+while(el && el !== document.body && d < 10){
+var s = el.tagName;
+if(el.id) s = s + ‘#’ + el.id;
+parts.push(s);
 el = el.parentNode;
-depth = depth + 1;
+d = d + 1;
 }
-return chain.reverse().join(’ > ’);
+return parts.reverse().join(’ > ’);
 }
 
-function findBackticks(){
-var results = [];
+function find(){
+var out = [];
 try{
-var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
-var n;
-while(n = walker.nextNode()){
-var p = n.parentNode;
-if(!p) continue;
-var tag = p.tagName;
+var all = document.body.getElementsByTagName(’*’);
+var L = all.length;
+var i, el, tag, j, n, val, rect, range;
+for(i = 0; i < L; i++){
+el = all[i];
+tag = el.tagName;
 if(tag === ‘SCRIPT’) continue;
 if(tag === ‘STYLE’) continue;
 if(tag === ‘NOSCRIPT’) continue;
-// デバッグパネル内除外
-var el = p;
-var inPanel = false;
-while(el && el !== document.body){
-if(el.id === ‘**debug_panel**’){ inPanel = true; break; }
-el = el.parentNode;
+if(el.id === ‘**debug_panel**’) continue;
+var skipPanel = false;
+var parent = el.parentNode;
+while(parent && parent !== document.body){
+if(parent.id === ‘**debug_panel**’){ skipPanel = true; break; }
+parent = parent.parentNode;
 }
-if(inPanel) continue;
-// バッククォート3連続を検索
-if(n.nodeValue && n.nodeValue.indexOf(BQ3) !== -1){
-var rect = null;
+if(skipPanel) continue;
+for(j = 0; j < el.childNodes.length; j++){
+n = el.childNodes[j];
+if(n.nodeType !== 3) continue;
+val = n.nodeValue;
+if(!val) continue;
+if(val.indexOf(BQ3) === -1) continue;
+rect = null;
 try{
-var range = document.createRange();
+range = document.createRange();
 range.selectNode(n);
 rect = range.getBoundingClientRect();
 }catch(e){}
-var styleInfo = ‘’;
-try{
-var cs = window.getComputedStyle(n.parentNode);
-styleInfo = ‘ff:’ + (cs.fontFamily || ‘’).substring(0,25) + ’ size:’ + cs.fontSize;
-}catch(e){}
-results.push({
-text: n.nodeValue.replace(/\n/g, ‘\n’).substring(0, 80),
-chain: getPath(n.parentNode),
-rect: rect ? {x:Math.round(rect.left), y:Math.round(rect.top), w:Math.round(rect.width), h:Math.round(rect.height)} : null,
-style: styleInfo
+out.push({
+t: val.substring(0, 60),
+p: getPath(el),
+r: rect ? (Math.round(rect.left) + ‘,’ + Math.round(rect.top) + ’ ’ + Math.round(rect.width) + ‘x’ + Math.round(rect.height)) : ‘none’
 });
 }
 }
 }catch(e){
-return [{error: e.message}];
+return [{err: e.message}];
 }
-return results;
+return out;
 }
 
-function updateDebugPanel(){
+function update(){
 var panel = document.getElementById(’**debug_panel**’);
 if(!panel) return;
 try{
-var results = findBackticks();
-var html = ‘<div style="font-weight:bold;font-size:13px;margin-bottom:4px;">DEBUG v3: [BQ3] ’ + results.length + ’ 箇所</div>’;
-if(results.length === 0){
-html = html + ‘<div>検出なし（この画面ではOK）</div>’;
+var res = find();
+var h = ‘<div style="font-weight:bold;font-size:13px;margin-bottom:4px;">DEBUG v4: [BQ3] ’ + res.length + ‘</div>’;
+if(res.length === 0){
+h = h + ‘<div>None detected</div>’;
 }else{
-var i;
-for(i = 0; i < results.length; i++){
-var r = results[i];
-if(r.error){
-html = html + ‘<div>ERROR: ’ + r.error + ‘</div>’;
-continue;
-}
-var pos = r.rect ? (’@(’ + r.rect.x + ‘,’ + r.rect.y + ’) ’ + r.rect.w + ‘x’ + r.rect.h) : ‘(no rect)’;
-var txt = r.text.replace(new RegExp(BQ, ‘g’), ‘[BQ]’).replace(/</g, ‘<’).replace(/>/g, ‘>’);
-html = html + ‘<div style="border-top:1px solid rgba(255,255,255,0.3);padding-top:4px;margin-top:4px;">’;
-html = html + ‘<div>[’ + (i+1) + ’] ’ + pos + ‘</div>’;
-html = html + ‘<div style="color:#FFD;">text: “’ + txt + ‘”</div>’;
-html = html + ’<div style="color:#FFD;font-size:10px;">path: ’ + r.chain + ‘</div>’;
-html = html + ’<div style="color:#CCF;font-size:10px;">style: ’ + r.style + ‘</div>’;
-html = html + ‘</div>’;
+var k;
+for(k = 0; k < res.length; k++){
+var r = res[k];
+if(r.err){ h = h + ‘<div>ERR: ’ + r.err + ‘</div>’; continue; }
+var txt = r.t.split(BQ).join(’[BQ]’);
+txt = txt.split(’<’).join(’<’).split(’>’).join(’>’);
+h = h + ‘<div style="border-top:1px solid rgba(255,255,255,0.3);padding-top:3px;margin-top:3px;">’;
+h = h + ‘<div>[’ + (k+1) + ‘] @’ + r.r + ‘</div>’;
+h = h + ‘<div style="color:#FFD;">”’ + txt + ‘”</div>’;
+h = h + ‘<div style="color:#CCF;font-size:10px;">’ + r.p + ‘</div>’;
+h = h + ‘</div>’;
 }
 }
-panel.innerHTML = html;
+panel.innerHTML = h;
 }catch(e){
-panel.innerHTML = ’<div>FATAL ERROR: ’ + e.message + ‘</div>’;
+panel.innerHTML = ’FATAL: ’ + e.message;
 }
 }
 
-setTimeout(updateDebugPanel, 500);
-setTimeout(updateDebugPanel, 1500);
-setTimeout(updateDebugPanel, 3000);
-setInterval(updateDebugPanel, 3000);
+setTimeout(update, 500);
+setTimeout(update, 1500);
+setTimeout(update, 3000);
+setInterval(update, 3000);
 })();
 </script>
+
+<!--/email_off-->
 
 </body>
 </html>
