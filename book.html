@@ -835,6 +835,41 @@ touch-action:manipulation;
 .fkb-del { background:#FFF0F0; color:#E53935; max-width:48px; }
 .fkb-cancel { flex:2; max-width:120px; background:#FFF0F0; color:#E53935; font-size:13px; }
 .fkb-commit { flex:2; max-width:120px; background:#52B788; color:#fff; font-size:13px; font-weight:600; }
+
+/* セル書式設定モーダル */
+.fmtmd-ov{position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.fmtmd-ov.show{display:flex;}
+.fmtmd-cd{background:#fff;border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;}
+.fmtmd-hd{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.fmtmd-tt{font-size:15px;font-weight:700;color:#1A4A2E;}
+.fmtmd-cl{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.fmtmd-tabs{display:flex;border-bottom:1px solid #D4EDE1;background:#F8FEFC;}
+.fmtmd-tab{flex:1;padding:10px 6px;font-size:12px;font-weight:600;color:#7A9A87;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
+.fmtmd-tab.active{color:#3D9E72;border-bottom-color:#3D9E72;background:#fff;}
+.fmtmd-tab:disabled{color:#C0CEC7;cursor:not-allowed;}
+.fmtmd-bd{padding:14px 18px;overflow-y:auto;flex:1;min-height:0;display:flex;gap:12px;}
+.fmtmd-cat{flex:0 0 130px;border:1px solid #D4EDE1;border-radius:8px;overflow:hidden;max-height:340px;overflow-y:auto;}
+.fmtmd-cat-it{padding:8px 10px;font-size:12px;color:#1A4A2E;cursor:pointer;border-bottom:1px solid #F0FAF4;}
+.fmtmd-cat-it:last-child{border-bottom:none;}
+.fmtmd-cat-it:hover{background:#F0FAF4;}
+.fmtmd-cat-it.active{background:#52B788;color:#fff;font-weight:600;}
+.fmtmd-cat-it.disabled{color:#B0C5B9;cursor:not-allowed;}
+.fmtmd-right{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;}
+.fmtmd-pv-lb{font-size:11px;color:#7A9A87;}
+.fmtmd-pv{padding:10px 12px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:14px;color:#1A4A2E;min-height:40px;display:flex;align-items:center;}
+.fmtmd-types-lb{font-size:11px;color:#7A9A87;margin-top:4px;}
+.fmtmd-types{border:1px solid #D4EDE1;border-radius:8px;max-height:200px;overflow-y:auto;}
+.fmtmd-type{padding:7px 10px;font-size:12px;color:#1A4A2E;cursor:pointer;border-bottom:1px solid #F0FAF4;}
+.fmtmd-type:last-child{border-bottom:none;}
+.fmtmd-type:hover{background:#F0FAF4;}
+.fmtmd-type.active{background:#52B788;color:#fff;font-weight:600;}
+.fmtmd-ft{padding:12px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;background:#F8FEFC;}
+.fmtmd-btn{padding:8px 18px;border-radius:8px;border:1px solid #D4EDE1;background:#fff;color:#1A4A2E;font-size:13px;font-weight:600;cursor:pointer;}
+.fmtmd-btn-pr{background:#52B788;color:#fff;border-color:#52B788;}
+@media(max-width:600px){
+  .fmtmd-bd{flex-direction:column;}
+  .fmtmd-cat{flex:none;max-height:130px;}
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/hyperformula@2.6.1/dist/hyperformula.full.min.js"></script>
@@ -1646,6 +1681,32 @@ function updateFormatBar(cell) {
 
 // 数値フォーマット適用
 function applyNumFmt(val, fmt) {
+  // 日付書式判定（小文字 y/m/d ベース）
+  var dateFmts=['m/d','mm/dd','yyyy/m/d','yyyy/mm/dd','yyyy-m-d','yyyy-mm-dd','yyyy年m月d日','yyyy年mm月dd日','m月d日','m月d日(aaa)'];
+  if(dateFmts.indexOf(fmt)>=0){
+    // val が日付文字列かチェック
+    var pd = (typeof parseDate==='function') ? parseDate(val) : null;
+    if(pd){
+      var mo=pd.m, d=pd.d, y=pd.y;
+      var mm=mo<10?'0'+mo:''+mo;
+      var dd=d<10?'0'+d:''+d;
+      var wdayJP=['日','月','火','水','木','金','土'];
+      var w=wdayJP[new Date(y,mo-1,d).getDay()];
+      switch(fmt){
+        case 'm/d':           return mo+'/'+d;
+        case 'mm/dd':         return mm+'/'+dd;
+        case 'yyyy/m/d':      return y+'/'+mo+'/'+d;
+        case 'yyyy/mm/dd':    return y+'/'+mm+'/'+dd;
+        case 'yyyy-m-d':      return y+'-'+mo+'-'+d;
+        case 'yyyy-mm-dd':    return y+'-'+mm+'-'+dd;
+        case 'yyyy年m月d日':  return y+'年'+mo+'月'+d+'日';
+        case 'yyyy年mm月dd日':return y+'年'+mm+'月'+dd+'日';
+        case 'm月d日':        return mo+'月'+d+'日';
+        case 'm月d日(aaa)':   return mo+'月'+d+'日('+w+')';
+      }
+    }
+    return val;
+  }
   var n = parseFloat(val);
   if(isNaN(n)) return val;
   if(fmt==='#,##0')    return Math.round(n).toLocaleString('ja-JP');
@@ -2382,6 +2443,46 @@ function generateFillValues(sourceVals, count){
 
 <!-- Excelバージョン選択モーダル（book.html用） -->
 
+<!-- セル書式設定モーダル -->
+<div class="fmtmd-ov" id="fmtModal">
+  <div class="fmtmd-cd">
+    <div class="fmtmd-hd">
+      <div class="fmtmd-tt">セルの書式設定</div>
+      <button class="fmtmd-cl" onclick="closeFmtModal()">×</button>
+    </div>
+    <div class="fmtmd-tabs">
+      <button class="fmtmd-tab active" data-tab="number">表示形式</button>
+      <button class="fmtmd-tab" disabled>フォント</button>
+      <button class="fmtmd-tab" disabled>罫線</button>
+      <button class="fmtmd-tab" disabled>配置</button>
+      <button class="fmtmd-tab" disabled>塗りつぶし</button>
+    </div>
+    <div class="fmtmd-bd">
+      <div class="fmtmd-cat" id="fmtModalCat">
+        <div class="fmtmd-cat-it disabled" data-cat="general">標準</div>
+        <div class="fmtmd-cat-it disabled" data-cat="number">数値</div>
+        <div class="fmtmd-cat-it disabled" data-cat="currency">通貨</div>
+        <div class="fmtmd-cat-it active" data-cat="date">日付</div>
+        <div class="fmtmd-cat-it disabled" data-cat="time">時刻</div>
+        <div class="fmtmd-cat-it disabled" data-cat="percent">パーセンテージ</div>
+        <div class="fmtmd-cat-it disabled" data-cat="text">文字列</div>
+      </div>
+      <div class="fmtmd-right">
+        <div class="fmtmd-pv-lb">プレビュー</div>
+        <div class="fmtmd-pv" id="fmtModalPreview">—</div>
+        <div class="fmtmd-types-lb">種類</div>
+        <div class="fmtmd-types" id="fmtModalTypes">
+          <!-- JSで動的に生成 -->
+        </div>
+      </div>
+    </div>
+    <div class="fmtmd-ft">
+      <button class="fmtmd-btn" onclick="closeFmtModal()">キャンセル</button>
+      <button class="fmtmd-btn fmtmd-btn-pr" onclick="applyFmtModal()">OK</button>
+    </div>
+  </div>
+</div>
+
 <div id="bookVerOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;">
@@ -2578,6 +2679,9 @@ window.addEventListener('load',updateBookVerBadge);
   <button class="fmt-btn" onclick="applyFormat('numFmt','#,##0')" title="桁区切り">,</button>
   <button class="fmt-btn" onclick="toggleDecimal()"               title="小数点増減">.0</button>
   <button class="fmt-btn" onclick="applyFormat('numFmt','¥#,##0')" title="通貨(¥)">¥</button>
+  <div class="fmt-sep"></div>
+  <!-- セル書式設定モーダル起動 -->
+  <button class="fmt-btn" onclick="openFmtModal()" title="セルの書式設定" style="font-size:14px;">📝</button>
   <div class="fmt-sep"></div>
   <!-- 2段目展開ボタン -->
   <button class="fmt-btn" id="fmt-toggle" onclick="toggleFmtBar2()" title="その他書式">▼</button>
@@ -3962,6 +4066,75 @@ function toggleFmtBar2() {
   var open = bar2.classList.toggle('open');
   if(btn) btn.textContent = open ? '▲' : '▼';
 }
+
+// ===== セル書式設定モーダル =====
+var FMT_DATE_TYPES=[
+  {fmt:'m/d',           label:'4/18'},
+  {fmt:'mm/dd',         label:'04/18'},
+  {fmt:'yyyy/m/d',      label:'2026/4/18'},
+  {fmt:'yyyy/mm/dd',    label:'2026/04/18'},
+  {fmt:'yyyy-m-d',      label:'2026-4-18'},
+  {fmt:'yyyy-mm-dd',    label:'2026-04-18'},
+  {fmt:'yyyy年m月d日',  label:'2026年4月18日'},
+  {fmt:'yyyy年mm月dd日',label:'2026年04月18日'},
+  {fmt:'m月d日',        label:'4月18日'},
+  {fmt:'m月d日(aaa)',   label:'4月18日(土)'}
+];
+var _fmtModalSelectedFmt=null;
+
+function openFmtModal(){
+  var cell=getCell(selR1,selC1);
+  var currentFmt=cell.numFmt||'';
+  // 種類リストを構築
+  var wrap=document.getElementById('fmtModalTypes');
+  wrap.innerHTML='';
+  for(var i=0;i<FMT_DATE_TYPES.length;i++){
+    var t=FMT_DATE_TYPES[i];
+    var div=document.createElement('div');
+    div.className='fmtmd-type'+(currentFmt===t.fmt?' active':'');
+    div.textContent=t.label+' ['+t.fmt+']';
+    div.setAttribute('data-fmt',t.fmt);
+    div.onclick=(function(fmt){return function(){
+      _fmtModalSelectedFmt=fmt;
+      document.querySelectorAll('#fmtModalTypes .fmtmd-type').forEach(function(el){el.classList.remove('active');});
+      this.classList.add('active');
+      updateFmtModalPreview();
+    };})(t.fmt);
+    wrap.appendChild(div);
+  }
+  _fmtModalSelectedFmt=currentFmt||FMT_DATE_TYPES[0].fmt;
+  updateFmtModalPreview();
+  document.getElementById('fmtModal').classList.add('show');
+}
+function updateFmtModalPreview(){
+  var pv=document.getElementById('fmtModalPreview');
+  var cell=getCell(selR1,selC1);
+  var raw=(cell.d!==undefined&&cell.d!=='')?cell.d:cell.v;
+  if(!raw){ pv.textContent='(空セル)'; pv.style.color='#7A9A87'; return; }
+  pv.style.color='#1A4A2E';
+  var formatted=applyNumFmt(raw, _fmtModalSelectedFmt);
+  if(formatted===raw){
+    // 日付パース失敗時
+    pv.textContent=raw+' (日付として認識されません)';
+    pv.style.color='#E53935';
+  } else {
+    pv.textContent=formatted;
+  }
+}
+function closeFmtModal(){
+  document.getElementById('fmtModal').classList.remove('show');
+}
+function applyFmtModal(){
+  if(_fmtModalSelectedFmt){
+    applyFormat('numFmt', _fmtModalSelectedFmt);
+  }
+  closeFmtModal();
+}
+// 背景クリックで閉じる
+(function(){
+  var ov=document.getElementById('fmtModal');
+  if(ov) ov.addEventListener('click', function(e){ if(e.target===this) closeFmtModal(); });
+})();
 
 // 小数点桁数増減
 function toggleDecimal() {
