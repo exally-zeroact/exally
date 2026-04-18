@@ -2281,10 +2281,10 @@ function openPrintWindow(autoPrint) {
     return;
   }
   pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
-  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
+  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght'+'@'+'400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
   pw.document.write('<style>');
   pw.document.write('*{box-sizing:border-box;margin:0;padding:0;}');
-  pw.document.write('@page{size:A4 portrait;margin:6mm;}');
+  pw.document.write('\x40page{size:A4 portrait;margin:6mm;}');
   pw.document.write('html,body{width:210mm;height:297mm;overflow:hidden;font-family:"Noto Sans JP",sans-serif;background:#fff;}');
   pw.document.write('body>div{width:100%;height:100%;display:flex;align-items:flex-start;}');
   pw.document.write('</style>');
