@@ -2300,15 +2300,8 @@ setTimeout(function(){ pw.print(); }, 1200);
 }
 
 // 印刷する
-function printPayslip(){
-openPrintWindow(true);
-}
-
-// PDFで保存（印刷ダイアログ経由）
-function downloadPDF(){
-showToast(‘📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’);
-openPrintWindow(true);
-}
+function printPayslip(){ openPrintWindow(true); }
+function downloadPDF(){ showToast(‘📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’); openPrintWindow(true); }
 
 // Excelでダウンロード（SheetJS）
 function downloadExcel(){
