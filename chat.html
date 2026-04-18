@@ -1643,25 +1643,85 @@ function showToast(msg,duration){
 })();
 </script>
 
-<!-- ===== デバッグv6：バッククォートの文脈表示 ===== -->
+<!-- ===== デバッグv7：疑似要素特定版 ===== -->
 
-<div id="__debug_panel__" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(229,57,53,0.95);color:#fff;font-size:11px;font-family:monospace;padding:8px 10px;max-height:50vh;overflow:auto;line-height:1.4;">DEBUG v6: 起動中</div>
+<div id="__debug_panel__" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(229,57,53,0.95);color:#fff;font-size:11px;font-family:monospace;padding:8px 10px;max-height:60vh;overflow:auto;line-height:1.4;">DEBUG v7: 起動中</div>
 
 <script data-cfasync="false">
 var B = String.fromCharCode(96);
 var B3 = B+B+B;
-var t = document.body.innerText;
-var results = [];
-var i = t.indexOf(B3);
-while (i !== -1 && results.length < 20) {
-  var before = t.substring(Math.max(0, i-40), i).replace(/\n/g, '|');
-  var after = t.substring(i+3, i+40).replace(/\n/g, '|');
-  results.push('【' + results.length + '】before="' + before + '" / after="' + after + '"');
-  i = t.indexOf(B3, i+1);
-}
-var html = '<b>v6: ' + results.length + '箇所の[BQ3]</b><br>';
-html += results.join('<br>');
-document.getElementById('__debug_panel__').innerHTML = html;
+
+setTimeout(function(){
+  var hits = [];
+  var all = document.getElementsByTagName('*');
+  for (var i = 0; i < all.length; i++) {
+    var el = all[i];
+    var tag = el.tagName;
+    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+    if (el.id === '__debug_panel__') continue;
+    var tc = el.textContent || '';
+    var it = el.innerText || '';
+    // innerTextに``` あるがtextContentには無い = 疑似要素由来
+    var inIT = it.indexOf(B3) !== -1;
+    var inTC = tc.indexOf(B3) !== -1;
+    if (inIT && !inTC) {
+      // この要素の ::before / ::after をチェック
+      var beforeContent = '';
+      var afterContent = '';
+      try {
+        var cs1 = window.getComputedStyle(el, '::before');
+        beforeContent = cs1.content || '';
+        var cs2 = window.getComputedStyle(el, '::after');
+        afterContent = cs2.content || '';
+      } catch(e) {}
+      hits.push({
+        tag: tag,
+        id: el.id || '',
+        cls: (el.className || '').toString().substring(0, 40),
+        before: beforeContent,
+        after: afterContent,
+        preview: el.outerHTML ? el.outerHTML.substring(0, 150) : ''
+      });
+      if (hits.length >= 10) break;
+    }
+  }
+  
+  var html = '<b>v7: 疑似要素由来 ' + hits.length + '件</b><br>';
+  if (hits.length === 0) {
+    html += '疑似要素由来なし。通常テキストノードを確認中...<br>';
+    // 通常テキストノード（textContentで見つかる）も出す
+    for (var j = 0; j < all.length && hits.length < 5; j++) {
+      var el2 = all[j];
+      if (el2.id === '__debug_panel__') continue;
+      var tc2 = el2.textContent || '';
+      if (tc2.indexOf(B3) === -1) continue;
+      // 子要素も同じものを持ってるなら親は除外（深い方だけ残す）
+      var hasChild = false;
+      for (var k = 0; k < el2.children.length; k++) {
+        if ((el2.children[k].textContent || '').indexOf(B3) !== -1) { hasChild = true; break; }
+      }
+      if (hasChild) continue;
+      hits.push({
+        tag: el2.tagName,
+        id: el2.id || '',
+        cls: (el2.className || '').toString().substring(0, 40),
+        preview: el2.outerHTML ? el2.outerHTML.substring(0, 200).split('<').join('&lt;').split('>').join('&gt;') : ''
+      });
+    }
+    html = '<b>v7: ' + hits.length + '件（textContent由来）</b><br>';
+  }
+  
+  for (var m = 0; m < hits.length; m++) {
+    var h = hits[m];
+    html += '<div style="border-top:1px solid rgba(255,255,255,0.3);padding-top:3px;margin-top:3px;">';
+    html += '[' + m + '] ' + h.tag + (h.id ? '#' + h.id : '') + ' .' + h.cls + '<br>';
+    if (h.before) html += 'before:' + h.before + '<br>';
+    if (h.after) html += 'after:' + h.after + '<br>';
+    html += '<span style="color:#FFD;font-size:10px;">' + (h.preview || '').split(B).join('[BQ]') + '</span>';
+    html += '</div>';
+  }
+  document.getElementById('__debug_panel__').innerHTML = html;
+}, 1000);
 </script>
 
 </body>
