@@ -278,12 +278,25 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#3D9E72;color:white;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;z-index:999;opacity:0;transition:all 0.3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(min-width:769px){.toast{bottom:30px;}}
-.tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:300;flex-direction:column;background:#F4F7F5;}
+.tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:1000;flex-direction:column;background:#F4F7F5;}
 .tmpl-iframe-screen.show{display:flex;}
+/* PC用 上段：Exally ロゴ + ナビ7個（book.htmlと統一・スマホでは非表示） */
+.tmpl-iframe-topbar{display:none;}
+@media(min-width:769px){
+  .tmpl-iframe-topbar{background:#ffffff;border-bottom:1px solid #D4EDE1;height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .tmpl-iframe-topbar-logo{display:flex;align-items:baseline;gap:5px;flex:1;}
+  .tmpl-iframe-topbar-en{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
+  .tmpl-iframe-topbar-ja{font-size:10px;color:#4A6B5A;}
+  .tmpl-iframe-topbar-nav{display:flex;gap:4px;align-items:center;}
+  .tmpl-iframe-topbar-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+  .tmpl-iframe-topbar-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+  .tmpl-iframe-topbar-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+  .tmpl-iframe-topbar-nav-item svg{width:22px;height:22px;}
+}
 .tmpl-iframe-bar{background:#fff;border-bottom:1px solid #E0EDE6;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .tmpl-iframe-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .tmpl-iframe-title{font-size:13px;font-weight:700;color:#4A6B5A;}
-.tmpl-iframe-wrap{flex:1;overflow:clip;}
+.tmpl-iframe-wrap{flex:1;overflow:clip;background:#F4F7F5;}
 .tmpl-iframe-wrap iframe{width:100%;height:100%;border:none;}
 .tmpl-gallery{padding:20px 16px 20px;max-width:860px;margin:0 auto;}
 @media(min-width:769px){.tmpl-gallery{padding:32px 40px 40px;}}
@@ -662,6 +675,22 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
     </div>
     <div class="tmpl-iframe-screen" id="tmplIframeScreen">
+      <!-- PC用 上段：Exally + ナビ7個（スマホでは非表示） -->
+      <div class="tmpl-iframe-topbar">
+        <div class="tmpl-iframe-topbar-logo">
+          <span class="tmpl-iframe-topbar-en">Exally</span>
+          <span class="tmpl-iframe-topbar-ja">エクサリー</span>
+        </div>
+        <nav class="tmpl-iframe-topbar-nav" aria-label="他画面への移動">
+          <a href="home.html" class="tmpl-iframe-topbar-nav-item" title="ホーム">🏠</a>
+          <a href="chat.html" class="tmpl-iframe-topbar-nav-item" title="AIチャット">🤖</a>
+          <a href="book.html" class="tmpl-iframe-topbar-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
+          <span class="tmpl-iframe-topbar-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
+          <a href="chat.html?tab=book" class="tmpl-iframe-topbar-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+          <a href="chat.html?tab=quiz" class="tmpl-iframe-topbar-nav-item" title="クイズ">🎯</a>
+          <a href="chat.html?tab=settings" class="tmpl-iframe-topbar-nav-item" title="設定">⚙️</a>
+        </nav>
+      </div>
       <div class="tmpl-iframe-bar">
         <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
         <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
