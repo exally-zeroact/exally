@@ -1726,6 +1726,28 @@ function applyNumFmt(val, fmt) {
     }
     return val;
   }
+  // 時刻書式判定
+  var timeFmts=['h:mm','hh:mm','h時mm分','hh時mm分','h:mm AM/PM','a h:mm'];
+  if(timeFmts.indexOf(fmt)>=0){
+    var pt = (typeof parseTime==='function') ? parseTime(val) : null;
+    if(pt){
+      var h24=pt.h, m2=pt.m;
+      var hh=h24<10?'0'+h24:''+h24;
+      var mmt=m2<10?'0'+m2:''+m2;
+      var isPM=h24>=12;
+      var h12=h24%12; if(h12===0) h12=12;
+      var h12s=h12<10?'0'+h12:''+h12;
+      switch(fmt){
+        case 'h:mm':         return h24+':'+mmt;
+        case 'hh:mm':        return hh+':'+mmt;
+        case 'h時mm分':      return h24+'時'+mmt+'分';
+        case 'hh時mm分':     return hh+'時'+mmt+'分';
+        case 'h:mm AM/PM':   return h12+':'+mmt+' '+(isPM?'PM':'AM');
+        case 'a h:mm':       return (isPM?'午後':'午前')+' '+h12+':'+mmt;
+      }
+    }
+    return val;
+  }
   var n = parseFloat(val);
   if(isNaN(n)) return val;
   if(fmt==='#,##0')    return Math.round(n).toLocaleString('ja-JP');
@@ -2307,7 +2329,7 @@ function detectSequencePattern(values){
 }
 
 // ソース値を基に count 個の値を生成
-// 優先順：① 日付パターン → ② 曜日/順序 → ③ 数値パターン → ④ 循環コピー
+// 優先順：① 日付 → ② 時刻 → ③ 曜日/順序 → ④ 数値 → ⑤ 循環コピー
 function generateFillValues(sourceVals, count){
   // ① 日付パターン
   var dp=detectDatePattern(sourceVals);
@@ -2327,7 +2349,18 @@ function generateFillValues(sourceVals, count){
     }
     return dOut;
   }
-  // ② 曜日・順序シーケンス
+  // ② 時刻パターン
+  var tp=detectTimePattern(sourceVals);
+  if(tp){
+    var tOut=[];
+    var lastMin=tp.times[tp.times.length-1].totalMin;
+    for(var ti=0;ti<count;ti++){
+      lastMin+=tp.step;
+      tOut.push(formatTime(lastMin, tp.pad));
+    }
+    return tOut;
+  }
+  // ③ 曜日・順序シーケンス
   var sp=detectSequencePattern(sourceVals);
   if(sp){
     var sOut=[];
@@ -2338,7 +2371,7 @@ function generateFillValues(sourceVals, count){
     }
     return sOut;
   }
-  // ③ 数値パターン
+  // ④ 数値パターン
   var pat=detectNumericPattern(sourceVals);
   var out=[];
   if(pat){
@@ -2350,12 +2383,66 @@ function generateFillValues(sourceVals, count){
       out.push(String(lastN));
     }
   } else {
-    // ④ 循環コピー
+    // ⑤ 循環コピー
     for(var k=0;k<count;k++){
       out.push(sourceVals[k%sourceVals.length]);
     }
   }
   return out;
+}
+
+// ===== 時刻パターン検出 =====
+// "H:MM" or "HH:MM" or "H時MM分" をパース
+function parseTime(s){
+  if(typeof s!=='string') return null;
+  // H:MM / HH:MM
+  var m=s.match(/^(\d{1,2}):(\d{2})$/);
+  if(m){
+    var h=parseInt(m[1],10), mm=parseInt(m[2],10);
+    if(h<0||h>23||mm<0||mm>59) return null;
+    return {h:h, m:mm, totalMin:h*60+mm, pad:m[1].length===2};
+  }
+  // H時MM分 / HH時MM分 / H時M分（1桁分も許容）
+  var m2=s.match(/^(\d{1,2})時(\d{1,2})分$/);
+  if(m2){
+    var h2=parseInt(m2[1],10), mm2=parseInt(m2[2],10);
+    if(h2<0||h2>23||mm2<0||mm2>59) return null;
+    return {h:h2, m:mm2, totalMin:h2*60+mm2, pad:m2[1].length===2};
+  }
+  return null;
+}
+// 分から "HH:MM" に戻す（pad=trueならゼロ埋め、24時循環対応）
+function formatTime(totalMin, pad){
+  totalMin = ((totalMin%1440)+1440)%1440;
+  var h=Math.floor(totalMin/60), mm=totalMin%60;
+  var hs=pad?(h<10?'0'+h:''+h):(''+h);
+  var ms=mm<10?'0'+mm:''+mm;
+  return hs+':'+ms;
+}
+// 時刻配列のパターン検出
+function detectTimePattern(values){
+  if(!values||values.length<2) return null;
+  var times=[];
+  for(var i=0;i<values.length;i++){
+    var t=parseTime(values[i]);
+    if(!t) return null;
+    times.push(t);
+  }
+  // pad判定：全データから（1桁→false、2桁ゼロ埋めあり→true）
+  var pad=false;
+  for(var k=0;k<values.length;k++){
+    var parts=values[k].split(':');
+    if(parts[0].length===2 && parseInt(parts[0],10)<10){ pad=true; break; }
+    if(parts[0].length===1){ pad=false; break; }
+  }
+  var step = times[1].totalMin - times[0].totalMin;
+  if(step===0) return null;
+  // 全ペアで step 一致確認（循環は考慮しない：単純な等差）
+  for(var j=2;j<times.length;j++){
+    var d=times[j].totalMin - times[j-1].totalMin;
+    if(d!==step) return null;
+  }
+  return {times:times, step:step, pad:pad};
 }
 
 </script>
@@ -2545,8 +2632,8 @@ function generateFillValues(sourceVals, count){
         <div class="fmtmd-cat-it disabled" data-cat="general">標準</div>
         <div class="fmtmd-cat-it disabled" data-cat="number">数値</div>
         <div class="fmtmd-cat-it disabled" data-cat="currency">通貨</div>
-        <div class="fmtmd-cat-it active" data-cat="date">日付</div>
-        <div class="fmtmd-cat-it disabled" data-cat="time">時刻</div>
+        <div class="fmtmd-cat-it active" data-cat="date" onclick="switchFmtCategory('date')">日付</div>
+        <div class="fmtmd-cat-it" data-cat="time" onclick="switchFmtCategory('time')">時刻</div>
         <div class="fmtmd-cat-it disabled" data-cat="percent">パーセンテージ</div>
         <div class="fmtmd-cat-it disabled" data-cat="text">文字列</div>
       </div>
@@ -2948,14 +3035,27 @@ function setCell(r,c,v,noUndo){
   var prev = sheets[activeSheet].data[key] ? sheets[activeSheet].data[key].v : '';
   if(!noUndo){ undoStack.push({sheet:activeSheet,key:key,old:prev,new_:v}); redoStack=[]; }
   var d = v;
-  var hfResult = setCellFormula(activeSheet, r, c, v);
-  if(hfResult !== null){ d = hfResult; }
-  else if(v && v[0]==='='){ d = evalFormula(v, r, c); }
+  // 時刻・日付は文字列として扱う（HFが小数シリアル値に変換するのを防ぐ）
+  var isTimeOrDate = false;
+  if(v && typeof v==='string' && v[0]!=='='){
+    if(typeof parseTime==='function' && parseTime(v)) isTimeOrDate=true;
+    else if(typeof parseDate==='function' && parseDate(v)) isTimeOrDate=true;
+  }
+  if(isTimeOrDate){
+    // HFには空をセット（残留防止）、d は v のまま
+    if(hf){
+      try{ hf.setCellContents({sheet:_hfSid(activeSheet),row:r,col:c}, v); }catch(e){}
+    }
+  } else {
+    var hfResult = setCellFormula(activeSheet, r, c, v);
+    if(hfResult !== null){ d = hfResult; }
+    else if(v && v[0]==='='){ d = evalFormula(v, r, c); }
+  }
   // 既存の書式プロパティを保持してv/f/dのみ更新
   var existing = sheets[activeSheet].data[key] || {};
   sheets[activeSheet].data[key] = Object.assign({}, existing, {v:v, f:v, d:String(d)});
   // 依存セルの再計算（数値変更→数式セルに即反映）
-  if(hfResult !== null){
+  if(!isTimeOrDate){
     var _s=activeSheet, _d=sheets[activeSheet].data;
     _scheduleRecalc(_s,_d);
   }
@@ -3423,7 +3523,7 @@ function pDist(e){ var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches
 
 function nearHandle(x,y){
   var bx=colX(selC2)+cW(selC2),by=rowY(selR2)+rH(selR2);
-  return Math.hypot(x-bx,y-by)<30;
+  return Math.hypot(x-bx,y-by)<15;
 }
 
 // ===== 列幅・行高リサイズ =====
@@ -3728,7 +3828,34 @@ function onTM(e){
   if(e.touches.length!==1) return;
   var t=e.touches[0];
   var dx=t.clientX-touchState.sx,dy=t.clientY-touchState.sy;
-  if(touchState.type==='pending'&&(Math.abs(dx)>5||Math.abs(dy)>5)) touchState.type='scroll';
+  if(touchState.type==='pending'&&(Math.abs(dx)>5||Math.abs(dy)>5)){
+    var elapsed = Date.now() - touchState.time;
+    if(elapsed >= 200){
+      // 200ms以上経過後のドラッグ → 範囲選択モード
+      var r0=canvas.getBoundingClientRect();
+      var sx0=touchState.sx-r0.left, sy0=touchState.sy-r0.top;
+      if(sx0>HDR_W&&sy0>HDR_H){
+        var sr=yToR(sy0), sc=xToC(sx0);
+        touchState={type:'rangeselect', startR:sr, startC:sc, r:canvas.getBoundingClientRect()};
+        sel(sr,sc,sr,sc);
+      } else {
+        touchState.type='scroll';
+      }
+    } else {
+      touchState.type='scroll';
+    }
+  }
+  // rangeselect: ドラッグで範囲選択拡張
+  if(touchState.type==='rangeselect'){
+    var tr0=e.touches[0];
+    var rr0=touchState.r;
+    var rx=tr0.clientX-rr0.left, ry=tr0.clientY-rr0.top;
+    if(rx>HDR_W&&ry>HDR_H){
+      var rr1=yToR(ry), rc1=xToC(rx);
+      sel(touchState.startR, touchState.startC, rr1, rc1);
+    }
+    return;
+  }
   if(touchState.type==='scroll'){
     scrollLeft=Math.max(0,touchState.ssl-dx);
     scrollTop=Math.max(0,touchState.sst-dy);
@@ -3779,6 +3906,10 @@ function onTE(e){
     sheets[activeSheet].rowH[touchState.row]=touchState.origH;
     setRowH(touchState.row, nh);
     touchState=null; render(); return;
+  }
+  // 範囲選択終了
+  if(touchState && touchState.type==='rangeselect'){
+    touchState=null; return;
   }
   // フィルハンドルドラッグ終了: fillPreview の範囲へフィル（値コピー）
   if(touchState && touchState.type==='handle'){
@@ -4255,16 +4386,48 @@ var FMT_DATE_TYPES=[
   {fmt:'m月d日',        label:'4月18日'},
   {fmt:'m月d日(aaa)',   label:'4月18日(土)'}
 ];
+var FMT_TIME_TYPES=[
+  {fmt:'h:mm',         label:'8:30'},
+  {fmt:'hh:mm',        label:'08:30'},
+  {fmt:'h時mm分',      label:'8時30分'},
+  {fmt:'hh時mm分',     label:'08時30分'},
+  {fmt:'h:mm AM/PM',   label:'8:30 AM'},
+  {fmt:'a h:mm',       label:'午前 8:30'}
+];
+var FMT_TYPES_MAP={date:FMT_DATE_TYPES, time:FMT_TIME_TYPES};
 var _fmtModalSelectedFmt=null;
+var _fmtModalCategory='date';
 
 function openFmtModal(){
   var cell=getCell(selR1,selC1);
   var currentFmt=cell.numFmt||'';
-  // 種類リストを構築
+  // 現在の値から自動でカテゴリ判定
+  var rawVal=(cell.d!==undefined&&cell.d!=='')?cell.d:cell.v;
+  if(typeof parseTime==='function' && parseTime(rawVal)){
+    _fmtModalCategory='time';
+  } else if(typeof parseDate==='function' && parseDate(rawVal)){
+    _fmtModalCategory='date';
+  }
+  // 書式が既に時刻書式ならカテゴリ優先
+  var timeFmtList=['h:mm','hh:mm','h時mm分','hh時mm分','h:mm AM/PM','a h:mm'];
+  var dateFmtList=['m/d','mm/dd','yyyy/m/d','yyyy/mm/dd','yyyy-m-d','yyyy-mm-dd','yyyy年m月d日','yyyy年mm月dd日','m月d日','m月d日(aaa)'];
+  if(timeFmtList.indexOf(currentFmt)>=0) _fmtModalCategory='time';
+  else if(dateFmtList.indexOf(currentFmt)>=0) _fmtModalCategory='date';
+  renderFmtModalCategory(currentFmt);
+  document.getElementById('fmtModal').classList.add('show');
+}
+function renderFmtModalCategory(currentFmt){
+  // カテゴリUI更新
+  var cats=document.querySelectorAll('#fmtModalCat .fmtmd-cat-it');
+  cats.forEach(function(el){
+    el.classList.toggle('active', el.getAttribute('data-cat')===_fmtModalCategory);
+  });
+  // 種類リスト構築
+  var types=FMT_TYPES_MAP[_fmtModalCategory]||[];
   var wrap=document.getElementById('fmtModalTypes');
   wrap.innerHTML='';
-  for(var i=0;i<FMT_DATE_TYPES.length;i++){
-    var t=FMT_DATE_TYPES[i];
+  for(var i=0;i<types.length;i++){
+    var t=types[i];
     var div=document.createElement('div');
     div.className='fmtmd-type'+(currentFmt===t.fmt?' active':'');
     div.textContent=t.label+' ['+t.fmt+']';
@@ -4277,9 +4440,14 @@ function openFmtModal(){
     };})(t.fmt);
     wrap.appendChild(div);
   }
-  _fmtModalSelectedFmt=currentFmt||FMT_DATE_TYPES[0].fmt;
+  _fmtModalSelectedFmt=currentFmt||(types[0]?types[0].fmt:'');
   updateFmtModalPreview();
-  document.getElementById('fmtModal').classList.add('show');
+}
+function switchFmtCategory(cat){
+  if(!FMT_TYPES_MAP[cat]) return; // 未対応カテゴリ
+  _fmtModalCategory=cat;
+  var cell=getCell(selR1,selC1);
+  renderFmtModalCategory(cell.numFmt||'');
 }
 function updateFmtModalPreview(){
   var pv=document.getElementById('fmtModalPreview');
@@ -4289,8 +4457,8 @@ function updateFmtModalPreview(){
   pv.style.color='#1A4A2E';
   var formatted=applyNumFmt(raw, _fmtModalSelectedFmt);
   if(formatted===raw){
-    // 日付パース失敗時
-    pv.textContent=raw+' (日付として認識されません)';
+    var kind = _fmtModalCategory==='time'?'時刻':'日付';
+    pv.textContent=raw+' ('+kind+'として認識されません)';
     pv.style.color='#E53935';
   } else {
     pv.textContent=formatted;
