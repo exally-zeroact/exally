@@ -1,19 +1,8 @@
 <!DOCTYPE html>
 
-<!-- 
-=============================================
- Exally 給料明細テンプレート
- Version: 2026.04.18-v3
- Build Timestamp: 1776504994000
-=============================================
--->
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>給料明細テンプレート | Exally</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
@@ -37,8 +26,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .header-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;}
 .header-logo-ja{font-size:10px;color:#4A6B5A;margin-left:-3px;}
 .header-title{font-size:13px;font-weight:700;color:#4A6B5A;margin-left:auto;}
-.main{max-width:600px;margin:0 auto;padding:8px 12px;}
-.type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.main{max-width:600px;margin:0 auto;padding:16px 12px;}
+.type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
 .type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
 .type-tab.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
 .step-guide{background:#fff;border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
@@ -154,24 +143,22 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .manual-switch-btn{width:100%;padding:11px;margin-bottom:8px;background:#FFF8EE;border:1.5px solid #F4D090;border-radius:var(--radius-md);font-size:13px;font-weight:700;color:#9A6000;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:opacity 0.15s;}
 .manual-restore-btn{width:100%;padding:11px;margin-bottom:8px;background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);font-size:13px;font-weight:700;color:var(--mint-dd);cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .manual-warn{background:#FFF8EE;border:1px solid #F4D090;border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.7;margin-bottom:10px;}
-@media(min-width:600px) and (max-width:768px){.main{padding:20px 16px;}.drag-table{font-size:13px;}.drag-table td{padding:12px 10px;}.item-val{max-width:220px;}.dh{font-size:20px;}}
+@media(min-width:600px){.main{padding:20px 16px;}.drag-table{font-size:13px;}.drag-table td{padding:12px 10px;}.item-val{max-width:220px;}.dh{font-size:20px;}}
 
 /* ===== ガイドパネル追加CSS ===== */
 body{padding-bottom:80px;}
+@media(min-width:769px){body{padding-bottom:0;}}
 
 /* layout */
 .layout-wrap{display:flex;flex-direction:column;}
 @media(min-width:769px){
-body{padding-bottom:0!important;overflow:hidden;height:100dvh;min-height:0;}
-.main{max-width:none!important;margin:0!important;padding:0!important;height:calc(100dvh - 49px);overflow:hidden;display:flex;flex-direction:column;}
-.layout-wrap{flex-direction:row;align-items:stretch;gap:0;flex:1;min-height:0;}
-.form-panel{flex:1;min-width:0;overflow-y:auto;padding:24px 32px 40px 32px;}
-.drag-table{font-size:13px;}
-.drag-table td{padding:12px 10px;}
+.layout-wrap{flex-direction:row;align-items:flex-start;gap:24px;}
+.form-panel{flex:1;min-width:0;}
+.main{max-width:none;margin:0;padding:32px 40px 40px 24px;}
 }
 
 /* スマホ上部sticky */
-.sp-top{position:sticky;top:0;z-index:200;background:#fff;border-bottom:2px solid #C8ECD8;}
+.sp-top{position:sticky;top:48px;z-index:200;background:#fff;border-bottom:2px solid #C8ECD8;}
 @media(min-width:769px){.sp-top{display:none;}}
 
 .sp-badges{display:flex;gap:6px;padding:7px 12px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #F0FAF4;}
@@ -198,10 +185,10 @@ body{padding-bottom:0!important;overflow:hidden;height:100dvh;min-height:0;}
 /* sticky-ctaを非表示 */
 .sticky-cta{display:none!important;}
 
-/* PC 左ガイドパネル（home.htmlのサイドバー仕様と同一：上下左右隙間なし） */
+/* PC 左ガイドパネル */
 .guide-panel{display:none;}
 @media(min-width:769px){
-.guide-panel{display:flex;flex-direction:column;width:220px;min-width:220px;flex-shrink:0;background:#ffffff;border-right:1px solid #D4EDE1;padding:20px 0;overflow-y:auto;height:auto;align-self:stretch;}
+.guide-panel{display:block;width:200px;flex-shrink:0;position:sticky;top:60px;max-height:calc(100vh - 80px);overflow-y:auto;background:#fff;border:1px solid #E0EDE6;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 }
 .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
 .gp-sec:last-child{border-bottom:none;}
@@ -262,12 +249,12 @@ body{padding-bottom:0!important;overflow:hidden;height:100dvh;min-height:0;}
 
 <div class="header">
   <!-- ★修正箇所：onclick追加 -->
-  <button class="header-back" onclick="if(window.parent&&window.parent.closeTmplIframe){window.parent.closeTmplIframe();}else{history.back();}">← 戻る</button>
+  <button class="header-back" onclick="location.href='chat.html?tab=template'">← テンプレ一覧</button>
   <span class="header-logo">Exally</span><span class="header-logo-ja">エクサリー</span>
   <span class="header-title" id="cardTitle">給料明細（月給制）</span>
 </div>
 
-<!-- ===== 業種帯（常時表示・ヘッダー直下にsticky） ===== -->
+<!-- ===== 業種帯（常時表示） ===== -->
 
 <div id="gyoshuBar" style="display:flex;position:sticky;top:49px;z-index:198;background:#F0FAF4;border-bottom:1px solid #C8ECD8;padding:7px 16px;align-items:center;gap:12px;">
   <span id="gyoshuBarLabel" style="font-size:12px;font-weight:700;color:#2E4038;">業種未選択</span>
@@ -583,8 +570,8 @@ function switchType(t){
   document.querySelectorAll('.type-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='monthly')||(i===1&&t==='hourly')));
   document.getElementById('cardTitle').textContent=t==='monthly'?'給料明細（月給制）':'給料明細（時給制）';
   document.getElementById('noticeEl').innerHTML=t==='monthly'
-    ?'\u26a0\ufe0f <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
-    :'\u26a0\ufe0f <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
+    ?'⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
+    :'⚠️ <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
   document.getElementById('resultEl').classList.remove('show');
   init();
 }
@@ -670,7 +657,7 @@ function renderSort(){
     if(item.cat!==lastCat){
       const trDiv=document.createElement('tr');
       trDiv.className='cat-divider'+(item.type==='pay'?' cat-pay':item.type==='deduct'?' cat-deduct':'');
-      const catLabel=item.type==='info'?'⏱ 勤怠':item.type==='pay'?'\ud83d\udcb0 支給':'🔻 控除';
+      const catLabel=item.type==='info'?'⏱ 勤怠':item.type==='pay'?'💰 支給':'🔻 控除';
       trDiv.innerHTML='<td colspan="4">'+catLabel+'</td>';
       tbody.appendChild(trDiv);
       lastCat=item.cat;
@@ -734,7 +721,7 @@ function addItem(id){
 
 function addCustom(){
   const inp=document.getElementById('customInp');const sel=document.getElementById('customType');
-  const label=inp.value.trim();if(!label){showToast('\u26a0\ufe0f 項目名を入力してください');return;}
+  const label=inp.value.trim();if(!label){showToast('⚠️ 項目名を入力してください');return;}
   const type=sel.value;const id='custom_'+Date.now();const cat=type==='pay'?'支給':'控除';
   const ni={id,label,type,cat,default:false,canRemove:true,value:'手入力',formula:null,title:null,rates:null};
   const lastIdx=active.map((i,idx)=>({i,idx})).filter(({i})=>i.cat===cat).pop()?.idx??active.length-1;
@@ -783,7 +770,7 @@ function setCustomFormula(formula){const inp=document.getElementById('customForm
 
 function applyCustomFormula(){
   const inp=document.getElementById('customFormulaInput');if(!inp||!popId)return;
-  const formula=inp.value.trim();if(!formula){showToast('\u26a0\ufe0f 数式を入力してください');return;}
+  const formula=inp.value.trim();if(!formula){showToast('⚠️ 数式を入力してください');return;}
   const activeItem=active.find(i=>i.id===popId);
   if(activeItem){activeItem.formula=formula;activeItem.value=formula;delete manualItems[popId];}
   render();closePop();showToast('✅ 計算式を設定しました');
@@ -906,7 +893,7 @@ function updateFitCheck(){
     </div>`;
   } else if(totalRows <= limit){
     html = `<div style="background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.8;">
-      \u26a0\ufe0f <strong>ギリギリです</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
+      ⚠️ <strong>ギリギリです</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
       印刷時に見切れる可能性があります。項目を1〜2個減らすと安全です。
     </div>`;
   } else {
@@ -1505,9 +1492,9 @@ function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
 }
 
 function copyTSVDirect(){
-  if(!generatedTSV){ showToast('\u26a0\ufe0f 先にデータを生成してください'); return; }
+  if(!generatedTSV){ showToast('⚠️ 先にデータを生成してください'); return; }
   navigator.clipboard.writeText(generatedTSV).then(()=>{
-    showToast('\ud83d\udccb コピー完了');
+    showToast('📋 コピー完了');
   });
 }
 
@@ -1519,7 +1506,7 @@ function openAIChat(){
 
 function copyPrompt(){
   navigator.clipboard.writeText(generatedTSV)
-    .then(()=>showToast('\ud83d\udccb コピーしました'));
+    .then(()=>showToast('📋 コピーしました'));
 }
 
 // ===== Excelプレビュー生成 =====
@@ -1566,7 +1553,7 @@ function renderExcelPreview(){
         </div>
         <table style="width:100%;border-collapse:collapse;">
           ${infoRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">⏱ 勤怠</td></tr>${infoRows}`:''}
-          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">\ud83d\udcb0 支給</td></tr>
+          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">💰 支給</td></tr>
           ${payRows}
           ${dedRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#C62828;background:#FFF5F5;border-bottom:1px solid #FFCDD2;">🔻 控除</td></tr>${dedRows}`:''}
           <tr style="background:#F8FEFC;">
@@ -1617,7 +1604,7 @@ function renderExcelPreview(){
         <!-- 支給・控除2カラム -->
         <div style="display:grid;grid-template-columns:1fr 1fr;">
           <div style="padding:5px 8px;border-right:1px solid #E0EDE6;">
-            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">\ud83d\udcb0 支給</div>
+            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div>
             ${payRows}
           </div>
           <div style="padding:5px 8px;">
@@ -1677,7 +1664,7 @@ function renderExcelPreview(){
   el.innerHTML=`
     <div style="background:#F8FEFC;border:1.5px solid #C8ECD8;border-radius:12px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;color:#3D9E72;letter-spacing:1px;">\ud83d\udcca 完成イメージ（${paperLabel}）</div>
+        <div style="font-size:11px;font-weight:700;color:#3D9E72;letter-spacing:1px;">📊 完成イメージ（${paperLabel}）</div>
         <div style="font-size:9px;color:#B0C4BA;">※完成イメージです</div>
       </div>
       ${sheetsHTML}
@@ -1733,13 +1720,13 @@ const PAPER_OPTIONS={
     {
       label:'A4縦・2人分（上下に並べる）',rank:'🥈',
       desc:'【紙代半減】1枚を上下2分割して2名分を印刷。ミシン目入り用紙を使うと綺麗に切り離せます。',
-      note:'\u26a0\ufe0f 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
+      note:'⚠️ 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
       preview:'a4-v-2'
     },
     {
       label:'A4縦・3人分（上下に並べる）',rank:'🥉',
       desc:'【紙代1/3】1枚に3名分を上下に印刷。縦の最大人数です。',
-      note:'\u26a0\ufe0f 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
+      note:'⚠️ 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
       preview:'a4-v-3'
     },
     {
@@ -1751,7 +1738,7 @@ const PAPER_OPTIONS={
     {
       label:'A4横・2人分（左右に並べる）',rank:'⑤',
       desc:'【横の最大人数】横向きで左右に2名分を並べます。横レイアウトで2人分が必要な場合に。',
-      note:'\u26a0\ufe0f 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
+      note:'⚠️ 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
       preview:'a4-h-2'
     },
     {
@@ -1763,7 +1750,7 @@ const PAPER_OPTIONS={
     {
       label:'B5縦・2人分（上下に並べる）',rank:'⑦',
       desc:'【B5を上下2分割】切り離し後はB6サイズ。長形6号封筒にぴったり入ります。紙代半減。',
-      note:'\u26a0\ufe0f 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
+      note:'⚠️ 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
       preview:'b5-v-2'
     },
   ],
@@ -1777,13 +1764,13 @@ const PAPER_OPTIONS={
     {
       label:'A4横・1人分（項目多め）',rank:'②',
       desc:'【項目が多い方向け】支給・控除の項目数が多い場合に横向きにすると見やすくなります。',
-      note:'\u26a0\ufe0f スマホで見る場合は横スクロールが必要になる場合があります。',
+      note:'⚠️ スマホで見る場合は横スクロールが必要になる場合があります。',
       preview:'a4-h-1'
     },
     {
       label:'A4縦・2人分（PDF）',rank:'③',
       desc:'【紙代節約・電子配信】1つのPDFに2名分を上下に配置して送付。印刷して切り離しても使えます。',
-      note:'\u26a0\ufe0f 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
+      note:'⚠️ 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
       preview:'a4-v-2'
     },
   ]
@@ -1840,7 +1827,7 @@ const PAPER_PREVIEWS={
         ✅ 1枚で2名分を印刷<br>
         ✅ 紙代・印刷代が半分に<br>
         ✂️ ミシン目で切り離して配布<br>
-        \u26a0\ufe0f 項目は10個以内推奨
+        ⚠️ 項目は10個以内推奨
       </div>
     </div>`
   },
@@ -1871,8 +1858,8 @@ const PAPER_PREVIEWS={
         ✅ 1枚で3名分を印刷<br>
         ✅ 紙代が1/3に<br>
         ✂️ ミシン目で切り離して配布<br>
-        \u26a0\ufe0f 項目は各5個以内推奨<br>
-        \u26a0\ufe0f 縦の最大人数
+        ⚠️ 項目は各5個以内推奨<br>
+        ⚠️ 縦の最大人数
       </div>
     </div>`
   },
@@ -1928,9 +1915,9 @@ const PAPER_PREVIEWS={
       <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
         ✅ 1枚で2名分を印刷<br>
         ✂️ ミシン目で切り離して配布<br>
-        \u26a0\ufe0f 1人分の幅が狭くなる<br>
-        \u26a0\ufe0f 横の最大人数<br>
-        \u26a0\ufe0f 項目は少なめ推奨
+        ⚠️ 1人分の幅が狭くなる<br>
+        ⚠️ 横の最大人数<br>
+        ⚠️ 項目は少なめ推奨
       </div>
     </div>`
   },
@@ -1983,7 +1970,7 @@ const PAPER_PREVIEWS={
         ✅ 切り離し後はB6サイズ<br>
         ✅ 長形6号封筒にぴったり<br>
         ✂️ ミシン目で切り離して配布<br>
-        \u26a0\ufe0f 項目は各3〜4個以内推奨
+        ⚠️ 項目は各3〜4個以内推奨
       </div>
     </div>`
   }
@@ -2059,16 +2046,13 @@ function initGyoshu(){
   var barLabel = document.getElementById('gyoshuBarLabel');
   var changeBtn = document.getElementById('gyoshuChangeBtn');
   if(!saved){
-    // 未選択時：モーダル表示、帯は「業種未選択」表示のまま、ボタンは「業種を選ぶ→」
     document.getElementById('gyoshuOverlay').classList.remove('hide');
     if(barLabel) barLabel.textContent = '業種未選択';
     if(changeBtn) changeBtn.textContent = '業種を選ぶ →';
   } else if(saved === 'skip'){
-    // スキップ時：帯は「業種を選ばない」表示、ボタンは「業種を選ぶ→」
     if(barLabel) barLabel.textContent = '業種を選ばない';
     if(changeBtn) changeBtn.textContent = '業種を選ぶ →';
   } else {
-    // 選択済み：帯にアイコン+業種名+選択中、ボタンは「業種を変更する→」
     var p = GYOSHU_PRESETS[saved];
     if(bar && barLabel && p){
       barLabel.textContent = p.icon + ' ' + saved + ' 選択中';
@@ -2137,7 +2121,7 @@ function changeGyoshu(){
 
 document.addEventListener('DOMContentLoaded',function(){
   renderPaperOptions();
-  document.getElementById('noticeEl').innerHTML='\u26a0\ufe0f <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
+  document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
   init();
   updateFitCheck();
   initRates();
@@ -2283,19 +2267,19 @@ function calcApproxPayTotal(){
 function openPrintWindow(autoPrint) {
   var content = document.getElementById('excelPreview');
   if(!content || content.innerHTML.trim() === '') {
-    showToast('\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。');
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
     return;
   }
   var pw = window.open('', '_blank', 'width=900,height=700');
   if(!pw) {
-    showToast('\u26a0\ufe0f ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    showToast('⚠️ ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
     return;
   }
   pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
-  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght'+'@'+'400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
+  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
   pw.document.write('<style>');
   pw.document.write('*{box-sizing:border-box;margin:0;padding:0;}');
-  pw.document.write('\x40page{size:A4 portrait;margin:6mm;}');
+  pw.document.write('@page{size:A4 portrait;margin:6mm;}');
   pw.document.write('html,body{width:210mm;height:297mm;overflow:hidden;font-family:"Noto Sans JP",sans-serif;background:#fff;}');
   pw.document.write('body>div{width:100%;height:100%;display:flex;align-items:flex-start;}');
   pw.document.write('</style>');
@@ -2311,17 +2295,24 @@ setTimeout(function(){ pw.print(); }, 1200);
 }
 
 // 印刷する
-function printPayslip(){ openPrintWindow(true); }
-function downloadPDF(){ showToast(’\ud83d\udcc4 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’); openPrintWindow(true); }
+function printPayslip(){
+openPrintWindow(true);
+}
+
+// PDFで保存（印刷ダイアログ経由）
+function downloadPDF(){
+showToast(‘📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。’);
+openPrintWindow(true);
+}
 
 // Excelでダウンロード（SheetJS）
 function downloadExcel(){
 if(typeof XLSX === ‘undefined’){
-showToast(’\u26a0\ufe0f ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
 return;
 }
 if(!generatedTSV || generatedTSV.trim() === ‘’){
-showToast(’\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。’);
+showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
 return;
 }
 // TSVを2次元配列に変換
@@ -2353,11 +2344,11 @@ showToast(‘📥 ‘+fname+’ をダウンロードしました’);
 // 賃金台帳をダウンロード
 function downloadKinmuDaichou(){
 if(typeof XLSX === ‘undefined’){
-showToast(’\u26a0\ufe0f ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
 return;
 }
 if(!generatedTSV || generatedTSV.trim() === ‘’){
-showToast(’\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。’);
+showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
 return;
 }
 
@@ -2386,7 +2377,7 @@ XLSX.utils.book_append_sheet(wb, ws, ‘賃金台帳’);
 
 var fname = ‘賃金台帳_’+name+’_’+ym+’.xlsx’;
 XLSX.writeFile(wb, fname);
-showToast(’\ud83d\udccb ‘+fname+’ をダウンロードしました。同じフォルダに毎月保存してね。’);
+showToast(‘📋 ‘+fname+’ をダウンロードしました。同じフォルダに毎月保存してね。’);
 }
 
 </script>
@@ -2416,7 +2407,7 @@ showToast(’\ud83d\udccb ‘+fname+’ をダウンロードしました。同�
   </div>
 </div>
 
-<!-- ===== DOM内の見えない``` を強制除去 ===== -->
+<!-- ```バグ対策 -->
 
 <style>
 *{font-feature-settings:"liga" 0,"dlig" 0,"calt" 0,"clig" 0!important;font-variant-ligatures:none!important;-webkit-font-feature-settings:"liga" 0,"dlig" 0,"calt" 0!important;}
