@@ -280,9 +280,23 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 @media(min-width:769px){.toast{bottom:30px;}}
 .tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:300;flex-direction:column;background:#F4F7F5;}
 .tmpl-iframe-screen.show{display:flex;}
+/* 下段：戻る + タイトル + 業種帯 */
 .tmpl-iframe-bar{background:#fff;border-bottom:1px solid #E0EDE6;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .tmpl-iframe-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .tmpl-iframe-title{font-size:13px;font-weight:700;color:#4A6B5A;}
+.tmpl-gyoshu-area{margin-left:auto;display:none;align-items:center;gap:8px;}
+.tmpl-gyoshu-area.active{display:flex;}
+.tmpl-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;}
+.tmpl-gyoshu-change{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+.tmpl-iframe-topbar{display:none;}
+@media(min-width:769px){
+  .tmpl-iframe-topbar{background:#ffffff;border-bottom:1px solid #D4EDE1;height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+}
+.tmpl-topbar-nav{display:flex;gap:4px;align-items:center;}
+.tmpl-topbar-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.tmpl-topbar-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+.tmpl-topbar-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.tmpl-topbar-nav-item svg{width:22px;height:22px;}
 .tmpl-iframe-wrap{flex:1;overflow:clip;}
 .tmpl-iframe-wrap iframe{width:100%;height:100%;border:none;}
 .tmpl-gallery{padding:20px 16px 20px;max-width:860px;margin:0 auto;}
@@ -662,9 +676,29 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="tmpl-cards-grid" id="tmplCardsGrid"></div>
     </div>
     <div class="tmpl-iframe-screen" id="tmplIframeScreen">
+      <div class="tmpl-iframe-topbar">
+        <div style="display:flex;align-items:baseline;gap:5px;">
+          <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#52B788;letter-spacing:-0.5px;">Exally</span>
+          <span style="font-size:10px;color:#4A6B5A;">エクサリー</span>
+        </div>
+        <nav class="tmpl-topbar-nav" aria-label="他画面への移動">
+          <a href="home.html" class="tmpl-topbar-nav-item" title="ホーム">🏠</a>
+          <a href="chat.html" class="tmpl-topbar-nav-item" title="AIチャット">🤖</a>
+          <a href="book.html" class="tmpl-topbar-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
+          <span class="tmpl-topbar-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
+          <a href="chat.html?tab=book" class="tmpl-topbar-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+          <a href="chat.html?tab=quiz" class="tmpl-topbar-nav-item" title="クイズ">🎯</a>
+          <a href="chat.html?tab=settings" class="tmpl-topbar-nav-item" title="設定">⚙️</a>
+        </nav>
+      </div>
+      <!-- 下段：戻る + タイトル + 業種帯 -->
       <div class="tmpl-iframe-bar">
         <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
         <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
+        <div class="tmpl-gyoshu-area" id="tmplGyoshuArea">
+          <span class="tmpl-gyoshu-label" id="tmplGyoshuLabel"></span>
+          <button class="tmpl-gyoshu-change" onclick="changeTmplGyoshu()">業種を変更する →</button>
+        </div>
       </div>
       <div class="tmpl-iframe-wrap">
         <iframe id="tmplIframe" src="" title="テンプレート"></iframe>
