@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -436,11 +436,11 @@ text-decoration:none;
 /* PC用 ヘッダーナビ（7個・自分＝ブックを除く他画面への導線） */
 .book-header-nav{display:none;}
 @media(min-width:769px){
-.book-header-nav{display:flex;gap:2px;align-items:center;}
-.book-header-nav-item{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#7A9A87;font-size:14px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.book-header-nav{display:flex;gap:4px;align-items:center;}
+.book-header-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
 .book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
 .book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
-.book-header-nav-item svg{width:16px;height:16px;}
+.book-header-nav-item svg{width:22px;height:22px;}
 }
 .sheet-tab {
 padding:5px 14px;
@@ -2211,7 +2211,7 @@ function drawSel(){
     <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
   </nav>
   <div style="display:flex;align-items:center;gap:6px;">
-    <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
+    <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
   </div>
 </div>
 
