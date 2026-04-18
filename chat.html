@@ -278,7 +278,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#3D9E72;color:white;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;z-index:999;opacity:0;transition:all 0.3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(min-width:769px){.toast{bottom:30px;}}
-.tmpl-iframe-screen{display:none;position:fixed;inset:0;z-index:1000;flex-direction:column;background:#F4F7F5;}
+.tmpl-iframe-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;flex-direction:column;background:#F4F7F5;}
+@media(max-width:768px){
+  .tmpl-iframe-screen{bottom:calc(54px + env(safe-area-inset-bottom));}
+}
 .tmpl-iframe-screen.show{display:flex;}
 /* PC用 上段：Exally ロゴ + ナビ7個（book.htmlと統一・スマホでは非表示） */
 .tmpl-iframe-topbar{display:none;}
@@ -294,10 +297,17 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
   .tmpl-iframe-topbar-nav-item svg{width:22px;height:22px;}
 }
 .tmpl-iframe-bar{background:#fff;border-bottom:1px solid #E0EDE6;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.tmpl-iframe-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.tmpl-iframe-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
 .tmpl-iframe-title{font-size:13px;font-weight:700;color:#4A6B5A;}
+/* 業種帯（PC限定：下段右端） */
+.tmpl-gyoshu-area{margin-left:auto;display:none;align-items:center;gap:8px;}
+@media(min-width:769px){
+  .tmpl-gyoshu-area.active{display:flex;}
+  .tmpl-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;}
+  .tmpl-gyoshu-change{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+}
 .tmpl-iframe-wrap{flex:1;overflow:clip;background:#F4F7F5;}
-.tmpl-iframe-wrap iframe{width:100%;height:100%;border:none;}
+.tmpl-iframe-wrap iframe{width:100%;height:100%;border:none;background:#F4F7F5;}
 .tmpl-gallery{padding:20px 16px 20px;max-width:860px;margin:0 auto;}
 @media(min-width:769px){.tmpl-gallery{padding:32px 40px 40px;}}
 .tmpl-gallery-title{font-size:18px;font-weight:700;color:#1A2B22;margin-bottom:4px;}
@@ -694,6 +704,10 @@ html,body{height:100%;font-family:'Noto Sans JP','DM Sans',sans-serif;background
       <div class="tmpl-iframe-bar">
         <button class="tmpl-iframe-back" onclick="closeTmplIframe()">← テンプレ一覧</button>
         <span class="tmpl-iframe-title" id="tmplIframeTitle"></span>
+        <div class="tmpl-gyoshu-area" id="tmplGyoshuArea">
+          <span class="tmpl-gyoshu-label" id="tmplGyoshuLabel"></span>
+          <button class="tmpl-gyoshu-change" onclick="changeTmplGyoshu()">業種を変更する →</button>
+        </div>
       </div>
       <div class="tmpl-iframe-wrap">
         <iframe id="tmplIframe" src="" title="テンプレート"></iframe>
@@ -1245,7 +1259,63 @@ function openTmplIframe(id){
   if(!tmpl) return;
   if(!tmpl.file){ showToast('準備中だよ✨'); return; }
   document.getElementById('tmplIframeTitle').textContent=tmpl.name;
-  document.getElementById('tmplIframe').src=tmpl.file;
+  var iframe=document.getElementById('tmplIframe');
+  iframe.src=tmpl.file;
+  // リセット
+  var area=document.getElementById('tmplGyoshuArea');
+  if(area) area.classList.remove('active');
+  // iframe読み込み後：PC時のみiframe内ヘッダー/業種帯を非表示＆業種帯連動
+  iframe.onload=function(){
+    try{
+      var doc=iframe.contentDocument;
+      if(!doc) return;
+      var isPC=window.innerWidth>=769;
+      if(isPC){
+        // PC：iframe内の重複要素を非表示
+        var hdr=doc.querySelector('.header');
+        if(hdr) hdr.style.display='none';
+        var hdr2=doc.querySelector('.hd');
+        if(hdr2) hdr2.style.display='none';
+        var gBar=doc.querySelector('#gyoshuBar');
+        if(gBar) gBar.style.display='none';
+        // タイトル連動（iframe内の#cardTitleで「給料明細（月給制）」など詳細タイトル）
+        var syncTitle=function(){
+          var ct=doc.querySelector('#cardTitle');
+          if(ct && ct.textContent && ct.textContent.trim()){
+            document.getElementById('tmplIframeTitle').textContent=ct.textContent.trim();
+          }
+        };
+        syncTitle();
+        var ctEl=doc.querySelector('#cardTitle');
+        if(ctEl){
+          var obsT=new MutationObserver(syncTitle);
+          obsT.observe(ctEl,{childList:true,characterData:true,subtree:true});
+        }
+        // 業種帯連動
+        var updateFromIframe=function(){
+          var lb=doc.querySelector('#gyoshuBarLabel');
+          if(lb && lb.textContent && lb.textContent.trim()){
+            document.getElementById('tmplGyoshuLabel').textContent=lb.textContent;
+            document.getElementById('tmplGyoshuArea').classList.add('active');
+          }else{
+            document.getElementById('tmplGyoshuArea').classList.remove('active');
+          }
+        };
+        updateFromIframe();
+        var labelEl=doc.querySelector('#gyoshuBarLabel');
+        if(labelEl){
+          var obs=new MutationObserver(updateFromIframe);
+          obs.observe(labelEl,{childList:true,characterData:true,subtree:true});
+        }
+      }else{
+        // スマホ：iframe内のExallyロゴ+戻るだけ非表示（重複回避）、業種帯はiframe内に残す
+        var hdr=doc.querySelector('.header');
+        if(hdr) hdr.style.display='none';
+        var hdr2=doc.querySelector('.hd');
+        if(hdr2) hdr2.style.display='none';
+      }
+    }catch(e){}
+  };
   document.getElementById('tmplIframeScreen').classList.add('show');
   document.getElementById('tmplGallery').style.display='none';
 }
@@ -1254,6 +1324,15 @@ function closeTmplIframe(){
   document.getElementById('tmplIframeScreen').classList.remove('show');
   document.getElementById('tmplIframe').src='';
   document.getElementById('tmplGallery').style.display='block';
+  var area=document.getElementById('tmplGyoshuArea');
+  if(area) area.classList.remove('active');
+}
+
+function changeTmplGyoshu(){
+  var iframe=document.getElementById('tmplIframe');
+  if(iframe && iframe.contentWindow && iframe.contentWindow.changeGyoshu){
+    iframe.contentWindow.changeGyoshu();
+  }
 }
 
 // ===== CHAT =====
