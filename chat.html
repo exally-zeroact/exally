@@ -1250,9 +1250,52 @@ function openTmplIframe(id){
   if(!tmpl) return;
   if(!tmpl.file){ showToast('準備中だよ✨'); return; }
   document.getElementById('tmplIframeTitle').textContent=tmpl.name;
-  document.getElementById('tmplIframe').src=tmpl.file;
+  var iframe=document.getElementById('tmplIframe');
+  iframe.src=tmpl.file;
+  // リセット：前回の業種帯を消す
+  var area=document.getElementById('tmplGyoshuArea');
+  if(area) area.classList.remove('active');
+  // iframe読み込み完了後：内部ヘッダー非表示＋業種帯連動
+  iframe.onload=function(){
+    try{
+      var doc=iframe.contentDocument;
+      if(!doc) return;
+      // iframe内のヘッダー(.header/.hd)を非表示
+      var hdr=doc.querySelector('.header');
+      if(hdr) hdr.style.display='none';
+      var hdr2=doc.querySelector('.hd');
+      if(hdr2) hdr2.style.display='none';
+      // iframe内の業種帯(#gyoshuBar)を非表示
+      var gBar=doc.querySelector('#gyoshuBar');
+      if(gBar) gBar.style.display='none';
+      // 業種ラベルの取得と親への反映
+      var updateFromIframe=function(){
+        var lb=doc.querySelector('#gyoshuBarLabel');
+        if(lb && lb.textContent && lb.textContent.trim()){
+          document.getElementById('tmplGyoshuLabel').textContent=lb.textContent;
+          document.getElementById('tmplGyoshuArea').classList.add('active');
+        }else{
+          document.getElementById('tmplGyoshuArea').classList.remove('active');
+        }
+      };
+      updateFromIframe();
+      // 業種変更時のMutationObserver
+      var labelEl=doc.querySelector('#gyoshuBarLabel');
+      if(labelEl){
+        var obs=new MutationObserver(updateFromIframe);
+        obs.observe(labelEl,{childList:true,characterData:true,subtree:true});
+      }
+    }catch(e){}
+  };
   document.getElementById('tmplIframeScreen').classList.add('show');
   document.getElementById('tmplGallery').style.display='none';
+}
+
+function changeTmplGyoshu(){
+  var iframe=document.getElementById('tmplIframe');
+  if(iframe && iframe.contentWindow && iframe.contentWindow.changeGyoshu){
+    iframe.contentWindow.changeGyoshu();
+  }
 }
 
 function closeTmplIframe(){
@@ -1755,4 +1798,4 @@ function showToast(msg,duration){
 </script>
 
 </body>
-</html>
+</html> 
