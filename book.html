@@ -2103,21 +2103,116 @@ function detectNumericPattern(values){
   return {nums:nums, step:step};
 }
 
+// ===== 日付パターン検出 =====
+// 文字列を {y,m,d,sep,pad} にパース（失敗時は null）
+function parseDate(s){
+  if(typeof s!=='string') return null;
+  var m=s.match(/^(\d{4})([\/\-])(\d{1,2})\2(\d{1,2})$/);
+  if(!m) return null;
+  var y=parseInt(m[1],10), mo=parseInt(m[3],10), d=parseInt(m[4],10);
+  if(mo<1||mo>12||d<1||d>31) return null;
+  var dt=new Date(y,mo-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null;
+  return {y:y,m:mo,d:d,sep:m[2],pad:m[3].length===2};
+}
+// 日付オブジェクトを元フォーマットで文字列化
+function formatDate(dt,sep,pad){
+  var y=dt.getFullYear(), mo=dt.getMonth()+1, d=dt.getDate();
+  var ms=pad?(mo<10?'0'+mo:''+mo):(''+mo);
+  var ds=pad?(d<10?'0'+d:''+d):(''+d);
+  return y+sep+ms+sep+ds;
+}
+// 日付配列のパターン検出
+function detectDatePattern(values){
+  if(!values||values.length<2) return null;
+  var dates=[];
+  for(var i=0;i<values.length;i++){
+    var pd=parseDate(values[i]);
+    if(!pd) return null;
+    dates.push(pd);
+  }
+  var sep=dates[0].sep;
+  // sep 一致チェック
+  for(var k=1;k<dates.length;k++){
+    if(dates[k].sep!==sep) return null;
+  }
+  // pad 判定：全データから。1桁数字がゼロ埋めされている例があれば true、1桁のままなら false
+  var pad=false;
+  for(var kk=0;kk<values.length;kk++){
+    var parts=values[kk].split(sep);
+    if(parts[1]&&parts[1].length===2&&parseInt(parts[1],10)<10){ pad=true; break; }
+    if(parts[2]&&parts[2].length===2&&parseInt(parts[2],10)<10){ pad=true; break; }
+    if(parts[1]&&parts[1].length===1){ pad=false; break; }
+    if(parts[2]&&parts[2].length===1){ pad=false; break; }
+  }
+  var d0=new Date(dates[0].y,dates[0].m-1,dates[0].d);
+  var d1=new Date(dates[1].y,dates[1].m-1,dates[1].d);
+  var dayStep=Math.round((d1-d0)/86400000);
+  var monthStep=null;
+  if(dates[0].d===dates[1].d){
+    monthStep=(dates[1].y-dates[0].y)*12+(dates[1].m-dates[0].m);
+  }
+  var yearStep=null;
+  if(dates[0].m===dates[1].m&&dates[0].d===dates[1].d){
+    yearStep=dates[1].y-dates[0].y;
+  }
+  function checkAll(type,step){
+    for(var j=1;j<dates.length;j++){
+      var prev=new Date(dates[j-1].y,dates[j-1].m-1,dates[j-1].d);
+      var cur=new Date(dates[j].y,dates[j].m-1,dates[j].d);
+      if(type==='day'){
+        if(Math.round((cur-prev)/86400000)!==step) return false;
+      } else if(type==='month'){
+        if(dates[j-1].d!==dates[j].d) return false;
+        if((dates[j].y-dates[j-1].y)*12+(dates[j].m-dates[j-1].m)!==step) return false;
+      } else if(type==='year'){
+        if(dates[j-1].m!==dates[j].m||dates[j-1].d!==dates[j].d) return false;
+        if(dates[j].y-dates[j-1].y!==step) return false;
+      }
+    }
+    return true;
+  }
+  // 判定優先：年step > 月step > 日step
+  if(yearStep!==null&&yearStep!==0&&checkAll('year',yearStep)) return {dates:dates,stepType:'year',step:yearStep,sep:sep,pad:pad};
+  if(monthStep!==null&&monthStep!==0&&checkAll('month',monthStep)) return {dates:dates,stepType:'month',step:monthStep,sep:sep,pad:pad};
+  if(dayStep!==0&&checkAll('day',dayStep)) return {dates:dates,stepType:'day',step:dayStep,sep:sep,pad:pad};
+  return null;
+}
+
 // ソース値を基に count 個の値を生成
-// パターン検出できれば等差数列、できなければ循環コピー
+// 優先順：① 日付パターン → ② 数値パターン → ③ 循環コピー
 function generateFillValues(sourceVals, count){
+  // ① 日付パターン
+  var dp=detectDatePattern(sourceVals);
+  if(dp){
+    var dOut=[];
+    var last=dp.dates[dp.dates.length-1];
+    var cur=new Date(last.y,last.m-1,last.d);
+    for(var i=0;i<count;i++){
+      if(dp.stepType==='day'){
+        cur=new Date(cur.getTime()+dp.step*86400000);
+      } else if(dp.stepType==='month'){
+        cur.setMonth(cur.getMonth()+dp.step);
+      } else if(dp.stepType==='year'){
+        cur.setFullYear(cur.getFullYear()+dp.step);
+      }
+      dOut.push(formatDate(cur,dp.sep,dp.pad));
+    }
+    return dOut;
+  }
+  // ② 数値パターン
   var pat=detectNumericPattern(sourceVals);
   var out=[];
   if(pat){
-    var last=pat.nums[pat.nums.length-1];
-    for(var i=0;i<count;i++){
-      last+=pat.step;
+    var lastN=pat.nums[pat.nums.length-1];
+    for(var ii=0;ii<count;ii++){
+      lastN+=pat.step;
       // 小数誤差を丸める（15桁丸め）
-      last=Math.round(last*1e12)/1e12;
-      out.push(String(last));
+      lastN=Math.round(lastN*1e12)/1e12;
+      out.push(String(lastN));
     }
   } else {
-    // 循環コピー
+    // ③ 循環コピー
     for(var k=0;k<count;k++){
       out.push(sourceVals[k%sourceVals.length]);
     }
