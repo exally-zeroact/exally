@@ -153,6 +153,14 @@ body {
 .fmt-color-bar {
   width:16px; height:3px; border-radius:1px; flex-shrink:0; pointer-events:none;
 }
+/* 背景色ボタンのみ：🎨を中央に大きく表示（上下にgap/padなし） */
+.fmt-color-icon.fmt-bg-only {
+  font-size:16px;
+  gap:0;
+  padding:0;
+  line-height:1;
+  justify-content:center;
+}
 #cell-addr {
   width:64px;
   font-size:12px;
@@ -2507,6 +2515,17 @@ function generateFillValues(sourceVals, count){
 
 <!-- Excelバージョン選択モーダル（book.html用） -->
 
+<!-- カラーパレットポップオーバー（文字色・背景色共用） -->
+<div id="colorPalette" style="display:none;position:absolute;z-index:1200;background:#fff;border:1px solid #D4EDE1;border-radius:8px;padding:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);width:240px;">
+  <div style="font-size:11px;color:#7A9A87;margin-bottom:4px;font-weight:600;">基本色</div>
+  <div id="cpaletteBasic" style="display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-bottom:8px;"></div>
+  <div style="font-size:11px;color:#7A9A87;margin-bottom:4px;font-weight:600;">テーマ色</div>
+  <div id="cpaletteThemes" style="display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-bottom:8px;"></div>
+  <div style="font-size:11px;color:#7A9A87;margin-bottom:4px;font-weight:600;">標準色</div>
+  <div id="cpaletteStd" style="display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-bottom:10px;"></div>
+  <button onclick="cpaletteOpenPicker()" style="width:100%;padding:7px;font-size:12px;background:#F0FAF4;color:#1A4A2E;border:1px solid #C8ECD8;border-radius:6px;cursor:pointer;font-weight:600;">🎨 その他の色...</button>
+</div>
+
 <!-- セル書式設定モーダル -->
 <div class="fmtmd-ov" id="fmtModal">
   <div class="fmtmd-cd">
@@ -2719,19 +2738,19 @@ window.addEventListener('load',updateBookVerBadge);
     onblur="(function(el){var r=window._fsCell[0],cc=window._fsCell[1],sz=parseInt(el.value)||12;if(!window._toolbarUpdating){var k=r+','+cc;if(!sheets[activeSheet].data[k])sheets[activeSheet].data[k]={v:'',f:'',d:''};sheets[activeSheet].data[k].fontSize=sz;render();updateBar();}})(this)"
     ontouchend="event.stopPropagation()">
   <div class="fmt-sep"></div>
-  <!-- 文字色 -->
-  <div class="fmt-color-wrap" title="文字色">
-    <div class="fmt-color-icon" id="fmt-color-icon">
-      <span style="line-height:1;pointer-events:none;">A</span>
+  <!-- 文字色（パレット選択ポップオーバー） -->
+  <div class="fmt-color-wrap" title="文字色" onclick="openColorPalette(event)">
+    <div class="fmt-color-icon" id="fmt-color-icon" style="pointer-events:none;">
+      <span style="line-height:1;">A</span>
       <div class="fmt-color-bar" id="fmt-color-bar" style="background:#1A2B22;"></div>
     </div>
-    <input type="color" id="fmt-color" value="#1A2B22" onchange="applyFormat('color',this.value)">
   </div>
-  <!-- 背景色 -->
-  <div class="fmt-color-wrap" title="背景色">
-    <div class="fmt-color-icon" id="fmt-bg-icon" style="font-size:13px;">🎨</div>
-    <input type="color" id="fmt-bg" value="#ffffff" onchange="applyFormat('bgColor',this.value)">
+  <input type="color" id="fmt-color" value="#1A2B22" style="display:none;" onchange="applyFormat('color',this.value)">
+  <!-- 背景色（パレット選択ポップオーバー） -->
+  <div class="fmt-color-wrap" title="背景色" onclick="openColorPalette(event, 'bgColor')">
+    <div class="fmt-color-icon fmt-bg-only" id="fmt-bg-icon" style="pointer-events:none;">🎨</div>
   </div>
+  <input type="color" id="fmt-bg" value="#ffffff" style="display:none;" onchange="applyFormat('bgColor',this.value)">
   <div class="fmt-sep"></div>
   <!-- 文字揃え -->
   <button class="fmt-btn active" id="fmt-align-left"   onclick="applyFormat('align','left')"   title="左揃え"><svg width="14" height="12" viewBox="0 0 14 12"><line x1="0" y1="2" x2="14" y2="2" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/></svg></button>
@@ -4286,11 +4305,89 @@ function applyFmtModal(){
   }
   closeFmtModal();
 }
-// 背景クリックで閉じる
+// ===== カラーパレット（文字色・背景色共用） =====
+// 基本色：モノクロ10段階
+var CPALETTE_BASIC=[
+  '#000000','#262626','#404040','#595959','#737373','#8C8C8C','#A6A6A6','#BFBFBF','#D9D9D9','#FFFFFF'
+];
+// テーマ色：5色系列 × 2段階 = 10色（Exally色＋汎用色）
+var CPALETTE_THEMES=[
+  '#1A4A2E','#2E6D48','#52B788','#C8ECD8','#F0FAF4',
+  '#0D47A1','#1976D2','#1E88E5','#BBDEFB','#E3F2FD',
+  '#BF360C','#E64A19','#FB8C00','#FFCCBC','#FFF3E0',
+  '#B71C1C','#E53935','#EF5350','#FFCDD2','#FFEBEE',
+  '#4A148C','#8E24AA','#AB47BC','#E1BEE7','#F3E5F5'
+];
+// 標準色：よく使う10色
+var CPALETTE_STD=[
+  '#E53935','#FB8C00','#FDD835','#7CB342','#43A047','#00ACC1','#1E88E5','#3949AB','#8E24AA','#D81B60'
+];
+var _paletteTarget='color'; // 'color' or 'bgColor'
+
+(function(){
+  var basic=document.getElementById('cpaletteBasic');
+  var themes=document.getElementById('cpaletteThemes');
+  var std=document.getElementById('cpaletteStd');
+  if(!basic||!themes||!std) return;
+  function mkSwatch(c){
+    var d=document.createElement('div');
+    d.style.cssText='width:18px;height:18px;border-radius:3px;cursor:pointer;border:1px solid #ccc;background:'+c+';';
+    d.setAttribute('data-color',c);
+    d.onclick=function(){ cpaletteApply(c); };
+    return d;
+  }
+  CPALETTE_BASIC.forEach(function(c){ basic.appendChild(mkSwatch(c)); });
+  CPALETTE_THEMES.forEach(function(c){ themes.appendChild(mkSwatch(c)); });
+  CPALETTE_STD.forEach(function(c){ std.appendChild(mkSwatch(c)); });
+})();
+function openColorPalette(evt, target){
+  var pal=document.getElementById('colorPalette');
+  if(!pal) return;
+  _paletteTarget = target || 'color';
+  var rect=evt.currentTarget.getBoundingClientRect();
+  pal.style.left=Math.max(8, rect.left)+'px';
+  pal.style.top=(rect.bottom+4)+'px';
+  pal.style.display='block';
+  setTimeout(function(){
+    var pr=pal.getBoundingClientRect();
+    if(pr.right>window.innerWidth-8){ pal.style.left=(window.innerWidth-pr.width-8)+'px'; }
+    if(pr.bottom>window.innerHeight-8){ pal.style.top=(rect.top-pr.height-4)+'px'; }
+  },0);
+}
+function closeColorPalette(){
+  var pal=document.getElementById('colorPalette');
+  if(pal) pal.style.display='none';
+}
+function cpaletteApply(color){
+  applyFormat(_paletteTarget, color);
+  if(_paletteTarget==='color'){
+    var ip=document.getElementById('fmt-color'); if(ip) ip.value=color;
+  } else {
+    var ip2=document.getElementById('fmt-bg'); if(ip2) ip2.value=color;
+  }
+  closeColorPalette();
+}
+function cpaletteOpenPicker(){
+  // パレットを閉じる前にピッカーを開く（同じクリックイベント内で開く必要あり）
+  var id = _paletteTarget==='color' ? 'fmt-color' : 'fmt-bg';
+  var ip=document.getElementById(id);
+  if(ip) ip.click();
+  closeColorPalette();
+}
+// fmtModal 背景クリックで閉じる
 (function(){
   var ov=document.getElementById('fmtModal');
   if(ov) ov.addEventListener('click', function(e){ if(e.target===this) closeFmtModal(); });
 })();
+// 外部クリックで閉じる
+document.addEventListener('click', function(e){
+  var pal=document.getElementById('colorPalette');
+  if(!pal||pal.style.display==='none') return;
+  if(pal.contains(e.target)) return;
+  var wrap=e.target.closest&&e.target.closest('.fmt-color-wrap');
+  if(wrap) return; // wrap クリックは openColorPalette で処理
+  closeColorPalette();
+});
 
 // 小数点桁数増減
 function toggleDecimal() {
