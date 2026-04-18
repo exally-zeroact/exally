@@ -572,8 +572,8 @@ function switchType(t){
   document.querySelectorAll('.type-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='monthly')||(i===1&&t==='hourly')));
   document.getElementById('cardTitle').textContent=t==='monthly'?'給料明細（月給制）':'給料明細（時給制）';
   document.getElementById('noticeEl').innerHTML=t==='monthly'
-    ?'⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
-    :'⚠️ <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
+    ?'\u26a0\ufe0f <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
+    :'\u26a0\ufe0f <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
   document.getElementById('resultEl').classList.remove('show');
   init();
 }
@@ -723,7 +723,7 @@ function addItem(id){
 
 function addCustom(){
   const inp=document.getElementById('customInp');const sel=document.getElementById('customType');
-  const label=inp.value.trim();if(!label){showToast('⚠️ 項目名を入力してください');return;}
+  const label=inp.value.trim();if(!label){showToast('\u26a0\ufe0f 項目名を入力してください');return;}
   const type=sel.value;const id='custom_'+Date.now();const cat=type==='pay'?'支給':'控除';
   const ni={id,label,type,cat,default:false,canRemove:true,value:'手入力',formula:null,title:null,rates:null};
   const lastIdx=active.map((i,idx)=>({i,idx})).filter(({i})=>i.cat===cat).pop()?.idx??active.length-1;
@@ -772,7 +772,7 @@ function setCustomFormula(formula){const inp=document.getElementById('customForm
 
 function applyCustomFormula(){
   const inp=document.getElementById('customFormulaInput');if(!inp||!popId)return;
-  const formula=inp.value.trim();if(!formula){showToast('⚠️ 数式を入力してください');return;}
+  const formula=inp.value.trim();if(!formula){showToast('\u26a0\ufe0f 数式を入力してください');return;}
   const activeItem=active.find(i=>i.id===popId);
   if(activeItem){activeItem.formula=formula;activeItem.value=formula;delete manualItems[popId];}
   render();closePop();showToast('✅ 計算式を設定しました');
@@ -895,7 +895,7 @@ function updateFitCheck(){
     </div>`;
   } else if(totalRows <= limit){
     html = `<div style="background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.8;">
-      ⚠️ <strong>ギリギリです</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
+      \u26a0\ufe0f <strong>ギリギリです</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
       印刷時に見切れる可能性があります。項目を1〜2個減らすと安全です。
     </div>`;
   } else {
@@ -1494,7 +1494,7 @@ function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
 }
 
 function copyTSVDirect(){
-  if(!generatedTSV){ showToast('⚠️ 先にデータを生成してください'); return; }
+  if(!generatedTSV){ showToast('\u26a0\ufe0f 先にデータを生成してください'); return; }
   navigator.clipboard.writeText(generatedTSV).then(()=>{
     showToast('📋 コピー完了');
   });
@@ -1722,13 +1722,13 @@ const PAPER_OPTIONS={
     {
       label:'A4縦・2人分（上下に並べる）',rank:'🥈',
       desc:'【紙代半減】1枚を上下2分割して2名分を印刷。ミシン目入り用紙を使うと綺麗に切り離せます。',
-      note:'⚠️ 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
+      note:'\u26a0\ufe0f 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
       preview:'a4-v-2'
     },
     {
       label:'A4縦・3人分（上下に並べる）',rank:'🥉',
       desc:'【紙代1/3】1枚に3名分を上下に印刷。縦の最大人数です。',
-      note:'⚠️ 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
+      note:'\u26a0\ufe0f 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
       preview:'a4-v-3'
     },
     {
@@ -1740,7 +1740,7 @@ const PAPER_OPTIONS={
     {
       label:'A4横・2人分（左右に並べる）',rank:'⑤',
       desc:'【横の最大人数】横向きで左右に2名分を並べます。横レイアウトで2人分が必要な場合に。',
-      note:'⚠️ 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
+      note:'\u26a0\ufe0f 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
       preview:'a4-h-2'
     },
     {
@@ -1752,7 +1752,7 @@ const PAPER_OPTIONS={
     {
       label:'B5縦・2人分（上下に並べる）',rank:'⑦',
       desc:'【B5を上下2分割】切り離し後はB6サイズ。長形6号封筒にぴったり入ります。紙代半減。',
-      note:'⚠️ 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
+      note:'\u26a0\ufe0f 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
       preview:'b5-v-2'
     },
   ],
@@ -1766,13 +1766,13 @@ const PAPER_OPTIONS={
     {
       label:'A4横・1人分（項目多め）',rank:'②',
       desc:'【項目が多い方向け】支給・控除の項目数が多い場合に横向きにすると見やすくなります。',
-      note:'⚠️ スマホで見る場合は横スクロールが必要になる場合があります。',
+      note:'\u26a0\ufe0f スマホで見る場合は横スクロールが必要になる場合があります。',
       preview:'a4-h-1'
     },
     {
       label:'A4縦・2人分（PDF）',rank:'③',
       desc:'【紙代節約・電子配信】1つのPDFに2名分を上下に配置して送付。印刷して切り離しても使えます。',
-      note:'⚠️ 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
+      note:'\u26a0\ufe0f 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
       preview:'a4-v-2'
     },
   ]
@@ -1829,7 +1829,7 @@ const PAPER_PREVIEWS={
         ✅ 1枚で2名分を印刷<br>
         ✅ 紙代・印刷代が半分に<br>
         ✂️ ミシン目で切り離して配布<br>
-        ⚠️ 項目は10個以内推奨
+        \u26a0\ufe0f 項目は10個以内推奨
       </div>
     </div>`
   },
@@ -1860,8 +1860,8 @@ const PAPER_PREVIEWS={
         ✅ 1枚で3名分を印刷<br>
         ✅ 紙代が1/3に<br>
         ✂️ ミシン目で切り離して配布<br>
-        ⚠️ 項目は各5個以内推奨<br>
-        ⚠️ 縦の最大人数
+        \u26a0\ufe0f 項目は各5個以内推奨<br>
+        \u26a0\ufe0f 縦の最大人数
       </div>
     </div>`
   },
@@ -1917,9 +1917,9 @@ const PAPER_PREVIEWS={
       <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
         ✅ 1枚で2名分を印刷<br>
         ✂️ ミシン目で切り離して配布<br>
-        ⚠️ 1人分の幅が狭くなる<br>
-        ⚠️ 横の最大人数<br>
-        ⚠️ 項目は少なめ推奨
+        \u26a0\ufe0f 1人分の幅が狭くなる<br>
+        \u26a0\ufe0f 横の最大人数<br>
+        \u26a0\ufe0f 項目は少なめ推奨
       </div>
     </div>`
   },
@@ -1972,7 +1972,7 @@ const PAPER_PREVIEWS={
         ✅ 切り離し後はB6サイズ<br>
         ✅ 長形6号封筒にぴったり<br>
         ✂️ ミシン目で切り離して配布<br>
-        ⚠️ 項目は各3〜4個以内推奨
+        \u26a0\ufe0f 項目は各3〜4個以内推奨
       </div>
     </div>`
   }
@@ -2126,7 +2126,7 @@ function changeGyoshu(){
 
 document.addEventListener('DOMContentLoaded',function(){
   renderPaperOptions();
-  document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
+  document.getElementById('noticeEl').innerHTML='\u26a0\ufe0f <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
   init();
   updateFitCheck();
   initRates();
@@ -2272,12 +2272,12 @@ function calcApproxPayTotal(){
 function openPrintWindow(autoPrint) {
   var content = document.getElementById('excelPreview');
   if(!content || content.innerHTML.trim() === '') {
-    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    showToast('\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。');
     return;
   }
   var pw = window.open('', '_blank', 'width=900,height=700');
   if(!pw) {
-    showToast('⚠️ ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    showToast('\u26a0\ufe0f ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
     return;
   }
   pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
@@ -2306,11 +2306,11 @@ function downloadPDF(){ showToast(‘📄 新しいウィンドウが開きま�
 // Excelでダウンロード（SheetJS）
 function downloadExcel(){
 if(typeof XLSX === ‘undefined’){
-showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+showToast(’\u26a0\ufe0f ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
 return;
 }
 if(!generatedTSV || generatedTSV.trim() === ‘’){
-showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
+showToast(’\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。’);
 return;
 }
 // TSVを2次元配列に変換
@@ -2342,11 +2342,11 @@ showToast(‘📥 ‘+fname+’ をダウンロードしました’);
 // 賃金台帳をダウンロード
 function downloadKinmuDaichou(){
 if(typeof XLSX === ‘undefined’){
-showToast(‘⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
+showToast(’\u26a0\ufe0f ダウンロード機能を読み込み中です。少し待ってから再度お試しください。’);
 return;
 }
 if(!generatedTSV || generatedTSV.trim() === ‘’){
-showToast(‘⚠️ 先に「Excel用データを生成する」ボタンを押してください。’);
+showToast(’\u26a0\ufe0f 先に「Excel用データを生成する」ボタンを押してください。’);
 return;
 }
 
