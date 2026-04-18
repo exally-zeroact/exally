@@ -448,6 +448,14 @@ body{padding-bottom:80px;}
 <!-- ===== SVG symbol defs (book.htmlから流用) ===== -->
 <svg style="display:none;" aria-hidden="true">
   <defs>
+    <symbol id="grid-sm" viewBox="0 0 20 20">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
+      <rect x="2" y="2" width="16" height="5" rx="2" fill="#52B788"/>
+      <rect x="2" y="5" width="16" height="2" fill="#52B788"/>
+      <line x1="8" y1="7" x2="8" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="14" y1="7" x2="14" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="2" y1="12" x2="18" y2="12" stroke="#C8ECD8" stroke-width="1"/>
+    </symbol>
     <symbol id="template-sm" viewBox="0 0 20 20">
       <rect x="4" y="3" width="12" height="15" rx="1.5" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
       <rect x="7" y="2" width="6" height="3" rx="1" fill="#52B788"/>
@@ -521,6 +529,7 @@ body{padding-bottom:80px;}
     <nav class="book-header-nav" aria-label="他画面への移動">
       <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
       <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+      <a href="book.html" class="book-header-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
       <a href="chat.html?tab=template" class="book-header-nav-item active" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
       <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
       <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
