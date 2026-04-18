@@ -195,16 +195,27 @@ display:block;
 }
 #cell-input {
 position:absolute;
-display:none;
-border:2px solid #1E88E5;
+display:block;
+border:none;
 outline:none;
 font-size:16px;
 font-family:inherit;
-padding:1px 3px;
-background:#fff;
+padding:0;
+background:transparent;
 z-index:20;
 resize:none;
 overflow:hidden;
+width:0;
+height:0;
+opacity:0;
+pointer-events:none;
+}
+#cell-input.editing {
+border:2px solid #1E88E5;
+padding:1px 3px;
+background:#fff;
+opacity:1;
+pointer-events:auto;
 }
 #ai-panel-wrap {
 display:none;
@@ -2865,7 +2876,13 @@ window.addEventListener('load', function() {
     if(typeof render === 'function') render();
     bindEvents();
     initPopupDrag(); initPopupResize();
-    canvas.focus();
+    // 初期セル選択＆cell-input に focus（IME常時ON化）
+    var _ci = document.getElementById('cell-input');
+    if(_ci){
+      _ci.style.left = colX(0)+'px';
+      _ci.style.top = rowY(0)+'px';
+      _ci.focus();
+    }
     if(typeof initFormulaEngine === 'function'){
       initFormulaEngine(sheets.map(function(s){return s.name;}));
     }
@@ -3105,6 +3122,19 @@ function sel(r1,c1,r2,c2){
   anchorR=r1; anchorC=c1;
   activeR=r2; activeC=c2;
   scrollToCell(selR1,selC1); updateBar(); render();
+  // cell-input を選択セル上に配置＆focus保持（IME常時ON化のため）
+  if(!editingCell){
+    var ci=document.getElementById('cell-input');
+    if(ci){
+      ci.style.left=colX(selC1)+'px';
+      ci.style.top=rowY(selR1)+'px';
+      ci.value='';
+      // 他の入力欄（formula-input, popup-input等）にfocusがなければ cell-input に
+      var ae=document.activeElement;
+      var tagAllow = !ae || ae===ci || ae===document.body || ae.tagName==='CANVAS' || ae===document.documentElement;
+      if(tagAllow) ci.focus();
+    }
+  }
 }
 
 // Shift拡張専用（アンカーを動かさずactiveだけ動かす）
@@ -3258,13 +3288,36 @@ function bindEvents(){
   // セル入力
   var ci=document.getElementById('cell-input');
   ci.addEventListener('keydown',function(e){
+    // 編集モード中以外: 矢印キー等はセル操作にパス
+    if(!editingCell){
+      if(e.key==='ArrowDown'||e.key==='ArrowUp'||e.key==='ArrowLeft'||e.key==='ArrowRight'||
+         e.key==='Tab'||e.key==='Home'||e.key==='End'||e.key==='Delete'||e.key==='Backspace'||
+         e.key==='F2'||e.key==='PageUp'||e.key==='PageDown'){
+        // onKD が処理する（スキップ）
+        return;
+      }
+      // Ctrl/Cmd ショートカットも onKD へ
+      if(e.ctrlKey||e.metaKey) return;
+      // Enter: F2相当で編集開始（既存値を初期値に）
+      if(e.key==='Enter'){ e.preventDefault(); startEdit(selR1,selC1); return; }
+    }
+    // 編集モード中
     if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(1,0);}
     else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(0,1);}
     else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
   });
   ci.addEventListener('input',function(){
     var v=this.value;
-    refMode=(editingCell&&this.style.display!=='none'&&v.length>0&&(v[0]==='='||v[0]==='＝'));
+    // 編集モード未開始で文字が入った → 編集モード開始（IME経由でも動く）
+    if(!editingCell && v.length>0){
+      editingCell={r:selR1,c:selC1};
+      var x=colX(selC1),y=rowY(selR1),w=cW(selC1),h=rH(selR1);
+      this.style.left=x+'px'; this.style.top=y+'px';
+      this.style.width=Math.max(w,80)+'px';
+      this.style.height=h+'px';
+      this.classList.add('editing');
+    }
+    refMode=(editingCell&&this.classList.contains('editing')&&v.length>0&&(v[0]==='='||v[0]==='＝'));
     if(!refMode){refStartR=-1;} render();
   });
   // blur: IMEの変換中はcommitしない（compositionend後にcommit）
@@ -3369,6 +3422,8 @@ function setRowH(r, h){
 // マウス
 function onMD(e){
   if(e.button!==0) return;
+  // canvas が focus を奪うのを防ぐ（cell-input の focus 保持のため）
+  e.preventDefault();
   // refMode中はcommitEditしない・セル参照挿入
   if(getRefInput()){
     var p2=cPos(e);
@@ -3380,7 +3435,9 @@ function onMD(e){
     }
   }
   commitEdit(); hideCtxMenu();
-  canvas.focus();
+  // cell-input に focus 強制（マウス操作で奪われた focus を取り戻す）
+  var _ci=document.getElementById('cell-input');
+  if(_ci && !editingCell) setTimeout(function(){ _ci.focus(); },0);
   var p=cPos(e);
 
   // 列幅リサイズ検出（列ヘッダー境界）
@@ -3710,7 +3767,8 @@ function onTE(e){
       insertRefAddr(tr,tc,tr,tc);
       touchState=null; return;
     }
-    commitEdit(); canvas.focus();
+    commitEdit();
+    var _ci2=document.getElementById('cell-input'); if(_ci2) _ci2.focus();
     var c=xToC(x),r2=yToR(y);
     if(selR1===r2&&selC1===c&&(Date.now()-touchState.time)<400){
       document.getElementById('formula-input').focus();
@@ -3744,9 +3802,13 @@ function onKD(e){
     }
   }
   // 以下はfocusガードあり
-  // 入力欄にフォーカスがある場合はキャンバスのキー処理をスキップ
+  // 入力欄（cell-input 以外）にフォーカスがある場合はキャンバスのキー処理をスキップ
   var _ae = document.activeElement;
-  if(_ae && (_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'||_ae.tagName==='SELECT')) return;
+  if(_ae && (_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'||_ae.tagName==='SELECT')){
+    if(_ae.id!=='cell-input') return;
+    // cell-input の場合: 編集モード中は onKD スキップ（cell-input側で処理）
+    if(editingCell) return;
+  }
   var moved=false;
 
   // Shift+矢印：選択範囲拡張
@@ -3770,19 +3832,7 @@ function onKD(e){
   if(e.key==='Tab'&&!e.shiftKey){moveSel(0,1);moved=true;}
   if(e.key==='Tab'&&e.shiftKey){moveSel(0,-1);moved=true;}
   if(moved) e.preventDefault();
-  // IME入力中: 独自判定でstartEditして入力欄にfocus移譲
-  // (ek.length===1 判定より前に置く。'Process' などは length>1 で来るため)
-  if(e.isComposing || e.keyCode===229 || e.key==='Process'){
-    e.preventDefault();
-    startEdit(selR1,selC1,'');
-    // 次のkeydownは cell-input にfocusされた状態で来るのでIMEが正常動作
-    return;
-  }
-  if(ek.length===1&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
-    // 通常文字キー: preventDefault せずに空で編集開始し、キー入力を cell-input に委譲
-    // これにより半角英数もIMEも同じ流れで動作
-    startEdit(selR1,selC1,'');
-  }
+  // 文字キーは cell-input が受け取るので onKD では処理しない（IME正常動作のため）
 }
 
 // コピペバッファ
@@ -3970,7 +4020,7 @@ function startEdit(r,c,init){
   var el=document.getElementById('cell-input');
   el.style.left=x+'px'; el.style.top=y+'px';
   el.style.width=Math.max(w,80)+'px'; el.style.height=h+'px';
-  el.style.display='block';
+  el.classList.add('editing');
   el.value=init!==undefined?init:(getCell(r,c).v||'');
   el.focus();
   if(init!==undefined) el.setSelectionRange(init.length,init.length);
@@ -4080,15 +4130,29 @@ function commitEdit(){
   if(!editingCell) return;
   var el=document.getElementById('cell-input');
   setCell(editingCell.r,editingCell.c,el.value);
-  el.style.display='none'; el.value='';
+  el.classList.remove('editing');
+  el.value='';
+  el.style.width='0'; el.style.height='0';
   editingCell=null; refMode=false;
   updateBar(); render();
+  // focus維持（次の入力のため）
+  setTimeout(function(){
+    el.style.left=colX(selC1)+'px'; el.style.top=rowY(selR1)+'px';
+    el.focus();
+  },0);
 }
 function cancelEdit(){
   if(!editingCell) return;
-  document.getElementById('cell-input').style.display='none';
-  document.getElementById('cell-input').value='';
+  var el=document.getElementById('cell-input');
+  el.classList.remove('editing');
+  el.value='';
+  el.style.width='0'; el.style.height='0';
   editingCell=null; refMode=false;
+  render();
+  setTimeout(function(){
+    el.style.left=colX(selC1)+'px'; el.style.top=rowY(selR1)+'px';
+    el.focus();
+  },0);
 }
 
 // シート
@@ -4741,7 +4805,8 @@ function closeResponsePopup(){
   popup.style.display = '';
   popupVisible = false;
   savePopupState();
-  if(canvas) canvas.focus();
+  var ci = document.getElementById('cell-input');
+  if(ci) ci.focus();
 }
 
 function savePopupState(){
