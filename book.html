@@ -432,6 +432,18 @@ text-decoration:none;
 .bottom-stack{box-shadow:none;background:transparent;}
 #sheet-tabs{border-bottom:none;}
 }
+
+/* PC用 細いサイドバー（48px・アイコンのみ） */
+.book-sidebar{display:none;}
+@media(min-width:769px){
+.book-sidebar{display:flex;flex-direction:column;position:fixed;top:0;left:0;width:48px;height:100dvh;background:#ffffff;border-right:1px solid #D4EDE1;padding:12px 0;z-index:100;align-items:center;gap:4px;}
+body{padding-left:48px;}
+.book-sidebar-item{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;border:none;background:none;color:#7A9A87;font-size:16px;transition:all 0.18s;text-decoration:none;flex-shrink:0;}
+.book-sidebar-item:hover{background:#F0FAF4;color:#3D9E72;}
+.book-sidebar-item.active{background:#F0FAF4;color:#3D9E72;}
+.book-sidebar-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.book-sidebar-item svg{width:18px;height:18px;}
+}
 .sheet-tab {
 padding:5px 14px;
 font-size:12px;
@@ -2146,6 +2158,19 @@ function drawSel(){
 
   </defs>
 </svg>
+
+<!-- PC用 細いサイドバー（アイコンのみ・他画面への導線） -->
+
+<aside class="book-sidebar" aria-label="ナビゲーション">
+  <a href="home.html" class="book-sidebar-item" title="ホーム">🏠</a>
+  <a href="chat.html" class="book-sidebar-item" title="AIチャット">🤖</a>
+  <a href="book.html" class="book-sidebar-item active" title="ブック"><svg><use href="#grid-sm"/></svg></a>
+  <a href="chat.html?tab=template" class="book-sidebar-item" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
+  <span class="book-sidebar-item nav-disabled" title="電子ハンコ"><svg><use href="#stamp-sm"/></svg></span>
+  <a href="chat.html?tab=book" class="book-sidebar-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+  <a href="chat.html?tab=quiz" class="book-sidebar-item" title="クイズ">🎯</a>
+  <a href="chat.html?tab=settings" class="book-sidebar-item" title="設定">⚙️</a>
+</aside>
 
 <div id="loading"><div class="spinner"></div><p>グリッドを起動中...</p></div>
 
