@@ -987,6 +987,19 @@ var HF_ERR = {
 function initFormulaEngine(sheetNames) {
   if(typeof HyperFormula === 'undefined') return;
   hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3'});
+  // FN_LIBRARY に HyperFormula の全関数を自動追加（既存重複は除く）
+  try {
+    if(typeof HyperFormula.getRegisteredFunctionNames==='function' && typeof FN_LIBRARY!=='undefined'){
+      var knownNames = {};
+      FN_LIBRARY.forEach(function(fn){ knownNames[fn.n]=true; });
+      var allNames = HyperFormula.getRegisteredFunctionNames('enGB') || [];
+      allNames.forEach(function(name){
+        if(!knownNames[name]){
+          FN_LIBRARY.push({n:name, c:'その他', d:'', s:name+'(...)'});
+        }
+      });
+    }
+  } catch(e) { console.warn('HF関数名取得失敗', e); }
   for(var i=0;i<sheetNames.length;i++) hf.addSheet(sheetNames[i]);
 }
 // シート名→HF数値IDに変換（HFはindex番号を要求）
@@ -2068,6 +2081,26 @@ function _doRender() {
     ctx.restore();
   });
 
+  // === 編集中なら _currentRefs 再計算（状態ズレ防止・必ず先にやる）===
+  var _editCi = document.getElementById('cell-input');
+  var _editFi = document.getElementById('formula-input');
+  var _editVal = null, _editR=-1, _editC=-1;
+  if(editingCell && _editCi && _editCi.classList.contains('editing')){
+    var _v1 = _editCi.value;
+    if(_v1 && (_v1[0]==='='||_v1[0]==='＝')){
+      _editVal = _v1; _editR = editingCell.r; _editC = editingCell.c;
+    }
+  } else if(_editFi && document.activeElement===_editFi){
+    var _fv = _editFi.value;
+    if(_fv && (_fv[0]==='='||_fv[0]==='＝')){
+      _editVal = _fv;
+    }
+  }
+  if(_editVal){
+    _currentRefs = extractRefs(_editVal);
+    refMode = true;
+  }
+
   if(getRefInput()&&_currentRefs.length>0){
     _currentRefs.forEach(function(addr,i){
       var color=REF_COLORS[i%REF_COLORS.length];
@@ -2076,6 +2109,11 @@ function _doRender() {
     });
   } else if(getRefInput()&&refStartR>=0){
     drawRefHighlightColor(refStartR,refStartC,REF_COLORS[0]);
+  }
+
+  // 編集中セルの数式テキストを色分け描画（Excel互換：参照先と同じ色で）
+  if(_editVal && _editR>=0){
+    drawColoredFormulaOnCell(_editR, _editC, _editVal);
   }
 
   // ⋮ボタン位置を更新
@@ -2260,6 +2298,8 @@ function insertRefAddr(r1,c1,r2,c2){
   }
   refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
   refStartR=r1; refStartC=c1;
+  // focus を入力欄に戻す（Excelライクに続けて +, *, セル選択が打てるように）
+  try{ el.focus(); }catch(e){}
   render();
 }
 function parseAddr(addr){
@@ -2288,6 +2328,49 @@ function drawRefHighlightColor(r,c,color){
   ctx.restore();
 }
 function drawRefHighlight(r,c){ drawRefHighlightColor(r,c,REF_COLORS[0]); }
+
+// 編集中セルに色分けした数式テキストを描画（cell-inputは透明のため、上書きで見せる）
+function drawColoredFormulaOnCell(r, c, formula){
+  var x=colX(c), y=rowY(r), w=cW(c), h=rH(r);
+  if(x+w<HDR_W||y+h<HDR_H) return;
+  // セル内クリップ（ヘッダー被りを防ぐ）
+  ctx.save();
+  ctx.rect(Math.max(x,HDR_W), Math.max(y,HDR_H), w, h);
+  ctx.clip();
+  // 背景を白で塗って下地のrender内容を隠す（cell-inputと同じ背景）
+  ctx.fillStyle='#fff';
+  ctx.fillRect(x+1, y+1, w-2, h-2);
+  // フォント設定
+  var fs = Math.max(9, Math.min(72, Math.round(12 * scale)));
+  ctx.font = fs + 'px "Noto Sans JP","DM Mono",monospace';
+  ctx.textBaseline='middle';
+  ctx.textAlign='left';
+  // トークン分解（セル参照のみ色付け、それ以外は黒）
+  var cellRE = /(\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?)/g;
+  // _currentRefs のアドレス → 色マップ（大文字化・$除去）
+  var colorMap = {};
+  _currentRefs.forEach(function(addr, i){
+    colorMap[addr.toUpperCase()] = REF_COLORS[i % REF_COLORS.length];
+  });
+  var parts = [];
+  var lastIdx = 0, m;
+  while((m = cellRE.exec(formula)) !== null){
+    if(m.index > lastIdx) parts.push({txt:formula.substring(lastIdx, m.index), color:'#1A4A2E'});
+    var key = m[0].replace(/\$/g,'').toUpperCase();
+    parts.push({txt:m[0], color: colorMap[key] || '#1A4A2E'});
+    lastIdx = cellRE.lastIndex;
+  }
+  if(lastIdx < formula.length) parts.push({txt:formula.substring(lastIdx), color:'#1A4A2E'});
+  // 描画（左から順に）
+  var curX = x + 4;
+  var midY = y + h/2;
+  parts.forEach(function(p){
+    ctx.fillStyle = p.color;
+    ctx.fillText(p.txt, curX, midY);
+    curX += ctx.measureText(p.txt).width;
+  });
+  ctx.restore();
+}
 
 function drawSel(){
   var x1=colX(selC1),y1=rowY(selR1);
@@ -2764,7 +2847,7 @@ function detectTimePattern(values){
 <!-- Excelバージョン選択モーダル（book.html用） -->
 
 <!-- 関数オートコンプリート -->
-<div id="fnAutocomplete" style="display:none;position:absolute;z-index:1100;background:#fff;border:1px solid #52B788;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:240px;max-width:320px;max-height:220px;overflow-y:auto;"></div>
+<div id="fnAutocomplete" style="display:none;position:fixed;z-index:99999;background:#fff;border:2px solid #52B788;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.25);min-width:240px;max-width:320px;max-height:240px;overflow-y:auto;"></div>
 
 <!-- トースト通知 -->
 <div id="toast"></div>
@@ -2872,7 +2955,8 @@ window.addEventListener('load',updateBookVerBadge);
 <div id="formula-bar">
   <input id="cell-addr" type="text" value="A1" readonly>
   <span id="fx-icon" title="関数の挿入" onclick="openFnPalette()">fx</span>
-  <input id="formula-input" type="text" placeholder="値や数式を入力してね">
+  <input id="formula-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="値や数式を入力してね">
+  <button id="formula-cancel" class="undo-btn" onclick="fbCancel()" title="キャンセル" style="color:#E53935;font-weight:700;">×</button>
   <button id="fkb-toggle" class="undo-btn" onclick="fkbToggle()" title="キーボード切替（関数や記号が打ちやすい）">⌨️</button>
   <button class="undo-btn" onclick="doUndo()" title="元に戻す">↩</button>
   <button class="undo-btn" onclick="doRedo()" title="やり直す">↪</button>
@@ -3062,7 +3146,7 @@ window.addEventListener('load',updateBookVerBadge);
 
 <canvas id="grid-canvas" tabindex="0"></canvas>
 
-  <textarea id="cell-input" rows="1"></textarea>
+  <textarea id="cell-input" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 
 </div>
 
@@ -4616,6 +4700,26 @@ function fkbCommit(){
   fkbHide();
   updateBar(); render();
 }
+// 数式バー × ボタン：数式バー/cell-input 両方の編集をキャンセル
+function fbCancel(){
+  var stored=getCell(selR1,selC1).f||'';
+  var fi=document.getElementById('formula-input');
+  if(fi) fi.value=stored;
+  var ci=document.getElementById('cell-input');
+  if(ci){
+    ci.value='';
+    ci.classList.remove('editing');
+    ci.style.width='0'; ci.style.height='0';
+  }
+  editingCell=null;
+  refMode=false; refStartR=-1;
+  _currentRefs=[];
+  _fiCursorPos=stored.length;
+  fkbHide();
+  // フォーカスを cell-input に戻す
+  if(ci){ setTimeout(function(){ ci.focus(); },0); }
+  render(); updateBar();
+}
 function fkbCancel(){
   var stored=getCell(selR1,selC1).f||'';
   document.getElementById('formula-input').value=stored;
@@ -4919,7 +5023,7 @@ var FN_LIBRARY=[
   {n:'DATE',      c:'日付', d:'日付作成', s:'DATE(年, 月, 日)'},
   {n:'DATEDIF',   c:'日付', d:'日付の差', s:'DATEDIF(開始, 終了, 単位)'}
 ];
-var FN_CATS=['すべて','数学','統計','論理','検索','文字列','日付'];
+var FN_CATS=['すべて','数学','統計','論理','検索','文字列','日付','その他'];
 var _fnSelectedCat='すべて';
 var _fnSelected=null;
 function openFnPalette(){
@@ -5022,14 +5126,16 @@ document.addEventListener('mousedown', function(e){
 // ===== 関数オートコンプリート =====
 var _acActive=false, _acIdx=-1, _acMatches=[], _acTargetInput=null;
 function getFnAutocompleteToken(value, cursorPos){
-  // カーソル直前の関数名候補を抽出（= や ( や , や + の直後の英字）
+  // カーソル直前の関数名候補を抽出
   var before = value.substring(0, cursorPos);
-  // 末尾が英字の連続した部分
-  var m = before.match(/([A-Za-z]+)$/);
+  // 全角英字 → 半角に変換して判定（表示は全角のまま）
+  var beforeNorm = before.replace(/[Ａ-Ｚａ-ｚ]/g, function(c){
+    return String.fromCharCode(c.charCodeAt(0)-0xFEE0);
+  });
+  var m = beforeNorm.match(/([A-Za-z]+)$/);
   if(!m) return null;
   var token = m[1];
-  // その直前が開始文字か確認（=, (, ,, 演算子など）
-  var prevChar = before.substring(0, before.length-token.length);
+  var prevChar = beforeNorm.substring(0, beforeNorm.length-token.length);
   var lastC = prevChar.slice(-1);
   if(prevChar==='' || /[=＝(,+\-*/^&<>%\s]$/.test(lastC)){
     return {token:token, start:before.length-token.length, cursorPos:cursorPos};
@@ -5052,18 +5158,45 @@ function showFnAutocomplete(targetInput){
     var item = document.createElement('div');
     var active = (i===_acIdx);
     item.style.cssText='padding:7px 12px;cursor:pointer;border-bottom:1px solid #F0FAF4;background:'+(active?'#F0FAF4':'#fff')+';';
-    item.innerHTML='<div style="display:flex;align-items:center;gap:6px;"><span style="font-family:monospace;font-weight:700;color:#3D9E72;font-size:13px;">'+fn.n+'</span><span style="font-size:10px;color:#7A9A87;">'+fn.c+'</span></div><div style="font-size:11px;color:#5A7A65;margin-top:2px;">'+fn.d+'</div>';
+    item.innerHTML='<div style="display:flex;align-items:center;gap:6px;"><span style="font-family:monospace;font-weight:700;color:#3D9E72;font-size:13px;">'+fn.n+'</span><span style="font-size:10px;color:#7A9A87;">'+fn.c+'</span></div>'+(fn.d?'<div style="font-size:11px;color:#5A7A65;margin-top:2px;">'+fn.d+'</div>':'');
     item.setAttribute('data-idx', i);
     item.onmousedown=function(e){ e.preventDefault(); _acIdx=i; insertFnAutocomplete(); };
     ac.appendChild(item);
   });
-  // 位置
+  // 位置：入力欄の上に優先表示（ブラウザ予測変換は下に出るため）
   var rect = targetInput.getBoundingClientRect();
-  ac.style.left = rect.left + 'px';
-  ac.style.top = (rect.bottom + 2) + 'px';
+  var anchorTop, anchorBottom, anchorLeft;
+  if(targetInput.id==='cell-input' && editingCell){
+    var canvasRect = canvas.getBoundingClientRect();
+    anchorTop = canvasRect.top + rowY(selR1);
+    anchorBottom = canvasRect.top + rowY(selR1) + rH(selR1);
+    anchorLeft = canvasRect.left + colX(selC1);
+  } else {
+    anchorTop = rect.top;
+    anchorBottom = rect.bottom;
+    anchorLeft = rect.left;
+  }
+  ac.style.left = anchorLeft + 'px';
   ac.style.display = 'block';
+  // サイズ取得して上下判定
+  setTimeout(function(){
+    var acRect = ac.getBoundingClientRect();
+    var spaceAbove = anchorTop;
+    var spaceBelow = window.innerHeight - anchorBottom;
+    // 上に置ける && (上の方が広い or 下が狭すぎる) → 上
+    if(spaceAbove > acRect.height + 10 && (spaceAbove >= spaceBelow || spaceBelow < acRect.height + 10)){
+      ac.style.top = (anchorTop - acRect.height - 4) + 'px';
+    } else {
+      ac.style.top = (anchorBottom + 4) + 'px';
+    }
+    // 左右はみ出し対応
+    if(acRect.right > window.innerWidth - 8){
+      ac.style.left = (window.innerWidth - acRect.width - 8) + 'px';
+    }
+  }, 0);
   _acActive = true;
-  if(_acIdx < 0) _acIdx = 0;
+  // _acIdx は -1 のまま（ユーザーが↓/↑で選ぶまで選択状態にしない）
+  // → Enter押下時にセル確定を優先できる
 }
 function hideFnAutocomplete(){
   _acActive = false; _acIdx = -1;
@@ -5072,7 +5205,11 @@ function hideFnAutocomplete(){
 }
 function moveFnAutocomplete(delta){
   if(!_acActive || _acMatches.length===0) return;
-  _acIdx = (_acIdx + delta + _acMatches.length) % _acMatches.length;
+  if(_acIdx < 0){
+    _acIdx = (delta > 0) ? 0 : _acMatches.length - 1;
+  } else {
+    _acIdx = (_acIdx + delta + _acMatches.length) % _acMatches.length;
+  }
   // 再描画
   if(_acTargetInput) showFnAutocomplete(_acTargetInput);
 }
@@ -5106,13 +5243,23 @@ function insertFnAutocomplete(){
       }
     });
     input.addEventListener('keydown', function(e){
-      if(!_acActive) return;
+      // 候補が実際に表示されていてマッチがある時だけイベント消費
+      if(!_acActive || _acMatches.length===0){ return; }
       if(e.key==='ArrowDown'){ e.preventDefault(); moveFnAutocomplete(1); }
       else if(e.key==='ArrowUp'){ e.preventDefault(); moveFnAutocomplete(-1); }
-      else if(e.key==='Tab'||(_acActive && e.key==='Enter' && _acMatches.length>0)){
+      else if(e.key==='Tab'){
         e.preventDefault(); insertFnAutocomplete();
       }
-      else if(e.key==='Escape'){ hideFnAutocomplete(); }
+      else if(e.key==='Enter'){
+        // _acIdx>=0 ならユーザーが選んでる → 挿入
+        // _acIdx<0 なら未選択 → オートコンプリート閉じてEnterはcell-input確定へ
+        if(_acIdx >= 0){
+          e.preventDefault(); insertFnAutocomplete();
+        } else {
+          hideFnAutocomplete();
+        }
+      }
+      else if(e.key==='Escape'){ hideFnAutocomplete(); e.stopPropagation(); }
     });
     input.addEventListener('blur', function(){
       setTimeout(hideFnAutocomplete, 200); // 少し待ってクリック処理に時間
