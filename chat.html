@@ -3752,6 +3752,7 @@ function onMM(e){
   if(!touchState||touchState.type!=='msel') return;
   if(p.x<HDR_W||p.y<HDR_H) return;
   selR2=yToR(p.y); selC2=xToC(p.x); updateBar(); render();
+  if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
 }
 
 // タッチ
