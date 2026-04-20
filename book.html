@@ -55,7 +55,12 @@ body {
   padding:0 6px;
   gap:4px;
   flex-shrink:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
+#formula-bar::-webkit-scrollbar { display:none; }
 .undo-btn {
   height:26px;
   min-width:28px;
@@ -108,6 +113,129 @@ body {
 @media(min-width:769px){
   #fmt-bar2 { display:flex; }
   #fmt-toggle { display:none; }
+}
+/* スマホ：▼ボタンを右端にsticky固定（見切れ防止）*/
+@media(max-width:768px){
+  #fmt-toggle {
+    position:sticky;
+    right:0;
+    background:#F8FEFC;
+    border-left:0.5px solid #C8ECD8;
+    z-index:1;
+  }
+}
+/* 戻る・進むボタン（fmt-bar1の左端sticky固定）*/
+.fmt-undo-redo {
+  position:sticky;
+  left:0;
+  background:#F8FEFC;
+  border:none;
+  color:#3D9E72;
+  font-size:16px;
+  padding:0 6px;
+  height:26px;
+  cursor:pointer;
+  flex-shrink:0;
+  z-index:1;
+}
+.fmt-undo-redo:active { background:#E8F5EE; }
+.fmt-undo-redo-right {
+  left:30px;
+  border-right:0.5px solid #C8ECD8;
+}
+/* 複数選択ボタン（formula-bar右端sticky）*/
+.multi-select-btn {
+  position:sticky;
+  right:0;
+  background:#F0FAF4;
+  color:#3D9E72;
+  border:0.5px solid #52B788;
+  border-radius:4px;
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:500;
+  flex-shrink:0;
+  cursor:pointer;
+  white-space:nowrap;
+  height:24px;
+  z-index:2;
+}
+.multi-select-btn.active {
+  background:#52B788;
+  color:#ffffff;
+  border-color:#52B788;
+}
+/* 複数選択モード サブバー（モードON時のみ表示）*/
+#multi-select-bar {
+  display:none;
+  background:#F0FAF4;
+  border-bottom:1px solid #52B788;
+  padding:6px 8px;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+#multi-select-bar.open { display:flex; }
+#multi-select-info {
+  flex:1;
+  font-size:11px;
+  color:#1A4A2E;
+  font-family:'DM Mono',monospace;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#multi-select-info .label {
+  color:#3D9E72;
+  font-weight:500;
+  font-family:'Noto Sans JP',sans-serif;
+  margin-right:6px;
+}
+#multi-select-ai-btn {
+  padding:3px 10px;
+  background:#52B788;
+  color:#ffffff;
+  font-size:11px;
+  font-weight:500;
+  border:none;
+  border-radius:3px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+#multi-select-cancel-btn {
+  padding:3px 8px;
+  background:transparent;
+  color:#7A9A87;
+  font-size:11px;
+  border:0.5px solid #B8D4C0;
+  border-radius:3px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+/* 選択範囲チップ（メイン・追加範囲を個別に × で削除可能）*/
+.multi-range-chip {
+  display:inline-block;
+  padding:2px 6px;
+  margin:0 2px 0 0;
+  background:#ffffff;
+  border:0.5px solid #B8D4C0;
+  border-radius:10px;
+  cursor:pointer;
+  color:#1A4A2E;
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  white-space:nowrap;
+  line-height:1.6;
+}
+.multi-range-chip.main {
+  background:#52B788;
+  color:#ffffff;
+  border-color:#52B788;
+}
+.multi-range-chip:active { opacity:0.6; }
+.multi-range-chip b {
+  font-weight:700;
+  margin-left:4px;
 }
 .fmt-btn {
   height:26px;
@@ -162,8 +290,8 @@ body {
   justify-content:center;
 }
 #cell-addr {
-  width:64px;
-  font-size:12px;
+  width:30px;
+  font-size:11px;
   font-weight:700;
   color:#3D9E72;
   text-align:center;
@@ -283,7 +411,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 transition:background 0.2s;
 }
 #ai-float-btn:hover { background:#2E8A5F; }
@@ -345,7 +473,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 }
 
 #ai-response-area { flex:1; max-height:none !important; overflow-y:auto; }
@@ -357,9 +485,9 @@ font-family:‘Noto Sans JP’,sans-serif;
 .arg-orange{color:#E8843A;font-weight:600;}
 .arg-purple{color:#9B5DE5;font-weight:600;}
 .arg-green{color:#2E9E6B;font-weight:600;}
-.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:‘DM Mono’,monospace;font-size:11px;padding:4px 8px;border-radius:6px;margin:4px 0;white-space:pre-wrap;word-break:break-all;line-height:1.4;display:block;width:fit-content;max-width:420px;}
-.inline-code{font-family:‘DM Mono’,monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
-.copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
+.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:11px;padding:4px 8px;border-radius:6px;margin:4px 0;white-space:pre-wrap;word-break:break-all;line-height:1.4;display:block;width:fit-content;max-width:420px;}
+.inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
+.copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
 .copy-btn:hover{background:#3D9E72;color:white;}
 .ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
 .ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;user-select:text;}
@@ -442,7 +570,7 @@ padding:6px 1px 5px;
 cursor:pointer;
 border:none;
 background:none;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#7A9A87;
 text-decoration:none;
 }
@@ -537,7 +665,7 @@ border-radius:12px;
 box-shadow:0 4px 20px rgba(61,158,114,0.18);
 z-index:200;
 overflow:hidden;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 display:none;
 }
 #explain-popup.show { display:block; }
@@ -587,7 +715,7 @@ border-radius:6px;
 background:#fff;
 color:#3D9E72;
 font-size:12px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 cursor:pointer;
 font-weight:600;
 }
@@ -607,7 +735,7 @@ display:none;
 .ctx-item {
 padding:8px 16px;
 font-size:13px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#1A2B22;
 cursor:pointer;
 display:flex;
@@ -636,7 +764,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 }
 #ai-panel-wrap {
 position:fixed !important;
@@ -793,7 +921,7 @@ border:1px solid #C8ECD8;
 border-radius:7px;
 padding:3px 5px;
 font-size:16px; /* iOSズーム防止 - 16px未満でタップするとpanningが起きる */
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 resize:none;
 outline:none;
 color:#1A2B22;
@@ -843,7 +971,7 @@ background:#fff;
 border:1px solid #C8ECD8;
 border-radius:6px;
 font-size:15px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#1A2B22;
 cursor:pointer;
 touch-action:manipulation;
@@ -1336,6 +1464,13 @@ function _doRender() {
   for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
     for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
       ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
+  // STEP2: 追加範囲(selRanges)も同じ色で塗る
+  for(var _si=0;_si<selRanges.length;_si++){
+    var _sr=selRanges[_si];
+    for(var _r=Math.max(sR,_sr.r1);_r<=Math.min(eR+1,_sr.r2);_r++)
+      for(var _c=Math.max(sC,_sr.c1);_c<=Math.min(eC+1,_sr.c2);_c++)
+        ctx.fillRect(colX(_c),rowY(_r),cW(_c),rH(_r));
+  }
 
   // 2. グリッド線
   ctx.strokeStyle=C_CELL_LINE; ctx.lineWidth=0.5; ctx.beginPath();
@@ -1364,6 +1499,12 @@ function _doRender() {
   ctx.fillStyle=C_SEL_HDR;
   for(var c=selC1;c<=selC2;c++) ctx.fillRect(colX(c),0,cW(c),HDR_H);
   for(var r=selR1;r<=selR2;r++) ctx.fillRect(0,rowY(r),HDR_W,rH(r));
+  // STEP2: 追加範囲(selRanges)のヘッダーも強調
+  for(var _hi=0;_hi<selRanges.length;_hi++){
+    var _hr=selRanges[_hi];
+    for(var _hc=_hr.c1;_hc<=_hr.c2;_hc++) ctx.fillRect(colX(_hc),0,cW(_hc),HDR_H);
+    for(var _hrr=_hr.r1;_hrr<=_hr.r2;_hrr++) ctx.fillRect(0,rowY(_hrr),HDR_W,rH(_hrr));
+  }
 
   // 7. ヘッダー線
   ctx.strokeStyle=C_HDR_LINE; ctx.lineWidth=0.5; ctx.beginPath();
@@ -1392,7 +1533,7 @@ function _doRender() {
   ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
   for(var c=sC;c<=eC+1;c++){
     var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue;
-    ctx.fillStyle=(c>=selC1&&c<=selC2)?'#1E88E5':C_HDR_TXT;
+    ctx.fillStyle=_colInAnySel(c)?'#1E88E5':C_HDR_TXT;
     ctx.fillText(colLetter(c),x+w/2,HDR_H/2);
   }
   ctx.textAlign='right';
@@ -1400,7 +1541,7 @@ function _doRender() {
   ctx.font=rf+'px "Noto Sans JP",sans-serif';
   for(var r=sR;r<=eR+1;r++){
     var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue;
-    ctx.fillStyle=(r>=selR1&&r<=selR2)?'#1E88E5':C_HDR_TXT;
+    ctx.fillStyle=_rowInAnySel(r)?'#1E88E5':C_HDR_TXT;
     ctx.fillText(r+1,HDR_W-4,y+h/2);
   }
 
@@ -1785,13 +1926,24 @@ function drawColoredFormulaOnCell(r, c, formula){
 }
 
 function drawSel(){
-  var x1=colX(selC1),y1=rowY(selR1);
-  var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
   ctx.save();
   ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
+  // STEP2: 追加範囲(selRanges)を先に点線で描く（メイン枠より下に）
+  ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
+  for(var _di=0;_di<selRanges.length;_di++){
+    var _dr=selRanges[_di];
+    var _dx1=colX(_dr.c1),_dy1=rowY(_dr.r1);
+    var _dx2=colX(_dr.c2)+cW(_dr.c2),_dy2=rowY(_dr.r2)+rH(_dr.r2);
+    ctx.setLineDash([4,2]);
+    ctx.strokeRect(_dx1+1,_dy1+1,_dx2-_dx1-2,_dy2-_dy1-2);
+  }
+  ctx.setLineDash([]);
+  // メイン範囲（アクティブ）：実線で上書き
+  var x1=colX(selC1),y1=rowY(selR1);
+  var x2=colX(selC2)+cW(selC2),y2=rowY(selR2)+rH(selR2);
   ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
   ctx.strokeRect(x1+1,y1+1,x2-x1-2,y2-y1-2);
-  // フィルハンドル（Excel 互換・右下の小さい四角）
+  // フィルハンドル（Excel 互換・右下の小さい四角）※メイン範囲のみ
   var FH=6; // 四角サイズ 6x6
   ctx.fillStyle='#fff';
   ctx.fillRect(x2-FH/2-1, y2-FH/2-1, FH+2, FH+2); // 白枠
@@ -2241,15 +2393,15 @@ function detectTimePattern(values){
     <span class="exally-logo-ja">エクサリー</span>
   </div>
   <nav class="book-header-nav" aria-label="他画面への移動">
-    <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
-    <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+    <button class="book-header-nav-item" onclick="location.href='home.html'" title="ホーム">🏠</button>
+    <button class="book-header-nav-item" onclick="location.href='chat.html'" title="AIチャット">🤖</button>
     <span class="book-header-nav-item active" title="ブック（このページ）"><svg><use href="#grid-sm"/></svg></span>
-    <a href="chat.html?tab=template" class="book-header-nav-item" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
+    <button class="book-header-nav-item" onclick="location.href='chat.html?tab=template'" title="テンプレ"><svg><use href="#template-sm"/></svg></button>
     <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
-    <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
-    <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+    <button class="book-header-nav-item" onclick="location.href='chat.html?tab=book'" title="数式帳"><svg><use href="#book-sm"/></svg></button>
+    <button class="book-header-nav-item" onclick="location.href='chat.html?tab=quiz'" title="クイズ">🎯</button>
     <button class="book-header-nav-item" onclick="openBookVerModal()" title="Excelバージョン">📊</button>
-    <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
+    <button class="book-header-nav-item" onclick="location.href='chat.html?tab=settings'" title="設定">⚙️</button>
   </nav>
   <div style="display:flex;align-items:center;gap:6px;">
     <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
@@ -2368,11 +2520,16 @@ window.addEventListener('load',updateBookVerBadge);
   <input id="cell-addr" type="text" value="A1" readonly>
   <span id="fx-icon" title="関数の挿入" onclick="openFnPalette()">fx</span>
   <input id="formula-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="値や数式を入力してね">
-  <button id="formula-cancel" class="undo-btn" onclick="fbCancel()" title="キャンセル" style="color:#E53935;font-weight:700;">×</button>
   <button id="fkb-toggle" class="undo-btn" onclick="fkbToggle()" title="キーボード切替（関数や記号が打ちやすい）">⌨️</button>
-  <button class="undo-btn" onclick="doUndo()" title="元に戻す">↩</button>
-  <button class="undo-btn" onclick="doRedo()" title="やり直す">↪</button>
+  <button id="multi-select-btn" class="multi-select-btn" onclick="toggleMultiSelect()" title="複数選択モード（離れた範囲を同時に選択）">+複数選択</button>
   <div id="ref-chip-bar" style="display:none;padding:2px 8px;background:#FFF8E1;border-bottom:1px solid #FFE0B2;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:#E65100;"></div>
+</div>
+
+<!-- 複数選択モード サブバー -->
+<div id="multi-select-bar">
+  <span id="multi-select-info"><span class="label">選択中(<span id="multi-select-count">0</span>):</span><span id="multi-select-addrs">-</span></span>
+  <button id="multi-select-ai-btn" onclick="multiSelectSendToAI()">AIへ</button>
+  <button id="multi-select-cancel-btn" onclick="toggleMultiSelect()">✕</button>
 </div>
 
 <!-- 色付き数式表示行（カスタムKBモード+数式入力時のみ表示） -->
@@ -2492,6 +2649,10 @@ window.addEventListener('load',updateBookVerBadge);
 <!-- ツールバー1段目<!-- ツールバー1段目（常時表示） -->
 
 <div id="fmt-bar1">
+  <!-- 戻る・進む（左端sticky）-->
+  <button class="fmt-undo-redo" onclick="doUndo()" title="元に戻す">↩</button>
+  <button class="fmt-undo-redo fmt-undo-redo-right" onclick="doRedo()" title="やり直す">↪</button>
+  <div class="fmt-sep"></div>
   <!-- 文字スタイル -->
   <button class="fmt-btn fmt-btn-b" id="fmt-bold"      onclick="toggleFormat('bold')"      title="太字">B</button>
   <button class="fmt-btn fmt-btn-i" id="fmt-italic"    onclick="toggleFormat('italic')"    title="斜体">I</button>
@@ -2601,6 +2762,143 @@ var sheets = [
 ];
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
+// ===== STEP1: 複数範囲選択の土台 =====
+// メイン範囲(selR1..selC2)以外に追加で保持する範囲の配列
+// 各要素: {r1, c1, r2, c2}
+var selRanges = [];
+// 複数選択モード: true=モードON（タップで追加/削除）, false=OFF（通常動作）
+var multiSelectMode = false;
+// メイン範囲を含む全選択範囲を走査する（描画用の統合ヘルパー）
+function _forEachSelRange(cb){
+  // メイン範囲
+  cb({r1:selR1, c1:selC1, r2:selR2, c2:selC2}, true);
+  // 追加範囲
+  for(var i=0;i<selRanges.length;i++){
+    cb(selRanges[i], false);
+  }
+}
+// セル(r,c)がselRangesのどれかに含まれるか判定。含まれる場合はインデックス、なければ-1
+function _findSelRangeIndex(r,c){
+  for(var i=0;i<selRanges.length;i++){
+    var rg=selRanges[i];
+    if(r>=rg.r1 && r<=rg.r2 && c>=rg.c1 && c<=rg.c2) return i;
+  }
+  return -1;
+}
+// セル(r,c)がメイン範囲に含まれるか
+function _cellInMainSel(r,c){
+  return r>=selR1 && r<=selR2 && c>=selC1 && c<=selC2;
+}
+// セル(r,c)が任意の選択範囲（メイン or selRanges）に含まれるか
+function _cellInAnySel(r,c){
+  return _cellInMainSel(r,c) || _findSelRangeIndex(r,c)>=0;
+}
+// 列cが任意の選択範囲の列範囲に含まれるか（ヘッダー文字色判定用）
+function _colInAnySel(c){
+  if(c>=selC1 && c<=selC2) return true;
+  for(var i=0;i<selRanges.length;i++){
+    if(c>=selRanges[i].c1 && c<=selRanges[i].c2) return true;
+  }
+  return false;
+}
+// 行rが任意の選択範囲の行範囲に含まれるか
+function _rowInAnySel(r){
+  if(r>=selR1 && r<=selR2) return true;
+  for(var i=0;i<selRanges.length;i++){
+    if(r>=selRanges[i].r1 && r<=selRanges[i].r2) return true;
+  }
+  return false;
+}
+
+// ===== STEP3: 複数選択モード関数群 =====
+// モードON/OFF切り替え
+function toggleMultiSelect(){
+  multiSelectMode = !multiSelectMode;
+  var btn = document.getElementById('multi-select-btn');
+  var bar = document.getElementById('multi-select-bar');
+  if(multiSelectMode){
+    if(btn){ btn.classList.add('active'); btn.textContent='✓複数選択'; }
+    if(bar){ bar.classList.add('open'); }
+    updateMultiSelectBar();
+  } else {
+    if(btn){ btn.classList.remove('active'); btn.textContent='+複数選択'; }
+    if(bar){ bar.classList.remove('open'); }
+    // モードOFF時はselRangesをクリア（メインはそのまま残す）
+    selRanges = [];
+    render();
+  }
+}
+// 範囲オブジェクトをアドレス文字列("A1" or "A1:B2")に変換
+function _rangeToAddr(rg){
+  if(rg.r1===rg.r2 && rg.c1===rg.c2){
+    return cellAddr(rg.r1, rg.c1);
+  }
+  return cellAddr(rg.r1, rg.c1) + ':' + cellAddr(rg.r2, rg.c2);
+}
+// 複数選択モード中のタップ処理（追加 or 削除のトグル）
+function multiSelectTapCell(r,c){
+  // この関数は onMD/onTE のモードON時処理が直接インラインで行うため、
+  // 互換性維持のためだけにここに残す（内部で同等処理を実施）
+  var idx = _findSelRangeIndex(r,c);
+  if(idx>=0){
+    selRanges.splice(idx,1);
+    updateMultiSelectBar(); updateBar(); render();
+    return;
+  }
+  selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
+  sel(r,c,r,c);
+}
+// サブバーの表示を更新（チップUI、メイン含め個別削除可）
+function updateMultiSelectBar(){
+  if(!multiSelectMode) return;
+  var countEl = document.getElementById('multi-select-count');
+  var addrsEl = document.getElementById('multi-select-addrs');
+  if(!countEl || !addrsEl) return;
+  var count = 1 + selRanges.length; // メイン + 追加
+  countEl.textContent = count;
+  // チップUI生成（メイン=idx 0、追加範囲=idx 1..N）
+  var chips = [];
+  chips.push('<span class="multi-range-chip main" onclick="multiSelectRemoveRange(0)">'
+    + _rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2})
+    + '<b>×</b></span>');
+  for(var i=0;i<selRanges.length;i++){
+    chips.push('<span class="multi-range-chip" onclick="multiSelectRemoveRange('+(i+1)+')">'
+      + _rangeToAddr(selRanges[i])
+      + '<b>×</b></span>');
+  }
+  addrsEl.innerHTML = chips.join(' ');
+}
+// チップ × タップ時の削除処理（メイン削除時は selRanges[0] が昇格）
+function multiSelectRemoveRange(idx){
+  if(idx===0){
+    // メイン範囲を削除 → selRanges[0]があれば昇格
+    if(selRanges.length>0){
+      var first = selRanges.shift();
+      selR1 = first.r1; selC1 = first.c1;
+      selR2 = first.r2; selC2 = first.c2;
+      anchorR = first.r1; anchorC = first.c1;
+      activeR = first.r2; activeC = first.c2;
+    } else {
+      // 全選択なし状態を避けるため、単一セル(0,0)に戻す
+      selR1 = 0; selC1 = 0; selR2 = 0; selC2 = 0;
+      anchorR = 0; anchorC = 0; activeR = 0; activeC = 0;
+    }
+  } else {
+    if(idx-1 < selRanges.length) selRanges.splice(idx-1, 1);
+  }
+  updateMultiSelectBar(); updateBar(); render();
+}
+// 「AIへ」ボタン（STEP6で本実装、今はトースト表示）
+function multiSelectSendToAI(){
+  var toast = document.getElementById('toast');
+  if(toast){
+    toast.textContent = 'AI送信はSTEP6で実装予定です（この機能は近日対応）';
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 2500);
+  } else {
+    alert('AI送信はSTEP6で実装予定です（この機能は近日対応）');
+  }
+}
 var scrollTop=0, scrollLeft=0;
 var initialInnerHeight = window.innerHeight; // キーボード出現前のinnerHeightを保存
 var scale=1;
@@ -2924,6 +3222,8 @@ function sel(r1,c1,r2,c2){
   anchorR=r1; anchorC=c1;
   activeR=r2; activeC=c2;
   scrollToCell(selR1,selC1); updateBar(); render();
+  // 複数選択モード中はサブバーも即時更新（ドラッグ中も反映）
+  if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
   // cell-input を選択セル上に配置＆focus保持（IME常時ON化のため）
   if(!editingCell){
     var ci=document.getElementById('cell-input');
@@ -3380,6 +3680,22 @@ function onMD(e){
   }
   var c=xToC(p.x),r=yToR(p.y);
 
+  // STEP3: 複数選択モード ON 時の挙動（PC・スマホ共通）
+  if(multiSelectMode && !e.shiftKey){
+    // selRanges内のセルタップ → その range を削除（即確定）
+    var _mIdx = _findSelRangeIndex(r,c);
+    if(_mIdx>=0){
+      selRanges.splice(_mIdx,1);
+      updateMultiSelectBar(); updateBar(); render();
+      return;
+    }
+    // それ以外（新規 or メイン内）→ 現メインを selRanges に退避し、新範囲選択開始
+    selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
+    sel(r,c,r,c); // 新範囲をメインに（sel()内でupdateMultiSelectBarも実行）
+    touchState={type:'msel',startR:r,startC:c}; // ドラッグで範囲拡張可能に
+    return;
+  }
+
   // Shift+セルクリック：範囲拡張
   if(e.shiftKey){
     sel(selR1,selC1,r,c);
@@ -3436,6 +3752,7 @@ function onMM(e){
   if(!touchState||touchState.type!=='msel') return;
   if(p.x<HDR_W||p.y<HDR_H) return;
   selR2=yToR(p.y); selC2=xToC(p.x); updateBar(); render();
+  if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
 }
 
 // タッチ
@@ -3717,6 +4034,22 @@ function onTE(e){
     commitEdit();
     var _ci2=document.getElementById('cell-input'); if(_ci2) _ci2.focus();
     var c=xToC(x),r2=yToR(y);
+    // STEP3: 複数選択モードON時はタップで追加/削除
+    if(multiSelectMode){
+      // selRanges内のセルタップ → 削除
+      var _mIdxT = _findSelRangeIndex(r2,c);
+      if(_mIdxT>=0){
+        selRanges.splice(_mIdxT,1);
+        updateMultiSelectBar(); updateBar(); render();
+        touchState=null;
+        return;
+      }
+      // それ以外 → 現メインをselRangesに退避、新範囲（単一セル）をメインに
+      selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
+      sel(r2,c,r2,c);
+      touchState=null;
+      return;
+    }
     if(selR1===r2&&selC1===c&&(Date.now()-touchState.time)<400){
       // ダブルタップ → セル編集モード（既存値を初期値に、IMEはcell-inputで動く）
       startEdit(selR1, selC1);
@@ -4112,26 +4445,7 @@ function fkbCommit(){
   fkbHide();
   updateBar(); render();
 }
-// 数式バー × ボタン：数式バー/cell-input 両方の編集をキャンセル
-function fbCancel(){
-  var stored=getCell(selR1,selC1).f||'';
-  var fi=document.getElementById('formula-input');
-  if(fi) fi.value=stored;
-  var ci=document.getElementById('cell-input');
-  if(ci){
-    ci.value='';
-    ci.classList.remove('editing');
-    ci.style.width='0'; ci.style.height='0';
-  }
-  editingCell=null;
-  refMode=false; refStartR=-1;
-  _currentRefs=[];
-  _fiCursorPos=stored.length;
-  fkbHide();
-  // フォーカスを cell-input に戻す
-  if(ci){ setTimeout(function(){ ci.focus(); },0); }
-  render(); updateBar();
-}
+// 数式バー × ボタン：削除済み（Esc キーに一本化）
 function fkbCancel(){
   var stored=getCell(selR1,selC1).f||'';
   document.getElementById('formula-input').value=stored;
@@ -5431,14 +5745,14 @@ function initPopupResize(){
     <button id="add-sheet-btn" onclick="addSheet()">＋</button>
   </div>
   <nav class="book-bn">
-    <a href="home.html" class="book-bn-i"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></a>
-    <a href="chat.html" class="book-bn-i"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></a>
+    <button class="book-bn-i" onclick="location.href='home.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
+    <button class="book-bn-i" onclick="location.href='chat.html'"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></button>
     <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
-    <a href="chat.html?tab=template" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></a>
+    <button class="book-bn-i" onclick="location.href='chat.html?tab=template'"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></button>
     <button class="book-bn-i book-bn-disabled"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
-    <a href="chat.html?tab=book" class="book-bn-i"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></a>
-    <a href="chat.html?tab=quiz" class="book-bn-i"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></a>
-    <a href="chat.html?tab=settings" class="book-bn-i"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></a>
+    <button class="book-bn-i" onclick="location.href='chat.html?tab=book'"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></button>
+    <button class="book-bn-i" onclick="location.href='chat.html?tab=quiz'"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></button>
+    <button class="book-bn-i" onclick="location.href='chat.html?tab=settings'"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></button>
   </nav>
 </div>
 </html>
