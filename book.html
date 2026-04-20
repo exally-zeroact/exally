@@ -3085,7 +3085,7 @@ function bindEvents(){
   fi.addEventListener('keyup',function(){ _fiCursorPos=this.selectionStart||0; });
   fi.addEventListener('blur',function(){ _fiCursorPos=this.selectionStart||_fiCursorPos; });
   fi.addEventListener('keydown',function(e){
-    if(e.key==='Enter'){e.preventDefault();fkbCommit();}
+    if(e.key==='Enter'){e.preventDefault();fkbCommit();moveSel(1,0);}
     else if(e.key==='Escape'){fkbCancel();}
   });
   fi.addEventListener('focus',function(){
