@@ -1,23 +1,106 @@
 /**
- * exally-formula.js - Exally 数式計算エンジン（純粋関数版）
+ * exally-formula.js - Exally 数式計算エンジン（完全版・A案）
  * ================================================================
- * 【役割】Excel 500+ 関数の独自実装 (86関数)
- * 【切り出し元】book.html line 1080〜1596
- * 【依存】なし（引数だけ受け取る純粋関数）
+ * 【役割】Excel 500+ 関数の独自実装（96関数全部入り）
+ * 【切り出し元】book.html line 1006〜1596（約590行）
+ * 【バージョン】2026-04-20 完全版
+ * 【設計】
+ *   - hf (HyperFormula) は内部変数 _hf として保持
+ *   - book.html 側で hf 初期化後に initExallyFormula(hf) を1回呼ぶだけ
+ *   - 呼び出し側の関数シグネチャは一切変更なし
+ *   - Node.js / ブラウザ両対応（末尾 module.exports）
  * 【使用箇所】
- *   - book.html (メインブック画面)
+ *   - book.html        (メインブック画面)
  *   - kyuuryoumeisai.html (給料明細)
- *   - seikyusyo.html (請求書)
+ *   - seikyusyo.html   (請求書)
  *   - mitsumoriyo.html (見積書)
- * 【切り出し日】2026-04-20
- * ================================================================
- * 【構造】
- *   トップレベル function として宣言 → script src="exally-formula.js" で読み込むだけで
- *   全関数がブラウザの window オブジェクトに自動登録される。
- *   book.html の既存コードはそのまま _jsRank() のように呼び出せる。
  * ================================================================
  */
 
+// ================================================================
+// 【HyperFormula インスタンスホルダー】
+// book.html 側で hf を作成後、initExallyFormula(hf) で渡す
+// ================================================================
+var _hf = null;
+
+function initExallyFormula(hfInstance) {
+  _hf = hfInstance;
+}
+
+function _hfSid(sheet){
+  if(typeof sheet==='number') return sheet;
+  try{ var id=_hf.getSheetId(sheet); return (id!==null&&id!==undefined)?id:0; }catch(e){return 0;}
+}
+function addSheetToEngine(name) {
+  if(!_hf) return;
+  try { _hf.addSheet(name); } catch(e) {}
+}
+
+// ================================================================
+// 内部ヘルパー
+// ================================================================
+function _hfGetDisplay(sheet, r, c) {
+  try {
+    var val = _hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
+    if(val===null||val===undefined) return '';
+    if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
+    return String(val);
+  } catch(e) { return '#ERR'; }
+}
+function _toRC(addr) {
+  var m = addr.match(/^([A-Z]+)(\d+)$/i);
+  if(!m) return null;
+  var col=0;
+  for(var i=0;i<m[1].length;i++) col=col*26+(m[1].toUpperCase().charCodeAt(i)-64);
+  return {r:parseInt(m[2])-1, c:col-1};
+}
+function _getRangeVals(sheet, rangeStr) {
+  var m = rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);
+  if(!m||!_hf) return [];
+  var s=_toRC(m[1]),e=_toRC(m[2]),vals=[];
+  for(var r=s.r;r<=e.r;r++)
+    for(var c=s.c;c<=e.c;c++){
+      var v=_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
+      if(typeof v==='number') vals.push(v);
+    }
+  return vals;
+}
+function _getRangeAll(sheet, rangeStr) {
+  var m = rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);
+  if(!m||!_hf) return [];
+  var s=_toRC(m[1]),e=_toRC(m[2]),vals=[];
+  for(var r=s.r;r<=e.r;r++)
+    for(var c=s.c;c<=e.c;c++)
+      vals.push(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c}));
+  return vals;
+}
+function _getSingleVal(sheet, ref) {
+  var rc=_toRC(ref);
+  if(!rc||!_hf) return null;
+  return _hf.getCellValue({sheet:_hfSid(sheet),row:rc.r,col:rc.c});
+}
+
+// ================================================================
+// JS実装関数群
+// ================================================================
+
+// --- TEXT書式 ---
+function _applyTextFormat(num, fmt) {
+  if(/^#,##0(\.0+)?$/.test(fmt)) {
+    var d=fmt.indexOf('.')===-1?0:fmt.length-fmt.indexOf('.')-1;
+    return num.toLocaleString('ja-JP',{minimumFractionDigits:d,maximumFractionDigits:d});
+  }
+  if(/^0+(\.0+)?$/.test(fmt)) {
+    var d=fmt.indexOf('.')===-1?0:fmt.length-fmt.indexOf('.')-1;
+    return num.toFixed(d);
+  }
+  if(fmt==='0%') return Math.round(num*100)+'%';
+  if(fmt==='0.00%') return (num*100).toFixed(2)+'%';
+  if(fmt==='¥#,##0'||fmt==='\\#,##0') return '¥'+Math.round(num).toLocaleString('ja-JP');
+  return String(num);
+}
+
+// --- 統計 ---
 function _jsRank(val,vals,order){var s=vals.slice().sort(function(a,b){return order===0?b-a:a-b;});var r=s.indexOf(val)+1;return r>0?r:'#N/A';}
 function _jsPercentile(vals,k){var s=vals.slice().sort(function(a,b){return a-b;}),n=s.length,idx=k*(n-1),lo=Math.floor(idx),hi=Math.ceil(idx);if(lo===hi)return s[lo];return s[lo]+(idx-lo)*(s[hi]-s[lo]);}
 function _jsQuartile(vals,q){return _jsPercentile(vals,[0,0.25,0.5,0.75,1][q]);}
@@ -75,8 +158,8 @@ function _jsType(v){if(typeof v==='number')return 1;if(typeof v==='string')retur
 function _jsCell(infoType,val){if(infoType==='type'){if(val===''||val===null||val===undefined)return'b';if(typeof val==='number')return'n';return'l';}if(infoType==='contents')return val;return'';}
 
 // --- 参照 ---
-function _jsIndirect(sheet,refStr){var rc=_toRC(refStr.trim());if(rc&&hf){var v=hf.getCellValue({sheet:_hfSid(sheet),row:rc.r,col:rc.c});return v===null||v===undefined?'':v;}return'#REF!';}
-function _jsOffset(sheet,ref,dr,dc){var rc=_toRC(ref.trim());if(!rc||!hf)return'#REF!';var nr=rc.r+dr,nc=rc.c+dc;if(nr<0||nc<0)return'#REF!';var v=hf.getCellValue({sheet:_hfSid(sheet),row:nr,col:nc});return v===null||v===undefined?'':v;}
+function _jsIndirect(sheet,refStr){var rc=_toRC(refStr.trim());if(rc&&_hf){var v=_hf.getCellValue({sheet:_hfSid(sheet),row:rc.r,col:rc.c});return v===null||v===undefined?'':v;}return'#REF!';}
+function _jsOffset(sheet,ref,dr,dc){var rc=_toRC(ref.trim());if(!rc||!_hf)return'#REF!';var nr=rc.r+dr,nc=rc.c+dc;if(nr<0||nc<0)return'#REF!';var v=_hf.getCellValue({sheet:_hfSid(sheet),row:nr,col:nc});return v===null||v===undefined?'':v;}
 function _jsLookup(val,lookupVals,resultVals){var found=-1;for(var i=0;i<lookupVals.length;i++){if(lookupVals[i]<=val)found=i;else break;}return found>=0?resultVals[found]:'#N/A';}
 function _jsXlookup(val,lookupVals,returnVals,notFound){for(var i=0;i<lookupVals.length;i++){if(String(lookupVals[i])===String(val))return returnVals[i];}return notFound!==undefined?notFound:'#N/A';}
 function _jsXmatch(val,arr,mode){if(!mode||mode===0){for(var i=0;i<arr.length;i++)if(String(arr[i])===String(val))return i+1;return'#N/A';}if(mode===1){var found=-1;for(var i=0;i<arr.length;i++)if(arr[i]<=val)found=i;return found>=0?found+1:'#N/A';}return'#N/A';}
@@ -113,7 +196,7 @@ function _jsConvert(num,from,to){var u={'g':1,'kg':1000,'mg':0.001,'lbm':453.592
 function _jsGestep(num,step){return num>=(step||0)?1:0;}
 
 // --- データベース ---
-function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(hf.getCellValue({sheet:_hfSid(sheet),row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);if(fieldIdx<0)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]);var critField=hf.getCellValue({sheet:_hfSid(sheet),row:cs.r,col:cs.c});var critVal=hf.getCellValue({sheet:_hfSid(sheet),row:cs.r+1,col:cs.c});var critFieldIdx=headers.indexOf(critField);var results=[];for(var r=s.r+1;r<=e.r;r++){if(String(hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+critFieldIdx}))===String(critVal)){results.push(hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';if(func==='PROD')return nums.reduce(function(a,b){return a*b;},1);if(func==='GET')return results.length===1?results[0]:'#NUM!';if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
+function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!_hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(_hf.getCellValue({sheet:_hfSid(sheet),row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);if(fieldIdx<0)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]);var critField=_hf.getCellValue({sheet:_hfSid(sheet),row:cs.r,col:cs.c});var critVal=_hf.getCellValue({sheet:_hfSid(sheet),row:cs.r+1,col:cs.c});var critFieldIdx=headers.indexOf(critField);var results=[];for(var r=s.r+1;r<=e.r;r++){if(String(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+critFieldIdx}))===String(critVal)){results.push(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';if(func==='PROD')return nums.reduce(function(a,b){return a*b;},1);if(func==='GET')return results.length===1?results[0]:'#NUM!';if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
 
 // --- Web ---
 function _jsEncodeUrl(str){try{return encodeURIComponent(str);}catch(e){return'#VALUE!';}}
@@ -185,71 +268,71 @@ function _jsLambdaExpand(formula) {
 
 // REDUCE(initial, range, LAMBDA(acc, x, body)) → HF委譲
 function _jsReduceCompute(sheet, initial, rangeStr, lambdaFormula) {
-  if(!hf) return null;
+  if(!_hf) return null;
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial;
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
+    var v=_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'('+acc+')').replace(new RegExp('\\b'+p2+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},'='+expr);
-    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9998,col:0});
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},'='+expr);
+    var res=_hf.getCellValue({sheet:_hfSid(sheet),row:9998,col:0});
     if(typeof res==='number') acc=res;
-    hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},null);
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9998,col:0},null);
   }}
   return String(acc);
 }
 
 // SCAN(initial, range, LAMBDA(acc, x, body)) → 先頭値を返す
 function _jsScanCompute(sheet, initial, rangeStr, lambdaFormula) {
-  if(!hf) return null;
+  if(!_hf) return null;
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),acc=initial,first=null;
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
+    var v=_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'('+acc+')').replace(new RegExp('\\b'+p2+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},'='+expr);
-    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9997,col:0});
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},'='+expr);
+    var res=_hf.getCellValue({sheet:_hfSid(sheet),row:9997,col:0});
     if(typeof res==='number'){acc=res; if(first===null)first=res;}
-    hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},null);
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9997,col:0},null);
   }}
   return first!==null ? String(first) : String(initial);
 }
 
 // MAP(range, LAMBDA(x, body)) → 全件カンマ区切り
 function _jsMapCompute(sheet, rangeStr, lambdaFormula) {
-  if(!hf) return null;
+  if(!_hf) return null;
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var param=mL[1].trim(),body=mL[2].trim();
   var m=rangeStr.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i); if(!m) return '#VALUE!';
   var s=_toRC(m[1]),e=_toRC(m[2]),results=[];
   for(var r=s.r;r<=e.r;r++){for(var c=s.c;c<=e.c;c++){
-    var v=hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
+    var v=_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:c});
     var expr=body.replace(new RegExp('\\b'+param+'\\b','g'),'('+v+')');
-    hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},'='+expr);
-    var res=hf.getCellValue({sheet:_hfSid(sheet),row:9999,col:c});
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},'='+expr);
+    var res=_hf.getCellValue({sheet:_hfSid(sheet),row:9999,col:c});
     results.push(res===null?'':String(res));
-    hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},null);
+    _hf.setCellContents({sheet:_hfSid(sheet),row:9999,col:c},null);
   }}
   return results[0]; // 先頭値（スピル制限）
 }
 
 // MAKEARRAY(rows, cols, LAMBDA(r, c, body)) → 先頭値を返す
 function _jsMakearrayCompute(sheet, rows, cols, lambdaFormula) {
-  if(!hf) return null;
+  if(!_hf) return null;
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var p1=mL[1].trim(),p2=mL[2].trim(),body=mL[3].trim();
   var expr=body.replace(new RegExp('\\b'+p1+'\\b','g'),'(1)').replace(new RegExp('\\b'+p2+'\\b','g'),'(1)');
-  hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},'='+expr);
-  var res=hf.getCellValue({sheet:_hfSid(sheet),row:9996,col:0});
-  hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},null);
+  _hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},'='+expr);
+  var res=_hf.getCellValue({sheet:_hfSid(sheet),row:9996,col:0});
+  _hf.setCellContents({sheet:_hfSid(sheet),row:9996,col:0},null);
   return res===null?'0':String(res);
 }
 
@@ -279,7 +362,7 @@ function convertFormula(f) {
 // _jsComputeFormula: JS側で完全計算
 // ================================================================
 function _jsComputeFormula(sheet, v) {
-  if(!v||v[0]!=='='||!hf) return null;
+  if(!v||v[0]!=='='||!_hf) return null;
 
   // 🚀 早期return: 関数名でJS処理対象外をHFに早送り（55regex→O(1)）
   var _f0 = v.slice(1).trim();
@@ -498,7 +581,7 @@ function _jsComputeFormula(sheet, v) {
 
   // MDETERM
   var mMd=fOrig.match(/^MDETERM\s*\(([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mMd){var m2=mMd[1].match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(m2){var s=_toRC(m2[1]),e=_toRC(m2[2]),n=e.r-s.r+1,mat=[];for(var r=0;r<n;r++){mat.push([]);for(var c=0;c<n;c++)mat[r].push(hf.getCellValue({sheet:_hfSid(sheet),row:s.r+r,col:s.c+c})||0);}return String(Math.round(_jsMdeterm(mat)*10000)/10000);}}
+  if(mMd){var m2=mMd[1].match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(m2){var s=_toRC(m2[1]),e=_toRC(m2[2]),n=e.r-s.r+1,mat=[];for(var r=0;r<n;r++){mat.push([]);for(var c=0;c<n;c++)mat[r].push(_hf.getCellValue({sheet:_hfSid(sheet),row:s.r+r,col:s.c+c})||0);}return String(Math.round(_jsMdeterm(mat)*10000)/10000);}}
 
   // IRR / XIRR (既存)
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
@@ -536,15 +619,18 @@ function _jsComputeFormula(sheet, v) {
 // ================================================================
 // HFに渡す値の型変換（文字列の数値→number、空→null）
 
-// ===== exally-formula.js END =====
-
 // ================================================================
-// 【Node.js 両対応】2026/04/20 A案追加
-// ブラウザでは無視される（module 変数が未定義のため）
-// Node.js では module.exports で関数を公開（Claude Tool Use等で使用可能）
+// 【Node.js 両対応】module.exports
+// ブラウザでは module が undefined なので無視される
 // ================================================================
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    initExallyFormula: initExallyFormula,
+    // 補助・内部
+    _hfSid: _hfSid, _toRC: _toRC, _getRangeVals: _getRangeVals,
+    _getRangeAll: _getRangeAll, _getSingleVal: _getSingleVal,
+    _hfGetDisplay: _hfGetDisplay, _applyTextFormat: _applyTextFormat,
+    addSheetToEngine: addSheetToEngine,
     // 統計
     _jsRank: _jsRank, _jsPercentile: _jsPercentile, _jsQuartile: _jsQuartile,
     _jsMode: _jsMode, _jsTrimmean: _jsTrimmean, _jsPercentrank: _jsPercentrank,
@@ -565,7 +651,7 @@ if (typeof module !== 'undefined' && module.exports) {
     // 日付・変換
     _jsDateValue: _jsDateValue, _jsDatestring: _jsDatestring,
     _jsValue: _jsValue, _jsN: _jsN, _jsType: _jsType, _jsCell: _jsCell,
-    // 参照系（hf依存・使用時はhfを別途セット必要）
+    // 参照系
     _jsIndirect: _jsIndirect, _jsOffset: _jsOffset,
     _jsLookup: _jsLookup, _jsXlookup: _jsXlookup, _jsXmatch: _jsXmatch,
     // 配列
@@ -582,12 +668,13 @@ if (typeof module !== 'undefined' && module.exports) {
     _jsConvert: _jsConvert, _jsGestep: _jsGestep, _jsDbFunc: _jsDbFunc,
     _jsEncodeUrl: _jsEncodeUrl, _jsAggregate: _jsAggregate,
     _jsIsomitted: _jsIsomitted,
-    // LET/LAMBDA系（hf依存）
+    // LET/LAMBDA系
+    _parseFuncArgs: _parseFuncArgs,
     _jsLetExpand: _jsLetExpand, _jsLambdaExpand: _jsLambdaExpand,
     _jsReduceCompute: _jsReduceCompute, _jsScanCompute: _jsScanCompute,
     _jsMapCompute: _jsMapCompute, _jsMakearrayCompute: _jsMakearrayCompute,
-    // 補助
-    _parseFuncArgs: _parseFuncArgs, convertFormula: convertFormula,
+    // ルーター
+    convertFormula: convertFormula,
     _jsComputeFormula: _jsComputeFormula
   };
 }
