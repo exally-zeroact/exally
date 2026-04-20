@@ -1502,9 +1502,10 @@ function _doRender() {
   for(var r=Math.max(sR,selR1);r<=Math.min(eR+1,selR2);r++)
     for(var c=Math.max(sC,selC1);c<=Math.min(eC+1,selC2);c++)
       ctx.fillRect(colX(c),rowY(r),cW(c),rH(r));
-  // STEP2: 追加範囲(selRanges)も同じ色で塗る
+  // STEP2: 追加範囲(selRanges)も同じ色で塗る（現在シートの範囲のみ）
   for(var _si=0;_si<selRanges.length;_si++){
     var _sr=selRanges[_si];
+    if(_sr.sheet && _sr.sheet !== sheets[activeSheet].name) continue; // 別シート範囲はスキップ
     for(var _r=Math.max(sR,_sr.r1);_r<=Math.min(eR+1,_sr.r2);_r++)
       for(var _c=Math.max(sC,_sr.c1);_c<=Math.min(eC+1,_sr.c2);_c++)
         ctx.fillRect(colX(_c),rowY(_r),cW(_c),rH(_r));
@@ -1537,9 +1538,10 @@ function _doRender() {
   ctx.fillStyle=C_SEL_HDR;
   for(var c=selC1;c<=selC2;c++) ctx.fillRect(colX(c),0,cW(c),HDR_H);
   for(var r=selR1;r<=selR2;r++) ctx.fillRect(0,rowY(r),HDR_W,rH(r));
-  // STEP2: 追加範囲(selRanges)のヘッダーも強調
+  // STEP2: 追加範囲(selRanges)のヘッダーも強調（現在シートの範囲のみ）
   for(var _hi=0;_hi<selRanges.length;_hi++){
     var _hr=selRanges[_hi];
+    if(_hr.sheet && _hr.sheet !== sheets[activeSheet].name) continue; // 別シート範囲はスキップ
     for(var _hc=_hr.c1;_hc<=_hr.c2;_hc++) ctx.fillRect(colX(_hc),0,cW(_hc),HDR_H);
     for(var _hrr=_hr.r1;_hrr<=_hr.r2;_hrr++) ctx.fillRect(0,rowY(_hrr),HDR_W,rH(_hrr));
   }
@@ -1966,10 +1968,11 @@ function drawColoredFormulaOnCell(r, c, formula){
 function drawSel(){
   ctx.save();
   ctx.rect(HDR_W,HDR_H,wrapW-HDR_W,wrapH-HDR_H); ctx.clip();
-  // STEP2: 追加範囲(selRanges)を先に点線で描く（メイン枠より下に）
+  // STEP2: 追加範囲(selRanges)を先に点線で描く（メイン枠より下に、現在シートの範囲のみ）
   ctx.strokeStyle=C_SEL_BORDER; ctx.lineWidth=2;
   for(var _di=0;_di<selRanges.length;_di++){
     var _dr=selRanges[_di];
+    if(_dr.sheet && _dr.sheet !== sheets[activeSheet].name) continue; // 別シート範囲はスキップ
     var _dx1=colX(_dr.c1),_dy1=rowY(_dr.r1);
     var _dx2=colX(_dr.c2)+cW(_dr.c2),_dy2=rowY(_dr.r2)+rH(_dr.r2);
     ctx.setLineDash([4,2]);
@@ -2824,10 +2827,12 @@ function _forEachSelRange(cb){
     cb(selRanges[i], false);
   }
 }
-// セル(r,c)がselRangesのどれかに含まれるか判定。含まれる場合はインデックス、なければ-1
+// セル(r,c)がselRangesのどれかに含まれるか判定。含まれる場合はインデックス、なければ-1（現在シートのみ判定）
 function _findSelRangeIndex(r,c){
+  var curSheet = sheets[activeSheet].name;
   for(var i=0;i<selRanges.length;i++){
     var rg=selRanges[i];
+    if(rg.sheet && rg.sheet !== curSheet) continue; // 別シート範囲はスキップ
     if(r>=rg.r1 && r<=rg.r2 && c>=rg.c1 && c<=rg.c2) return i;
   }
   return -1;
@@ -2840,18 +2845,22 @@ function _cellInMainSel(r,c){
 function _cellInAnySel(r,c){
   return _cellInMainSel(r,c) || _findSelRangeIndex(r,c)>=0;
 }
-// 列cが任意の選択範囲の列範囲に含まれるか（ヘッダー文字色判定用）
+// 列cが任意の選択範囲の列範囲に含まれるか（ヘッダー文字色判定用、現在シートのみ）
 function _colInAnySel(c){
   if(c>=selC1 && c<=selC2) return true;
+  var curSheet = sheets[activeSheet].name;
   for(var i=0;i<selRanges.length;i++){
+    if(selRanges[i].sheet && selRanges[i].sheet !== curSheet) continue;
     if(c>=selRanges[i].c1 && c<=selRanges[i].c2) return true;
   }
   return false;
 }
-// 行rが任意の選択範囲の行範囲に含まれるか
+// 行rが任意の選択範囲の行範囲に含まれるか（現在シートのみ）
 function _rowInAnySel(r){
   if(r>=selR1 && r<=selR2) return true;
+  var curSheet = sheets[activeSheet].name;
   for(var i=0;i<selRanges.length;i++){
+    if(selRanges[i].sheet && selRanges[i].sheet !== curSheet) continue;
     if(r>=selRanges[i].r1 && r<=selRanges[i].r2) return true;
   }
   return false;
@@ -2878,12 +2887,25 @@ function toggleMultiSelect(){
     render();
   }
 }
-// 範囲オブジェクトをアドレス文字列("A1" or "A1:B2")に変換
+// 範囲オブジェクトをアドレス文字列("A1" or "A1:B2")に変換（シート名付き対応）
 function _rangeToAddr(rg){
-  if(rg.r1===rg.r2 && rg.c1===rg.c2){
-    return cellAddr(rg.r1, rg.c1);
-  }
-  return cellAddr(rg.r1, rg.c1) + ':' + cellAddr(rg.r2, rg.c2);
+  var cellPart = (rg.r1===rg.r2 && rg.c1===rg.c2)
+    ? cellAddr(rg.r1, rg.c1)
+    : cellAddr(rg.r1, rg.c1) + ':' + cellAddr(rg.r2, rg.c2);
+  // シート情報がない、または現在シートならシート名省略
+  if(!rg.sheet || rg.sheet === sheets[activeSheet].name) return cellPart;
+  // 特殊文字（英数字・アンダースコア・日本語以外）を含むならクォート付き
+  var needQuote = /[^a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(rg.sheet);
+  var displayName = needQuote ? "'" + rg.sheet.replace(/'/g,"''") + "'" : rg.sheet;
+  return displayName + '!' + cellPart;
+}
+// AI送信用：常にクォート付きシート名（HyperFormula互換の安全形式）
+function _rangeToAddrEscape(rg){
+  var cellPart = (rg.r1===rg.r2 && rg.c1===rg.c2)
+    ? cellAddr(rg.r1, rg.c1)
+    : cellAddr(rg.r1, rg.c1) + ':' + cellAddr(rg.r2, rg.c2);
+  var sheetName = rg.sheet || sheets[activeSheet].name;
+  return "'" + sheetName.replace(/'/g,"''") + "'!" + cellPart;
 }
 // 複数選択モード中のタップ処理（追加 or 削除のトグル）
 function multiSelectTapCell(r,c){
@@ -2895,7 +2917,7 @@ function multiSelectTapCell(r,c){
     updateMultiSelectBar(); updateBar(); render();
     return;
   }
-  selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
+  selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:sheets[activeSheet].name});
   sel(r,c,r,c);
 }
 // 展開状態フラグ（▼/▲ トグル用）
@@ -2950,7 +2972,8 @@ function updateMultiSelectBar(){
   countEl.textContent = count;
   var all = [];
   all.push({idx:0, addr:_rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2}), isMain:true});
-  for(var i=0;i<selRanges.length;i++){
+  // selRangesを新しい順で表示（直前に選んだものがメインの隣に来る）
+  for(var i=selRanges.length-1;i>=0;i--){
     all.push({idx:i+1, addr:_rangeToAddr(selRanges[i]), isMain:false});
   }
   // 利用可能幅を計算（multi-select-info の clientWidth - ラベル幅）
@@ -3005,18 +3028,38 @@ function updateMultiSelectBar(){
     }
   }
 }
-// チップ × タップ時の削除処理（メイン削除時は selRanges[0] が昇格）
+// チップ × タップ時の削除処理（メイン削除時は現シート優先で selRanges から昇格）
 function multiSelectRemoveRange(idx){
   if(idx===0){
-    // メイン範囲を削除 → selRanges[0]があれば昇格
-    if(selRanges.length>0){
-      var first = selRanges.shift();
+    // メイン範囲を削除 → 現シート範囲を優先して昇格
+    var curSheet = sheets[activeSheet].name;
+    var candidateIdx = -1;
+    for(var i=0;i<selRanges.length;i++){
+      if(!selRanges[i].sheet || selRanges[i].sheet === curSheet){
+        candidateIdx = i;
+        break;
+      }
+    }
+    if(candidateIdx >= 0){
+      // 現シートの範囲あり → それをメインに昇格（シート移動なし）
+      var first = selRanges.splice(candidateIdx, 1)[0];
       selR1 = first.r1; selC1 = first.c1;
       selR2 = first.r2; selC2 = first.c2;
       anchorR = first.r1; anchorC = first.c1;
       activeR = first.r2; activeC = first.c2;
+    } else if(selRanges.length > 0){
+      // 現シート範囲なし → 別シート範囲に切り替え（シート移動扱い）
+      var first2 = selRanges.shift();
+      for(var si=0;si<sheets.length;si++){
+        if(sheets[si].name === first2.sheet){ activeSheet = si; break; }
+      }
+      selR1 = first2.r1; selC1 = first2.c1;
+      selR2 = first2.r2; selC2 = first2.c2;
+      anchorR = first2.r1; anchorC = first2.c1;
+      activeR = first2.r2; activeC = first2.c2;
+      document.querySelectorAll('.sheet-tab').forEach(function(t,i){t.classList.toggle('active',i===activeSheet);});
     } else {
-      // 全選択なし状態を避けるため、単一セル(0,0)に戻す
+      // 選択なし → A1 単独
       selR1 = 0; selC1 = 0; selR2 = 0; selC2 = 0;
       anchorR = 0; anchorC = 0; activeR = 0; activeC = 0;
     }
@@ -3025,16 +3068,31 @@ function multiSelectRemoveRange(idx){
   }
   updateMultiSelectBar(); updateBar(); render();
 }
-// 「AIへ」ボタン（STEP6で本実装、今はトースト表示）
+// 「AIへ」ボタン（STEP6で本実装、今はトースト+コンソールで送信内容プレビュー）
 function multiSelectSendToAI(){
+  // AI送信用アドレス文字列（メイン + selRanges、全てクォート付きでシート名明示）
+  var addrs = [_rangeToAddrEscape({r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:sheets[activeSheet].name})];
+  for(var i=0;i<selRanges.length;i++){
+    addrs.push(_rangeToAddrEscape(selRanges[i]));
+  }
+  var payload = addrs.join(', ');
+  if(typeof console!=='undefined') console.log('[multiSelectSendToAI] 送信予定:', payload);
   var toast = document.getElementById('toast');
   if(toast){
-    toast.textContent = 'AI送信はSTEP6で実装予定です（この機能は近日対応）';
+    toast.textContent = 'AI送信はSTEP6で実装予定（' + (1+selRanges.length) + '範囲プレビュー）';
     toast.classList.add('show');
     setTimeout(function(){ toast.classList.remove('show'); }, 2500);
   } else {
-    alert('AI送信はSTEP6で実装予定です（この機能は近日対応）');
+    alert('AI送信はSTEP6で実装予定（' + (1+selRanges.length) + '範囲）');
   }
+}
+// シート削除時に呼ぶ：selRanges から削除されたシートの範囲を除去
+function _cleanupSelRangesOnSheetDelete(deletedSheetName){
+  if(!deletedSheetName) return;
+  selRanges = selRanges.filter(function(rg){
+    return !rg.sheet || rg.sheet !== deletedSheetName;
+  });
+  if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
 }
 var scrollTop=0, scrollLeft=0;
 var initialInnerHeight = window.innerHeight; // キーボード出現前のinnerHeightを保存
@@ -3840,7 +3898,7 @@ function onMD(e){
       return;
     }
     // 現メインを一時退避（mouseup時にタップ/ドラッグ判定して push するか決める）
-    var _origMain = {r1:selR1, c1:selC1, r2:selR2, c2:selC2};
+    var _origMain = {r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:sheets[activeSheet].name};
     sel(r,c,r,c); // 新範囲をメインに（sel()内でupdateMultiSelectBarも実行）
     touchState={
       type:'msel',
@@ -4049,7 +4107,11 @@ function onTM(e){
       var sx0=touchState.sx-r0.left, sy0=touchState.sy-r0.top;
       if(sx0>HDR_W&&sy0>HDR_H){
         var sr=yToR(sy0), sc=xToC(sx0);
-        touchState={type:'rangeselect', startR:sr, startC:sc, r:canvas.getBoundingClientRect()};
+        // モード中はドラッグ開始前のメインをprevMainに記憶（touchendで selRanges に退避）
+        var prevMainTS = multiSelectMode
+          ? {r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:sheets[activeSheet].name}
+          : null;
+        touchState={type:'rangeselect', startR:sr, startC:sc, r:canvas.getBoundingClientRect(), prevMain:prevMainTS};
         sel(sr,sc,sr,sc);
       } else {
         touchState.type='scroll';
@@ -4122,6 +4184,14 @@ function onTE(e){
   }
   // 範囲選択終了
   if(touchState && touchState.type==='rangeselect'){
+    // モード中：ドラッグ開始前のメインを selRanges に退避（A1単独デフォルトは除く）
+    if(multiSelectMode && touchState.prevMain){
+      var pm = touchState.prevMain;
+      var isDefaultA1 = (pm.r1===0 && pm.c1===0 && pm.r2===0 && pm.c2===0);
+      if(!isDefaultA1){
+        selRanges.push(pm);
+      }
+    }
     touchState=null;
     // フル更新（プルダウン判定 & サブバー再計算）
     if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
@@ -4205,7 +4275,7 @@ function onTE(e){
         return;
       }
       // それ以外 → 現メインをselRangesに退避、新範囲（単一セル）をメインに
-      selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
+      selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:sheets[activeSheet].name});
       sel(r2,c,r2,c);
       touchState=null;
       return;
@@ -4646,10 +4716,46 @@ function cancelEdit(){
 
 // シート
 function switchSheet(idx){
-  commitEdit(); activeSheet=idx;
-  scrollTop=0;scrollLeft=0;scale=1;selR1=0;selC1=0;selR2=0;selC2=0;
+  commitEdit();
+  if(multiSelectMode){
+    // 複数選択モード中：メイン退避 & 新シート範囲を昇格
+    _switchSheetWithMultiSelect(idx);
+  } else {
+    activeSheet=idx;
+    selR1=0;selC1=0;selR2=0;selC2=0;
+  }
+  scrollTop=0;scrollLeft=0;scale=1;
   updateBar(); render();
   document.querySelectorAll('.sheet-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
+  // モード中はサブバーも更新（別シート範囲のチップ表示に反映）
+  if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
+}
+// 複数選択モード中のシート切替処理（メイン退避 + 新シート範囲の自動昇格）
+function _switchSheetWithMultiSelect(newIdx){
+  var newSheetName = sheets[newIdx].name;
+  var oldSheetName = sheets[activeSheet].name;
+  // 現メインを selRanges に退避（A1単独のデフォルト状態は退避しない）
+  var isDefaultA1 = (selR1===0 && selC1===0 && selR2===0 && selC2===0);
+  if(!isDefaultA1){
+    selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2, sheet:oldSheetName});
+  }
+  activeSheet = newIdx;
+  // 新シートに属する最新範囲を後ろから探してメインに昇格
+  var candidateIdx = -1;
+  for(var i=selRanges.length-1; i>=0; i--){
+    if(selRanges[i].sheet === newSheetName){ candidateIdx = i; break; }
+  }
+  if(candidateIdx >= 0){
+    var cand = selRanges[candidateIdx];
+    selR1 = cand.r1; selC1 = cand.c1;
+    selR2 = cand.r2; selC2 = cand.c2;
+    anchorR = cand.r1; anchorC = cand.c1;
+    activeR = cand.r2; activeC = cand.c2;
+    selRanges.splice(candidateIdx, 1);
+  } else {
+    selR1=0; selC1=0; selR2=0; selC2=0;
+    anchorR=0; anchorC=0; activeR=0; activeC=0;
+  }
 }
 function addSheet(){
   var idx=sheets.length;
