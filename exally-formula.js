@@ -537,3 +537,57 @@ function _jsComputeFormula(sheet, v) {
 // HFに渡す値の型変換（文字列の数値→number、空→null）
 
 // ===== exally-formula.js END =====
+
+// ================================================================
+// 【Node.js 両対応】2026/04/20 A案追加
+// ブラウザでは無視される（module 変数が未定義のため）
+// Node.js では module.exports で関数を公開（Claude Tool Use等で使用可能）
+// ================================================================
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    // 統計
+    _jsRank: _jsRank, _jsPercentile: _jsPercentile, _jsQuartile: _jsQuartile,
+    _jsMode: _jsMode, _jsTrimmean: _jsTrimmean, _jsPercentrank: _jsPercentrank,
+    _jsFrequency: _jsFrequency, _jsKurt: _jsKurt, _jsPermut: _jsPermut,
+    _jsPermutationa: _jsPermutationa, _jsProb: _jsProb, _jsBinomDistRange: _jsBinomDistRange,
+    // 回帰
+    _jsSlope: _jsSlope, _jsIntercept: _jsIntercept, _jsForecast: _jsForecast,
+    _jsLinest: _jsLinest, _jsLogest: _jsLogest, _jsTrend: _jsTrend, _jsGrowth: _jsGrowth,
+    // 行列
+    _jsMdeterm: _jsMdeterm, _jsMinverse: _jsMinverse,
+    // 文字列
+    _jsConcat: _jsConcat, _jsTextjoin: _jsTextjoin, _jsFixed: _jsFixed,
+    _jsDollar: _jsDollar, _jsYen: _jsYen, _jsLenb: _jsLenb, _jsLeftb: _jsLeftb,
+    _jsRightb: _jsRightb, _jsMidb: _jsMidb, _jsFindb: _jsFindb, _jsReplaceb: _jsReplaceb,
+    _jsAsc: _jsAsc, _jsJis: _jsJis,
+    _jsTextbefore: _jsTextbefore, _jsTextafter: _jsTextafter, _jsTextsplit: _jsTextsplit,
+    _jsValuetotext: _jsValuetotext, _jsArraytotext: _jsArraytotext,
+    // 日付・変換
+    _jsDateValue: _jsDateValue, _jsDatestring: _jsDatestring,
+    _jsValue: _jsValue, _jsN: _jsN, _jsType: _jsType, _jsCell: _jsCell,
+    // 参照系（hf依存・使用時はhfを別途セット必要）
+    _jsIndirect: _jsIndirect, _jsOffset: _jsOffset,
+    _jsLookup: _jsLookup, _jsXlookup: _jsXlookup, _jsXmatch: _jsXmatch,
+    // 配列
+    _jsSequence: _jsSequence, _jsRandarray: _jsRandarray, _jsSort: _jsSort,
+    _jsUnique: _jsUnique, _jsFilter: _jsFilter, _jsTake: _jsTake, _jsDrop: _jsDrop,
+    _jsExpand: _jsExpand, _jsVstack: _jsVstack, _jsHstack: _jsHstack,
+    _jsTorow: _jsTorow, _jsTocol: _jsTocol,
+    _jsChoosecols: _jsChoosecols, _jsChooserows: _jsChooserows,
+    // 財務
+    _jsIrr: _jsIrr, _jsXirr: _jsXirr, _jsVdb: _jsVdb, _jsDisc: _jsDisc,
+    _jsIntrate: _jsIntrate, _jsDuration: _jsDuration, _jsAccrint: _jsAccrint,
+    _jsAmordegrc: _jsAmordegrc, _jsAmorlinc: _jsAmorlinc,
+    // その他
+    _jsConvert: _jsConvert, _jsGestep: _jsGestep, _jsDbFunc: _jsDbFunc,
+    _jsEncodeUrl: _jsEncodeUrl, _jsAggregate: _jsAggregate,
+    _jsIsomitted: _jsIsomitted,
+    // LET/LAMBDA系（hf依存）
+    _jsLetExpand: _jsLetExpand, _jsLambdaExpand: _jsLambdaExpand,
+    _jsReduceCompute: _jsReduceCompute, _jsScanCompute: _jsScanCompute,
+    _jsMapCompute: _jsMapCompute, _jsMakearrayCompute: _jsMakearrayCompute,
+    // 補助
+    _parseFuncArgs: _parseFuncArgs, convertFormula: convertFormula,
+    _jsComputeFormula: _jsComputeFormula
+  };
+}
