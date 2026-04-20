@@ -170,20 +170,25 @@ body {
   display:none;
   background:#F0FAF4;
   border-bottom:1px solid #52B788;
-  padding:6px 8px;
-  align-items:center;
-  gap:6px;
+  flex-direction:column;
   flex-shrink:0;
 }
 #multi-select-bar.open { display:flex; }
+#multi-select-row1 {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  min-width:0;
+}
 #multi-select-info {
   flex:1;
   font-size:11px;
   color:#1A4A2E;
   font-family:'DM Mono',monospace;
   overflow:hidden;
-  text-overflow:ellipsis;
   white-space:nowrap;
+  min-width:0;
 }
 #multi-select-info .label {
   color:#3D9E72;
@@ -192,10 +197,10 @@ body {
   margin-right:6px;
 }
 #multi-select-ai-btn {
-  padding:3px 10px;
+  padding:2px 7px;
   background:#52B788;
   color:#ffffff;
-  font-size:11px;
+  font-size:10px;
   font-weight:500;
   border:none;
   border-radius:3px;
@@ -203,15 +208,47 @@ body {
   flex-shrink:0;
 }
 #multi-select-cancel-btn {
-  padding:3px 8px;
+  padding:2px 5px;
   background:transparent;
   color:#7A9A87;
-  font-size:11px;
+  font-size:10px;
   border:0.5px solid #B8D4C0;
   border-radius:3px;
   cursor:pointer;
   flex-shrink:0;
 }
+/* 展開エリア（4件以上で▼タップ時に横並びで表示、溢れたら折り返し）*/
+#multi-select-expanded {
+  display:none;
+  max-height:150px;
+  overflow-y:auto;
+  padding:6px 8px;
+  border-top:0.5px solid #B8D4C0;
+  background:#F8FEFC;
+  -webkit-overflow-scrolling:touch;
+  flex-wrap:wrap;
+  gap:4px;
+  align-content:flex-start;
+}
+#multi-select-expanded.open { display:flex; }
+/* 「他N件▼」「閉じる▲」ボタン */
+.multi-more-btn {
+  display:inline-block;
+  padding:2px 5px;
+  margin:0 1px;
+  background:#3D9E72;
+  color:#ffffff;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:10px;
+  font-weight:500;
+  white-space:nowrap;
+  line-height:1.6;
+  vertical-align:middle;
+}
+.multi-more-btn:active { opacity:0.6; }
 /* 選択範囲チップ（メイン・追加範囲を個別に × で削除可能）*/
 .multi-range-chip {
   display:inline-block;
@@ -2534,9 +2571,12 @@ window.addEventListener('load',updateBookVerBadge);
 <!-- 複数選択モード サブバー -->
 
 <div id="multi-select-bar">
-  <span id="multi-select-info"><span class="label">選択中(<span id="multi-select-count">0</span>):</span><span id="multi-select-addrs">-</span></span>
-  <button id="multi-select-ai-btn" onclick="multiSelectSendToAI()">AIへ</button>
-  <button id="multi-select-cancel-btn" onclick="toggleMultiSelect()">✕</button>
+  <div id="multi-select-row1">
+    <span id="multi-select-info"><span class="label">選択中(<span id="multi-select-count">0</span>):</span><span id="multi-select-addrs">-</span></span>
+    <button id="multi-select-ai-btn" onclick="multiSelectSendToAI()">AIへ</button>
+    <button id="multi-select-cancel-btn" onclick="toggleMultiSelect()">✕</button>
+  </div>
+  <div id="multi-select-expanded"></div>
 </div>
 
 <!-- 色付き数式表示行（カスタムKBモード+数式入力時のみ表示） -->
@@ -2823,6 +2863,7 @@ function toggleMultiSelect(){
   multiSelectMode = !multiSelectMode;
   var btn = document.getElementById('multi-select-btn');
   var bar = document.getElementById('multi-select-bar');
+  var expEl = document.getElementById('multi-select-expanded');
   if(multiSelectMode){
     if(btn){ btn.classList.add('active'); btn.textContent='✓複数選択'; }
     if(bar){ bar.classList.add('open'); }
@@ -2830,8 +2871,10 @@ function toggleMultiSelect(){
   } else {
     if(btn){ btn.classList.remove('active'); btn.textContent='+複数選択'; }
     if(bar){ bar.classList.remove('open'); }
-    // モードOFF時はselRangesをクリア（メインはそのまま残す）
+    if(expEl){ expEl.classList.remove('open'); expEl.innerHTML=''; }
+    // モードOFF時はselRangesをクリア、展開状態もリセット
     selRanges = [];
+    multiSelectExpanded = false;
     render();
   }
 }
@@ -2855,25 +2898,112 @@ function multiSelectTapCell(r,c){
   selRanges.push({r1:selR1, c1:selC1, r2:selR2, c2:selC2});
   sel(r,c,r,c);
 }
-// サブバーの表示を更新（チップUI、メイン含め個別削除可）
-function updateMultiSelectBar(){
+// 展開状態フラグ（▼/▲ トグル用）
+var multiSelectExpanded = false;
+// 展開エリアの表示/非表示をトグル
+function toggleMultiSelectExpand(){
+  multiSelectExpanded = !multiSelectExpanded;
+  updateMultiSelectBar();
+}
+// チップHTML生成（共通化）
+function _buildRangeChip(idx, addr, isMain){
+  return '<span class="multi-range-chip ' + (isMain?'main':'') + '" onclick="multiSelectRemoveRange('+idx+')">'
+    + addr + '<b>×</b></span>';
+}
+// サブバーの表示を更新（offsetWidthベースで動的に入るだけ表示、iOS Safari対応）
+// ドラッグ中の軽量更新：メインチップのaddrだけ書き換え（高速、チラつかない）
+function _updateMultiSelectBarFast(){
   if(!multiSelectMode) return;
   var countEl = document.getElementById('multi-select-count');
+  if(countEl) countEl.textContent = 1 + selRanges.length;
+  // メインチップのaddr表示だけ書き換え（DOM構造はそのまま）
   var addrsEl = document.getElementById('multi-select-addrs');
-  if(!countEl || !addrsEl) return;
-  var count = 1 + selRanges.length; // メイン + 追加
-  countEl.textContent = count;
-  // チップUI生成（メイン=idx 0、追加範囲=idx 1..N）
-  var chips = [];
-  chips.push('<span class="multi-range-chip main" onclick="multiSelectRemoveRange(0)">'
-    + _rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2})
-    + '<b>×</b></span>');
-  for(var i=0;i<selRanges.length;i++){
-    chips.push('<span class="multi-range-chip" onclick="multiSelectRemoveRange('+(i+1)+')">'
-      + _rangeToAddr(selRanges[i])
-      + '<b>×</b></span>');
+  if(!addrsEl) return;
+  var mainChip = addrsEl.querySelector('.multi-range-chip.main');
+  if(mainChip){
+    var newAddr = _rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2});
+    mainChip.innerHTML = newAddr + '<b>×</b>';
   }
-  addrsEl.innerHTML = chips.join(' ');
+  // 展開エリア内のメインチップも同期
+  var expEl = document.getElementById('multi-select-expanded');
+  if(expEl && expEl.classList.contains('open')){
+    var mainChipExp = expEl.querySelector('.multi-range-chip.main');
+    if(mainChipExp){
+      var newAddrExp = _rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2});
+      mainChipExp.innerHTML = newAddrExp + '<b>×</b>';
+    }
+  }
+}
+// サブバーの表示を更新（ドラッグ中は軽量、それ以外はフル更新でプルダウン判定）
+function updateMultiSelectBar(){
+  if(!multiSelectMode) return;
+  // ドラッグ中（rangeselect/msel）は軽量更新のみ（高速・チラつき防止）
+  if(touchState && (touchState.type==='rangeselect' || touchState.type==='msel')){
+    _updateMultiSelectBarFast();
+    return;
+  }
+  var countEl = document.getElementById('multi-select-count');
+  var addrsEl = document.getElementById('multi-select-addrs');
+  var expEl = document.getElementById('multi-select-expanded');
+  if(!countEl || !addrsEl) return;
+  var count = 1 + selRanges.length;
+  countEl.textContent = count;
+  var all = [];
+  all.push({idx:0, addr:_rangeToAddr({r1:selR1,c1:selC1,r2:selR2,c2:selC2}), isMain:true});
+  for(var i=0;i<selRanges.length;i++){
+    all.push({idx:i+1, addr:_rangeToAddr(selRanges[i]), isMain:false});
+  }
+  // 利用可能幅を計算（multi-select-info の clientWidth - ラベル幅）
+  var infoEl = document.getElementById('multi-select-info');
+  var label = infoEl ? infoEl.querySelector('.label') : null;
+  var available = infoEl ? infoEl.clientWidth : 200;
+  if(label) available -= label.offsetWidth;
+  available -= 8; // マージン余裕
+  // まず全件を一度DOMに入れて、各チップの実寸法を取得
+  var chipsAll = all.map(function(item){ return _buildRangeChip(item.idx, item.addr, item.isMain); });
+  addrsEl.innerHTML = chipsAll.join(' ');
+  var children = addrsEl.children;
+  var chipWidths = [];
+  for(var i=0;i<children.length;i++){
+    chipWidths.push(children[i].offsetWidth + 4); // チップ間マージン4px考慮
+  }
+  // 全件入るかチェック
+  var totalAll = 0;
+  for(var i=0;i<chipWidths.length;i++) totalAll += chipWidths[i];
+  if(totalAll <= available){
+    // 全件入る → 展開エリア非表示
+    if(expEl){ expEl.innerHTML=''; expEl.classList.remove('open'); }
+    multiSelectExpanded = false;
+    return;
+  }
+  // 全件入らない → ▼ボタン分のスペース確保（推定50px）して最大何件入るか計算
+  var MORE_BTN_W = 50;
+  var availWithMore = available - MORE_BTN_W;
+  var k = 0, used = 0;
+  for(var i=0;i<chipWidths.length;i++){
+    if(used + chipWidths[i] > availWithMore) break;
+    used += chipWidths[i];
+    k = i + 1;
+  }
+  k = Math.max(1, k); // 最低1件は表示
+  var inline = all.slice(0, k).map(function(item){ return _buildRangeChip(item.idx, item.addr, item.isMain); });
+  var remaining = count - k;
+  var moreLabel = multiSelectExpanded ? '閉じる ▲' : '+' + remaining + ' ▼';
+  var moreBtn = '<button class="multi-more-btn" onclick="toggleMultiSelectExpand()">' + moreLabel + '</button>';
+  addrsEl.innerHTML = inline.join(' ') + ' ' + moreBtn;
+  // 展開エリア（モード展開中のみ横並び折り返しで表示）
+  if(expEl){
+    if(multiSelectExpanded){
+      var chipsAllExp = all.map(function(item){
+        return _buildRangeChip(item.idx, item.addr, item.isMain);
+      });
+      expEl.innerHTML = chipsAllExp.join(' ');
+      expEl.classList.add('open');
+    } else {
+      expEl.innerHTML = '';
+      expEl.classList.remove('open');
+    }
+  }
 }
 // チップ × タップ時の削除処理（メイン削除時は selRanges[0] が昇格）
 function multiSelectRemoveRange(idx){
@@ -3318,14 +3448,16 @@ function bindEvents(){
     }
     if(touchState.type==='msel'){
       // 複数選択モード中：タップかドラッグかで挙動を分岐（スマホと統一）
+      var wasDragged = !!touchState.multiSelectDragged;
       if(touchState.multiSelectPendingPush && !touchState.multiSelectDragged){
         // タップのみ = 前のメインを selRanges に退避（既存のタップ挙動）
         selRanges.push(touchState.multiSelectPendingPush);
-        if(typeof updateMultiSelectBar==='function') updateMultiSelectBar();
         updateBar(); render();
       }
       // ドラッグあり = push しない（メインが新範囲に置き換わる、スマホと同じ）
       touchState=null;
+      // touchState クリア後にフル更新（プルダウン判定 & サブバー再計算）
+      if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
     }
     else if(touchState.type==='colresize'||touchState.type==='rowresize') touchState=null;
   });
@@ -3990,7 +4122,10 @@ function onTE(e){
   }
   // 範囲選択終了
   if(touchState && touchState.type==='rangeselect'){
-    touchState=null; return;
+    touchState=null;
+    // フル更新（プルダウン判定 & サブバー再計算）
+    if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
+    return;
   }
   // フィルハンドルドラッグ終了: fillPreview の範囲へフィル（値コピー）
   if(touchState && touchState.type==='handle'){
