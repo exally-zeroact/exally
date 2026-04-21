@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>給料明細テンプレート | Exally</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-text-size-adjust:100%;}
+body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-height:100vh;padding-bottom:100px;}
+:root{
+  --mint:#52B788;--mint-d:#3D9E72;--mint-dd:#2E7D54;
+  --mint-bg:#F0FAF4;--mint-border:#C8ECD8;
+  --red:#C62828;--red-bg:#FFF5F5;--red-border:#FFCDD2;
+  --text-primary:#1A2B22;--text-secondary:#4A6B5A;--text-muted:#7A9A87;
+  --border:#E0EDE6;--white:#FFFFFF;
+  --shadow-sm:0 1px 4px rgba(30,60,40,0.08);
+  --shadow-md:0 4px 16px rgba(30,60,40,0.12);
+  --shadow-lg:0 8px 32px rgba(30,60,40,0.16);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;
+}
+/* ===== ヘッダー（2段構造・統一仕様） ===== */
+.header{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E0EDE6;box-shadow:0 1px 4px rgba(30,60,40,0.08);}
+/* 1段目：ロゴ + アイコンnav */
+.header-top{display:flex;align-items:center;padding:8px 14px;gap:10px;border-bottom:1px solid #F0FAF4;min-height:44px;}
+.header-logo-wrap{display:flex;align-items:baseline;gap:5px;text-decoration:none;flex-shrink:0;}
+.header-logo{font-family:monospace;font-size:20px;font-weight:800;color:#52B788;letter-spacing:-0.5px;}
+.header-logo-ja{font-size:10px;font-weight:600;color:#4A6B5A;margin-left:-3px;}
+/* SP専用タイトル（1段目右端） */
+.header-title-sp{font-size:12px;font-weight:700;color:#4A6B5A;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(min-width:769px){.header-title-sp{display:none;}}
+.book-header-nav{display:none;}
+@media(min-width:769px){.book-header-nav{display:flex;gap:4px;align-items:center;margin-left:auto;}}
+.book-header-nav-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#4A6B5A;font-size:20px;text-decoration:none;cursor:pointer;transition:all 0.18s;background:none;border:none;font-family:inherit;}
+.book-header-nav-item:hover{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item.nav-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+.book-header-nav-item.active{background:#F0FAF4;color:#3D9E72;}
+.book-header-nav-item svg{width:22px;height:22px;}
+/* PC1段目は余裕持たせる */
+@media(min-width:769px){.header-top{padding:10px 16px;gap:12px;min-height:52px;}.header-logo{font-size:22px;}}
+/* 2段目：戻る + タイトル + 業種 */
+.header-sub{display:flex;align-items:center;padding:8px 16px;gap:12px;flex-wrap:nowrap;min-height:48px;}
+.header-back{background:none;border:1.5px solid #E0EDE6;color:#3D9E72;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;transition:all 0.15s;}
+.header-back:hover{background:#F0FAF4;border-color:#C8ECD8;}
+.header-title{font-size:13px;font-weight:700;color:#4A6B5A;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+@media(max-width:768px){.header-title{display:none;}}
+.header-gyoshu-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.header-gyoshu-label{font-size:12px;font-weight:700;color:#2E4038;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-gyoshu-btn{background:#fff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;}
+/* スマホ：2段目を1行に圧縮（ボタン小さめ・ラベル省略対応） */
+@media(max-width:768px){
+  .header-sub{padding:6px 12px;gap:8px;flex-wrap:nowrap;min-height:40px;}
+  .header-back{font-size:10px;padding:3px 9px;}
+  .header-gyoshu-wrap{gap:6px;flex:1;min-width:0;justify-content:flex-end;}
+  .header-gyoshu-label{font-size:11px;min-width:0;}
+  .header-gyoshu-btn{font-size:10px;padding:3px 9px;}
+}
+.main{max-width:600px;margin:0 auto;padding:16px 12px;}
+.type-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
+.type-tab.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
+.step-guide{background:#fff;border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.step-guide-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.step-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--mint-bg);}
+.step-row:last-child{border-bottom:none;}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--mint);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Sans',sans-serif;}
+.step-text{font-size:12px;color:var(--text-secondary);font-weight:500;}
+.card{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
+.card-title{font-size:15px;font-weight:700;color:var(--text-primary);padding:16px 16px 0;}
+.sec{padding:14px 16px;border-bottom:1px solid var(--mint-bg);}
+.sec:last-child{border-bottom:none;}
+.sec-label{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.drag-table{width:100%;border-collapse:collapse;min-width:280px;}
+.cat-divider td{padding:6px 8px 4px;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint-d);background:var(--mint-bg);border-top:1px solid var(--mint-border);border-bottom:1px solid var(--mint-border);}
+.cat-divider.cat-pay td{color:var(--mint-dd);background:var(--mint-bg);}
+.cat-divider.cat-deduct td{color:var(--red);background:var(--red-bg);}
+.drag-tr{transition:opacity 0.15s,box-shadow 0.2s,transform 0.15s;user-select:none;touch-action:none;}
+.drag-tr:hover td{background:#FAFFFE;}
+.drag-tr.dragging{opacity:0.4;transform:scale(0.98);}
+.drag-tr.drag-over td{background:var(--mint-bg) !important;border-top:2px solid var(--mint);}
+.drag-tr.deduct-row .item-name{color:var(--red);}
+.drag-tr.added{animation:rowFlash 0.7s ease-out;}
+@keyframes rowFlash{0%{background:#C8ECD8;}100%{background:transparent;}}
+.drag-table td{padding:10px 8px;border-bottom:1px solid var(--mint-bg);vertical-align:middle;}
+.dh-cell{width:40px;text-align:center;padding:4px !important;}
+.dh{display:inline-flex;align-items:center;justify-content:center;width:32px;height:44px;cursor:grab;color:var(--mint-border);font-size:18px;border-radius:var(--radius-sm);transition:color 0.15s,background 0.15s;}
+.dh:hover,.dh:active{color:var(--mint);background:var(--mint-bg);cursor:grabbing;}
+.item-name{font-size:13px;font-weight:700;color:var(--text-primary);line-height:1.3;}
+.item-name small{display:block;font-size:10px;color:var(--text-muted);font-weight:400;margin-top:2px;}
+.item-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);word-break:break-all;max-width:150px;}
+.item-val.fc{color:var(--mint-d);cursor:pointer;padding:4px 6px;border-radius:6px;transition:background 0.15s;}
+.item-val.fc:hover{background:var(--mint-bg);}
+.fc-tip{font-size:9px;color:var(--mint);margin-left:3px;opacity:0.8;}
+.del-cell{width:32px;text-align:center;padding:4px !important;}
+.del-btn{width:26px;height:26px;border-radius:50%;background:var(--mint-bg);border:none;font-size:13px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.del-btn:hover{background:var(--red-bg);color:var(--red);}
+.net-row td{background:#F8FEFC;font-weight:700;padding:12px 8px !important;}
+.net-row .item-name{font-size:14px;color:var(--text-primary);}
+.net-row .item-val{color:var(--mint-d);font-size:12px;}
+.deduct-notice{background:var(--red-bg);border-radius:var(--radius-md);padding:12px 14px;font-size:11px;color:#7A3A3A;line-height:1.8;border:1px solid var(--red-border);}
+.deduct-notice strong{font-size:12px;}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.tag{padding:7px 13px;border-radius:20px;border:1.5px dashed var(--mint-border);background:#fff;font-size:12px;font-weight:700;color:var(--mint-d);cursor:pointer;transition:all 0.15s;}
+.tag:hover{background:var(--mint-bg);border-color:var(--mint);}
+.custom-area{border-top:1px solid var(--mint-bg);padding-top:12px;margin-top:4px;}
+.custom-area-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;}
+.custom-row{display:flex;gap:8px;margin-bottom:8px;}
+.custom-type-sel{padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--text-primary);outline:none;background:#fff;transition:border-color 0.15s;}
+.custom-type-sel:focus{border-color:var(--mint);}
+.custom-inp{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Noto Sans JP',sans-serif;color:var(--text-primary);outline:none;background:#fff;transition:border-color 0.15s;}
+.custom-inp:focus{border-color:var(--mint);}
+.custom-add-btn{width:100%;padding:12px;background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);font-size:13px;font-weight:700;color:var(--mint-dd);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;}
+.custom-add-btn:hover{background:#E0F5EA;border-color:var(--mint);}
+.paper-sec{padding:14px 16px;}
+.paper-step-label{font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:8px;}
+.paper-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.paper-chip{padding:9px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;white-space:nowrap;}
+.paper-chip.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
+.paper-rank-list{display:flex;flex-direction:column;gap:8px;}
+.paper-rank-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all 0.15s;}
+.paper-rank-item.active{border-color:var(--mint);background:var(--mint-bg);}
+.paper-rank-num{font-size:18px;flex-shrink:0;width:28px;}
+.paper-rank-info{flex:1;}
+.paper-rank-name{font-size:13px;font-weight:700;color:var(--text-primary);}
+.paper-rank-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.5;}
+.paper-rank-check{font-size:14px;color:var(--mint);font-weight:700;flex-shrink:0;}
+.paper-note{font-size:11px;color:var(--mint-d);background:var(--mint-bg);border-radius:var(--radius-sm);padding:7px 10px;margin-top:10px;line-height:1.6;}
+.result-sec{display:none;padding:14px 16px;}
+.result-sec.show{display:block;}
+.result-label{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;}
+.result-box{background:var(--mint-bg);border:1px solid var(--mint-border);border-radius:var(--radius-md);padding:14px;font-size:12px;color:var(--text-secondary);line-height:2;white-space:pre-wrap;word-break:break-all;}
+.next-steps{margin-top:16px;background:#F8FEFC;border:1px solid var(--mint-border);border-radius:var(--radius-md);padding:14px;}
+.next-steps-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px;}
+.next-step-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--mint-bg);}
+.next-step-row:last-child{border-bottom:none;}
+.next-step-num{width:22px;height:22px;border-radius:50%;background:var(--mint);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Sans',sans-serif;margin-top:1px;}
+.next-step-text{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+.next-step-text strong{color:var(--text-primary);font-size:13px;}
+.next-step-text span{font-size:11px;color:var(--text-muted);}
+.copy-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--mint-d),var(--mint));border:none;border-radius:var(--radius-md);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:var(--shadow-md);transition:opacity 0.15s;}
+.copy-btn:active{opacity:0.85;}
+.gen-wrap{padding:16px;}
+.gen-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--mint-d),var(--mint));border:none;border-radius:var(--radius-lg);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 4px 20px rgba(61,158,114,0.35);transition:all 0.2s;letter-spacing:0.3px;}
+.gen-btn:active{transform:scale(0.98);opacity:0.9;}
+.gen-sub{text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;}
+.sticky-cta{position:fixed;bottom:0;left:0;right:0;padding:10px 16px 20px;background:linear-gradient(to top,rgba(244,247,245,1) 60%,rgba(244,247,245,0));z-index:190;display:flex;justify-content:center;pointer-events:none;}
+.sticky-cta button{pointer-events:auto;width:100%;max-width:600px;padding:15px;background:linear-gradient(135deg,var(--mint-d),var(--mint));border:none;border-radius:var(--radius-lg);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 4px 24px rgba(61,158,114,0.4);transition:all 0.2s;}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A2B22;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;opacity:0;transition:all 0.3s;z-index:500;pointer-events:none;font-family:'Noto Sans JP',sans-serif;box-shadow:var(--shadow-lg);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.pop-ov{position:fixed;inset:0;background:rgba(10,20,15,0.5);z-index:400;display:none;align-items:flex-end;backdrop-filter:blur(2px);}
+.pop-ov.show{display:flex;}
+.pop-sheet{background:#fff;border-radius:24px 24px 0 0;padding:20px 18px 36px;width:100%;max-width:600px;margin:0 auto;animation:slideUp 0.3s cubic-bezier(.4,0,.2,1);max-height:85vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.pop-close{float:right;width:32px;height:32px;border-radius:50%;background:var(--mint-bg);border:none;font-size:16px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;}
+.pop-title{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;padding-top:4px;clear:both;}
+.pop-formula{font-family:'DM Mono',monospace;font-size:12px;color:var(--mint-d);background:var(--mint-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:10px;word-break:break-all;}
+.pop-desc{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:8px;}
+.pop-why{font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;}
+.pop-edit{margin-bottom:14px;}
+.pop-edit-title{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:1px;}
+.pop-rate-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px;background:var(--mint-bg);border-radius:var(--radius-md);}
+.pop-rate-label{font-size:12px;font-weight:700;color:var(--text-secondary);flex:1;}
+.pop-rate-inp{width:90px;padding:7px 10px;border:1.5px solid var(--mint-border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Mono',monospace;color:var(--text-primary);outline:none;text-align:right;}
+.pop-rate-inp:focus{border-color:var(--mint);}
+.pop-rate-unit{font-size:11px;color:var(--text-muted);min-width:20px;}
+.pop-btns{display:flex;gap:8px;margin-top:4px;}
+.pop-btn{flex:1;padding:13px;border-radius:var(--radius-md);font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;border:none;transition:opacity 0.15s;}
+.pop-btn.s{background:var(--mint-bg);color:var(--mint-dd);}
+.pop-btn.p{background:var(--mint);color:#fff;}
+.pop-btn:active{opacity:0.8;}
+.manual-switch-btn{width:100%;padding:11px;margin-bottom:8px;background:#FFF8EE;border:1.5px solid #F4D090;border-radius:var(--radius-md);font-size:13px;font-weight:700;color:#9A6000;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:opacity 0.15s;}
+.manual-restore-btn{width:100%;padding:11px;margin-bottom:8px;background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);font-size:13px;font-weight:700;color:var(--mint-dd);cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.manual-warn{background:#FFF8EE;border:1px solid #F4D090;border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.7;margin-bottom:10px;}
+@media(min-width:600px){.main{padding:20px 16px;}.drag-table{font-size:13px;}.drag-table td{padding:12px 10px;}.item-val{max-width:220px;}.dh{font-size:20px;}}
+
+/* ===== ガイドパネル追加CSS ===== */
+body{padding-bottom:80px;}
+@media(min-width:769px){body{padding-bottom:0;}}
+
+/* layout */
+.layout-wrap{display:flex;flex-direction:column;}
+@media(min-width:769px){
+  .form-panel{flex:1;min-width:0;}
+  .main{max-width:none;margin:0;padding:32px 40px 40px 40px;}
+}
+
+/* スマホ上部パネル（sticky解除：.header 2段が常時固定されるため通常フロー） */
+.sp-top{background:#fff;border-bottom:2px solid #C8ECD8;}
+@media(min-width:769px){.sp-top{display:none;}}
+
+.sp-badges{display:flex;gap:6px;padding:7px 12px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #F0FAF4;}
+.sp-badges::-webkit-scrollbar{display:none;}
+.sp-badge-item{display:inline-flex;align-items:center;white-space:nowrap;flex-shrink:0;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#3D9E72;}
+.sp-steps-row{display:flex;align-items:center;padding:7px 12px 6px;gap:4px;border-bottom:1px solid #F0FAF4;}
+.sp-step-item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#4A6B5A;white-space:nowrap;}
+.sp-step-circle{width:18px;height:18px;border-radius:50%;background:#52B788;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sp-arrow{color:#C8ECD8;font-size:10px;flex-shrink:0;}
+.sp-how-btn{flex:1;margin-left:6px;background:#fff;border:2px solid #52B788;color:#3D9E72;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;text-align:center;}
+.sp-preview-row{padding:7px 12px 8px;}
+.sp-preview-row button{width:100%;padding:11px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);}
+
+/* モーダル */
+.sp-modal-ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.4);}
+.sp-modal-ov.open{display:flex;align-items:flex-end;}
+.sp-modal-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:82vh;overflow-y:auto;padding-bottom:32px;}
+.sp-modal-hd{position:sticky;top:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #E0EDE6;z-index:10;}
+.sp-modal-title{font-size:14px;font-weight:700;color:#1A2B22;}
+.sp-modal-close{background:none;border:1.5px solid #E0EDE6;color:#7A9A87;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.sp-modal-body{padding:16px;}
+@media(min-width:769px){.sp-modal-ov{display:none!important;}}
+
+/* sticky-ctaを非表示 */
+.sticky-cta{display:none!important;}
+
+/* ===== ページ全体レイアウト（PC: サイドバー + メイン） ===== */
+.page-wrap{display:flex;flex-direction:column;min-height:100vh;}
+@media(min-width:769px){.page-wrap{flex-direction:row;align-items:flex-start;}}
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+/* ===== 左サイドバー（PC専用・chat.html同仕様・隙間なし） ===== */
+.sidebar{display:none;}
+@media(min-width:769px){
+  .sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:16px 0;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+}
+.sidebar .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
+.sidebar .gp-sec:last-child{border-bottom:none;}
+
+/* ===== スマホ下部アンダーバー ===== */
+.mobile-bottombar{display:none;}
+@media(max-width:768px){
+  .mobile-bottombar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #D4EDE1;z-index:300;justify-content:space-around;padding:6px 0 8px;box-shadow:0 -2px 8px rgba(0,0,0,0.05);}
+}
+.mbb-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;text-decoration:none;color:#7A9A87;font-family:'Noto Sans JP',sans-serif;background:none;border:none;cursor:pointer;transition:color 0.15s;}
+.mbb-item:hover{color:#3D9E72;}
+.mbb-item.active{color:#3D9E72;}
+.mbb-item.nav-disabled{opacity:0.45;cursor:not-allowed;pointer-events:none;}
+.mbb-item-icon{font-size:18px;line-height:1;}
+.mbb-item-icon svg{width:18px;height:18px;}
+.mbb-item-label{font-size:9px;font-weight:500;}
+
+/* 旧 .guide-panel を完全非表示に（中身はサイドバーに移植済み） */
+.guide-panel{display:none!important;}
+.gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
+.gp-sec:last-child{border-bottom:none;}
+.gp-title{font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:8px;}
+.feat-list{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.feat-item{background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;padding:6px 7px;}
+.feat-main{font-size:10px;font-weight:700;color:#3D9E72;line-height:1.3;}
+.feat-sub{font-size:9px;color:#7A9A87;margin-top:1px;line-height:1.3;}
+.gp-steps{display:flex;flex-direction:column;gap:10px;}
+.gp-step{display:flex;gap:8px;align-items:flex-start;}
+.gp-num{width:18px;height:18px;border-radius:50%;background:#52B788;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.gp-text{font-size:11px;line-height:1.5;flex:1;}
+.gp-text b{color:#1A2B22;display:block;margin-bottom:1px;}
+.gp-text small{font-size:9px;color:#7A9A87;}
+.gp-hints{margin-top:4px;display:flex;flex-direction:column;gap:3px;}
+.gp-hint{font-size:9px;color:#3D9E72;font-weight:700;background:#F0FAF4;border-radius:5px;padding:3px 6px;line-height:1.4;}
+.gp-preview-btn{width:100%;padding:10px 6px;background:#52B788;color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 3px 10px rgba(82,183,136,0.35);white-space:nowrap;}
+.xl-steps{display:flex;flex-direction:column;gap:8px;}
+.xl-step{border-left:2px solid #C8ECD8;padding-left:8px;}
+.xl-step-lbl{font-size:9px;font-weight:700;color:#3D9E72;margin-bottom:2px;}
+.xl-step-main{font-size:10px;color:#1A2B22;font-weight:700;margin-bottom:2px;}
+.xl-point{font-size:9px;color:#52B788;font-weight:700;background:#F0FAF4;border-radius:5px;padding:2px 5px;display:inline-block;margin-top:2px;}
+.xl-pat{font-size:9px;color:#4A6B5A;padding:2px 0;border-bottom:1px solid #F4F7F5;line-height:1.5;}
+.xl-pat:last-child{border-bottom:none;}
+.xl-pat b{color:#1A2B22;}
+.sec-div{font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin:16px 0 12px;}
+/* ===== 業種プリセット ===== */
+.gyoshu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.gyoshu-overlay.hide{display:none;}
+.gyoshu-sheet{background:#fff;border-radius:20px;width:100%;max-width:540px;padding:24px 16px 32px;max-height:90vh;overflow-y:auto;}
+.gyoshu-sheet-title{font-size:16px;font-weight:700;color:#1A2B22;margin-bottom:4px;}
+.gyoshu-sheet-sub{font-size:12px;color:#7A9A87;margin-bottom:18px;line-height:1.6;}
+.gyoshu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.gyoshu-card{background:#fff;border:2px solid #E0EDE6;border-radius:14px;padding:12px 6px 10px;text-align:center;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.gyoshu-card:hover{border-color:#52B788;background:#F8FEFC;}
+.gyoshu-card.selected{border-color:#3D9E72;background:#F0FAF4;}
+.gyoshu-icon{font-size:24px;line-height:1;}
+.gyoshu-name{font-size:11px;font-weight:700;color:#2E4038;line-height:1.3;}
+.gyoshu-card.selected .gyoshu-name{color:#3D9E72;}
+.gyoshu-preset-info{background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;padding:12px 14px;margin-bottom:16px;display:none;}
+.gyoshu-preset-info.show{display:block;}
+.gyoshu-preset-title{font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:8px;}
+.gyoshu-preset-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.gyoshu-preset-tag{background:#fff;border:1px solid #C8ECD8;border-radius:20px;padding:3px 10px;font-size:11px;color:#2E4038;font-weight:500;}
+.gyoshu-preset-tag.on{background:#3D9E72;border-color:#3D9E72;color:#fff;}
+.gyoshu-apply-btn{width:100%;padding:15px;background:#C8ECD8;color:#7A9A87;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:not-allowed;font-family:'Noto Sans JP',sans-serif;margin-bottom:10px;}
+.gyoshu-apply-btn.active{background:linear-gradient(135deg,#3D9E72,#52B788);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(61,158,114,0.3);}
+.gyoshu-skip{background:none;border:none;color:#7A9A87;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;width:100%;padding:6px;}
+@media print {
+  /* 新ウィンドウ印刷方式に変更したためこのCSSは使用しない */
+}
+
+/* Excelバージョン選択モーダル（home.htmlと共有） */
+.vm-ov{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;}
+.vm-ov.show{display:flex;}
+.vm-cd{background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.vm-hd{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;}
+.vm-tt{font-size:16px;font-weight:700;color:#1A4A2E;}
+.vm-cl{background:none;border:none;font-size:22px;color:#7A9A87;cursor:pointer;padding:0 4px;line-height:1;}
+.vm-bd{padding:14px 18px 18px;overflow-y:auto;min-height:0;}
+.vm-ht{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5;margin-bottom:12px;}
+.vm-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vm-op{background:#ffffff;border:1.5px solid #D4EDE1;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.vm-op:hover{border-color:#52B788;background:#F0FAF4;}
+.vm-op.current{border-color:#52B788;background:#F0FAF4;}
+.vm-op-ic{font-size:20px;margin-bottom:3px;}
+.vm-op-lb{font-size:11px;font-weight:700;color:#1A4A2E;}
+.vm-op.current .vm-op-lb{color:#3D9E72;}
+</style>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js" charset="UTF-8"></script>
+</head>
+<body>
+
+<!-- ===== SVG symbol defs (book.htmlから流用) ===== -->
+<svg style="display:none;" aria-hidden="true">
+  <defs>
+    <symbol id="grid-sm" viewBox="0 0 20 20">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
+      <rect x="2" y="2" width="16" height="5" rx="2" fill="#52B788"/>
+      <rect x="2" y="5" width="16" height="2" fill="#52B788"/>
+      <line x1="8" y1="7" x2="8" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="14" y1="7" x2="14" y2="18" stroke="#C8ECD8" stroke-width="1"/>
+      <line x1="2" y1="12" x2="18" y2="12" stroke="#C8ECD8" stroke-width="1"/>
+    </symbol>
+    <symbol id="template-sm" viewBox="0 0 20 20">
+      <rect x="4" y="3" width="12" height="15" rx="1.5" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
+      <rect x="7" y="2" width="6" height="3" rx="1" fill="#52B788"/>
+      <line x1="6" y1="9" x2="14" y2="9" stroke="#C8ECD8" stroke-width="1.2"/>
+      <line x1="6" y1="12" x2="14" y2="12" stroke="#C8ECD8" stroke-width="1.2"/>
+      <line x1="6" y1="15" x2="11" y2="15" stroke="#C8ECD8" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="stamp-sm" viewBox="0 0 20 20">
+      <rect x="3" y="3" width="14" height="14" fill="none" stroke="#E53935" stroke-width="1.5"/>
+      <text x="10" y="12" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-weight="900" font-size="4.3" font-style="italic" fill="#E53935">Exally</text>
+    </symbol>
+    <symbol id="book-sm" viewBox="0 0 20 20">
+      <path d="M3 4 C3 3.5 3.5 3 4 3 L9 3 C9.5 3 10 3.5 10 4 L10 16.5 L4 16.5 C3.5 16.5 3 16 3 15.5 Z" fill="#52B788"/>
+      <path d="M10 4 C10 3.5 10.5 3 11 3 L16 3 C16.5 3 17 3.5 17 4 L17 15.5 C17 16 16.5 16.5 16 16.5 L10 16.5 Z" fill="#3D9E72"/>
+      <line x1="4.5" y1="5.5" x2="8.5" y2="5.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="4.5" y1="7.5" x2="8.5" y2="7.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="11.5" y1="5.5" x2="15.5" y2="5.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+      <line x1="11.5" y1="7.5" x2="15.5" y2="7.5" stroke="#ffffff" stroke-width="0.7" opacity="0.8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page-wrap">
+
+<!-- ===== PC左サイドバー（画面端ベタ付け・隙間なし） ===== -->
+<aside class="sidebar" aria-label="テンプレートガイド">
+  <div class="gp-sec">
+    <div class="gp-title">✨ このテンプレでできること</div>
+    <div class="feat-list">
+      <div class="feat-item"><div class="feat-main">📅 月給・時給</div><div class="feat-sub">両方対応</div></div>
+      <div class="feat-item"><div class="feat-main">🔢 自動計算</div><div class="feat-sub">控除も計算式付き</div></div>
+      <div class="feat-item"><div class="feat-main">👥 複数人対応</div><div class="feat-sub">最大3人分</div></div>
+      <div class="feat-item"><div class="feat-main">💰 控除明細</div><div class="feat-sub">透明性のある明細</div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📋 使い方</div>
+    <div class="gp-steps">
+      <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
+      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+      <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
+      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <button class="gp-preview-btn" onclick="document.getElementById('stickyCta').querySelector('button').click()">👁 プレビューを確認する</button>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📊 Excelで印刷するには</div>
+    <div class="xl-steps">
+      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線が現れる＝印刷範囲の目安</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+
+<!-- ===== ヘッダー（2段構造） ===== -->
+<div class="header">
+  <!-- 1段目：ロゴ + PCアイコンnav -->
+  <div class="header-top">
+    <a href="home.html" class="header-logo-wrap">
+      <span class="header-logo">Exally</span>
+      <span class="header-logo-ja">エクサリー</span>
+    </a>
+    <!-- SP専用タイトル（1段目右端） -->
+    <span class="header-title-sp js-title">給料明細（月給制）</span>
+    <nav class="book-header-nav" aria-label="他画面への移動">
+      <a href="home.html" class="book-header-nav-item" title="ホーム">🏠</a>
+      <a href="chat.html" class="book-header-nav-item" title="AIチャット">🤖</a>
+      <a href="book.html" class="book-header-nav-item" title="ブック"><svg><use href="#grid-sm"/></svg></a>
+      <a href="chat.html?tab=template" class="book-header-nav-item active" title="テンプレ"><svg><use href="#template-sm"/></svg></a>
+      <span class="book-header-nav-item nav-disabled" title="電子ハンコ（準備中）"><svg><use href="#stamp-sm"/></svg></span>
+      <a href="chat.html?tab=book" class="book-header-nav-item" title="数式帳"><svg><use href="#book-sm"/></svg></a>
+      <a href="chat.html?tab=quiz" class="book-header-nav-item" title="クイズ">🎯</a>
+      <button class="book-header-nav-item" onclick="openVerModal()" title="Excelバージョン">📊</button>
+      <a href="chat.html?tab=settings" class="book-header-nav-item" title="設定">⚙️</a>
+    </nav>
+  </div>
+  <!-- 2段目：戻る + タイトル + 業種 -->
+  <div class="header-sub">
+    <button class="header-back" onclick="location.href='chat.html?tab=template'">← テンプレ一覧に戻る</button>
+    <span class="header-title js-title" id="cardTitle">給料明細（月給制）</span>
+    <div class="header-gyoshu-wrap" id="gyoshuBar">
+      <span class="header-gyoshu-label" id="gyoshuBarLabel">業種未選択</span>
+      <button class="header-gyoshu-btn" id="gyoshuChangeBtn" onclick="changeGyoshu()">業種を選ぶ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== スマホ：上部stickyパネル ===== -->
+<div class="sp-top">
+  <div class="sp-badges">
+    <div class="sp-badge-item">📅 月給・時給対応</div>
+    <div class="sp-badge-item">🔢 自動計算</div>
+    <div class="sp-badge-item">👥 複数人対応</div>
+    <div class="sp-badge-item">💰 控除明細対応</div>
+  </div>
+  <div class="sp-steps-row">
+    <div class="sp-step-item"><div class="sp-step-circle">1</div><span>項目を設定</span></div>
+    <span class="sp-arrow">→</span>
+    <div class="sp-step-item"><div class="sp-step-circle">2</div><span>確認する</span></div>
+    <span class="sp-arrow">→</span>
+    <div class="sp-step-item"><div class="sp-step-circle">3</div><span>Excelへ</span></div>
+    <button class="sp-how-btn" onclick="openGuideModal()">📖 使い方</button>
+  </div>
+  <div class="sp-preview-row">
+    <button onclick="document.getElementById('stickyCta').querySelector('button').click()">👁 プレビューを確認する</button>
+  </div>
+</div>
+
+<!-- スマホ：使い方モーダル -->
+<div class="sp-modal-ov" id="spGuideModal" onclick="if(event.target===this)closeGuideModal()">
+  <div class="sp-modal-box">
+    <div class="sp-modal-hd">
+      <span class="sp-modal-title">📖 使い方・Excelで印刷するには</span>
+      <button class="sp-modal-close" onclick="closeGuideModal()">閉じる</button>
+    </div>
+    <div class="sp-modal-body">
+      <div class="sec-div">📋 使い方</div>
+      <div class="gp-steps">
+        <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
+        <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+        <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
+        <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
+      </div>
+      <div class="sec-div">📊 Excelで印刷するには</div>
+      <div class="xl-steps">
+        <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
+        <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線が現れる＝印刷範囲の目安</div></div>
+        <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
+        <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+<div class="layout-wrap">
+
+<!-- PC：左ガイドパネル -->
+<div class="guide-panel">
+  <div class="gp-sec">
+    <div class="gp-title">✨ このテンプレでできること</div>
+    <div class="feat-list">
+      <div class="feat-item"><div class="feat-main">📅 月給・時給</div><div class="feat-sub">両方対応</div></div>
+      <div class="feat-item"><div class="feat-main">🔢 自動計算</div><div class="feat-sub">控除も計算式付き</div></div>
+      <div class="feat-item"><div class="feat-main">👥 複数人対応</div><div class="feat-sub">最大3人分</div></div>
+      <div class="feat-item"><div class="feat-main">💰 控除明細</div><div class="feat-sub">透明性のある明細</div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📋 使い方</div>
+    <div class="gp-steps">
+      <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
+      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+      <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
+      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <button class="gp-preview-btn" onclick="document.getElementById('stickyCta').querySelector('button').click()">👁 プレビューを確認する</button>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📊 Excelで印刷するには</div>
+    <div class="xl-steps">
+      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線が現れる＝印刷範囲の目安</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- フォームパネル -->
+<div class="form-panel">
+  <div class="type-tabs">
+    <button class="type-tab active" onclick="switchType('monthly')">📅 月給制</button>
+    <button class="type-tab" onclick="switchType('hourly')">⏰ 時給制</button>
+  </div>
+  <div class="step-guide">
+    <div class="step-guide-title">使い方</div>
+    <div class="step-row"><div class="step-num">1</div><div class="step-text">☰ をドラッグして項目を並び替える</div></div>
+    <div class="step-row"><div class="step-num">2</div><div class="step-text">💡 をタップして計算式を確認・変更する</div></div>
+    <div class="step-row"><div class="step-num">3</div><div class="step-text">「Excel用データを生成する」を押してコピー → Excelに貼り付け</div></div>
+  </div>
+  <div class="card">
+    <div class="sec">
+      <div class="sec-label">含まれる項目</div>
+      <div class="tbl-wrap">
+        <table class="drag-table"><tbody id="dragTableBody"></tbody></table>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">☰ をドラッグで並び替え ／ 💡 で計算式確認・変更 ／ ✕ で除外</div>
+    </div>
+    <div class="sec" id="deductNotice" style="display:none;">
+      <div class="deduct-notice">
+        <strong>控除（こうじょ）とは？</strong><br>給与から引かれるお金のことです。<br>
+        <span style="color:var(--red);">健康保険</span>＝病院代が安くなる保険 ／
+        <span style="color:var(--red);">厚生年金</span>＝将来の年金 ／
+        <span style="color:var(--red);">雇用保険</span>＝失業時の給付金 ／
+        <span style="color:var(--red);">所得税</span>＝国に納める税金
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-label">追加できる項目</div>
+      <div class="tags" id="addableTags"></div>
+      <div class="custom-area">
+        <div class="custom-area-label">独自の項目を追加</div>
+        <div class="custom-row">
+          <select class="custom-type-sel" id="customType"><option value="pay">支給</option><option value="deduct">控除</option></select>
+          <input class="custom-inp" id="customInp" placeholder="項目名を入力（例：弁当代）" maxlength="20" onkeydown="if(event.key==='Enter') addCustom()">
+        </div>
+        <button class="custom-add-btn" onclick="addCustom()">＋ 追加する</button>
+      </div>
+    </div>
+    <div class="paper-sec">
+      <div class="sec-label">明細の設定</div>
+
+      <div style="margin-bottom:14px;">
+        <div class="paper-step-label">勤務地（健康保険料率・最低賃金に影響）</div>
+        <select id="prefSelect" onchange="onPrefChange()" style="width:100%;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;">
+        </select>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div class="paper-step-label">扶養人数</div>
+        <div style="font-size:11px;color:#7A9A87;margin-bottom:8px;line-height:1.7;">養っている家族（収入のない配偶者・子ども・親など）の人数を入れてね。わからなければ0人のままでOK。年末調整で自動的に精算されるから安心してね。</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="number" id="fuyouInput" min="0" max="7" value="0" onchange="onFuyouChange()" style="width:80px;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;text-align:center;">
+          <span style="font-size:13px;color:#7A9A87;">人</span>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
+      <div style="margin-bottom:14px;">
+        <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
+        <div class="paper-row">
+          <button class="paper-chip active" id="deliver-paper" onclick="setDeliver('paper')">📄 紙で手渡し・封筒配布</button>
+          <button class="paper-chip" id="deliver-pdf" onclick="setDeliver('pdf')">💻 PDFでメール・電子配信</button>
+        </div>
+      </div>
+      <div>
+        <div class="paper-step-label">STEP 2｜用紙サイズを選んでください</div>
+        <div class="paper-rank-list" id="paperRankList"></div>
+        <div class="paper-note" id="paperNote"></div>
+        <div id="paperPreview" style="margin-top:14px;"></div>
+      </div>
+    </div>
+    <div class="result-sec" id="resultEl">
+
+      <!-- 保存・印刷エリア（主役・最上部） -->
+      <div id="save-print-area" style="margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:12px;">完成しました。保存・印刷してください</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button onclick="printPayslip()" style="width:100%;padding:13px;background:#3D9E72;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🖨️ 印刷する</button>
+          <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
+          <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
+        </div>
+        <div style="margin-top:12px;padding:14px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;">
+          <div style="font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:6px;">📋 賃金台帳に記録する</div>
+          <div style="font-size:11px;color:#7A9A87;line-height:1.7;margin-bottom:10px;">毎月このボタンを押してダウンロード→同じフォルダに保存していくと賃金台帳が完成します。<br><span style="color:#E05555;font-weight:700;">⚠️ 労働基準法で5年保存が義務です</span></div>
+          <button onclick="downloadKinmuDaichou()" style="width:100%;padding:12px;background:#3D9E72;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📋 賃金台帳をダウンロード</button>
+        </div>
+      </div>
+
+      <!-- AIチャット -->
+      <div id="ai-chat-area" style="margin-top:14px;padding:12px;background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;">
+        <div style="font-size:11px;font-weight:700;color:#9A6000;margin-bottom:6px;">💬 AIチャットで調整したい場合</div>
+        <div style="font-size:11px;color:#7A5500;margin-bottom:8px;line-height:1.6;">「残業時間の計算式を変えたい」など追加の調整はAIに相談できます。</div>
+        <button onclick="openAIChat()" style="width:100%;padding:10px;background:#F4A942;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">AIチャットで相談する →</button>
+      </div>
+
+      <!-- Excelプレビュー（下部・スクロールして確認） -->
+      <div style="margin-top:20px;border-top:1px solid #E0EDE6;padding-top:14px;">
+        <div style="font-size:11px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:10px;">📊 完成イメージ（スクロールして確認）</div>
+        <div id="excelPreview"></div>
+      </div>
+    </div>
+    <div class="gen-wrap">
+      <div id="fitCheckMsg" style="margin-bottom:10px;"></div>
+      <button class="gen-btn" id="genMainBtn" onclick="generateTSV()">Excel用データを生成する →</button>
+      <div class="gen-sub">選択・並び替えした項目で計算式付きTSVを自動生成します</div>
+    </div>
+  </div>
+  <div id="noticeEl" style="font-size:11px;color:var(--text-muted);padding:4px 4px 16px;line-height:1.7;"></div>
+</div>
+
+<div class="sticky-cta" id="stickyCta">
+  <button onclick="showPayslipPreview()">👁 プレビューを確認する</button>
+</div>
+
+</div><!-- /form-panel -->
+</div><!-- /layout-wrap -->
+
+<!-- プレビューエリア -->
+<div id="previewArea" style="display:none;max-width:600px;margin:0 auto 12px;padding:0 12px;"></div>
+<!-- Excelバージョン選択モーダル（home.htmlと共有） -->
+<div class="vm-ov" id="verModal">
+  <div class="vm-cd">
+    <div class="vm-hd">
+      <div class="vm-tt">Excelバージョンを選んでね</div>
+      <button class="vm-cl" onclick="closeVerModal()">×</button>
+    </div>
+    <div class="vm-bd">
+      <div class="vm-ht">💡 後で変えられる・Excelなくても使える</div>
+      <div class="vm-gr">
+        <div class="vm-op" data-ver="excel_365" onclick="selectVer('excel_365')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 365</div></div>
+        <div class="vm-op" data-ver="excel_2024" onclick="selectVer('excel_2024')"><div class="vm-op-ic">🟢</div><div class="vm-op-lb">Excel 2024</div></div>
+        <div class="vm-op" data-ver="excel_2021" onclick="selectVer('excel_2021')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2021</div></div>
+        <div class="vm-op" data-ver="excel_2019" onclick="selectVer('excel_2019')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2019</div></div>
+        <div class="vm-op" data-ver="excel_2016" onclick="selectVer('excel_2016')"><div class="vm-op-ic">🔵</div><div class="vm-op-lb">Excel 2016</div></div>
+        <div class="vm-op" data-ver="excel_mac" onclick="selectVer('excel_mac')"><div class="vm-op-ic">🍎</div><div class="vm-op-lb">Excel for Mac</div></div>
+        <div class="vm-op" data-ver="excel_online" onclick="selectVer('excel_online')"><div class="vm-op-ic">☁️</div><div class="vm-op-lb">Excel Online</div></div>
+        <div class="vm-op" data-ver="excel_none" onclick="selectVer('excel_none')"><div class="vm-op-ic">✨</div><div class="vm-op-lb">Excelなし</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="pop-ov" id="popOv" onclick="closePopEv(event)">
+  <div class="pop-sheet">
+    <button class="pop-close" onclick="closePop()">✕</button>
+    <div class="pop-title" id="popTitle"></div>
+    <div class="pop-formula" id="popFormula"></div>
+    <div class="pop-desc" id="popDesc"></div>
+    <div class="pop-why" id="popWhy"></div>
+    <div class="pop-edit" id="popEdit" style="display:none;">
+      <div class="pop-edit-title">⚙️ 数値を変更する</div>
+      <div id="popRates"></div>
+    </div>
+    <div id="manualSwitchWrap" style="display:none;">
+      <div class="manual-warn">⚠️ 手入力モードにすると自動計算式が削除されます。後から「自動計算に戻す」ことも可能です。</div>
+      <button class="manual-switch-btn" onclick="switchToManual()">✏️ 手入力に切り替える（計算式を削除）</button>
+    </div>
+    <div id="manualRestoreWrap" style="display:none;">
+      <button class="manual-restore-btn" onclick="restoreFormula()">🔄 自動計算に戻す</button>
+    </div>
+    <div class="pop-btns">
+      <button class="pop-btn s" onclick="closePop()">閉じる</button>
+      <button class="pop-btn p" id="applyBtn" onclick="applyRates()">この数値で反映する</button>
+    </div>
+  </div>
+</div>
+
+<script src="shakaihoken-hyo.js" charset="UTF-8"></script>
+<script src="koyohoken-ritsu.js" charset="UTF-8"></script>
+<script src="rouki-ritsu.js" charset="UTF-8"></script>
+<script src="saitei-chingin.js" charset="UTF-8"></script>
+<script src="shotokuzei-hyou.js" charset="UTF-8"></script>
+<script src="exally-formula.js" charset="UTF-8"></script>
+<script>
+const MONTHLY=[
+  {id:'attend',label:'出勤日数',type:'info',cat:'勤怠',default:true,canRemove:false,value:'__日 / 所定__日',formula:null,title:null,rates:null},
+  {id:'absent',label:'欠勤日数',type:'info',cat:'勤怠',default:true,canRemove:true,value:'__日',formula:null,title:null,rates:null},
+  {id:'ot_h',label:'残業時間',type:'info',cat:'勤怠',default:true,canRemove:true,value:'__時間',formula:null,title:null,rates:null},
+  {id:'mid_h',label:'深夜時間',type:'info',cat:'勤怠',default:false,canRemove:true,value:'__時間',formula:null,title:null,rates:null},
+  {id:'basic',label:'基本給',type:'pay',cat:'支給',default:true,canRemove:false,value:'¥250,000',formula:'手入力',title:'基本給',desc:'毎月固定で支払われる給与。残業代・手当の計算基準になります。',why:'基本給は雇用契約で決定します。',rates:null},
+  {id:'overtime',label:'残業代',type:'pay',cat:'支給',default:true,canRemove:true,value:'=基本給÷160×1.25×残業時間',formula:'=ROUND(基本給/160*1.25*残業時間,0)',title:'残業代の計算式',desc:'月の所定労働時間（160時間）で基本給を割り、割増率をかけた金額です。',why:'労働基準法により月60時間以内の残業は25%増し（×1.25）が義務です。',rates:[{key:'rate',label:'残業割増率',val:1.25,unit:'倍',hint:'法定最低 1.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'midnight',label:'深夜手当',type:'pay',cat:'支給',default:true,canRemove:true,value:'=基本給÷160×0.25×深夜時間',formula:'=ROUND(基本給/160*0.25*深夜時間,0)',title:'深夜手当の計算式',desc:'22時〜翌5時の労働に対して基本給の25%増しが追加されます。',why:'深夜労働には25%割増賃金が法律で義務付けられています（労基法第37条）。',rates:[{key:'rate',label:'深夜割増率',val:0.25,unit:'倍',hint:'法定最低 0.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'transport',label:'交通費',type:'pay',cat:'支給',default:true,canRemove:true,value:'実費支給（上限¥150,000/月）',formula:'手入力',title:'交通費',desc:'通勤実費を支給します。非課税限度額は月15万円です。',why:'月15万円を超える交通費は給与として課税されます。',rates:null},
+  {id:'health',label:'健康保険',sub:'病院代が安くなる保険',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×4.955%',formula:'=ROUND(支給合計*0.04955,0)',title:'健康保険料の計算式',desc:'給与から健康保険料が天引きされます。会社と折半で負担します。',why:'協会けんぽ（東京）2025年度の従業員負担は4.955%です。',rates:[{key:'rate',label:'従業員負担率',val:0.04955,unit:'%',hint:'東京協会けんぽ2025年度: 4.955%',fmt:v=>(v*100).toFixed(3)+'%',toD:v=>(v*100).toFixed(3),frD:v=>parseFloat(v)/100}]},
+  {id:'pension',label:'厚生年金',sub:'将来の年金のための積立',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×9.15%（全国一律）',formula:'=ROUND(支給合計*0.0915,0)',title:'厚生年金保険料の計算式',desc:'全国一律18.3%。会社と折半するため従業員負担は9.15%です。',why:'厚生年金の料率は法律で全国一律18.3%に固定されています。',rates:[{key:'rate',label:'従業員負担率（固定）',val:0.0915,unit:'%',hint:'法定固定値 変更不可',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100,ro:true}]},
+  {id:'employ',label:'雇用保険',sub:'失業したときの給付金',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×0.55%',formula:'=ROUND(支給合計*0.0055,0)',title:'雇用保険料の計算式',desc:'失業給付などの財源となる保険料です。',why:'2025年度の雇用保険料率（一般事業）は従業員負担0.55%です。',rates:[{key:'rate',label:'従業員負担率',val:0.0055,unit:'%',hint:'一般事業2025年度: 0.55%',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100}]},
+  {id:'kaigo',label:'介護保険',sub:'40歳以上64歳以下の従業員に適用',type:'deduct',cat:'控除',default:false,canRemove:true,value:'=支給合計×0.795%',formula:'=ROUND(支給合計*0.00795,0)',title:'介護保険料の計算式',desc:'40歳以上64歳以下の従業員に健康保険と一緒に天引きされます。会社と折半で負担します。',why:'令和7年度の介護保険料率は1.59%で、従業員負担は半分の0.795%です。40歳未満・65歳以上の従業員には不要です。',rates:[{key:'rate',label:'従業員負担率',val:0.00795,unit:'%',hint:'令和7年度: 0.795%（全国一律）',fmt:v=>(v*100).toFixed(3)+'%',toD:v=>(v*100).toFixed(3),frD:v=>parseFloat(v)/100}]},
+  {id:'income',label:'所得税',sub:'給与にかかる国税（年末調整あり）',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=課税所得×源泉税額表',formula:'=課税所得×源泉税額表',title:'所得税の計算式',desc:'給与から社会保険料を引いた金額と扶養人数をもとに、国税庁の源泉徴収税額表で金額が決まるよ。',why:'給与から社会保険料を引いた金額がどの範囲かを国税庁の税額表で調べて、その金額をそのまま使うんだよ。従業員ごとの扶養人数・都道府県はExcelの設定エリアで変更してね。年末調整で最終的な金額に精算されるから安心してね。',rates:null},
+  {id:'resident',label:'住民税',sub:'前年所得への市区町村税',type:'deduct',cat:'控除',default:false,canRemove:true,value:'前年所得から算定（市区町村通知額÷12）',formula:'手入力',title:'住民税',desc:'前年の所得に基づき市区町村が計算した金額を12分割して天引きします。',why:'住民税は前年所得で決まるため会社での計算は不可能です。',rates:null},
+  {id:'perfect',label:'皆勤手当',type:'pay',cat:'支給',default:false,canRemove:true,value:'=IF(欠勤=0, ¥5,000, ¥0)',formula:'=IF(欠勤日数=0,5000,0)',title:'皆勤手当の計算式',desc:'欠勤・遅刻が0回の月に支給される手当です。',why:'皆勤手当は法律の義務ではなく会社が任意で設定します。',rates:[{key:'amount',label:'支給金額',val:5000,unit:'円',hint:'会社で自由に設定',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'housing',label:'住宅手当',type:'pay',cat:'支給',default:false,canRemove:true,value:'固定額（¥10,000）',formula:'=10000',title:'住宅手当',desc:'従業員の家賃負担を軽減するための手当です。',why:'住宅手当は法律上の義務はありません。',rates:[{key:'amount',label:'支給金額',val:10000,unit:'円',hint:'会社で自由に設定',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'skill',label:'資格手当',type:'pay',cat:'支給',default:false,canRemove:true,value:'固定額（¥3,000）',formula:'=3000',title:'資格手当',desc:'調理師免許・食品衛生責任者など特定資格保持者への手当です。',why:'資格手当は会社が任意で設定できます。',rates:[{key:'amount',label:'支給金額',val:3000,unit:'円',hint:'会社で自由に設定',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'lunch',label:'弁当代・食事代',type:'deduct',cat:'控除',default:false,canRemove:true,value:'固定額（例：¥3,000/月）',formula:'手入力',title:'弁当代・食事代の控除',desc:'社員食堂やまかない食の実費を給与から天引きします。',why:'月3,500円以下かつ従業員が半額以上負担する場合は非課税。',rates:[{key:'amount',label:'月額控除額',val:3000,unit:'円',hint:'月3,500円以下・半額以上負担で非課税',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'dormitory',label:'社宅・寮費',type:'deduct',cat:'控除',default:false,canRemove:true,value:'固定額（実費の一部）',formula:'手入力',title:'社宅・寮費の控除',desc:'会社が用意した社宅・寮の家賃相当額を天引きします。',why:'適正家賃の50%以上を従業員が負担すれば非課税。',rates:null},
+  {id:'uniform',label:'制服・ユニフォーム代',type:'deduct',cat:'控除',default:false,canRemove:true,value:'分割控除（例：¥1,000/月）',formula:'手入力',title:'制服・ユニフォーム代の控除',desc:'制服の購入費などを分割で天引きします。',why:'業務に必要な制服は会社負担が原則。就業規則への明記が必要です。',rates:null},
+  {id:'union',label:'組合費・親睦会費',type:'deduct',cat:'控除',default:false,canRemove:true,value:'固定額（例：¥500）',formula:'手入力',title:'組合費・親睦会費の控除',desc:'労働組合費や社内親睦会費を給与から天引きします。',why:'チェックオフ（給与天引き）は労使協定が必要です。',rates:null},
+  {id:'advance',label:'貸付金・立替金返済',type:'deduct',cat:'控除',default:false,canRemove:true,value:'月額返済額（要書面）',formula:'手入力',title:'貸付金・立替金返済の控除',desc:'会社からの借入金や立替金を分割で返済します。',why:'給与からの控除は労使協定が必要です。最低賃金を下回る控除は違法です。',rates:null},
+];
+
+const HOURLY=[
+  {id:'h_work',label:'実働時間',type:'info',cat:'勤怠',default:true,canRemove:false,value:'__時間__分',formula:null,title:null,rates:null},
+  {id:'h_attend',label:'出勤日数',type:'info',cat:'勤怠',default:true,canRemove:false,value:'__日',formula:null,title:null,rates:null},
+  {id:'h_ot_h',label:'残業時間',type:'info',cat:'勤怠',default:true,canRemove:true,value:'__時間',formula:null,title:null,rates:null},
+  {id:'h_mid_h',label:'深夜時間',type:'info',cat:'勤怠',default:false,canRemove:true,value:'__時間',formula:null,title:null,rates:null},
+  {id:'h_wage',label:'時給',type:'pay',cat:'支給',default:true,canRemove:false,value:'¥1,226',formula:'手入力',title:'時給',desc:'雇用契約で決めた1時間あたりの賃金です。',why:'2025年度の東京都最低賃金は時給1,226円です。下回る設定は違法になります。',rates:[{key:'wage',label:'時給',val:1226,unit:'円',hint:'東京最低賃金2025年度: 1,226円',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'h_base',label:'基本給（時給×実働）',type:'pay',cat:'支給',default:true,canRemove:false,value:'=時給×実働時間',formula:'=ROUND(時給*実働時間,0)',title:'基本給（時給制）の計算式',desc:'時給に実際の実働時間をかけた金額です。',why:'時給制の場合、働いた時間だけ給与が発生します。',rates:null},
+  {id:'h_ot',label:'残業代（時給制）',type:'pay',cat:'支給',default:true,canRemove:true,value:'=時給×1.25×残業時間',formula:'=ROUND(時給*1.25*残業時間,0)',title:'残業代（時給制）の計算式',desc:'時給に割増率（1.25）と残業時間をかけた金額です。',why:'月60時間以内の残業は時給の25%増し（×1.25）が法定義務です。',rates:[{key:'rate',label:'残業割増率',val:1.25,unit:'倍',hint:'法定最低 1.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'h_mid',label:'深夜手当（時給制）',type:'pay',cat:'支給',default:false,canRemove:true,value:'=時給×0.25×深夜時間',formula:'=ROUND(時給*0.25*深夜時間,0)',title:'深夜手当（時給制）の計算式',desc:'時給の25%増しが深夜時間分追加されます。',why:'時給制も月給制と同様に深夜割増（0.25倍）が義務です。',rates:[{key:'rate',label:'深夜割増率',val:0.25,unit:'倍',hint:'法定最低 0.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'h_health',label:'健康保険',sub:'病院代が安くなる保険',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×4.955%',formula:'=ROUND(支給合計*0.04955,0)',title:'健康保険料（時給制）',desc:'支給合計に保険料率をかけた金額を天引きします。',why:'週30時間以上（または一定条件）勤務のパートは社会保険加入が必要です。',rates:[{key:'rate',label:'従業員負担率',val:0.04955,unit:'%',hint:'東京協会けんぽ2025年度: 4.955%',fmt:v=>(v*100).toFixed(3)+'%',toD:v=>(v*100).toFixed(3),frD:v=>parseFloat(v)/100}]},
+  {id:'h_pension',label:'厚生年金',sub:'将来の年金のための積立',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×9.15%（全国一律）',formula:'=ROUND(支給合計*0.0915,0)',title:'厚生年金（時給制）',desc:'全国一律18.3%。会社と折半するため従業員負担は9.15%です。',why:'料率は法律で固定されています。',rates:[{key:'rate',label:'従業員負担率（固定）',val:0.0915,unit:'%',hint:'法定固定値 変更不可',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100,ro:true}]},
+  {id:'h_employ',label:'雇用保険',sub:'失業したときの給付金',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=支給合計×0.55%',formula:'=ROUND(支給合計*0.0055,0)',title:'雇用保険料（時給制）',desc:'週20時間以上勤務であれば加入が必要です。',why:'2025年度の雇用保険料率（一般事業）は従業員負担0.55%です。',rates:[{key:'rate',label:'従業員負担率',val:0.0055,unit:'%',hint:'一般事業2025年度: 0.55%',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100}]},
+  {id:'h_kaigo',label:'介護保険',sub:'40歳以上64歳以下の従業員に適用',type:'deduct',cat:'控除',default:false,canRemove:true,value:'=支給合計×0.795%',formula:'=ROUND(支給合計*0.00795,0)',title:'介護保険料の計算式（時給制）',desc:'40歳以上64歳以下の従業員に健康保険と一緒に天引きされます。会社と折半で負担します。',why:'令和7年度の介護保険料率は1.59%で、従業員負担は半分の0.795%です。40歳未満・65歳以上の従業員には不要です。',rates:[{key:'rate',label:'従業員負担率',val:0.00795,unit:'%',hint:'令和7年度: 0.795%（全国一律）',fmt:v=>(v*100).toFixed(3)+'%',toD:v=>(v*100).toFixed(3),frD:v=>parseFloat(v)/100}]},
+  {id:'h_income',label:'所得税',sub:'給与にかかる国税（年末調整あり）',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=課税所得×源泉税額表',formula:'=課税所得×源泉税額表',title:'所得税の計算式（時給制）',desc:'給与から社会保険料を引いた金額と扶養人数をもとに、国税庁の源泉徴収税額表で金額が決まるよ。',why:'給与から社会保険料を引いた金額がどの範囲かを国税庁の税額表で調べて、その金額をそのまま使うんだよ。従業員ごとの扶養人数・都道府県はExcelの設定エリアで変更してね。年末調整で最終的な金額に精算されるから安心してね。',rates:null},
+];
+
+let cType='monthly',active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
+function base(){return cType==='monthly'?MONTHLY:HOURLY;}
+
+function init(){
+  active=base().filter(i=>i.default).map(i=>({...i}));
+  cRates={};
+  Object.keys(manualItems).forEach(k=>delete manualItems[k]);
+  base().forEach(i=>{cRates[i.id]={};if(i.rates)i.rates.forEach(r=>{cRates[i.id][r.key]=r.val;});});
+  render();
+}
+
+function switchType(t){
+  cType=t;
+  document.querySelectorAll('.type-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='monthly')||(i===1&&t==='hourly')));
+  document.querySelectorAll('.js-title').forEach(function(el){el.textContent=t==='monthly'?'給料明細（月給制）':'給料明細（時給制）';});
+  document.getElementById('noticeEl').innerHTML=t==='monthly'
+    ?'⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。'
+    :'⚠️ <strong>週20時間以上</strong>勤務で雇用保険加入義務あり。<strong>週30時間以上</strong>（または一定条件）で社会保険加入義務があります。';
+  document.getElementById('resultEl').classList.remove('show');
+  init();
+}
+
+function flashRow(itemId){
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('.drag-tr');
+    const idx=active.findIndex(i=>i.id===itemId);
+    if(idx>=0&&rows[idx]){rows[idx].classList.add('added');rows[idx].scrollIntoView({behavior:'smooth',block:'nearest'});setTimeout(()=>rows[idx].classList.remove('added'),900);}
+  },50);
+}
+
+function render(){MONTHLY_AMOUNT=calcApproxPayTotal();renderSort();renderAddable();const hasDeduct=active.some(i=>i.type==='deduct');const notice=document.getElementById('deductNotice');if(notice)notice.style.display=hasDeduct?'block':'none';updateFitCheck();
+  // 生成済みの場合はプレビューも更新
+  if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
+}
+
+function getVal(item){
+  if(manualItems&&manualItems[item.id])return'✏️ 手入力';
+  if(!item.rates||!cRates[item.id])return item.value;
+  const r=item.rates[0];if(!r)return item.value;
+  const v=cRates[item.id][r.key];
+  if(r.unit==='倍'){
+    if(['overtime','h_ot'].includes(item.id))return`=基本給÷160×${v.toFixed(2)}×残業時間`;
+    if(['midnight','h_mid'].includes(item.id))return`=基本給÷160×${v.toFixed(2)}×深夜時間`;
+    if(item.id==='h_ot')return`=時給×${v.toFixed(2)}×残業時間`;
+    if(item.id==='h_mid')return`=時給×${v.toFixed(2)}×深夜時間`;
+  }
+  if(r.unit==='%'){
+    if(item.id==='income'||item.id==='h_income'){
+      // 所得税：JS側でSHOTOKUZEI_HYOUから確定金額を計算して表示
+      if(typeof SHOTOKUZEI_HYOU !== 'undefined'){
+        var fuyou = (cRates[item.id]&&cRates[item.id]['fuyou']!==undefined)?cRates[item.id]['fuyou']:0;
+        // 課税所得を概算（支給合計から社保を引く）
+        var payApprox = MONTHLY_AMOUNT || 0;
+        if(payApprox > 0){
+          var hRate = (cRates['health']&&cRates['health']['rate'])||0.04955;
+          var hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(payApprox);
+          var hAmt = Math.round(hyojun * hRate);
+          var pAmt = Math.round(hyojun * 0.0915);
+          var eAmt = Math.round(payApprox * ((cRates['employ']&&cRates['employ']['rate'])||0.0055));
+          var kazei = payApprox - hAmt - pAmt - eAmt;
+          if(kazei > 0){
+            var zei = SHOTOKUZEI_HYOU.getZei(kazei, fuyou);
+            if(zei !== null) return '¥'+zei.toLocaleString()+'（扶養'+fuyou+'人・税額表）';
+            return '¥－（税額表範囲外・要確認）';
+          }
+        }
+        return '=課税所得×源泉税額表（扶養'+fuyou+'人）';
+      }
+      var fuyou2 = (cRates[item.id]&&cRates[item.id]['fuyou']!==undefined)?cRates[item.id]['fuyou']:0;
+      return '=課税所得×源泉税額表（扶養'+fuyou2+'人）';
+    }
+    if(item.id==='health'||item.id==='h_health'){
+      // 健保：標準報酬月額から確定金額を計算
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        var hyojun2 = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        var hRate2 = v;
+        var hAmt2 = Math.round(hyojun2 * hRate2);
+        return '¥'+hAmt2.toLocaleString()+'（標準報酬¥'+hyojun2.toLocaleString()+'）';
+      }
+    }
+    if(item.id==='pension'||item.id==='h_pension'){
+      // 年金：標準報酬月額から確定金額を計算
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        var hyojun3 = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        var pAmt2 = Math.round(hyojun3 * 0.0915);
+        return '¥'+pAmt2.toLocaleString()+'（標準報酬¥'+hyojun3.toLocaleString()+'）';
+      }
+    }
+    return`=支給合計×${(v*100).toFixed(item.id.includes('employ')?2:3)}%`;
+  }
+  if(r.unit==='円')return`固定額（¥${Math.round(v).toLocaleString()}）`;
+  if(r.key==='wage')return`¥${Math.round(v).toLocaleString()}`;
+  return item.value;
+}
+
+function renderSort(){
+  const tbody=document.getElementById('dragTableBody');
+  tbody.innerHTML='';
+  let lastCat=null;
+  active.forEach((item,idx)=>{
+    if(item.cat!==lastCat){
+      const trDiv=document.createElement('tr');
+      trDiv.className='cat-divider'+(item.type==='pay'?' cat-pay':item.type==='deduct'?' cat-deduct':'');
+      const catLabel=item.type==='info'?'⏱ 勤怠':item.type==='pay'?'💰 支給':'🔻 控除';
+      trDiv.innerHTML='<td colspan="4">'+catLabel+'</td>';
+      tbody.appendChild(trDiv);
+      lastCat=item.cat;
+    }
+    const hf=item.formula&&item.formula!=='手入力';
+    const isDeduct=item.type==='deduct';
+    const isInfo=item.type==='info';
+    const sub=item.sub?'<small>'+item.sub+'</small>':'';
+    const tr=document.createElement('tr');
+    tr.className='drag-tr'+(isDeduct?' deduct-row':'')+(isInfo?' info-row':'');
+    tr.draggable=true;
+    const tdH=document.createElement('td');tdH.className='dh-cell';tdH.innerHTML='<span class="dh">⠿</span>';
+    const tdN=document.createElement('td');tdN.innerHTML='<span class="item-name'+(isDeduct?' dc':'')+'">' +item.label+sub+'</span>';
+    const tdV=document.createElement('td');
+    const valDisplay=getVal(item);
+    if(hf){tdV.className='item-val fc';tdV.innerHTML=valDisplay+'<span class="fc-tip">💡</span>';tdV.onclick=()=>openPop(item.id);}
+    else if(!isInfo){tdV.className='item-val';tdV.style.cursor='pointer';tdV.innerHTML=valDisplay+'<span style="font-size:9px;color:#B0C4BA;margin-left:3px;">💡</span>';tdV.onclick=()=>openPop(item.id);}
+    else{tdV.className='item-val';tdV.textContent=valDisplay;tdV.style.color='#7A9A87';}
+    const tdD=document.createElement('td');tdD.className='del-cell';
+    if(item.canRemove){const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';btn.onclick=()=>removeItem(item.id);tdD.appendChild(btn);}
+    tr.appendChild(tdH);tr.appendChild(tdN);tr.appendChild(tdV);tr.appendChild(tdD);
+    tr.addEventListener('dragstart',e=>{dragSrc=idx;tr.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    tr.addEventListener('dragend',()=>{tr.classList.remove('dragging');cleanDO();render();});
+    tr.addEventListener('dragover',e=>{e.preventDefault();tr.classList.add('drag-over');if(dragSrc!==null&&dragSrc!==idx){const tmp=[...active];const mv=tmp.splice(dragSrc,1)[0];tmp.splice(idx,0,mv);renderTableTemp(tmp);}});
+    tr.addEventListener('dragleave',()=>tr.classList.remove('drag-over'));
+    tr.addEventListener('drop',e=>{e.preventDefault();drop(idx);});
+    const dh=tdH.querySelector('.dh');let isTouching=false;if(!dh)return;
+    dh.addEventListener('touchstart',e=>{isTouching=true;dragSrc=idx;tr.classList.add('dragging');e.stopPropagation();},{passive:true});
+    tr.addEventListener('touchmove',e=>{if(!isTouching)return;e.preventDefault();const y=e.touches[0].clientY;cleanDO();tbody.querySelectorAll('.drag-tr').forEach((el,i)=>{const r=el.getBoundingClientRect();if(y>=r.top&&y<=r.bottom){el.classList.add('drag-over');if(dragSrc!==null&&dragSrc!==i){const tmp=[...active];const mv=tmp.splice(dragSrc,1)[0];tmp.splice(i,0,mv);renderTableTemp(tmp);}}});},{passive:false});
+    tr.addEventListener('touchend',e=>{if(!isTouching)return;isTouching=false;tr.classList.remove('dragging');const y=e.changedTouches[0].clientY;tbody.querySelectorAll('.drag-tr').forEach((el,i)=>{const r=el.getBoundingClientRect();if(y>=r.top&&y<=r.bottom&&i!==dragSrc)drop(i);});cleanDO();});
+    tbody.appendChild(tr);
+  });
+  const trNet=document.createElement('tr');
+  trNet.className='drag-tr net-row';
+  trNet.innerHTML='<td class="dh-cell"></td><td><span class="item-name">差引支給額</span></td><td class="item-val fc" onclick="openPop(\'net\')">支給合計 − 控除合計<span class="fc-tip">💡</span></td><td class="del-cell"></td>';
+  tbody.appendChild(trNet);
+}
+
+function renderTableTemp(tmp){
+  const rows=document.getElementById('dragTableBody').querySelectorAll('.drag-tr');
+  tmp.forEach((item,i)=>{if(i>=rows.length)return;const nameEl=rows[i].querySelector('.item-name');const valEl=rows[i].querySelector('.item-val');if(nameEl)nameEl.firstChild.textContent=item.label;if(valEl){const tip=valEl.querySelector('.fc-tip');valEl.textContent=getVal(item);if(tip)valEl.appendChild(tip);}});
+}
+
+function cleanDO(){document.querySelectorAll('.drag-tr,.sort-item').forEach(el=>el.classList.remove('drag-over'));}
+function drop(ti){if(dragSrc===null||dragSrc===ti)return;const m=active.splice(dragSrc,1)[0];active.splice(ti,0,m);dragSrc=null;render();showToast('↕ 並び替えました');}
+function removeItem(id){active=active.filter(i=>i.id!==id);render();showToast('🗑 除外しました');}
+
+function renderAddable(){
+  const c=document.getElementById('addableTags');c.innerHTML='';
+  const activeIds=active.map(i=>i.id);
+  base().filter(i=>!activeIds.includes(i.id)&&!i.default).forEach(item=>{const tag=document.createElement('div');tag.className='tag';tag.innerHTML=`＋ ${item.label}`;tag.onclick=()=>addItem(item.id);c.appendChild(tag);});
+}
+
+function addItem(id){
+  const b=base().find(i=>i.id===id);if(!b)return;
+  const lastIdx=active.map((i,idx)=>({i,idx})).filter(({i})=>i.cat===b.cat).pop()?.idx??active.length-1;
+  active.splice(lastIdx+1,0,{...b});
+  if(!cRates[id]){cRates[id]={};if(b.rates)b.rates.forEach(r=>{cRates[id][r.key]=r.val;});}
+  render();showToast('✅ 追加しました');
+}
+
+function addCustom(){
+  const inp=document.getElementById('customInp');const sel=document.getElementById('customType');
+  const label=inp.value.trim();if(!label){showToast('⚠️ 項目名を入力してください');return;}
+  const type=sel.value;const id='custom_'+Date.now();const cat=type==='pay'?'支給':'控除';
+  const ni={id,label,type,cat,default:false,canRemove:true,value:'手入力',formula:null,title:null,rates:null};
+  const lastIdx=active.map((i,idx)=>({i,idx})).filter(({i})=>i.cat===cat).pop()?.idx??active.length-1;
+  active.splice(lastIdx+1,0,ni);cRates[id]={};
+  inp.value='';render();flashRow(id);showToast(`✅「${label}」を追加しました`);
+}
+
+const NET={id:'net',title:'差引支給額（手取り）の計算式',formula:'=SUM(支給項目) - SUM(控除項目)',desc:'支給合計から社会保険料・所得税などを引いた実際の手取り金額です。',why:'社会保険料・所得税は会社が従業員に代わって納付するため給与から天引きされます。',rates:null};
+
+function openPop(id){
+  popId=id;
+  const item=id==='net'?NET:(active.find(i=>i.id===id)||base().find(i=>i.id===id));
+  if(!item)return;
+  if(!item.title&&id!=='net'){
+    document.getElementById('popTitle').textContent=item.label+' — 計算式を設定';
+    document.getElementById('popFormula').textContent=item.formula||'現在：手入力';
+    document.getElementById('popDesc').textContent='この項目に自動計算の数式を設定できます。';
+    document.getElementById('popWhy').textContent='例）残業時間×時給×1.25 のような計算式を設定すると、Excelで自動計算されます。';
+    document.getElementById('popEdit').style.display='block';
+    const ratesEl=document.getElementById('popRates');
+    ratesEl.innerHTML=`<div style="margin-bottom:8px;"><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:6px;">よく使う数式例（タップで入力）</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"><button onclick="setCustomFormula('=基本給/160*1.25*残業時間')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">残業代</button><button onclick="setCustomFormula('=支給合計*0.04955')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">健保料率</button><button onclick="setCustomFormula('=IF(欠勤日数=0,5000,0)')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">皆勤手当</button><button onclick="setCustomFormula('=基本給/所定日数*出勤日数')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">日割計算</button></div><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:4px;">数式を直接入力</div><div style="display:flex;gap:6px;align-items:center;"><input id="customFormulaInput" type="text" placeholder="例：=基本給*0.05" style="flex:1;padding:9px 11px;border:1.5px solid #C8ECD8;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;outline:none;color:#1A2B22;" value="${item.formula&&item.formula!=='手入力'?item.formula:''}"><button onclick="applyCustomFormula()" style="padding:9px 14px;background:#52B788;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">設定</button></div></div>`;
+    const sw=document.getElementById('manualSwitchWrap');const rw=document.getElementById('manualRestoreWrap');const ab=document.getElementById('applyBtn');
+    const isM=manualItems[id];
+    if(sw)sw.style.display=isM?'none':'block';if(rw)rw.style.display=isM?'block':'none';if(ab)ab.style.display='none';
+    document.getElementById('popOv').classList.add('show');return;
+  }
+  if(!item.title)return;
+  document.getElementById('popTitle').textContent=item.title;
+  document.getElementById('popFormula').textContent=item.formula;
+  document.getElementById('popDesc').textContent=item.desc;
+  document.getElementById('popWhy').textContent=item.why;
+  const editEl=document.getElementById('popEdit');const ratesEl=document.getElementById('popRates');ratesEl.innerHTML='';
+  if(item.rates&&item.rates.length){
+    editEl.style.display='block';
+    item.rates.forEach(r=>{const cur=cRates[id]?.[r.key]??r.val;const dv=r.toD(cur);ratesEl.innerHTML+=`<div class="pop-rate-row"><span class="pop-rate-label">${r.label}<br><small style="font-size:10px;color:var(--text-muted);">${r.hint}</small></span><input class="pop-rate-inp" type="number" id="ri_${r.key}" value="${dv}" step="any" ${r.ro?'readonly':''}><span class="pop-rate-unit">${r.unit}</span></div>`;});
+  }else{editEl.style.display='none';}
+  const switchWrap=document.getElementById('manualSwitchWrap');const restoreWrap=document.getElementById('manualRestoreWrap');const applyBtn=document.getElementById('applyBtn');
+  const isManual=id!=='net'&&manualItems[id];const hasRates=item.rates&&item.rates.length>0;const isNet=id==='net';
+  if(isNet){if(switchWrap)switchWrap.style.display='none';if(restoreWrap)restoreWrap.style.display='none';if(applyBtn)applyBtn.style.display='none';}
+  else if(isManual){if(switchWrap)switchWrap.style.display='none';if(restoreWrap)restoreWrap.style.display='block';if(applyBtn)applyBtn.style.display='none';editEl.style.display='none';}
+  else{if(switchWrap)switchWrap.style.display='block';if(restoreWrap)restoreWrap.style.display='none';if(applyBtn)applyBtn.style.display=hasRates?'block':'none';}
+  document.getElementById('popOv').classList.add('show');
+}
+
+function setCustomFormula(formula){const inp=document.getElementById('customFormulaInput');if(inp)inp.value=formula;}
+
+function applyCustomFormula(){
+  const inp=document.getElementById('customFormulaInput');if(!inp||!popId)return;
+  const formula=inp.value.trim();if(!formula){showToast('⚠️ 数式を入力してください');return;}
+  const activeItem=active.find(i=>i.id===popId);
+  if(activeItem){activeItem.formula=formula;activeItem.value=formula;delete manualItems[popId];}
+  render();closePop();showToast('✅ 計算式を設定しました');
+}
+
+const manualItems={};
+
+function switchToManual(){
+  if(!popId||popId==='net')return;
+  manualItems[popId]=true;
+  const activeItem=active.find(i=>i.id===popId);
+  if(activeItem){activeItem._origFormula=activeItem.formula;activeItem._origValue=activeItem.value;activeItem._origRates=activeItem.rates;activeItem.formula='手入力';activeItem.value='手入力（直接入力）';activeItem.rates=null;}
+  render();closePop();showToast('✏️ 手入力モードに切り替えました');
+}
+
+function restoreFormula(){
+  if(!popId||popId==='net')return;
+  const activeItem=active.find(i=>i.id===popId);
+  if(activeItem&&activeItem._origFormula){activeItem.formula=activeItem._origFormula;activeItem.value=activeItem._origValue;activeItem.rates=activeItem._origRates;delete activeItem._origFormula;delete activeItem._origValue;delete activeItem._origRates;}
+  delete manualItems[popId];render();closePop();showToast('🔄 自動計算に戻しました');
+}
+
+function getBase(){return cType==='monthly'?MONTHLY:HOURLY;}
+
+function applyRates(){
+  if(!popId||popId==='net'){closePop();return;}
+  const item=active.find(i=>i.id===popId)||base().find(i=>i.id===popId);
+  if(!item||!item.rates){closePop();return;}
+  item.rates.forEach(r=>{if(r.ro)return;const inp=document.getElementById(`ri_${r.key}`);if(inp)cRates[popId][r.key]=r.frD(inp.value);});
+  render();closePop();showToast('✅ 計算式を更新しました');
+}
+
+function closePopEv(e){if(e.target===document.getElementById('popOv'))closePop();}
+function closePop(){document.getElementById('popOv').classList.remove('show');}
+
+// ===== TSV動的生成（メイン・横並びレイアウト） =====
+var generatedTSV = '';
+
+// ===== 行数チェック =====
+// A4縦1枚の実用上限行数（行高さ約6mmとして）
+const ROW_LIMITS = {
+  'A4縦': 42,
+  'A4横': 28,
+  'B5縦': 36,
+  'B5縦2': 18,  // B5縦・2人分は上下2分割なので1人分の上限
+};
+
+function calcRowsPerPerson(){
+  const infoItems = active.filter(i => i.type === 'info');
+  const payItems  = active.filter(i => i.type === 'pay');
+  const dedItems  = active.filter(i => i.type === 'deduct');
+  const infoRows = Math.ceil(infoItems.length / 2); // 2列ペア
+  const bodyRows = Math.max(payItems.length, dedItems.length) + 2; // ラベル+合計
+  // 固定行: タイトル1+基本情報2+差引支給額1+空行2+勤怠ラベル1+勤怠+空行1+合計行1
+  const fixed = 1 + 2 + 1 + 1 + 1 + infoRows + 1 + 1;
+  return fixed + bodyRows;
+}
+
+// 3人分コンパクトレイアウトの1人分行数
+function calcRowsPerPersonCompact(){
+  const payItems = active.filter(i => i.type === 'pay');
+  const dedItems = active.filter(i => i.type === 'deduct');
+  // ヘッダー2行+差引1行+勤怠1行+ラベル1行+本体+合計1行
+  return 5 + Math.max(payItems.length, dedItems.length) + 1;
+}
+
+function checkFit(){
+  const paperLabel = getPaperLabel();
+  const is2 = paperLabel.includes('2人');
+  const is3 = paperLabel.includes('3人');
+  const isLandscape = paperLabel.includes('横');
+  const isB5 = paperLabel.includes('B5');
+  const peopleCount = is3 ? 3 : is2 ? 2 : 1;
+
+  // 横並び（A4横・2人分）は行数が1人分と同じ
+  // B5縦・2人分は上下並びだがB5の半分（B6）が1人分の上限
+  const isLandscape2 = isLandscape && is2;
+  const isB5two = isB5 && is2;
+  const stackCount = isLandscape2 ? 1 : peopleCount;
+
+  let limitKey;
+  if(isB5two){
+    limitKey = 'B5縦2'; // B5を2分割した時の1人分上限
+  } else if(isB5){
+    limitKey = 'B5縦';
+  } else if(isLandscape){
+    limitKey = 'A4横';
+  } else {
+    limitKey = 'A4縦';
+  }
+  const limit = ROW_LIMITS[limitKey] || 42;
+
+  // 3人分はコンパクトレイアウト、それ以外は通常
+  const useCompact = peopleCount === 3 && !isLandscape;
+  const rowsPerPerson = useCompact ? calcRowsPerPersonCompact() : calcRowsPerPerson();
+  const separator = stackCount > 1 ? 2 * (stackCount - 1) : 0;
+  // B5縦・2人分は1人分の行数を上限B5縦2(18)で判定
+  const totalRows = isB5two ? rowsPerPerson : rowsPerPerson * stackCount + separator;
+
+  const payCount = active.filter(i=>i.type==='pay').length;
+  const dedCount = active.filter(i=>i.type==='deduct').length;
+
+  return { totalRows, limit, rowsPerPerson, peopleCount, stackCount, payCount, dedCount, isLandscape, is2, isB5 };
+}
+
+function updateFitCheck(){
+  const el = document.getElementById('fitCheckMsg');
+  if(!el) return;
+  const { totalRows, limit, rowsPerPerson, peopleCount, payCount, dedCount } = checkFit();
+  const paperLabel = getPaperLabel();
+  const pct = Math.round(totalRows / limit * 100);
+  const genBtn = document.getElementById('genMainBtn');
+
+  let html = '', canGenerate = true;
+
+  if(totalRows <= limit * 0.85){
+    html = `<div style="background:#F0FAF4;border:1px solid #C8ECD8;border-radius:10px;padding:10px 12px;font-size:11px;color:#2E7D54;line-height:1.8;">
+      ✅ <strong>${paperLabel}に収まります</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
+      支給${payCount}項目・控除${dedCount}項目・${peopleCount}人分
+    </div>`;
+  } else if(totalRows <= limit){
+    html = `<div style="background:#FFF8EE;border:1px solid #F4D090;border-radius:10px;padding:10px 12px;font-size:11px;color:#7A5500;line-height:1.8;">
+      ⚠️ <strong>ギリギリです</strong>（推定${totalRows}行 / 上限${limit}行・${pct}%使用）<br>
+      印刷時に見切れる可能性があります。項目を1〜2個減らすと安全です。
+    </div>`;
+  } else {
+    canGenerate = false;
+    const over = totalRows - limit;
+    const suggestions = [];
+    if(peopleCount === 3) suggestions.push('「A4縦・2人分」に変更する');
+    if(dedCount > 4) suggestions.push(`控除項目を${dedCount-3}個以上減らす`);
+    if(payCount > 4) suggestions.push(`支給項目を${payCount-3}個以上減らす`);
+    html = `<div style="background:#FFF0F0;border:1px solid #FFCDD2;border-radius:10px;padding:10px 12px;font-size:11px;color:#C62828;line-height:1.8;">
+      ❌ <strong>${paperLabel}には収まりません</strong>（推定${totalRows}行 / 上限${limit}行・${over}行オーバー）<br><br>
+      <strong>なぜ収まらないか：</strong><br>
+      支給${payCount}項目・控除${dedCount}項目・${peopleCount}人分で合計${totalRows}行になるため、${paperLabel}の印刷範囲（${limit}行）を超えています。<br><br>
+      <strong>解決策：</strong><br>
+      ${suggestions.map(s=>'→ '+s).join('<br>')}
+    </div>`;
+  }
+
+  el.innerHTML = html;
+  if(genBtn) genBtn.disabled = !canGenerate;
+  if(genBtn) genBtn.style.opacity = canGenerate ? '1' : '0.4';
+  if(genBtn) genBtn.style.cursor = canGenerate ? 'pointer' : 'not-allowed';
+}
+
+function generateTSV(){
+  // 支給合計の概算値を計算（健保・所得税の標準報酬計算用）
+  MONTHLY_AMOUNT = calcApproxPayTotal();
+  const { canGenerate } = (() => {
+    const { totalRows, limit } = checkFit();
+    return { canGenerate: totalRows <= limit };
+  })();
+
+  const paperLabel = getPaperLabel();
+  const is2 = paperLabel.includes('2人');
+  const is3 = paperLabel.includes('3人');
+  const peopleCount = is3 ? 3 : is2 ? 2 : 1;
+
+  // 1人分のTSV行を生成（横並び構造）
+  // 列構成: A=左ラベル, B=左金額, C=空, D=右ラベル, E=右金額
+  // 支給はA・B列、控除はD・E列に横並び
+  function buildOnePerson(startRow){
+    const rows = [];
+    let r = startRow;
+    const push = (...cells) => { rows.push(cells.join('\t')); r++; };
+
+    const infoItems = active.filter(i => i.type === 'info');
+    const payItems  = active.filter(i => i.type === 'pay');
+    const dedItems  = active.filter(i => i.type === 'deduct');
+
+    // ── 勤怠セルマップ（先に計算） ──
+    // 行1:タイトル 行2:会社名 行3:従業員名 行4:差引支給額 行5:空行
+    // 行6:勤怠ラベル 行7〜:勤怠ペア
+    const infoLabelRow = startRow + 5;
+    const cellMap = {};
+    infoItems.forEach((item, idx) => {
+      const rowIdx = infoLabelRow + 1 + Math.floor(idx / 2);
+      const isRight = idx % 2 === 1;
+      cellMap[item.id] = { row: rowIdx, col: isRight ? 'E' : 'B' };
+    });
+
+    // 支給・控除の開始行計算
+    // タイトル1+基本情報2+差引1+空1+勤怠ラベル1+勤怠行数+空1+ラベル行1
+    const infoRows = Math.ceil(infoItems.length / 2);
+    const bodyStartRow = startRow + 1 + 2 + 1 + 1 + 1 + infoRows + 1 + 1;
+
+    // 支給・控除セルマップ（B列=支給金額、E列=控除金額）
+    payItems.forEach((item, idx) => {
+      cellMap[item.id] = { row: bodyStartRow + idx, col: 'B' };
+    });
+    const maxBody = Math.max(payItems.length, dedItems.length);
+    dedItems.forEach((item, idx) => {
+      cellMap[item.id] = { row: bodyStartRow + idx, col: 'E' };
+    });
+
+    // 支給合計・控除合計・差引支給額のセル番地
+    const payStartRow2 = bodyStartRow;
+    const payEndRow2   = bodyStartRow + payItems.length - 1;
+    const dedStartRow2 = bodyStartRow;
+    const dedEndRow2   = bodyStartRow + dedItems.length - 1;
+    const totalRow     = bodyStartRow + maxBody; // 合計行
+    const payTotalCell = `B${totalRow}`;
+    const dedTotalCell = `E${totalRow}`;
+
+    // 差引支給額のセル番地（行4）
+    const netRow = startRow + 3;
+    const netCell = `B${netRow}`;
+
+    // ── 出力開始 ──
+
+    // 行1: タイトル
+    push('給与明細書','','','','');
+
+    // 行2: 会社名 / 対象年月
+    push('会社名','【会社名を入力】','','対象年月','【例：2026年4月】');
+
+    // 行3: 従業員名
+    push('従業員名','【氏名を入力】','','','');
+
+    // 行4: 差引支給額（netRowと一致させる）
+    push('差引支給額',`=${payTotalCell}-${dedTotalCell}`,'','','');
+
+    // 行5: 空行
+    push('','','','','');
+
+    // 行6: 勤怠ラベル
+    push('【勤怠】','','','','');
+
+    // 行7〜: 勤怠ペア
+    for(let i = 0; i < infoItems.length; i += 2){
+      const left  = infoItems[i];
+      const right = infoItems[i+1];
+      push(left.label,'0','',right ? right.label : '','',right ? '0' : '');
+    }
+
+    // 空行
+    push('','','','','');
+
+    // 支給・控除ラベル行
+    push('【支給】','','','【控除】','');
+
+    // 支給・控除横並び
+    for(let i = 0; i < maxBody; i++){
+      const payItem = payItems[i];
+      const dedItem = dedItems[i];
+      const payVal = payItem ? buildItemFormula(payItem, cellMap, 'B') : '';
+      const dedVal = dedItem ? buildDedFormula(dedItem, payTotalCell, cellMap, 'E') : '';
+      push(
+        payItem ? payItem.label : '',
+        payItem ? payVal : '',
+        '',
+        dedItem ? dedItem.label : '',
+        dedItem ? dedVal : ''
+      );
+    }
+
+    // 合計行（totalRowと一致）
+    const payS = payItems.length > 0 ? `=SUM(B${payStartRow2}:B${payEndRow2})` : '0';
+    const dedS = dedItems.length > 0 ? `=SUM(E${dedStartRow2}:E${dedEndRow2})` : '0';
+    push('総支給額', payS, '', '控除合計', dedS);
+
+    // 区切り空行（複数人の場合）
+    if(peopleCount > 1){
+      push('','','','','');
+      push('','','','','');
+    }
+
+    return rows;
+  }
+
+  // 支給項目の数式を組み立て
+  function buildItemFormula(item, cellMap, col){
+    if(manualItems[item.id]) return '0';
+    if(!item.formula || item.formula === '手入力') return '0';
+
+    const basicCell = cellMap['basic'] || cellMap['h_wage'];
+    const wageCell = cellMap['h_wage'];
+    const otCell = cellMap['h_ot_h'] || cellMap['ot_h'];
+    const midCell = cellMap['mid_h'] || cellMap['h_mid_h'];
+    const workCell = cellMap['h_work'];
+
+    const basicRef = basicCell ? `${basicCell.col}${basicCell.row}` : 'C11';
+    const wageRef = wageCell ? `${wageCell.col}${wageCell.row}` : basicRef;
+    const otRef = otCell ? `${otCell.col}${otCell.row}` : 'C8';
+    const midRef = midCell ? `${midCell.col}${midCell.row}` : 'E8';
+    const workRef = workCell ? `${workCell.col}${workCell.row}` : 'C7';
+
+    const rate = cRates[item.id] || {};
+
+    if(item.id === 'overtime'){
+      const r = rate['rate'] ?? 1.25;
+      return `=ROUND(${basicRef}/160*${r}*${otRef},0)`;
+    }
+    if(item.id === 'midnight'){
+      const r = rate['rate'] ?? 0.25;
+      return `=ROUND(${basicRef}/160*${r}*${midRef},0)`;
+    }
+    if(item.id === 'h_base'){
+      return `=ROUND(${wageRef}*${workRef},0)`;
+    }
+    if(item.id === 'h_ot'){
+      const r = rate['rate'] ?? 1.25;
+      return `=ROUND(${wageRef}*${r}*${otRef},0)`;
+    }
+    if(item.id === 'h_mid'){
+      const r = rate['rate'] ?? 0.25;
+      return `=ROUND(${wageRef}*${r}*${midRef},0)`;
+    }
+    if(item.id === 'perfect'){
+      const absent = cellMap['absent'];
+      const absentRef = absent ? `${absent.col}${absent.row}` : 'C7';
+      const amt = rate['amount'] ?? 5000;
+      return `=IF(${absentRef}=0,${amt},0)`;
+    }
+    if(item.id === 'housing' || item.id === 'skill'){
+      const amt = rate['amount'] ?? (item.id === 'housing' ? 10000 : 3000);
+      return `=${amt}`;
+    }
+    // その他手入力
+    return '0';
+  }
+
+  // 控除項目の数式を組み立て（支給合計セルを参照）
+  function buildDedFormula(item, payTotalCell, cellMap, col){
+    if(manualItems[item.id]) return '0';
+    if(!item.formula || item.formula === '手入力') return '0';
+
+    const rate = cRates[item.id] || {};
+
+    if(item.id === 'health' || item.id === 'h_health'){
+      // 標準報酬月額から健保確定額を計算してExcelに数値で出力
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        const r = rate['rate'] ?? 0.04955;
+        return Math.round(hyojun * r).toString();
+      }
+      const r = rate['rate'] ?? 0.04955;
+      return `=ROUND(${payTotalCell}*${r},0)`;
+    }
+    if(item.id === 'pension' || item.id === 'h_pension'){
+      // 標準報酬月額から年金確定額を計算してExcelに数値で出力
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        return Math.round(hyojun * 0.0915).toString();
+      }
+      return `=ROUND(${payTotalCell}*0.0915,0)`;
+    }
+    if(item.id === 'employ' || item.id === 'h_employ'){
+      const r = rate['rate'] ?? 0.0055;
+      return `=ROUND(${payTotalCell}*${r},0)`;
+    }
+    if(item.id === 'income' || item.id === 'h_income'){
+      // 所得税：SHOTOKUZEI_HYOUのgetZeiで確定税額を計算して数値で出力
+      if(typeof SHOTOKUZEI_HYOU !== 'undefined' && MONTHLY_AMOUNT > 0){
+        const fuyou = (rate['fuyou'] !== undefined) ? rate['fuyou'] : 0;
+        const hRate = (cRates['health']&&cRates['health']['rate'])||0.04955;
+        const hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+        const hAmt = Math.round(hyojun * hRate);
+        const pAmt = Math.round(hyojun * 0.0915);
+        const eRate = (cRates['employ']&&cRates['employ']['rate'])||0.0055;
+        const eAmt = Math.round(MONTHLY_AMOUNT * eRate);
+        const kazei = MONTHLY_AMOUNT - hAmt - pAmt - eAmt;
+        if(kazei > 0){
+          const zei = SHOTOKUZEI_HYOU.getZei(kazei, fuyou);
+          if(zei !== null) return zei.toString();
+        }
+        return '0';
+      }
+      // フォールバック：セル参照式
+      const healthCell = cellMap['health'] || cellMap['h_health'];
+      const pensionCell = cellMap['pension'] || cellMap['h_pension'];
+      const employCell = cellMap['employ'] || cellMap['h_employ'];
+      const r = rate['rate'] ?? 0.05;
+      if(healthCell && pensionCell && employCell){
+        const hRef = `${healthCell.col}${healthCell.row}`;
+        const pRef = `${pensionCell.col}${pensionCell.row}`;
+        const eRef = `${employCell.col}${employCell.row}`;
+        return `=ROUND((${payTotalCell}-${hRef}-${pRef}-${eRef})*${r},0)`;
+      }
+      return `=ROUND(${payTotalCell}*${r},0)`;
+    }
+    if(['lunch','dormitory','uniform','union','advance'].includes(item.id)){
+      const amt = rate['amount'] ?? 0;
+      return amt > 0 ? `=${amt}` : '0';
+    }
+    return '0';
+  }
+
+  // ===== 全人数分のTSVを結合 =====
+  const paperLabel2 = getPaperLabel();
+  const isLandscape2 = paperLabel2.includes('横');
+  const isB5two = paperLabel2.includes('B5') && paperLabel2.includes('2人');
+  const is2people = paperLabel2.includes('2人');
+
+  let allRows = [];
+
+  if(isLandscape2 && is2people){
+    allRows = buildLandscape2Person();
+  } else if(peopleCount === 3 && !isLandscape2){
+    // 3人分はコンパクトレイアウトで生成
+    allRows = buildCompact3Person();
+  } else {
+    let currentRow = 1;
+    const count2 = isB5two ? 2 : peopleCount;
+    for(let p = 1; p <= count2; p++){
+      const personRows = buildOnePerson(currentRow);
+      allRows = allRows.concat(personRows);
+      currentRow += personRows.length;
+    }
+  }
+
+  generatedTSV = allRows.join('\n');
+
+  // プレビューとUI更新
+  document.getElementById('resultEl').classList.add('show');
+  renderExcelPreview();
+  setTimeout(function(){
+    var el = document.getElementById('save-print-area');
+    var hd = document.querySelector('.header');
+    var sp = document.querySelector('.sp-top');
+    var offset = (hd ? hd.offsetHeight : 0) + (sp ? sp.offsetHeight : 0) + 8;
+    var top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({top: top, behavior: 'smooth'});
+  }, 400);
+  const sc = document.getElementById('stickyCta');
+  if(sc) sc.style.display = 'none';
+}
+
+
+// ===== A4縦・3人分：コンパクトTSV生成 =====
+// ヘッダー2行+差引1行+勤怠1行+支給控除ラベル1行+本体+合計1行 = 5+max(pay,ded)+1
+function buildCompact3Person(){
+  const rows = [];
+  const infoItems = active.filter(i => i.type === 'info');
+  const payItems  = active.filter(i => i.type === 'pay');
+  const dedItems  = active.filter(i => i.type === 'deduct');
+  const maxBody   = Math.max(payItems.length, dedItems.length);
+
+  // セルマップ計算
+  // 行1:タイトル+日付 行2:会社名+氏名(+支給日) 行3:差引 行4:勤怠 行5:ラベル
+  // 行6〜(5+maxBody):本体 行(6+maxBody):合計
+  const bodyStart = 7;  // 行7から本体（会社名・従業員名を別行にしたため+1）
+  const totalRow  = bodyStart + maxBody;
+
+  function makeCompactMap(startRow){
+    const cm = {};
+    // 勤怠行はラベル+値ペア: A=ラベル B=値 C=ラベル D=値 E=ラベル F=値 G=ラベル H=値
+    // 数式参照は値列（B,D,F,H）
+    const attendValCols = ['B','D','F','H'];
+    infoItems.forEach((item, idx) => {
+      cm[item.id] = { row: startRow + 3, col: attendValCols[idx] || 'B' };
+    });
+    payItems.forEach((item, idx) => {
+      cm[item.id] = { row: startRow + bodyStart - 1 + idx, col: 'B' };
+    });
+    dedItems.forEach((item, idx) => {
+      cm[item.id] = { row: startRow + bodyStart - 1 + idx, col: 'E' };
+    });
+    return cm;
+  }
+
+  const push = (...cells) => rows.push(cells.join('\t'));
+
+  // 1人分のコンパクトブロックを生成（セル番地を直接計算）
+  function oneCompactBlock(startRow){
+    const blockRows = [];
+    const bp = (...cells) => blockRows.push(cells.join('\t'));
+
+    // セル番地を直接計算（行2=会社名、行3=従業員名、行4=差引、行5=勤怠、行6=ラベル、行7〜=本体）
+    const attendRow  = startRow + 4;  // 行5（勤怠）
+    const bodyRow    = startRow + bodyStart - 1; // 行7〜（本体）
+    const sumRow     = startRow + totalRow - 1;  // 合計行
+    const netRow     = startRow + 3;  // 行4（差引支給額）
+
+    // 勤怠セル番地（ラベル+値ペア: A=ラベルB=値C=ラベルD=値...）
+    const attendValCols = ['B','D','F','H'];
+    const attendMap = {};
+    infoItems.forEach((item,idx) => {
+      attendMap[item.id] = `${attendValCols[idx]}${attendRow}`;
+    });
+
+    // 支給・控除セル番地
+    const payMap = {};
+    payItems.forEach((item,idx) => { payMap[item.id] = `B${bodyRow+idx}`; });
+    const dedMap = {};
+    dedItems.forEach((item,idx) => { dedMap[item.id] = `E${bodyRow+idx}`; });
+
+    const ptCell = `B${sumRow}`;
+    const dtCell = `E${sumRow}`;
+
+    // 行1: タイトル + 対象年月
+    bp('給料明細書', '', '', '対象年月', '【例：2026年4月】');
+
+    // 行2: 会社名のみ
+    bp('会社名','【会社名を入力】','','','');
+
+    // 行3: 従業員名
+    bp('従業員名','【氏名を入力】','','','');
+
+    // 行4: 差引支給額
+    bp('差引支給額', `=${ptCell}-${dtCell}`, '', '', '');
+
+    // 行5: 勤怠（全項目を1行に横並び）
+    const al = infoItems.map(i=>i.label);
+    bp(
+      al[0]||'', '0',
+      al[1]||'', '0',
+      al[2]||'', '0',
+      al[3]||'', al[3]?'0':''
+    );
+
+    // 行5: 支給・控除ラベル
+    bp('【支給】', '', '', '【控除】', '');
+
+    // 行6〜: 本体（支給・控除横並び）・数式を直接組み立て
+    for(let i = 0; i < maxBody; i++){
+      const pi = payItems[i];
+      const di = dedItems[i];
+
+      let pv = '';
+      if(pi){
+        const rate = cRates[pi.id] || {};
+        const basicRef = payMap['basic'] || payMap['h_wage'] || `B${bodyRow}`;
+        const wageRef  = payMap['h_wage'] || basicRef;
+        const otRef    = attendMap['ot_h'] || attendMap['h_ot_h'] || `F${attendRow}`;
+        const midRef   = attendMap['mid_h'] || attendMap['h_mid_h'] || `H${attendRow}`;
+        const workRef  = attendMap['h_work'] || `B${attendRow}`;
+        if(!pi.formula || pi.formula==='手入力' || manualItems[pi.id]){
+          pv = '0';
+        } else if(pi.id==='overtime'){
+          const r=rate['rate']??1.25; pv=`=ROUND(${basicRef}/160*${r}*${otRef},0)`;
+        } else if(pi.id==='midnight'){
+          const r=rate['rate']??0.25; pv=`=ROUND(${basicRef}/160*${r}*${midRef},0)`;
+        } else if(pi.id==='h_base'){
+          pv=`=ROUND(${wageRef}*${workRef},0)`;
+        } else if(pi.id==='h_ot'){
+          const r=rate['rate']??1.25; pv=`=ROUND(${wageRef}*${r}*${otRef},0)`;
+        } else if(pi.id==='h_mid'){
+          const r=rate['rate']??0.25; pv=`=ROUND(${wageRef}*${r}*${midRef},0)`;
+        } else if(pi.id==='perfect'){
+          const absentRef=attendMap['absent']||`D${attendRow}`;
+          const amt=rate['amount']??5000;
+          pv=`=IF(${absentRef}=0,${amt},0)`;
+        } else if(pi.id==='housing'||pi.id==='skill'){
+          const amt=rate['amount']??(pi.id==='housing'?10000:3000); pv=`=${amt}`;
+        } else { pv='0'; }
+      }
+
+      let dv = '';
+      if(di){
+        const rate = cRates[di.id] || {};
+        const hRef = dedMap['health'] || dedMap['h_health'];
+        const pRef = dedMap['pension'] || dedMap['h_pension'];
+        const eRef = dedMap['employ'] || dedMap['h_employ'];
+        if(!di.formula || di.formula==='手入力' || manualItems[di.id]){
+          dv = '0';
+        } else if(di.id==='health'||di.id==='h_health'){
+          const r=rate['rate']??0.04955; dv=`=ROUND(${ptCell}*${r},0)`;
+        } else if(di.id==='pension'||di.id==='h_pension'){
+          dv=`=ROUND(${ptCell}*0.0915,0)`;
+        } else if(di.id==='employ'||di.id==='h_employ'){
+          const r=rate['rate']??0.0055; dv=`=ROUND(${ptCell}*${r},0)`;
+        } else if(di.id==='income'||di.id==='h_income'){
+          const r=rate['rate']??0.05;
+          if(hRef&&pRef&&eRef){
+            dv=`=ROUND((${ptCell}-${hRef}-${pRef}-${eRef})*${r},0)`;
+          } else { dv=`=ROUND(${ptCell}*${r},0)`; }
+        } else if(['lunch','dormitory','uniform','union','advance'].includes(di.id)){
+          const amt=rate['amount']??0; dv=amt>0?`=${amt}`:'0';
+        } else { dv='0'; }
+      }
+
+      bp(pi?pi.label:'', pi?pv:'', '', di?di.label:'', di?dv:'');
+    }
+
+    // 合計行
+    const ps = payItems.length>0 ? `=SUM(B${bodyRow}:B${bodyRow+payItems.length-1})` : '0';
+    const ds = dedItems.length>0 ? `=SUM(E${bodyRow}:E${bodyRow+dedItems.length-1})` : '0';
+    bp('総支給額', ps, '', '控除合計', ds);
+
+    return blockRows;
+  }
+
+  // 3人分を上下に並べる（区切り2行）
+  let currentRow = 1;
+  for(let p = 1; p <= 3; p++){
+    const block = oneCompactBlock(currentRow, p);
+    rows.push(...block);
+    currentRow += block.length;
+    if(p < 3){
+      rows.push(''); // 区切り空行
+      rows.push(''); // ミシン目用空行
+      currentRow += 2;
+    }
+  }
+  return rows;
+}
+
+// ===== A4横・2人分：左右並びTSV生成 =====
+function buildLandscape2Person(){
+  const rows = [];
+  const infoItems = active.filter(i => i.type === 'info');
+  const payItems  = active.filter(i => i.type === 'pay');
+  const dedItems  = active.filter(i => i.type === 'deduct');
+  const infoRows2 = Math.ceil(infoItems.length / 2);
+  const maxBody   = Math.max(payItems.length, dedItems.length);
+
+  const p1 = { pay:'B', ded:'D', al:'B', ar:'D' };
+  const p2 = { pay:'G', ded:'I', al:'G', ar:'I' };
+
+  const bodyStart = 9 + infoRows2;
+  const totalRow  = bodyStart + maxBody;
+
+  function makeMap(pp){
+    const m = {};
+    infoItems.forEach((item,idx)=>{
+      m[item.id]={row:7+Math.floor(idx/2),col:idx%2===0?pp.al:pp.ar};
+    });
+    payItems.forEach((item,idx)=>{ m[item.id]={row:bodyStart+idx,col:pp.pay}; });
+    dedItems.forEach((item,idx)=>{ m[item.id]={row:bodyStart+idx,col:pp.ded}; });
+    return m;
+  }
+  const cm1=makeMap(p1), cm2=makeMap(p2);
+  const pt1=`${p1.pay}${totalRow}`,dt1=`${p1.ded}${totalRow}`;
+  const pt2=`${p2.pay}${totalRow}`,dt2=`${p2.ded}${totalRow}`;
+
+  const push=(...cells)=>rows.push(cells.join('\t'));
+
+  push('給与明細書','','','','','給与明細書','','','');
+  push('会社名','【会社名を入力】','','対象年月','【例：2026年4月】','会社名','【会社名を入力】','','対象年月','【例：2026年4月】');
+  push('従業員名','【氏名を入力】','','','','従業員名','【氏名を入力】','','');
+  push('差引支給額',`=${pt1}-${dt1}`,'','','','差引支給額',`=${pt2}-${dt2}`,'','');
+  push('','','','','','','','','');
+  push('【勤怠】','','','','','【勤怠】','','','');
+  for(let i=0;i<infoItems.length;i+=2){
+    const l=infoItems[i],r2=infoItems[i+1];
+    push(l.label,'0',r2?r2.label:'',r2?'0':'','',l.label,'0',r2?r2.label:'',r2?'0':'');
+  }
+  push('','','','','','','','','');
+  push('【支給】','','【控除】','','','【支給】','','【控除】','');
+  for(let i=0;i<maxBody;i++){
+    const pi=payItems[i],di=dedItems[i];
+    push(
+      pi?pi.label:'',pi?buildItemFormula2(pi,cm1,p1.pay):'',
+      di?di.label:'',di?buildDedFormula2(di,pt1,cm1,p1.ded):'',
+      '',
+      pi?pi.label:'',pi?buildItemFormula2(pi,cm2,p2.pay):'',
+      di?di.label:'',di?buildDedFormula2(di,pt2,cm2,p2.ded):''
+    );
+  }
+  const ps1=payItems.length>0?`=SUM(${p1.pay}${bodyStart}:${p1.pay}${bodyStart+payItems.length-1})`:'0';
+  const ds1=dedItems.length>0?`=SUM(${p1.ded}${bodyStart}:${p1.ded}${bodyStart+dedItems.length-1})`:'0';
+  const ps2=payItems.length>0?`=SUM(${p2.pay}${bodyStart}:${p2.pay}${bodyStart+payItems.length-1})`:'0';
+  const ds2=dedItems.length>0?`=SUM(${p2.ded}${bodyStart}:${p2.ded}${bodyStart+dedItems.length-1})`:'0';
+  push('総支給額',ps1,'控除合計',ds1,'','総支給額',ps2,'控除合計',ds2);
+  return rows;
+}
+
+function buildItemFormula2(item,cellMap,payCol){
+  if(manualItems[item.id])return'0';
+  if(!item.formula||item.formula==='手入力')return'0';
+  const basicCell=cellMap['basic']||cellMap['h_wage'];
+  const wageCell=cellMap['h_wage'];
+  const otCell=cellMap['h_ot_h']||cellMap['ot_h'];
+  const midCell=cellMap['mid_h']||cellMap['h_mid_h'];
+  const workCell=cellMap['h_work'];
+  const basicRef=basicCell?`${basicCell.col}${basicCell.row}`:`${payCol}11`;
+  const wageRef=wageCell?`${wageCell.col}${wageCell.row}`:basicRef;
+  const otRef=otCell?`${otCell.col}${otCell.row}`:'B8';
+  const midRef=midCell?`${midCell.col}${midCell.row}`:'D8';
+  const workRef=workCell?`${workCell.col}${workCell.row}`:'B7';
+  const rate=cRates[item.id]||{};
+  if(item.id==='overtime'){const r=rate['rate']??1.25;return`=ROUND(${basicRef}/160*${r}*${otRef},0)`;}
+  if(item.id==='midnight'){const r=rate['rate']??0.25;return`=ROUND(${basicRef}/160*${r}*${midRef},0)`;}
+  if(item.id==='h_base'){return`=ROUND(${wageRef}*${workRef},0)`;}
+  if(item.id==='h_ot'){const r=rate['rate']??1.25;return`=ROUND(${wageRef}*${r}*${otRef},0)`;}
+  if(item.id==='h_mid'){const r=rate['rate']??0.25;return`=ROUND(${wageRef}*${r}*${midRef},0)`;}
+  if(item.id==='perfect'){const absent=cellMap['absent'];const absentRef=absent?`${absent.col}${absent.row}`:`${payCol}7`;const amt=rate['amount']??5000;return`=IF(${absentRef}=0,${amt},0)`;}
+  if(item.id==='housing'||item.id==='skill'){const amt=rate['amount']??(item.id==='housing'?10000:3000);return`=${amt}`;}
+  return'0';
+}
+
+function buildDedFormula2(item,payTotalCell,cellMap,dedCol){
+  if(manualItems[item.id])return'0';
+  if(!item.formula||item.formula==='手入力')return'0';
+  const rate=cRates[item.id]||{};
+  if(item.id==='health'||item.id==='h_health'){
+    if(typeof SHAKAIHOKEN_HYO!=='undefined'&&MONTHLY_AMOUNT>0){const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);const r=rate['rate']??0.04955;return Math.round(hy*r).toString();}
+    const r=rate['rate']??0.04955;return`=ROUND(${payTotalCell}*${r},0)`;
+  }
+  if(item.id==='pension'||item.id==='h_pension'){
+    if(typeof SHAKAIHOKEN_HYO!=='undefined'&&MONTHLY_AMOUNT>0){const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);return Math.round(hy*0.0915).toString();}
+    return`=ROUND(${payTotalCell}*0.0915,0)`;
+  }
+  if(item.id==='employ'||item.id==='h_employ'){const r=rate['rate']??0.0055;return`=ROUND(${payTotalCell}*${r},0)`;}
+  if(item.id==='income'||item.id==='h_income'){
+    if(typeof SHOTOKUZEI_HYOU!=='undefined'&&MONTHLY_AMOUNT>0){
+      const fuyou=(rate['fuyou']!==undefined)?rate['fuyou']:0;
+      const hRate=(cRates['health']&&cRates['health']['rate'])||0.04955;
+      const hy=SHAKAIHOKEN_HYO.getHyojunHoshu(MONTHLY_AMOUNT);
+      const hA=Math.round(hy*hRate);const pA=Math.round(hy*0.0915);
+      const eR=(cRates['employ']&&cRates['employ']['rate'])||0.0055;
+      const eA=Math.round(MONTHLY_AMOUNT*eR);
+      const kazei=MONTHLY_AMOUNT-hA-pA-eA;
+      if(kazei>0){const zei=SHOTOKUZEI_HYOU.getZei(kazei,fuyou);if(zei!==null)return zei.toString();}
+      return'0';
+    }
+    const hC=cellMap['health']||cellMap['h_health'];
+    const pC=cellMap['pension']||cellMap['h_pension'];
+    const eC=cellMap['employ']||cellMap['h_employ'];
+    const r=rate['rate']??0.05;
+    if(hC&&pC&&eC){return`=ROUND((${payTotalCell}-${hC.col}${hC.row}-${pC.col}${pC.row}-${eC.col}${eC.row})*${r},0)`;}
+    return`=ROUND(${payTotalCell}*${r},0)`;
+  }
+  if(['lunch','dormitory','uniform','union','advance'].includes(item.id)){const amt=rate['amount']??0;return amt>0?`=${amt}`:'0';}
+  return'0';
+}
+
+function copyTSVDirect(){
+  if(!generatedTSV){ showToast('⚠️ 先にデータを生成してください'); return; }
+  navigator.clipboard.writeText(generatedTSV).then(()=>{
+    showToast('📋 コピー完了');
+  });
+}
+
+function openAIChat(){
+  if(window.parent && window.parent.switchTab){
+    window.parent.switchTab('chat');
+  }
+}
+
+function copyPrompt(){
+  navigator.clipboard.writeText(generatedTSV)
+    .then(()=>showToast('📋 コピーしました'));
+}
+
+// ===== Excelプレビュー生成 =====
+function renderExcelPreview(){
+  const el=document.getElementById('excelPreview');
+  if(!el)return;
+
+  const paperLabel=getPaperLabel();
+  const isLandscape=paperLabel.includes('横');
+  const is2=paperLabel.includes('2人');
+  const is3=paperLabel.includes('3人');
+  const peopleCount=is3?3:is2?2:1;
+  const isCompact=(peopleCount===3 && !isLandscape);
+
+  const payItems=active.filter(i=>i.type==='pay');
+  const dedItems=active.filter(i=>i.type==='deduct');
+  const infoItems=active.filter(i=>i.type==='info');
+
+  // ===== 通常レイアウト（1人・2人・横向き） =====
+  function oneSheet(personLabel){
+    const infoRows=infoItems.map(i=>`
+      <tr>
+        <td style="padding:2px 6px;font-size:10px;color:#4A6B5A;border-bottom:1px solid #E8F5EE;width:55%;">${i.label}</td>
+        <td style="padding:2px 6px;font-size:10px;color:#7A9A87;border-bottom:1px solid #E8F5EE;text-align:right;">—</td>
+      </tr>`).join('');
+    const payRows=payItems.map(i=>`
+      <tr>
+        <td style="padding:2px 6px;font-size:10px;color:#1A2B22;border-bottom:1px solid #E8F5EE;">${i.label}</td>
+        <td style="padding:2px 6px;font-size:10px;color:#2E7D54;border-bottom:1px solid #E8F5EE;text-align:right;font-family:'DM Mono',monospace;">¥—</td>
+      </tr>`).join('');
+    const dedRows=dedItems.map(i=>`
+      <tr>
+        <td style="padding:2px 6px;font-size:10px;color:#C62828;border-bottom:1px solid #E8F5EE;">${i.label}</td>
+        <td style="padding:2px 6px;font-size:10px;color:#C62828;border-bottom:1px solid #E8F5EE;text-align:right;font-family:'DM Mono',monospace;">¥—</td>
+      </tr>`).join('');
+    return `
+      <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">
+        <div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.8);">${personLabel}</span>
+        </div>
+        <div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;">
+          <span>会社名：＿＿＿＿</span><span>氏名：＿＿＿＿</span><span>2026年○月分</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          ${infoRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">⏱ 勤怠</td></tr>${infoRows}`:''}
+          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">💰 支給</td></tr>
+          ${payRows}
+          ${dedRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#C62828;background:#FFF5F5;border-bottom:1px solid #FFCDD2;">🔻 控除</td></tr>${dedRows}`:''}
+          <tr style="background:#F8FEFC;">
+            <td style="padding:5px 6px;font-size:10px;font-weight:700;color:#1A2B22;border-top:2px solid #3D9E72;">差引支給額</td>
+            <td style="padding:5px 6px;font-size:11px;font-weight:700;color:#3D9E72;text-align:right;border-top:2px solid #3D9E72;font-family:'DM Mono',monospace;">¥———</td>
+          </tr>
+        </table>
+      </div>`;
+  }
+
+  // ===== コンパクトレイアウト（A4縦・3人分のみ） =====
+  function oneSheetCompact(personLabel){
+    const attendCols=infoItems.map(i=>`
+      <div style="flex:1;padding:3px 4px;text-align:center;border-right:1px solid #C8ECD8;">
+        <div style="font-size:8px;color:#7A9A87;">${i.label}</div>
+        <div style="font-size:10px;font-weight:700;color:#1A2B22;font-family:'DM Mono',monospace;">—</div>
+      </div>`).join('');
+    const payRows=payItems.map(i=>`
+      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
+        <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
+        <span style="font-size:9px;font-family:'DM Mono',monospace;color:#1A2B22;">¥—</span>
+      </div>`).join('');
+    const dedRows=dedItems.map(i=>`
+      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
+        <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
+        <span style="font-size:9px;font-family:'DM Mono',monospace;color:#C62828;">¥—</span>
+      </div>`).join('');
+    return `
+      <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;">
+        <!-- ヘッダー -->
+        <div style="background:#3D9E72;padding:5px 10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:1.5px;">給 料 明 細 書</span>
+            <span style="font-size:9px;color:rgba(255,255,255,0.85);">2026年○月分</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.9);">○○株式会社</span>
+            <span style="font-size:10px;font-weight:700;color:#fff;">${personLabel||'＿＿＿＿'}</span>
+          </div>
+        </div>
+        <!-- 差引支給額 -->
+        <div style="background:#F8FEFC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #C8ECD8;">
+          <span style="font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;">差 引 支 給 額</span>
+          <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:#3D9E72;">¥———</span>
+        </div>
+        <!-- 勤怠1行 -->
+        ${infoItems.length?`<div style="display:flex;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">${attendCols}<div style="width:0;"></div></div>`:''}
+        <!-- 支給・控除2カラム -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;">
+          <div style="padding:5px 8px;border-right:1px solid #E0EDE6;">
+            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">💰 支給</div>
+            ${payRows}
+          </div>
+          <div style="padding:5px 8px;">
+            <div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">🔻 控除</div>
+            ${dedRows}
+          </div>
+        </div>
+        <!-- 総支給額・控除合計 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;background:#F8FEFC;border-top:1.5px solid #C8ECD8;">
+          <div style="padding:4px 8px;text-align:center;border-right:1px solid #E0EDE6;">
+            <div style="font-size:8px;color:#7A9A87;">総支給額</div>
+            <div style="font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:#2E7D54;">¥———</div>
+          </div>
+          <div style="padding:4px 8px;text-align:center;">
+            <div style="font-size:8px;color:#7A9A87;">控除合計</div>
+            <div style="font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:#C62828;">¥———</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const perf=`<div style="border-top:2px dashed #52B788;margin:6px 0;position:relative;text-align:center;"><span style="position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:13px;background:#F8FEFC;padding:0 4px;color:#52B788;">✂</span></div>`;
+
+  let sheetsHTML='';
+
+  if(peopleCount===1){
+    const maxW = isLandscape ? '480px' : '340px';
+    sheetsHTML=`<div style="max-width:${maxW};margin:0 auto;">${oneSheetCompact('')}</div>`;
+  } else if(peopleCount===2 && isLandscape){
+    sheetsHTML=`
+      <div style="display:flex;gap:6px;">
+        ${oneSheetCompact('1人目')}
+        <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+        ${oneSheetCompact('2人目')}
+      </div>
+      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して左右2名分に</div>`;
+  } else if(peopleCount===2){
+    sheetsHTML=`
+      <div style="display:flex;flex-direction:column;gap:0;">
+        ${oneSheetCompact('1人目')}
+        ${perf}
+        ${oneSheetCompact('2人目')}
+      </div>
+      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して上下2名分に</div>`;
+  } else {
+    sheetsHTML=`
+      <div style="display:flex;flex-direction:column;gap:0;">
+        ${oneSheetCompact('氏名 1')}
+        ${perf}
+        ${oneSheetCompact('氏名 2')}
+        ${perf}
+        ${oneSheetCompact('氏名 3')}
+      </div>
+      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:6px;">✂️ 点線で切り離して3名分に配布</div>`;
+  }
+
+  el.innerHTML=`
+    <div style="background:#F8FEFC;border:1.5px solid #C8ECD8;border-radius:12px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#3D9E72;letter-spacing:1px;">📊 完成イメージ（${paperLabel}）</div>
+        <div style="font-size:9px;color:#B0C4BA;">※完成イメージです</div>
+      </div>
+      ${sheetsHTML}
+    </div>`;
+}
+
+function showPayslipPreview(){
+  // resultElを表示してプレビュー生成
+  document.getElementById('resultEl').classList.add('show');
+  renderExcelPreview();
+  // previewAreaにプレビューUIを構築
+  var area = document.getElementById('previewArea');
+  area.style.display = 'block';
+  area.innerHTML =
+    '<div style="background:#F8FEFC;border:1.5px solid #C8ECD8;border-radius:12px;padding:14px;margin-bottom:8px;">' +
+      '<div id="payslipPreviewInner"></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;padding:0 0 8px;">' +
+      '<button onclick="hidePayslipPreview()" style="flex:1;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:#F0FAF4;border:none;color:#3D9E72;">← 戻って修正</button>' +
+      '<button onclick="hidePayslipPreview(true);generateTSV();" style="flex:2;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:linear-gradient(135deg,#3D9E72,#52B788);border:none;color:#fff;box-shadow:0 4px 16px rgba(61,158,114,0.35);">Excel用データを生成する →</button>' +
+    '</div>';
+  // excelPreviewの中身をpreviewAreaに移す
+  var inner = document.getElementById('payslipPreviewInner');
+  var src = document.getElementById('excelPreview');
+  if(inner && src) inner.innerHTML = src.innerHTML;
+  // スティッキー非表示
+  document.getElementById('stickyCta').style.display = 'none';
+  var hd2 = document.querySelector('.header');
+  var sp2 = document.querySelector('.sp-top');
+  var offset2 = (hd2 ? hd2.offsetHeight : 0) + (sp2 ? sp2.offsetHeight : 0) + 8;
+  var top2 = area.getBoundingClientRect().top + window.pageYOffset - offset2;
+  window.scrollTo({top: top2, behavior: 'smooth'});
+}
+function hidePayslipPreview(noScroll){
+  var area = document.getElementById('previewArea');
+  area.style.display = 'none';
+  area.innerHTML = '';
+  document.getElementById('stickyCta').style.display = '';
+  if(!noScroll) window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+// ========== PAPER ==========
+const PAPER_OPTIONS={
+  paper:[
+    {
+      label:'A4縦・1人分',rank:'🥇',
+      desc:'【最も一般的】項目数が多くても見やすい定番サイズ。どのプリンターでも対応。',
+      note:'長形3号封筒に三つ折りで入ります。項目が多い方はこちら推奨。',
+      preview:'a4-v-1'
+    },
+    {
+      label:'A4縦・2人分（上下に並べる）',rank:'🥈',
+      desc:'【紙代半減】1枚を上下2分割して2名分を印刷。ミシン目入り用紙を使うと綺麗に切り離せます。',
+      note:'⚠️ 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
+      preview:'a4-v-2'
+    },
+    {
+      label:'A4縦・3人分（上下に並べる）',rank:'🥉',
+      desc:'【紙代1/3】1枚に3名分を上下に印刷。縦の最大人数です。',
+      note:'⚠️ 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
+      preview:'a4-v-3'
+    },
+    {
+      label:'A4横・1人分',rank:'④',
+      desc:'【項目が多い方向け】横向きで列を広く取れるため、項目数が多くても見やすい。',
+      note:'項目が15個以上ある場合はこちらが読みやすくなります。',
+      preview:'a4-h-1'
+    },
+    {
+      label:'A4横・2人分（左右に並べる）',rank:'⑤',
+      desc:'【横の最大人数】横向きで左右に2名分を並べます。横レイアウトで2人分が必要な場合に。',
+      note:'⚠️ 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
+      preview:'a4-h-2'
+    },
+    {
+      label:'B5縦・1人分',rank:'⑥',
+      desc:'【給料袋サイズ】B5は給料袋にぴったり入るサイズ。飲食店・中小企業で多く使われています。',
+      note:'長形4号封筒に三つ折りで入ります。給料袋配布の方はこちら。',
+      preview:'b5-v-1'
+    },
+    {
+      label:'B5縦・2人分（上下に並べる）',rank:'⑦',
+      desc:'【B5を上下2分割】切り離し後はB6サイズ。長形6号封筒にぴったり入ります。紙代半減。',
+      note:'⚠️ 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
+      preview:'b5-v-2'
+    },
+  ],
+  pdf:[
+    {
+      label:'A4縦・1人分（PDF標準）',rank:'✅',
+      desc:'【最も一般的】メール・LINE送信・Web配信に最適。スマホ・PCどちらでも見やすい。',
+      note:'PDFで保存すれば印刷にも使えます。迷ったらこちら。',
+      preview:'a4-v-1'
+    },
+    {
+      label:'A4横・1人分（項目多め）',rank:'②',
+      desc:'【項目が多い方向け】支給・控除の項目数が多い場合に横向きにすると見やすくなります。',
+      note:'⚠️ スマホで見る場合は横スクロールが必要になる場合があります。',
+      preview:'a4-h-1'
+    },
+    {
+      label:'A4縦・2人分（PDF）',rank:'③',
+      desc:'【紙代節約・電子配信】1つのPDFに2名分を上下に配置して送付。印刷して切り離しても使えます。',
+      note:'⚠️ 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
+      preview:'a4-v-2'
+    },
+  ]
+};
+let deliverType='paper',paperIdx=0;
+
+// ===== 用紙プレビュー図解 =====
+const PAPER_PREVIEWS={
+  'a4-v-1':{
+    label:'A4縦・1人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:60px;height:84px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:4px;display:flex;flex-direction:column;gap:2px;">
+          <div style="font-size:6px;font-weight:700;color:#1A2B22;text-align:center;border-bottom:1px solid #C8ECD8;padding-bottom:2px;">給 料 明 細</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:1px;padding-top:2px;">
+            <div style="height:5px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:5px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:5px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:5px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:5px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:2px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">A4縦</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 1人分がA4全体に表示<br>
+        ✅ 項目数が多くても見やすい<br>
+        ✅ 封筒に三つ折りで入る<br>
+        📌 最も一般的なサイズ
+      </div>
+    </div>`
+  },
+  'a4-v-2':{
+    label:'A4縦・2人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:60px;height:84px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:4px;display:flex;flex-direction:column;gap:0;">
+          <div style="flex:1;border-bottom:1.5px dashed #52B788;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">1人目</div>
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+          <div style="flex:1;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">2人目</div>
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">A4縦（上下2分割）</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 1枚で2名分を印刷<br>
+        ✅ 紙代・印刷代が半分に<br>
+        ✂️ ミシン目で切り離して配布<br>
+        ⚠️ 項目は10個以内推奨
+      </div>
+    </div>`
+  },
+  'a4-v-3':{
+    label:'A4縦・3人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:60px;height:84px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:3px;display:flex;flex-direction:column;gap:0;">
+          <div style="flex:1;border-bottom:1.5px dashed #52B788;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;">1人目</div>
+            <div style="height:3px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:3px;background:#FFF5F5;border-radius:1px;"></div>
+          </div>
+          <div style="flex:1;border-bottom:1.5px dashed #52B788;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;">2人目</div>
+            <div style="height:3px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:3px;background:#FFF5F5;border-radius:1px;"></div>
+          </div>
+          <div style="flex:1;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;">3人目</div>
+            <div style="height:3px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:3px;background:#FFF5F5;border-radius:1px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">A4縦（上下3分割）</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 1枚で3名分を印刷<br>
+        ✅ 紙代が1/3に<br>
+        ✂️ ミシン目で切り離して配布<br>
+        ⚠️ 項目は各5個以内推奨<br>
+        ⚠️ 縦の最大人数
+      </div>
+    </div>`
+  },
+  'a4-h-1':{
+    label:'A4横・1人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:84px;height:60px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:4px;display:flex;flex-direction:column;gap:2px;">
+          <div style="font-size:6px;font-weight:700;color:#1A2B22;text-align:center;border-bottom:1px solid #C8ECD8;padding-bottom:2px;">給 料 明 細</div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:2px;padding-top:2px;">
+            <div style="display:flex;flex-direction:column;gap:1px;">
+              <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+              <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+              <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1px;">
+              <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+              <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+              <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">A4横</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 横向きで列が広く取れる<br>
+        ✅ 項目数が多くても見やすい<br>
+        ✅ 支給・控除を横並びに配置<br>
+        📌 項目15個以上の方向け
+      </div>
+    </div>`
+  },
+  'a4-h-2':{
+    label:'A4横・2人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:84px;height:60px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:4px;display:flex;gap:0;">
+          <div style="flex:1;border-right:1.5px dashed #52B788;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">1人目</div>
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+          <div style="flex:1;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">2人目</div>
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">A4横（左右2分割）</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 1枚で2名分を印刷<br>
+        ✂️ ミシン目で切り離して配布<br>
+        ⚠️ 1人分の幅が狭くなる<br>
+        ⚠️ 横の最大人数<br>
+        ⚠️ 項目は少なめ推奨
+      </div>
+    </div>`
+  },
+  'b5-v-1':{
+    label:'B5縦・1人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:52px;height:73px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:4px;display:flex;flex-direction:column;gap:2px;">
+          <div style="font-size:5px;font-weight:700;color:#1A2B22;text-align:center;border-bottom:1px solid #C8ECD8;padding-bottom:2px;">給 料 明 細</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:1px;padding-top:2px;">
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:4px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:2px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">B5縦</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 給料袋にぴったり入る<br>
+        ✅ 長形4号封筒に三つ折りで入る<br>
+        ✅ 飲食・建設業で定番<br>
+        📌 給料袋で配布する方向け
+      </div>
+    </div>`
+  },
+  'b5-v-2':{
+    label:'B5縦・2人分',
+    html:`<div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <div style="width:52px;height:73px;border:2px solid #3D9E72;border-radius:3px;background:#fff;padding:3px;display:flex;flex-direction:column;gap:0;">
+          <div style="flex:1;border-bottom:1.5px dashed #52B788;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:4px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">1人目</div>
+            <div style="height:3px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:3px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:3px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+          <div style="flex:1;padding:2px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:4px;font-weight:700;color:#1A2B22;text-align:center;margin-bottom:1px;">2人目</div>
+            <div style="height:3px;background:#F0FAF4;border-radius:1px;"></div>
+            <div style="height:3px;background:#FFF5F5;border-radius:1px;"></div>
+            <div style="height:3px;background:#F8FEFC;border-radius:1px;border-top:1px solid #3D9E72;margin-top:1px;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#7A9A87;text-align:center;margin-top:4px;">B5縦（上下2分割）</div>
+      </div>
+      <div style="font-size:11px;color:#4A6B5A;line-height:1.9;">
+        ✅ 1枚で2名分を印刷<br>
+        ✅ 切り離し後はB6サイズ<br>
+        ✅ 長形6号封筒にぴったり<br>
+        ✂️ ミシン目で切り離して配布<br>
+        ⚠️ 項目は各3〜4個以内推奨
+      </div>
+    </div>`
+  }
+};
+
+function setDeliver(type){
+  deliverType=type;paperIdx=0;
+  document.getElementById('deliver-paper').classList.toggle('active',type==='paper');
+  document.getElementById('deliver-pdf').classList.toggle('active',type==='pdf');
+  renderPaperOptions();
+  updateFitCheck();
+  if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
+}
+
+function renderPaperOptions(){
+  const opts=PAPER_OPTIONS[deliverType];const list=document.getElementById('paperRankList');list.innerHTML='';
+  opts.forEach((opt,i)=>{
+    const div=document.createElement('div');div.className='paper-rank-item'+(i===paperIdx?' active':'');div.onclick=()=>selectPaper(i);
+    div.innerHTML=`<div class="paper-rank-num">${opt.rank}</div><div class="paper-rank-info"><div class="paper-rank-name">${opt.label}</div><div class="paper-rank-desc">${opt.desc}</div></div><div class="paper-rank-check" style="opacity:${i===paperIdx?1:0}">✓</div>`;
+    list.appendChild(div);
+  });
+  updatePaperNote();
+  renderPaperPreview();
+}
+
+function selectPaper(idx){
+  paperIdx=idx;
+  document.querySelectorAll('.paper-rank-item').forEach((el,i)=>{el.classList.toggle('active',i===idx);el.querySelector('.paper-rank-check').style.opacity=i===idx?1:0;});
+  updatePaperNote();
+  renderPaperPreview();
+  updateFitCheck();
+  if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
+}
+
+function updatePaperNote(){
+  const opt=PAPER_OPTIONS[deliverType][paperIdx];
+  const noteEl=document.getElementById('paperNote');
+  if(noteEl&&opt)noteEl.textContent='📌 '+opt.note;
+}
+
+function renderPaperPreview(){
+  const opt=PAPER_OPTIONS[deliverType][paperIdx];
+  const el=document.getElementById('paperPreview');
+  if(!el||!opt||!opt.preview)return;
+  const pv=PAPER_PREVIEWS[opt.preview];
+  if(!pv){el.innerHTML='';return;}
+  el.innerHTML=`
+    <div style="background:#F8FEFC;border:1.5px solid #C8ECD8;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:10px;">📐 レイアウトイメージ</div>
+      ${pv.html}
+    </div>`;
+}
+
+function getPaperLabel(){return PAPER_OPTIONS[deliverType][paperIdx]?.label||'A4縦・1人分';}
+
+// ===== 業種プリセット =====
+var GYOSHU_STORAGE_KEY = 'exally_gyoshu';
+var selectedGyoshuName = null;
+var GYOSHU_PRESETS = {
+  '飲食・サービス': {icon:'🍳', on:['mid_h','midnight','lunch','perfect'],               label:['深夜時間','深夜手当','食事代控除','皆勤手当']},
+  '建設・工事':     {icon:'🏗',  on:['skill','perfect','housing','uniform'],              label:['資格手当','皆勤手当','住宅手当','制服代控除']},
+  '介護・医療':     {icon:'🏥',  on:['mid_h','midnight','skill','perfect','housing'],     label:['深夜時間','深夜手当','資格手当','皆勤手当','住宅手当']},
+  '小売・販売':     {icon:'🏪',  on:['mid_h','midnight','perfect','uniform'],             label:['深夜時間','深夜手当','皆勤手当','制服代控除']},
+  '事務・オフィス': {icon:'🏢',  on:['housing','resident'],                               label:['住宅手当','住民税']},
+  '学校・教育':     {icon:'🏫',  on:['housing','resident','skill'],                       label:['住宅手当','住民税','資格手当']},
+  '製造・工場':     {icon:'⚙️',  on:['mid_h','midnight','perfect','uniform','housing'],   label:['深夜時間','深夜手当','皆勤手当','制服代控除','住宅手当']},
+  'その他':         {icon:'👤',  on:[],                                                   label:[]}
+};
+
+function initGyoshu(){
+  var saved = localStorage.getItem(GYOSHU_STORAGE_KEY);
+  var barLabel = document.getElementById('gyoshuBarLabel');
+  var btn = document.getElementById('gyoshuChangeBtn');
+  if(!saved){
+    // 未選択：初回はモーダル表示、バーは「業種未選択」
+    if(barLabel) barLabel.textContent = '業種未選択';
+    if(btn) btn.textContent = '業種を選ぶ →';
+    document.getElementById('gyoshuOverlay').classList.remove('hide');
+  } else if(saved === 'skip'){
+    // スキップ状態
+    if(barLabel) barLabel.textContent = '業種を選ばない';
+    if(btn) btn.textContent = '業種を選ぶ →';
+  } else {
+    // 選択済み
+    var p = GYOSHU_PRESETS[saved];
+    if(barLabel && p){
+      barLabel.textContent = p.icon + ' ' + saved + ' 選択中';
+    }
+    if(btn) btn.textContent = '業種を変更する →';
+  }
+}
+
+function selectGyoshuCard(el, name){
+  document.querySelectorAll('.gyoshu-card').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedGyoshuName = name;
+  var preset = GYOSHU_PRESETS[name];
+  var info = document.getElementById('gyoshuPresetInfo');
+  var title = document.getElementById('gyoshuPresetTitle');
+  var tags = document.getElementById('gyoshuPresetTags');
+  title.textContent = preset.icon + ' ' + name + ' 向けに以下の項目を追加しました';
+  var html = preset.label.length > 0
+    ? preset.label.map(function(t){ return '<span class="gyoshu-preset-tag on">✅ ' + t + '</span>'; }).join('')
+    : '<span class="gyoshu-preset-tag">追加項目なし（標準設定）</span>';
+  tags.innerHTML = html;
+  info.classList.add('show');
+  var btn = document.getElementById('gyoshuApplyBtn');
+  if(btn){ btn.classList.add('active'); btn.textContent = 'この設定で始める →'; }
+}
+
+function applyGyoshu(){
+  if(!selectedGyoshuName) return;
+  var preset = GYOSHU_PRESETS[selectedGyoshuName];
+  if(preset && preset.on.length > 0){
+    preset.on.forEach(function(id){
+      if(!active.find(function(i){ return i.id === id; })){
+        addItem(id);
+      }
+    });
+  }
+  localStorage.setItem(GYOSHU_STORAGE_KEY, selectedGyoshuName);
+  var barLabel = document.getElementById('gyoshuBarLabel');
+  var btn = document.getElementById('gyoshuChangeBtn');
+  if(barLabel){
+    barLabel.textContent = preset.icon + ' ' + selectedGyoshuName + ' 選択中';
+  }
+  if(btn) btn.textContent = '業種を変更する →';
+  document.getElementById('gyoshuOverlay').classList.add('hide');
+}
+
+function skipGyoshu(){
+  localStorage.setItem(GYOSHU_STORAGE_KEY, 'skip');
+  var barLabel = document.getElementById('gyoshuBarLabel');
+  var btn = document.getElementById('gyoshuChangeBtn');
+  if(barLabel) barLabel.textContent = '業種を選ばない';
+  if(btn) btn.textContent = '業種を選ぶ →';
+  document.getElementById('gyoshuOverlay').classList.add('hide');
+}
+
+function changeGyoshu(){
+  selectedGyoshuName = null;
+  document.querySelectorAll('.gyoshu-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('gyoshuPresetInfo').classList.remove('show');
+  var btn = document.getElementById('gyoshuApplyBtn');
+  if(btn){ btn.classList.remove('active'); btn.textContent = '業種を選んでください'; }
+  document.getElementById('gyoshuOverlay').classList.remove('hide');
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  renderPaperOptions();
+  document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
+  init();
+  updateFitCheck();
+  initRates();
+  initPrefSelect();
+  initGyoshu();
+});
+
+function openGuideModal(){
+  document.getElementById('spGuideModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeGuideModal(){
+  document.getElementById('spGuideModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function initPrefSelect(){
+  var sel = document.getElementById('prefSelect');
+  if(!sel) return;
+  var prefs = [
+    {code:'hokkaido',name:'北海道'},{code:'aomori',name:'青森県'},{code:'iwate',name:'岩手県'},
+    {code:'miyagi',name:'宮城県'},{code:'akita',name:'秋田県'},{code:'yamagata',name:'山形県'},
+    {code:'fukushima',name:'福島県'},{code:'ibaraki',name:'茨城県'},{code:'tochigi',name:'栃木県'},
+    {code:'gunma',name:'群馬県'},{code:'saitama',name:'埼玉県'},{code:'chiba',name:'千葉県'},
+    {code:'tokyo',name:'東京都'},{code:'kanagawa',name:'神奈川県'},{code:'niigata',name:'新潟県'},
+    {code:'toyama',name:'富山県'},{code:'ishikawa',name:'石川県'},{code:'fukui',name:'福井県'},
+    {code:'yamanashi',name:'山梨県'},{code:'nagano',name:'長野県'},{code:'gifu',name:'岐阜県'},
+    {code:'shizuoka',name:'静岡県'},{code:'aichi',name:'愛知県'},{code:'mie',name:'三重県'},
+    {code:'shiga',name:'滋賀県'},{code:'kyoto',name:'京都府'},{code:'osaka',name:'大阪府'},
+    {code:'hyogo',name:'兵庫県'},{code:'nara',name:'奈良県'},{code:'wakayama',name:'和歌山県'},
+    {code:'tottori',name:'鳥取県'},{code:'shimane',name:'島根県'},{code:'okayama',name:'岡山県'},
+    {code:'hiroshima',name:'広島県'},{code:'yamaguchi',name:'山口県'},{code:'tokushima',name:'徳島県'},
+    {code:'kagawa',name:'香川県'},{code:'ehime',name:'愛媛県'},{code:'kochi',name:'高知県'},
+    {code:'fukuoka',name:'福岡県'},{code:'saga',name:'佐賀県'},{code:'nagasaki',name:'長崎県'},
+    {code:'kumamoto',name:'熊本県'},{code:'oita',name:'大分県'},{code:'miyazaki',name:'宮崎県'},
+    {code:'kagoshima',name:'鹿児島県'},{code:'okinawa',name:'沖縄県'}
+  ];
+  prefs.forEach(function(p){
+    var opt = document.createElement('option');
+    opt.value = p.code;
+    opt.textContent = p.name;
+    if(p.code === 'tokyo') opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onPrefChange(){
+  var code = document.getElementById('prefSelect').value;
+  if(!code) return;
+  var kenkoMap = {
+    hokkaido:0.05155,aomori:0.04925,iwate:0.04855,miyagi:0.05040,akita:0.05005,
+    yamagata:0.04920,fukushima:0.04900,ibaraki:0.04910,tochigi:0.04985,gunma:0.04910,
+    saitama:0.04940,chiba:0.04935,tokyo:0.04955,kanagawa:0.04950,niigata:0.04925,
+    toyama:0.04910,ishikawa:0.04940,fukui:0.04925,yamanashi:0.04935,nagano:0.04895,
+    gifu:0.05015,shizuoka:0.04930,aichi:0.05045,mie:0.05010,shiga:0.04985,
+    kyoto:0.05015,osaka:0.05100,hyogo:0.05090,nara:0.05035,wakayama:0.05065,
+    tottori:0.04940,shimane:0.05030,okayama:0.05125,hiroshima:0.05085,yamaguchi:0.05065,
+    tokushima:0.05130,kagawa:0.05140,ehime:0.05130,kochi:0.05155,fukuoka:0.05225,
+    saga:0.05390,nagasaki:0.05230,kumamoto:0.05110,oita:0.05125,miyazaki:0.05100,
+    kagoshima:0.05190,okinawa:0.04720
+  };
+  var chinginMap = {
+    hokkaido:1107,aomori:1055,iwate:1047,miyagi:1055,akita:1031,yamagata:1037,
+    fukushima:1028,ibaraki:1077,tochigi:1078,gunma:1057,saitama:1148,chiba:1145,
+    tokyo:1226,kanagawa:1225,niigata:1063,toyama:1072,ishikawa:1058,fukui:1049,
+    yamanashi:1055,nagano:1072,gifu:1068,shizuoka:1105,aichi:1145,mie:1092,
+    shiga:1082,kyoto:1124,osaka:1177,hyogo:1118,nara:1053,wakayama:1043,
+    tottori:1027,shimane:1032,okayama:1050,hiroshima:1090,yamaguchi:1043,
+    tokushima:1051,kagawa:1071,ehime:1023,kochi:1023,fukuoka:1065,saga:1024,
+    nagasaki:1020,kumamoto:1034,oita:1019,miyazaki:1023,kagoshima:1020,okinawa:1023
+  };
+  var kenkoRitsu = kenkoMap[code] || kenkoMap['tokyo'];
+  var chingin = chinginMap[code] || chinginMap['tokyo'];
+  var setVal = function(id, key, val){
+    var item = MONTHLY.find(function(m){ return m.id===id; });
+    if(item && item.rates){ var r=item.rates.find(function(r){ return r.key===key; }); if(r) r.val=val; }
+  };
+  if(cRates['health'])  cRates['health']['rate']  = kenkoRitsu;
+  if(cRates['h_health'])cRates['h_health']['rate'] = kenkoRitsu;
+  if(cRates['h_wage'])  cRates['h_wage']['wage']   = chingin;
+  render();
+}
+
+
+function onFuyouChange(){
+  var val = parseInt(document.getElementById('fuyouInput').value) || 0;
+  val = Math.min(Math.max(val, 0), 7);
+  if(!cRates['income'])  cRates['income']  = {};
+  if(!cRates['h_income'])cRates['h_income']= {};
+  cRates['income']['fuyou']   = val;
+  cRates['h_income']['fuyou'] = val;
+  render();
+}
+
+function initRates(){
+  if(typeof SHAKAIHOKEN_HYO === 'undefined' || typeof KOYOHOKEN_RITSU === 'undefined' || typeof ROUKI_RITSU === 'undefined' || typeof SAITEI_CHINGIN === 'undefined') return;
+  var setVal = function(id, key, val){
+    var item = MONTHLY.find(function(m){ return m.id===id; });
+    if(item && item.rates){ var r=item.rates.find(function(r){ return r.key===key; }); if(r) r.val=val; }
+  };
+  setVal('health',   'rate', SHAKAIHOKEN_HYO.KENKO_RITSU.tokyo.jugyoin);
+  setVal('pension',  'rate', SHAKAIHOKEN_HYO.KOSEI_NENKIN_RITSU_JUGYOIN);
+  setVal('employ',   'rate', KOYOHOKEN_RITSU.jugyoin.ippan);
+  setVal('h_health', 'rate', SHAKAIHOKEN_HYO.KENKO_RITSU.tokyo.jugyoin);
+  setVal('h_pension','rate', SHAKAIHOKEN_HYO.KOSEI_NENKIN_RITSU_JUGYOIN);
+  setVal('h_employ', 'rate', KOYOHOKEN_RITSU.jugyoin.ippan);
+  setVal('overtime', 'rate', ROUKI_RITSU.jikangai.tsujou);
+  setVal('h_ot',     'rate', ROUKI_RITSU.jikangai.tsujou);
+  setVal('h_wage',   'wage', SAITEI_CHINGIN.todofuken.tokyo.chingin);
+  if(!cRates['income'])  cRates['income']  = {};
+  if(!cRates['h_income'])cRates['h_income']= {};
+  cRates['income']['fuyou']   = 0;
+  cRates['h_income']['fuyou'] = 0;
+}
+
+function calcApproxPayTotal(){
+  // active配列の支給項目から概算合計を計算（TSV生成前に呼ぶ）
+  var total = 0;
+  active.forEach(function(item){
+    if(item.type !== 'pay') return;
+    var rate = cRates[item.id] || {};
+    // 基本給（月給制）
+    if(item.id === 'basic'){
+      total += rate['amount'] || 250000;
+      return;
+    }
+    // 基本給（時給制）
+    if(item.id === 'h_base'){
+      var wage = rate['wage'] || 1226;
+      var work = rate['work'] || 160;
+      total += Math.round(wage * work);
+      return;
+    }
+    // 固定手当
+    if(rate['amount']) total += rate['amount'];
+  });
+  return total > 0 ? total : 250000; // デフォルト250,000円
+}
+
+// ===== 印刷・保存・ダウンロード =====
+
+// 新ウィンドウでexcelPreviewだけを印刷
+function openPrintWindow(autoPrint) {
+  var content = document.getElementById('excelPreview');
+  if(!content || content.innerHTML.trim() === '') {
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+  var pw = window.open('', '_blank', 'width=900,height=700');
+  if(!pw) {
+    showToast('⚠️ ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">');
+  pw.document.write('<style>');
+  pw.document.write('*{box-sizing:border-box;margin:0;padding:0;}');
+  pw.document.write('@page{size:A4 portrait;margin:6mm;}');
+  pw.document.write('html,body{width:210mm;height:297mm;overflow:hidden;font-family:"Noto Sans JP",sans-serif;background:#fff;}');
+  pw.document.write('body>div{width:100%;height:100%;display:flex;align-items:flex-start;}');
+  pw.document.write('</style>');
+  pw.document.write('</head><body>');
+  pw.document.write(content.innerHTML);
+  pw.document.write('</body></html>');
+  pw.document.close();
+  pw.focus();
+  if(autoPrint) {
+    setTimeout(function(){ pw.print(); }, 1200);
+  }
+}
+
+// 印刷する
+function printPayslip(){
+  openPrintWindow(true);
+}
+
+// PDFで保存（印刷ダイアログ経由）
+function downloadPDF(){
+  showToast('📄 新しいウィンドウが開きます。印刷ダイアログで「PDFとして保存」を選んでください。');
+  openPrintWindow(true);
+}
+
+// Excelでダウンロード（SheetJS）
+function downloadExcel(){
+  if(typeof XLSX === 'undefined'){
+    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
+    return;
+  }
+  if(!generatedTSV || generatedTSV.trim() === ''){
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+  // TSVを2次元配列に変換
+  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // 列幅の自動設定
+  var colWidths = [];
+  rows.forEach(function(row){
+    row.forEach(function(cell, i){
+      var len = cell ? String(cell).length * 2 : 8;
+      if(!colWidths[i] || colWidths[i] < len) colWidths[i] = len;
+    });
+  });
+  ws['!cols'] = colWidths.map(function(w){ return {wch: Math.min(w, 30)}; });
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '給料明細');
+
+  // ファイル名：給料明細_氏名_年月
+  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '';
+  var now = new Date();
+  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+  var fname = '給料明細' + (name ? '_'+name : '') + '_' + ym + '.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('📥 '+fname+' をダウンロードしました');
+}
+
+// 賃金台帳をダウンロード
+function downloadKinmuDaichou(){
+  if(typeof XLSX === 'undefined'){
+    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
+    return;
+  }
+  if(!generatedTSV || generatedTSV.trim() === ''){
+    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
+    return;
+  }
+
+  // TSVから支給合計・控除合計・差引支給額を取得
+  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
+  var shikyuGokei = '', kojogokei = '', sashihiki = '';
+  rows.forEach(function(r){
+    if(r[0] && r[0].indexOf('支給合計') !== -1) shikyuGokei = r[1] || '';
+    if(r[0] && r[0].indexOf('控除合計') !== -1) kojogokei = r[4] || r[1] || '';
+    if(r[0] && r[0].indexOf('差引') !== -1) sashihiki = r[1] || '';
+  });
+
+  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '氏名未入力';
+  var now = new Date();
+  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+
+  var daichouRow = [ym, name, shikyuGokei, kojogokei, sashihiki];
+  var ws = XLSX.utils.aoa_to_sheet([
+    ['対象月', '氏名', '支給合計', '控除合計', '差引支給額（手取り）'],
+    daichouRow
+  ]);
+  ws['!cols'] = [{wch:12},{wch:12},{wch:14},{wch:14},{wch:18}];
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '賃金台帳');
+
+  var fname = '賃金台帳_'+name+'_'+ym+'.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('📋 '+fname+' をダウンロードしました。同じフォルダに毎月保存してね。');
+}
+
+</script>
+
+<!-- ===== 業種選択オーバーレイ ===== -->
+<div class="gyoshu-overlay hide" id="gyoshuOverlay">
+  <div class="gyoshu-sheet">
+    <div class="gyoshu-sheet-title">あなたの業種はどれですか？</div>
+    <div class="gyoshu-sheet-sub">業種を選ぶだけで、よく使う項目（深夜手当・交通費など）が自動で追加されます。もちろん後から自由に変更できます。</div>
+    <div class="gyoshu-grid">
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'飲食・サービス')"><div class="gyoshu-icon">🍳</div><div class="gyoshu-name">飲食・<br>サービス</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'建設・工事')"><div class="gyoshu-icon">🏗</div><div class="gyoshu-name">建設・<br>工事</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'介護・医療')"><div class="gyoshu-icon">🏥</div><div class="gyoshu-name">介護・<br>医療</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'小売・販売')"><div class="gyoshu-icon">🏪</div><div class="gyoshu-name">小売・<br>販売</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'事務・オフィス')"><div class="gyoshu-icon">🏢</div><div class="gyoshu-name">事務・<br>オフィス</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'学校・教育')"><div class="gyoshu-icon">🏫</div><div class="gyoshu-name">学校・<br>教育</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'製造・工場')"><div class="gyoshu-icon">⚙️</div><div class="gyoshu-name">製造・<br>工場</div></div>
+      <div class="gyoshu-card" onclick="selectGyoshuCard(this,'その他')"><div class="gyoshu-icon">👤</div><div class="gyoshu-name">その他</div></div>
+    </div>
+    <div class="gyoshu-preset-info" id="gyoshuPresetInfo">
+      <div class="gyoshu-preset-title" id="gyoshuPresetTitle"></div>
+      <div class="gyoshu-preset-tags" id="gyoshuPresetTags"></div>
+    </div>
+    <button class="gyoshu-apply-btn" id="gyoshuApplyBtn" onclick="applyGyoshu()">業種を選んでください</button>
+    <button class="gyoshu-skip" onclick="skipGyoshu()">業種を選ばずに始める</button>
+  </div>
+</div>
+
+</div><!-- /main-wrap -->
+</div><!-- /page-wrap -->
+
+<!-- ===== スマホ下部アンダーバー ===== -->
+<nav class="mobile-bottombar" aria-label="下部ナビゲーション">
+  <a href="home.html" class="mbb-item"><span class="mbb-item-icon">🏠</span><span class="mbb-item-label">ホーム</span></a>
+  <a href="chat.html" class="mbb-item"><span class="mbb-item-icon">🤖</span><span class="mbb-item-label">AI</span></a>
+  <a href="book.html" class="mbb-item"><span class="mbb-item-icon"><svg><use href="#grid-sm"/></svg></span><span class="mbb-item-label">ブック</span></a>
+  <a href="chat.html?tab=template" class="mbb-item active"><span class="mbb-item-icon"><svg><use href="#template-sm"/></svg></span><span class="mbb-item-label">テンプレ</span></a>
+  <span class="mbb-item nav-disabled"><span class="mbb-item-icon"><svg><use href="#stamp-sm"/></svg></span><span class="mbb-item-label">ハンコ</span></span>
+  <a href="chat.html?tab=book" class="mbb-item"><span class="mbb-item-icon"><svg><use href="#book-sm"/></svg></span><span class="mbb-item-label">数式帳</span></a>
+  <a href="chat.html?tab=quiz" class="mbb-item"><span class="mbb-item-icon">🎯</span><span class="mbb-item-label">クイズ</span></a>
+  <a href="chat.html?tab=settings" class="mbb-item"><span class="mbb-item-icon">⚙️</span><span class="mbb-item-label">設定</span></a>
+</nav>
+
+<script>
+// ===== Excelバージョン管理（home.htmlと共有：localStorageキー exally_excel_version） =====
+var VER_LABEL_MAP = {
+  excel_365:'365', excel_2024:'2024', excel_2021:'2021', excel_2019:'2019',
+  excel_2016:'2016', excel_mac:'Mac', excel_online:'Online', excel_none:'なし'
+};
+function getVerKey(){
+  try{ var v=localStorage.getItem('exally_excel_version'); return (typeof v==='string' && v.length>0) ? v : 'excel_365'; }
+  catch(e){ return 'excel_365'; }
+}
+function openVerModal(){
+  var current=getVerKey();
+  document.querySelectorAll('.vm-op').forEach(function(el){
+    el.classList.toggle('current', el.getAttribute('data-ver')===current);
+  });
+  document.getElementById('verModal').classList.add('show');
+}
+function closeVerModal(){
+  document.getElementById('verModal').classList.remove('show');
+}
+function selectVer(verKey){
+  try{ localStorage.setItem('exally_excel_version', verKey); }catch(e){}
+  closeVerModal();
+  if(typeof showToast === 'function') showToast('Excelバージョンを'+(VER_LABEL_MAP[verKey]||verKey)+'に変更したよ');
+}
+(function(){
+  var vm = document.getElementById('verModal');
+  if(vm) vm.addEventListener('click', function(e){ if(e.target===this) closeVerModal(); });
+})();
+</script>
+
+</body>
+</html>
