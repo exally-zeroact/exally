@@ -583,13 +583,14 @@ body{padding-bottom:80px;}
         <div style="font-size:13px;font-weight:700;color:#1A2B22;margin-bottom:12px;">完成しました。保存・印刷してください</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button onclick="printPayslip()" style="width:100%;padding:13px;background:#3D9E72;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🖨️ 印刷する</button>
-          <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
-          <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
-        </div>
-        <div style="margin-top:12px;padding:14px;background:#F0FAF4;border:1.5px solid #C8ECD8;border-radius:12px;">
-          <div style="font-size:12px;font-weight:700;color:#3D9E72;margin-bottom:6px;">📋 賃金台帳に記録する</div>
-          <div style="font-size:11px;color:#7A9A87;line-height:1.7;margin-bottom:10px;">毎月このボタンを押してダウンロード→同じフォルダに保存していくと賃金台帳が完成します。<br><span style="color:#E05555;font-weight:700;">⚠️ 労働基準法で5年保存が義務です</span></div>
-          <button onclick="downloadKinmuDaichou()" style="width:100%;padding:12px;background:#3D9E72;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📋 賃金台帳をダウンロード</button>
+          <div>
+            <button onclick="downloadPDF()" style="width:100%;padding:13px;background:#52B788;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📄 PDFで保存する</button>
+            <div style="font-size:11px;color:#7A9A87;margin-top:4px;padding-left:4px;">メール・LINEで送れます</div>
+          </div>
+          <div>
+            <button onclick="downloadExcel()" style="width:100%;padding:13px;background:#ffffff;color:#3D9E72;border:2px solid #52B788;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">📥 Excelでダウンロード</button>
+            <div style="font-size:11px;color:#7A9A87;margin-top:4px;padding-left:4px;line-height:1.5;">数字を変えたら自動で再計算<br>（税額表・社保データが別シートに入ってます）</div>
+          </div>
         </div>
       </div>
 
@@ -840,7 +841,7 @@ function removeItem(id){active=active.filter(i=>i.id!==id);render();showToast('�
 function renderAddable(){
   const c=document.getElementById('addableTags');c.innerHTML='';
   const activeIds=active.map(i=>i.id);
-  base().filter(i=>!activeIds.includes(i.id)&&!i.default).forEach(item=>{const tag=document.createElement('div');tag.className='tag';tag.innerHTML=`＋ ${item.label}`;tag.onclick=()=>addItem(item.id);c.appendChild(tag);});
+  base().filter(i=>!activeIds.includes(i.id)).forEach(item=>{const tag=document.createElement('div');tag.className='tag';tag.innerHTML=`＋ ${item.label}`;tag.onclick=()=>addItem(item.id);c.appendChild(tag);});
 }
 
 function addItem(id){
@@ -2464,43 +2465,6 @@ function downloadExcel(){
 }
 
 // 賃金台帳をダウンロード
-function downloadKinmuDaichou(){
-  if(typeof XLSX === 'undefined'){
-    showToast('⚠️ ダウンロード機能を読み込み中です。少し待ってから再度お試しください。');
-    return;
-  }
-  if(!generatedTSV || generatedTSV.trim() === ''){
-    showToast('⚠️ 先に「Excel用データを生成する」ボタンを押してください。');
-    return;
-  }
-
-  // TSVから支給合計・控除合計・差引支給額を取得
-  var rows = generatedTSV.split('\n').map(function(r){ return r.split('\t'); });
-  var shikyuGokei = '', kojogokei = '', sashihiki = '';
-  rows.forEach(function(r){
-    if(r[0] && r[0].indexOf('支給合計') !== -1) shikyuGokei = r[1] || '';
-    if(r[0] && r[0].indexOf('控除合計') !== -1) kojogokei = r[4] || r[1] || '';
-    if(r[0] && r[0].indexOf('差引') !== -1) sashihiki = r[1] || '';
-  });
-
-  var name = (document.getElementById('nameInput') && document.getElementById('nameInput').value) || '氏名未入力';
-  var now = new Date();
-  var ym = now.getFullYear()+'年'+(now.getMonth()+1)+'月';
-
-  var daichouRow = [ym, name, shikyuGokei, kojogokei, sashihiki];
-  var ws = XLSX.utils.aoa_to_sheet([
-    ['対象月', '氏名', '支給合計', '控除合計', '差引支給額（手取り）'],
-    daichouRow
-  ]);
-  ws['!cols'] = [{wch:12},{wch:12},{wch:14},{wch:14},{wch:18}];
-
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '賃金台帳');
-
-  var fname = '賃金台帳_'+name+'_'+ym+'.xlsx';
-  XLSX.writeFile(wb, fname);
-  showToast('📋 '+fname+' をダウンロードしました。同じフォルダに毎月保存してね。');
-}
 
 </script>
 
