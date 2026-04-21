@@ -59,4 +59,3 @@ window.GYOSHU_PRESETS = {
   '製造・工場':     {icon:'⚙️',  on:['mid_h','midnight','perfect','uniform','housing'],   label:['深夜時間','深夜手当','皆勤手当','制服代控除','住宅手当']},
   'その他':         {icon:'👤',  on:[],                                                   label:[]}
 };
-
