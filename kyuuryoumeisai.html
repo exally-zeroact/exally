@@ -1137,7 +1137,7 @@ function generateTSV(){
     for(let i = 0; i < infoItems.length; i += 2){
       const left  = infoItems[i];
       const right = infoItems[i+1];
-      push(left.label,'0','',right ? right.label : '','',right ? '0' : '');
+      push(left.label,'0','',right ? right.label : '',right ? '0' : '');
     }
 
     // 空行
