@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -1100,24 +1100,17 @@ function updateFitCheck(){
   if(genBtn) genBtn.style.cursor = canGenerate ? 'pointer' : 'not-allowed';
 }
 
-// ブックで最終確認する機能（D2+D5：保存＋自動遷移）
+// ブックで最終確認する機能（最小版・ボタン反応確認）
 function finalCheck(){
-  const data = generateJsonData();
-  const sheet = data.sheets[0];
-  const cells = sheet.cells;
-
-  // ブラウザのメモ帳（localStorage）に JSON を保存
+  alert('✅ボタン押せたよ！');
   try {
-    const jsonStr = JSON.stringify(data);
-    localStorage.setItem('exally_paste_data', jsonStr);
+    const data = generateJsonData();
+    localStorage.setItem('exally_paste_data', JSON.stringify(data));
+    alert('✅ 保存完了（' + data.sheets[0].cells.length + '個のセル）\nOKでブックへ');
+    location.href = 'book.html';
   } catch(e) {
-    alert('⚠️ 保存に失敗しちゃった：' + (e && e.message ? e.message : '不明なエラー'));
-    return;
+    alert('エラー: ' + e.message);
   }
-
-  // OK で book.html に自動遷移
-  alert('✅ 準備完了！OKを押すとブックに移動するよ。\n\n（' + cells.length + '個のセルを持っていくね）');
-  location.href = 'book.html';
 }
 
 // コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
