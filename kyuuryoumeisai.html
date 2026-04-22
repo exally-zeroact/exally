@@ -526,7 +526,7 @@ body{padding-bottom:80px;}
     <div class="step-guide-title">使い方</div>
     <div class="step-row"><div class="step-num">1</div><div class="step-text">☰ をドラッグして項目を並び替える</div></div>
     <div class="step-row"><div class="step-num">2</div><div class="step-text">値をタップしたら数式や説明が見れるよ</div></div>
-    <div class="step-row"><div class="step-num">3</div><div class="step-text">「Excel用データを生成する」を押してコピー → Excelに貼り付け</div></div>
+    <div class="step-row"><div class="step-num">3</div><div class="step-text">「ブックで最終確認してね」を押してエクサリーのブックに移動</div></div>
   </div>
   <div class="card">
     <div class="sec">
@@ -583,9 +583,7 @@ body{padding-bottom:80px;}
     </div>
     <div class="gen-wrap">
       <div id="fitCheckMsg" style="margin-bottom:10px;"></div>
-      <button class="gen-btn" id="genMainBtn" onclick="generateTSV()">Excel用データを生成する →</button>
-      <div class="gen-sub">選択・並び替えした項目で計算式付きTSVを自動生成します</div>
-      <button class="gen-btn final-check-btn" onclick="finalCheck()" style="margin-top:12px;">ブックで最終確認してね →</button>
+      <button class="gen-btn final-check-btn" onclick="finalCheck()">ブックで最終確認してね →</button>
       <div class="gen-sub">エクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるよ</div>
     </div>
   </div>
@@ -1085,7 +1083,7 @@ function updateFitCheck(){
 function finalCheck(){
   const data = generateJsonData();
   const cellCount = data.sheets[0].cells.length;
-  alert('📘 ブックで最終確認する機能は準備中だよ。\n近日中にエクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるようにするね。\n\n（準備：データ ' + cellCount + ' 個のセル分生成済み）');
+  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み）');
 }
 
 // コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
@@ -1888,7 +1886,7 @@ function showPayslipPreview(){
     '</div>' +
     '<div style="display:flex;gap:8px;padding:0 0 8px;">' +
       '<button onclick="hidePayslipPreview()" style="flex:1;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:#F0FAF4;border:none;color:#3D9E72;">← 戻って修正</button>' +
-      '<button onclick="hidePayslipPreview(true);generateTSV();" style="flex:2;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:linear-gradient(135deg,#3D9E72,#52B788);border:none;color:#fff;box-shadow:0 4px 16px rgba(61,158,114,0.35);">Excel用データを生成する →</button>' +
+      '<button onclick="hidePayslipPreview(true);finalCheck();" style="flex:2;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;background:linear-gradient(135deg,#3D9E72,#52B788);border:none;color:#fff;box-shadow:0 4px 16px rgba(61,158,114,0.35);">ブックで最終確認してね →</button>' +
     '</div>';
   // excelPreviewの中身をpreviewAreaに移す
   var inner = document.getElementById('payslipPreviewInner');
