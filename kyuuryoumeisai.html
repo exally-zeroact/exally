@@ -544,23 +544,6 @@ body{padding-bottom:80px;}
       </div>
     </div>
     <div class="paper-sec">
-      <div class="sec-label">明細の設定</div>
-
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">勤務地（健康保険料率・最低賃金に影響）</div>
-        <select id="prefSelect" onchange="onPrefChange()" style="width:100%;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;">
-        </select>
-      </div>
-
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">扶養人数</div>
-        <div style="font-size:11px;color:#7A9A87;margin-bottom:8px;line-height:1.7;">養っている家族（収入のない配偶者・子ども・親など）の人数を入れてね。わからなければ0人のままでOK。年末調整で自動的に精算されるから安心してね。</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="fuyouInput" min="0" max="7" value="0" onchange="onFuyouChange()" style="width:80px;padding:10px 12px;border:1.5px solid #C8ECD8;border-radius:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;color:#2E4038;background:#fff;outline:none;text-align:center;">
-          <span style="font-size:13px;color:#7A9A87;">人</span>
-        </div>
-      </div>
-
       <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
       <div style="margin-bottom:14px;">
         <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
@@ -2293,7 +2276,9 @@ function initPrefSelect(){
 }
 
 function onPrefChange(){
-  var code = document.getElementById('prefSelect').value;
+  var sel = document.getElementById('prefSelect');
+  if(!sel) return;
+  var code = sel.value;
   if(!code) return;
   var kenkoMap = {
     hokkaido:0.05155,aomori:0.04925,iwate:0.04855,miyagi:0.05040,akita:0.05005,
@@ -2331,7 +2316,9 @@ function onPrefChange(){
 
 
 function onFuyouChange(){
-  var val = parseInt(document.getElementById('fuyouInput').value) || 0;
+  var inp = document.getElementById('fuyouInput');
+  if(!inp) return;
+  var val = parseInt(inp.value) || 0;
   val = Math.min(Math.max(val, 0), 7);
   if(!cRates['income'])  cRates['income']  = {};
   if(!cRates['h_income'])cRates['h_income']= {};
