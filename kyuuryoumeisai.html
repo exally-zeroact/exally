@@ -1079,7 +1079,7 @@ function updateFitCheck(){
   if(genBtn) genBtn.style.cursor = canGenerate ? 'pointer' : 'not-allowed';
 }
 
-// ブックで最終確認する機能（Phase 2 で localStorage + book.html 遷移を追加予定）
+// ブックで最終確認する機能（D1：localStorage 保存実装・遷移は D5 で追加予定）
 function finalCheck(){
   const data = generateJsonData();
   const sheet = data.sheets[0];
@@ -1088,7 +1088,19 @@ function finalCheck(){
   const styledCount = cells.filter(function(c){return c.style;}).length;
   const colCount = sheet.colWidths.length;
   const rowHeightCount = Object.keys(sheet.rowHeights).length;
-  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み・うち' + styledCount + '個に書式付き / 列幅' + colCount + '列・行高さ' + rowHeightCount + '行設定）');
+
+  // ブラウザのメモ帳（localStorage）に JSON を保存
+  let saveMsg = '';
+  try {
+    const jsonStr = JSON.stringify(data);
+    localStorage.setItem('exally_paste_data', jsonStr);
+    const sizeKB = Math.round(jsonStr.length / 1024 * 10) / 10;
+    saveMsg = '\n\n✅ ブラウザのメモ帳に保存完了（' + sizeKB + ' KB）';
+  } catch(e) {
+    saveMsg = '\n\n⚠️ 保存に失敗：' + (e && e.message ? e.message : '不明なエラー');
+  }
+
+  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み・うち' + styledCount + '個に書式付き / 列幅' + colCount + '列・行高さ' + rowHeightCount + '行設定）' + saveMsg);
 }
 
 // コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
