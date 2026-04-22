@@ -2252,6 +2252,15 @@ function updateStickyTop(){
     pr.style.top = hd.offsetHeight + 'px';
   }
 }
+// throttle 150ms（モバイルのスクロール時 resize 多発対策・memory 9 パフォーマンスルール）
+var _stickyTopTimer = null;
+function updateStickyTopThrottled(){
+  if(_stickyTopTimer) return;
+  _stickyTopTimer = setTimeout(function(){
+    updateStickyTop();
+    _stickyTopTimer = null;
+  }, 150);
+}
 
 document.addEventListener('DOMContentLoaded',function(){
   renderPaperOptions();
@@ -2263,7 +2272,8 @@ document.addEventListener('DOMContentLoaded',function(){
   initGyoshu();
   updateStickyTop();
 });
-window.addEventListener('resize', updateStickyTop);
+window.addEventListener('resize', updateStickyTopThrottled);
+window.addEventListener('orientationchange', updateStickyTopThrottled);
 
 function openGuideModal(){
   document.getElementById('spGuideModal').classList.add('open');
