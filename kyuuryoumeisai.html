@@ -97,11 +97,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .del-btn{width:26px;height:26px;border-radius:50%;background:var(--mint-bg);border:none;font-size:13px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .del-btn:hover{background:var(--red-bg);color:var(--red);}
 .net-row td{padding:0 !important;border-bottom:none;}
-.net-cell{background:#F8FEFC;border-top:2px solid #3D9E72;padding:14px 16px !important;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.net-cell{background:#F8FEFC;border-top:2px solid #3D9E72;padding:14px 16px;cursor:pointer;}
+.net-cell-inner{display:flex;justify-content:space-between;align-items:center;}
 .net-label{font-size:14px;font-weight:700;color:var(--text-primary);}
 .net-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--mint-d);}
 .subtotal-row td{padding:0 !important;border-bottom:none;}
-.subtotal-cell{padding:10px 16px !important;display:flex;justify-content:space-between;align-items:center;}
+.subtotal-cell{padding:10px 16px;}
+.subtotal-cell-inner{display:flex;justify-content:space-between;align-items:center;}
 .subtotal-row.pay-sub .subtotal-cell{background:#F0FAF4;border-top:1.5px solid #C8ECD8;}
 .subtotal-row.deduct-sub .subtotal-cell{background:#FFF5F5;border-top:1.5px solid #FFCDD2;}
 .subtotal-label{font-size:13px;font-weight:700;}
@@ -789,7 +791,7 @@ function renderSort(){
     const isP=type==='pay';
     tr.className='drag-tr subtotal-row '+(isP?'pay-sub':'deduct-sub');
     const label=isP?'支給合計':'控除合計';
-    tr.innerHTML='<td colspan="4" class="subtotal-cell"><span class="subtotal-label">'+label+'</span><span class="subtotal-val">¥'+Math.round(amount).toLocaleString()+'</span></td>';
+    tr.innerHTML='<td colspan="4" class="subtotal-cell"><div class="subtotal-cell-inner"><span class="subtotal-label">'+label+'</span><span class="subtotal-val">¥'+Math.round(amount).toLocaleString()+'</span></div></td>';
     tbody.appendChild(tr);
   }
 
@@ -844,7 +846,7 @@ function renderSort(){
   // 差引支給額行（colspan=4 で全幅表示）
   const trNet=document.createElement('tr');
   trNet.className='drag-tr net-row';
-  trNet.innerHTML='<td colspan="4" class="net-cell" onclick="openPop(\'net\')"><span class="net-label">差引支給額</span><span class="net-val">¥'+Math.round(totals.net).toLocaleString()+'<span class="fc-tip">💡</span></span></td>';
+  trNet.innerHTML='<td colspan="4" class="net-cell" onclick="openPop(\'net\')"><div class="net-cell-inner"><span class="net-label">差引支給額</span><span class="net-val">¥'+Math.round(totals.net).toLocaleString()+'<span class="fc-tip">💡</span></span></div></td>';
   tbody.appendChild(trNet);
 }
 
