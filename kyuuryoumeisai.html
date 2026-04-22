@@ -97,13 +97,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .del-btn{width:26px;height:26px;border-radius:50%;background:var(--mint-bg);border:none;font-size:13px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .del-btn:hover{background:var(--red-bg);color:var(--red);}
 .net-row td{padding:0 !important;border-bottom:none;}
-.net-cell{background:#F8FEFC;border-top:2px solid #3D9E72;padding:14px 16px;cursor:pointer;min-height:52px;}
-.net-cell-inner{display:flex;justify-content:space-between;align-items:center;}
+.net-cell{background:#F8FEFC;border-top:2px solid #3D9E72;padding:4px 8px;cursor:pointer;}
+.net-cell-inner{display:flex;justify-content:space-between;align-items:center;height:44px;padding:0 8px;}
 .net-label{font-size:14px;font-weight:700;color:var(--text-primary);}
 .net-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--mint-d);}
 .subtotal-row td{padding:0 !important;border-bottom:none;}
-.subtotal-cell{padding:14px 16px;min-height:52px;}
-.subtotal-cell-inner{display:flex;justify-content:space-between;align-items:center;}
+.subtotal-cell{padding:4px 8px;}
+.subtotal-cell-inner{display:flex;justify-content:space-between;align-items:center;height:44px;padding:0 8px;}
 .subtotal-row.pay-sub .subtotal-cell{background:#F0FAF4;border-top:1px solid #C8ECD8;}
 .subtotal-row.deduct-sub .subtotal-cell{background:#FFF5F5;border-top:1px solid #FFCDD2;}
 .subtotal-label{font-size:14px;font-weight:700;}
@@ -112,7 +112,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .subtotal-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;}
 .subtotal-row.pay-sub .subtotal-val{color:#2E7D54;}
 .subtotal-row.deduct-sub .subtotal-val{color:#C62828;}
-@media(min-width:600px){.net-cell{padding:16px 18px;}.subtotal-cell{padding:16px 18px;}}
 .deduct-notice{background:var(--red-bg);border-radius:var(--radius-md);padding:12px 14px;font-size:11px;color:#7A3A3A;line-height:1.8;border:1px solid var(--red-border);}
 .deduct-notice strong{font-size:12px;}
 .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
