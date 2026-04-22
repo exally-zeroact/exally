@@ -585,6 +585,8 @@ body{padding-bottom:80px;}
       <div id="fitCheckMsg" style="margin-bottom:10px;"></div>
       <button class="gen-btn" id="genMainBtn" onclick="generateTSV()">Excel用データを生成する →</button>
       <div class="gen-sub">選択・並び替えした項目で計算式付きTSVを自動生成します</div>
+      <button class="gen-btn final-check-btn" onclick="finalCheck()" style="margin-top:12px;">ブックで最終確認してね →</button>
+      <div class="gen-sub">エクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるよ</div>
     </div>
   </div>
   <div id="noticeEl" style="font-size:11px;color:var(--text-muted);padding:4px 4px 16px;line-height:1.7;"></div>
@@ -1077,6 +1079,11 @@ function updateFitCheck(){
   if(genBtn) genBtn.disabled = !canGenerate;
   if(genBtn) genBtn.style.opacity = canGenerate ? '1' : '0.4';
   if(genBtn) genBtn.style.cursor = canGenerate ? 'pointer' : 'not-allowed';
+}
+
+// ブックで最終確認する機能（Phase 2 で generateJsonData + localStorage + book.html 遷移を実装予定）
+function finalCheck(){
+  alert('📘 ブックで最終確認する機能は準備中だよ。\n近日中にエクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるようにするね。');
 }
 
 function generateTSV(){
