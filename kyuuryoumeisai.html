@@ -2244,6 +2244,15 @@ function changeGyoshu(){
   document.getElementById('gyoshuOverlay').classList.remove('hide');
 }
 
+// sp-preview-row の sticky top を header 高さに動的に合わせる
+function updateStickyTop(){
+  var hd = document.querySelector('.header');
+  var pr = document.querySelector('.sp-preview-row');
+  if(hd && pr){
+    pr.style.top = hd.offsetHeight + 'px';
+  }
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   renderPaperOptions();
   document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
@@ -2252,7 +2261,9 @@ document.addEventListener('DOMContentLoaded',function(){
   initRates();
   initPrefSelect();
   initGyoshu();
+  updateStickyTop();
 });
+window.addEventListener('resize', updateStickyTop);
 
 function openGuideModal(){
   document.getElementById('spGuideModal').classList.add('open');
