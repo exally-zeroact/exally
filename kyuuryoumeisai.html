@@ -378,7 +378,7 @@ body{padding-bottom:80px;}
     <div class="gp-title">📋 使い方</div>
     <div class="gp-steps">
       <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
-      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 値タップで計算式や説明を確認・変更OK</div></div>
       <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
       <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
     </div>
@@ -464,7 +464,7 @@ body{padding-bottom:80px;}
       <div class="sec-div">📋 使い方</div>
       <div class="gp-steps">
         <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
-        <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+        <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 値タップで計算式や説明を確認・変更OK</div></div>
         <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
         <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
       </div>
@@ -497,7 +497,7 @@ body{padding-bottom:80px;}
     <div class="gp-title">📋 使い方</div>
     <div class="gp-steps">
       <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
-      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 計算式は💡アイコンで確認・変更OK</div></div>
+      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 値タップで計算式や説明を確認・変更OK</div></div>
       <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
       <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
     </div>
@@ -525,7 +525,7 @@ body{padding-bottom:80px;}
   <div class="step-guide">
     <div class="step-guide-title">使い方</div>
     <div class="step-row"><div class="step-num">1</div><div class="step-text">☰ をドラッグして項目を並び替える</div></div>
-    <div class="step-row"><div class="step-num">2</div><div class="step-text">💡 をタップして計算式を確認・変更する</div></div>
+    <div class="step-row"><div class="step-num">2</div><div class="step-text">値をタップしたら数式や説明が見れるよ</div></div>
     <div class="step-row"><div class="step-num">3</div><div class="step-text">「Excel用データを生成する」を押してコピー → Excelに貼り付け</div></div>
   </div>
   <div class="card">
@@ -534,7 +534,7 @@ body{padding-bottom:80px;}
       <div class="tbl-wrap">
         <table class="drag-table"><tbody id="dragTableBody"></tbody></table>
       </div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">☰ をドラッグで並び替え ／ 💡 で計算式確認・変更 ／ ✕ で除外</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">☰ をドラッグで並び替え ／ 値タップで数式や説明 ／ ✕ で除外</div>
     </div>
     <div class="sec" id="deductNotice" style="display:none;">
       <div class="deduct-notice">
@@ -799,9 +799,9 @@ function renderSort(){
     const tdN=document.createElement('td');tdN.innerHTML='<span class="item-name'+(isDeduct?' dc':'')+'">' +item.label+sub+'</span>';
     const tdV=document.createElement('td');
     const valDisplay=getVal(item);
-    if(hf){tdV.className='item-val fc';tdV.innerHTML=valDisplay+'<span class="fc-tip">💡</span>';tdV.onclick=()=>openPop(item.id);}
-    else if(!isInfo){tdV.className='item-val';tdV.style.cursor='pointer';tdV.innerHTML=valDisplay+'<span style="font-size:9px;color:#B0C4BA;margin-left:3px;">💡</span>';tdV.onclick=()=>openPop(item.id);}
-    else{tdV.className='item-val';tdV.textContent=valDisplay;tdV.style.color='#7A9A87';}
+    if(hf){tdV.className='item-val fc';tdV.innerHTML=valDisplay;tdV.onclick=()=>openPop(item.id);}
+    else if(!isInfo){tdV.className='item-val';tdV.style.cursor='pointer';tdV.innerHTML=valDisplay;tdV.onclick=()=>openPop(item.id);}
+    else{tdV.className='item-val';tdV.textContent=valDisplay;tdV.style.color='#7A9A87';tdV.style.cursor='pointer';tdV.onclick=()=>openPop(item.id);}
     const tdD=document.createElement('td');tdD.className='del-cell';
     if(item.canRemove){const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';btn.onclick=()=>removeItem(item.id);tdD.appendChild(btn);}
     tr.appendChild(tdH);tr.appendChild(tdN);tr.appendChild(tdV);tr.appendChild(tdD);
@@ -841,7 +841,7 @@ function renderSort(){
   // 差引支給額行（colspan=4 で全幅表示）
   const trNet=document.createElement('tr');
   trNet.className='drag-tr net-row';
-  trNet.innerHTML='<td colspan="4" class="net-cell" onclick="openPop(\'net\')"><div class="net-cell-inner"><span class="net-label">差引支給額</span><span class="net-val">¥'+Math.round(totals.net).toLocaleString()+'<span class="fc-tip">💡</span></span></div></td>';
+  trNet.innerHTML='<td colspan="4" class="net-cell" onclick="openPop(\'net\')"><div class="net-cell-inner"><span class="net-label">差引支給額</span><span class="net-val">¥'+Math.round(totals.net).toLocaleString()+'</span></div></td>';
   tbody.appendChild(trNet);
 }
 
@@ -884,6 +884,18 @@ function openPop(id){
   popId=id;
   const item=id==='net'?NET:(active.find(i=>i.id===id)||base().find(i=>i.id===id));
   if(!item)return;
+  // 情報項目：シンプルな説明モーダル（編集UIは非表示）
+  if(item.type==='info'){
+    document.getElementById('popTitle').textContent=item.label;
+    document.getElementById('popFormula').textContent='';
+    document.getElementById('popDesc').textContent='この項目は仮のデフォルト値だよ。Excelに貼り付けたあと、今月の実際の値に書き換えて使ってね。';
+    document.getElementById('popWhy').textContent='出勤日数・欠勤日数・残業時間などは、月や人によって変わるから、テンプレートには仮の数字を入れているよ。';
+    document.getElementById('popEdit').style.display='none';
+    document.getElementById('popRates').innerHTML='';
+    const sw2=document.getElementById('manualSwitchWrap');const rw2=document.getElementById('manualRestoreWrap');const ab2=document.getElementById('applyBtn');
+    if(sw2)sw2.style.display='none';if(rw2)rw2.style.display='none';if(ab2)ab2.style.display='none';
+    document.getElementById('popOv').classList.add('show');return;
+  }
   if(!item.title&&id!=='net'){
     document.getElementById('popTitle').textContent=item.label+' — 計算式を設定';
     document.getElementById('popFormula').textContent=item.formula||'現在：手入力';
