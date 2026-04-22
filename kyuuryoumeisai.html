@@ -1081,12 +1081,15 @@ function updateFitCheck(){
   if(genBtn) genBtn.style.cursor = canGenerate ? 'pointer' : 'not-allowed';
 }
 
-// ブックで最終確認する機能（Phase 2 で generateJsonData + localStorage + book.html 遷移を実装予定）
+// ブックで最終確認する機能（Phase 2 で localStorage + book.html 遷移を追加予定）
 function finalCheck(){
-  alert('📘 ブックで最終確認する機能は準備中だよ。\n近日中にエクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるようにするね。');
+  const data = generateJsonData();
+  const cellCount = data.sheets[0].cells.length;
+  alert('📘 ブックで最終確認する機能は準備中だよ。\n近日中にエクサリーのブック（Excelっぽい画面）に移動して、色や書式付きで編集できるようにするね。\n\n（準備：データ ' + cellCount + ' 個のセル分生成済み）');
 }
 
-function generateTSV(){
+// コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
+function buildAllRows(){
   // 支給合計の概算値を計算（健保・所得税の標準報酬計算用）
   MONTHLY_AMOUNT = calcApproxPayTotal();
   const { canGenerate } = (() => {
@@ -1352,8 +1355,12 @@ function generateTSV(){
     }
   }
 
-  generatedTSV = allRows.join('\n');
+  return allRows.join('\n');
+}
 
+// 既存 API：TSV 文字列を生成してグローバル変数に保存 + 結果エリアを表示（クリップボードコピー用）
+function generateTSV(){
+  generatedTSV = buildAllRows();
   // プレビューとUI更新
   document.getElementById('resultEl').classList.add('show');
   renderExcelPreview();
@@ -1368,6 +1375,34 @@ function generateTSV(){
   }, 400);
   const sc = document.getElementById('stickyCta');
   if(sc) sc.style.display = 'none';
+}
+
+// JSON データ生成：buildAllRows を呼んで JSON 形式で返す（UI 更新なし）
+function generateJsonData(){
+  const tsv = buildAllRows();
+  return parseTsvToJson(tsv);
+}
+
+// TSV 文字列を JSON 形式（{r, c, v} のセル配列）に変換
+function parseTsvToJson(tsv){
+  const cells = [];
+  const rows = tsv.split('\n');
+  rows.forEach(function(row, r){
+    const cols = row.split('\t');
+    cols.forEach(function(v, c){
+      if(v !== '' && v != null) cells.push({r: r, c: c, v: v});
+    });
+  });
+  return {
+    source: 'kyuuryoumeisai',
+    version: '1.0',
+    sheets: [{
+      name: '給料明細',
+      cells: cells,
+      colWidths: [],
+      rowHeights: []
+    }]
+  };
 }
 
 
