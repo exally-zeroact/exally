@@ -90,7 +90,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .item-name{font-size:13px;font-weight:700;color:var(--text-primary);line-height:1.3;}
 .item-name small{display:block;font-size:10px;color:var(--text-muted);font-weight:400;margin-top:2px;}
 .item-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);word-break:break-all;max-width:150px;}
-.item-val.fc{color:var(--mint-d);cursor:pointer;padding:4px 6px;border-radius:6px;transition:background 0.15s;}
+.item-val.fc{color:#555;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background 0.15s;}
 .item-val.fc:hover{background:var(--mint-bg);}
 .fc-tip{font-size:9px;color:var(--mint);margin-left:3px;opacity:0.8;}
 .del-cell{width:32px;text-align:center;padding:4px !important;}
@@ -800,8 +800,8 @@ function renderSort(){
     const tdV=document.createElement('td');
     const valDisplay=getVal(item);
     if(hf){tdV.className='item-val fc';tdV.innerHTML=valDisplay;tdV.onclick=()=>openPop(item.id);}
-    else if(!isInfo){tdV.className='item-val';tdV.style.cursor='pointer';tdV.innerHTML=valDisplay;tdV.onclick=()=>openPop(item.id);}
-    else{tdV.className='item-val';tdV.textContent=valDisplay;tdV.style.color='#7A9A87';tdV.style.cursor='pointer';tdV.onclick=()=>openPop(item.id);}
+    else if(!isInfo){tdV.className='item-val fc';tdV.innerHTML=valDisplay;tdV.onclick=()=>openPop(item.id);}
+    else{tdV.className='item-val fc';tdV.textContent=valDisplay;tdV.onclick=()=>openPop(item.id);}
     const tdD=document.createElement('td');tdD.className='del-cell';
     if(item.canRemove){const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';btn.onclick=()=>removeItem(item.id);tdD.appendChild(btn);}
     tr.appendChild(tdH);tr.appendChild(tdN);tr.appendChild(tdV);tr.appendChild(tdD);
