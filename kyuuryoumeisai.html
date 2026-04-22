@@ -768,8 +768,30 @@ function getVal(item){
 function renderSort(){
   const tbody=document.getElementById('dragTableBody');
   tbody.innerHTML='';
+
+  // Phase 2a: 合計計算
+  const totals = (typeof calcNetAmount === 'function') ? calcNetAmount() : {pay:0, deduct:0, net:0};
+
+  // 小計行を挿入するヘルパー
+  function appendSubtotal(type, amount){
+    const tr=document.createElement('tr');
+    tr.className='drag-tr subtotal-row';
+    const isP=type==='pay';
+    const label=isP?'支給合計':'控除合計';
+    const bg=isP?'#F0FAF4':'#FFF5F5';
+    const fg=isP?'#2E7D54':'#C62828';
+    const border=isP?'#C8ECD8':'#FFCDD2';
+    tr.innerHTML='<td class="dh-cell"></td><td style="background:'+bg+';border-top:1.5px solid '+border+';"><span class="item-name" style="color:'+fg+';font-weight:700;">'+label+'</span></td><td class="item-val" style="background:'+bg+';border-top:1.5px solid '+border+';color:'+fg+';font-weight:700;font-family:\'DM Mono\',monospace;">¥'+Math.round(amount).toLocaleString()+'</td><td class="del-cell" style="background:'+bg+';border-top:1.5px solid '+border+';"></td>';
+    tbody.appendChild(tr);
+  }
+
+  let prevType=null;
   let lastCat=null;
   active.forEach((item,idx)=>{
+    // type 遷移時に支給合計を挿入
+    if(prevType==='pay' && item.type!=='pay'){
+      appendSubtotal('pay', totals.pay);
+    }
     if(item.cat!==lastCat){
       const trDiv=document.createElement('tr');
       trDiv.className='cat-divider'+(item.type==='pay'?' cat-pay':item.type==='deduct'?' cat-deduct':'');
@@ -805,10 +827,16 @@ function renderSort(){
     tr.addEventListener('touchmove',e=>{if(!isTouching)return;e.preventDefault();const y=e.touches[0].clientY;cleanDO();tbody.querySelectorAll('.drag-tr').forEach((el,i)=>{const r=el.getBoundingClientRect();if(y>=r.top&&y<=r.bottom){el.classList.add('drag-over');if(dragSrc!==null&&dragSrc!==i){const tmp=[...active];const mv=tmp.splice(dragSrc,1)[0];tmp.splice(i,0,mv);renderTableTemp(tmp);}}});},{passive:false});
     tr.addEventListener('touchend',e=>{if(!isTouching)return;isTouching=false;tr.classList.remove('dragging');const y=e.changedTouches[0].clientY;tbody.querySelectorAll('.drag-tr').forEach((el,i)=>{const r=el.getBoundingClientRect();if(y>=r.top&&y<=r.bottom&&i!==dragSrc)drop(i);});cleanDO();});
     tbody.appendChild(tr);
+    prevType=item.type;
   });
+  // ループ終了後・最後のtypeが pay / deduct なら合計を追加
+  if(prevType==='pay') appendSubtotal('pay', totals.pay);
+  if(prevType==='deduct') appendSubtotal('deduct', totals.deduct);
+
+  // 差引支給額行（計算結果表示）
   const trNet=document.createElement('tr');
   trNet.className='drag-tr net-row';
-  trNet.innerHTML='<td class="dh-cell"></td><td><span class="item-name">差引支給額</span></td><td class="item-val fc" onclick="openPop(\'net\')">支給合計 − 控除合計<span class="fc-tip">💡</span></td><td class="del-cell"></td>';
+  trNet.innerHTML='<td class="dh-cell"></td><td><span class="item-name">差引支給額</span></td><td class="item-val fc" onclick="openPop(\'net\')">¥'+Math.round(totals.net).toLocaleString()+'<span class="fc-tip">💡</span></td><td class="del-cell"></td>';
   tbody.appendChild(trNet);
 }
 
@@ -2371,6 +2399,182 @@ function calcApproxPayTotal(){
   });
   return total > 0 ? total : 250000; // デフォルト250,000円
 }
+
+// ===== 差引支給額の計算（Phase 2a 追加）=====
+// value文字列から数値を抽出 ("22日" → 22, "¥15,000" → 15000, "160時間00分" → 160)
+function parseNumericValue(str){
+  if(!str) return 0;
+  // 円マーク除去・カンマ除去
+  var s = String(str).replace(/[¥,]/g, '');
+  // 最初の整数を抽出
+  var m = s.match(/\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+
+// 勤怠項目の値を取得（active配列から、なければbaseから）
+function getAttendValue(id){
+  var item = active.find(function(i){ return i.id === id; });
+  if(!item) item = base().find(function(i){ return i.id === id; });
+  if(!item) return 0;
+  return parseNumericValue(item.value);
+}
+
+// 1項目の金額を計算（円単位の数値を返す）
+function calcItemAmount(item, ctx){
+  if(!item) return 0;
+  var rate = cRates[item.id] || {};
+  var id = item.id;
+  ctx = ctx || {};
+
+  // ========== 勤怠（info）は合計に含めない ==========
+  if(item.type === 'info') return 0;
+
+  // ========== 支給（pay）==========
+  if(item.type === 'pay'){
+    // 基本給（月給制）
+    if(id === 'basic') return rate['amount'] || parseNumericValue(item.value) || 250000;
+    // 時給（時給制本体ではなく基本給計算用・合計には含めない）
+    if(id === 'h_wage') return 0;
+    // 基本給（時給制）= 時給 × 実働時間
+    if(id === 'h_base'){
+      var wageItem = active.find(function(i){return i.id==='h_wage';}) || base().find(function(i){return i.id==='h_wage';});
+      var wage = (cRates['h_wage'] && cRates['h_wage']['wage']) || parseNumericValue(wageItem && wageItem.value) || 1563;
+      var work = getAttendValue('h_work') || 160;
+      return Math.round(wage * work);
+    }
+    // 残業代（月給制）= 基本給/160 × 倍率 × 残業時間
+    if(id === 'overtime'){
+      var basic = ctx.basic || 250000;
+      var r = rate['rate'] || 1.25;
+      var ot = getAttendValue('ot_h');
+      return Math.round(basic / 160 * r * ot);
+    }
+    // 残業代（時給制）= 時給 × 倍率 × 残業時間
+    if(id === 'h_ot'){
+      var wageItem2 = active.find(function(i){return i.id==='h_wage';}) || base().find(function(i){return i.id==='h_wage';});
+      var hwage = (cRates['h_wage'] && cRates['h_wage']['wage']) || parseNumericValue(wageItem2 && wageItem2.value) || 1563;
+      var hr = rate['rate'] || 1.25;
+      var hot = getAttendValue('h_ot_h');
+      return Math.round(hwage * hr * hot);
+    }
+    // 深夜手当（月給制）= 基本給/160 × 倍率 × 深夜時間
+    if(id === 'midnight'){
+      var basic2 = ctx.basic || 250000;
+      var mr = rate['rate'] || 0.25;
+      var mid = getAttendValue('mid_h');
+      return Math.round(basic2 / 160 * mr * mid);
+    }
+    // 深夜手当（時給制）= 時給 × 倍率 × 深夜時間
+    if(id === 'h_mid'){
+      var wageItem3 = active.find(function(i){return i.id==='h_wage';}) || base().find(function(i){return i.id==='h_wage';});
+      var hwage2 = (cRates['h_wage'] && cRates['h_wage']['wage']) || parseNumericValue(wageItem3 && wageItem3.value) || 1563;
+      var mr2 = rate['rate'] || 0.25;
+      var hmid = getAttendValue('h_mid_h');
+      return Math.round(hwage2 * mr2 * hmid);
+    }
+    // 皆勤手当 = 欠勤0 なら amount else 0
+    if(id === 'perfect'){
+      var absent = getAttendValue('absent');
+      return absent === 0 ? (rate['amount'] || 5000) : 0;
+    }
+    // 住宅手当・資格手当・交通費 etc（rate['amount']またはvalue）
+    if(rate['amount']) return rate['amount'];
+    return parseNumericValue(item.value);
+  }
+
+  // ========== 控除（deduct）==========
+  if(item.type === 'deduct'){
+    var payTotal = ctx.payTotal || 0;
+    // 健康保険 = 標準報酬 × 料率
+    if(id === 'health' || id === 'h_health'){
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && payTotal > 0){
+        var hyojun = SHAKAIHOKEN_HYO.getHyojunHoshu(payTotal);
+        var hRate = (rate['rate']) || 0.04955;
+        return Math.round(hyojun * hRate);
+      }
+      return 0;
+    }
+    // 厚生年金 = 標準報酬 × 0.0915
+    if(id === 'pension' || id === 'h_pension'){
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && payTotal > 0){
+        var hyojun2 = SHAKAIHOKEN_HYO.getHyojunHoshu(payTotal);
+        return Math.round(hyojun2 * 0.0915);
+      }
+      return 0;
+    }
+    // 雇用保険 = 支給合計 × 料率
+    if(id === 'employ' || id === 'h_employ'){
+      var eRate = (rate['rate']) || 0.0055;
+      return Math.round(payTotal * eRate);
+    }
+    // 介護保険 = 標準報酬 × 料率
+    if(id === 'kaigo' || id === 'h_kaigo'){
+      if(typeof SHAKAIHOKEN_HYO !== 'undefined' && payTotal > 0){
+        var hyojun3 = SHAKAIHOKEN_HYO.getHyojunHoshu(payTotal);
+        var kRate = (rate['rate']) || 0.00795;
+        return Math.round(hyojun3 * kRate);
+      }
+      return 0;
+    }
+    // 所得税 = 税額表参照
+    if(id === 'income' || id === 'h_income'){
+      if(typeof SHOTOKUZEI_HYOU !== 'undefined' && typeof SHAKAIHOKEN_HYO !== 'undefined' && payTotal > 0){
+        var fuyou = (rate['fuyou'] !== undefined) ? rate['fuyou'] : 0;
+        var hRate2 = (cRates['health'] && cRates['health']['rate']) || 0.04955;
+        var hyojun4 = SHAKAIHOKEN_HYO.getHyojunHoshu(payTotal);
+        var hAmt = Math.round(hyojun4 * hRate2);
+        var pAmt = Math.round(hyojun4 * 0.0915);
+        var eAmt = Math.round(payTotal * ((cRates['employ'] && cRates['employ']['rate']) || 0.0055));
+        var kazei = payTotal - hAmt - pAmt - eAmt;
+        if(kazei > 0){
+          var zei = SHOTOKUZEI_HYOU.getZei(kazei, fuyou);
+          return zei !== null ? zei : 0;
+        }
+      }
+      return 0;
+    }
+    // 住民税・弁当代・社宅・制服・組合費・貸付金など固定金額
+    if(rate['amount']) return rate['amount'];
+    return parseNumericValue(item.value);
+  }
+
+  return 0;
+}
+
+// 支給合計を計算
+function calcPayTotal(){
+  var ctx = { basic: 0 };
+  // 先に基本給を確定（残業代計算で必要）
+  var basicItem = active.find(function(i){ return i.id === 'basic'; });
+  if(basicItem) ctx.basic = calcItemAmount(basicItem, ctx);
+  
+  var total = 0;
+  active.forEach(function(item){
+    if(item.type !== 'pay') return;
+    total += calcItemAmount(item, ctx);
+  });
+  return total;
+}
+
+// 控除合計を計算（支給合計を引数で受ける）
+function calcDeductTotal(payTotal){
+  var ctx = { payTotal: payTotal };
+  var total = 0;
+  active.forEach(function(item){
+    if(item.type !== 'deduct') return;
+    total += calcItemAmount(item, ctx);
+  });
+  return total;
+}
+
+// 支給合計・控除合計・差引支給額を一括計算
+function calcNetAmount(){
+  var pay = calcPayTotal();
+  var deduct = calcDeductTotal(pay);
+  var net = pay - deduct;
+  return { pay: pay, deduct: deduct, net: net };
+}
+
 
 // ===== 印刷・保存・ダウンロード =====
 
