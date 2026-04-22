@@ -1082,8 +1082,10 @@ function updateFitCheck(){
 // ブックで最終確認する機能（Phase 2 で localStorage + book.html 遷移を追加予定）
 function finalCheck(){
   const data = generateJsonData();
-  const cellCount = data.sheets[0].cells.length;
-  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み）');
+  const cells = data.sheets[0].cells;
+  const cellCount = cells.length;
+  const styledCount = cells.filter(function(c){return c.style;}).length;
+  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み・うち' + styledCount + '個に書式付き）');
 }
 
 // コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
@@ -1381,14 +1383,19 @@ function generateJsonData(){
   return parseTsvToJson(tsv);
 }
 
-// TSV 文字列を JSON 形式（{r, c, v} のセル配列）に変換
+// TSV 文字列を JSON 形式（{r, c, v, style} のセル配列）に変換
 function parseTsvToJson(tsv){
   const cells = [];
   const rows = tsv.split('\n');
   rows.forEach(function(row, r){
     const cols = row.split('\t');
     cols.forEach(function(v, c){
-      if(v !== '' && v != null) cells.push({r: r, c: c, v: v});
+      if(v !== '' && v != null){
+        const cell = {r: r, c: c, v: v};
+        const style = detectStyle(v, r, c);
+        if(style) cell.style = style;
+        cells.push(cell);
+      }
     });
   });
   return {
@@ -1401,6 +1408,39 @@ function parseTsvToJson(tsv){
       rowHeights: []
     }]
   };
+}
+
+// セル内容・位置から書式を判定（memory #26 の style 仕様に準拠）
+function detectStyle(v, r, c){
+  // タイトル「給与明細書」
+  if(r === 0 && c === 0 && v === '給与明細書'){
+    return {bold: true, fontSize: 16, align: 'center', bg: '#3D9E72', color: '#fff'};
+  }
+  // 差引支給額行（通常 r=3）
+  if(v === '差引支給額'){
+    return {bold: true, fontSize: 14};
+  }
+  // 差引支給額の数式（直前の行に「差引支給額」ラベル、数式 =XX-XX）
+  if(r === 3 && c === 1 && typeof v === 'string' && v.startsWith('=')){
+    return {bold: true, fontSize: 14, color: '#3D9E72', align: 'right'};
+  }
+  // セクションラベル【勤怠】【支給】【控除】のみ（完全一致）
+  if(v === '【勤怠】' || v === '【支給】' || v === '【控除】'){
+    return {bold: true, bg: '#F0FAF4', color: '#3D9E72'};
+  }
+  // プレースホルダー（【〜】だが勤怠・支給・控除以外）→ 薄グレーで「ここに入力してね」感
+  if(typeof v === 'string' && /^【.+】$/.test(v)){
+    return {color: '#999'};
+  }
+  // 総支給額・控除合計ラベル
+  if(v === '総支給額' || v === '控除合計'){
+    return {bold: true, bg: '#F8FEFC'};
+  }
+  // 数式（= で始まる・右寄せ）
+  if(typeof v === 'string' && v.startsWith('=')){
+    return {align: 'right'};
+  }
+  return null;
 }
 
 
