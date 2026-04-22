@@ -1082,10 +1082,13 @@ function updateFitCheck(){
 // ブックで最終確認する機能（Phase 2 で localStorage + book.html 遷移を追加予定）
 function finalCheck(){
   const data = generateJsonData();
-  const cells = data.sheets[0].cells;
+  const sheet = data.sheets[0];
+  const cells = sheet.cells;
   const cellCount = cells.length;
   const styledCount = cells.filter(function(c){return c.style;}).length;
-  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み・うち' + styledCount + '個に書式付き）');
+  const colCount = sheet.colWidths.length;
+  const rowHeightCount = Object.keys(sheet.rowHeights).length;
+  alert('📘 準備中だよ！近日中にブックに移動できるようにするね。\n\n（内部確認：' + cellCount + '個のセル生成済み・うち' + styledCount + '個に書式付き / 列幅' + colCount + '列・行高さ' + rowHeightCount + '行設定）');
 }
 
 // コアロジック：全 TSV 行を生成して文字列で返す（UI 更新なし・JSON 生成とも共用）
@@ -1404,10 +1407,53 @@ function parseTsvToJson(tsv){
     sheets: [{
       name: '給料明細',
       cells: cells,
-      colWidths: [],
-      rowHeights: []
+      colWidths: buildColWidths(rows),
+      rowHeights: buildRowHeights(rows)
     }]
   };
+}
+
+// 列幅を生成（5列パターン：A=項目名120 / B=金額100 / C=区切り10 / D=項目名120 / E=金額100）
+// 人数が増えても同じパターンを繰り返す（複数人横並びレイアウト対応）
+function buildColWidths(rows){
+  const maxCols = rows.reduce(function(m, row){ return Math.max(m, row.split('\t').length); }, 0);
+  const pattern = [120, 100, 10, 120, 100];
+  const widths = [];
+  for(let c = 0; c < maxCols; c++){
+    widths.push(pattern[c % 5]);
+  }
+  return widths;
+}
+
+// 行高さを生成（行内容からタイプ判定・人数が増えても各行で自動判定）
+function buildRowHeights(rows){
+  const heights = {};
+  rows.forEach(function(row, r){
+    const cells = row.split('\t');
+    const hasValue = cells.some(function(v){ return v !== ''; });
+    // タイトル行「給与明細書」
+    if(cells.some(function(v){ return v === '給与明細書'; })){
+      heights[r] = 30;
+    }
+    // 差引支給額ラベル行
+    else if(cells.some(function(v){ return v === '差引支給額'; })){
+      heights[r] = 28;
+    }
+    // セクションラベル行【勤怠】【支給】【控除】
+    else if(cells.some(function(v){ return v === '【勤怠】' || v === '【支給】' || v === '【控除】'; })){
+      heights[r] = 24;
+    }
+    // 合計行「総支給額」or「控除合計」
+    else if(cells.some(function(v){ return v === '総支給額' || v === '控除合計'; })){
+      heights[r] = 24;
+    }
+    // 空行
+    else if(!hasValue){
+      heights[r] = 10;
+    }
+    // それ以外はデフォルト（指定なし）
+  });
+  return heights;
 }
 
 // セル内容・位置から書式を判定（memory #26 の style 仕様に準拠）
