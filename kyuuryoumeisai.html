@@ -379,19 +379,30 @@ body{padding-bottom:80px;}
       <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
       <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 値タップで計算式や説明を確認・変更OK</div></div>
       <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
-      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
+      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>📘 ブックで最終確認してね</b><small>ブックに移動して色や書式付きで編集できるよ</small></div></div>
     </div>
   </div>
   <div class="gp-sec">
     <button class="gp-preview-btn" onclick="document.getElementById('stickyCta').querySelector('button').click()">👁 プレビューを確認する</button>
   </div>
   <div class="gp-sec">
-    <div class="gp-title">📊 Excelで印刷するには</div>
+    <div class="gp-title">📘 ブックでできること</div>
     <div class="xl-steps">
-      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線が現れる＝印刷範囲の目安</div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">✏️ 編集</div><div class="xl-step-main">セルを自由に編集できる</div><div class="xl-pat">項目・数字・数式を直接書き換えOK</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">🎨 書式</div><div class="xl-step-main">色や書式が自動で付く</div><div class="xl-pat">太字・背景色・文字揃えは設定済み</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">🧮 関数</div><div class="xl-step-main">関数も使える</div><div class="xl-pat">SUM・VLOOKUP など Excel と同じ関数が動く</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">📄 シート</div><div class="xl-step-main">3シート構成でシンプル</div><div class="xl-pat">使い方 / 入力 / 給料明細</div></div>
+    </div>
+  </div>
+  <div class="gp-sec">
+    <div class="gp-title">📊 Excelで使う・編集するには</div>
+    <div class="xl-steps">
+      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">Excelでダウンロードする</div><div class="xl-pat">ブック画面の「📥 Excelでダウンロード」ボタンから</div><div class="xl-point">📄 ダウンロード時に 8 シート構成に展開されるよ</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">🟡 入力シート で数字を書き換える</div><div class="xl-pat">基本給・残業時間・出勤日数を変えるだけ</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">🟡 家族構成シート で扶養・都道府県を変える</div><div class="xl-pat">所得税・健保料が自動で再計算される</div></div>
+      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">🟢 給料明細シート で確認・印刷</div><div class="xl-pat">STEP 2・3 で入れた数字が自動で反映されるよ</div></div>
+      <div class="xl-point">💡 関数の仕組み：所得税は税額表、健保料は社保データを VLOOKUP で参照する式に書き換わるから、数字を変えても自動で再計算されるよ</div>
+      <div class="xl-point">⚠️ ⚪ 税額表・社保データシート（グレータブ）は触らないでね。計算の元データだから、消すと給料明細が壊れるよ</div>
     </div>
   </div>
 </aside>
