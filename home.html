@@ -16,19 +16,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 /* PC サイドバー */
 .sb{display:none;}
 @media(min-width:769px){
-.sb{display:flex;flex-direction:column;width:210px;min-width:210px;background:#ffffff;border-right:1px solid #D4EDE1;padding:20px 0;flex-shrink:0;height:100%;}
+.sb{display:flex;flex-direction:column;width:220px;min-width:220px;background:#ffffff;border-right:1px solid #D4EDE1;padding:24px 0;flex-shrink:0;height:100%;}
 .sb-logo{padding:0 20px 28px;display:flex;align-items:baseline;gap:5px;}
 .sb-en{font-family:monospace;font-size:22px;font-weight:800;color:#52B788;letter-spacing:-0.5px;}
 .sb-ja{font-size:10px;font-weight:600;color:#4A6B5A;}
-.sb-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.sb-it{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;width:100%;text-align:left;color:#2E4038;font-size:13px;font-weight:500;transition:all 0.18s;}
+.sb-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+.sb-it{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:‘Noto Sans JP’,sans-serif;width:100%;text-align:left;color:#2E4038;font-size:13px;font-weight:500;transition:all 0.18s;}
 .sb-it:hover{background:#F0FAF4;color:#2E4038;}
 .sb-it.active{background:#F0FAF4;color:#2E4038;font-weight:700;}
-.sb-ic{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sb-ic svg{width:18px;height:18px;}
+.sb-ic{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-ic svg{width:20px;height:20px;}
 .sb-ic-emoji{font-size:15px;line-height:1;}
 .sb-ft{padding:10px 18px;border-top:1px solid #D4EDE1;display:flex;flex-direction:column;gap:5px;}
-.sb-vb{background:#ffffff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:7px 10px;border-radius:9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;}
+.sb-vb{background:#ffffff;border:1.5px solid #C8ECD8;color:#3D9E72;font-size:11px;font-weight:700;padding:7px 10px;border-radius:9px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;}
 .sb-vb:hover{background:#F0FAF4;border-color:#3D9E72;}
 .sb-bd{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-align:center;}
 .sb-bd-d{background:#FFF8EE;border:1px solid #F4A942;color:#9A6000;}
@@ -53,7 +53,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 @media(min-width:769px){.mh{display:none;}}
 
 /* PC右上 */
-.vbp{display:none;position:absolute;top:18px;right:24px;z-index:50;background:#ffffff;border:2px solid #52B788;color:#3D9E72;font-size:14px;font-weight:700;padding:8px 18px;border-radius:22px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;box-shadow:0 4px 14px rgba(82,183,136,0.2);align-items:center;gap:6px;}
+.vbp{display:none;position:absolute;top:18px;right:24px;z-index:50;background:#ffffff;border:2px solid #52B788;color:#3D9E72;font-size:14px;font-weight:700;padding:8px 18px;border-radius:22px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;box-shadow:0 4px 14px rgba(82,183,136,0.2);align-items:center;gap:6px;}
 .vbp:hover{background:#F0FAF4;border-color:#3D9E72;box-shadow:0 6px 18px rgba(82,183,136,0.28);transform:translateY(-1px);}
 @media(min-width:769px){.vbp{display:inline-flex;}}
 
@@ -64,7 +64,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 
 /* モバイル固定ボトムナビ */
 .bn{position:absolute;bottom:0;left:0;right:0;display:flex;background:#ffffff;border-top:1px solid #D4EDE1;padding:3px 0 max(3px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center;gap:0;z-index:40;}
-.bn-i{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 1px;border:none;background:none;cursor:pointer;color:#2E4038;font-family:'Noto Sans JP',sans-serif;min-width:35px;flex:1;}
+.bn-i{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 1px;border:none;background:none;cursor:pointer;color:#2E4038;font-family:‘Noto Sans JP’,sans-serif;min-width:35px;flex:1;}
 .bn-i.active{color:#2E4038;font-weight:700;}
 .bn-ic{display:inline-flex;align-items:center;justify-content:center;height:16px;}
 .bn-ic svg{width:15px;height:15px;}
@@ -75,7 +75,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 /* ========== ヒーロー ========== */
 .b-hero{text-align:center;padding:6px 0 12px;max-width:620px;margin:0 auto;}
 @media(min-width:769px){.b-hero{padding:14px 0 32px;max-width:780px;}}
-.b-eye{font-family:'DM Mono',monospace;font-size:9px;color:#52B788;letter-spacing:2.5px;margin-bottom:4px;font-weight:500;}
+.b-eye{font-family:‘DM Mono’,monospace;font-size:9px;color:#52B788;letter-spacing:2.5px;margin-bottom:4px;font-weight:500;}
 @media(min-width:769px){.b-eye{font-size:10px;margin-bottom:6px;}}
 .b-ttl{font-size:20px;font-weight:900;color:#1A4A2E;line-height:1.2;letter-spacing:-0.8px;margin-bottom:2px;}
 @media(min-width:769px){.b-ttl{font-size:40px;letter-spacing:-1.5px;margin-bottom:6px;}}
@@ -89,7 +89,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .b-srch:focus-within{border-color:#52B788;box-shadow:0 4px 14px rgba(82,183,136,0.14);}
 .b-srch-ic{font-size:16px;flex-shrink:0;}
 @media(min-width:769px){.b-srch-ic{font-size:20px;}}
-.b-srch input{flex:1;border:none;outline:none;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:#1A4A2E;background:transparent;min-width:0;}
+.b-srch input{flex:1;border:none;outline:none;font-family:‘Noto Sans JP’,sans-serif;font-size:13px;color:#1A4A2E;background:transparent;min-width:0;}
 @media(min-width:769px){.b-srch input{font-size:15px;}}
 .b-srch input::placeholder{color:#7A9A87;}
 .b-srch-btn{background:#3D9E72;color:#ffffff;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;font-weight:700;flex-shrink:0;transition:background 0.15s;}
@@ -104,12 +104,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .b-chips-row{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px;max-width:780px;margin:12px auto 0;grid-template-columns:none;}
 .b-chips-row-2{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px;max-width:780px;margin:6px auto 0;}
 }
-.b-ch{font-family:'Noto Sans JP',sans-serif;background:#ffffff;border:1px solid #D4EDE1;color:#3D9E72;font-size:10px;font-weight:600;padding:5px 9px;border-radius:12px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:3px;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.b-ch{font-family:‘Noto Sans JP’,sans-serif;background:#ffffff;border:1px solid #D4EDE1;color:#3D9E72;font-size:10px;font-weight:600;padding:5px 9px;border-radius:12px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:3px;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media(min-width:769px){.b-ch{font-size:11px;padding:6px 12px;}}
 .b-ch:hover{background:#F0FAF4;border-color:#52B788;}
 
 /* セクション見出し */
-.b-sec{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;margin:10px 0 6px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;color:#1A4A2E;}
+.b-sec{font-family:‘DM Mono’,monospace;font-size:10px;letter-spacing:2.5px;margin:10px 0 6px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;color:#1A4A2E;}
 @media(min-width:769px){.b-sec{margin:20px 0 12px;font-size:11px;letter-spacing:3px;}}
 .b-sec::before,.b-sec::after{content:’’;flex:1;height:1px;background:#52B788;opacity:0.25;max-width:40px;}
 @media(min-width:769px){.b-sec::before,.b-sec::after{max-width:60px;}}
@@ -139,9 +139,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 @media(min-width:769px){.b-c-d{font-size:12px;}}
 .b-c-foot{display:flex;align-items:center;justify-content:space-between;padding-top:5px;border-top:1px solid #E0EDE6;}
 @media(min-width:769px){.b-c-foot{padding-top:8px;}}
-.b-c-meta{font-family:'DM Mono',monospace;font-size:8px;color:#7A9A87;letter-spacing:0.8px;}
+.b-c-meta{font-family:‘DM Mono’,monospace;font-size:8px;color:#7A9A87;letter-spacing:0.8px;}
 @media(min-width:769px){.b-c-meta{font-size:10px;}}
-.b-c-ar{color:#52B788;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;transition:transform 0.2s;}
+.b-c-ar{color:#52B788;font-family:‘DM Mono’,monospace;font-size:10px;font-weight:500;transition:transform 0.2s;}
 @media(min-width:769px){.b-c-ar{font-size:12px;}}
 .b-c:hover .b-c-ar{transform:translateX(3px);color:#1A4A2E;}
 
@@ -161,7 +161,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .b-rc-it:hover{background:#F0FAF4;}
 .b-rc-it-t{font-size:11px;font-weight:500;color:#1A4A2E;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
 @media(min-width:769px){.b-rc-it-t{font-size:13px;}}
-.b-rc-it-d{font-family:'DM Mono',monospace;font-size:8px;color:#7A9A87;letter-spacing:0.5px;flex-shrink:0;}
+.b-rc-it-d{font-family:‘DM Mono’,monospace;font-size:8px;color:#7A9A87;letter-spacing:0.5px;flex-shrink:0;}
 @media(min-width:769px){.b-rc-it-d{font-size:10px;}}
 
 /* TOOLS 3カード */
@@ -176,7 +176,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .b-s-text{flex:1;min-width:0;}
 .b-s-t{font-size:10px;font-weight:700;color:#1A4A2E;line-height:1.3;}
 @media(min-width:769px){.b-s-t{font-size:14px;margin-bottom:2px;line-height:1.25;}}
-.b-s-meta{font-family:'DM Mono',monospace;font-size:8px;color:#7A9A87;letter-spacing:0.3px;}
+.b-s-meta{font-family:‘DM Mono’,monospace;font-size:8px;color:#7A9A87;letter-spacing:0.3px;}
 @media(min-width:769px){.b-s-meta{font-size:10px;}}
 /* クリック無効化（未実装機能用） */
 .nav-disabled{cursor:not-allowed!important;opacity:0.55;pointer-events:none;}
@@ -197,7 +197,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .vm-op-lb{font-size:11px;font-weight:700;color:#1A4A2E;}
 .vm-op.current .vm-op-lb{color:#3D9E72;}
 .vm-ft{padding:12px 18px 16px;border-top:1px solid #D4EDE1;background:#ffffff;display:flex;flex-direction:column;gap:8px;}
-.vm-fn{width:100%;padding:12px;background:#52B788;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background 0.2s;}
+.vm-fn{width:100%;padding:12px;background:#52B788;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;transition:background 0.2s;}
 .vm-fn:hover{background:#3D9E72;}
 .vm-sk{display:block;text-align:center;font-size:12px;color:#7A9A87;cursor:pointer;padding:6px;}
 .vm-sk:hover{color:#3D9E72;}
@@ -228,12 +228,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
     </symbol>
 
 <!-- 電子ハンコ（正方形） -->
+
 <symbol id="stamp-icon" viewBox="0 0 40 40">
   <rect x="6" y="6" width="28" height="28" fill="#ffffff" stroke="#E53935" stroke-width="1.8"/>
   <text x="20" y="24" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-weight="900" font-size="9" font-style="italic" fill="#E53935" letter-spacing="-0.4">Exally</text>
 </symbol>
 
 <!-- 表を読み込む -->
+
 <symbol id="import-icon" viewBox="0 0 40 40">
   <rect x="6" y="10" width="28" height="24" rx="3" fill="#ffffff" stroke="#52B788" stroke-width="1.5"/>
   <line x1="6" y1="17" x2="34" y2="17" stroke="#C8ECD8" stroke-width="1"/>
@@ -245,6 +247,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 </symbol>
 
 <!-- テンプレ -->
+
 <symbol id="template-icon" viewBox="0 0 40 40">
   <rect x="9" y="7" width="22" height="28" rx="3" fill="#ffffff" stroke="#52B788" stroke-width="1.5"/>
   <rect x="14" y="5" width="12" height="6" rx="2" fill="#52B788"/>
@@ -254,6 +257,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 </symbol>
 
 <!-- 数式帳 -->
+
 <symbol id="book-icon" viewBox="0 0 40 40">
   <path d="M6 8 C6 7 7 6 8 6 L18 6 C19 6 20 7 20 8 L20 33 L8 33 C7 33 6 32 6 31 Z" fill="#52B788"/>
   <path d="M20 8 C20 7 21 6 22 6 L32 6 C33 6 34 7 34 8 L34 31 C34 32 33 33 32 33 L20 33 Z" fill="#3D9E72"/>
@@ -267,6 +271,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 </symbol>
 
 <!-- サイドバー小アイコン -->
+
 <symbol id="grid-sm" viewBox="0 0 20 20">
   <rect x="2" y="2" width="16" height="16" rx="2" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
   <rect x="2" y="2" width="16" height="5" rx="2" fill="#52B788"/>
@@ -337,131 +342,134 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 <div class="sc">
   <div class="ct">
 
-    <!-- ヒーロー -->
-    <div class="b-hero">
-      <div class="b-eye">— EXALLY AI</div>
-      <div class="b-ttl">何でも<span class="b-ttl-mint">話しかけて</span>ね。</div>
-      <div class="b-sub">Excelの疑問、日本語でそのまま解決。</div>
-      <div class="b-srch-w">
-        <div class="b-srch">
-          <span class="b-srch-ic">💬</span>
-          <input type="text" id="srchInput" placeholder="例：VLOOKUPの使い方は？" onkeydown="if(event.key==='Enter')gotoChat()">
-          <button class="b-srch-btn" onclick="gotoChat()">→</button>
+```
+<!-- ヒーロー -->
+<div class="b-hero">
+  <div class="b-eye">— EXALLY AI</div>
+  <div class="b-ttl">何でも<span class="b-ttl-mint">話しかけて</span>ね。</div>
+  <div class="b-sub">Excelの疑問、日本語でそのまま解決。</div>
+  <div class="b-srch-w">
+    <div class="b-srch">
+      <span class="b-srch-ic">💬</span>
+      <input type="text" id="srchInput" placeholder="例：VLOOKUPの使い方は？" onkeydown="if(event.key==='Enter')gotoChat()">
+      <button class="b-srch-btn" onclick="gotoChat()">→</button>
+    </div>
+    <div class="b-chips-row">
+      <span class="b-ch" onclick="gotoChatWith('VLOOKUPの使い方を教えて')">📈 VLOOKUP教えて</span>
+      <span class="b-ch" onclick="gotoChatWith('給料明細を作って')">💰 給料明細作って</span>
+      <span class="b-ch" onclick="gotoChatWith('請求書テンプレを作って')">📋 請求書テンプレ</span>
+    </div>
+    <div class="b-chips-row b-chips-row-2">
+      <span class="b-ch" onclick="gotoChatWith('エラーを直したい')">⚠️ エラーを直したい</span>
+      <span class="b-ch" onclick="gotoChatWith('グラフを作って')">📊 グラフを作って</span>
+    </div>
+  </div>
+</div>
+
+<!-- PC: 2カラムグリッド / モバイル: 縦順 -->
+<div class="b-pc-grid">
+
+  <!-- 左カラム: CREATE + TOOLS -->
+  <div class="b-pc-col">
+    <div class="b-sec b-sec-pc">CREATE</div>
+    <div class="b-cs">
+      <div class="b-c" onclick="location.href='book.html'">
+        <div class="b-c-top">
+          <div class="b-c-ic"><svg><use href="#grid-icon"/></svg></div>
+          <div class="b-c-text">
+            <div class="b-c-tt">ブックを作る</div>
+            <div class="b-c-d">AIと一緒にExcelを作成</div>
+          </div>
         </div>
-        <div class="b-chips-row">
-          <span class="b-ch" onclick="gotoChatWith('VLOOKUPの使い方を教えて')">📈 VLOOKUP教えて</span>
-          <span class="b-ch" onclick="gotoChatWith('給料明細を作って')">💰 給料明細作って</span>
-          <span class="b-ch" onclick="gotoChatWith('請求書テンプレを作って')">📋 請求書テンプレ</span>
+        <div class="b-c-foot">
+          <span class="b-c-meta">NEW / BLANK</span>
+          <span class="b-c-ar">OPEN →</span>
         </div>
-        <div class="b-chips-row b-chips-row-2">
-          <span class="b-ch" onclick="gotoChatWith('エラーを直したい')">⚠️ エラーを直したい</span>
-          <span class="b-ch" onclick="gotoChatWith('グラフを作って')">📊 グラフを作って</span>
+      </div>
+      <div class="b-c nav-disabled">
+        <div class="b-c-top">
+          <div class="b-c-ic"><svg><use href="#import-icon"/></svg></div>
+          <div class="b-c-text">
+            <div class="b-c-tt">表を読み込む</div>
+            <div class="b-c-d">xlsx・画像・CSVを分析</div>
+          </div>
+        </div>
+        <div class="b-c-foot">
+          <span class="b-c-meta">XLSX / CSV / IMG</span>
+          <span class="b-c-ar">OPEN →</span>
         </div>
       </div>
     </div>
 
-    <!-- PC: 2カラムグリッド / モバイル: 縦順 -->
-    <div class="b-pc-grid">
-
-      <!-- 左カラム: CREATE + TOOLS -->
-      <div class="b-pc-col">
-        <div class="b-sec b-sec-pc">CREATE</div>
-        <div class="b-cs">
-          <div class="b-c" onclick="location.href='book.html'">
-            <div class="b-c-top">
-              <div class="b-c-ic"><svg><use href="#grid-icon"/></svg></div>
-              <div class="b-c-text">
-                <div class="b-c-tt">ブックを作る</div>
-                <div class="b-c-d">AIと一緒にExcelを作成</div>
-              </div>
-            </div>
-            <div class="b-c-foot">
-              <span class="b-c-meta">NEW / BLANK</span>
-              <span class="b-c-ar">OPEN →</span>
-            </div>
-          </div>
-          <div class="b-c nav-disabled">
-            <div class="b-c-top">
-              <div class="b-c-ic"><svg><use href="#import-icon"/></svg></div>
-              <div class="b-c-text">
-                <div class="b-c-tt">表を読み込む</div>
-                <div class="b-c-d">xlsx・画像・CSVを分析</div>
-              </div>
-            </div>
-            <div class="b-c-foot">
-              <span class="b-c-meta">XLSX / CSV / IMG</span>
-              <span class="b-c-ar">OPEN →</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="b-sec b-sec-pc" style="margin-top:22px;">TOOLS</div>
-        <div class="b-ss">
-          <div class="b-s" onclick="location.href='template.html'">
-            <div class="b-s-ic"><svg><use href="#template-icon"/></svg></div>
-            <div class="b-s-text">
-              <div class="b-s-t">テンプレ</div>
-              <div class="b-s-meta">— 12種類</div>
-            </div>
-          </div>
-          <div class="b-s nav-disabled">
-            <div class="b-s-ic"><svg><use href="#stamp-icon"/></svg></div>
-            <div class="b-s-text">
-              <div class="b-s-t">電子判子<br>作成</div>
-              <div class="b-s-meta">— PDF対応</div>
-            </div>
-          </div>
-          <div class="b-s" onclick="location.href='chat.html?tab=book'">
-            <div class="b-s-ic"><svg><use href="#book-icon"/></svg></div>
-            <div class="b-s-text">
-              <div class="b-s-t">数式帳</div>
-              <div class="b-s-meta">— 0件保存</div>
-            </div>
-          </div>
+    <div class="b-sec b-sec-pc" style="margin-top:22px;">TOOLS</div>
+    <div class="b-ss">
+      <div class="b-s" onclick="location.href='template.html'">
+        <div class="b-s-ic"><svg><use href="#template-icon"/></svg></div>
+        <div class="b-s-text">
+          <div class="b-s-t">テンプレ</div>
+          <div class="b-s-meta">— 12種類</div>
         </div>
       </div>
-
-      <!-- 右カラム: RECENT -->
-      <div class="b-pc-col">
-        <div class="b-sec b-sec-pc">RECENT</div>
-        <div class="b-rc-hd">
-          <div class="b-rc-t">最近使ったファイル</div>
-          <span class="b-rc-m">すべて見る →</span>
-        </div>
-        <div class="b-rc-list">
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">売上管理.xlsx</div>
-            <div class="b-rc-it-d">TODAY</div>
-          </div>
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">給料明細_4月.xlsx</div>
-            <div class="b-rc-it-d">YESTERDAY</div>
-          </div>
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">顧客リスト.xlsx</div>
-            <div class="b-rc-it-d">3 DAYS AGO</div>
-          </div>
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">請求書_山田商事.xlsx</div>
-            <div class="b-rc-it-d">1 WEEK AGO</div>
-          </div>
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">経費精算_3月.xlsx</div>
-            <div class="b-rc-it-d">1 WEEK AGO</div>
-          </div>
-          <div class="b-rc-it nav-disabled">
-            <div class="b-rc-it-t">シフト表_4月.xlsx</div>
-            <div class="b-rc-it-d">2 WEEKS AGO</div>
-          </div>
+      <div class="b-s nav-disabled">
+        <div class="b-s-ic"><svg><use href="#stamp-icon"/></svg></div>
+        <div class="b-s-text">
+          <div class="b-s-t">電子判子<br>作成</div>
+          <div class="b-s-meta">— PDF対応</div>
         </div>
       </div>
-
+      <div class="b-s" onclick="location.href='chat.html?tab=book'">
+        <div class="b-s-ic"><svg><use href="#book-icon"/></svg></div>
+        <div class="b-s-text">
+          <div class="b-s-t">数式帳</div>
+          <div class="b-s-meta">— 0件保存</div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- 右カラム: RECENT -->
+  <div class="b-pc-col">
+    <div class="b-sec b-sec-pc">RECENT</div>
+    <div class="b-rc-hd">
+      <div class="b-rc-t">最近使ったファイル</div>
+      <span class="b-rc-m">すべて見る →</span>
+    </div>
+    <div class="b-rc-list">
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">売上管理.xlsx</div>
+        <div class="b-rc-it-d">TODAY</div>
+      </div>
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">給料明細_4月.xlsx</div>
+        <div class="b-rc-it-d">YESTERDAY</div>
+      </div>
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">顧客リスト.xlsx</div>
+        <div class="b-rc-it-d">3 DAYS AGO</div>
+      </div>
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">請求書_山田商事.xlsx</div>
+        <div class="b-rc-it-d">1 WEEK AGO</div>
+      </div>
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">経費精算_3月.xlsx</div>
+        <div class="b-rc-it-d">1 WEEK AGO</div>
+      </div>
+      <div class="b-rc-it nav-disabled">
+        <div class="b-rc-it-t">シフト表_4月.xlsx</div>
+        <div class="b-rc-it-d">2 WEEKS AGO</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+```
 
   </div>
 </div>
 
 <!-- モバイル固定ボトムナビ（8項目） -->
+
 <nav class="bn">
   <button class="bn-i active"><span class="bn-ic"><span class="bn-ic-emoji">🏠</span></span><span class="bn-lb">ホーム</span></button>
   <button class="bn-i" onclick="location.href='chat.html'"><span class="bn-ic"><span class="bn-ic-emoji">🤖</span></span><span class="bn-lb">AI</span></button>
@@ -575,5 +583,6 @@ function gotoChatWith(q){
   location.href='chat.html?q='+encodeURIComponent(q);
 }
 </script>
+
 </body>
 </html>
