@@ -448,7 +448,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 transition:background 0.2s;
 }
 #ai-float-btn:hover { background:#2E8A5F; }
@@ -510,7 +510,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 }
 
 #ai-response-area { flex:1; max-height:none !important; overflow-y:auto; }
@@ -522,9 +522,9 @@ font-family:‘Noto Sans JP’,sans-serif;
 .arg-orange{color:#E8843A;font-weight:600;}
 .arg-purple{color:#9B5DE5;font-weight:600;}
 .arg-green{color:#2E9E6B;font-weight:600;}
-.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:‘DM Mono’,monospace;font-size:11px;padding:4px 8px;border-radius:6px;margin:4px 0;white-space:pre-wrap;word-break:break-all;line-height:1.4;display:block;width:fit-content;max-width:420px;}
-.inline-code{font-family:‘DM Mono’,monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
-.copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
+.formula-block{background:#C8ECD8;color:#1A4A2E;font-family:'DM Mono',monospace;font-size:11px;padding:4px 8px;border-radius:6px;margin:4px 0;white-space:pre-wrap;word-break:break-all;line-height:1.4;display:block;width:fit-content;max-width:420px;}
+.inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
+.copy-btn{background:#C8ECD8;border:none;color:#1A4A2E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
 .copy-btn:hover{background:#3D9E72;color:white;}
 .ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
 .ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;user-select:text;}
@@ -607,7 +607,7 @@ padding:6px 1px 5px;
 cursor:pointer;
 border:none;
 background:none;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#7A9A87;
 text-decoration:none;
 }
@@ -702,7 +702,7 @@ border-radius:12px;
 box-shadow:0 4px 20px rgba(61,158,114,0.18);
 z-index:200;
 overflow:hidden;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 display:none;
 }
 #explain-popup.show { display:block; }
@@ -752,7 +752,7 @@ border-radius:6px;
 background:#fff;
 color:#3D9E72;
 font-size:12px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 cursor:pointer;
 font-weight:600;
 }
@@ -772,7 +772,7 @@ display:none;
 .ctx-item {
 padding:8px 16px;
 font-size:13px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#1A2B22;
 cursor:pointer;
 display:flex;
@@ -801,7 +801,7 @@ z-index:500;
 align-items:center;
 gap:6px;
 box-shadow:0 2px 12px rgba(61,158,114,0.4);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 }
 #ai-panel-wrap {
 position:fixed !important;
@@ -958,7 +958,7 @@ border:1px solid #C8ECD8;
 border-radius:7px;
 padding:3px 5px;
 font-size:16px; /* iOSズーム防止 - 16px未満でタップするとpanningが起きる */
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 resize:none;
 outline:none;
 color:#1A2B22;
@@ -1008,7 +1008,7 @@ background:#fff;
 border:1px solid #C8ECD8;
 border-radius:6px;
 font-size:15px;
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:'Noto Sans JP',sans-serif;
 color:#1A2B22;
 cursor:pointer;
 touch-action:manipulation;
@@ -1085,7 +1085,7 @@ display:inline-flex;
 align-items:center;
 justify-content:center;
 width:30px; height:28px;
-font-family:‘Times New Roman’, serif;
+font-family:'Times New Roman', serif;
 font-style:italic;
 font-weight:700;
 color:#52B788;
@@ -1470,6 +1470,81 @@ function _scheduleRecalc(sheet,data){
   clearTimeout(_recalcTimer[sheet]);
   _recalcTimer[sheet]=setTimeout(function(){ recalcSheet(sheet,data); render(); },150);
 }
+
+// ===== Exally テンプレから受信した JSON を Sheet1 に描画 =====
+// 受信データ構造: {source, version, sheets:[{name, cells:[{r,c,v,style?}], colWidths:[], rowHeights:{}}]}
+function receivePasteData(pasteData) {
+  try {
+    if (!pasteData || !pasteData.sheets || !pasteData.sheets[0]) {
+      throw new Error('データ構造が不正です');
+    }
+    var sheet = pasteData.sheets[0];
+    var cells = sheet.cells || [];
+
+    // Sheet1 をクリア（複数回遷移でも累積しないように）
+    sheets[0].data = {};
+    sheets[0].colW = {};
+    sheets[0].rowH = {};
+    sheets[0].hiddenRows = {};
+    sheets[0].hiddenCols = {};
+
+    // 書式プロパティのマッピング（bg のみキー名を bgColor に変換）
+    var styleKeyMap = {
+      bold:'bold', italic:'italic', underline:'underline', strike:'strike', wrap:'wrap',
+      color:'color', bg:'bgColor', align:'align', fontSize:'fontSize',
+      numFmt:'numFmt', border:'border'
+    };
+
+    // Sheet1 をアクティブに
+    activeSheet = 0;
+
+    // セル書き込み（noUndo=true で Undo スタックを汚染しない）
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      setCell(cell.r, cell.c, cell.v, true);
+      if (cell.style) {
+        var key = cell.r + ',' + cell.c;
+        var existing = sheets[0].data[key] || {};
+        var skeys = Object.keys(cell.style);
+        for (var j = 0; j < skeys.length; j++) {
+          var sk = skeys[j];
+          var targetKey = styleKeyMap[sk] || sk;
+          existing[targetKey] = cell.style[sk];
+        }
+        sheets[0].data[key] = existing;
+      }
+    }
+
+    // 列幅適用（配列 → オブジェクト）
+    if (Array.isArray(sheet.colWidths)) {
+      for (var ci = 0; ci < sheet.colWidths.length; ci++) {
+        if (sheet.colWidths[ci]) sheets[0].colW[ci] = sheet.colWidths[ci];
+      }
+    }
+
+    // 行高さ適用（オブジェクト → オブジェクト）
+    if (sheet.rowHeights && typeof sheet.rowHeights === 'object') {
+      var rkeys = Object.keys(sheet.rowHeights);
+      for (var ri = 0; ri < rkeys.length; ri++) {
+        sheets[0].rowH[parseInt(rkeys[ri], 10)] = sheet.rowHeights[rkeys[ri]];
+      }
+    }
+
+    // Undo/Redo スタックをクリア（過去の操作履歴を消す）
+    undoStack = [];
+    redoStack = [];
+
+    // 即時 render（_scheduleRecalc も 150ms 後に recalc+render 自動実行）
+    render();
+
+    return true;
+  } catch (e) {
+    alert('⚠️ テンプレの受信に失敗しました：' + (e && e.message ? e.message : '不明なエラー'));
+    console.error('[Exally] receivePasteData error:', e);
+    return false;
+  }
+}
+
 function render(){
   if(_renderPending) return;
   _renderPending=true;
@@ -2319,14 +2394,12 @@ function detectTimePattern(values){
     </symbol>
 
 <!-- 電子ハンコ（正方形） -->
-
 <symbol id="stamp-icon" viewBox="0 0 40 40">
   <rect x="6" y="6" width="28" height="28" fill="#ffffff" stroke="#E53935" stroke-width="1.8"/>
   <text x="20" y="24" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-weight="900" font-size="9" font-style="italic" fill="#E53935" letter-spacing="-0.4">Exally</text>
 </symbol>
 
 <!-- 表を読み込む -->
-
 <symbol id="import-icon" viewBox="0 0 40 40">
   <rect x="6" y="10" width="28" height="24" rx="3" fill="#ffffff" stroke="#52B788" stroke-width="1.5"/>
   <line x1="6" y1="17" x2="34" y2="17" stroke="#C8ECD8" stroke-width="1"/>
@@ -2338,7 +2411,6 @@ function detectTimePattern(values){
 </symbol>
 
 <!-- テンプレ -->
-
 <symbol id="template-icon" viewBox="0 0 40 40">
   <rect x="9" y="7" width="22" height="28" rx="3" fill="#ffffff" stroke="#52B788" stroke-width="1.5"/>
   <rect x="14" y="5" width="12" height="6" rx="2" fill="#52B788"/>
@@ -2348,7 +2420,6 @@ function detectTimePattern(values){
 </symbol>
 
 <!-- 数式帳 -->
-
 <symbol id="book-icon" viewBox="0 0 40 40">
   <path d="M6 8 C6 7 7 6 8 6 L18 6 C19 6 20 7 20 8 L20 33 L8 33 C7 33 6 32 6 31 Z" fill="#52B788"/>
   <path d="M20 8 C20 7 21 6 22 6 L32 6 C33 6 34 7 34 8 L34 31 C34 32 33 33 32 33 L20 33 Z" fill="#3D9E72"/>
@@ -2362,7 +2433,6 @@ function detectTimePattern(values){
 </symbol>
 
 <!-- サイドバー小アイコン -->
-
 <symbol id="grid-sm" viewBox="0 0 20 20">
   <rect x="2" y="2" width="16" height="16" rx="2" fill="#ffffff" stroke="#3D9E72" stroke-width="1.5"/>
   <rect x="2" y="2" width="16" height="5" rx="2" fill="#52B788"/>
@@ -5155,16 +5225,18 @@ document.addEventListener('DOMContentLoaded', function(){
   if(pal){
     pal.addEventListener('keydown', function(e){ if(e.key==='Escape') closeFnPalette(); });
   }
-  // Exally テンプレから渡された JSON を受信（D2：読み取り確認のみ・画面反映は D3 以降）
+  // Exally テンプレから渡された JSON を受信して Sheet1 に描画
   try {
     var pasteRaw = localStorage.getItem('exally_paste_data');
     if(pasteRaw){
       var pasteData = JSON.parse(pasteRaw);
-      alert('✅ テンプレからデータを受信したよ\n\n' + pasteData.sheets[0].cells.length + '個のセル（' + Math.round(pasteRaw.length/1024*10)/10 + ' KB）');
-      localStorage.removeItem('exally_paste_data');
+      var ok = receivePasteData(pasteData);
+      if(ok) localStorage.removeItem('exally_paste_data');
+      // エラー時は removeItem しない（ユーザーがリロードすれば再試行できるように）
     }
   } catch(e) {
     console.error('[Exally] Paste data load failed:', e);
+    alert('⚠️ テンプレの受信に失敗しました：' + (e && e.message ? e.message : '不明なエラー'));
   }
 });
 // 外部クリックで閉じる（mousedown で判定して、カテゴリ再描画の影響回避）
