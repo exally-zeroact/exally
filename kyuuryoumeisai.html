@@ -254,8 +254,6 @@ body{padding-bottom:80px;}
 .mbb-item-icon svg{width:18px;height:18px;}
 .mbb-item-label{font-size:9px;font-weight:500;}
 
-/* 旧 .guide-panel を完全非表示に（中身はサイドバーに移植済み） */
-.guide-panel{display:none!important;}
 .gp-sec{padding:14px 16px;border-bottom:1px solid #F0FAF4;}
 .gp-sec:last-child{border-bottom:none;}
 .gp-title{font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;margin-bottom:8px;}
@@ -482,40 +480,6 @@ body{padding-bottom:80px;}
 
 <div class="main">
 <div class="layout-wrap">
-
-<!-- PC：左ガイドパネル -->
-<div class="guide-panel">
-  <div class="gp-sec">
-    <div class="gp-title">✨ このテンプレでできること</div>
-    <div class="feat-list">
-      <div class="feat-item"><div class="feat-main">📅 月給・時給</div><div class="feat-sub">両方対応</div></div>
-      <div class="feat-item"><div class="feat-main">🔢 自動計算</div><div class="feat-sub">控除も計算式付き</div></div>
-      <div class="feat-item"><div class="feat-main">👥 複数人対応</div><div class="feat-sub">最大3人分</div></div>
-      <div class="feat-item"><div class="feat-main">💰 控除明細</div><div class="feat-sub">透明性のある明細</div></div>
-    </div>
-  </div>
-  <div class="gp-sec">
-    <div class="gp-title">📋 使い方</div>
-    <div class="gp-steps">
-      <div class="gp-step"><div class="gp-num">1</div><div class="gp-text"><b>項目を設定する</b><small>支給・控除項目を入力するだけ</small></div></div>
-      <div class="gp-hints"><div class="gp-hint">💡 項目はドラッグで並び替えできるよ</div><div class="gp-hint">🔢 値タップで計算式や説明を確認・変更OK</div></div>
-      <div class="gp-step"><div class="gp-num">2</div><div class="gp-text"><b>プレビューで確認する</b><small>実際の明細イメージで確認できる</small></div></div>
-      <div class="gp-step"><div class="gp-num">3</div><div class="gp-text"><b>Excelに貼り付ける</b><small>A1セルを選択して貼り付け</small></div></div>
-    </div>
-  </div>
-  <div class="gp-sec">
-    <button class="gp-preview-btn" onclick="document.getElementById('stickyCta').querySelector('button').click()">👁 プレビューを確認する</button>
-  </div>
-  <div class="gp-sec">
-    <div class="gp-title">📊 Excelで印刷するには</div>
-    <div class="xl-steps">
-      <div class="xl-step"><div class="xl-step-lbl">STEP 1</div><div class="xl-step-main">A1セルに貼り付ける</div><div class="xl-pat">A1をクリック → <b>Ctrl+V</b></div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 2</div><div class="xl-step-main">A4サイズに設定する</div><div class="xl-pat"><b>ページレイアウト</b>→用紙サイズ→<b>A4</b></div><div class="xl-point">📄 点線が現れる＝印刷範囲の目安</div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 3</div><div class="xl-step-main">列幅を調整する</div><div class="xl-pat">👆 <b>まずこれ：</b>境界線をダブルクリック</div><div class="xl-pat">📐 <b>細かく：</b>ドラッグ or 右クリック→列の幅</div><div class="xl-pat">🗜 <b>全体収める：</b>印刷→1ページに収める</div></div>
-      <div class="xl-step"><div class="xl-step-lbl">STEP 4</div><div class="xl-step-main">印刷プレビューで最終確認</div><div class="xl-pat"><b>ファイル</b>→印刷→プレビュー確認</div></div>
-    </div>
-  </div>
-</div>
 
 <!-- フォームパネル -->
 <div class="form-panel">
