@@ -53,10 +53,16 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
   .header-back{font-size:10px;padding:3px 9px;}
 }
 .main{max-width:600px;margin:0 auto;padding:16px 16px;}
-.type-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
 .type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
 @media(max-width:480px){.type-tab{padding:9px 4px;font-size:11px;}}
 .type-tab.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
+.sub-tabs-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.sub-tab-label{font-size:11px;color:#8A9A8E;white-space:nowrap;}
+.sub-tab{padding:6px 12px;border-radius:20px;border:1.5px solid #C8D4CC;background:#fff;font-size:12px;font-weight:700;color:#3A4A42;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;}
+.sub-tab:hover{border-color:#52B788;}
+.sub-tab.active{background:#3D9E72;border-color:#3D9E72;color:#fff;}
+.sub-tab:disabled{opacity:0.35;cursor:not-allowed;}
 .step-guide{background:#fff;border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
 .step-guide-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
 .step-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--mint-bg);}
@@ -482,6 +488,16 @@ body{padding-bottom:80px;}
     <button class="type-tab" onclick="switchType('hourly')">⏰ 時給制</button>
     <button class="type-tab" onclick="switchType('daily')">📆 日当制</button>
   </div>
+  <div class="sub-tabs-row">
+    <span class="sub-tab-label">レイアウト</span>
+    <button class="sub-tab active" id="layout-A" onclick="switchLayout('A')">A縦型</button>
+    <button class="sub-tab" id="layout-B" onclick="switchLayout('B')">B横型</button>
+    <span class="sub-tab-label" style="margin-left:8px;">人数</span>
+    <button class="sub-tab active" id="ninzu-1" onclick="switchNinzu(1)">1人</button>
+    <button class="sub-tab" id="ninzu-2" onclick="switchNinzu(2)">2人</button>
+    <button class="sub-tab" id="ninzu-3" onclick="switchNinzu(3)">3人</button>
+    <button class="sub-tab" id="ninzu-4" onclick="switchNinzu(4)">4人</button>
+  </div>
   <div class="step-guide">
     <div class="step-guide-title">使い方</div>
     <div class="step-row"><div class="step-num">1</div><div class="step-text">☰ をドラッグして項目を並び替える</div></div>
@@ -620,7 +636,7 @@ body{padding-bottom:80px;}
 const MONTHLY = window.MONTHLY;
 const HOURLY  = window.HOURLY;
 const DAILY   = window.DAILY;
-let cType='monthly',active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
+let cType='monthly',cLayout='A',cNinzu=1,active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
 function base(){return cType==='monthly'?MONTHLY:cType==='hourly'?HOURLY:DAILY;}
 
 function init(){
@@ -642,6 +658,30 @@ function switchType(t){
     :'⚠️ <strong>日当制</strong>でも時間外労働は25%増し（×1.25）が法定義務です。残業代 = 日当 ÷ 所定時間 × 1.25 × 残業時間。';
   document.getElementById('resultEl').classList.remove('show');
   init();
+}
+
+function switchLayout(l){
+  cLayout=l;
+  ['A','B'].forEach(function(x){
+    var el=document.getElementById('layout-'+x);
+    if(el) el.classList.toggle('active', x===l);
+  });
+  // Bは3人まで・4人を無効化
+  var btn4=document.getElementById('ninzu-4');
+  if(btn4){
+    btn4.disabled=(l==='B');
+    if(l==='B' && cNinzu===4) switchNinzu(3);
+  }
+  if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
+}
+
+function switchNinzu(n){
+  cNinzu=n;
+  [1,2,3,4].forEach(function(x){
+    var el=document.getElementById('ninzu-'+x);
+    if(el) el.classList.toggle('active', x===n);
+  });
+  if(document.getElementById('resultEl').classList.contains('show')) renderExcelPreview();
 }
 
 function flashRow(itemId){
@@ -1348,7 +1388,11 @@ function generateTSV(){
 // JSON データ生成：buildAllRows を呼んで JSON 形式で返す（UI 更新なし）
 function generateJsonData(){
   const tsv = buildAllRows();
-  return parseTsvToJson(tsv);
+  const data = parseTsvToJson(tsv);
+  data.layout  = cLayout;
+  data.ninzu   = cNinzu;
+  data.payType = cType;
+  return data;
 }
 
 // TSV 文字列を JSON 形式（{r, c, v, style} のセル配列）に変換
@@ -1768,10 +1812,8 @@ function renderExcelPreview(){
   if(!el)return;
 
   const paperLabel=getPaperLabel();
-  const isLandscape=paperLabel.includes('横');
-  const is2=paperLabel.includes('2人');
-  const is3=paperLabel.includes('3人');
-  const peopleCount=is3?3:is2?2:1;
+  const isLandscape=(cLayout==='B');
+  const peopleCount=cNinzu;
   const isCompact=(peopleCount===3 && !isLandscape);
 
   const payItems=active.filter(i=>i.type==='pay');
@@ -1816,6 +1858,52 @@ function renderExcelPreview(){
         </table>
       </div>`;
   }
+
+  // ===== レイアウトB：支給・控除 左右2列並び =====
+  function oneSheetB(personLabel){
+    const payRows=payItems.map(i=>`
+      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
+        <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
+        <span style="font-size:9px;color:#2E7D54;font-family:'DM Mono',monospace;">¥—</span>
+      </div>`).join('');
+    const dedRows=dedItems.map(i=>`
+      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
+        <span style="font-size:9px;color:#C62828;">${i.label}</span>
+        <span style="font-size:9px;color:#C62828;font-family:'DM Mono',monospace;">¥—</span>
+      </div>`).join('');
+    return `
+      <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">
+        <div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.8);">${personLabel}</span>
+        </div>
+        <div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;">
+          <span>会社名：＿＿</span><span>氏名：＿＿</span><span>2026年○月分</span>
+        </div>
+        ${infoItems.length?`<div style="background:#F0FAF4;padding:3px 10px;font-size:8px;color:#3D9E72;border-bottom:1px solid #C8ECD8;">⏱ ${infoItems.map(function(i){return i.label;}).join('　')}</div>`:''}
+        <div style="display:flex;border-bottom:1.5px solid #C8ECD8;">
+          <div style="flex:1;padding:5px 8px;border-right:1px solid #E0EDE6;">
+            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;border-bottom:1px solid #E0EDE6;margin-bottom:3px;">💰 支給</div>
+            ${payRows}
+            <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;">
+              <span style="font-size:9px;font-weight:700;color:#1A2B22;">総支給額</span>
+              <span style="font-size:9px;font-weight:700;color:#2E7D54;font-family:'DM Mono',monospace;">¥——</span>
+            </div>
+          </div>
+          <div style="flex:1;padding:5px 8px;">
+            <div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;border-bottom:1px solid #E0EDE6;margin-bottom:3px;">🔻 控除</div>
+            ${dedRows}
+            <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;">
+              <span style="font-size:9px;font-weight:700;color:#1A2B22;">控除合計</span>
+              <span style="font-size:9px;font-weight:700;color:#C62828;font-family:'DM Mono',monospace;">¥——</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:#F8FEFC;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:#1A2B22;">差引支給額</span>
+          <span style="font-size:12px;font-weight:700;color:#3D9E72;font-family:'DM Mono',monospace;">¥———</span>
+        </div>
+      </div>`;}
 
   // ===== コンパクトレイアウト（A4縦・3人分のみ） =====
   function oneSheetCompact(personLabel){
@@ -1882,34 +1970,44 @@ function renderExcelPreview(){
   const perf=`<div style="border-top:2px dashed #52B788;margin:6px 0;position:relative;text-align:center;"><span style="position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:13px;background:#F8FEFC;padding:0 4px;color:#52B788;">✂</span></div>`;
 
   let sheetsHTML='';
+  const fn = isLandscape ? oneSheetB : (isCompact ? oneSheetCompact : oneSheet);
+  const perf2=`<div style="border-top:1.5px dashed #C8ECD8;margin:4px 0;text-align:center;font-size:9px;color:#B0C4BA;">✂</div>`;
 
   if(peopleCount===1){
     const maxW = isLandscape ? '480px' : '340px';
-    sheetsHTML=`<div style="max-width:${maxW};margin:0 auto;">${oneSheetCompact('')}</div>`;
+    sheetsHTML=`<div style="max-width:${maxW};margin:0 auto;">${fn('')}</div>`;
   } else if(peopleCount===2 && isLandscape){
     sheetsHTML=`
       <div style="display:flex;gap:6px;">
-        ${oneSheetCompact('1人目')}
+        ${fn('1人目')}
         <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
-        ${oneSheetCompact('2人目')}
+        ${fn('2人目')}
       </div>
       <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して左右2名分に</div>`;
   } else if(peopleCount===2){
     sheetsHTML=`
       <div style="display:flex;flex-direction:column;gap:0;">
-        ${oneSheetCompact('1人目')}
-        ${perf}
-        ${oneSheetCompact('2人目')}
+        ${fn('1人目')}
+        ${perf2}
+        ${fn('2人目')}
       </div>
       <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して上下2名分に</div>`;
+  } else if(peopleCount===4){
+    sheetsHTML=`
+      <div style="display:flex;gap:4px;">
+        <div style="display:flex;flex-direction:column;gap:0;flex:1;">${fn('1人目')}${perf2}${fn('2人目')}</div>
+        <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+        <div style="display:flex;flex-direction:column;gap:0;flex:1;">${fn('3人目')}${perf2}${fn('4人目')}</div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 切り離して4名分に</div>`;
   } else {
     sheetsHTML=`
       <div style="display:flex;flex-direction:column;gap:0;">
-        ${oneSheetCompact('氏名 1')}
-        ${perf}
-        ${oneSheetCompact('氏名 2')}
-        ${perf}
-        ${oneSheetCompact('氏名 3')}
+        ${fn('氏名 1')}
+        ${perf2}
+        ${fn('氏名 2')}
+        ${perf2}
+        ${fn('氏名 3')}
       </div>
       <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:6px;">✂️ 点線で切り離して3名分に配布</div>`;
   }
@@ -2278,7 +2376,10 @@ function renderPaperPreview(){
     </div>`;
 }
 
-function getPaperLabel(){return PAPER_OPTIONS[deliverType][paperIdx]?.label||'A4縦・1人分';}
+function getPaperLabel(){
+  var nin=cNinzu===1?'1人分':cNinzu===2?'2人分':cNinzu===3?'3人分':'4人分';
+  return (cLayout==='A'?'A縦型':'B横型')+'・'+nin;
+}
 
 // sp-preview-row の sticky top を header 高さに動的に合わせる
 function updateStickyTop(){
@@ -2299,6 +2400,13 @@ function updateStickyTopThrottled(){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
+  // URLパラメータでlayout初期設定（?layout=A or ?layout=B）
+  try{
+    var params = new URLSearchParams(location.search);
+    var lp = params.get('layout');
+    if(lp==='B') switchLayout('B');
+    else switchLayout('A');
+  }catch(e){}
   renderPaperOptions();
   document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
   init();
