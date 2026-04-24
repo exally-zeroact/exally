@@ -54,6 +54,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .main{max-width:600px;margin:0 auto;padding:16px 12px;}
 .type-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .type-tab{padding:12px;border-radius:var(--radius-md);border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
+@media(max-width:480px){.type-tab{padding:9px 4px;font-size:11px;}}
 .type-tab.active{border-color:var(--mint);background:var(--mint-bg);color:var(--mint-dd);}
 .step-guide{background:#fff;border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
 .step-guide-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
