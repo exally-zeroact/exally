@@ -63,13 +63,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 @media(min-width:769px){.ct{max-width:1080px;padding:28px 40px 40px;width:100%;}}
 
 /* モバイル固定ボトムナビ */
-.bn{position:absolute;bottom:0;left:0;right:0;display:flex;background:#ffffff;border-top:1px solid #D4EDE1;padding:3px 0 max(3px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center;gap:0;z-index:40;}
-.bn-i{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 1px;border:none;background:none;cursor:pointer;color:#2E4038;font-family:'Noto Sans JP',sans-serif;min-width:35px;flex:1;}
+.bn{position:absolute;bottom:0;left:0;right:0;display:flex;background:#ffffff;border-top:1px solid #D4EDE1;padding-bottom:env(safe-area-inset-bottom);justify-content:space-around;align-items:center;gap:0;z-index:40;}
+.bn-i{display:flex;flex-direction:column;align-items:center;gap:0;padding:6px 1px 5px;border:none;background:none;cursor:pointer;color:#2E4038;font-family:'Noto Sans JP',sans-serif;min-width:35px;flex:1;}
 .bn-i.active{color:#2E4038;font-weight:700;}
 .bn-ic{display:inline-flex;align-items:center;justify-content:center;height:16px;}
 .bn-ic svg{width:15px;height:15px;}
-.bn-ic-emoji{font-size:14px;line-height:1;}
-.bn-lb{font-size:8px;font-weight:700;letter-spacing:-0.4px;white-space:nowrap;}
+.bn-ic-emoji{font-size:15px;line-height:1;}
+.bn-lb{font-size:9px;font-weight:700;letter-spacing:-0.3px;margin-top:2px;white-space:nowrap;}
 @media(min-width:769px){.bn{display:none;}}
 
 /* ========== ヒーロー ========== */
