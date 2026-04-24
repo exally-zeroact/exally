@@ -48,6 +48,23 @@ window.HOURLY = [
   {id:'h_income',label:'所得税',sub:'給与にかかる国税（年末調整あり）',type:'deduct',cat:'控除',default:true,canRemove:true,value:'=課税所得×源泉税額表',formula:'=課税所得×源泉税額表',title:'所得税の計算式（時給制）',desc:'給与から社会保険料を引いた金額と扶養人数をもとに、国税庁の源泉徴収税額表で金額が決まるよ。',why:'給与から社会保険料を引いた金額がどの範囲かを国税庁の税額表で調べて、その金額をそのまま使うんだよ。従業員ごとの扶養人数・都道府県はExcelの設定エリアで変更してね。年末調整で最終的な金額に精算されるから安心してね。',rates:null},
 ];
 
+// ----- 日当制の項目定義 -----
+window.DAILY = [
+  {id:'d_teiji', label:'1日所定時間', type:'info', cat:'勤怠', default:true, canRemove:false, value:'8時間',   formula:null, title:null, rates:null},
+  {id:'d_attend',label:'出勤日数',    type:'info', cat:'勤怠', default:true, canRemove:false, value:'20日',    formula:null, title:null, rates:null},
+  {id:'d_ot_h',  label:'残業時間',   type:'info', cat:'勤怠', default:true, canRemove:true,  value:'0時間',   formula:null, title:null, rates:null},
+  {id:'d_mid_h', label:'深夜時間',   type:'info', cat:'勤怠', default:false,canRemove:true,  value:'0時間',   formula:null, title:null, rates:null},
+  {id:'d_wage',  label:'日当',       type:'pay',  cat:'支給', default:true, canRemove:false, value:'¥15,000', formula:'手入力', title:'日当', desc:'1日あたりの賃金です。出勤日数をかけて基本給を計算します。', why:'日当×出勤日数=基本給。残業代は日当÷所定時間×1.25×残業時間で計算します。', rates:[{key:'wage',label:'日当',val:15000,unit:'円',hint:'会社で設定',fmt:v=>'¥'+Math.round(v).toLocaleString(),toD:v=>Math.round(v),frD:v=>parseInt(v)}]},
+  {id:'d_base',  label:'基本給（日当×出勤日数）', type:'pay', cat:'支給', default:true, canRemove:false, value:'=日当×出勤日数', formula:'=ROUND(日当*出勤日数,0)', title:'基本給（日当制）の計算式', desc:'日当に出勤日数をかけた金額です。', why:'日当制では実際に出勤した日数分だけ給与が発生します。', rates:null},
+  {id:'d_ot',    label:'残業代（日当制）', type:'pay', cat:'支給', default:true, canRemove:true, value:'=日当÷所定時間×1.25×残業時間', formula:'=ROUND(日当/1日所定時間*1.25*残業時間,0)', title:'残業代（日当制）の計算式', desc:'日当を所定時間で割った時給換算額に、割増率と残業時間をかけます。', why:'日当制でも時間外労働は25%割増が法律で義務付けられています。', rates:[{key:'rate',label:'残業割増率',val:1.25,unit:'倍',hint:'法定最低 1.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'d_mid',   label:'深夜手当（日当制）', type:'pay', cat:'支給', default:false, canRemove:true, value:'=日当÷所定時間×0.25×深夜時間', formula:'=ROUND(日当/1日所定時間*0.25*深夜時間,0)', title:'深夜手当（日当制）の計算式', desc:'日当÷所定時間で時給換算し、0.25倍×深夜時間分を追加します。', why:'日当制も深夜割増（0.25倍）の義務があります。', rates:[{key:'rate',label:'深夜割増率',val:0.25,unit:'倍',hint:'法定最低 0.25倍',fmt:v=>v.toFixed(2)+'倍',toD:v=>v,frD:v=>parseFloat(v)}]},
+  {id:'d_transport',label:'交通費', type:'pay', cat:'支給', default:true, canRemove:true, value:'¥15,000', formula:'手入力', title:'交通費', desc:'通勤実費を支給します。非課税限度額は月15万円です。', why:'月15万円を超える交通費は給与として課税されます。', rates:null},
+  {id:'d_health', label:'健康保険', sub:'病院代が安くなる保険',    type:'deduct',cat:'控除',default:true, canRemove:true, value:'=支給合計×4.955%',        formula:'=ROUND(支給合計*0.04955,0)',  title:'健康保険料（日当制）', desc:'支給合計に保険料率をかけた金額を天引きします。', why:'週30時間以上（または一定条件）勤務のパートは社会保険加入が必要です。', rates:[{key:'rate',label:'従業員負担率',val:0.04955,unit:'%',hint:'東京協会けんぽ2025年度: 4.955%',fmt:v=>(v*100).toFixed(3)+'%',toD:v=>(v*100).toFixed(3),frD:v=>parseFloat(v)/100}]},
+  {id:'d_pension', label:'厚生年金', sub:'将来の年金のための積立',  type:'deduct',cat:'控除',default:true, canRemove:true, value:'=支給合計×9.15%（全国一律）',formula:'=ROUND(支給合計*0.0915,0)',   title:'厚生年金（日当制）', desc:'全国一律18.3%。会社と折半するため従業員負担は9.15%です。', why:'料率は法律で固定されています。', rates:[{key:'rate',label:'従業員負担率（固定）',val:0.0915,unit:'%',hint:'法定固定値 変更不可',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100,ro:true}]},
+  {id:'d_employ',  label:'雇用保険', sub:'失業したときの給付金',    type:'deduct',cat:'控除',default:true, canRemove:true, value:'=支給合計×0.55%',         formula:'=ROUND(支給合計*0.0055,0)',  title:'雇用保険料（日当制）', desc:'週20時間以上勤務であれば加入が必要です。', why:'2025年度の雇用保険料率（一般事業）は従業員負担0.55%です。', rates:[{key:'rate',label:'従業員負担率',val:0.0055,unit:'%',hint:'一般事業2025年度: 0.55%',fmt:v=>(v*100).toFixed(2)+'%',toD:v=>(v*100).toFixed(2),frD:v=>parseFloat(v)/100}]},
+  {id:'d_income',  label:'所得税',   sub:'給与にかかる国税（年末調整あり）', type:'deduct',cat:'控除',default:true, canRemove:true, value:'=課税所得×源泉税額表', formula:'=課税所得×源泉税額表', title:'所得税の計算式（日当制）', desc:'給与から社会保険料を引いた金額と扶養人数をもとに、国税庁の源泉徴収税額表で金額が決まるよ。', why:'給与から社会保険料を引いた金額がどの範囲かを国税庁の税額表で調べて、その金額をそのまま使うんだよ。', rates:null},
+];
+
 // ----- 業種プリセット -----
 window.GYOSHU_PRESETS = {
   '飲食・サービス': {icon:'🍳', on:['mid_h','midnight','lunch','perfect'],               label:['深夜時間','深夜手当','食事代控除','皆勤手当']},
