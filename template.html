@@ -76,7 +76,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F8FEFC;-webkit-font-smoot
 .tmpl-sub2{font-size:11px;color:#3D9E72;margin-bottom:18px;line-height:1.6;font-weight:500;}
 @media(min-width:769px){.tmpl-sub2{font-size:13px;}}
 .tmpl-grid-payslip{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;}
-@media(min-width:600px){.tmpl-grid-payslip{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:600px){.tmpl-grid-payslip{display:none;}}
 .tmpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;}
 @media(min-width:600px){.tmpl-grid{grid-template-columns:repeat(3,1fr);}}
 .tmpl-card{background:#fff;border-radius:16px;overflow:hidden;border:1.5px solid #E0EDE6;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(30,60,40,0.07);}
@@ -274,8 +274,15 @@ function renderGallery(){
   }
 
   var payslipIds = ['payslip_a','payslip_b'];
-  payslipGrid.innerHTML = TEMPLATES.filter(function(t){ return payslipIds.indexOf(t.id)!==-1; }).map(makeCard).join('');
-  grid.innerHTML = TEMPLATES.filter(function(t){ return payslipIds.indexOf(t.id)===-1; }).map(makeCard).join('');
+  if(window.innerWidth >= 600){
+    // デスクトップ：全カードを1つのグリッドに
+    payslipGrid.innerHTML = '';
+    grid.innerHTML = TEMPLATES.map(makeCard).join('');
+  } else {
+    // モバイル：給料明細行を分離（2fr 3fr）
+    payslipGrid.innerHTML = TEMPLATES.filter(function(t){ return payslipIds.indexOf(t.id)!==-1; }).map(makeCard).join('');
+    grid.innerHTML = TEMPLATES.filter(function(t){ return payslipIds.indexOf(t.id)===-1; }).map(makeCard).join('');
+  }
 }
 
 // ===== iframe開閉 =====
