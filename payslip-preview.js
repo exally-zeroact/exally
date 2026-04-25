@@ -171,7 +171,7 @@ function makeACard(person, diffFontSize) {
     // 控除
     + secHdr('控 除') + dedRows + totalRow('控除合計', _yen(person.dedTotal))
     // フッター
-    + '<div style="padding:3px 8px;text-align:right;font-size:8px;color:' + c.gray + ';">2026年4月</div>'
+
     + '</div>';
 }
 
@@ -247,13 +247,20 @@ function renderPayslipPreview(el, layout, ninzu, activeItems) {
     var cards   = people.map(function(p) { return makeBCard(p, compact, df); });
     html = cards.join(perf);
   } else {
-    // A縦型: 横並び
+    // A縦型: 横並び（PDF比率準拠）
     var df = PAYSLIP_LAYOUT.A.diffFont[ninzu] || 11;
+    // PDF仕様: 1人=40%中央, 2人=40%+gap10%, 3人=28%+gap6%, 4人=23.75%+gap1%
+    var widths = {1:'40%', 2:'40%', 3:'28%', 4:'23.75%'};
+    var gaps   = {1:'0px', 2:'6px',  3:'4px',  4:'2px'};
+    var w = widths[ninzu] || '25%';
+    var g = gaps[ninzu]   || '4px';
     if (ninzu === 1) {
-      html = '<div style="max-width:280px;margin:0 auto;">' + makeACard(people[0], df) + '</div>';
+      html = '<div style="width:40%;margin:0 auto;">' + makeACard(people[0], df) + '</div>';
     } else {
-      var parts = people.map(function(p) { return makeACard(p, df); });
-      html = '<div style="display:flex;gap:0;align-items:stretch;">'
+      var parts = people.map(function(p) {
+        return '<div style="flex:0 0 ' + w + ';min-width:0;">' + makeACard(p, df) + '</div>';
+      });
+      html = '<div style="display:flex;gap:' + g + ';align-items:stretch;">'
         + parts.join(sep)
         + '</div>';
     }
