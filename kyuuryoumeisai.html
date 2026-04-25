@@ -530,22 +530,6 @@ body{padding-bottom:80px;}
         <button class="custom-add-btn" onclick="addCustom()">＋ 追加する</button>
       </div>
     </div>
-    <div class="paper-sec">
-      <div class="sec-label" style="margin-top:4px;">渡し方・用紙サイズ</div>
-      <div style="margin-bottom:14px;">
-        <div class="paper-step-label">STEP 1｜どうやって渡しますか？</div>
-        <div class="paper-row">
-          <button class="paper-chip active" id="deliver-paper" onclick="setDeliver('paper')">📄 紙で手渡し・封筒配布</button>
-          <button class="paper-chip" id="deliver-pdf" onclick="setDeliver('pdf')">💻 PDFでメール・電子配信</button>
-        </div>
-      </div>
-      <div>
-        <div class="paper-step-label">STEP 2｜用紙サイズを選んでください</div>
-        <div class="paper-rank-list" id="paperRankList"></div>
-        <div class="paper-note" id="paperNote"></div>
-        <div id="paperPreview" style="margin-top:14px;"></div>
-      </div>
-    </div>
     <div class="result-sec" id="resultEl">
 
       <!-- Excelプレビュー（下部・スクロールして確認） -->
@@ -2370,7 +2354,6 @@ document.addEventListener('DOMContentLoaded',function(){
     if(lp==='B') switchLayout('B');
     else switchLayout('A');
   }catch(e){}
-  renderPaperOptions();
   document.getElementById('noticeEl').innerHTML='⚠️ <strong>深夜手当（22時〜翌5時）</strong>は25%増しが法定義務。料率は社保組合・自治体により異なります。';
   init();
   updateFitCheck();
