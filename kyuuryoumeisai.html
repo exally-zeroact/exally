@@ -92,7 +92,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .dh:hover,.dh:active{color:var(--mint);background:var(--mint-bg);cursor:grabbing;}
 .item-name{font-size:13px;font-weight:700;color:var(--text-primary);line-height:1.3;}
 .item-name small{display:block;font-size:10px;color:var(--text-muted);font-weight:400;margin-top:2px;}
-.item-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);word-break:break-all;max-width:150px;}
+.item-val{font-family:monospace;font-size:11px;color:var(--text-secondary);word-break:break-all;max-width:150px;}
 .item-val.fc{color:#555;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background 0.15s;}
 .item-val.fc:hover{background:var(--mint-bg);}
 .fc-tip{font-size:9px;color:var(--mint);margin-left:3px;opacity:0.8;}
@@ -103,7 +103,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .net-cell{background:#F8FEFC;border-top:2px solid #3D9E72;padding:4px 8px;cursor:pointer;}
 .net-cell-inner{display:flex;justify-content:space-between;align-items:center;height:44px;padding:0 8px;}
 .net-label{font-size:14px;font-weight:700;color:var(--text-primary);}
-.net-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--mint-d);}
+.net-val{font-family:monospace;font-size:14px;font-weight:700;color:var(--mint-d);}
 .subtotal-row td{padding:0 !important;border-bottom:none;}
 .subtotal-cell{padding:4px 8px;}
 .subtotal-cell-inner{display:flex;justify-content:space-between;align-items:center;height:44px;padding:0 8px;}
@@ -112,7 +112,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 .subtotal-label{font-size:14px;font-weight:700;}
 .subtotal-row.pay-sub .subtotal-label{color:#2E7D54;}
 .subtotal-row.deduct-sub .subtotal-label{color:#C62828;}
-.subtotal-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;}
+.subtotal-val{font-family:monospace;font-size:14px;font-weight:700;}
 .subtotal-row.pay-sub .subtotal-val{color:#2E7D54;}
 .subtotal-row.deduct-sub .subtotal-val{color:#C62828;}
 .deduct-notice{background:var(--red-bg);border-radius:var(--radius-md);padding:12px 14px;font-size:11px;color:#7A3A3A;line-height:1.8;border:1px solid var(--red-border);}
@@ -171,14 +171,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:#F4F7F5;color:#1A2B22;min-
 @keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .pop-close{float:right;width:32px;height:32px;border-radius:50%;background:var(--mint-bg);border:none;font-size:16px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;}
 .pop-title{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;padding-top:4px;clear:both;}
-.pop-formula{font-family:'DM Mono',monospace;font-size:12px;color:var(--mint-d);background:var(--mint-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:10px;word-break:break-all;}
+.pop-formula{font-family:monospace;font-size:12px;color:var(--mint-d);background:var(--mint-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:10px;word-break:break-all;}
 .pop-desc{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:8px;}
 .pop-why{font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;}
 .pop-edit{margin-bottom:14px;}
 .pop-edit-title{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:1px;}
 .pop-rate-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px;background:var(--mint-bg);border-radius:var(--radius-md);}
 .pop-rate-label{font-size:12px;font-weight:700;color:var(--text-secondary);flex:1;}
-.pop-rate-inp{width:90px;padding:7px 10px;border:1.5px solid var(--mint-border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Mono',monospace;color:var(--text-primary);outline:none;text-align:right;}
+.pop-rate-inp{width:90px;padding:7px 10px;border:1.5px solid var(--mint-border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace;color:var(--text-primary);outline:none;text-align:right;}
 .pop-rate-inp:focus{border-color:var(--mint);}
 .pop-rate-unit{font-size:11px;color:var(--text-muted);min-width:20px;}
 .pop-btns{display:flex;gap:8px;margin-top:4px;}
@@ -904,7 +904,7 @@ function openPop(id){
     document.getElementById('popWhy').textContent='例）残業時間×時給×1.25 のような計算式を設定すると、Excelで自動計算されます。';
     document.getElementById('popEdit').style.display='block';
     const ratesEl=document.getElementById('popRates');
-    ratesEl.innerHTML=`<div style="margin-bottom:8px;"><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:6px;">よく使う数式例（タップで入力）</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"><button onclick="setCustomFormula('=基本給/160*1.25*残業時間')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">残業代</button><button onclick="setCustomFormula('=支給合計*0.04955')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">健保料率</button><button onclick="setCustomFormula('=IF(欠勤日数=0,5000,0)')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">皆勤手当</button><button onclick="setCustomFormula('=基本給/所定日数*出勤日数')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">日割計算</button></div><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:4px;">数式を直接入力</div><div style="display:flex;gap:6px;align-items:center;"><input id="customFormulaInput" type="text" placeholder="例：=基本給*0.05" style="flex:1;padding:9px 11px;border:1.5px solid #C8ECD8;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;outline:none;color:#1A2B22;" value="${item.formula&&item.formula!=='手入力'?item.formula:''}"><button onclick="applyCustomFormula()" style="padding:9px 14px;background:#52B788;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">設定</button></div></div>`;
+    ratesEl.innerHTML=`<div style="margin-bottom:8px;"><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:6px;">よく使う数式例（タップで入力）</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"><button onclick="setCustomFormula('=基本給/160*1.25*残業時間')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">残業代</button><button onclick="setCustomFormula('=支給合計*0.04955')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">健保料率</button><button onclick="setCustomFormula('=IF(欠勤日数=0,5000,0)')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">皆勤手当</button><button onclick="setCustomFormula('=基本給/所定日数*出勤日数')" style="padding:5px 10px;background:#F0FAF4;border:1px solid #C8ECD8;border-radius:8px;font-size:11px;color:#3D9E72;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">日割計算</button></div><div style="font-size:11px;font-weight:700;color:#3D9E72;margin-bottom:4px;">数式を直接入力</div><div style="display:flex;gap:6px;align-items:center;"><input id="customFormulaInput" type="text" placeholder="例：=基本給*0.05" style="flex:1;padding:9px 11px;border:1.5px solid #C8ECD8;border-radius:8px;font-size:13px;font-family:monospace;outline:none;color:#1A2B22;" value="${item.formula&&item.formula!=='手入力'?item.formula:''}"><button onclick="applyCustomFormula()" style="padding:9px 14px;background:#52B788;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">設定</button></div></div>`;
     const sw=document.getElementById('manualSwitchWrap');const rw=document.getElementById('manualRestoreWrap');const ab=document.getElementById('applyBtn');
     const isM=manualItems[id];
     if(sw)sw.style.display=isM?'none':'block';if(rw)rw.style.display=isM?'block':'none';if(ab)ab.style.display='none';
@@ -1387,12 +1387,153 @@ function generateTSV(){
 
 // JSON データ生成：buildAllRows を呼んで JSON 形式で返す（UI 更新なし）
 function generateJsonData(){
-  const tsv = buildAllRows();
-  const data = parseTsvToJson(tsv);
-  data.layout  = cLayout;
-  data.ninzu   = cNinzu;
-  data.payType = cType;
-  return data;
+  var infoItems=active.filter(function(i){return i.type==='info';});
+  var payItems =active.filter(function(i){return i.type==='pay';});
+  var dedItems =active.filter(function(i){return i.type==='deduct';});
+  var cells=[],colWidths=[],rowHeights={};
+
+  function C(r,c,v,s){var o={r:r,c:c,v:(v===undefined||v===null)?'':v};if(s)o.style=s;cells.push(o);}
+
+  // スタイル定数
+  var sH  ={bold:true,bg:'#3D9E72',color:'#fff'};
+  var sHR ={bold:true,bg:'#3D9E72',color:'#fff',align:'right'};
+  var sSec={bold:true,bg:'#F0FAF4',color:'#3D9E72'};
+  var sDL ={bold:true};
+  var sDV ={bold:true,fontSize:16,color:'#3D9E72',align:'right'};
+  var sTL ={bold:true};
+  var sTV ={bold:true,align:'right'};
+  var sVR ={align:'right'};
+  var sSm ={fontSize:9,color:'#8A9A8E'};
+  var sSmR={fontSize:9,color:'#8A9A8E',align:'right'};
+
+  // 0-indexed列番号 → A1列名
+  function cn(c){var s='',n=c+1;while(n>0){s=String.fromCharCode(64+(n%26||26))+s;n=Math.floor((n-1)/26);}return s;}
+
+  if(cLayout==='B'){
+    // ===== B横型: 支給|控除 左右2列 / 複数人は縦積み =====
+    colWidths=[120,90,10,120,90];
+    var maxB=Math.max(payItems.length,dedItems.length,1);
+    var attR=Math.max(1,Math.ceil(infoItems.length/5));
+    var rpp=3+1+attR+1+maxB+1+1;
+
+    for(var p=0;p<cNinzu;p++){
+      var rb=p*(rpp+1),r=rb;
+
+      // ヘッダー2行
+      C(r,0,'給料明細',sH);C(r,1,'',{bg:'#3D9E72'});C(r,2,'',{bg:'#3D9E72'});C(r,3,'',{bg:'#3D9E72'});C(r,4,'2026年○月',sHR);
+      rowHeights[r]=24;r++;
+      C(r,0,'○○株式会社',sH);C(r,1,'',{bg:'#3D9E72'});C(r,2,'',{bg:'#3D9E72'});C(r,3,'',{bg:'#3D9E72'});C(r,4,'氏名：',sHR);
+      rowHeights[r]=20;r++;
+
+      // 差引支給額（後で数式を入れる）
+      var diffR=r;
+      C(r,0,'差引支給額',sDL);C(r,1,'');C(r,2,'');C(r,3,'');C(r,4,'',sDV);
+      rowHeights[r]=32;r++;
+
+      // 勤怠
+      C(r,0,'勤 怠',sSec);C(r,1,'',{bg:'#F0FAF4'});C(r,2,'',{bg:'#F0FAF4'});C(r,3,'',{bg:'#F0FAF4'});C(r,4,'',{bg:'#F0FAF4'});
+      rowHeights[r]=18;r++;
+      var af=0;
+      for(var ai=0;ai<infoItems.length;ai+=5){
+        for(var aj=0;aj<5&&(ai+aj)<infoItems.length;aj++) C(r,aj,infoItems[ai+aj].label+' 0',sSm);
+        rowHeights[r]=16;r++;af++;
+      }
+      while(af<attR){rowHeights[r]=16;r++;af++;}
+
+      // 支給|控除 セクションラベル
+      C(r,0,'支 給',sSec);C(r,1,'',{bg:'#F0FAF4'});C(r,2,'');C(r,3,'控 除',sSec);C(r,4,'',{bg:'#F0FAF4'});
+      rowHeights[r]=22;r++;
+
+      // 本体
+      var ps=r;
+      for(var i=0;i<maxB;i++){
+        var pi=payItems[i],di=dedItems[i];
+        C(r,0,pi?pi.label:'');C(r,1,pi?'0':'',sVR);C(r,2,'');C(r,3,di?di.label:'');C(r,4,di?'0':'',sVR);
+        rowHeights[r]=22;r++;
+      }
+      var pe=r-1;
+
+      // 合計
+      var sp='=SUM('+cn(1)+(ps+1)+':'+cn(1)+(pe+1)+')';
+      var sd='=SUM('+cn(4)+(ps+1)+':'+cn(4)+(pe+1)+')';
+      C(r,0,'総支給額',sTL);C(r,1,sp,sTV);C(r,2,'');C(r,3,'控除合計',sTL);C(r,4,sd,sTV);
+      rowHeights[r]=22;
+      // 差引数式を更新
+      var tR=r+1;
+      var df='='+cn(1)+tR+'-'+cn(4)+tR;
+      for(var ci=0;ci<cells.length;ci++){if(cells[ci].r===diffR&&cells[ci].c===4){cells[ci].v=df;break;}}
+      r++;
+
+      // フッター
+      C(r,4,'2026年4月',sSmR);rowHeights[r]=16;
+    }
+
+  } else {
+    // ===== A縦型: 支給縦一列→控除縦一列 / 複数人は横並び =====
+    // 1人分4列[label1(120),val1(90),label2(120),val2(90)] + ギャップ1列(20)
+    var stride=5;
+    for(var p=0;p<cNinzu;p++){colWidths.push(120,90,120,90);if(p<cNinzu-1)colWidths.push(20);}
+
+    // 行位置（全人数共通）
+    var attPairs=Math.max(1,Math.ceil(infoItems.length/2));
+    var R_H1=0,R_H2=1,R_DF=2;
+    var R_AS=3,R_AV=4,R_AE=R_AV+attPairs-1;
+    var R_SP=R_AE+2,R_PS=R_SP+1,R_PE=R_PS+payItems.length-1,R_PT=R_PE+1;
+    var R_DS=R_PT+2,R_DI=R_DS+1,R_DE=R_DI+dedItems.length-1,R_DT=R_DE+1;
+    var R_FT=R_DT+1;
+
+    // 行高さ
+    rowHeights[R_H1]=24;rowHeights[R_H2]=20;rowHeights[R_DF]=32;
+    rowHeights[R_AS]=20;
+    for(var i=0;i<attPairs;i++) rowHeights[R_AV+i]=16;
+    rowHeights[R_AE+1]=8;rowHeights[R_SP]=22;
+    for(var i=0;i<payItems.length;i++) rowHeights[R_PS+i]=22;
+    rowHeights[R_PT]=22;rowHeights[R_PT+1]=8;rowHeights[R_DS]=22;
+    for(var i=0;i<dedItems.length;i++) rowHeights[R_DI+i]=22;
+    rowHeights[R_DT]=22;rowHeights[R_FT]=16;
+
+    for(var p=0;p<cNinzu;p++){
+      var co=p*stride,vc=co+1;
+
+      // ヘッダー
+      C(R_H1,co,'給料明細',sH);C(R_H1,co+1,'',{bg:'#3D9E72'});C(R_H1,co+2,'',{bg:'#3D9E72'});C(R_H1,co+3,'2026年○月',sHR);
+      C(R_H2,co,'○○株式会社',sH);C(R_H2,co+1,'',{bg:'#3D9E72'});C(R_H2,co+2,'氏名：',sH);C(R_H2,co+3,'',sHR);
+
+      // 差引支給額
+      var dfF='='+cn(vc)+(R_PT+1)+'-'+cn(vc)+(R_DT+1);
+      C(R_DF,co,'差引支給額',sDL);C(R_DF,co+1,dfF,sDV);C(R_DF,co+2,'');C(R_DF,co+3,'');
+
+      // 勤怠
+      C(R_AS,co,'勤 怠',sSec);C(R_AS,co+1,'',{bg:'#F0FAF4'});C(R_AS,co+2,'',{bg:'#F0FAF4'});C(R_AS,co+3,'',{bg:'#F0FAF4'});
+      for(var ai=0;ai<infoItems.length;ai+=2){
+        var ar=R_AV+Math.floor(ai/2);
+        var la=infoItems[ai],lb=infoItems[ai+1];
+        C(ar,co,la.label,sSm);C(ar,co+1,'0',sSmR);
+        C(ar,co+2,lb?lb.label:'',sSm);C(ar,co+3,lb?'0':'',sSmR);
+      }
+
+      // 支給
+      C(R_SP,co,'支 給',sSec);C(R_SP,co+1,'',{bg:'#F0FAF4'});C(R_SP,co+2,'',{bg:'#F0FAF4'});C(R_SP,co+3,'',{bg:'#F0FAF4'});
+      for(var i=0;i<payItems.length;i++){C(R_PS+i,co,payItems[i].label);C(R_PS+i,co+1,'',sVR);}
+      var pSum=payItems.length>0?'=SUM('+cn(vc)+(R_PS+1)+':'+cn(vc)+(R_PE+1)+')':'0';
+      C(R_PT,co,'総支給額',sTL);C(R_PT,co+1,pSum,sTV);
+
+      // 控除
+      C(R_DS,co,'控 除',sSec);C(R_DS,co+1,'',{bg:'#F0FAF4'});C(R_DS,co+2,'',{bg:'#F0FAF4'});C(R_DS,co+3,'',{bg:'#F0FAF4'});
+      for(var i=0;i<dedItems.length;i++){C(R_DI+i,co,dedItems[i].label);C(R_DI+i,co+1,'',sVR);}
+      var dSum=dedItems.length>0?'=SUM('+cn(vc)+(R_DI+1)+':'+cn(vc)+(R_DE+1)+')':'0';
+      C(R_DT,co,'控除合計',sTL);C(R_DT,co+1,dSum,sTV);
+
+      // フッター
+      C(R_FT,co+3,'2026年4月',sSmR);
+    }
+  }
+
+  return {
+    source:'kyuuryoumeisai',version:'2.0',
+    layout:cLayout,ninzu:cNinzu,payType:cType,
+    sheets:[{name:'給料明細',cells:cells,colWidths:colWidths,rowHeights:rowHeights}]
+  };
 }
 
 // TSV 文字列を JSON 形式（{r, c, v, style} のセル配列）に変換
@@ -1821,106 +1962,82 @@ function renderExcelPreview(){
   const infoItems=active.filter(i=>i.type==='info');
 
   // ===== 通常レイアウト（1人・2人・横向き） =====
+  function fmtAmt(n){ return (n&&n>0)?'\u00a5'+Math.round(n).toLocaleString():'\u00a5—'; }
+
+  function getAmt(item){
+    if(!item) return 0;
+    try{ return calcItemAmount(item, {basic:250000, payTotal:MONTHLY_AMOUNT||250000})||0; }
+    catch(e){ return 0; }
+  }
+
   function oneSheet(personLabel){
-    const infoRows=infoItems.map(i=>`
-      <tr>
-        <td style="padding:2px 6px;font-size:10px;color:#4A6B5A;border-bottom:1px solid #E8F5EE;width:55%;">${i.label}</td>
-        <td style="padding:2px 6px;font-size:10px;color:#7A9A87;border-bottom:1px solid #E8F5EE;text-align:right;">—</td>
-      </tr>`).join('');
-    const payRows=payItems.map(i=>`
-      <tr>
-        <td style="padding:2px 6px;font-size:10px;color:#1A2B22;border-bottom:1px solid #E8F5EE;">${i.label}</td>
-        <td style="padding:2px 6px;font-size:10px;color:#2E7D54;border-bottom:1px solid #E8F5EE;text-align:right;font-family:'DM Mono',monospace;">¥—</td>
-      </tr>`).join('');
-    const dedRows=dedItems.map(i=>`
-      <tr>
-        <td style="padding:2px 6px;font-size:10px;color:#C62828;border-bottom:1px solid #E8F5EE;">${i.label}</td>
-        <td style="padding:2px 6px;font-size:10px;color:#C62828;border-bottom:1px solid #E8F5EE;text-align:right;font-family:'DM Mono',monospace;">¥—</td>
-      </tr>`).join('');
-    return `
-      <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">
-        <div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span>
-          <span style="font-size:9px;color:rgba(255,255,255,0.8);">${personLabel}</span>
-        </div>
-        <div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;">
-          <span>会社名：＿＿＿＿</span><span>氏名：＿＿＿＿</span><span>2026年○月分</span>
-        </div>
-        <table style="width:100%;border-collapse:collapse;">
-          ${infoRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">⏱ 勤怠</td></tr>${infoRows}`:''}
-          <tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#2E7D54;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">💰 支給</td></tr>
-          ${payRows}
-          ${dedRows.length?`<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#C62828;background:#FFF5F5;border-bottom:1px solid #FFCDD2;">🔻 控除</td></tr>${dedRows}`:''}
-          <tr style="background:#F8FEFC;">
-            <td style="padding:5px 6px;font-size:10px;font-weight:700;color:#1A2B22;border-top:2px solid #3D9E72;">差引支給額</td>
-            <td style="padding:5px 6px;font-size:11px;font-weight:700;color:#3D9E72;text-align:right;border-top:2px solid #3D9E72;font-family:'DM Mono',monospace;">¥———</td>
-          </tr>
-        </table>
-      </div>`;
+    var payTotal=0, dedTotal=0;
+    var pay=active.filter(function(i){return i.type==='pay';});
+    var ded=active.filter(function(i){return i.type==='deduct';});
+    var inf=active.filter(function(i){return i.type==='info';});
+    pay.forEach(function(i){payTotal+=getAmt(i);});
+    var ctx={basic:payTotal||250000, payTotal:payTotal};
+    var dedAmts={};
+    ded.forEach(function(i){var v=0;try{v=calcItemAmount(i,ctx)||0;}catch(e){}dedAmts[i.id]=v;dedTotal+=v;});
+    var payAmts={};
+    pay.forEach(function(i){payAmts[i.id]=getAmt(i);});
+    var infoRows=inf.map(function(i){return '<tr><td style="padding:2px 6px;font-size:10px;color:#4A6B5A;border-bottom:1px solid #E8F5EE;width:55%;">'+i.label+'</td><td style="padding:2px 6px;font-size:10px;color:#8A9A8E;border-bottom:1px solid #E8F5EE;text-align:right;">—</td></tr>';}).join('');
+    var payRows=pay.map(function(i){return '<tr><td style="padding:2px 6px;font-size:10px;color:#1A2B22;border-bottom:1px solid #E8F5EE;">'+i.label+'</td><td style="padding:2px 6px;font-size:10px;color:#3A4A42;border-bottom:1px solid #E8F5EE;text-align:right;font-family:monospace;">'+fmtAmt(payAmts[i.id])+'</td></tr>';}).join('');
+    var dedRows=ded.map(function(i){return '<tr><td style="padding:2px 6px;font-size:10px;color:#3A4A42;border-bottom:1px solid #E8F5EE;">'+i.label+'</td><td style="padding:2px 6px;font-size:10px;color:#3A4A42;border-bottom:1px solid #E8F5EE;text-align:right;font-family:monospace;">'+fmtAmt(dedAmts[i.id])+'</td></tr>';}).join('');
+    return '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">'+
+      '<div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span><span style="font-size:9px;color:rgba(255,255,255,0.8);">'+personLabel+'</span></div>'+
+      '<div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;"><span>会社名：＿＿＿＿</span><span>氏名：＿＿＿＿</span><span>2026年○月分</span></div>'+
+      '<table style="width:100%;border-collapse:collapse;">'+
+      (infoRows?'<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">⏱ 勤怠</td></tr>'+infoRows:'')+
+      '<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">💰 支給</td></tr>'+payRows+
+      '<tr><td colspan="2" style="padding:2px 6px;font-size:9px;font-weight:700;color:#3D9E72;border-bottom:1px solid #C8ECD8;text-align:right;">総支給額 '+fmtAmt(payTotal)+'</td></tr>'+
+      (dedRows?'<tr><td colspan="2" style="padding:3px 6px;font-size:9px;font-weight:700;color:#3D9E72;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">控 除</td></tr>'+dedRows+'<tr><td colspan="2" style="padding:2px 6px;font-size:9px;color:#3A4A42;border-bottom:1px solid #C8ECD8;text-align:right;">控除合計 '+fmtAmt(dedTotal)+'</td></tr>':'')+
+      '<tr style="background:#F8FEFC;"><td style="padding:5px 6px;font-size:10px;font-weight:700;color:#1A2B22;border-top:2px solid #3D9E72;">差引支給額</td><td style="padding:5px 6px;font-size:11px;font-weight:700;color:#3D9E72;text-align:right;border-top:2px solid #3D9E72;font-family:monospace;">'+fmtAmt(payTotal-dedTotal)+'</td></tr>'+
+      '</table></div>';
   }
 
   // ===== レイアウトB：支給・控除 左右2列並び =====
   function oneSheetB(personLabel){
-    const payRows=payItems.map(i=>`
-      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
-        <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
-        <span style="font-size:9px;color:#2E7D54;font-family:'DM Mono',monospace;">¥—</span>
-      </div>`).join('');
-    const dedRows=dedItems.map(i=>`
-      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
-        <span style="font-size:9px;color:#C62828;">${i.label}</span>
-        <span style="font-size:9px;color:#C62828;font-family:'DM Mono',monospace;">¥—</span>
-      </div>`).join('');
-    return `
-      <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">
-        <div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span>
-          <span style="font-size:9px;color:rgba(255,255,255,0.8);">${personLabel}</span>
-        </div>
-        <div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;">
-          <span>会社名：＿＿</span><span>氏名：＿＿</span><span>2026年○月分</span>
-        </div>
-        ${infoItems.length?`<div style="background:#F0FAF4;padding:3px 10px;font-size:8px;color:#3D9E72;border-bottom:1px solid #C8ECD8;">⏱ ${infoItems.map(function(i){return i.label;}).join('　')}</div>`:''}
-        <div style="display:flex;border-bottom:1.5px solid #C8ECD8;">
-          <div style="flex:1;padding:5px 8px;border-right:1px solid #E0EDE6;">
-            <div style="font-size:8px;font-weight:700;color:#2E7D54;padding:2px 0 4px;border-bottom:1px solid #E0EDE6;margin-bottom:3px;">💰 支給</div>
-            ${payRows}
-            <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;">
-              <span style="font-size:9px;font-weight:700;color:#1A2B22;">総支給額</span>
-              <span style="font-size:9px;font-weight:700;color:#2E7D54;font-family:'DM Mono',monospace;">¥——</span>
-            </div>
-          </div>
-          <div style="flex:1;padding:5px 8px;">
-            <div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;border-bottom:1px solid #E0EDE6;margin-bottom:3px;">🔻 控除</div>
-            ${dedRows}
-            <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;">
-              <span style="font-size:9px;font-weight:700;color:#1A2B22;">控除合計</span>
-              <span style="font-size:9px;font-weight:700;color:#C62828;font-family:'DM Mono',monospace;">¥——</span>
-            </div>
-          </div>
-        </div>
-        <div style="background:#F8FEFC;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:10px;font-weight:700;color:#1A2B22;">差引支給額</span>
-          <span style="font-size:12px;font-weight:700;color:#3D9E72;font-family:'DM Mono',monospace;">¥———</span>
-        </div>
-      </div>`;}
+    var payTotal=0, dedTotal=0;
+    var pay=active.filter(function(i){return i.type==='pay';});
+    var ded=active.filter(function(i){return i.type==='deduct';});
+    var inf=active.filter(function(i){return i.type==='info';});
+    pay.forEach(function(i){payTotal+=getAmt(i);});
+    var ctx={basic:payTotal||250000, payTotal:payTotal};
+    var dedAmts={};
+    ded.forEach(function(i){var v=0;try{v=calcItemAmount(i,ctx)||0;}catch(e){}dedAmts[i.id]=v;dedTotal+=v;});
+    var payAmts={};
+    pay.forEach(function(i){payAmts[i.id]=getAmt(i);});
+    var payRows=pay.map(function(i){return '<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">'+i.label+'</span><span style="font-size:9px;color:#3A4A42;font-family:monospace;">'+fmtAmt(payAmts[i.id])+'</span></div>';}).join('');
+    var dedRows=ded.map(function(i){return '<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;"><span style="font-size:9px;color:#4A6B5A;">'+i.label+'</span><span style="font-size:9px;color:#3A4A42;font-family:monospace;">'+fmtAmt(dedAmts[i.id])+'</span></div>';}).join('');
+    return '<div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;flex:1;min-width:0;">'+
+      '<div style="background:#3D9E72;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;">給 料 明 細 書</span><span style="font-size:9px;color:rgba(255,255,255,0.8);">'+personLabel+'</span></div>'+
+      '<div style="background:#F0FAF4;padding:5px 10px;display:flex;justify-content:space-between;font-size:9px;color:#4A6B5A;border-bottom:1px solid #C8ECD8;"><span>会社名：＿＿</span><span>氏名：＿＿</span><span>2026年○月分</span></div>'+
+      (inf.length?'<div style="background:#F0FAF4;padding:3px 10px;font-size:8px;color:#3D9E72;border-bottom:1px solid #C8ECD8;">⏱ '+inf.map(function(i){return i.label;}).join('　')+'</div>':'')+
+      '<div style="display:flex;border-bottom:1.5px solid #C8ECD8;">'+
+      '<div style="flex:1;padding:5px 8px;border-right:1px solid #E0EDE6;"><div style="font-size:8px;font-weight:700;color:#3D9E72;background:#F0FAF4;padding:2px 0 4px;border-bottom:1px solid #C8ECD8;margin-bottom:3px;">支 給</div>'+payRows+
+      '<div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;"><span style="font-size:9px;font-weight:700;color:#1A2B22;">総支給額</span><span style="font-size:9px;font-weight:700;color:#3A4A42;font-family:monospace;">'+fmtAmt(payTotal)+'</span></div></div>'+
+      '<div style="flex:1;padding:5px 8px;"><div style="font-size:8px;font-weight:700;color:#3D9E72;background:#F0FAF4;padding:2px 0 4px;border-bottom:1px solid #C8ECD8;margin-bottom:3px;">控 除</div>'+dedRows+
+      '<div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:2px;"><span style="font-size:9px;font-weight:700;color:#1A2B22;">控除合計</span><span style="font-size:9px;font-weight:700;color:#3A4A42;font-family:monospace;">'+fmtAmt(dedTotal)+'</span></div></div></div>'+
+      '<div style="background:#F8FEFC;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;font-weight:700;color:#1A2B22;">差引支給額</span><span style="font-size:12px;font-weight:700;color:#3D9E72;font-family:monospace;">'+fmtAmt(payTotal-dedTotal)+'</span></div></div>';
+  }
 
   // ===== コンパクトレイアウト（A4縦・3人分のみ） =====
   function oneSheetCompact(personLabel){
     const attendCols=infoItems.map(i=>`
       <div style="flex:1;padding:3px 4px;text-align:center;border-right:1px solid #C8ECD8;">
         <div style="font-size:8px;color:#7A9A87;">${i.label}</div>
-        <div style="font-size:10px;font-weight:700;color:#1A2B22;font-family:'DM Mono',monospace;">—</div>
+        <div style="font-size:10px;font-weight:700;color:#1A2B22;font-family:monospace;">—</div>
       </div>`).join('');
     const payRows=payItems.map(i=>`
       <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
         <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
-        <span style="font-size:9px;font-family:'DM Mono',monospace;color:#1A2B22;">¥—</span>
+        <span style="font-size:9px;font-family:monospace;color:#1A2B22;">¥—</span>
       </div>`).join('');
     const dedRows=dedItems.map(i=>`
       <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F4F7F5;">
         <span style="font-size:9px;color:#4A6B5A;">${i.label}</span>
-        <span style="font-size:9px;font-family:'DM Mono',monospace;color:#C62828;">¥—</span>
+        <span style="font-size:9px;font-family:monospace;color:#3A4A42;">¥—</span>
       </div>`).join('');
     return `
       <div style="background:#fff;border:1.5px solid #C8ECD8;border-radius:8px;overflow:hidden;">
@@ -1938,7 +2055,7 @@ function renderExcelPreview(){
         <!-- 差引支給額 -->
         <div style="background:#F8FEFC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #C8ECD8;">
           <span style="font-size:9px;font-weight:700;color:#7A9A87;letter-spacing:1px;">差 引 支 給 額</span>
-          <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:#3D9E72;">¥———</span>
+          <span style="font-family:monospace;font-size:16px;font-weight:500;color:#3D9E72;">¥———</span>
         </div>
         <!-- 勤怠1行 -->
         ${infoItems.length?`<div style="display:flex;background:#F0FAF4;border-bottom:1px solid #C8ECD8;">${attendCols}<div style="width:0;"></div></div>`:''}
@@ -1949,7 +2066,7 @@ function renderExcelPreview(){
             ${payRows}
           </div>
           <div style="padding:5px 8px;">
-            <div style="font-size:8px;font-weight:700;color:#C62828;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #E0EDE6;">🔻 控除</div>
+            <div style="font-size:8px;font-weight:700;color:#3D9E72;background:#F0FAF4;padding:2px 0 4px;margin-bottom:3px;border-bottom:1px solid #C8ECD8;">控 除</div>
             ${dedRows}
           </div>
         </div>
@@ -1957,11 +2074,11 @@ function renderExcelPreview(){
         <div style="display:grid;grid-template-columns:1fr 1fr;background:#F8FEFC;border-top:1.5px solid #C8ECD8;">
           <div style="padding:4px 8px;text-align:center;border-right:1px solid #E0EDE6;">
             <div style="font-size:8px;color:#7A9A87;">総支給額</div>
-            <div style="font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:#2E7D54;">¥———</div>
+            <div style="font-size:10px;font-weight:700;font-family:monospace;color:#2E7D54;">¥———</div>
           </div>
           <div style="padding:4px 8px;text-align:center;">
             <div style="font-size:8px;color:#7A9A87;">控除合計</div>
-            <div style="font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:#C62828;">¥———</div>
+            <div style="font-size:10px;font-weight:700;font-family:monospace;color:#3A4A42;">¥———</div>
           </div>
         </div>
       </div>`;
@@ -1976,40 +2093,48 @@ function renderExcelPreview(){
   if(peopleCount===1){
     const maxW = isLandscape ? '480px' : '340px';
     sheetsHTML=`<div style="max-width:${maxW};margin:0 auto;">${fn('')}</div>`;
-  } else if(peopleCount===2 && isLandscape){
-    sheetsHTML=`
-      <div style="display:flex;gap:6px;">
-        ${fn('1人目')}
-        <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
-        ${fn('2人目')}
-      </div>
-      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して左右2名分に</div>`;
-  } else if(peopleCount===2){
-    sheetsHTML=`
-      <div style="display:flex;flex-direction:column;gap:0;">
-        ${fn('1人目')}
-        ${perf2}
-        ${fn('2人目')}
-      </div>
-      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して上下2名分に</div>`;
-  } else if(peopleCount===4){
-    sheetsHTML=`
-      <div style="display:flex;gap:4px;">
-        <div style="display:flex;flex-direction:column;gap:0;flex:1;">${fn('1人目')}${perf2}${fn('2人目')}</div>
-        <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
-        <div style="display:flex;flex-direction:column;gap:0;flex:1;">${fn('3人目')}${perf2}${fn('4人目')}</div>
-      </div>
-      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 切り離して4名分に</div>`;
+  } else if(!isLandscape){
+    // A縦型: 複数人は横並び
+    if(peopleCount===2){
+      sheetsHTML=`
+        <div style="display:flex;gap:6px;">
+          ${fn('1人目')}
+          <div style="width:1.5px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('2人目')}
+        </div>
+        <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して左右2名分に</div>`;
+    } else if(peopleCount===3){
+      sheetsHTML=`
+        <div style="display:flex;gap:4px;">
+          ${fn('1人目')}
+          <div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('2人目')}
+          <div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('3人目')}
+        </div>
+        <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して3名分に</div>`;
+    } else {
+      sheetsHTML=`
+        <div style="display:flex;gap:3px;">
+          ${fn('1人目')}
+          <div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('2人目')}
+          <div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('3人目')}
+          <div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 6px,transparent 6px,transparent 10px);flex-shrink:0;"></div>
+          ${fn('4人目')}
+        </div>
+        <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して4名分に</div>`;
+    }
   } else {
+    // B横型: 複数人は縦積み
+    const sheets = [];
+    for(let pi=1;pi<=peopleCount;pi++) sheets.push(fn(pi+'人目'));
     sheetsHTML=`
       <div style="display:flex;flex-direction:column;gap:0;">
-        ${fn('氏名 1')}
-        ${perf2}
-        ${fn('氏名 2')}
-        ${perf2}
-        ${fn('氏名 3')}
+        ${sheets.join(perf2)}
       </div>
-      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:6px;">✂️ 点線で切り離して3名分に配布</div>`;
+      <div style="text-align:center;font-size:10px;color:#7A9A87;margin-top:4px;">✂️ 点線で切り離して${peopleCount}名分に</div>`;
   }
 
   el.innerHTML=`
