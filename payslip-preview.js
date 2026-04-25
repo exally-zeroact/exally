@@ -255,7 +255,7 @@ function renderPayslipPreview(el, layout, ninzu, activeItems) {
     var w = widths[ninzu] || '25%';
     var g = gaps[ninzu]   || '4px';
     if (ninzu === 1) {
-      html = '<div style="width:40%;margin:0 auto;">' + makeACard(people[0], df) + '</div>';
+      html = '<div style="max-width:260px;width:100%;margin:0 auto;">' + makeACard(people[0], df) + '</div>';
     } else {
       var parts = people.map(function(p) {
         return '<div style="flex:0 0 ' + w + ';min-width:0;">' + makeACard(p, df) + '</div>';
