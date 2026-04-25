@@ -84,8 +84,8 @@ function _yen(n) {
   return '\u00a5' + Math.round(n || 0).toLocaleString();
 }
 
-function _mergePersonData(activeItems, samplePerson) {
-  // activeItemsがあれば項目ラベルをそちらから、値はサンプル
+function _mergePersonData(activeItems, samplePerson, actualData) {
+  // activeItemsがあれば項目ラベルをそちらから、値はサンプル（actualDataがあれば実値優先）
   var pay = activeItems
     ? activeItems.filter(function(i) { return i.type === 'pay'; })
     : Object.keys(samplePerson.pay).map(function(k) { return { label: k }; });
@@ -96,24 +96,30 @@ function _mergePersonData(activeItems, samplePerson) {
     ? activeItems.filter(function(i) { return i.type === 'info'; })
     : Object.keys(samplePerson.att).map(function(k) { return { label: k }; });
 
-  // 支給値: activeの順番にサンプル値を対応させる
+  // 支給値: actualDataがあれば実値、なければサンプル値にインデックス対応
   var payKeys = Object.keys(samplePerson.pay);
   var dedKeys = Object.keys(samplePerson.ded);
 
   return {
     name:     samplePerson.name,
     payRows:  pay.map(function(item, i) {
-      return { label: item.label, val: samplePerson.pay[payKeys[i]] || 0 };
+      var val = (actualData && actualData.payRows && actualData.payRows[i] !== undefined)
+                ? actualData.payRows[i]
+                : (samplePerson.pay[payKeys[i]] || 0);
+      return { label: item.label, val: val };
     }),
     dedRows:  ded.map(function(item, i) {
-      return { label: item.label, val: samplePerson.ded[dedKeys[i]] || 0 };
+      var val = (actualData && actualData.dedRows && actualData.dedRows[i] !== undefined)
+                ? actualData.dedRows[i]
+                : (samplePerson.ded[dedKeys[i]] || 0);
+      return { label: item.label, val: val };
     }),
     attStr:   Object.keys(samplePerson.att).map(function(k) {
       return k + samplePerson.att[k];
     }).join('\u3000'),
-    payTotal: samplePerson.payTotal,
-    dedTotal: samplePerson.dedTotal,
-    net:      samplePerson.net,
+    payTotal: (actualData && actualData.payTotal) || samplePerson.payTotal,
+    dedTotal: (actualData && actualData.dedTotal) || samplePerson.dedTotal,
+    net:      (actualData && actualData.net)      || samplePerson.net,
   };
 }
 
@@ -228,20 +234,24 @@ function makeBCard(person, compact, diffFontSize) {
 // =============================================
 // メイン描画関数
 // =============================================
-function renderPayslipPreview(el, layout, ninzu, activeItems) {
+// actualData: person 0 の実値 { payRows:[], dedRows:[], payTotal, dedTotal, net }
+// 省略時はサンプル値を使用（後方互換）
+function renderPayslipPreview(el, layout, ninzu, activeItems, actualData) {
   if (!el) return;
   var perf = '<div style="border-top:1.5px dashed #C8ECD8;margin:4px 0;text-align:center;font-size:9px;color:#C8ECD8;">\u2702</div>';
   var sep  = '<div style="width:1px;background:repeating-linear-gradient(to bottom,#52B788 0,#52B788 5px,transparent 5px,transparent 9px);flex-shrink:0;margin:0 6px;"></div>';
 
   var people = [];
   for (var i = 0; i < ninzu; i++) {
-    people.push(_mergePersonData(activeItems, PAYSLIP_SAMPLE_PERSONS[i] || PAYSLIP_SAMPLE_PERSONS[0]));
+    // person 0 のみ実値を渡す（1〜3 はサンプル値）
+    var ad = (i === 0 && actualData) ? actualData : null;
+    people.push(_mergePersonData(activeItems, PAYSLIP_SAMPLE_PERSONS[i] || PAYSLIP_SAMPLE_PERSONS[0], ad));
   }
 
   var html = '';
 
   if (layout === 'B') {
-    // B横型: 縦積み・A4縦向き比率（max-width:300px）
+    // B横型: 縦積み・A4縦向き比率（max-width:300px = PDF仕様）
     var compact = PAYSLIP_LAYOUT.B.compact[ninzu] || false;
     var df      = PAYSLIP_LAYOUT.B.diffFont[ninzu] || 11;
     var cards   = people.map(function(p) { return makeBCard(p, compact, df); });
