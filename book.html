@@ -1488,6 +1488,12 @@ function receivePasteData(pasteData) {
     sheets[0].hiddenRows = {};
     sheets[0].hiddenCols = {};
 
+    // シート名をテンプレ種別に合わせて設定
+    var sheetLabel = '給料明細';
+    if (pasteData.payType === 'hourly') sheetLabel = '給料明細（時給）';
+    if (pasteData.payType === 'daily')  sheetLabel = '給料明細（日当）';
+    sheets[0].name = sheetLabel;
+
     // 書式プロパティのマッピング（bg のみキー名を bgColor に変換）
     var styleKeyMap = {
       bold:'bold', italic:'italic', underline:'underline', strike:'strike', wrap:'wrap',
@@ -2886,8 +2892,7 @@ var C_FORMULA    = '#1565C0';
 
 // ===== 状態 =====
 var sheets = [
-  { name:'Sheet1', data:{}, colW:{}, rowH:{}, hiddenRows:{}, hiddenCols:{} },
-  { name:'Sheet2', data:{}, colW:{}, rowH:{}, hiddenRows:{}, hiddenCols:{} }
+  { name:'Sheet1', data:{}, colW:{}, rowH:{}, hiddenRows:{}, hiddenCols:{} }
 ];
 var activeSheet = 0;
 var selR1=0, selC1=0, selR2=0, selC2=0;
@@ -6072,7 +6077,6 @@ function initPopupResize(){
 <div class="bottom-stack">
   <div id="sheet-tabs">
     <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
-    <button class="sheet-tab" onclick="switchSheet(1)">Sheet2</button>
     <button id="add-sheet-btn" onclick="addSheet()">＋</button>
   </div>
   <nav class="book-bn">
