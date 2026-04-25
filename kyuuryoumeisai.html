@@ -634,7 +634,7 @@ body{padding-bottom:80px;}
 const MONTHLY = window.MONTHLY;
 const HOURLY  = window.HOURLY;
 const DAILY   = window.DAILY;
-let cType='monthly',cLayout='A',cNinzu=1,cPaperSize='A4',active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
+let cType='monthly',cLayout='A',cNinzu=1,active=[],cRates={},popId=null,dragSrc=null,MONTHLY_AMOUNT=0;
 function base(){return cType==='monthly'?MONTHLY:cType==='hourly'?HOURLY:DAILY;}
 
 function init(){
@@ -1410,11 +1410,6 @@ function generateJsonData(){
   if(cLayout==='B'){
     // ===== B横型: 支給|控除 左右2列 / 複数人は縦積み =====
     colWidths=[120,90,10,120,90];
-    // B5縦: 幅182mm/A4縦210mm=86.7%・高さ257mm/A4縦297mm=86.5% でスケール
-    if(cPaperSize==='B5') colWidths=colWidths.map(function(w){return Math.round(w*182/210);});
-    var rhS=cPaperSize==='B5'?257/297:1; // 行高さスケール係数
-    function rh(n){return Math.round(n*rhS);}
-
     var maxB=Math.max(payItems.length,dedItems.length,1);
     var attR=Math.max(1,Math.ceil(infoItems.length/5));
     var rpp=3+1+attR+1+maxB+1+1;
@@ -1424,35 +1419,35 @@ function generateJsonData(){
 
       // ヘッダー2行
       C(r,0,'給料明細',sH);C(r,1,'',{bg:'#3D9E72'});C(r,2,'',{bg:'#3D9E72'});C(r,3,'',{bg:'#3D9E72'});C(r,4,'2026年○月',sHR);
-      rowHeights[r]=rh(24);r++;
+      rowHeights[r]=24;r++;
       C(r,0,'○○株式会社',sH);C(r,1,'',{bg:'#3D9E72'});C(r,2,'',{bg:'#3D9E72'});C(r,3,'',{bg:'#3D9E72'});C(r,4,'氏名：',sHR);
-      rowHeights[r]=rh(20);r++;
+      rowHeights[r]=20;r++;
 
       // 差引支給額（後で数式を入れる）
       var diffR=r;
       C(r,0,'差引支給額',sDL);C(r,1,'');C(r,2,'');C(r,3,'');C(r,4,'',sDV);
-      rowHeights[r]=rh(32);r++;
+      rowHeights[r]=32;r++;
 
       // 勤怠
       C(r,0,'勤 怠',sSec);C(r,1,'',{bg:'#F0FAF4'});C(r,2,'',{bg:'#F0FAF4'});C(r,3,'',{bg:'#F0FAF4'});C(r,4,'',{bg:'#F0FAF4'});
-      rowHeights[r]=rh(18);r++;
+      rowHeights[r]=18;r++;
       var af=0;
       for(var ai=0;ai<infoItems.length;ai+=5){
         for(var aj=0;aj<5&&(ai+aj)<infoItems.length;aj++) C(r,aj,infoItems[ai+aj].label+' 0',sSm);
-        rowHeights[r]=rh(16);r++;af++;
+        rowHeights[r]=16;r++;af++;
       }
-      while(af<attR){rowHeights[r]=rh(16);r++;af++;}
+      while(af<attR){rowHeights[r]=16;r++;af++;}
 
       // 支給|控除 セクションラベル
       C(r,0,'支 給',sSec);C(r,1,'',{bg:'#F0FAF4'});C(r,2,'');C(r,3,'控 除',sSec);C(r,4,'',{bg:'#F0FAF4'});
-      rowHeights[r]=rh(22);r++;
+      rowHeights[r]=22;r++;
 
       // 本体
       var ps=r;
       for(var i=0;i<maxB;i++){
         var pi=payItems[i],di=dedItems[i];
         C(r,0,pi?pi.label:'');C(r,1,pi?'0':'',sVR);C(r,2,'');C(r,3,di?di.label:'');C(r,4,di?'0':'',sVR);
-        rowHeights[r]=rh(22);r++;
+        rowHeights[r]=22;r++;
       }
       var pe=r-1;
 
@@ -1460,7 +1455,7 @@ function generateJsonData(){
       var sp='=SUM('+cn(1)+(ps+1)+':'+cn(1)+(pe+1)+')';
       var sd='=SUM('+cn(4)+(ps+1)+':'+cn(4)+(pe+1)+')';
       C(r,0,'総支給額',sTL);C(r,1,sp,sTV);C(r,2,'');C(r,3,'控除合計',sTL);C(r,4,sd,sTV);
-      rowHeights[r]=rh(22);
+      rowHeights[r]=22;
       // 差引数式を更新
       var tR=r+1;
       var df='='+cn(1)+tR+'-'+cn(4)+tR;
@@ -1468,7 +1463,7 @@ function generateJsonData(){
       r++;
 
       // フッター
-      C(r,4,'2026年4月',sSmR);rowHeights[r]=rh(16);
+      C(r,4,'2026年4月',sSmR);rowHeights[r]=16;
     }
 
   } else {
@@ -2031,43 +2026,43 @@ function showToast(msg){const el=document.getElementById('toast');el.textContent
 const PAPER_OPTIONS={
   paper:[
     {
-      label:'A4縦・1人分',rank:'🥇',layout:'B',ninzu:1,
+      label:'A4縦・1人分',rank:'🥇',
       desc:'【最も一般的】項目数が多くても見やすい定番サイズ。どのプリンターでも対応。',
       note:'長形3号封筒に三つ折りで入ります。項目が多い方はこちら推奨。',
       preview:'a4-v-1'
     },
     {
-      label:'A4縦・2人分（上下に並べる）',rank:'🥈',layout:'B',ninzu:2,
+      label:'A4縦・2人分（上下に並べる）',rank:'🥈',
       desc:'【紙代半減】1枚を上下2分割して2名分を印刷。ミシン目入り用紙を使うと綺麗に切り離せます。',
       note:'⚠️ 支給・控除の項目数が多いと1人分が小さくなります。項目が10個以内の方向け。',
       preview:'a4-v-2'
     },
     {
-      label:'A4縦・3人分（上下に並べる）',rank:'🥉',layout:'B',ninzu:3,
+      label:'A4縦・3人分（上下に並べる）',rank:'🥉',
       desc:'【紙代1/3】1枚に3名分を上下に印刷。縦の最大人数です。',
       note:'⚠️ 1人分がかなり小さくなります。支給・控除が各5項目以内の場合のみ推奨。',
       preview:'a4-v-3'
     },
     {
-      label:'A4横・1人分',rank:'①',layout:'A',ninzu:1,
+      label:'A4横・1人分',rank:'④',
       desc:'【項目が多い方向け】横向きで列を広く取れるため、項目数が多くても見やすい。',
       note:'項目が15個以上ある場合はこちらが読みやすくなります。',
       preview:'a4-h-1'
     },
     {
-      label:'A4横・2人分（左右に並べる）',rank:'②',layout:'A',ninzu:2,
+      label:'A4横・2人分（左右に並べる）',rank:'⑤',
       desc:'【横の最大人数】横向きで左右に2名分を並べます。横レイアウトで2人分が必要な場合に。',
       note:'⚠️ 1人分の横幅が狭くなります。項目が少ない場合のみ推奨。',
       preview:'a4-h-2'
     },
     {
-      label:'B5縦・1人分',rank:'③',layout:'B',ninzu:1,b5:true,
+      label:'B5縦・1人分',rank:'⑥',
       desc:'【給料袋サイズ】B5は給料袋にぴったり入るサイズ。飲食店・中小企業で多く使われています。',
       note:'長形4号封筒に三つ折りで入ります。給料袋配布の方はこちら。',
       preview:'b5-v-1'
     },
     {
-      label:'B5縦・2人分（上下に並べる）',rank:'④',layout:'B',ninzu:2,b5:true,
+      label:'B5縦・2人分（上下に並べる）',rank:'⑦',
       desc:'【B5を上下2分割】切り離し後はB6サイズ。長形6号封筒にぴったり入ります。紙代半減。',
       note:'⚠️ 支給・控除は各3〜4項目以内推奨。5項目以上ははみ出す可能性があります。',
       preview:'b5-v-2'
@@ -2075,19 +2070,19 @@ const PAPER_OPTIONS={
   ],
   pdf:[
     {
-      label:'A4縦・1人分（PDF標準）',rank:'✅',layout:'B',ninzu:1,
+      label:'A4縦・1人分（PDF標準）',rank:'✅',
       desc:'【最も一般的】メール・LINE送信・Web配信に最適。スマホ・PCどちらでも見やすい。',
       note:'PDFで保存すれば印刷にも使えます。迷ったらこちら。',
       preview:'a4-v-1'
     },
     {
-      label:'A4横・1人分（項目多め）',rank:'②',layout:'A',ninzu:1,
+      label:'A4横・1人分（項目多め）',rank:'②',
       desc:'【項目が多い方向け】支給・控除の項目数が多い場合に横向きにすると見やすくなります。',
       note:'⚠️ スマホで見る場合は横スクロールが必要になる場合があります。',
       preview:'a4-h-1'
     },
     {
-      label:'A4縦・2人分（PDF）',rank:'③',layout:'B',ninzu:2,
+      label:'A4縦・2人分（PDF）',rank:'③',
       desc:'【紙代節約・電子配信】1つのPDFに2名分を上下に配置して送付。印刷して切り離しても使えます。',
       note:'⚠️ 受け取った従業員が切り離す手間が発生します。項目が少ない場合のみ推奨。',
       preview:'a4-v-2'
@@ -2296,7 +2291,7 @@ const PAPER_PREVIEWS={
 };
 
 function setDeliver(type){
-  deliverType=type;paperIdx=-1;
+  deliverType=type;paperIdx=0;
   document.getElementById('deliver-paper').classList.toggle('active',type==='paper');
   document.getElementById('deliver-pdf').classList.toggle('active',type==='pdf');
   renderPaperOptions();
@@ -2305,40 +2300,19 @@ function setDeliver(type){
 }
 
 function renderPaperOptions(){
-  const allOpts=PAPER_OPTIONS[deliverType];
-  const list=document.getElementById('paperRankList');list.innerHTML='';
-  // paperIdxが現在のcLayoutと合わない場合は最初の一致するものに補正
-  if(paperIdx<0||!allOpts[paperIdx]||allOpts[paperIdx].layout!==cLayout){
-    paperIdx=allOpts.findIndex(function(o){return o.layout===cLayout;});
-    if(paperIdx<0)paperIdx=0;
-    const first=allOpts[paperIdx];
-    if(first){if(first.ninzu)switchNinzu(first.ninzu);cPaperSize=first.b5?'B5':'A4';}
-  }
-  allOpts.forEach(function(opt,fullIdx){
-    if(opt.layout!==cLayout)return; // 現在のレイアウトのみ表示
-    const div=document.createElement('div');
-    div.className='paper-rank-item'+(fullIdx===paperIdx?' active':'');
-    div.dataset.fullIdx=fullIdx;
-    div.onclick=function(){selectPaper(fullIdx);};
-    div.innerHTML=`<div class="paper-rank-num">${opt.rank}</div><div class="paper-rank-info"><div class="paper-rank-name">${opt.label}</div><div class="paper-rank-desc">${opt.desc}</div></div><div class="paper-rank-check" style="opacity:${fullIdx===paperIdx?1:0}">✓</div>`;
+  const opts=PAPER_OPTIONS[deliverType];const list=document.getElementById('paperRankList');list.innerHTML='';
+  opts.forEach((opt,i)=>{
+    const div=document.createElement('div');div.className='paper-rank-item'+(i===paperIdx?' active':'');div.onclick=()=>selectPaper(i);
+    div.innerHTML=`<div class="paper-rank-num">${opt.rank}</div><div class="paper-rank-info"><div class="paper-rank-name">${opt.label}</div><div class="paper-rank-desc">${opt.desc}</div></div><div class="paper-rank-check" style="opacity:${i===paperIdx?1:0}">✓</div>`;
     list.appendChild(div);
   });
   updatePaperNote();
   renderPaperPreview();
 }
 
-function selectPaper(fullIdx){
-  paperIdx=fullIdx;
-  document.querySelectorAll('.paper-rank-item').forEach(function(el){
-    var idx=parseInt(el.dataset.fullIdx);
-    el.classList.toggle('active',idx===paperIdx);
-    el.querySelector('.paper-rank-check').style.opacity=idx===paperIdx?1:0;
-  });
-  const opt=PAPER_OPTIONS[deliverType][paperIdx];
-  if(opt){
-    if(opt.ninzu)switchNinzu(opt.ninzu);
-    cPaperSize=opt.b5?'B5':'A4';
-  }
+function selectPaper(idx){
+  paperIdx=idx;
+  document.querySelectorAll('.paper-rank-item').forEach((el,i)=>{el.classList.toggle('active',i===idx);el.querySelector('.paper-rank-check').style.opacity=i===idx?1:0;});
   updatePaperNote();
   renderPaperPreview();
   updateFitCheck();
@@ -2366,8 +2340,7 @@ function renderPaperPreview(){
 
 function getPaperLabel(){
   var nin=cNinzu===1?'1人分':cNinzu===2?'2人分':cNinzu===3?'3人分':'4人分';
-  var size=cPaperSize==='B5'?'B5縦':(cLayout==='A'?'A4横':'A4縦');
-  return size+'・'+nin;
+  return (cLayout==='A'?'A縦型':'B横型')+'・'+nin;
 }
 
 // sp-preview-row の sticky top を header 高さに動的に合わせる
