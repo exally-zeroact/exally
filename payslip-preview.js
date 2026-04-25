@@ -241,11 +241,11 @@ function renderPayslipPreview(el, layout, ninzu, activeItems) {
   var html = '';
 
   if (layout === 'B') {
-    // B横型: 縦積み・A4縦向き比率（max-width:420px）
+    // B横型: 縦積み・A4縦向き比率（max-width:300px）
     var compact = PAYSLIP_LAYOUT.B.compact[ninzu] || false;
     var df      = PAYSLIP_LAYOUT.B.diffFont[ninzu] || 11;
     var cards   = people.map(function(p) { return makeBCard(p, compact, df); });
-    html = '<div style="max-width:420px;margin:0 auto;">' + cards.join(perf) + '</div>';
+    html = '<div style="max-width:300px;margin:0 auto;">' + cards.join(perf) + '</div>';
   } else {
     // A縦型: 横並び（PDF比率準拠）
     var df = PAYSLIP_LAYOUT.A.diffFont[ninzu] || 11;
