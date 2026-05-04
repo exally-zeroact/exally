@@ -1,9 +1,0 @@
-# Branch Protection Test
-
-This file is created on 2026-05-03 to verify that Branch Protection rule is working correctly.
-
-If you see this file in the repository via Pull Request flow, the protection is working.
-
-Created by: 矢野司 (Tsukasa)
-Purpose: STEP 5 - Action verification of branch protection rule
-Safe to delete after verification.
