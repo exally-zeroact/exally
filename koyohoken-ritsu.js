@@ -55,6 +55,14 @@ const KOYOHOKEN_RITSU = {
     kyuyo: 250000,
     ritsu: 0.0055,
     kingaku: 250000 * 0.0055  // = 1375円
+  },
+
+  // 中央(Supabase statutory kind=koyo)の従業員負担率で上書き。norin→noriinsuisan 名前写像。不正なら何もしない=フォールバック。
+  hydrate: function(data) {
+    if (!data || typeof data !== 'object') return;
+    if (typeof data.ippan === 'number') this.jugyoin.ippan = data.ippan;
+    if (typeof data.kensetsu === 'number') this.jugyoin.kensetsu = data.kensetsu;
+    if (typeof data.norin === 'number') this.jugyoin.noriinsuisan = data.norin;
   }
 
 };

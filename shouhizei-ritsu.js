@@ -54,6 +54,13 @@ const SHOUHIZEI_RITSU = {
       '2026年10月〜2029年9月': 0.50,  // 50%控除可
       '2029年10月〜':          0.00,  // 控除不可
     }
+  },
+
+  // 中央(Supabase statutory kind=shouhizei)の税率で上書き。不正なら何もしない=フォールバック。
+  hydrate: function(data) {
+    if (!data || typeof data !== 'object') return;
+    if (typeof data.hyojun === 'number') this.hyojun = data.hyojun;
+    if (typeof data.keigen === 'number') this.keigen = data.keigen;
   }
 
 };

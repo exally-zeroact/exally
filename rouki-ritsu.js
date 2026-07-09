@@ -76,7 +76,20 @@ const ROUKI_RITSU = {
     '住宅手当',
     '臨時に支払われた賃金',
     '1か月を超える期間ごとに支払われる賃金（賞与等）'
-  ]
+  ],
+
+  // 中央(Supabase statutory kind=warimashi)の割増率で上書き。warimashiは増分基準(night=0.25)なので深夜のみ=1+night に写像。不正はフォールバック。
+  hydrate: function(data) {
+    if (!data || typeof data !== 'object') return;
+    var n = function(v) { return typeof v === 'number' && !isNaN(v); };
+    if (n(data.ot)) { this.jikangai.tsujou = data.ot; this.kyujitsu.shoteikyujitsu = data.ot; } // 所定休日=通常残業と同率
+    if (n(data.over60)) this.jikangai.cho60 = data.over60;
+    if (n(data.otNight)) this.jikangai.tsujou_shinya = data.otNight;
+    if (n(data.over60Night)) this.jikangai.cho60_shinya = data.over60Night;
+    if (n(data.holiday)) this.kyujitsu.hoteikyujitsu = data.holiday;
+    if (n(data.holidayNight)) this.kyujitsu.hoteikyujitsu_shinya = data.holidayNight;
+    if (n(data.night)) this.shinya.tanjoku = 1 + data.night; // 深夜のみ=通常賃金×(1+深夜増分)
+  }
 
 };
 
