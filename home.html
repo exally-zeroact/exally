@@ -5,6 +5,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exally（エクサリー）- ホーム</title>
+<!-- PWA(ホーム画面/デスクトップに単独アプリとしてインストール) -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2E7D54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Exally">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
+<link rel="icon" type="image/png" href="/img/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -575,5 +583,6 @@ function gotoChatWith(q){
   location.href='chat.html?q='+encodeURIComponent(q);
 }
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
