@@ -7,7 +7,10 @@ const { execFileSync } = require('child_process');
 const path = require('path');
 
 const FILES = [
-  'suite-data.test.js'
+  'suite-data.test.js',     // E0 共有データ層の契約
+  'aggregate.test.js',      // E1 事業別集計(純関数)
+  'access-drift.test.js',   // E1 利用権 + Kyually版とのドリフト突合
+  'hub-ui.mjs'              // E1 UI 全ボタン(jsdom)
 ];
 
 let ng = 0;
