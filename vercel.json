@@ -2,8 +2,8 @@
   "rewrites": [
     { "source": "/.netlify/functions/claude", "destination": "/api/claude" },
     { "source": "/api/claude", "destination": "/api/claude" },
-    { "source": "/", "destination": "/home.html" },
-    { "source": "/index.html", "destination": "/home.html" },
+    { "source": "/", "destination": "/hub.html" },
+    { "source": "/index.html", "destination": "/hub.html" },
     { "source": "/index6.html", "destination": "/chat.html" },
     { "source": "/exally-home.html", "destination": "/home.html" },
     { "source": "/exally-canvas-grid.html", "destination": "/book.html" },
