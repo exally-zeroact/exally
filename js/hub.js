@@ -335,9 +335,8 @@
       if (pr) { openPt(pr.getAttribute('data-pt')); return; }
     });
 
-    $('tile-ledger').addEventListener('click', function () {
-      toast('日次台帳はまだ準備中です。毎日の売上や時間をここに貯められるようにしています。');
-    });
+    $('mo-x').addEventListener('click', modalClose);
+    $('mo').addEventListener('click', function (ev) { if (ev.target === $('mo')) modalClose(); }); // 外側タップで閉じる
 
     $('org-save').addEventListener('click', saveOrg);
     $('org-biz-add').addEventListener('click', addBiz);
@@ -370,18 +369,31 @@
     renderEmps(); renderPts(); renderBizChips();
   }
 
-  // auth.js がログイン成功後に呼ぶ
+  // auth.js がログイン成功後に呼ぶ。従業員を読んでから台帳(E2)を起こす（台帳は人の一覧を使うため順番が要る）
   function attach(client) {
     SD = global.SuiteData ? global.SuiteData.create({ client: client }) : null;
-    return loadAll().then(function () { return SD; });
+    return loadAll()
+      .then(function () { return (global.Ledger && global.Ledger.attach) ? global.Ledger.attach(SD) : null; })
+      .catch(function () { /* 台帳が起きなくてもハブ自体は使える */ })
+      .then(function () { return SD; });
   }
+
+  /* ═══ モーダル（その人の記録の一覧など） ═══ */
+  function modal(title, html) {
+    var mo = $('mo'); if (!mo) return;
+    $('mo-t').textContent = title || '';
+    $('mo-b').innerHTML = html || '';
+    mo.classList.add('on');
+  }
+  function modalClose() { var mo = $('mo'); if (mo) mo.classList.remove('on'); }
 
   var Hub = {
     init: init, attach: attach, show: show, showTab: showTab,
     loadAll: loadAll, renderAgg: renderAgg, paintAgg: paintAgg,
     state: state,
     _setSuiteData: function (sd) { SD = sd; },     // テスト用の差し込み口
-    _toast: toast, _jpFail: jpFail
+    _toast: toast, _jpFail: jpFail,
+    _modal: modal, _modalClose: modalClose
   };
   global.Hub = Hub;
   global.__EXALLY_TEST = Hub;                       // ★UIテスト(jsdom/実機)から中を見る

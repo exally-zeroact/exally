@@ -81,10 +81,26 @@ Kyually の `cloudSaveState` は `state` から `employees` を除いた**全ス
 - ★**v1からの変更**：列名 `date` → **`ymd`**。`date` はSQLの型名と衝突して PostgREST/SQL で毎回クォートが要る（事故の元）。既存アプリの命名（`birthYmd` / `leaveStartYmd`）とも揃う。
 - ★**v1からの変更**：**「人×日付＝1行」ではなく、人×日付に複数行を許す**。
   理由＝現場の実態（代行は1日に何本も・司さんのExcelの「売上1/2/3」）。1日1行に縛ると入らない。集計は `ymd` で束ねる。
-- `data`＝`{ 売上?, 時間?, 金額?, 件数?, business?, memo? }`（各社バラバラの溜め方を許容）。
-  - `business` を行に持てる＝同じ人が別事業をやった日を正しく分けられる（従業員マスタの `business` は既定値）。
-- **締め方（日次/週次/N日/1〜10・11〜20・21〜末）で期間集計 → 期間の支給額 → Kyuallyへ**（集計エンジンは **E2**。E0 は器と契約のみ）。
-- 決め方（率／保障／日額）は従業員data の給与形態 or 別ルールに（E2）。
+- ★**`data` のキー（E2で確定・2026-07-26・司さん承認）**
+  ```
+  { uriage?, minutes?, amount?, count?, business?, memo?, hikazei? }
+  ```
+  | キー | 型 | 意味・K4での注意 |
+  |---|---|---|
+  | `uriage` | number | 売上。率で払う代行に必須。**Kyuallyの `dailyEntries` には無い項目** |
+  | `minutes` | number | 労働時間を**分**で持つ。★Kyually `dailyEntries.hm` は `"8:30"` の**文字列**＝**K4で変換が要る** |
+  | `amount` | number | その日に直接入れた金額 |
+  | `count` | number | 件数 |
+  | `business` | string | 事業。行に持てる＝同じ人が別事業をやった日を正しく分けられる（未設定なら従業員マスタの `business` が既定） |
+  | `memo` | string | メモ |
+  | ★`hikazei` | boolean | **非課税**。Kyually `dailyEntries.hikazei` に対応。**★これが無いと K4 で読み替えた時に非課税の区別が落ちて課税額が狂う（お金の間違い）★** 必ず持ち回る |
+- **締め方（月まとめ/半月/10日締め/任意N日）で期間集計 → 期間の"実績値" → Kyuallyへ**。
+  ★**期間の定義は Kyually `lib/periods.js` が唯一の源**（Exally は同一実装を置き、**全パターン突合テストで赤化**）。
+  ★**締め方の設定も Kyually の会社設定（`pay_companies.data.company.shimeMethod` / `shimeN`）が唯一の源**。Exally は**読んで表示するだけ**（設定UIを作らない＝二重管理しない）。
+- ★**決め方（率／保障／日額）は Kyually の `lib/pay-rule.js` が唯一の源。Exally は支給額を計算しない**（司さん判断 2026-07-26）。
+  複製は「最賃38県ドリフト誤値」と同じ事故クラスのため禁止。Exally が渡すのは**生の実績値**だけ：
+  `ctx = { sales, workDays, workMin, count, commission }`（＝`pay-rule.js` がそのまま食う形）＋非課税額。
+  **金額が画面に出るのは K4（Kyuallyが台帳を読んで明細にする）完了時**。
 - **削除はソフト削除**（`deleted_at`）。**金額の記録＝勝手に物理削除しない**。
 
 ---
@@ -98,9 +114,13 @@ Kyually の `cloudSaveState` は `state` から `employees` を除いた**全ス
 → 同じ月に期間行が2件以上あると **1件しか残らない＝労基法108条の賃金台帳が欠落／定時決定（標準報酬月額）・年末調整も過少**。
 
 ### 6-2. 決定（両セッションが守る）
-1. **id** = `ps_{ym}_{period}_{eid}`。`period`＝`M`（月次1本）｜`P1`/`P2`/`P3`（1〜10/11〜20/21〜末）｜将来 `W{n}`/`D{n}`。
-   **既存 `ps_{ym}_{eid}` は `period='M'` 相当として不変**（後方互換・既存データを書き換えない）。賞与は `psb_{ym}_{eid}` のまま（期間分割しない）。
-2. **data に必須追加**：`period`（同上）／`periodFrom`・`periodTo`（`YYYY-MM-DD`）。
+1. ★**id（2026-07-26 改訂・司さん承認）**：Kyually の実装 `lib/periods.js`（K2・push済 6954ecb）に合わせる。
+   - **分割なし（`shimeMethod='monthly'`）＝ 従来どおり `ps_{ym}_{eid}`（period を付けない）** ＝既存データと完全互換。
+   - **分割あり（half/ten/ndays）＝ `ps_{ym}_{Pn}_{eid}`**（例 `ps_2026-07_P1_e1`）。
+   - 賞与は `psb_{ym}_{eid}` のまま（期間分割しない）。
+   ※v2初版で書いた `M` は**廃止**。理由＝`periods.js` は**分割なしでも key が `'P1'`** で、`M` という値をどこも作らないため（実物照合）。
+2. **data に必須追加**：`period`（**`periods.js` が返す key をそのまま**。monthly なら `'P1'`）／`periodFrom`・`periodTo`（`YYYY-MM-DD`）。
+   ※ id には period を付けないが data には入れる＝「どの期間の実績か」が行から分かる。
 3. **消費側は除外方式（`kind!=='bonus'`）を許可方式（`kind==='monthly' || kind==null`）に変える**。
 4. **同一 ym の複数 period は、法定帳簿へ渡す前に合算する**（賃金台帳・定時決定・年調・前月比）。→ **Kyuallyセッション K2 の実装項目**。
 5. ★**4 が実装されるまで、Exally は pay_payslips に期間行を書かない**（Exally は pay_ledger のみ）。＝今の帳簿を壊さない。

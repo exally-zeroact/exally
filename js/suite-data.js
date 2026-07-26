@@ -144,6 +144,25 @@
         }
       },
 
+      /* ═══ 会社設定(pay_companies)は「読むだけ」 ═══ */
+      //  ★締め方(shimeMethod/shimeN)は Kyually の会社設定が唯一の源(E2)。
+      //    Exally は読んで表示するだけ＝設定UIを作らない(二重管理を作らない)。
+      //    書き込みは §2-2 の updated_at 空更新のみ(data は絶対に触らない)。
+      company: {
+        // 締め方を読む。行が無い/未設定は monthly(分割なし)として返す。
+        getShime: function () {
+          return Promise.resolve(sb.from('pay_companies').select('data').maybeSingle())
+            .then(function (r) {
+              if (r && r.error) throw new Error(err(r.error));
+              var co = (r && r.data && r.data.data && r.data.data.company) || {};
+              var m = co.shimeMethod;
+              if (['monthly', 'half', 'ten', 'ndays'].indexOf(m) < 0) m = 'monthly';
+              var n = Number(co.shimeN);
+              return { method: m, n: (isFinite(n) && n > 0) ? Math.floor(n) : 10, fromKyually: !!co.shimeMethod };
+            });
+        }
+      },
+
       /* ═══ 自社情報(pay_org) ═══ */
       org: {
         get: function () {

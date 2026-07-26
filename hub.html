@@ -34,11 +34,11 @@
         <span class="tile-d">Kyually</span>
         <span class="tile-go">開く →</span>
       </a>
-      <button class="tile tile-soon" id="tile-ledger" type="button">
+      <button class="tile" id="tile-ledger" type="button" data-go="scr-ledger">
         <span class="tile-ic">📒</span>
         <span class="tile-t">日次台帳</span>
         <span class="tile-d">毎日の売上・時間を貯める</span>
-        <span class="tile-badge">準備中</span>
+        <span class="tile-go">開く →</span>
       </button>
       <button class="tile" type="button" data-go="scr-agg">
         <span class="tile-ic">📊</span>
@@ -141,6 +141,84 @@
     </div>
   </section>
 
+  <!-- ═══ 日次台帳(E2) ═══ -->
+  <section id="scr-ledger" class="scr">
+    <h2 class="scr-t">日次台帳</h2>
+    <p class="scr-s">毎日ちょこちょこ入れておけば、締めの日に自動でまとまります。</p>
+
+    <div class="agg-ctl">
+      <select id="lg-ym"></select>
+      <button class="b2" type="button" id="lg-reload">更新</button>
+    </div>
+    <p class="lg-shime" id="lg-shime"></p>
+
+    <div class="ptabs" id="lg-ptabs"></div>
+    <div id="lg-body"></div>
+    <div class="msg" id="lg-msg"></div>
+  </section>
+
+  <!-- 1件の入力(逆Excル: 白紙の表を埋めさせない) -->
+  <section id="scr-lg-entry" class="scr">
+    <h2 class="scr-t" id="lge-title">入れる</h2>
+    <p class="scr-s" id="lge-sub"></p>
+
+    <div class="card" data-kiku="ledger-entry">
+      <div class="fld">
+        <label>いつ</label>
+        <div class="chips" id="lge-day-chips"></div>
+        <input id="lge-ymd" type="date">
+      </div>
+
+      <div class="fld" id="lge-biz-wrap">
+        <label>事業</label>
+        <div class="chips" id="lge-biz-chips"></div>
+      </div>
+
+      <div class="fld" id="lge-f-uriage">
+        <label for="lge-uriage">売上</label>
+        <input id="lge-uriage" type="text" inputmode="numeric" placeholder="例：4200">
+      </div>
+
+      <div class="fld" id="lge-f-minutes">
+        <label for="lge-hm">時間</label>
+        <input id="lge-hm" type="text" inputmode="numeric" placeholder="例：1:30">
+        <div class="chips" style="margin-top:8px">
+          <button class="chip chip-btn" type="button" data-hm="30">+30分</button>
+          <button class="chip chip-btn" type="button" data-hm="60">+1時間</button>
+          <button class="chip chip-btn" type="button" data-hm="480">+8時間</button>
+          <button class="chip chip-btn" type="button" data-hm="0">消す</button>
+        </div>
+      </div>
+
+      <div class="fld" id="lge-f-count">
+        <label for="lge-count">件数</label>
+        <div class="chip-add">
+          <button class="b2" type="button" id="lge-cnt-minus">－</button>
+          <input id="lge-count" type="text" inputmode="numeric" placeholder="例：1" style="text-align:center">
+          <button class="b2" type="button" id="lge-cnt-plus">＋</button>
+        </div>
+      </div>
+
+      <div class="fld" id="lge-f-amount">
+        <label for="lge-amount">金額</label>
+        <input id="lge-amount" type="text" inputmode="numeric" placeholder="例：5000">
+        <label class="chk"><input id="lge-hikazei" type="checkbox"> 非課税（立替の精算など）</label>
+      </div>
+
+      <div class="fld">
+        <label for="lge-memo">メモ</label>
+        <input id="lge-memo" type="text" placeholder="任意">
+      </div>
+
+      <div class="acts">
+        <button class="b-del" type="button" id="lge-del">削除</button>
+        <button class="b2" type="button" id="lge-cancel">やめる</button>
+        <button class="b1" type="button" id="lge-save">入れる</button>
+      </div>
+      <div class="msg" id="lge-msg"></div>
+    </div>
+  </section>
+
   <!-- ═══ 集計 ═══ -->
   <section id="scr-agg" class="scr">
     <h2 class="scr-t">集計</h2>
@@ -165,6 +243,7 @@
 
   <nav class="bn">
     <button class="bn-i active" type="button" data-go="scr-hub"><span class="bn-ic">🏠</span>ホーム</button>
+    <button class="bn-i" type="button" data-go="scr-ledger"><span class="bn-ic">📒</span>台帳</button>
     <button class="bn-i" type="button" data-go="scr-data"><span class="bn-ic">🗂</span>データ</button>
     <button class="bn-i" type="button" data-go="scr-agg"><span class="bn-ic">📊</span>集計</button>
   </nav>
@@ -173,12 +252,22 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="mo" id="mo">
+  <div class="mo-card">
+    <div class="mo-h"><span class="mo-t" id="mo-t"></span><button class="mo-x" type="button" id="mo-x" aria-label="閉じる">×</button></div>
+    <div class="mo-b" id="mo-b"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supa-config.js"></script>
 <script src="lib/access.js"></script>
 <script src="lib/aggregate.js"></script>
+<script src="lib/periods.js"></script>
+<script src="lib/ledger-agg.js"></script>
 <script src="js/suite-data.js"></script>
 <script src="js/hub.js"></script>
+<script src="js/ledger.js"></script>
 <script src="js/auth.js"></script>
 </body>
 </html>

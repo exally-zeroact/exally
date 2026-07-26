@@ -133,6 +133,43 @@ test('§2-2 pay_companies 行が無いアカウントでもエラーにならな
   assert.strictEqual(tables.pay_companies.length, 0, '勝手に pay_companies を作った');
 });
 
+/* ═══ 締め方は Kyually の会社設定を「読むだけ」(E2) ═══ */
+
+test('E2 締め方: Kyuallyの会社設定から読める', async () => {
+  const { sd, tables } = setup();
+  tables.pay_companies[0].data.company = { name: 'テスト', shimeMethod: 'ten', shimeN: '10' };
+  const s = await sd.company.getShime();
+  assert.deepStrictEqual(s, { method: 'ten', n: 10, fromKyually: true });
+});
+
+test('E2 締め方: 任意N日のNも読める', async () => {
+  const { sd, tables } = setup();
+  tables.pay_companies[0].data.company = { shimeMethod: 'ndays', shimeN: '7' };
+  const s = await sd.company.getShime();
+  assert.strictEqual(s.method, 'ndays');
+  assert.strictEqual(s.n, 7);
+});
+
+test('E2 締め方: 未設定/行なしは月まとめ(分割なし)として返す', async () => {
+  const a = setup();
+  assert.deepStrictEqual(await a.sd.company.getShime(), { method: 'monthly', n: 10, fromKyually: false });
+  const b = setup({ pay_companies: [] });
+  assert.deepStrictEqual(await b.sd.company.getShime(), { method: 'monthly', n: 10, fromKyually: false });
+});
+
+test('E2 締め方: 知らない値は月まとめに倒す(勝手な期間を作らない)', async () => {
+  const { sd, tables } = setup();
+  tables.pay_companies[0].data.company = { shimeMethod: 'weekly' };
+  assert.strictEqual((await sd.company.getShime()).method, 'monthly');
+});
+
+test('E2 締め方: 読むだけで pay_companies を書き換えない', async () => {
+  const { sd, tables } = setup();
+  const before = JSON.stringify(tables.pay_companies[0]);
+  await sd.company.getShime();
+  assert.strictEqual(JSON.stringify(tables.pay_companies[0]), before, '読むだけのはずが書き換えた');
+});
+
 /* ═══ §3 自社情報 = pay_org ═══ */
 
 test('§3 org.save は pay_org に書く(pay_companies には絶対に書かない)', async () => {
@@ -360,12 +397,19 @@ test('§6-2 suite-data は pay_payslips に書かない(合算がKyuallyに入�
   assert.strictEqual(writes, null, 'pay_payslips への書き込みがある: ' + writes);
 });
 
-test('§2-2以外で pay_companies を書き換えていない(updated_atのみ)', () => {
+test('§2-2以外で pay_companies を書き換えていない(読み取りはOK・書くのは updated_at のみ)', () => {
   const src = fs.readFileSync(path.join(ROOT, 'js', 'suite-data.js'), 'utf8');
   const ops = src.match(/from\(\s*'pay_companies'\s*\)\s*\.\s*\w+\([^)]*\)/g) || [];
+  assert.ok(ops.length > 0, 'pay_companies を触る箇所が見つからない(検査が空振り)');
   ops.forEach(op => {
+    if (/\.select\(/.test(op)) return;                       // 読み取りは許可(E2で締め方を読む)
     assert.ok(/\.update\(/.test(op), 'pay_companies に update 以外の書き込み: ' + op);
-    assert.ok(!/data/.test(op), 'pay_companies の data を触っている: ' + op);
+    assert.ok(!/data/.test(op), 'pay_companies の data を書き換えている: ' + op);
+  });
+  // 行を作る/消す系が1つも無いこと(Kyuallyの設定を勝手に作らない・消さない)
+  ['upsert', 'insert', 'delete'].forEach(bad => {
+    assert.strictEqual(new RegExp("from\\(\\s*'pay_companies'\\s*\\)\\s*\\.\\s*" + bad).test(src), false,
+      'pay_companies に ' + bad + ' がある');
   });
 });
 
