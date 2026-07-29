@@ -100,9 +100,9 @@ T('0. ★中身(.app)は最初 hidden＝未ログインで画面を見せない'
 doc.getElementById('app').hidden = false;   // 以降はログイン済みとして描画を見る
 
 /* ═══ 1. ハブ ═══ */
-T('1. ハブが出る・タイルは4つだけ', () => {
+T('1. ハブが出る・タイルは5つ(表を足した)', () => {
   ok(doc.getElementById('scr-hub').classList.contains('active'), 'ハブが表示されていない');
-  ok(doc.querySelectorAll('#scr-hub .tile').length === 4, 'タイル数=' + doc.querySelectorAll('#scr-hub .tile').length);
+  ok(doc.querySelectorAll('#scr-hub .tile').length === 5, 'タイル数=' + doc.querySelectorAll('#scr-hub .tile').length);
 });
 T('1. 給料明細タイルは働くKyuallyへ繋がる(本物の行き先が1つある)', () => {
   const a = doc.getElementById('tile-payslip');
@@ -110,6 +110,20 @@ T('1. 給料明細タイルは働くKyuallyへ繋がる(本物の行き先が1�
   ok(a.getAttribute('href') === 'https://payslip-app-olive.vercel.app', 'href=' + a.getAttribute('href'));
   ok(a.getAttribute('target') === '_blank' && /noopener/.test(a.getAttribute('rel') || ''), '別タブ/noopenerでない');
 });
+T('1. ★表(ブック)のタイルがあり book.html を開く', () => {
+  const t = doc.getElementById('tile-book');
+  ok(t, 'タイルが無い');
+  ok(t.tagName === 'A', 'リンクでない');
+  ok(t.getAttribute('href') === 'book.html', 'href=' + t.getAttribute('href') + ' (相対リンクであること)');
+  ok(!/^https?:/.test(t.getAttribute('href')), '絶対URLになっている');
+  ok(/表|ブック/.test(t.textContent), '文言=' + t.textContent.replace(/s+/g,' '));
+});
+T('1. ★逆Excルと衝突させない位置づけの説明がある(薄く1行)', () => {
+  const d = doc.querySelector('#tile-book .tile-d');
+  ok(d && d.textContent.trim().length > 0, '説明が無い');
+  ok(d.textContent.length <= 30, '説明が長すぎる(薄くの原則): ' + d.textContent);
+});
+
 T('1. 日次台帳(E2)は本物になり「準備中」は消えた', () => {
   const t = doc.getElementById('tile-ledger');
   ok(!/準備中/.test(t.textContent), 'まだ準備中と出ている');
