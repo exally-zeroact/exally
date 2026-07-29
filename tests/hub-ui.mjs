@@ -17,6 +17,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 /* ── hub.html を読み込み、ローカルの script だけ順に流す(CDN/auth は除外=ネットに出ない) ── */
 const html = fs.readFileSync(path.join(ROOT, 'hub.html'), 'utf8');
 const srcs = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1])
+  .map(s => s.split('?')[0])   // ★キャッシュバスターの ?v=... を落としてから実ファイルを読む
   .filter(s => !/^https?:/.test(s) && !/supa-config|auth\.js/.test(s));
 const dom = new JSDOM(html.replace(/<script[\s\S]*?<\/script>/g, ''), { runScripts: 'dangerously', url: 'http://localhost/', pretendToBeVisual: true });
 const win = dom.window, doc = win.document;
@@ -306,6 +307,53 @@ await (async () => {
     ok(/期間を短く/.test(m), 'msg=' + m);
     ok(doc.getElementById('agg-body').innerHTML === '', '嘘の合計が残っている');
   });
+})();
+
+/* ═══ 5c. E5 横断集計(事業のまとめ) ═══ */
+await (async () => {
+  H.show('scr-agg'); await sleep(60);
+  T('5c. 事業のまとめが出る(登録した事業ぶん)', () => {
+    const rows = [...doc.querySelectorAll('#x-body .x-row .x-b')].map(e => e.textContent);
+    ok(rows.length >= 2, '行数=' + rows.length + ' / ' + rows.join(','));
+    ok(rows.includes('代行'), '事業=' + rows.join(','));
+  });
+  T('5c. ★動いていない事業も出す(0を隠さない)', () => {
+    // db.org.businesses = 代行/空調 のうち、台帳の実績があるのは代行だけ
+    const zero = [...doc.querySelectorAll('#x-body .x-row.x-zero .x-b')].map(e => e.textContent);
+    ok(zero.length >= 1, '実績0の事業が出ていない');
+    ok(doc.querySelector('#x-body .x-zero-tag'), '「記録なし」の印が無い');
+  });
+  T('5c. 月の推移が棒で出る(散布図・折れ線は作らない)', () => {
+    const mo = doc.querySelectorAll('#x-body .x-months .x-mo');
+    ok(mo.length >= 3, '月の棒が足りない: ' + mo.length);
+    const h = doc.getElementById('scr-agg').innerHTML;
+    ok(!/<canvas|scatter|polyline|<path/i.test(h), '凝ったグラフがある');
+  });
+  T('5c. ★支給額(円)を出していない', () => {
+    const t = doc.querySelector('.x-sec').textContent;
+    ok(!/支給額|手取り|差引/.test(t), '支給額を出している: ' + t.slice(0, 120));
+  });
+  await (async () => {
+    const sel = doc.getElementById('x-span');
+    sel.value = '12'; sel.dispatchEvent(new win.Event('change')); await sleep(60);
+    T('5c. 期間を変えると読み直して月が増える', () => {
+      // 棒は「1事業あたり月数」ぶん出る（全体は 月数 × 事業数）
+      const first = doc.querySelector('#x-body .x-row');
+      const per = first.querySelectorAll('.x-months .x-mo').length;
+      ok(per === 12, '1事業あたり12か月ぶんの棒が出ていない: ' + per);
+      ok(/2025|2026/.test(doc.getElementById('x-range').textContent), 'range=' + doc.getElementById('x-range').textContent);
+    });
+    sel.value = '3'; sel.dispatchEvent(new win.Event('change')); await sleep(60);
+  })();
+  await (async () => {
+    failNext = 'ledger';
+    doc.getElementById('x-reload').click(); await sleep(60);
+    T('5c. ★件数上限で全部読めない時は、合計を出さずに教える', () => {
+      ok(/期間を短く/.test(doc.getElementById('x-msg').textContent), 'msg=' + doc.getElementById('x-msg').textContent);
+      ok(doc.getElementById('x-body').innerHTML === '', '嘘の合計が残っている');
+    });
+    doc.getElementById('x-reload').click(); await sleep(60);
+  })();
 })();
 
 /* ═══ 5b. 日次台帳(E2) ═══ */
