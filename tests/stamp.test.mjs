@@ -180,6 +180,23 @@ test('★hub.html のインラインスクリプトが構文として通る(壊�
   });
 });
 
+/* ═══ 撤去したものが表に出ていないか ═══
+ * 2026-07-30: chat.html に「売っていない月額プラン」と撤去済みの看板が載っていたので中身を撤去した。
+ * 同じものが戻ってこないよう見張る。
+ */
+// 2026-07-31: home.html / template.html のバッジも撤去したので、除外は無くなった＝全HTMLを検査する。
+test('★売っていない課金や撤去した看板が、どのHTMLにも残っていない（除外なし）', () => {
+  const NG = [/¥1,280/, /1日43円/, /Excel専門AI/, /Excel上級者/, /14日間無料/];
+  const files = fs.readdirSync(ROOT).filter(x => /\.html$/i.test(x));
+  assert.ok(files.length >= 5, 'HTMLが少なすぎる(検査が空振り): ' + files.length);
+  const bad = [];
+  for (const f of files) {
+    const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    NG.forEach(re => { if (re.test(s)) bad.push(f + ' に ' + re.source); });
+  }
+  assert.deepStrictEqual(bad, [], '売っていない課金/撤去した看板が残っている: ' + bad.join(' / '));
+});
+
 /* ═══ 実行 ═══ */
 let ng = 0;
 for (const t of T) {

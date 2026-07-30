@@ -14,6 +14,7 @@ const FILES = [
   'periods-drift.test.js',  // E2 締め方(期間) + Kyually版との全パターン突合
   'ledger-agg.test.js',     // E2 台帳→期間の実績値(ctx)
   'cross-agg.test.js',      // E5 横断集計(事業別のまとめ)
+  'org-prefill.test.mjs',   // 請求書/見積の自社情報 自動プリフィル
   'hub-ui.mjs'              // E1 UI 全ボタン(jsdom)
 ];
 

@@ -425,6 +425,24 @@ test('§2-2以外で pay_companies を書き換えていない(読み取りはOK
   });
 });
 
+/* ═══ 全件ページングが消えていないか（巻き戻り防止） ═══
+ * ★2026-07-31 に危うくやりかけた: 別セッションが入れた「1000件超の全件ページング(fetchAllQ)」を、
+ *   それより古い枝から本番へ出して消しかけた。お金の記録が黙って欠ける事故になるので、テストで居座らせる。
+ */
+test('★全件ページング(fetchAllQ)が消えていない=1000件超が黙って欠けない', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'js', 'suite-data.js'), 'utf8');
+  assert.ok(/function\s+fetchAllQ/.test(src), 'fetchAllQ(全件ページング)が消えている＝1000件超が欠落する');
+  const uses = (src.match(/fetchAllQ\(/g) || []).length;
+  assert.ok(uses >= 4, 'fetchAllQ の利用が少なすぎる(' + uses + '箇所)＝どこかが素の select に戻っている');
+});
+
+test('★台帳の読みが件数上限で黙って切れない仕掛けが残っている', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'js', 'suite-data.js'), 'utf8');
+  // 「全件取り切る」か「切れたら検知する」か、どちらかは必ず有ること
+  const guarded = /fetchAllQ/.test(src) || /count:\s*'exact'/.test(src);
+  assert.ok(guarded, '台帳の読みに「全件取得」も「切れ検知」も無い＝合計が静かに過少になる');
+});
+
 /* ═══ DDL の安全性(既存を壊さない) ═══ */
 
 test('DDL: 新規3テーブルの作成のみ・既存への ALTER/DROP TABLE が無い', () => {

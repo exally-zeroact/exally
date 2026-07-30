@@ -100,9 +100,9 @@ T('0. ★中身(.app)は最初 hidden＝未ログインで画面を見せない'
 doc.getElementById('app').hidden = false;   // 以降はログイン済みとして描画を見る
 
 /* ═══ 1. ハブ ═══ */
-T('1. ハブが出る・タイルは5つ(表を足した)', () => {
+T('1. ハブが出る・タイルは7つ(請求書/見積を足した)', () => {
   ok(doc.getElementById('scr-hub').classList.contains('active'), 'ハブが表示されていない');
-  ok(doc.querySelectorAll('#scr-hub .tile').length === 5, 'タイル数=' + doc.querySelectorAll('#scr-hub .tile').length);
+  ok(doc.querySelectorAll('#scr-hub .tile').length === 7, 'タイル数=' + doc.querySelectorAll('#scr-hub .tile').length);
 });
 T('1. 給料明細タイルは働くKyuallyへ繋がる(本物の行き先が1つある)', () => {
   const a = doc.getElementById('tile-payslip');
@@ -110,6 +110,20 @@ T('1. 給料明細タイルは働くKyuallyへ繋がる(本物の行き先が1�
   ok(a.getAttribute('href') === 'https://payslip-app-olive.vercel.app', 'href=' + a.getAttribute('href'));
   ok(a.getAttribute('target') === '_blank' && /noopener/.test(a.getAttribute('rel') || ''), '別タブ/noopenerでない');
 });
+T('1. ★請求書・見積のタイルがあり、それぞれのページを開く', () => {
+  const pairs = [['tile-seikyu','seikyusyo.html','請求書'], ['tile-mitsumori','mitsumoriyo.html','見積']];
+  pairs.forEach(([id, href, label]) => {
+    const t = doc.getElementById(id);
+    ok(t, label + 'のタイルが無い');
+    ok(t.tagName === 'A', label + ': リンクでない');
+    ok(t.getAttribute('href') === href, label + ': href=' + t.getAttribute('href'));
+    ok(!/^https?:/.test(t.getAttribute('href')), label + ': 絶対URLになっている');
+  });
+});
+T('1. ★撤去したお試し画面(chat.html)へのタイルは無い', () => {
+  ok(!/chat.html/.test(doc.getElementById('scr-hub').innerHTML), 'ハブから chat.html へ行ける');
+});
+
 T('1. ★表(ブック)のタイルがあり book.html を開く', () => {
   const t = doc.getElementById('tile-book');
   ok(t, 'タイルが無い');
