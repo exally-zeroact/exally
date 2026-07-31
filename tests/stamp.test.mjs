@@ -185,9 +185,13 @@ test('★hub.html のインラインスクリプトが構文として通る(壊�
  * 同じものが戻ってこないよう見張る。
  */
 // 2026-07-31: home.html / template.html のバッジも撤去したので、除外は無くなった＝全HTMLを検査する。
+// 2026-08-01: 給与を kyuyo/ に統合し、旧5枚(kyuuryoumeisai/seikyusyo/mitsumoriyo/template/home)を削除。
+//   直下だけ見ていると検査対象が3枚に減ってしまうので、kyuyo/ の配信HTMLも検査に含める（対象は増えている）。
 test('★売っていない課金や撤去した看板が、どのHTMLにも残っていない（除外なし）', () => {
   const NG = [/¥1,280/, /1日43円/, /Excel専門AI/, /Excel上級者/, /14日間無料/];
   const files = fs.readdirSync(ROOT).filter(x => /\.html$/i.test(x));
+  const sub = path.join(ROOT, 'kyuyo');
+  if (fs.existsSync(sub)) for (const f of fs.readdirSync(sub)) if (/\.html$/i.test(f)) files.push('kyuyo/' + f);
   assert.ok(files.length >= 5, 'HTMLが少なすぎる(検査が空振り): ' + files.length);
   const bad = [];
   for (const f of files) {
