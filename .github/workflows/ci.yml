@@ -17,6 +17,12 @@ jobs:
         with:
           node-version: '20'
 
+      # ★依存は「使う前」に入れる。CIは毎回まっさらな環境で走るので、
+      #   ローカルで緑でも node_modules が無ければ jsdom を使うテストが SKIP になり、
+      #   テスト側は「SKIPを緑と呼ばない」作りなので赤になる（その振る舞いが正しい）。
+      - name: Install test deps (jsdom / jsqr)
+        run: npm install --no-audit --no-fund
+
       # ── Exally 由来（据置） ──
       - name: Cache-buster stamp guard (貼り忘れ検知・コードより先に見る)
         run: node scripts/stamp-build.mjs --check
@@ -28,8 +34,6 @@ jobs:
         run: node tests/ci-coverage.test.mjs
 
       # ── 給与(kyuyo/) 由来（据置） ──
-      - name: Install test deps (jsdom / jsqr)
-        run: npm install --no-audit --no-fund
       - name: Payroll unit tests (依存なし・実数リテラル+回帰)
         run: node kyuyo/tests/run.js
       - name: Payroll integration (jsdomで本物のapp.jsを読み配線/UI/状態/描画)
