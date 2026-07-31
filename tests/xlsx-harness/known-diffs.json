@@ -1,0 +1,33 @@
+{
+  "note": "既知の不一致の台帳。ここに載っている物だけが「既知」として緑になる。載っていない不一致は赤。★載せる=直したではない。全部レポートに並び続ける。",
+  "classes": {
+    "A": "うちで潰す。★期限(due)必須",
+    "B": "HyperFormula 側の更新待ち。版と課題を書いて据え置く",
+    "C": "仕様差として明示的に放置。理由を書いて表に出し続ける"
+  },
+  "history": {
+    "wave1_2026-07-31": "TEXT書式5 / TEXT日付2 / INT負数2 / MOD符号3 / VALUE桁区切り1 / TEXTJOIN引数分解2 ＝15件。一致 193→221",
+    "wave2_2026-08-01": "SORT / UNIQUE / FILTERの第3引数 / MATCHワイルドカード / TEXT入れ子 ＝12件。加えて TEXT・TEXTJOIN・INT・MOD・VALUE・XLOOKUP を HFプラグインへ移し、入れ子でも効くようにした。一致 221→243"
+  },
+  "roots": {
+    "R3_SUMPRODUCT_array": "★HyperFormula は配列同士の掛け算 (D1:D6=\"A\")*E1:E6 を配列として扱えない。SUMPRODUCT を自前実装しても、引数に届く前に潰れているので直らない。エンジンの配列演算そのものを直す必要がある",
+    "R11_input_parse": "セルに打ち込んだ『桁区切り付きの数』『日付に見える文字』を、Excel は数値/日付に解釈するがグリッドは文字列のまま持つ",
+    "R14_nesting_pending": "★独自層(_jsSet)に残っている関数は、式の一番外側でしか効かない。入れ子で使われると HyperFormula の答えに戻る。実測で38関数が該当(tests/xlsx-harness/nesting-audit.mjs)。HFプラグインへ移せば直る"
+  },
+  "nesting_pending": {
+    "class": "A",
+    "due": "2026-09-30",
+    "count": 38,
+    "note": "★第3波。下の関数はまだ _jsSet 側にあり、入れ子で使われると答えが変わる。nesting-audit.mjs の件数が baseline を超えたらCIが赤になる(黙って増やせない)。",
+    "funcs": ["NUMBERVALUE","RANK","PERCENTILE","QUARTILE","MODE","TRIMMEAN","PERCENTRANK","KURT","INTERCEPT","FORECAST","IRR","DATEVALUE","INDIRECT","XMATCH","LOOKUP","CONCAT","FIXED","DOLLAR","YEN","N","TYPE","ENCODEURL","GESTEP","TEXTBEFORE","TEXTAFTER","VALUETOTEXT","AGGREGATE","PERMUT","PERMUTATIONA","MDETERM","LENB","LEFTB","RIGHTB","MIDB","ASC","JIS","DSUM","DCOUNT"]
+  },
+  "diffs": [
+    { "id": "SUMPRODUCT_cond", "func": "SUMPRODUCT", "root": "R3_SUMPRODUCT_array", "class": "B", "money_impact": true,  "exally": "100", "excel365": "1000",
+      "note": "★条件×金額の定番形。SUMPRODUCT を自前実装しても直らないことを実測で確認した。原因は HyperFormula の配列演算((範囲=値)*範囲 が配列にならない)で、エンジン側の課題。SUMIFS で書けば正しく出る" },
+    { "id": "SUMPRODUCT_len",  "func": "SUMPRODUCT", "root": "R3_SUMPRODUCT_array", "class": "B", "money_impact": false, "exally": "3",   "excel365": "11",
+      "note": "同上(配列を返す関数を引数に取る形)" },
+
+    { "id": "INPUT_typed_comma",    "func": "(入力)", "root": "R11_input_parse", "class": "A", "due": "2026-09-30", "money_impact": true,  "exally": "1,234",      "excel365": "1234",  "note": "『1,234』と打っても数値にならない=以降の合計に入らない。グリッドの入力処理(book.html)側の話なので関数プラグインでは直らない" },
+    { "id": "INPUT_typed_datelike", "func": "(入力)", "root": "R11_input_parse", "class": "A", "due": "2026-09-30", "money_impact": false, "exally": "2026-07-31", "excel365": "46234", "note": "『2026-07-31』と打っても日付にならない=日付計算に使えない" }
+  ]
+}

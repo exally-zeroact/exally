@@ -81,23 +81,165 @@ function _getSingleVal(sheet, ref) {
 }
 
 // ================================================================
+// 引数の式を値にする(★入れ子の関数呼び出しに対応)
+//   以前は引数を素朴なカンマ分割で切っていたため、TEXTJOIN(",",TRUE,SORT(E1:E6,1,-1)) のような
+//   入れ子があると『1,-1)』という無意味な文字列を黙って返していた。
+//   ・引数の切り分けは _parseFuncArgs(括弧と引用符を数える)を使う
+//   ・値にできない式は HyperFormula の calculateFormula に計算させる
+//     (getCellValue は配列の先頭1個しか返さないが、calculateFormula は配列のまま返す)
+//   ・★エラーはエラーのまま返す。壊れた文字列を返さない。
+// ================================================================
+var _ERRTXT = {DIV_BY_ZERO:'#DIV/0!',NUM:'#NUM!',NA:'#N/A',VALUE:'#VALUE!',REF:'#REF!',NAME:'#NAME?',CYCLE:'#CYCLE!',NULL:'#NULL!',SPILL:'#SPILL!'};
+function _errText(v){
+  if(typeof HF_ERR!=='undefined' && HF_ERR[v.type]) return HF_ERR[v.type];
+  return _ERRTXT[v.type] || ('#'+v.type);
+}
+function _isErrObj(v){ return !!v && typeof v==='object' && !Array.isArray(v) && !!v.type; }
+function _isErrBox(x){ return !!x && typeof x==='object' && !Array.isArray(x) && typeof x.err==='string'; }
+
+function _argList(sheet, arg) {
+  arg = String(arg).trim();
+  var q = arg.match(/^"([\s\S]*)"$/);
+  if(q) return [q[1].replace(/""/g,'"')];
+  if(/^[A-Z]+\d+:[A-Z]+\d+$/i.test(arg)) return _getRangeAll(sheet, arg);
+  if(/^[A-Z]+\d+$/i.test(arg))            return [_getSingleVal(sheet, arg)];
+  if(/^-?\d+(\.\d+)?$/.test(arg))         return [parseFloat(arg)];
+  if(/^(TRUE|FALSE)$/i.test(arg))         return [arg.toUpperCase()==='TRUE'];
+  if(!_hf || typeof _hf.calculateFormula!=='function') return {err:'#VALUE!'};
+  var v;
+  try { v = _hf.calculateFormula(arg.charAt(0)==='=' ? arg : '='+arg, _hfSid(sheet)); }
+  catch(e){ return {err:'#VALUE!'}; }
+  if(_isErrObj(v)) return {err:_errText(v)};
+  if(Array.isArray(v)){
+    var out=[];
+    for(var i=0;i<v.length;i++){
+      var row=Array.isArray(v[i]) ? v[i] : [v[i]];
+      for(var j=0;j<row.length;j++){
+        if(_isErrObj(row[j])) return {err:_errText(row[j])};
+        out.push(row[j]);
+      }
+    }
+    return out;
+  }
+  return [v];
+}
+function _argScalar(sheet, arg) {
+  var l = _argList(sheet, arg);
+  if(_isErrBox(l)) return l;
+  return l.length ? l[0] : null;
+}
+// 「その式が NAME(...) だけで出来ているか」を括弧を数えて確かめ、中身の引数文字列を返す。
+//  ★ /^INT\s*\((.+)\)$/ のような貪欲な正規表現だと INT(NOW())-TODAY() の
+//    最後の ")" まで飲み込んで別物になる(実際にこれで揮発性の確認を壊した)。
+function _wholeCallArgs(f, name) {
+  var m = new RegExp('^' + name + '\\s*\\(', 'i').exec(f);
+  if(!m) return null;
+  var i = m[0].length, depth = 1, ins = false;
+  for(; i<f.length; i++){
+    var c = f.charAt(i);
+    if(c==='"'){ ins=!ins; continue; }
+    if(ins) continue;
+    if(c==='(') depth++;
+    else if(c===')'){ depth--; if(depth===0) break; }
+  }
+  if(depth!==0) return null;
+  if(i !== f.length-1) return null;      // 閉じ括弧が式の末尾でない=この関数だけの式ではない
+  return f.slice(m[0].length, i);
+}
+function _argNum(v) {
+  if(typeof v==='number') return v;
+  if(typeof v==='boolean') return v?1:0;
+  if(typeof v==='string' && v.trim()!=='' && !isNaN(v)) return parseFloat(v);
+  return null;
+}
+
+// ================================================================
 // JS実装関数群
 // ================================================================
 
-// --- TEXT書式 ---
+// --- TEXT書式 ---------------------------------------------------
+//  ★以前は #,##0 / 0.00 / 0% / 0.00% / ¥#,##0 の5通りしか見ておらず、
+//    それ以外(0.0% や yyyy/mm/dd、正負で分ける #,##0;(#,##0))は書式を無視して
+//    数値をそのまま返していた。0.1235 が「0.1%」になる(=100倍違う)状態だった。
+//  ★対応できない書式では null を返す。呼び出し側はHyperFormulaに任せる。
+//    黙って String(num) を返すと「独自層を足したせいで悪くなる」ことがあるため
+//    (実際に日付書式でそうなっていた)。
+
+// Excelの丸め=四捨五入(0から遠い方向)。JSのMath.roundは負数で挙動が違うので符号を分ける。
+// 12.35 のような2進で表せない数は e記法の文字列経由で丸める(toFixedだと12.3になる)。
+function _fmtRound(n, d) {
+  var sign = n<0 ? -1 : 1, a = Math.abs(n);
+  var r = +(Math.round(+(a + 'e' + d)) + 'e' + (-d));
+  return sign * r;
+}
+// 「正の書式;負の書式」を引用符の外の ; で分ける
+function _fmtSections(fmt) {
+  var out=[], cur='', ins=false;
+  for(var i=0;i<fmt.length;i++){
+    var c=fmt.charAt(i);
+    if(c==='"'){ ins=!ins; cur+=c; continue; }
+    if(c===';'&&!ins){ out.push(cur); cur=''; continue; }
+    cur+=c;
+  }
+  out.push(cur);
+  return out;
+}
+function _fmtLit(s) { return String(s).replace(/"([^"]*)"/g,'$1').replace(/\\(.)/g,'$1'); }
+function _fmtIsDate(fmt) {
+  var f = String(fmt).replace(/"[^"]*"/g,'');
+  return /[ymdhs]/i.test(f) && !/[#0]/.test(f);
+}
+// シリアル値 → 日付(1900系。Excelの1900年閏年バグ域=シリアル60以前は扱わない)
+function _fmtDate(serial, fmt) {
+  var days = Math.floor(serial);
+  var ms   = Math.round((serial - days) * 86400) * 1000;
+  var d    = new Date(Date.UTC(1899,11,30) + days*86400000 + ms);
+  var Y=d.getUTCFullYear(), Mo=d.getUTCMonth()+1, D=d.getUTCDate();
+  var H=d.getUTCHours(), Mi=d.getUTCMinutes(), S=d.getUTCSeconds();
+  var p2=function(v){ return (v<10?'0':'')+v; };
+  return String(fmt).replace(/"[^"]*"|yyyy|yy|mm|m|dd|d|hh|h|ss|s/gi, function(t){
+    if(t.charAt(0)==='"') return t.slice(1,-1);
+    switch(t.toLowerCase()){
+      case 'yyyy': return String(Y);
+      case 'yy':   return p2(Y%100);
+      case 'mm':   return p2(Mo);
+      case 'm':    return String(Mo);
+      case 'dd':   return p2(D);
+      case 'd':    return String(D);
+      case 'hh':   return p2(H);
+      case 'h':    return String(H);
+      case 'ss':   return p2(S);
+      case 's':    return String(S);
+      default:     return t;
+    }
+  });
+}
+function _fmtNumber(num, fmt) {
+  var secs = _fmtSections(fmt);
+  var useNeg = num<0 && secs.length>1;
+  var f = useNeg ? secs[1] : secs[0];
+  var v = useNeg ? Math.abs(num) : num;
+  var m = f.match(/^([^#0]*?)([#0][#0,]*(?:\.[#0]+)?)(%?)([^#0]*)$/);
+  if(!m) return null;
+  var pre=m[1], core=m[2], pct=m[3], suf=m[4];
+  if(pct) v = v*100;
+  var dot = core.indexOf('.');
+  var dec = dot>=0 ? core.length-dot-1 : 0;
+  var grp = core.indexOf(',')>=0;
+  var intCore = (dot>=0 ? core.slice(0,dot) : core).replace(/,/g,'');
+  var minInt = (intCore.match(/0/g)||[]).length;
+  var r = _fmtRound(v, dec);
+  var sign = r<0 ? '-' : '';
+  var parts = Math.abs(r).toFixed(dec).split('.');
+  while(parts[0].length < minInt) parts[0] = '0' + parts[0];
+  if(grp) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return sign + _fmtLit(pre) + parts.join('.') + pct + _fmtLit(suf);
+}
 function _applyTextFormat(num, fmt) {
-  if(/^#,##0(\.0+)?$/.test(fmt)) {
-    var d=fmt.indexOf('.')===-1?0:fmt.length-fmt.indexOf('.')-1;
-    return num.toLocaleString('ja-JP',{minimumFractionDigits:d,maximumFractionDigits:d});
-  }
-  if(/^0+(\.0+)?$/.test(fmt)) {
-    var d=fmt.indexOf('.')===-1?0:fmt.length-fmt.indexOf('.')-1;
-    return num.toFixed(d);
-  }
-  if(fmt==='0%') return Math.round(num*100)+'%';
-  if(fmt==='0.00%') return (num*100).toFixed(2)+'%';
-  if(fmt==='¥#,##0'||fmt==='\\#,##0') return '¥'+Math.round(num).toLocaleString('ja-JP');
-  return String(num);
+  var bare = String(fmt).replace(/"[^"]*"/g,'');
+  if(/m{3,}|d{3,}/i.test(bare)) return null;   // 月名/曜日名(mmm・dddd)は未対応=HFに任せる
+  if(_fmtIsDate(fmt)) return _fmtDate(num, fmt);
+  return _fmtNumber(num, fmt);
 }
 
 // --- 統計 ---
@@ -342,8 +484,75 @@ function _jsIsomitted(v) { return v===undefined||v===null; }
 // ================================================================
 // convertFormula: 文字列変換
 // ================================================================
+// VALUE("1,234") を Excel と同じ 1234 にする。
+//  ★独自層(_jsComputeFormula)は「式の一番外側の関数」しか横取りしないため、
+//    =IFERROR(VALUE(B7),"NA") のように入れ子だと届かない。
+//    そこで文字列書換の段(convertFormula)で桁区切りを外す形に書き換える。ここなら入れ子でも効く。
+//  ・文字列リテラルの中は書き換えない
+//  ・DATEVALUE / NUMBERVALUE のように VALUE で終わる別の関数名は触らない(直前が識別子の文字なら飛ばす)
+//  関数呼び出しを丸ごと別の式に置き換える汎用。文字列リテラルの中は触らない。
+//  DATEVALUE / NUMBERVALUE や POINT( のように名前の一部として現れる物は触らない(直前が識別子の文字なら飛ばす)。
+function _rewriteCalls(f, name, build) {
+  var out='', i=0, ins=false;
+  var re = new RegExp('^' + name + '\\s*\\(', 'i');
+  while(i<f.length){
+    var ch=f.charAt(i);
+    if(ch==='"'){ ins=!ins; out+=ch; i++; continue; }
+    if(ins){ out+=ch; i++; continue; }
+    var m=re.exec(f.slice(i));
+    var prev=i>0?f.charAt(i-1):'';
+    if(m && !/[A-Za-z0-9_.]/.test(prev)){
+      var start=i+m[0].length, depth=1, j=start, sin=false;
+      for(; j<f.length; j++){
+        var c=f.charAt(j);
+        if(c==='"'){ sin=!sin; continue; }
+        if(sin) continue;
+        if(c==='(') depth++;
+        else if(c===')'){ depth--; if(depth===0) break; }
+      }
+      if(depth!==0){ out+=ch; i++; continue; }          // 括弧が閉じていない=触らない
+      var inner=_rewriteCalls(f.slice(start,j), name, build);   // 入れ子も先に置き換える
+      var built=build(_parseFuncArgs(inner));
+      if(built===null){ out+=f.slice(i, j+1); i=j+1; continue; }
+      out += built;
+      i = j+1;
+      continue;
+    }
+    out+=ch; i++;
+  }
+  return out;
+}
+// floor(x) を HyperFormula の式で書く。HFのINTは0方向へ切り捨てるので使えない。
+function _floorExpr(x){ return '(IF((' + x + ')<0,-ROUNDUP(-(' + x + '),0),ROUNDDOWN((' + x + '),0)))'; }
+
+function _rewriteValueCalls(f) {
+  // ★HyperFormula 2.6.1 には VALUE 関数自体が無い(#NAME?)。VALUE のまま渡してもだめなので、
+  //   「桁区切りを外して数値に変える」形に置き換える。数値にならない物は #VALUE! になり、
+  //   Excel と同じく IFERROR で拾える。空文字は Excel と同じく #VALUE! にする("x"*1 でエラーを作る)。
+  return _rewriteCalls(f, 'VALUE', function(a){
+    if(a.length!==1) return null;
+    var x=a[0];
+    return '((IF((' + x + ')="","x",SUBSTITUTE((' + x + '),",","")))*1)';
+  });
+}
+// ★独自層(_jsComputeFormula)は「式の一番外側の関数」しか横取りしないので、
+//   =ROUND(MOD(-3,2),0) のように入れ子だと届かず、HFの違う答えがそのまま出ていた。
+//   INT と MOD は HF の式で正しく書けるので、ここで書き換えて入れ子でも合うようにする。
+//   (TEXT は書式処理を式で書けないため、ここでは直せない=台帳 R12 で管理)
+function _rewriteIntMod(f) {
+  f = _rewriteCalls(f, 'INT', function(a){ return a.length===1 ? _floorExpr(a[0]) : null; });
+  f = _rewriteCalls(f, 'MOD', function(a){
+    if(a.length!==2) return null;
+    var x=a[0], y=a[1], q='((' + x + ')/(' + y + '))';
+    return '((' + x + ')-(' + y + ')*' + _floorExpr(q) + ')';
+  });
+  return f;
+}
+
 function convertFormula(f) {
   if(!f||f[0]!=='=') return f;
+  if(/VALUE\s*\(/i.test(f))     f = _rewriteValueCalls(f);
+  if(/\b(INT|MOD)\s*\(/i.test(f)) f = _rewriteIntMod(f);
   // LET展開
   if(/^=LET\s*\(/i.test(f)) f = _jsLetExpand(f);
   // LAMBDA即時呼び出し展開
@@ -369,10 +578,10 @@ function _jsComputeFormula(sheet, v) {
   var _fn = _f0.match(/^([A-Z][A-Z0-9.]*)\s*\(/i);
   if(!_fn) return null; // 関数形式でない（=A1+B1等）→ HFへ
   var _fnBase = _fn[1].toUpperCase().split('.')[0];
-  var _jsSet = {TEXT:1,VALUE:1,NUMBERVALUE:1,RANK:1,PERCENTILE:1,QUARTILE:1,
+  var _jsSet = {NUMBERVALUE:1,RANK:1,PERCENTILE:1,QUARTILE:1,
     MODE:1,TRIMMEAN:1,PERCENTRANK:1,KURT:1,INTERCEPT:1,FORECAST:1,IRR:1,XIRR:1,
-    DATEVALUE:1,DATESTRING:1,INDIRECT:1,OFFSET:1,XLOOKUP:1,XMATCH:1,LOOKUP:1,
-    CONCAT:1,TEXTJOIN:1,FIXED:1,DOLLAR:1,YEN:1,N:1,TYPE:1,ENCODEURL:1,
+    DATEVALUE:1,DATESTRING:1,INDIRECT:1,OFFSET:1,XMATCH:1,LOOKUP:1,
+    CONCAT:1,FIXED:1,DOLLAR:1,YEN:1,N:1,TYPE:1,ENCODEURL:1,
     CONVERT:1,GESTEP:1,TEXTBEFORE:1,TEXTAFTER:1,VALUETOTEXT:1,
     DSUM:1,DAVERAGE:1,DCOUNT:1,DCOUNTA:1,DMAX:1,DMIN:1,DPRODUCT:1,
     DGET:1,DSTDEV:1,DSTDEVP:1,DVAR:1,DVARP:1,
@@ -383,10 +592,6 @@ function _jsComputeFormula(sheet, v) {
 
   var f = v.slice(1).trim().toUpperCase();
   var fOrig = v.slice(1).trim();
-
-  // TEXT
-  var mText=fOrig.match(/^TEXT\s*\(([A-Z]+\d+)\s*,\s*"([^"]+)"\s*\)$/i);
-  if(mText){var num=_getSingleVal(sheet,mText[1]);if(typeof num==='number')return _applyTextFormat(num,mText[2]);}
 
   // VALUE / NUMBERVALUE
   var mVal=fOrig.match(/^(?:VALUE|NUMBERVALUE)\s*\(([^)]+)\)$/i);
@@ -471,20 +676,6 @@ function _jsComputeFormula(sheet, v) {
       return a.replace(/^["']|["']$/g,'');
     });
     return args.join('');
-  }
-
-  // TEXTJOIN
-  var mTj=fOrig.match(/^TEXTJOIN\s*\("([^"]*)"\s*,\s*(TRUE|FALSE)\s*,\s*(.+)\)$/i);
-  if(mTj){
-    var delim=mTj[1],ignore=mTj[2].toUpperCase()==='TRUE';
-    var parts=mTj[3].split(',').map(function(a){
-      a=a.trim();
-      if(/:/.test(a))return _getRangeAll(sheet,a).map(function(v){return v===null||v===undefined?'':String(v);});
-      var sv=_getSingleVal(sheet,a);
-      return [sv!==null?String(sv):a.replace(/^["']|["']$/g,'')];
-    });
-    var vals=[].concat.apply([],parts);
-    return _jsTextjoin(delim,ignore,vals);
   }
 
   // FIXED
@@ -677,4 +868,273 @@ if (typeof module !== 'undefined' && module.exports) {
     convertFormula: convertFormula,
     _jsComputeFormula: _jsComputeFormula
   };
+}
+
+// ================================================================
+// 【HyperFormula 関数プラグイン】★ここが「その関数の唯一の定義場所」
+// ================================================================
+//  なぜプラグインなのか:
+//    独自層(_jsComputeFormula)は「式の一番外側の関数」しか横取りしない。
+//    =INDEX(SORT(...),1) や =IF(1=1,XLOOKUP(...),...) のように入れ子で使われると
+//    救済が効かず、HyperFormula の違う答えがそのまま出る(実測で275本中61本)。
+//    表示だけ正しくて、そのセルを参照した先が間違う=一番タチが悪い壊れ方。
+//    プラグインとして登録すればエンジン自身が正しく計算するので、入れ子でも参照先でも正しくなる。
+//
+//  ★決まり: ここに登録した関数は _jsSet に入れない(1つの関数は1箇所でだけ定義する)。
+//           テストが両方に居たら赤にする。
+//  ★振り分けの基準:
+//     ・入れ子で使われうる純粋な関数              → ここ(HFプラグイン)
+//     ・セルを直接読む必要があるグリッド固有のオペ → _jsSet
+var _PLUGIN_FUNCS = ['SORT','UNIQUE','TEXT','TEXTJOIN','INT','MOD','VALUE','XLOOKUP','FILTER','MATCH','SUMPRODUCT'];
+var _pluginRegistered = false;
+
+// 渡された物がクラス(HyperFormula)でも名前空間({HyperFormula, FunctionPlugin, ...})でも動くようにする。
+//  ブラウザとNodeで形が違うため。
+function _resolveHFParts(ns) {
+  if(!ns) return null;
+  var cls = (typeof ns.registerFunctionPlugin === 'function') ? ns
+          : (ns.HyperFormula && typeof ns.HyperFormula.registerFunctionPlugin === 'function') ? ns.HyperFormula
+          : null;
+  if(!cls) return null;
+  var g = (typeof window !== 'undefined' && window) ? window : {};
+  function pick(k){ return ns[k] || cls[k] || g[k]; }
+  return {
+    cls: cls,
+    FunctionPlugin: pick('FunctionPlugin'),
+    T: pick('FunctionArgumentType'),
+    SRV: pick('SimpleRangeValue'),
+    CellError: pick('CellError'),
+    ErrorType: pick('ErrorType')
+  };
+}
+
+function registerExallyFunctions(HFns) {
+  if(_pluginRegistered) return true;
+  var P = _resolveHFParts(HFns);
+  if(!P) return false;
+  var FunctionPlugin = P.FunctionPlugin;
+  var T = P.T;
+  var SRV = P.SRV;
+  var CellError = P.CellError, ErrorType = P.ErrorType;
+  if(!FunctionPlugin || !T || !SRV || !CellError || !ErrorType) return false;
+
+  function err(t){ return new CellError(t); }
+  //  HyperFormula は空セルを Symbol(Empty value) で渡してくる。文字列化すると
+  //  「Symbol(Empty value)」という文字がそのまま出るので、空文字に直す(実測で踏んだ)。
+  function unwrap(v){ return (typeof v === 'symbol') ? '' : v; }
+  function flat(v){
+    if(v && typeof v==='object' && v.data) return [].concat.apply([], v.data).map(unwrap);
+    if(Array.isArray(v)) return [].concat.apply([], v).map(unwrap);
+    return [unwrap(v)];
+  }
+  function isErr(v){ return v instanceof CellError; }
+  function firstErr(arr){ for(var i=0;i<arr.length;i++) if(isErr(arr[i])) return arr[i]; return null; }
+  function toNum(v){
+    if(typeof v==='number') return v;
+    if(typeof v==='boolean') return v?1:0;
+    if(typeof v==='string' && v.trim()!=='' && !isNaN(v)) return parseFloat(v);
+    return null;
+  }
+  function col(arr){ return SRV.onlyValues(arr.map(function(v){ return [v]; })); }
+  function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function wildRe(pat){
+    var out='';
+    for(var i=0;i<pat.length;i++){
+      var c=pat.charAt(i);
+      if(c==='~' && i+1<pat.length){ out += esc(pat.charAt(i+1)); i++; continue; }
+      if(c==='*'){ out += '[\\s\\S]*'; continue; }
+      if(c==='?'){ out += '[\\s\\S]'; continue; }
+      out += esc(c);
+    }
+    return new RegExp('^'+out+'$','i');
+  }
+  function hasWild(s){ return typeof s==='string' && /[*?]/.test(s); }
+  function eqVal(a,b){
+    if(typeof a==='string' && typeof b==='string') return a.toLowerCase()===b.toLowerCase();
+    return a===b;
+  }
+
+  //  FunctionPlugin は ES のクラス。ES5の apply では継承できない
+  //  (実測: Class constructors cannot be invoked without 'new')
+  var ExallyPlugin = class ExallyPlugin extends FunctionPlugin {};
+
+  ExallyPlugin.prototype.exSort = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.SORT'), function(range, idx, order){
+      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+      var e = firstErr(arr); if(e) return e;
+      var dir = (toNum(order)===-1) ? -1 : 1;
+      arr.sort(function(a,b){
+        if(typeof a==='number' && typeof b==='number') return (a-b)*dir;
+        return String(a).localeCompare(String(b))*dir;
+      });
+      return col(arr);
+    });
+  };
+  ExallyPlugin.prototype.exUnique = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.UNIQUE'), function(range){
+      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+      var e = firstErr(arr); if(e) return e;
+      var seen = [], out = [];
+      for(var i=0;i<arr.length;i++){
+        var key = (typeof arr[i]) + ' ' + String(arr[i]);
+        if(seen.indexOf(key)<0){ seen.push(key); out.push(arr[i]); }
+      }
+      return col(out);
+    });
+  };
+  ExallyPlugin.prototype.exText = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.TEXT'), function(v, fmt){
+      if(isErr(v)) return v;
+      if(isErr(fmt)) return fmt;
+      var raw = flat(v)[0];
+      var n = toNum(raw);
+      if(n===null) return raw===null||raw===undefined ? '' : String(raw);
+      var r = _applyTextFormat(n, String(fmt));
+      return r===null ? String(n) : r;
+    });
+  };
+  ExallyPlugin.prototype.exTextjoin = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.TEXTJOIN'), function(){
+      var a = Array.prototype.slice.call(arguments);
+      var delim = a[0]===null||a[0]===undefined ? '' : String(flat(a[0])[0]);
+      var ign = a[1]===true || String(flat(a[1])[0]).toUpperCase()==='TRUE';
+      var vals = [];
+      for(var i=2;i<a.length;i++) vals = vals.concat(flat(a[i]));
+      var e = firstErr(vals); if(e) return e;
+      return _jsTextjoin(delim, ign, vals.map(function(v){ return v===null||v===undefined?'':v; }));
+    });
+  };
+  ExallyPlugin.prototype.exInt = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.INT'), function(v){
+      if(isErr(v)) return v;
+      var n = toNum(flat(v)[0]);
+      if(n===null) return err(ErrorType.VALUE);
+      return Math.floor(n);
+    });
+  };
+  ExallyPlugin.prototype.exMod = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.MOD'), function(x, y){
+      if(isErr(x)) return x;
+      if(isErr(y)) return y;
+      var a = toNum(flat(x)[0]), b = toNum(flat(y)[0]);
+      if(a===null || b===null) return err(ErrorType.VALUE);
+      if(b===0) return err(ErrorType.DIV_BY_ZERO);
+      return a - b*Math.floor(a/b);
+    });
+  };
+  ExallyPlugin.prototype.exValue = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.VALUE'), function(v){
+      if(isErr(v)) return v;
+      var raw = flat(v)[0];
+      if(raw===null || raw===undefined || raw==='') return err(ErrorType.VALUE);
+      if(typeof raw==='number') return raw;
+      var n = _jsValue(raw);
+      return n===null ? err(ErrorType.VALUE) : n;
+    });
+  };
+  ExallyPlugin.prototype.exXlookup = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.XLOOKUP'), function(key, la, ra, ifnf){
+      if(isErr(key)) return key;
+      var k = flat(key)[0];
+      var L = flat(la), R = flat(ra);
+      var e = firstErr(L) || firstErr(R); if(e) return e;
+      for(var i=0;i<L.length;i++){
+        if(hasWild(k) ? wildRe(String(k)).test(String(L[i])) : eqVal(L[i], k)) return R[i]===undefined?null:R[i];
+      }
+      if(ifnf===undefined || ifnf===null) return err(ErrorType.NA);
+      return flat(ifnf)[0];
+    });
+  };
+  ExallyPlugin.prototype.exFilter = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.FILTER'), function(range, cond, ifEmpty){
+      var A = flat(range), C = flat(cond);
+      var e = firstErr(A) || firstErr(C); if(e) return e;
+      var out = [];
+      for(var i=0;i<A.length;i++){
+        var c = C[i];
+        if(c===true || c===1 || (typeof c==='string' && c.toUpperCase()==='TRUE')) out.push(A[i]);
+      }
+      if(!out.length){
+        if(ifEmpty===undefined || ifEmpty===null) return err(ErrorType.NA);
+        return col(flat(ifEmpty));
+      }
+      return col(out);
+    });
+  };
+  ExallyPlugin.prototype.exMatch = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.MATCH'), function(key, range, type){
+      if(isErr(key)) return key;
+      var k = flat(key)[0], A = flat(range);
+      var e = firstErr(A); if(e) return e;
+      var t = (type===undefined||type===null) ? 1 : toNum(flat(type)[0]);
+      if(t===0){
+        for(var i=0;i<A.length;i++){
+          if(hasWild(k) ? wildRe(String(k)).test(String(A[i])) : eqVal(A[i], k)) return i+1;
+        }
+        return err(ErrorType.NA);
+      }
+      var best=-1;
+      for(var j=0;j<A.length;j++){
+        var v=A[j];
+        if(t===1 && typeof v==='number' && typeof k==='number' && v<=k) best=j;
+        if(t===-1 && typeof v==='number' && typeof k==='number' && v>=k) best=j;
+        if(t===1 && typeof v==='string' && typeof k==='string' && String(v).toLowerCase()<=String(k).toLowerCase()) best=j;
+      }
+      return best<0 ? err(ErrorType.NA) : best+1;
+    });
+  };
+  ExallyPlugin.prototype.exSumproduct = function(ast, state){
+    return this.runFunction(ast.args, state, this.metadata('EX.SUMPRODUCT'), function(){
+      var a = Array.prototype.slice.call(arguments).map(flat);
+      if(!a.length) return 0;
+      for(var i=0;i<a.length;i++){ var e=firstErr(a[i]); if(e) return e; }
+      var n = a[0].length, sum = 0;
+      for(var r=0;r<n;r++){
+        var p = 1;
+        for(var c=0;c<a.length;c++){
+          var v = a[c][r];
+          if(v===true) v=1; else if(v===false) v=0;
+          var num = typeof v==='number' ? v : ((v===null||v===undefined||v===''||isNaN(v)) ? 0 : parseFloat(v));
+          p *= num;
+        }
+        sum += p;
+      }
+      return sum;
+    });
+  };
+
+  var ANY = { argumentType: T.ANY };
+  var OPT = { argumentType: T.ANY, optionalArg: true };
+  ExallyPlugin.implementedFunctions = {
+    'EX.SORT':       { method: 'exSort',       parameters: [ANY, OPT, OPT, OPT], arrayFunction: true },
+    'EX.UNIQUE':     { method: 'exUnique',     parameters: [ANY, OPT, OPT],      arrayFunction: true },
+    'EX.TEXT':       { method: 'exText',       parameters: [ANY, ANY] },
+    'EX.TEXTJOIN':   { method: 'exTextjoin',   parameters: [ANY, ANY, ANY], repeatLastArgs: 1 },
+    'EX.INT':        { method: 'exInt',        parameters: [ANY] },
+    'EX.MOD':        { method: 'exMod',        parameters: [ANY, ANY] },
+    'EX.VALUE':      { method: 'exValue',      parameters: [ANY] },
+    'EX.XLOOKUP':    { method: 'exXlookup',    parameters: [ANY, ANY, ANY, OPT, OPT, OPT] },
+    'EX.FILTER':     { method: 'exFilter',     parameters: [ANY, ANY, OPT],      arrayFunction: true },
+    'EX.MATCH':      { method: 'exMatch',      parameters: [ANY, ANY, OPT] },
+    'EX.SUMPRODUCT': { method: 'exSumproduct', parameters: [ANY], repeatLastArgs: 1 }
+  };
+  var tr = {};
+  _PLUGIN_FUNCS.forEach(function(n){ tr['EX.'+n] = n; });
+  try {
+    P.cls.registerFunctionPlugin(ExallyPlugin, { enGB: tr, enUS: tr });
+  } catch(e) {
+    if(typeof console!=='undefined') console.warn('Exally関数プラグインの登録に失敗', e);
+    return false;
+  }
+  _pluginRegistered = true;
+  return true;
+}
+
+// ブラウザ: hyperformula.full.min.js の後に読まれるので、ここで登録する
+//  (HyperFormula.buildEmpty より前に登録されている必要がある)
+if (typeof HyperFormula !== 'undefined') registerExallyFunctions(HyperFormula);
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.registerExallyFunctions = registerExallyFunctions;
+  module.exports._PLUGIN_FUNCS = _PLUGIN_FUNCS;
 }
