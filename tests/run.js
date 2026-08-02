@@ -14,6 +14,9 @@ const FILES = [
   'cross-agg.test.js',      // E5 横断集計(事業別のまとめ)
   'hub-ui.mjs',             // E1 UI 全ボタン(jsdom)
   'no-duplicate-libs.test.mjs', // ★同じ物を2箇所に置かせない(法定データのコピペ・ドリフト防止)
+  'refs-resolve.test.mjs',      // ★読んでいるファイルが実在するか(require/importも参照として数える)
+  ['refs-resolve.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
+  'api-claude.test.mjs',        // ★チャットが客に言う基準数値(実数リテラル・NaN混入検知)
   // P1② 版対応 検証ハーネス
   'xlsx-harness/roundtrip.test.mjs',        // 数式入りxlsxの往復(SheetJS・★新関数の _xlfn.)
   'xlsx-harness/compare.mjs',               // Excelの真値と突合(新規の不一致があれば赤)
