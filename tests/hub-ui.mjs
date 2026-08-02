@@ -110,7 +110,10 @@ T('1. ★給与タイルは同一オリジンの /kyuyo/ へ繋がる(別サイ�
   const a = doc.getElementById('tile-payslip');
   ok(a, '給与タイルが無い');
   ok(a.tagName === 'A', 'リンクでない');
-  ok(a.getAttribute('href') === '/kyuyo/', 'href=' + a.getAttribute('href'));
+  // ★2026-08-02 相対に直した。'/kyuyo/' はドメイン直下を指すので、サブパスで配信した時に404になる
+  //   （テスト環境 exally-staging は github.io/exally-staging/ のサブパス配信）。
+  //   相対なら Vercel のルート配信でも Pages のサブパスでも同じ場所を指す＝両方で正しい。
+  ok(a.getAttribute('href') === 'kyuyo/', 'href=' + a.getAttribute('href') + ' (相対 kyuyo/ であること)');
   ok(!/^https?:/.test(a.getAttribute('href')), '外部URLになっている(別オリジン=ログインが分かれる)');
   ok(!a.getAttribute('target'), '別タブで開く指定が残っている(同一サイト内なので不要)');
 });
