@@ -60,6 +60,8 @@ jobs:
         run: node kyuyo/tests/ops-real-values.test.mjs
       - name: ★源泉区分(204条) 選べるのに算式が無い区分を残さない＋実数1円一致
         run: node kyuyo/tests/gensen-kubun.test.mjs && node kyuyo/tests/gensen-kubun.test.mjs --self-test
+      - name: ★入口の見張りの「判定」が空振りしていないか (外へ出ない部分だけ・実際の死活は hosts.yml 週1)
+        run: node scripts/check-hosts.mjs --self-test
       - name: CI coverage guard (CIから黙って外れているテストが無いか=除外は理由と戻す条件つきのみ)
         run: node tests/ci-coverage.test.mjs
 
