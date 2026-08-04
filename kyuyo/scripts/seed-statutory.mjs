@@ -17,7 +17,25 @@ const WM = require('../lib/warimashi.js');
 const SHZ = require('../lib/shouhizei-ritsu.js');
 const { buildStatutoryRows } = require('../lib/statutory-rows.js');
 
-const c = new pg.Client({ host: 'db.tnfwipbgfgjaymlszeid.supabase.co', port: 5432, user: 'postgres', password: process.env.SUPA_DB_PW, database: 'postgres', ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 });
+// ★書き込み先は【このリポジトリ自身の接続設定】から導く（ホスト直書きをやめた・2026-08-01）★
+//   なぜ: これは書き込みツール。ホストを直書きすると、テスト用リポジトリ(exally-staging)で
+//   うっかり走らせた時に【本番倉庫へ書いてしまう】。リポジトリが持つ js/supa-config.js から
+//   プロジェクトrefを取れば、本番repo→本番DB / stagingのrepo→DB-test にしかならない＝事故が構造的に起きない。
+//   (js/supa-config.js は本番とstagingで中身が違う唯一のファイル＝環境の唯一の分かれ目。)
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+function projectRefFromRepo() {
+  const p = path.join(REPO, 'js', 'supa-config.js');
+  if (!fs.existsSync(p)) throw new Error('js/supa-config.js が無い＝接続先を決められない。書き込みは行いません。');
+  const m = fs.readFileSync(p, 'utf8').match(/https:\/\/([a-z0-9]+)\.supabase\.co/);
+  if (!m) throw new Error('js/supa-config.js から Supabase の URL を読めない。書き込みは行いません。');
+  return m[1];
+}
+const REF = projectRefFromRepo();
+console.log('書き込み先(このリポジトリの js/supa-config.js 由来): db.' + REF + '.supabase.co');
+const c = new pg.Client({ host: 'db.' + REF + '.supabase.co', port: 5432, user: 'postgres', password: process.env.SUPA_DB_PW, database: 'postgres', ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 });
 
 // ★行生成は lib/statutory-rows.js に集約(seedとadmin.htmlで単一ソース・二重持ち禁止)★
 const rows = buildStatutoryRows({ SHH, SAI, KOYO, D, H, NI, SZ, N, WM, SHZ });

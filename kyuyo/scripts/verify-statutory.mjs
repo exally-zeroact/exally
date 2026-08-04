@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const SHH = require('../lib/shakaihoken-hyo.js');
 const SAI = require('../lib/saitei-chingin.js');
+const SR = require('../lib/statutory-rows.js');
 const KOYO = require('../lib/koyo-hoken.js');
 const D = require('../lib/shotokuzei-densan.js');
 const H = require('../lib/shotokuzei-hei.js');
@@ -15,7 +16,19 @@ const SZ = require('../lib/shoyo-zei.js');
 const N = require('../lib/nenmatsu.js');
 const WM = require('../lib/warimashi.js');
 
-const SUPA_URL = 'https://tnfwipbgfgjaymlszeid.supabase.co';
+// ★ここだけは「アプリの倉庫(js/supa-config.js)」ではなく【中央statutory】を見る（意図的・2026-08-01）★
+//   理由: statutory は法定データ(健保料率・最賃・所得税表…)＝全国で1つの表であって、
+//         会社ごとのデータ(テナントデータ)ではない。環境ごとに別々の正を持つ物ではないので、
+//         本番/テストで分けない。読取専用(anon の GET だけ)＝ここから書く経路は無い。
+//   実測(2026-08-01): DB-test(khawdrnvssdenumbiwfg) の statutory は【空(0行)】。
+//         ここを DB-test に向けると全kindが「中央に無し」になり、
+//         ドリフトが無いのにCIが赤くなる＝ガードとして機能しない。
+//   戻す条件: DB-test 側の statutory に本番と同じ行を入れた時。その時は下を
+//         js/supa-config.js 由来に切り替える(seed-statutory.mjs と同じやり方)。
+//   ※このファイルが本番refを持つことは tests/no-absolute-paths.test.mjs の例外表に
+//     理由つきで明示してある。黙って残っている本番URLではない。
+const STATUTORY_CENTRAL_URL = 'https://tnfwipbgfgjaymlszeid.supabase.co';
+const SUPA_URL = STATUTORY_CENTRAL_URL;
 const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRuZndpcGJnZmdqYXltbHN6ZWlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Nzk4MzQsImV4cCI6MjA5NzE1NTgzNH0.zhKPLSlW4zxsdjsXNvqDHvtP3wBqp-EKaxbjqLGW_ek';
 
 const diffs = [];
@@ -39,7 +52,9 @@ function verify(rows) {
   }
   // ── 最賃47県 ──
   const sai = row(rows, 'saitei_chingin', 2025);
-  if (sai) { eq('最賃todofuken', SAI.todofuken, sai.todofuken); eq('最賃全国平均', SAI.ZENKOKU_HEIKIN, sai.zenkoku_heikin); } else diffs.push('saitei_chingin 中央に無し');
+  // ★中央へ送る形(名前と額)で比べる。lib が持つ発効日/前年額はまだ中央へ配信していない
+  //   （中央の表を変えるのは本番データの操作＝指示をもらってから seed-statutory で入れる）。
+  if (sai) { eq('最賃todofuken', SR.saiteiForCentral(SAI), sai.todofuken); eq('最賃全国平均', SAI.ZENKOKU_HEIKIN, sai.zenkoku_heikin); } else diffs.push('saitei_chingin 中央に無し');
   // ── 雇用 令和7/8 ──
   for (const year of [2025, 2026]) { const d = row(rows, 'koyo', year); if (d) eq('雇用' + year, KOYO.RATES[year], d); else diffs.push('koyo/' + year + ' 中央に無し'); }
   // ── 所得税 月額(densan) 令和7/8 ──

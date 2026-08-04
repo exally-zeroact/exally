@@ -38,6 +38,26 @@ jobs:
         run: node tests/api-claude.test.mjs
       - name: ★法定値の直書きガード (率・額が説明文に固定されていないか)
         run: node tests/no-hardcoded-statutory.test.mjs && node tests/no-hardcoded-statutory.test.mjs --self-test
+      - name: ★契約v0 (レジストリ / 契約の線=呼ばれているか・面を呼び返していないか)
+        run: node tests/op-registry.test.mjs && node tests/op-boundary.test.mjs && node tests/op-boundary.test.mjs --self-test
+      - name: ★iPhoneで動かない書き方ガード (type=month / octet-stream / writeFile / Blob散在)
+        run: node tests/ios-unsupported.test.mjs && node tests/ios-unsupported.test.mjs --self-test
+      - name: ★ファイルの渡し方 (種類・スマホは共有シート・PCは落ちる)
+        run: node kyuyo/tests/file-out.test.mjs
+      - name: ★最低賃金 47県が公式の実額と一致 (前科のある行・1円単位)
+        run: node kyuyo/tests/saitei-official.test.mjs
+      - name: ★最低賃金を県ごとの発効日で判定 (誤警告ゼロ＋本物の割れを見逃さない)
+        run: node kyuyo/tests/saitei-hatsuko.test.mjs
+      - name: ★法定データの出典・確認日・指紋 (率を変えたら確認日が自己失効する)
+        run: node kyuyo/tests/statutory-freshness.test.mjs && node kyuyo/tests/statutory-freshness.test.mjs --self-test
+      - name: ★中央statutoryの写しが最新か (出典/確認日/指紋・最賃47県)
+        run: node kyuyo/scripts/pull-statutory.mjs --check
+      - name: ★app.jsの道とオペの道が同じ物を作るか (新旧AOA完全一致)
+        run: node kyuyo/tests/ops-app-parity.test.mjs
+      - name: ★契約が実データの書き方を受け取れるか (画面の選択肢を機械で突き合わせ)
+        run: node kyuyo/tests/ops-real-values.test.mjs
+      - name: ★源泉区分(204条) 選べるのに算式が無い区分を残さない＋実数1円一致
+        run: node kyuyo/tests/gensen-kubun.test.mjs && node kyuyo/tests/gensen-kubun.test.mjs --self-test
       - name: CI coverage guard (CIから黙って外れているテストが無いか=除外は理由と戻す条件つきのみ)
         run: node tests/ci-coverage.test.mjs
 

@@ -10,6 +10,32 @@
   function PM(){ return (typeof PayrollMonthly!=='undefined')?PayrollMonthly:(typeof window!=='undefined'&&window.PayrollMonthly); }
   function PW(){ return (typeof PayrollWarnings!=='undefined')?PayrollWarnings:(typeof window!=='undefined'&&window.PayrollWarnings); }
   function ctxOf(){ return { company: state.company, month: state.month, otHist: state._otHist }; }
+
+  /* ══ 契約(オペレーション)の入口 ══════════════════════════════════════
+   *  設計: docs/SPEC_engine_grid_contract_v0.md
+   *  ★業務の答えを出すのはオペだけ。面(この app.js)がやるのは
+   *    「自分の形 → inputs への詰め替え」と「返ってきた物の見せ方・ファイル書き出し」だけ。
+   *    ★面では1円も計算しない。
+   *  ★呼ばれていない契約は「有る」と言わない — tests/op-boundary.test.mjs が
+   *    「ops配下とテストの外から最低1箇所呼ばれているか」を見ている。
+   */
+  var _statSource = {};   // 中央(statutory)から流し込んだ行の出典・確認日。provenance に載せる
+  function opPayrollMonthly(){
+    var R = (typeof OpRegistry !== 'undefined') ? OpRegistry : (window && window.OpRegistry);
+    if(!R) return null;
+    if(!R.has('payroll.monthly')){
+      var o = (typeof OpPayrollMonthly !== 'undefined') ? OpPayrollMonthly : (window && window.OpPayrollMonthly);
+      if(!o) return null;
+      R.register(o);
+    }
+    return R.get('payroll.monthly');
+  }
+  // 画面の状態 → オペの inputs（詰め替えるだけ。判定も計算もしない）
+  function payrollInputs(emps){
+    return { month: state.month, company: state.company, employees: emps,
+      otHistory: state._otHist || {}, options: { statutorySource: _statSource } };
+  }
+
   var num=function(v){ return PM().num(v); }; // 数値化は lib/payroll-monthly.js へ移設(単一定義)
   var yen=function(n){return '¥'+Math.round(n).toLocaleString('ja-JP');};
   var fmtN=function(v){var n=num(v);return n?n.toLocaleString('ja-JP'):(v===0||v==='0'?'0':'');};
@@ -822,7 +848,7 @@
       if(sb.excluded&&sb.excluded.length) body+='<div class="exinfo">✓ '+sb.excluded.map(function(x){return labels[x];}).join('・')+'は支払基礎日数が'+th+'日未満のため<b>ルール上この月を計算から外しました</b>（あなたのミスではありません）。残りの月の平均で算定します。</div>';
       if(mode==='teiji') body+='<div style="text-align:right;margin-top:2px"><span class="sh-refetch" data-refetch="1" style="font-size:12px;color:#3D9E72;text-decoration:underline;cursor:pointer">過去の4〜6月から自動入力</span></div>';
       if(mode==='zuiji'){
-        body+='<div class="zk-inp"><div class="frow"><div class="flabel">変動があった月<span class="hint2">昇給・降給した月</span></div><input type="month" class="finput sh-henko" value="'+attr(s.henkoYm)+'"></div>'
+        body+='<div class="zk-inp"><div class="frow"><div class="flabel">変動があった月<span class="hint2">昇給・降給した月</span></div><input type="hidden" data-ym class="finput sh-henko" value="'+attr(s.henkoYm)+'"></div>'
           +'<div class="frow"><div class="flabel">従前の標準報酬月額<span class="hint2">円・変動前</span><span class="help-i" data-help="toukyu">💡</span></div><input class="finput num sh-prevhyojun" value="'+attr(s.prevHyojun)+'" placeholder="200000"></div>'
           +'<div class="nw-row" style="margin:2px 0 6px"><div class="nw-q">固定的賃金（基本給・手当など）が変わりましたか？<div class="nw-help">昇給・降給・手当の新設/廃止など。残業だけの増減は含みません。</div></div><div class="nw-in">'+ynPill('shfixed','1',!!s.fixedChanged)+'</div></div></div>';
         body+='<div class="zk-box">'+zuijiJudgeHTML(e)+'</div>';
@@ -1474,7 +1500,7 @@
     var b=state.bonus||{}, ym=bonusYmOf(), pm=prevYmOf(ym);
     var head='<div class="card" style="padding:12px;margin-bottom:10px">'
       +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">'
-      +'<label style="font-size:12px;color:#2E7D54;font-weight:700">賞与支給月 <input type="month" class="finput finput-sm" data-bn="payYm" value="'+attr(ym)+'"></label>'
+      +'<label style="font-size:12px;color:#2E7D54;font-weight:700">賞与支給月 <input type="hidden" data-ym class="finput finput-sm" data-bn="payYm" value="'+attr(ym)+'"></label>'
       +'<label style="font-size:12px;color:#2E7D54;font-weight:700">支給日 <input class="finput finput-sm" data-bn="payDay" value="'+attr(b.payDay)+'" placeholder="例 12月10日" style="width:110px"></label>'
       +'</div>'
       +'<div class="hint" style="margin:8px 0 0">賞与の所得税は<b>前月（'+esc(pm)+'）の給与から社会保険料を引いた額</b>と扶養人数で税率が決まります（国税庁 算出率表）。<span class="help-i" data-help="bonusPrev">💡</span> 前月を計算・保存していれば自動、無ければ各行で手入力してください。</div>'
@@ -2505,7 +2531,30 @@
       +'<p class="hint" style="margin:6px 0 0">全銀ファイル=銀行の「総合振込」に取り込む固定長データ（Shift-JIS）。銀行/支店コードは通帳や銀行サイトで確認してください。</p>';
     box.innerHTML=committer+listHTML+btns;
   }
-  function dlBytes(bytes, filename, type){ try{ var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(url); if(a.parentNode)a.parentNode.removeChild(a); },200); }catch(e){ uiAlert('ダウンロードに失敗しました'); } }
+  // ★ファイルの渡し口は js/file-out.js の1本だけ。種類は拡張子から必ず決まる（octet-stream にしない）。
+  //   iPhone では共有シートが出て「Excelで開く」が並ぶ。PC等は今までどおり落ちる。
+  /* ★lib は画面にも通信にも触らない（headless）。だから面(ここ)が2つ渡す:
+   *   ① 渡し口(FileOut)そのもの ② 失敗を客に知らせるやり方
+   * ★文言はここで決める。lib は符号(code)しか知らない。
+   * ★押したのに何も起きない、を作らない＝失敗は必ず画面に出す。 */
+  var XLSX_OUT_MSG = {
+    XLSX_NOT_LOADED: 'Excel機能を読み込めませんでした。通信環境をご確認のうえ、もう一度お試しください。',
+    NO_FILE_OUT: 'ファイルを渡す部品を読み込めませんでした。ページを開き直してからもう一度お試しください。',
+    DELIVER_FAILED: 'ファイルを渡せませんでした。もう一度お試しください。',
+  };
+  if(window.PayslipXlsx){
+    if(PayslipXlsx.setFileOut) PayslipXlsx.setFileOut(window.FileOut);
+    if(PayslipXlsx.setErrorReporter) PayslipXlsx.setErrorReporter(function(err){
+      var code=(err&&err.code)||'DELIVER_FAILED';
+      var detail=(err&&err.error&&err.error.message)?('\n（' + err.error.message + '）'):'';
+      uiAlert((XLSX_OUT_MSG[code]||XLSX_OUT_MSG.DELIVER_FAILED)+detail);
+    });
+  }
+  function dlBytes(bytes, filename, type){
+    if(!window.FileOut){ uiAlert('ファイルの受け渡し部品(js/file-out.js)が読み込まれていません'); return; }
+    window.FileOut.deliver(bytes, filename, type?{type:type}:undefined)
+      .catch(function(e){ uiAlert('ファイルを渡せませんでした：'+((e&&e.message)||e)); });
+  }
   function downloadZengin(){
     if(typeof Zengin==='undefined'){ uiAlert('全銀モジュールが読み込まれていません'); return; }
     var c=state.company; var d=(c.furiDate&&/^\d{4}-\d{2}-\d{2}$/.test(c.furiDate))?c.furiDate.slice(5,7)+c.furiDate.slice(8,10):'';
@@ -2906,10 +2955,62 @@
     var _fitT; window.addEventListener('resize',function(){ if(!$('#scr-print')||!$('#scr-print').classList.contains('active'))return; clearTimeout(_fitT); _fitT=setTimeout(fitPreview,120); });
     $('#b-xlsx').addEventListener('click',function(){ if(!window.PayslipXlsx)return; markOutput(); var v=$('#p-emp').value; var emps=(v==='__all')?state.employees.filter(function(e){return isActiveInMonth(e,state.month);}):[state.employees[+v]];
       var isBonus=state.printMode==='bonus'; // 印刷の月次/賞与トグルに合わせる(賞与で月次が出る不具合を修正)
+      // ★月次は契約(オペレーション)経由で出す。セルを決めるのはエンジン側だけ＝画面とファイルがズレようがない。
+      //   賞与はまだオペ化していないので従来の道（オペ化したらここも契約経由にする）。
+      if(!isBonus && exportMonthlyViaOp(emps)) return;
       var people=isBonus?buildBonusPeople(emps):buildPeople(emps);
       var lbl=(isBonus?bonusMonthLabel():monthLabel()).replace(/ /g,'');
       var fn=isBonus?('賞与明細_'+bonusYmOf()+'.xlsx'):('給与明細_'+state.month+'.xlsx');
       PayslipXlsx.download(people, {company:state.company.name, monthLabel:lbl, filename:fn}); });
+    // ★契約経由の月次Excel。面の仕事は「詰め替え」と「ファイルに書く」だけ。
+    //   検証NGなら【ファイルを作らず】どこが悪いかをその場で言う（0円の明細を出さない）。
+    /* ★契約のエラーを、客に向けた文にする（2026-08-04）
+     *  悪い: 「employees[0].employmentType：次のいずれかにしてください（employee/contractor）」
+     *  良い: 「山田 太郎さんの「雇用形態」が読めませんでした（設定 → 従業員マスタ で選び直してください）」
+     *  ★内部の名前（employees[0] / employmentType / 決まった値の一覧）を客に見せない。
+     *  ★何を・どこで直すかを書く。
+     *  内部の path と code は res.errors にそのまま残っている（テストとログ用・消していない）。 */
+    var OP_FIELD = {
+      employmentType: { name: '雇用形態', where: '設定 → 従業員マスタ' },
+      payType:        { name: '給与形態', where: '設定 → 従業員マスタ' },
+      taxClass:       { name: '所得税の区分（甲・乙・丙）', where: '設定 → 従業員マスタ' },
+      pref:           { name: '都道府県', where: '設定 → 従業員マスタ' },
+      birthYmd:       { name: '生年月日', where: '設定 → 従業員マスタ' },
+      joinYmd:        { name: '入社日', where: '設定 → 従業員マスタ' },
+      taishokuYmd:    { name: '退職日', where: '設定 → 従業員マスタ' },
+      fuyou:          { name: '扶養親族等の数', where: '設定 → 従業員マスタ' },
+      name:           { name: '氏名', where: '設定 → 従業員マスタ' },
+      gyoshu:         { name: '雇用保険の業種', where: '設定 → 会社の決まり' },
+      month:          { name: '対象月', where: '画面上の「対象月」' },
+    };
+    function humanOpErrors(errors, emps){
+      var lines=errors.slice(0,5).map(function(e){
+        var m=/^employees\[(\d+)\]\.(\w+)$/.exec(e.path||'');
+        var key=m?m[2]:String(e.path||'').split('.').pop();
+        var f=OP_FIELD[key]||null;
+        var field=f?f.name:'この項目', where=f?f.where:'設定';
+        if(m){
+          var i=+m[1], who=(emps&&emps[i]&&emps[i].name)?(emps[i].name+'さん'):((i+1)+'人目の方');
+          return '・'+who+'の「'+field+'」が読めませんでした（'+where+' で選び直してください）';
+        }
+        return '・「'+field+'」が読めませんでした（'+where+' で確認してください）';
+      });
+      return 'Excelを作れませんでした。次の所を直すと作れます。\n\n'+lines.join('\n')
+        +(errors.length>5?('\n…ほか'+(errors.length-5)+'件'):'')
+        +'\n\n※直したあと、もう一度「Excel」を押してください。';
+    }
+
+    function exportMonthlyViaOp(emps){
+      var op=opPayrollMonthly(); if(!op) return false;               // 読めていなければ従来の道
+      var res=op.engine(payrollInputs(emps));
+      if(res.errors && res.errors.length){
+        uiAlert(humanOpErrors(res.errors, emps));
+        return true;                                                 // ★止めた（従来の道へは落とさない）
+      }
+      var out=op.excel.export(res); if(!out) return false;
+      PayslipXlsx.downloadSheets(out.sheets, { filename: out.filename });
+      return true;
+    }
     // Web明細で公開(従業員向け配布・アクセスコード方式)
     $('#b-webpub').addEventListener('click',function(){ markOutput(); publishMeisaiNow(state.printMode==='bonus'); });
     $('#webmeisai-card').addEventListener('click',function(e){
@@ -3117,6 +3218,8 @@
     return Store.getStatutory().then(function(rows){
       if(!rows||!rows.length) return false; // 空=フォールバック
       var sh=SHH(), sa=SAI(), kh=KH(), applied=0;
+      // ★どの kind:year を中央のどの出典で上書きしたかを控える（provenance で客に出す）
+      rows.forEach(function(r){ if(r&&r.kind) _statSource[r.kind+':'+r.year]={ source_url:r.source_url||null, verified_at:r.verified_at||null }; });
       // 数値表libのbare参照(index.htmlで先にロード済み・calc.js等は同一オブジェクト参照なので変異が伝播)
       var dn=(typeof ShotokuzeiDensan!=='undefined'?ShotokuzeiDensan:window.ShotokuzeiDensan);
       var hi=(typeof ShotokuzeiHei!=='undefined'?ShotokuzeiHei:window.ShotokuzeiHei);

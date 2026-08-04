@@ -17,6 +17,11 @@ const FILES = [
   'refs-resolve.test.mjs',      // ★読んでいるファイルが実在するか(require/importも参照として数える)
   ['refs-resolve.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   'api-claude.test.mjs',        // ★チャットが客に言う基準数値(実数リテラル・NaN混入検知)
+  'ios-unsupported.test.mjs',   // ★iPhoneで動かない書き方(type=month/octet-stream/writeFile/Blob散在)
+  ['ios-unsupported.test.mjs', '--self-test'],
+  'op-registry.test.mjs',       // ★契約の入口(二重登録は投げる)
+  'op-boundary.test.mjs',       // ★契約の線(⑤呼ばれているか/⑧面を呼び返していないか/provenance必須)
+  ['op-boundary.test.mjs', '--self-test'],
   'no-hardcoded-statutory.test.mjs',      // ★法定の率・額を配信物の文に直書きさせない(説明文だけ年度で取り残される事故)
   ['no-hardcoded-statutory.test.mjs', '--self-test'], // ★わざと壊して赤になるか＋誤検知が出ないか
   // P1② 版対応 検証ハーネス
