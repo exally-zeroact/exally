@@ -60,6 +60,8 @@ jobs:
         run: node kyuyo/tests/ops-real-values.test.mjs
       - name: ★源泉区分(204条) 選べるのに算式が無い区分を残さない＋実数1円一致
         run: node kyuyo/tests/gensen-kubun.test.mjs && node kyuyo/tests/gensen-kubun.test.mjs --self-test
+      - name: ★設定ファイルに知らない項目/説明文が混ざっていないか (混ぜるとデプロイがビルド前に止まる)
+        run: node tests/config-schema.test.mjs && node tests/config-schema.test.mjs --self-test
       - name: ★空振りしているテストが無いか (SKIPを緑と呼んでいないか・逃げ道/除外の一覧)
         run: node tests/hollow-guard.test.mjs --self-test && node tests/hollow-guard.test.mjs
       - name: ★入口の見張りの「判定」が空振りしていないか (外へ出ない部分だけ・実際の死活は hosts.yml 週1)
