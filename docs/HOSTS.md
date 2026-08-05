@@ -29,6 +29,15 @@
 |---|---|---|---|
 | https://payslip-app-olive.vercel.app/ | 本番 給与 | ★2026-08-04 に塞いだ | `vercel.json` の `redirects` で **308**（`?t=`/`?c=`/`#` を落とさない・`/meisai` は `.html` を付け直す・`sw.js` だけ飛ばさない） |
 | https://exally-zeroact.github.io/payslip-app-test/ | テスト 給与 | ★2026-08-04 に塞いだ | 中身を消し、案内1枚＋自動転送（`404.html` で直リンクも拾う） |
+| https://exally-test.vercel.app/ （`/index.html` `/home.html` `/exally-home.html`） | 本番 ハブ | ★2026-08-04 に塞いだ | `vercel.json` の `redirects` で **308**。★この4本だけ★ |
+
+### ★exally-test は「古いホームだけ」を塞ぐ（実務が同居している）★
+
+`exally-test.vercel.app` には **代行請求システム（`/daikou-seikyu.html`）が実務で毎日動いています**。
+グリッド・各テンプレート・`/api/claude` も生きています。**塞ぐのは古いホーム4本だけ。**
+`check-hosts` に「★代行請求が飛ばされていないこと★」を毎週見る行を入れました
+（塞ぐ範囲が広がって実務を巻き込んだら、その週のうちに赤で分かります）。
+詳しくは `Exally-test` リポジトリの `docs/HOSTS.md`。
 
 ### 旧本番を塞ぐ時に気をつけたこと（同じ形で塞ぐ人のために）
 
@@ -79,5 +88,15 @@
 
 | 入口 | 何が出るか | なぜ触らなかったか |
 |---|---|---|
-| https://exally-test.vercel.app/ | 「Exally（エクサリー）- ホーム」の**古い1枚もの**（外部JSなし・Supabase接続なし＝**データは見ない**） | Exally の古い入口だが、**倉庫を触らないので危険度が低い**。今回の指示は旧本番 `payslip-app-olive` を塞ぐことだったので、勝手に広げずここに記録する。塞ぐなら同じ 308 のやり方で1ファイル。 |
-| https://amazon-ads-automation.vercel.app/ | 「Adsilio — Amazon PPC Automation」（**アマかせとは別の製品名のLP**） | アマかせの本番ドメインに別製品が出ている。**アマかせのセッションの持ち物**なので触らない。要確認として記録。 |
+| https://amazon-ads-automation.vercel.app/ | 「Adsilio — Amazon PPC Automation」（**アマかせとは別の製品名のLP**） | アマかせの本番ドメインに別製品が出ている。**アマかせのセッションの持ち物**なので触らない（2026-08-04 指示役の判断：報告だけでよい）。 |
+
+## ★push は反映ではない（2026-08-04 に実際にやらかした）★
+
+`exally-test` の `vercel.json` に説明用の `"//"` キーを足したところ、
+**Vercel が設定を読む段階で弾き、ビルドに入る前にデプロイが失敗**した。
+このとき **前のデプロイがそのまま配信され続ける**ので、画面は正常に見える。
+＝ **「pushした」と「直しが入った」は別**。
+
+気づけたのは `check-hosts` が「まだ 200 のまま（308 になっていない）」と赤で示したから。
+**push したら必ず実物のURLを叩いて確かめること。** `vercel.json` にコメントは書けない
+（自前のキーも足せない）ので、説明は各リポジトリの `docs/HOSTS.md` に置く。

@@ -67,6 +67,20 @@ const OLD = [
       + '「自分を登録解除してキャッシュを消す」中身をそのまま返す。',
   },
   {
+    name: '旧Exallyホーム(/)', url: 'https://exally-test.vercel.app/',
+    to: 'https://exally.vercel.app/hub.html', landing: true,
+    why: '★入口が1つ増えているだけで価値がゼロ。司さんが古い入口を「テスト用」と誤解した前科がある。',
+  },
+  {
+    name: '旧Exallyホーム(/home.html)', url: 'https://exally-test.vercel.app/home.html',
+    to: 'https://exally.vercel.app/hub.html', landing: true,
+  },
+  {
+    name: '★代行請求は塞がない（実務で動いている）', url: 'https://exally-test.vercel.app/daikou-seikyu.html',
+    expectNoRedirect: true, mustContainBody: ['代行請求'],
+    why: '★同じホストで実務が動いている。古いホームを塞ぐ時に巻き込んでいないことを、毎週ここで確かめる。',
+  },
+  {
     name: '旧テスト 給与', url: 'https://exally-zeroact.github.io/payslip-app-test/',
     to: 'https://exally-zeroact.github.io/exally-staging/kyuyo/',
   },
