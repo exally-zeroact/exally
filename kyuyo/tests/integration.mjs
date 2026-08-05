@@ -12,7 +12,7 @@ const ROOT = path.join(__dirname, '..');
 
 let JSDOM;
 try { ({ JSDOM } = await import('jsdom')); }
-catch { console.log('SKIP: jsdom未導入=統合テストをスキップ(npm i jsdom で有効化)。'); process.exit(0); }
+catch { console.log('★jsdomが入っていません。この検証は飛ばせません（SKIPを緑と呼ばない）。npm install してください。'); process.exit(1); }
 
 let pass = 0, fail = 0;
 function T(name, fn) { try { fn(); pass++; console.log('  ✓ ' + name); } catch (e) { fail++; console.log('  ✗ ' + name + ' — ' + (e && e.message)); } }
