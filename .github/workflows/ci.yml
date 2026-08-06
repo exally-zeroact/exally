@@ -44,6 +44,12 @@ jobs:
         run: node tests/ios-unsupported.test.mjs && node tests/ios-unsupported.test.mjs --self-test
       - name: ★版対応 (その式が相手のExcelで動くか・Excelに無い23個/版マーカー14個)
         run: node tests/excel-version.test.mjs && node tests/excel-version.test.mjs --self-test
+      - name: ★グリッド→xlsx の変換 (落ちる物の警告・実際に書いて読み戻す)
+        run: node tests/grid-xlsx.test.mjs
+      - name: ★グリッドの日付 (打った日付が日付になる / 売上の数を日付に化けさせない / 書き出しと同じ規則)
+        run: node tests/grid-date.test.mjs && node tests/grid-date.test.mjs --self-test
+      - name: ★渡した相手の画面で ######## にならないか (日付の列に幅を付けて書き出す)
+        run: node tests/grid-colwidth.test.mjs && node tests/grid-colwidth.test.mjs --self-test
       - name: ★ファイルの渡し方 (種類・全端末で落とす=共有シートを使わない・名前に日時)
         run: node kyuyo/tests/file-out.test.mjs
       - name: ★スマホ幅の見た目 (ボタンが折り返さない / 対象月の選択は1つで重ならない)
