@@ -44,6 +44,12 @@ const EXCEPTIONS = {
       + 'うちが呼ばなければ通らない。★呼ばないことは下の C/D の検査が守る。',
     restoreWhen: 'ライブラリを差し替える時。',
   },
+  'lib/xlsx-io.js': {
+    rules: ['writeFile'],
+    reason: 'グリッド(book.html)の書き出し部品。★ここは XLSX.write(…type:buffer) を使っており、'
+      + 'writeFile という語はコメント/名前として出てくるだけ。実際にファイルを落とすのは呼び出し側。',
+    restoreWhen: 'グリッド側の書き出しも FileOut に寄せる時（今は kyuyo とHTMLが別なので別々）。',
+  },
 };
 
 /* コメントを落とす（実際に動くコードだけ見る）。

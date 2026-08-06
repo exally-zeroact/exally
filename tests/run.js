@@ -25,7 +25,12 @@ const FILES = [
   'no-hardcoded-statutory.test.mjs',      // ★法定の率・額を配信物の文に直書きさせない(説明文だけ年度で取り残される事故)
   ['no-hardcoded-statutory.test.mjs', '--self-test'], // ★わざと壊して赤になるか＋誤検知が出ないか
   // P1② 版対応 検証ハーネス
+  'excel-version.test.mjs', // ★その式が相手のExcelで動くか(Excelに無い23個＝常時 / 版マーカー14個＝版連動)
+  ['excel-version.test.mjs', '--self-test'],
   'xlsx-harness/roundtrip.test.mjs',        // 数式入りxlsxの往復(SheetJS・★新関数の _xlfn.)
+  'xlsx-harness/bare-form.test.mjs',        // ★「客が最初に書く形」のケースが無い関数を赤にする(R19の再発防止)
+  'xlsx-harness/alias.test.mjs',            // ★日本語UI名→本名(JIS→DBCS / YEN→DOLLAR。入口=エンジン/出口=書き出し)
+  'xlsx-harness/xlfn-coverage.test.mjs',    // ★書き出す関数名が分類済みか(_xlfn.の付け忘れを止める)
   'xlsx-harness/compare.mjs',               // Excelの真値と突合(新規の不一致があれば赤)
   ['xlsx-harness/compare.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'] // ★入れ子で壊れる式が増えていないか

@@ -42,6 +42,8 @@ jobs:
         run: node tests/op-registry.test.mjs && node tests/op-boundary.test.mjs && node tests/op-boundary.test.mjs --self-test
       - name: ★iPhoneで動かない書き方ガード (type=month / octet-stream / writeFile / Blob散在)
         run: node tests/ios-unsupported.test.mjs && node tests/ios-unsupported.test.mjs --self-test
+      - name: ★版対応 (その式が相手のExcelで動くか・Excelに無い23個/版マーカー14個)
+        run: node tests/excel-version.test.mjs && node tests/excel-version.test.mjs --self-test
       - name: ★ファイルの渡し方 (種類・全端末で落とす=共有シートを使わない・名前に日時)
         run: node kyuyo/tests/file-out.test.mjs
       - name: ★スマホ幅の見た目 (ボタンが折り返さない / 対象月の選択は1つで重ならない)
