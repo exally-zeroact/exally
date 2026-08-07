@@ -37,13 +37,14 @@ const NOT_TESTS = {
   'tests/run.js': 'ランナー本体',
   'kyuyo/tests/run.js': 'ランナー本体',
   'tests/fake-supa.js': 'テスト用のSupabaseモック（他テストが読む部品）',
+  'tests/repo-supa.mjs': 'このリポジトリの接続先(js/supa-config.js)を返す部品。実DBに触る道具が読む（テストではない）',
   'tests/dbtest-seed.mjs': 'DB-testに種データを入れる手動ツール（CIから叩かない）',
   'tests/live-seed.mjs': '実DBに種を入れる手動ツール（CIから叩かない）',
   'tests/live-roundtrip.mjs': '実DBに触る手動確認ツール（CIから叩かない）',
   'tests/xlsx-harness/build-libre-input.mjs': 'LibreOffice入力を作る手動ツール',
   'tests/xlsx-harness/collect-libre.mjs': 'LibreOfficeの結果を集める手動ツール',
   'tests/xlsx-harness/run-exally.mjs': 'ハーネスの実行部品（compare.mjs から使う）',
-  'tests/xlsx-harness/xlsx-io.js': 'ハーネスの入出力部品（テストではない）',
+
 };
 
 let pass = 0, fail = 0;
