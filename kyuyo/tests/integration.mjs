@@ -592,5 +592,182 @@ T('★lib は文言を持たない（符号だけを返す）', () => {
   });
 });
 
+/* ★全銀ファイルの改行コード（銀行ごとに違う）が【実物の画面のボタン】まで届いているか（2026-08-08）
+   lib(zengin.js)の単体が緑でも、面が設定を渡していなければ ★銀行では弾かれる★。
+   だから jsdom で 振込タブを開き、実際に「全銀ファイル」ボタンを押して、
+   ★渡し口(FileOut)に届いたバイト列そのもの★ を数える。 */
+function pressZengin(newlineSetting, bankSetting) {
+  const A = win.__PAYSLIP_TEST;
+  const st = A.state;
+  const keepEmps = st.employees.slice(), keepCo = Object.assign({}, st.company), keepMode = st.printMode;
+  const keepDeliver = win.FileOut.deliver;
+  let got = null;
+  try {
+    st.printMode = 'monthly';
+    st.company = Object.assign({}, st.company, {
+      furiCode: '0123456789', furiName: 'ｶ)ｾﾞﾛｱｸﾄ', furiBankNo: '0001', furiBankName: 'ﾐｽﾞﾎ',
+      furiBranchNo: '001', furiBranchName: 'ﾎﾝﾃﾝ', furiYokin: '普通', furiAccount: '1234567',
+      furiDate: '2026-08-25', furiNewline: newlineSetting, furiBank: bankSetting,
+    });
+    const e = Object.assign(A.defEmp('振込太郎'), {
+      payType: '月給', base: '250000', joinYmd: '2020-04-01',
+      furiBankNo: '0005', furiBankName: 'ﾐﾂﾋﾞｼ', furiBranchNo: '012', furiBranchName: 'ｼﾌﾞﾔ',
+      furiYokin: '普通', furiAccount: '7654321', furiKana: 'ﾌﾘｺﾐ ﾀﾛｳ',
+    });
+    st.employees = [e];
+    win.FileOut.deliver = function (bytes, filename) { got = { bytes: bytes, filename: filename }; return Promise.resolve(); };
+    win.document.querySelector('[data-scr="scr-furikomi"]').click();   // ★実物のタブを押す
+    const btn = win.document.getElementById('b-zengin');
+    ok(btn && !btn.disabled, '全銀ファイルのボタンが押せる状態で出ている');
+    btn.click();                                                       // ★実物のボタンを押す
+  } finally {
+    win.FileOut.deliver = keepDeliver;
+    st.employees = keepEmps; st.company = keepCo; st.printMode = keepMode;
+  }
+  ok(got, '★ボタンを押したのにファイルが渡されていない');
+  return got;
+}
+const nlBytes = (b) => Array.from(b).filter(x => x === 0x0D || x === 0x0A).length;
+
+T('★振込: 既定(設定なし)は今までどおりCRLF＝1バイトも変わらない（実UIのボタンで測る）', () => {
+  const r = pressZengin(undefined);
+  eq(r.filename.slice(-4), '.txt', 'ファイル名');
+  eq(r.bytes.length % 122, 0, '★120バイト＋CRLF の倍数');
+  eq(nlBytes(r.bytes), (r.bytes.length / 122) * 2, 'CRLFが行数ぶん');
+  eq(r.bytes[120], 0x0D); eq(r.bytes[121], 0x0A, '1行目の後ろがCRLF');
+});
+T('★振込: 「改行なし」を選ぶと、押したファイルに改行が1バイトも入らない（楽天型）', () => {
+  const r = pressZengin('NONE');
+  eq(r.bytes.length % 120, 0, '★120の倍数ちょうど');
+  eq(nlBytes(r.bytes), 0, '★改行バイト0本');
+});
+T('★振込: 「LF」を選ぶと LF だけ・CRが1バイトも混ざらない', () => {
+  const r = pressZengin('LF');
+  eq(r.bytes.length % 121, 0, '120＋LF の倍数');
+  eq(Array.from(r.bytes).filter(x => x === 0x0D).length, 0, '★CRが0本');
+});
+T('★振込: 知らない値が設定に入っていても【既定CRLF】に倒れる（黙ってLFにしない）', () => {
+  const r = pressZengin('えるえふ');
+  eq(r.bytes.length % 122, 0, '★既定のCRLFで出ている');
+});
+/* ★★ここが一番効く★★ 折りたたみを一度も開かずに押したファイルが、
+   今まで（＝この機能を入れる前）と1バイトも変わらないこと。 */
+T('★★振込: 「銀行に取り込めなかった時」を開かずに押したら、今までと1バイトも同じ★★', () => {
+  const r = pressZengin(undefined, undefined);
+  eq(r.filename.slice(-4), '.txt', 'ファイル名');
+  eq(r.bytes.length % 122, 0, '★120バイト＋CRLF の倍数');
+  eq(nlBytes(r.bytes), (r.bytes.length / 122) * 2, 'CRLFが行数ぶん');
+  eq(r.bytes[120], 0x0D); eq(r.bytes[121], 0x0A, '1行目の後ろがCRLF');
+  // 折りたたみは閉じたまま＝中の選択は画面に出ていない
+  win.document.querySelector('[data-scr="scr-furikomi"]').click();
+  const body = win.document.getElementById('furi-foldbody');
+  ok(body, '折りたたみが無い');
+  eq(body.style.display, 'none', '★普段は閉じている（改行コードが目に入らない）');
+});
+
+T('★振込: 銀行を選ぶと機械が形を決める（楽天=改行なし／伊予=CR+LF）', () => {
+  eq(nlBytes(pressZengin(undefined, 'rakuten').bytes), 0, '★楽天=改行が1バイトも無い');
+  const iyo = pressZengin(undefined, 'iyo');
+  eq(iyo.bytes.length % 122, 0, '伊予=120+CRLF');
+});
+T('★振込: ★未確認の銀行（みずほ等）を選んでも CR+LF のまま★', () => {
+  for (const k of ['mizuho', 'smbc', 'yucho', 'ehime']) {
+    eq(pressZengin(undefined, k).bytes.length % 122, 0, k + ': 既定のまま');
+  }
+});
+T('★振込: 手で「行の終わり」を選べばそれが勝つ（銀行に縛られない逃げ道）', () => {
+  eq(nlBytes(pressZengin('CRLF', 'rakuten').bytes) > 0, true, '楽天でもCR+LFにできる');
+  eq(pressZengin('LF', 'iyo').bytes.length % 121, 0, '伊予でもLFにできる');
+});
+
+T('★振込: 折りたたみを開くと 銀行と行の終わりが出る。選択肢は lib の表と同じ（面に作り直していない）', () => {
+  win.document.querySelector('[data-scr="scr-furikomi"]').click();
+  const hd = win.document.getElementById('furi-fold');
+  ok(hd, '「銀行に取り込めなかった時」の見出しが無い');
+  ok(/取り込めなかった/.test(hd.textContent), '見出しが「いつ使うか」になっていない: ' + hd.textContent);
+  hd.click();                                                   // ★実際に開く
+  eq(win.document.getElementById('furi-foldbody').style.display, '', '開かない');
+
+  const bank = win.document.querySelector('[data-fc="furiBank"]');
+  ok(bank, '銀行の選択が無い');
+  eq(bank.options[0].value, '', '先頭は「選んでいません」');
+  ok(/CR\+LF/.test(bank.options[0].text), '選ばない時どうなるかが書かれていない: ' + bank.options[0].text);
+  // ★選ぶ前に 確認済み／未確認 が分かること（群で分かれている）
+  const groups = [...bank.querySelectorAll('optgroup')].map(g => g.label);
+  ok(groups.some(g => /確認済み/.test(g)), '「確認済み」の群が無い: ' + groups.join('/'));
+  ok(groups.some(g => /未確認/.test(g)), '★「未確認」の群が無い（選んで初めて分かる形になっている）: ' + groups.join('/'));
+  const inGroup = (label) => [...bank.querySelectorAll('optgroup')].filter(g => label.test(g.label))
+    .flatMap(g => [...g.querySelectorAll('option')].map(o => o.value));
+  const okKeys = inGroup(/確認済み/), ngKeys = inGroup(/未確認/);
+  for (const b of win.Zengin.BANKS) {
+    const where = b.confirmed ? okKeys : ngKeys;
+    ok(where.indexOf(b.key) >= 0, b.name + ' が正しい群に入っていない');
+  }
+  eq(okKeys[0], 'iyo', '★確認済みの1行目が伊予銀行（客が使う順）');
+
+  const nl = win.document.querySelector('[data-fc="furiNewline"]');
+  ok(nl, '行の終わりの選択が無い');
+  eq(nl.options[0].value, '', '先頭は「銀行に合わせる」');
+  const vals = [...nl.options].map(o => o.value).filter(Boolean);
+  for (const k of Object.keys(win.Zengin.NEWLINES)) ok(vals.indexOf(k) >= 0, '★選択肢を減らしている: ' + k);
+});
+
+T('★振込: 銀行を選ぶと、その場で1行（確認済みなら出典・未確認なら未確認）が出る', () => {
+  win.document.querySelector('[data-scr="scr-furikomi"]').click();
+  win.document.getElementById('furi-fold').click();
+  const bank = win.document.querySelector('[data-fc="furiBank"]');
+  const note = () => win.document.getElementById('furi-banknote').innerHTML;
+  bank.value = 'rakuten'; bank.dispatchEvent(new win.Event('change', { bubbles: true }));
+  ok(/楽天銀行/.test(note()) && /改行なし/.test(note()), '楽天の1行が出ない: ' + note());
+  ok(/rakuten-bank\.co\.jp/.test(note()), '★出典が出ていない: ' + note());
+  ok(/target="_blank"/.test(note()), '★出典のリンクが同じ窓で開く（ホーム画面アプリで戻れなくなる）');
+  bank.value = 'mizuho'; bank.dispatchEvent(new win.Event('change', { bubbles: true }));
+  ok(/未確認/.test(note()), '★未確認と言っていない: ' + note());
+  ok(/CR\+LF で試して/.test(note()), 'どうすればいいかが無い: ' + note());
+  bank.value = ''; bank.dispatchEvent(new win.Event('change', { bubbles: true }));
+});
+
+T('★振込: 押せない理由がボタンの【中】に出る（下まで読ませない）', () => {
+  const A = win.__PAYSLIP_TEST, st = A.state;
+  const keep = st.employees.slice();
+  try {
+    st.employees = [];                                        // 対象者なし
+    win.document.querySelector('[data-scr="scr-furikomi"]').click();
+    const b = win.document.getElementById('b-zengin');
+    ok(b.disabled, '0件なのに押せる');
+    ok(/対象者なし/.test(b.textContent), '★理由がボタンの中に無い: ' + b.textContent);
+    const hints = [...win.document.querySelectorAll('#furi-box .hint')].map(p => p.textContent);
+    ok(!hints.some(t => /^全銀ファイル：/.test(t)), '★下の説明行が残っている');
+  } finally { st.employees = keep; win.document.querySelector('[data-scr="scr-furikomi"]').click(); }
+});
+
+T('★振込: 委託者情報が空なら、奥の設定より先に「まず埋めて」と出る（埋める順番）', () => {
+  const A = win.__PAYSLIP_TEST, st = A.state;
+  const keep = Object.assign({}, st.company);
+  try {
+    st.company = Object.assign({}, st.company, { furiCode: '', furiBankNo: '', furiBranchNo: '', furiAccount: '' });
+    win.document.querySelector('[data-scr="scr-furikomi"]').click();
+    const first = win.document.querySelector('#furi-box').firstElementChild;
+    ok(/まず/.test(first.textContent) && /委託者情報/.test(first.textContent), '★一番上に案内が出ていない: ' + first.textContent);
+    st.company = Object.assign({}, st.company, { furiCode: '1', furiBankNo: '2', furiBranchNo: '3', furiAccount: '4' });
+    win.document.querySelector('[data-scr="scr-furikomi"]').click();
+    const f2 = win.document.querySelector('#furi-box').firstElementChild;
+    ok(!/まず下の/.test(f2.textContent), '★埋めたのに案内が残っている: ' + f2.textContent);
+  } finally { st.company = keep; }
+});
+
+T('★振込: 振込先が未入力の人の警告が1行（3行にしない）', () => {
+  const A = win.__PAYSLIP_TEST, st = A.state;
+  const keep = st.employees.slice();
+  try {
+    st.employees = ['甲', '乙', '丙'].map(n => Object.assign(A.defEmp(n), { payType: '月給', base: '250000', joinYmd: '2020-04-01' }));
+    win.document.querySelector('[data-scr="scr-furikomi"]').click();
+    const w = [...win.document.querySelectorAll('#furi-box .cr-warn')].find(e => /振込先が未入力/.test(e.textContent));
+    ok(w, '警告が出ていない');
+    ok(/ほか2名/.test(w.textContent), '★3人以上を「ほか○名」に縮めていない: ' + w.textContent);
+    ok(w.textContent.length <= 40, '★1行に収まっていない(' + w.textContent.length + '字): ' + w.textContent);
+  } finally { st.employees = keep; win.document.querySelector('[data-scr="scr-furikomi"]').click(); }
+});
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

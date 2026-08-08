@@ -85,3 +85,146 @@ T('zengin build: 負の金額は符号を保持して除外(正額に化けな�
   var r = Z.build(committer, [t1, { bankNo: '0009', branchNo: '001', account: '1', name: 'ﾏｲﾅｽ', amount: -500 }]);
   eq(r.count, 1); eq(r.total, 328710); // -500 が +500 として通らない
 });
+
+/* ══ ★改行コード（銀行ごとに違う）★ ═══════════════════════════════════
+ * 【なぜ】全銀の改行は銀行ごとに違う（CR+LF／CR／LF／改行なし）。
+ *   ★1つに固定すると、今 通っている銀行が明日 弾かれる。★
+ *   だから「選べる／既定は今のまま(CRLF)」を、境界ごと実物のバイト数で固定する。
+ * 【一次情報 2026-08-08 実測】docs/zengin-newline-banks.md
+ *   大分/京都/JA/きらぼし/イオン = CR+LF・CR・LF いずれも可＋改行なしも可
+ *   群馬/東和/広島/三菱UFJ信託  = 120バイト＋改行(CRLF)を付ける場合は後ろに2バイト
+ *   楽天銀行                    = 「120byte固定長、改行は不要」
+ * バイト数の期待値は 120×レコード数(+改行×レコード数) を【手で組んだ式】から出す（出力の写しではない）。 */
+var t2n = { bankNo: '0009', bankName: 'ﾐﾂｲ', branchNo: '100', branchName: 'ｼﾝｼﾞｭｸ', yokin: '当座', account: '0011223', name: 'サトウ タロウ', amount: 250000 };
+function bytesFor(nRec, nlLen) { return 120 * nRec + nlLen * nRec; }
+
+T('★改行: 既定(引数なし)は今までどおりCRLF＝1バイトも変わらない', function () {
+  var r = Z.build(committer, [t1, t2n]);
+  eq(r.newline, 'CRLF', '既定の鍵');
+  eq(r.bytes.length, bytesFor(5, 2), '120×5 + CRLF×5');
+  eq(r.text.slice(120, 122), '\r\n', '1行目の後ろがCRLF');
+  eq(r.text.slice(-2), '\r\n', '末尾にも改行(エンドレコード後は任意)');
+});
+T('★改行: 空・未設定・知らない値・日本語は【必ず既定CRLF】へ倒す(黙ってLFにしない)', function () {
+  ['', null, undefined, '改行なし', 'xxx', 0, '  '].forEach(function (v) {
+    eq(Z.newlineKey(v), 'CRLF', JSON.stringify(v) + ' → 既定');
+    eq(Z.build(committer, [t1], { newline: v }).newline, 'CRLF', JSON.stringify(v) + ' → build も既定');
+  });
+  eq(Z.build(committer, [t1], {}).newline, 'CRLF', 'optsが空でも既定');
+});
+T('★改行: NONE=改行なし(楽天型)。120バイトの倍数ちょうど・改行バイトが0本', function () {
+  var r = Z.build(committer, [t1, t2n], { newline: 'NONE' });
+  eq(r.newline, 'NONE');
+  eq(r.text.length, 120 * 5, '120×5文字ちょうど');
+  eq(r.bytes.length, bytesFor(5, 0), '120×5バイト');
+  eq(r.text.indexOf('\r'), -1, 'CRが1つも無い'); eq(r.text.indexOf('\n'), -1, 'LFが1つも無い');
+  eq(Array.from(r.bytes).filter(function (b) { return b === 0x0D || b === 0x0A; }).length, 0, '改行バイト0本');
+});
+T('★改行: LF=0x0Aだけ。CRが1バイトも混ざらない', function () {
+  var r = Z.build(committer, [t1, t2n], { newline: 'LF' });
+  eq(r.newline, 'LF');
+  eq(r.bytes.length, bytesFor(5, 1), '120×5 + LF×5');
+  eq(r.text.slice(120, 121), '\n');
+  eq(Array.from(r.bytes).filter(function (b) { return b === 0x0D; }).length, 0, '★CRが0本(LFのみ要求の銀行向け)');
+  eq(Array.from(r.bytes).filter(function (b) { return b === 0x0A; }).length, 5, 'LFが5本');
+});
+T('★改行: CR=0x0Dだけ(全銀の規定にある3つ目)', function () {
+  var r = Z.build(committer, [t1, t2n], { newline: 'CR' });
+  eq(r.newline, 'CR');
+  eq(r.bytes.length, bytesFor(5, 1));
+  eq(Array.from(r.bytes).filter(function (b) { return b === 0x0A; }).length, 0, 'LFが0本');
+});
+T('★改行: 小文字・前後の空白・全角混じりでも鍵として読める(nashi/none は改行なし)', function () {
+  eq(Z.newlineKey('crlf'), 'CRLF'); eq(Z.newlineKey(' lf '), 'LF');
+  eq(Z.newlineKey('none'), 'NONE'); eq(Z.newlineKey('nashi'), 'NONE');
+});
+T('★改行: どの改行でも「レコードは必ず120バイト」が崩れない(0件=3レコードの境界も)', function () {
+  ['CRLF', 'LF', 'CR', 'NONE'].forEach(function (k) {
+    var nl = Z.NEWLINES[k].length;
+    var r0 = Z.build(committer, [], { newline: k });                 // 対象0件=ヘッダ+トレーラ+エンド
+    eq(r0.records.length, 3, k + ': 0件でも3レコード');
+    eq(r0.count, 0); eq(r0.total, 0);
+    eq(r0.bytes.length, bytesFor(3, nl), k + ': 0件のバイト数');
+    var r1 = Z.build(committer, [t1], { newline: k });               // 1件=4レコード
+    eq(r1.bytes.length, bytesFor(4, nl), k + ': 1件のバイト数');
+    r1.records.forEach(function (rec) { eq(Z.toShiftJisBytes(rec).length, 120, k + ': 各レコード120バイト'); });
+  });
+});
+/* ══ ★銀行の表（これが唯一の正）★ ═══════════════════════════════════════
+ * 画面は lib のこの表から作る。表と docs/zengin-newline-banks.md が食い違ったら赤にする
+ * ＝「表を直したのに対応表が古いまま」「対応表を直したのにアプリが古いまま」を止める。 */
+var fs = require('fs'), path = require('path');
+var DOC = fs.readFileSync(path.join(__dirname, '..', 'docs', 'zengin-newline-banks.md'), 'utf8');
+
+T('★銀行の表: 地銀・信金が先頭で、1行目は伊予銀行（客が使う順・網羅ではない）', function () {
+  eq(Z.BANKS[0].key, 'iyo', '1行目');
+  eq(Z.BANKS[0].name, '伊予銀行');
+  eq(Z.BANKS[0].confirmed, true);
+  // メガ・ネットは後ろ（地銀・信金より前に来ていない）
+  var iMega = Z.BANKS.findIndex(function (b) { return b.key === 'mufg'; });
+  var iChiho = Z.BANKS.findIndex(function (b) { return b.key === 'oita'; });
+  ok(iMega > iChiho, 'メガが地銀より前に来ている');
+});
+T('★銀行の表: 出典URLと改行が docs の対応表と一致（片方だけ古くならない）', function () {
+  Z.BANKS.forEach(function (b) {
+    ok(DOC.indexOf(b.name) >= 0, '対応表に ' + b.name + ' が無い');
+    if (b.confirmed) {
+      ok(!!b.source, b.name + ': 確認済みなのに出典URLが無い');
+      ok(DOC.indexOf(b.source) >= 0, b.name + ': 出典URLが対応表に無い ' + b.source);
+    } else {
+      eq(b.source, '', b.name + ': 未確認なのに出典URLがある');
+      eq(b.newline, 'CRLF', '★未確認の行は既定(CRLF)以外を持たない');
+    }
+    ok(Z.NEWLINES[b.newline] != null, b.name + ': 知らない改行 ' + b.newline);
+  });
+});
+T('★銀行の表: 鍵が重複していない・確認済みが12行以上ある(表が空振りしていない)', function () {
+  var seen = {};
+  Z.BANKS.forEach(function (b) { if (seen[b.key]) throw new Error('鍵が重複: ' + b.key); seen[b.key] = 1; });
+  ok(Z.BANKS.filter(function (b) { return b.confirmed; }).length >= 12, '確認済みが少なすぎる');
+});
+
+/* ══ ★銀行→改行の決まり方★ ═══════════════════════════════════════════ */
+T('★決まり方: 何も選ばない＝今までどおり CR+LF（0件の設定でも変わらない）', function () {
+  eq(Z.resolveNewlineKey(), 'CRLF');
+  eq(Z.resolveNewlineKey({}), 'CRLF');
+  eq(Z.resolveNewlineKey({ bank: '', newline: '' }), 'CRLF');
+  eq(Z.resolveNewlineKey({ newline: 'AUTO' }), 'CRLF');
+  eq(Z.build(committer, [t1]).newline, 'CRLF');
+});
+T('★決まり方: 確認済みの銀行を選ぶとその形（伊予=CR+LF / 楽天=改行なし）', function () {
+  eq(Z.resolveNewlineKey({ bank: 'iyo' }), 'CRLF', '伊予銀行');
+  eq(Z.resolveNewlineKey({ bank: 'rakuten' }), 'NONE', '楽天銀行');
+  eq(Z.build(committer, [t1], { bank: 'rakuten' }).bytes.length, bytesFor(4, 0), '楽天=120の倍数ちょうど');
+  eq(Z.build(committer, [t1], { bank: 'iyo' }).bytes.length, bytesFor(4, 2), '伊予=120+CRLF');
+});
+T('★決まり方: ★未確認の銀行を選んでも CR+LF のまま★（「未確認」は「変える理由が無い」）', function () {
+  ['mizuho', 'smbc', 'yucho', 'shinkin', 'ehime', 'ehime-shinkin', 'imabari-shinkin'].forEach(function (k) {
+    eq(Z.resolveNewlineKey({ bank: k }), 'CRLF', k);
+    eq(Z.build(committer, [t1], { bank: k }).bytes.length, bytesFor(4, 2), k + ': 既定のまま');
+  });
+});
+T('★決まり方: 一覧にない銀行・知らない鍵も CR+LF（黙って別の形にしない）', function () {
+  eq(Z.resolveNewlineKey({ bank: '__other' }), 'CRLF');
+  eq(Z.resolveNewlineKey({ bank: 'そんな銀行はない' }), 'CRLF');
+  eq(Z.resolveNewlineKey({ bank: null }), 'CRLF');
+});
+T('★決まり方: 手で選んだ形は銀行より優先（銀行に従わせない逃げ道を残す）', function () {
+  eq(Z.resolveNewlineKey({ bank: 'rakuten', newline: 'CRLF' }), 'CRLF', '楽天でもCR+LFにできる');
+  eq(Z.resolveNewlineKey({ bank: 'iyo', newline: 'LF' }), 'LF', '伊予でもLFにできる');
+  eq(Z.resolveNewlineKey({ bank: 'iyo', newline: 'NONE' }), 'NONE');
+});
+T('★決まり方: 伊予銀行は「120バイト＋CRLF(データ長122)」＝手引きの5パターンの②で通る', function () {
+  var r = Z.build(committer, [t1], { bank: 'iyo' });
+  eq(r.newline, 'CRLF');
+  r.records.forEach(function (rec) { eq(Z.toShiftJisBytes(rec).length, 120, 'レコード長120バイト'); });
+  eq(r.bytes.length / r.records.length, 122, 'データ長122バイト');
+  ok(DOC.indexOf('１２０バイトの内に含める') >= 0, '★「120の内に含める」軸が記録に残っているか（今は作らない）');
+});
+
+T('★改行: 中身(120桁のレコード)は改行を変えても1文字も変わらない', function () {
+  var a = Z.build(committer, [t1, t2n], { newline: 'CRLF' }).records.join('|');
+  ['LF', 'CR', 'NONE'].forEach(function (k) {
+    eq(Z.build(committer, [t1, t2n], { newline: k }).records.join('|'), a, k + ': レコード本体が変わっている');
+  });
+});
