@@ -576,6 +576,14 @@ box-shadow:0 -2px 10px rgba(30,60,40,0.06);
 .bottom-stack{padding-bottom:max(4px, env(safe-area-inset-bottom));}
 }
 
+/* ★スマホの幅で頭が詰まるのを止める（2026-08-09 iPhone 390px で実際に詰まった）★
+   「Excelを開く」を足したら、ロゴが切れて 365 の切替が画面の外へ出た。
+   狭い時は ★絵文字だけにして、開いているファイル名は隠す★（名前は保存の時のお知らせにも出る）。 */
+@media (max-width: 560px) {
+  #openBookBtn .hdr-lb, #saveBookBtn .hdr-lb { display: none; }
+  #openBookBtn, #saveBookBtn { padding: 4px 10px; }
+  #openedFileLabel { display: none; }
+}
 #sheet-tabs {
 position:relative;
 height:32px;
@@ -1147,14 +1155,14 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=3be08ee0"></script>
+<script src="hyperformula.full.min.js?v=f2487a95"></script>
 
-<script src="exally-formula.js?v=3be08ee0"></script>
+<script src="exally-formula.js?v=f2487a95"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=3be08ee0"></script>
-<script src="lib/grid-xlsx.js?v=3be08ee0"></script>
-<script src="lib/excel-version.js?v=3be08ee0"></script>
+<script src="js/file-out.js?v=f2487a95"></script>
+<script src="lib/grid-xlsx.js?v=f2487a95"></script>
+<script src="lib/excel-version.js?v=f2487a95"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2615,7 +2623,11 @@ function detectTimePattern(values){
     <button class="book-header-nav-item" onclick="location.href='chat.html?tab=settings'" title="設定">⚙️</button>
   </nav>
   <div style="display:flex;align-items:center;gap:6px;">
-    <button onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelファイル(.xlsx)として保存">💾 Excelに保存</button>
+    <!-- ★受け取り口★ 元のファイルは預からない。開いた瞬間に作業用の控えを持ち、保存はそれを書き換える -->
+    <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
+    <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを開く（.xlsx / .xlsm / .xlsb）">📂 <span class="hdr-lb">Excelを開く</span></button>
+    <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイル(.xlsx)として保存">💾 <span class="hdr-lb">Excelに保存</span></button>
     <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
   </div>
 </div>
@@ -4980,6 +4992,7 @@ function switchSheet(idx){
     selR1=0;selC1=0;selR2=0;selC2=0;
   }
   scrollTop=0;scrollLeft=0;scale=1;
+  loadSheetIntoEngine(idx);   /* ★見るシートだけ、その時に計算する側へ流す★ */
   updateBar(); render();
   document.querySelectorAll('.sheet-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
   // モード中はサブバーも更新（別シート範囲のチップ表示に反映）
@@ -6036,9 +6049,124 @@ function _ensureXlsx(){
   // ★順番が要る: xlsx-io.js は読み込まれた瞬間に XLSX を掴むので、SheetJS が先。
   _xlsxLoading = _loadScript('lib/xlsx.full.min.js' + v).then(function(){
     return _loadScript('lib/xlsx-io.js' + v);
-  });
+  }).then(function(){
+    // ★受け取ったファイルを直す道（元のzipを持ったまま、値だけ書き換える）★
+    //   ここが無いと、開いたファイルを保存した時に判子・罫線・グラフが消える。
+    return _loadScript('lib/zip-surgeon.js' + v);
+  }).then(function(){ return _loadScript('lib/xlsx-edit.js' + v); })
+    .then(function(){ return _loadScript('lib/xlsb-edit.js' + v); })
+    .then(function(){ return _loadScript('js/book-open.js' + v); });
   return _xlsxLoading;
 }
+
+/* ★開いたシートだけ、計算する側へ流し込む★（2026-08-09 実機で分かった）
+   受け取ったブックを開いた直後は、式が計算する側に1つも入っていない。
+   その状態で1文字でも打つと ★同じシートの式の答えが全部 空になる★（実際にそうなった）。
+   14シート・2万セルを開いた瞬間に全部 流すと固まるので、★見ているシートだけ★流す。 */
+var _engineLoaded = {};
+/* ★日本語や数字で始まるシート名は、式の中で ' ' で囲まないと計算する側が読めない★
+   実測(2026-08-09): `=4月!E14` を渡すと
+     「Parsing error. unexpected character: ->月<- at offset: 2」
+   になり、★まとめのシートの合計が全部 #ERROR になった★。
+   Excel は必要な時だけ ' ' を付けるが、読み取り側から来る式には付いていない事がある。
+   ★中身は変えない。計算する側へ渡す時だけ囲む。★ */
+function quoteSheetRefs(f){
+  if (typeof f !== 'string' || f.charAt(0) !== '=') return f;
+  for (var i = 0; i < sheets.length; i++) {
+    var n = sheets[i].name;
+    if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(n)) continue;       // 素直な名前はそのままで通る
+    var esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    f = f.replace(new RegExp("(^|[^'\\w])" + esc + "!", 'g'), "$1'" + n + "'!");
+  }
+  return f;
+}
+function loadSheetIntoEngine(idx){
+  if(!hf || _engineLoaded[idx]) return;
+  var sh = sheets[idx];
+  if(!sh || !sh._fromFile) { _engineLoaded[idx] = true; return; }
+  var maxR = 0, maxC = 0, k, p;
+  for(k in sh.data){ p = k.split(','); if(+p[0]>maxR) maxR=+p[0]; if(+p[1]>maxC) maxC=+p[1]; }
+  var grid = [];
+  for(var r=0;r<=maxR;r++){
+    var row = new Array(maxC+1);
+    for(var c=0;c<=maxC;c++){
+      var cell = sh.data[r+','+c];
+      if(!cell){ row[c] = null; continue; }
+      var f = (typeof cell.f==='string' && cell.f.charAt(0)==='=') ? cell.f : null;
+      row[c] = f ? quoteSheetRefs(typeof convertFormula==='function' ? convertFormula(f) : f)
+                 : (cell.v===''||cell.v===undefined ? null : cell.v);
+    }
+    grid.push(row);
+  }
+  try { hf.setSheetContent(_hfSid(idx), grid); }
+  catch(e){ if(window.console) console.warn('[Exally] シートを計算側へ流せませんでした', e); }
+  _engineLoaded[idx] = true;
+}
+
+/* ★シートのタブを 今の sheets[] から作り直す★
+   受け取ったブックは14枚あることもある。作り直さないと「Sheet1」1枚のままで、
+   ★開いたのに1枚目しか触れない★（2026-08-09 実機で実際にそうなった）。 */
+function rebuildSheetTabs(){
+  var tabs = document.getElementById('sheet-tabs');
+  if(!tabs) return;
+  var addBtn = document.getElementById('add-sheet-btn');
+  Array.prototype.slice.call(tabs.querySelectorAll('.sheet-tab')).forEach(function(t){ tabs.removeChild(t); });
+  sheets.forEach(function(sh, i){
+    var btn = document.createElement('button');
+    btn.className = 'sheet-tab' + (i===activeSheet ? ' active' : '');
+    btn.textContent = sh.name;
+    btn.title = sh.name;
+    btn.onclick = (function(k){ return function(){ switchSheet(k); }; })(i);
+    if(addBtn) tabs.insertBefore(btn, addBtn); else tabs.appendChild(btn);
+    // 式を計算する側にもシートを登録する（無いと そのシートの式が動かない）
+    if(typeof addSheetToEngine === 'function'){ try{ addSheetToEngine(sh.name); }catch(e){} }
+  });
+}
+
+/* ===== ★受け取り口★（ファイル選択／ドラッグ&ドロップ） ===== */
+function onPickBookFile(el){
+  var f = el && el.files && el.files[0];
+  el.value = '';                      // 同じファイルをもう一度選べるようにする
+  if (f) openBookFile(f);
+}
+function openBookFile(file){
+  showToast('開いています…', 1200);
+  return _ensureXlsx().then(function(){
+    return BookOpen.openFile(file);
+  }).then(function(res){
+    sheets = res.sheets;
+    activeSheet = 0;
+    selR1=selC1=selR2=selC2=0;
+    _engineLoaded = {};
+    // ★計算する側を作り直す（シートの名前と数が変わるため）★
+    if (typeof initFormulaEngine === 'function') initFormulaEngine(sheets.map(function(s){ return s.name; }));
+    rebuildSheetTabs();          // ★14枚あってもタブを出す（出さないと1枚目しか触れない）★
+    loadSheetIntoEngine(0);      // ★開いたシートだけ流す（全部やると固まる）★
+    render(); updateBar();
+    var lbl = document.getElementById('openedFileLabel');
+    if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';
+    if (res.kind === 'xls') {
+      // ★「対応していません」ではなく「まだ直せません」★（後で作る）
+      showToast('<span class="toast-h">開きました（見るだけ）</span>' + BookOpen.MSG_XLS, 6000, 'warn');
+    } else {
+      showToast('開きました：' + file.name + '（' + res.sheets.length + 'シート）'
+        + '<br>保存すると★元の書式・判子・グラフはそのまま★で、値だけ書き換えます。', 5000);
+    }
+  }).catch(function(err){
+    showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
+  });
+}
+(function(){
+  // 画面のどこに落としても受け取る
+  var stop = function(e){ e.preventDefault(); e.stopPropagation(); };
+  ['dragenter','dragover','dragleave','drop'].forEach(function(t){
+    window.addEventListener(t, stop, false);
+  });
+  window.addEventListener('drop', function(e){
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) openBookFile(f);
+  }, false);
+})();
 // 配列を返す式か（＝Excelではスピルするが、うちのグリッドは1セル分しか出さない）
 //  ★HyperFormula 自身に聞く(isCellPartOfArray)。getCellValue は展開後の左上のスカラーを返すので、
 //    値だけ見ても配列かどうかは分からない（2026-08-02 R19 の修正後に実測して判明）。
@@ -6050,9 +6178,41 @@ function _isArrayFormula(sheetIdx, r, c){
     return Array.isArray(v) || !!(v && typeof v === 'object' && typeof v.data !== 'undefined');
   } catch(e){ return false; }
 }
+/* ★受け取ったファイルを直して返す★（元のバイト列を書き換える。作り直さない） */
+function saveOpenedBook(){
+  var cur = BookOpen.current();
+  /* ★保存の前に、まだ計算していないシートも全部 計算する★（2026-08-09 実機で分かった）
+     「開いたシートだけ計算する」ので、まとめのシートを開かずに保存すると
+     ★他のシートを参照している合計が古いまま出る★（実際に 88,000 のままだった）。
+     開く時に全部やると固まるが、★保存は1回きりなので ここで全部やる★。 */
+  for (var i = 0; i < sheets.length; i++) {
+    loadSheetIntoEngine(i);
+    if (typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
+  }
+  _ensureXlsx().then(function(){
+    return BookOpen.saveOpened(sheets);
+  }).then(function(res){
+    var buf = res && res.bytes ? res.bytes : res;      // xlsb は素の Uint8Array を返す
+    var log = res && res.log;
+    return FileOut.deliver(buf, cur.name).then(function(){
+      showToast('<span class="toast-h">保存しました（元の書式はそのまま）</span>'
+        + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
+        + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
+                 + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);
+    });
+  }).catch(function(err){
+    // ★歩けない・直せないファイルは、壊さずに断る★
+    showToast('<span class="toast-h">保存しませんでした</span>' + ((err && err.message) || err), 6000, 'warn');
+  });
+}
 function saveXlsx(){
   if (typeof GridXlsx === 'undefined') { showToast('保存の部品が読み込まれていません', 3000); return; }
   showToast('Excelファイルを作っています…', 1500);
+  /* ★★道が2つある。ここが分かれ目。★★
+       受け取ったファイル → 元のzipを持ったまま値だけ書き換える（判子・罫線・グラフが残る）
+       ゼロから作った表   → 下の gridToBook → writeBook（元々書式が無いので問題ない）
+     ★受け取ったファイルを writeBook に入れると判子が消える。混ぜないこと。★ */
+  if (typeof BookOpen !== 'undefined' && BookOpen.isOpened()) { saveOpenedBook(); return; }
   _ensureXlsx().then(function(){
     // ★「相手のExcelで動くか」も書き出しの直前に出す（Excelに無い関数＋選んだ版に無い関数）
     var verWarns = (typeof ExcelVersion !== 'undefined')
@@ -6264,8 +6424,59 @@ function initPopupResize(){
   handle.addEventListener('touchend', function(){ if(resizing){ resizing = false; savePopupState(); } });
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ★「黙って素通り」を書き方で潰す★（2026-08-09）
 
+   14シートのブックを開いてもタブが1枚のままだった。原因は
+     if (typeof renderSheetTabs === 'function') renderSheetTabs();
+   ★その名前の関数が存在しなかったので、黙って何も起きなかった★。
+   node --check も div の数も参照の解決も全部 緑だったのに、押したら壊れていた。
 
+   ★守り方を変える★
+     ・無かったら壊れている物は、下の REQUIRED に名前を書く
+       → 起動時に存在を確かめ、★無ければ画面に赤で出す（黙って通さない）★
+     ・本当に任意（外部ライブラリの版で有無が変わる）物だけ OPTIONAL に理由つきで書く
+       → 無い時は印を残す（window.__EXALLY_MISSING__ に積む）
+     ・引数として渡される物（グローバルではない）は PARAM に理由つきで書く
+     ・tests/no-silent-optional.test.mjs が
+       「typeof ○○ === 'function' で守っている名前が、この3つの表に載っているか」を見張る
+   ══════════════════════════════════════════════════════════════ */
+var REQUIRED_FNS = [
+  // book.html 自身が持っている物（★在って当たり前。無ければ書き間違い★）
+  'render', 'parseDate', 'parseDateStr', 'parseTime', 'dateFmtForFormula',
+  'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
+  'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
+  'recalcSheet', 'convertFormula',
+  // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）
+  'initExallyFormula', 'addSheetToEngine'
+];
+/* ★本当に任意＝外部ライブラリの版で有無が変わる物だけ。理由を書く★ */
+var OPTIONAL_FNS = {
+  'HyperFormula.getRegisteredFunctionNames': '版によって無い。関数一覧を出せないだけで、計算は動く',
+  'hf.isCellPartOfArray': '版によって無い。配列の式かどうかの判定が落ちるだけ（警告が出ないだけ）'
+};
+/* ★グローバルではなく「引数」として渡ってくる物★（呼ぶ側が渡さない事がある） */
+var PARAM_FNS = {
+  'lookup': 'dateFmtForFormula(f, lookup) の第2引数。渡さない呼び方も許している（参照先を見ない＝日付にしないだけ）'
+};
+window.__EXALLY_MISSING__ = [];
+function checkRequiredFns(){
+  var miss = REQUIRED_FNS.filter(function(n){ return typeof window[n] !== 'function'; });
+  if(!miss.length) return [];
+  window.__EXALLY_MISSING__ = miss;
+  // ★黙らない。画面に出す★
+  try{
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#B3261E;color:#fff;'
+      + 'padding:10px 14px;font:700 13px/1.6 system-ui;box-shadow:0 2px 8px rgba(0,0,0,.3)';
+    box.textContent = '★この画面は正しく動きません★ 部品が読み込めていません: ' + miss.join(', ')
+      + '（読み込みに失敗しているか、名前が違います）';
+    document.body.appendChild(box);
+  }catch(e){}
+  if(window.console && console.error) console.error('[Exally] 必要な関数が無い: ' + miss.join(', '));
+  return miss;
+}
+document.addEventListener('DOMContentLoaded', function(){ checkRequiredFns(); });
 
 </script>
 
