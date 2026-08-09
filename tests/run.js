@@ -33,6 +33,7 @@ const FILES = [
   ['no-hardcoded-supa.test.mjs', '--self-test'], // ★わざと壊して赤になるか＋誤検知が出ないか
   'no-silent-optional.test.mjs',          // ★typeof で守って「無ければ黙って素通り」を許さない(14シート開いてもタブが1枚だった事故)
   ['no-silent-optional.test.mjs', '--self-test'],
+  'book-open.test.mjs',                   // ★受け取ったブックを「開いて何も変えずに保存」しても壊れない(実機で出た事故)
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス

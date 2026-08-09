@@ -1155,14 +1155,14 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=f2487a95"></script>
+<script src="hyperformula.full.min.js?v=cb9681de"></script>
 
-<script src="exally-formula.js?v=f2487a95"></script>
+<script src="exally-formula.js?v=cb9681de"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=f2487a95"></script>
-<script src="lib/grid-xlsx.js?v=f2487a95"></script>
-<script src="lib/excel-version.js?v=f2487a95"></script>
+<script src="js/file-out.js?v=cb9681de"></script>
+<script src="lib/grid-xlsx.js?v=cb9681de"></script>
+<script src="lib/excel-version.js?v=cb9681de"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -6101,6 +6101,11 @@ function loadSheetIntoEngine(idx){
   try { hf.setSheetContent(_hfSid(idx), grid); }
   catch(e){ if(window.console) console.warn('[Exally] シートを計算側へ流せませんでした', e); }
   _engineLoaded[idx] = true;
+  /* ★流した直後に計算して、控えを取り直す★
+     うちのエンジンは Excel と答えが違う式がある（実物で771セル）。
+     取り直さないと それを「客が変えた」と数えて、★間違った答えで上書きしてしまう★。 */
+  if (typeof recalcSheet === 'function') recalcSheet(idx, sh.data);
+  if (typeof BookOpen !== 'undefined' && BookOpen.rebaseSheet) BookOpen.rebaseSheet(sh);
 }
 
 /* ★シートのタブを 今の sheets[] から作り直す★
@@ -6186,7 +6191,7 @@ function saveOpenedBook(){
      ★他のシートを参照している合計が古いまま出る★（実際に 88,000 のままだった）。
      開く時に全部やると固まるが、★保存は1回きりなので ここで全部やる★。 */
   for (var i = 0; i < sheets.length; i++) {
-    loadSheetIntoEngine(i);
+    loadSheetIntoEngine(i);      // ★まだ開いていないシートは ここで流して控えも取り直す★
     if (typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
   }
   _ensureXlsx().then(function(){

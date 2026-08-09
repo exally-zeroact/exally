@@ -49,6 +49,20 @@
       // ★表示用の読み取り（見るだけ）★
       var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false });
       var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm); });
+      /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
+         画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
+         ★計算し直した瞬間に 46043 と食い違い、全部「変わった」ことになる★
+         （実物14シートで 14,424セルが変わった扱いになり、保存が断られた）。 */
+      var base = {};
+      wb.SheetNames.forEach(function (nm) {
+        var ws = wb.Sheets[nm];
+        Object.keys(ws).forEach(function (a) {
+          if (a.charAt(0) === '!') return;
+          var rc = root.XLSX.utils.decode_cell(a);
+          var v = ws[a].v;
+          base[nm + '|' + rc.r + ',' + rc.c] = (v === undefined || v === null) ? '' : v;
+        });
+      });
 
       opened = {
         name: file.name, kind: kind, bytes: bytes,
@@ -58,7 +72,7 @@
            ・触っていない所まで書き換える危険
            ・答えがエラーの数式セル（記録11）に当たって★保存そのものが断られる★
            が起きる（実物14シート・2万セルで実際に起きた 2026-08-09）。 */
-        base: baselineOf(out),
+        base: base,
       };
       return { kind: kind, sheets: out, opened: opened };
     });
@@ -129,17 +143,55 @@
     return base;
   }
   /** ★開いた時から変わったセルだけ★を集める（触っていない所は1つも書かない） */
+  /* ★見た目の違いを「変わった」と数えない★（2026-08-09 指示役が実機で発見）
+     開いた時の控えは ファイルの表示文字（例 "1,000"）、
+     計算し直した後は 生の数（1000）になる。そのまま比べると
+     ★1つも触っていないのに 数式セルが全部「変わった」ことになり、
+       文字を返す数式セル（記録8）に当たって保存そのものが断られた★。
+     司さんの実物には BrtFmlaString が 2,866個＝必ず当たる。 */
+  function normForCompare(v) {
+    if (v === undefined || v === null) return '';
+    if (typeof v === 'number') return String(v);
+    var s = String(v).trim().replace(/[,\s¥￥]/g, '');
+    if (s !== '' && !isNaN(Number(s))) return String(Number(s));   // "1,000" と 1000 は同じ
+    return String(v).trim();
+  }
   function changedCells(sh) {
     var out = {}, base = opened.base || {};
     Object.keys(sh.data || {}).forEach(function (k) {
       var p = k.split(','), r = parseInt(p[0], 10), c = parseInt(p[1], 10);
       if (isNaN(r) || isNaN(c)) return;
       var now = valueOf(sh.data[k]);
-      if (String(now) === String(base[sh.name + '|' + k])) return;   // 変わっていない
+      if (normForCompare(now) === normForCompare(base[sh.name + '|' + k])) return;  // 変わっていない
       if (now === '') return;                                        // 空にする操作は まだ扱わない
+      /* ★うちの計算が答えを出せなかったセルは、元のまま置いておく★
+         #ERROR や #NAME? を書き込むと、★開ける物を自分で壊す★。
+         （実物には うちのエンジンが読めない式がある。読めない物は触らないのが正しい） */
+      if (typeof now === 'string' && now.charAt(0) === '#') return;
       out[k] = now;
     });
     return out;
+  }
+  /** ★そのシートの控えを、今の値で取り直す★
+   *  うちの計算エンジンは Excel と答えが違う式がある（実物で771セル）。
+   *  それを「客が変えた」と数えると、★うちの間違った答えでファイルを上書きしてしまう★。
+   *  ⇒ ★シートを計算する側へ流して計算し直した直後に、控えを取り直す★
+   *     こうすると「控え＝うちのエンジンから見た今のファイル」になり、
+   *     ★そのあとの違い＝客が触った所★だけになる。 */
+  function rebaseSheet(sh) {
+    if (!opened || !sh) return;
+    Object.keys(sh.data || {}).forEach(function (k) {
+      opened.base[sh.name + '|' + k] = valueOf(sh.data[k]);
+    });
+  }
+
+  /** ブック全体で1つでも変わったか（★0件なら元のバイト列をそのまま返す★） */
+  function anyChanged(sheets) {
+    for (var i = 0; i < sheets.length; i++) {
+      if (opened.sheetNames.indexOf(sheets[i].name) < 0) continue;
+      if (Object.keys(changedCells(sheets[i])).length) return true;
+    }
+    return false;
   }
 
   /** .xlsx 用に A1 形式へ直す。★式のセルは <v>(答え)をうちの計算結果で埋める★ */
@@ -219,6 +271,11 @@
   function saveOpened(sheets) {
     if (!opened) return Promise.reject(new Error('開いたファイルがありません'));
     if (opened.kind === 'xls') return Promise.reject(new Error(MSG_XLS));
+    /* ★1つも変わっていないなら、元のバイト列をそのまま返す★
+       作り直さないのが いちばん安全（1バイトも動かない）。 */
+    if (!anyChanged(sheets)) {
+      return Promise.resolve({ bytes: opened.bytes, log: { compressed: 0, stored: 0, why: '', noChange: true } });
+    }
     return (opened.kind === 'xlsb' ? saveXlsb(sheets) : saveXlsxLike(sheets));
   }
 
@@ -229,6 +286,7 @@
     reset: function () { opened = null; },
     detectKind: detectKind, sheetToGrid: sheetToGrid, collectValues: collectValues,
     baselineOf: baselineOf, changedCells: changedCells, valueOf: valueOf,
+    anyChanged: anyChanged, normForCompare: normForCompare, rebaseSheet: rebaseSheet,
     MSG_XLS: MSG_XLS,
   };
 })(typeof self !== 'undefined' ? self : this);
