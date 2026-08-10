@@ -158,6 +158,7 @@
   "SORT_text",
   "SUMPRODUCT_cond",
   "SUMPRODUCT_len",
+  "SUM_float",
   "TEXTAFTER_first",
   "TEXTAFTER_negative",
   "TEXTAFTER_nested",

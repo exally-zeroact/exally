@@ -1188,7 +1188,17 @@ var HF_ERR = {
 // ================================================================
 function initFormulaEngine(sheetNames) {
   if(typeof HyperFormula === 'undefined') return;
-  hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3', useArrayArithmetic:true});
+  /* ★smartRounding は切る（2026-08-10 司さん判断）★
+     既定の true は、計算の結果を14桁で丸めて「きれいな数字」に直す。★Excelは丸めない。★
+     実測(司さんの実物・式15,126本): 切ると ★41件がExcelと一致し、新しい食い違いは0件★
+       売上表 D37 =D36/1.1        188000    → 187999.99999999997（Excelと同じ）
+       売上表 AN38 =AN36*0.1/1.1  200       → 199.99999999999997（★消費税★）
+       距離 D1 =C36+G36+…         26718.5   → 26718.499999999996
+     ★切らないと「切り捨てが1つ入るだけで1円ズレる」（記憶の決まりの実例）。★
+     ★書き出す時のキャッシュ値もうちの計算結果なので、切らないと渡した紙まで違う。★
+     ★見にくさは表示側で直す。計算を歪めて見やすくしない。★
+     ★tests/smart-rounding.test.mjs が、true に戻したら赤にする。★ */
+  hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3', useArrayArithmetic:true, smartRounding:false});
   // FN_LIBRARY に HyperFormula の全関数を自動追加（既存重複は除く）
   try {
     if(typeof HyperFormula.getRegisteredFunctionNames==='function' && typeof FN_LIBRARY!=='undefined'){
@@ -1469,6 +1479,18 @@ function updateFormatBar(cell) {
 }
 
 // 数値フォーマット適用
+/* ★書式の無いセルの「見せ方」だけ整える（計算は1ミリも触らない）★
+   smartRounding を切ったので、0.1+0.2 が 0.30000000000000004 のまま持たれる。
+   ★中身は正しい（Excelと同じ）★ので触らない。★見せる時だけ★ Excel と同じく
+   15桁までにして、余った 0 を落とす。
+   ★計算を歪めて見やすくするのは、今 直した物に戻ること。だから表示だけ。★ */
+function forDisplay(v) {
+  if (typeof v !== 'number' || !isFinite(v)) return v;
+  if (Number.isInteger(v)) return v;
+  var s = v.toPrecision(15);                       // Excel も 15桁で見せる
+  if (s.indexOf('e') >= 0 || s.indexOf('E') >= 0) return v;   // 指数の形はそのまま
+  return String(Number(s));                        // 末尾の 0 を落とす
+}
 function applyNumFmt(val, fmt) {
   // 日付書式判定（小文字 y/m/d ベース）
   var dateFmts=['m/d','mm/dd','yyyy/m/d','yyyy/mm/dd','yyyy-m-d','yyyy-mm-dd','yyyy年m月d日','yyyy年mm月dd日','m月d日','m月d日(aaa)'];
@@ -1883,7 +1905,7 @@ function drawText(r,c){
   // 表示値（numFmt適用）
   var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
   if(!raw) return;
-  var display = (cell.numFmt && raw!=='') ? applyNumFmt(raw, cell.numFmt) : raw;
+  var display = (cell.numFmt && raw!=='') ? applyNumFmt(raw, cell.numFmt) : forDisplay(raw);
 
   // フォント
   var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||12)*scale)));
@@ -6451,7 +6473,7 @@ var REQUIRED_FNS = [
   'render', 'parseDate', 'parseDateStr', 'parseTime', 'dateFmtForFormula',
   'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
   'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
-  'recalcSheet', 'convertFormula',
+  'recalcSheet', 'convertFormula', 'forDisplay', 'applyNumFmt',
   // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）
   'initExallyFormula', 'addSheetToEngine'
 ];
