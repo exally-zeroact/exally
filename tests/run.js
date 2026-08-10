@@ -35,6 +35,8 @@ const FILES = [
   ['no-silent-optional.test.mjs', '--self-test'],
   'smart-rounding.test.mjs',              // ★計算の結果を14桁で丸めさせない(消費税が1円ズレる)
   ['smart-rounding.test.mjs', '--self-test'],
+  'text-format.test.mjs',                 // ★TEXT()の書式コード(曜日aaa/月名/時刻の分)。実物730本がシリアル値のまま出ていた
+  ['text-format.test.mjs', '--self-test'],
   'book-open.test.mjs',                   // ★受け取ったブックを「開いて何も変えずに保存」しても壊れない(実機で出た事故)
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
