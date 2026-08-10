@@ -35,11 +35,15 @@ export const EXCEL = [
   { name: '売上表 AN38 =AN36*0.1/1.1（消費税）', a: 2200, f: '=A1*0.1/1.1', want: 199.99999999999997, floorSmart: 200, floorReal: 199 },
 ];
 
-/** 表示だけ整える（book.html の forDisplay と同じ物。★計算は触らない★） */
+/** 表示だけ整える（book.html の forDisplay と同じ物。★計算は触らない★）
+ *  ★文字も受ける★: recalcSheet は答えを _hfGetDisplay の戻り＝文字で置くので、
+ *  数だけ見ていると 187999.99999999997 が素通りする（2026-08-10 実測）。 */
 export function forDisplay(v) {
-  if (typeof v !== 'number' || !isFinite(v)) return v;
-  if (Number.isInteger(v)) return v;
-  var s = v.toPrecision(15);
+  var n = (typeof v === 'number') ? v
+        : ((typeof v === 'string' && /^-?\d+\.\d+$/.test(v)) ? Number(v) : null);
+  if (n === null || !isFinite(n)) return v;
+  if (Number.isInteger(n)) return v;
+  var s = n.toPrecision(15);
   if (s.indexOf('e') >= 0 || s.indexOf('E') >= 0) return v;
   return String(Number(s));
 }
@@ -112,8 +116,37 @@ T('★見にくさは表示側で直している（計算は触っていない�
   if (String(forDisplay(26718.499999999996)) !== '26718.5') throw new Error('26718.5');
   if (forDisplay(0.1 + 0.2) === 0.1 + 0.2) throw new Error('数のまま返している（文字にして見せる）');
   if (!/function forDisplay/.test(html)) throw new Error('book.html に forDisplay が無い');
-  if (!/applyNumFmt\(raw, cell\.numFmt\) : forDisplay\(raw\)/.test(html)) {
-    throw new Error('★描く所で forDisplay を通していない★（書式の無いセルが 0.30000000000000004 のまま出る）');
+});
+T('★答えが「文字」で来ても丸めて見せる（recalcSheet は文字を置く）', () => {
+  //  ここを数だけにすると、実物で 41件が 187999.99999999997 のまま画面に出る（実測）
+  if (forDisplay('187999.99999999997') !== '188000') throw new Error('文字の 187999… が素通り');
+  if (forDisplay('26718.499999999996') !== '26718.5') throw new Error('文字の 26718.5 が素通り');
+  if (forDisplay('1/21') !== '1/21') throw new Error('日付の文字を触ってはいけない');
+  if (forDisplay('7,000') !== '7,000') throw new Error('桁区切りの文字を触ってはいけない');
+  if (!/typeof v === 'string'/.test(html.slice(html.indexOf('function forDisplay'), html.indexOf('function forDisplay') + 500))) {
+    throw new Error('★book.html の forDisplay が数しか見ていない★（文字で来る答えが素通りする）');
+  }
+});
+T('★描く所は fmtForDisplay を通している（書式つきのセルも救われる）', () => {
+  if (!/function fmtForDisplay/.test(html)) throw new Error('book.html に fmtForDisplay が無い');
+  if (!/var display = fmtForDisplay\(raw, cell\.numFmt\);/.test(html)) {
+    throw new Error('★描く所で fmtForDisplay を通していない★\n'
+      + '   applyNumFmt は Excel の書式をほとんど知らない。司さんの実物では\n'
+      + '   ★書式つき 6,568セルが全部 素通り★していた（"#,##0_ " も "General" も知らない）。\n'
+      + '   素通りすると 187999.99999999997 がそのまま画面に出る。');
+  }
+  //  順番が命: ①ファイルの書式器 → ②applyNumFmt → ③15桁に丸める
+  const body = html.slice(html.indexOf('function fmtForDisplay'));
+  const i1 = body.indexOf('XLSX.SSF.format'), i2 = body.indexOf('applyNumFmt('), i3 = body.indexOf('forDisplay(raw)');
+  if (!(i1 > 0 && i2 > i1 && i3 > i2)) throw new Error('順番が違う（書式器→applyNumFmt→15桁 の順で落とすこと）');
+  if (body.slice(0, 900).indexOf('/^-?\\d+(\\.\\d+)?$/') < 0) {
+    throw new Error('★裸の数字だけに使う歯止めが無い★（"1/21" を数に戻すと 1/1 になる）');
+  }
+});
+T('★書式器を呼ぶための withWeekday が公開されている', () => {
+  const bo = fs.readFileSync(path.join(ROOT, 'js', 'book-open.js'), 'utf8');
+  if (!/withWeekday:\s*withWeekday/.test(bo)) {
+    throw new Error('BookOpen.withWeekday が公開されていない＝fmtForDisplay が例外で落ちる');
   }
 });
 

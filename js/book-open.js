@@ -285,7 +285,7 @@
     current: function () { return opened; },
     reset: function () { opened = null; },
     detectKind: detectKind, sheetToGrid: sheetToGrid, collectValues: collectValues,
-    baselineOf: baselineOf, changedCells: changedCells, valueOf: valueOf,
+    baselineOf: baselineOf, changedCells: changedCells, valueOf: valueOf, withWeekday: withWeekday,
     anyChanged: anyChanged, normForCompare: normForCompare, rebaseSheet: rebaseSheet,
     MSG_XLS: MSG_XLS,
   };

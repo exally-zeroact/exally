@@ -1155,14 +1155,14 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=a1ea173f"></script>
+<script src="hyperformula.full.min.js?v=370f6158"></script>
 
-<script src="exally-formula.js?v=a1ea173f"></script>
+<script src="exally-formula.js?v=370f6158"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=a1ea173f"></script>
-<script src="lib/grid-xlsx.js?v=a1ea173f"></script>
-<script src="lib/excel-version.js?v=a1ea173f"></script>
+<script src="js/file-out.js?v=370f6158"></script>
+<script src="lib/grid-xlsx.js?v=370f6158"></script>
+<script src="lib/excel-version.js?v=370f6158"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1485,11 +1485,37 @@ function updateFormatBar(cell) {
    15桁までにして、余った 0 を落とす。
    ★計算を歪めて見やすくするのは、今 直した物に戻ること。だから表示だけ。★ */
 function forDisplay(v) {
-  if (typeof v !== 'number' || !isFinite(v)) return v;
-  if (Number.isInteger(v)) return v;
-  var s = v.toPrecision(15);                       // Excel も 15桁で見せる
+  //  recalcSheet は答えを ★文字★ で置く（_hfGetDisplay の戻り）ので、数だけ見ていると素通りする
+  var n = (typeof v === 'number') ? v
+        : ((typeof v === 'string' && /^-?\d+\.\d+$/.test(v)) ? Number(v) : null);
+  if (n === null || !isFinite(n)) return v;
+  if (Number.isInteger(n)) return v;
+  var s = n.toPrecision(15);                       // Excel も 15桁で見せる
   if (s.indexOf('e') >= 0 || s.indexOf('E') >= 0) return v;   // 指数の形はそのまま
   return String(Number(s));                        // 末尾の 0 を落とす
+}
+
+/* ★画面に出す文字を作る。計算は触らない★
+   うちの applyNumFmt は Excel の書式をほとんど知らない。司さんの実物で数えたら
+   ★書式つき 6,568セルが 全部 素通り★していた（2026-08-10 実測）。素通りすると
+   計算結果が 187999.99999999997 のまま画面に出る。
+   本を開いている時は ★そのファイルの元の見え方を作ったのと同じ道具★
+   （SheetJS の書式器・sheetToGrid が使っている物）で作り直す。
+   使えなければ applyNumFmt、それも知らない書式なら 15桁に丸めて見せる。
+   ★裸の数字にしか使わない★ — "1/21" や "7,000" "¥1,000" を数に戻して
+   作り直すと、日付が 1/1 になるような壊し方をする。 */
+function fmtForDisplay(raw, fmt) {
+  if (fmt && raw !== '' && raw !== undefined && raw !== null) {
+    if (/^-?\d+(\.\d+)?$/.test(String(raw))
+        && typeof BookOpen !== 'undefined' && BookOpen.isOpened()
+        && typeof XLSX !== 'undefined' && XLSX.SSF) {
+      try { return XLSX.SSF.format(BookOpen.withWeekday(fmt, +raw), +raw); }
+      catch (e) { /* 読めない書式だった時だけ下に落とす */ }
+    }
+    var out = applyNumFmt(raw, fmt);
+    if (String(out) !== String(raw)) return out;   // うちが知っている書式だった
+  }
+  return forDisplay(raw);
 }
 function applyNumFmt(val, fmt) {
   // 日付書式判定（小文字 y/m/d ベース）
@@ -1905,7 +1931,7 @@ function drawText(r,c){
   // 表示値（numFmt適用）
   var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
   if(!raw) return;
-  var display = (cell.numFmt && raw!=='') ? applyNumFmt(raw, cell.numFmt) : forDisplay(raw);
+  var display = fmtForDisplay(raw, cell.numFmt);
 
   // フォント
   var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||12)*scale)));
@@ -6473,7 +6499,7 @@ var REQUIRED_FNS = [
   'render', 'parseDate', 'parseDateStr', 'parseTime', 'dateFmtForFormula',
   'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
   'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
-  'recalcSheet', 'convertFormula', 'forDisplay', 'applyNumFmt',
+  'recalcSheet', 'convertFormula', 'forDisplay', 'fmtForDisplay', 'applyNumFmt',
   // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）
   'initExallyFormula', 'addSheetToEngine'
 ];
