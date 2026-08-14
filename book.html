@@ -5040,7 +5040,12 @@ function switchSheet(idx){
     selR1=0;selC1=0;selR2=0;selC2=0;
   }
   scrollTop=0;scrollLeft=0;scale=1;
-  loadSheetIntoEngine(idx);   /* ★見るシートだけ、その時に計算する側へ流す★ */
+  loadSheetIntoEngine(idx);   /* ★見るシート＋そのシートが参照しているシートを流す★ */
+  /* ★もう流してあるシートでも、開くたびに計算し直す★
+     他のシートを直した結果がこのシートの合計に効いてくる。やらないと
+     ★開いた時の古い合計が そのまま残る★（4月を直して まとめへ戻ると 429,000 のままだった）。
+     ここでは控えを取り直さない＝客の操作で変わった分は「変わった」と数えて保存に載せる。 */
+  if (typeof recalcSheet === 'function' && sheets[idx]) recalcSheet(idx, sheets[idx].data);
   updateBar(); render();
   document.querySelectorAll('.sheet-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
   // モード中はサブバーも更新（別シート範囲のチップ表示に反映）
@@ -6128,10 +6133,61 @@ function quoteSheetRefs(f){
   }
   return f;
 }
+/* ★その シートの式が どのシートを見ているかを数える★
+   ここを見ずに「見ているシートだけ」流すと、まとめの ='5月'!E14 が
+   ★空のシートを参照して 空を返す★。#ERROR が出ないので、
+   ★合計が黙って小さくなる★（2026-08-11 指示役が実機で発見：527,000 が 186,000 になった）。 */
+function _sheetsReferencedBy(idx){
+  var sh = sheets[idx];
+  if(!sh || !sh.data) return [];
+  var alts = [], byName = {}, i;
+  for(i=0;i<sheets.length;i++){
+    byName[sheets[i].name] = i;
+    alts.push(sheets[i].name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  }
+  alts.sort(function(a,b){ return b.length - a.length; });   // 長い名前を先に当てる
+  var re = new RegExp("(?:'((?:[^']|'')+)'|(" + alts.join('|') + "))!", 'g');
+  var hit = {}, k, f, m, nm, j;
+  for(k in sh.data){
+    f = sh.data[k] && sh.data[k].f;
+    if(typeof f !== 'string' || f.charAt(0) !== '=') continue;
+    re.lastIndex = 0;
+    while((m = re.exec(f))){
+      nm = (m[1] !== undefined) ? m[1].replace(/''/g, "'") : m[2];
+      j = byName[nm];
+      if(j !== undefined && j !== idx) hit[j] = true;
+    }
+  }
+  var out = [];
+  for(k in hit) out.push(+k);
+  return out;
+}
+/* 1枚だけ計算する側へ流す（計算し直しはしない）。★参照先を先に流す★ */
+function _pushSheetToEngine(idx, pushed){
+  if(!hf || _engineLoaded[idx]) return;
+  _engineLoaded[idx] = true;                 // ★先に立てる（お互いを参照していても無限に潜らない）
+  var sh = sheets[idx];
+  if(!sh || !sh._fromFile) return;
+  _pushGrid(idx, sh);
+  pushed.push(idx);
+  /* ★この シートが見ているシートも流す★ 流さないと空を返して合計が小さくなる */
+  var deps = _sheetsReferencedBy(idx);
+  for(var i=0;i<deps.length;i++) _pushSheetToEngine(deps[i], pushed);
+}
 function loadSheetIntoEngine(idx){
   if(!hf || _engineLoaded[idx]) return;
-  var sh = sheets[idx];
-  if(!sh || !sh._fromFile) { _engineLoaded[idx] = true; return; }
+  var pushed = [];
+  _pushSheetToEngine(idx, pushed);
+  /* ★流した物を全部 計算し直してから控えを取り直す★
+     参照先が後から入るので、先に流したシートも計算し直す必要がある。 */
+  for(var i=0;i<pushed.length;i++){
+    if (typeof recalcSheet === 'function') recalcSheet(pushed[i], sheets[pushed[i]].data);
+  }
+  for(i=0;i<pushed.length;i++){
+    if (typeof BookOpen !== 'undefined' && BookOpen.rebaseSheet) BookOpen.rebaseSheet(sheets[pushed[i]]);
+  }
+}
+function _pushGrid(idx, sh){
   var maxR = 0, maxC = 0, k, p;
   for(k in sh.data){ p = k.split(','); if(+p[0]>maxR) maxR=+p[0]; if(+p[1]>maxC) maxC=+p[1]; }
   var grid = [];
@@ -6148,12 +6204,9 @@ function loadSheetIntoEngine(idx){
   }
   try { hf.setSheetContent(_hfSid(idx), grid); }
   catch(e){ if(window.console) console.warn('[Exally] シートを計算側へ流せませんでした', e); }
-  _engineLoaded[idx] = true;
-  /* ★流した直後に計算して、控えを取り直す★
-     うちのエンジンは Excel と答えが違う式がある（実物で771セル）。
-     取り直さないと それを「客が変えた」と数えて、★間違った答えで上書きしてしまう★。 */
-  if (typeof recalcSheet === 'function') recalcSheet(idx, sh.data);
-  if (typeof BookOpen !== 'undefined' && BookOpen.rebaseSheet) BookOpen.rebaseSheet(sh);
+  /* ★計算し直しと控えの取り直しは loadSheetIntoEngine 側でまとめて行う★
+     参照先のシートが後から入るので、ここで1枚ずつやると
+     ★先に流したシートが「参照先が空」のままの答えで控えを取ってしまう★。 */
 }
 
 /* ★シートのタブを 今の sheets[] から作り直す★
