@@ -163,15 +163,21 @@ console.log('  見た配信物: ' + files.length + '本');
    ここに書いていない confirm が増えたら赤。alert / prompt は例外なしで0件。 */
 const CONFIRM_ALLOW = {
   'js/hub.js': {
-    what: '取引先を削除する前の1枚',
+    n: 1, what: '取引先を削除する前の1枚',
     why: '消す操作の歯止め。今 外すと ★確認なしで消える★ ので、置き換える物が出来るまで残す',
-    replaceWith: '画面を止めない自前の確認（トーストではなく、はい/いいえを選ぶ小窓）',
+    replaceWith: '★Timeally が作っている「画面の中で1回 聞く形」を借り物として持ってくる★（作り直さない）',
     due: '2026-09-30',
   },
   'js/ledger.js': {
-    what: '台帳の記録を削除する前の1枚',
+    n: 1, what: '台帳の記録を削除する前の1枚',
     why: '同上',
-    replaceWith: '同上（hub と同じ部品を1つ作って両方から使う）',
+    replaceWith: '同上（借りてきた同じ部品を hub と台帳の両方から使う）',
+    due: '2026-09-30',
+  },
+  'seikyu/js/seikyu-app.js': {
+    n: 4, what: '入金の記録を消す／請求書を取り消す／下書きを削除する／角印を消す の4枚',
+    why: 'どれも消す操作の歯止め。★請求書セッションの持ち物なので Exally は触らない★',
+    replaceWith: '同じ借り物の部品（請求書セッションが差し替える）',
     due: '2026-09-30',
   },
 };
@@ -203,13 +209,18 @@ T('★①-b confirm は「消す前の1枚」だけ（増えたら赤・台帳�
   }
   const unexpected = Object.keys(found).filter((f) => !CONFIRM_ALLOW[f]);
   if (unexpected.length) throw new Error('台帳に無い confirm: ' + unexpected.join(', '));
+  const shown = [];
   for (const f of Object.keys(CONFIRM_ALLOW)) {
-    if (!found[f]) throw new Error(f + ' の confirm が消えている＝台帳から外すか、置き換えた事を書くこと');
-    if (found[f] !== 1) throw new Error(f + ' の confirm が ' + found[f] + '個に増えている（1個だけの約束）');
     const e = CONFIRM_ALLOW[f];
+    /* ★本番とテスト線で持っている画面が違う★。無いファイルは飛ばす（この台帳は両方で同じ物） */
+    if (!fs.existsSync(path.join(ROOT, f))) continue;
+    if (!found[f]) throw new Error(f + ' の confirm が0個＝置き換えたなら台帳から外すこと（残したままにしない）');
+    if (found[f] !== e.n) throw new Error(f + ' の confirm が ' + found[f] + '個（台帳は ' + e.n + '個）＝増やさない');
     if (new Date(e.due) < new Date('2026-08-16')) throw new Error(f + ': 期限切れ ' + e.due);
+    shown.push('     残している confirm: ' + f + ' ×' + e.n + ' … ' + e.what + '（期限 ' + e.due + '）');
   }
-  Object.keys(CONFIRM_ALLOW).forEach((f) => console.log('     残している confirm: ' + f + ' … ' + CONFIRM_ALLOW[f].what + '（期限 ' + CONFIRM_ALLOW[f].due + '）'));
+  if (!shown.length) throw new Error('台帳の対象ファイルが1つも無い＝この検査は空振り');
+  shown.forEach((s) => console.log(s));
 });
 
 const { win, doc, blocked } = await bootBook();
