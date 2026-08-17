@@ -18,6 +18,8 @@ const FILES = [
   ['grid-date.test.mjs', '--self-test'],
   'grid-colwidth.test.mjs', // ★渡した相手の画面で ######## にならないか(日付の列に幅を付ける)
   ['grid-colwidth.test.mjs', '--self-test'],
+  'typed-value.test.mjs',                 // ★E3: 1,234 が文字列で合計に入らない(金が落ちる・期限9/30)
+  ['typed-value.test.mjs', '--self-test'],
   'no-duplicate-libs.test.mjs', // ★同じ物を2箇所に置かせない(法定データのコピペ・ドリフト防止)
   'refs-resolve.test.mjs',      // ★読んでいるファイルが実在するか(require/importも参照として数える)
   ['refs-resolve.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
