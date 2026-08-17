@@ -1144,14 +1144,14 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=865ec6f6"></script>
+<script src="hyperformula.full.min.js?v=af48d21f"></script>
 
-<script src="exally-formula.js?v=865ec6f6"></script>
+<script src="exally-formula.js?v=af48d21f"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=865ec6f6"></script>
-<script src="lib/grid-xlsx.js?v=865ec6f6"></script>
-<script src="lib/excel-version.js?v=865ec6f6"></script>
+<script src="js/file-out.js?v=af48d21f"></script>
+<script src="lib/grid-xlsx.js?v=af48d21f"></script>
+<script src="lib/excel-version.js?v=af48d21f"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -6079,6 +6079,11 @@ function _ensureXlsx(){
     return _loadScript('lib/zip-surgeon.js' + v);
   }).then(function(){ return _loadScript('lib/xlsx-edit.js' + v); })
     .then(function(){ return _loadScript('lib/xlsb-edit.js' + v); })
+    /* ★表の名前での参照（Table[列名]）を、実際のA1範囲に直す★
+       .xlsb では読み込みライブラリが列名を捨てるので、これが無いと
+       実物の式 11,669本が 1本残らず #ERROR になる（2026-08-18 実測）。
+       ★zip-surgeon より後・book-open.js より前★（book-open.js がこれを呼ぶ） */
+    .then(function(){ return _loadScript('lib/table-refs.js' + v); })
     .then(function(){ return _loadScript('js/book-open.js' + v); });
   return _xlsxLoading;
 }

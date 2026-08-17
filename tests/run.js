@@ -40,6 +40,8 @@ const FILES = [
   'no-dead-ui.test.mjs',                  // ★出来ていない物のボタン/画面を止める窓/中の言葉(STEP6・実装予定)を客に見せない
   ['no-dead-ui.test.mjs', '--self-test'],
   'cross-sheet.test.mjs',                 // ★他のシートを参照している合計が黙って小さくならないか(527,000が186,000になった)
+  'table-refs.test.mjs',                  // ★表の名前での参照(Table[列名])→A1範囲。実物の式11,669本が1本残らず#ERRORだった
+  ['table-refs.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認(16通り)
   'book-open.test.mjs',                   // ★受け取ったブックを「開いて何も変えずに保存」しても壊れない(実機で出た事故)
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
