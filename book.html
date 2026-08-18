@@ -1144,17 +1144,17 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=851906d4"></script>
+<script src="hyperformula.full.min.js?v=391784fa"></script>
 
-<script src="exally-formula.js?v=851906d4"></script>
+<script src="exally-formula.js?v=391784fa"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=851906d4"></script>
+<script src="js/file-out.js?v=391784fa"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=851906d4"></script>
-<script src="lib/grid-xlsx.js?v=851906d4"></script>
-<script src="lib/excel-version.js?v=851906d4"></script>
+<script src="lib/typed-value.js?v=391784fa"></script>
+<script src="lib/grid-xlsx.js?v=391784fa"></script>
+<script src="lib/excel-version.js?v=391784fa"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2783,8 +2783,13 @@ function detectTimePattern(values){
 <div id="diffOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:520px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:18px 20px 12px;border-bottom:1px solid #D4EDE1;">
-      <div style="font-size:16px;font-weight:700;color:#2E7D54;">保存する前に確かめてください</div>
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">書き出す前に確かめてください</div>
       <div id="diffHead" style="font-size:13px;color:#333333;margin-top:6px;line-height:1.6;"></div>
+      <!-- ★書き出す名前を先に出す（全アプリの決まり）。既定は開いた時と同じ名前。
+           同じ名前だと ★書き出し先で元と並ぶ★ので、名前を見せて迷わせない。
+           ★直せるようにするのは次のコミット（今回は出すだけ）★ -->
+      <div id="diffName" style="font-size:13px;color:#333333;margin-top:4px;line-height:1.6;"></div>
+      <div style="font-size:12px;color:#333333;margin-top:6px;line-height:1.6;">元のファイルは変わりません。同じ名前で1本 書き出します。</div>
     </div>
     <div id="diffBody" style="padding:14px 18px;overflow:auto;font-size:13px;color:#333333;line-height:1.7;"></div>
     <div style="padding:10px 18px 14px;border-top:1px solid #D4EDE1;">
@@ -6352,6 +6357,8 @@ function _askBeforeWrite(plan, fileName){
     var go = document.getElementById('diffGo');
     var cancel = document.getElementById('diffCancel');
     head.textContent = DiffPreview.headline(plan, fileName);
+    var nameEl = document.getElementById('diffName');
+    if (nameEl) nameEl.textContent = '書き出す名前：' + fileName;
     /* ★件数は省略しない（シートごとの数は全部 出す）／中身だけ先頭3行★ */
     var html = '';
     for(var i=0;i<plan.sheets.length;i++){
@@ -6372,7 +6379,7 @@ function _askBeforeWrite(plan, fileName){
       html += '</div>';
     }
     body.innerHTML = html;
-    go.textContent = 'この' + plan.total + 'か所を書き込む';
+    go.textContent = DiffPreview.goLabel(plan);   // ★言葉は lib の1か所だけ★
     ov.style.display = 'flex';
     var done = function(v){
       ov.style.display = 'none';
@@ -6415,14 +6422,14 @@ function saveOpenedBook(){
       return BookOpen.saveOpened(sheets).then(function(res0){
         var b0 = res0 && res0.bytes ? res0.bytes : res0;
         return FileOut.deliver(b0, cur.name).then(function(){
-          showToast('<span class="toast-h">変える所はありません</span>元のまま返しました（1バイトも変えていません）', 4000);
+          showToast('<span class="toast-h">変える所はありません</span>元のまま書き出しました（1バイトも変えていません）', 4000);
         });
       });
     }
     return _askBeforeWrite(plan, cur.name).then(function(go){
       if(!go){
         /* ★やめる＝ファイルを1バイトも作らない★ */
-        showToast('やめました。ファイルは作っていません。', 3000);
+        showToast('やめました。ファイルは1本も書き出していません。', 3000);
         return null;
       }
       return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan }; });
@@ -6434,7 +6441,8 @@ function saveOpenedBook(){
     var log = res && res.log;
     return FileOut.deliver(buf, cur.name).then(function(){
       _editedCells = {};                     // ★書き終えたら「直した所」を空にする★
-      showToast('<span class="toast-h">' + plan.total + 'か所 書き込みました（元の書式はそのまま）</span>'
+      showToast('<span class="toast-h">' + plan.total + 'か所 直して 書き出しました</span>'
+        + '★元のファイルは変わっていません★。同じ名前で1本 書き出しました。'
         + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
         + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
                  + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);

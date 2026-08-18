@@ -39,6 +39,13 @@ const orig = new Uint8Array(fs.readFileSync(FIX));
 const fakeFile = (name, b) => ({ name, arrayBuffer: () => Promise.resolve(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)) });
 
 let pass = 0, fail = 0;
+const seenCounts = {};
+
+/* ★受け取り口(js/book-open.js)を読んでいる画面を数える★
+   テスト線の book.html は別系統で ★受け取り口が無い＝窓の置き場所が無い★。
+   「無いから飛ばす」ではなく ★数えた物の数を出す★（見ていないだけの緑を作らない）。 */
+const PAGES = fs.readdirSync(ROOT).filter(f => /\.html$/i.test(f));
+const OPEN_PAGES = PAGES.filter(f => fs.readFileSync(path.join(ROOT, f), 'utf8').indexOf('js/book-open.js') >= 0);
 const T = async (n, fn) => { try { await fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
 
 /* ══ self-test（判定そのものをわざと壊す） ══════════════════════════ */
@@ -201,7 +208,11 @@ await T('② ★触っていない部品は1バイトも変わらない（文言
 });
 
 /* ── ⑤ 配線 ── */
-await T('⑤ 配線（book.html が窓を出してから書き込む）', () => {
+console.log('      ── 実測 ── 画面 ' + PAGES.length + '枚のうち 受け取り口(js/book-open.js)を持つのは ' + OPEN_PAGES.length + '枚: ' + (OPEN_PAGES.join(',') || '（無し）'));
+if (!OPEN_PAGES.length) {
+  console.log('      ＝この repo の画面は受け取り口を持たない系統。★窓ごしの検査は対象が無い★（部品は上で測っている）');
+}
+if (OPEN_PAGES.length) await T('⑤ 配線（book.html が窓を出してから書き出す）', () => {
   const h = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
   const must = [
     ['lib/diff-preview.js', '窓の部品を読んでいる'],
@@ -226,7 +237,7 @@ function waitFor(fn, why, ms) {
     })();
   });
 }
-await T('③ ★[やめる]を実際に押す→1バイトも作られない／[書き込む]→作られる', async () => {
+if (OPEN_PAGES.length) await T('③ ★[やめる]を実際に押す→1本も書き出さない／[書き出す]→1本', async () => {
   let JSDOM;
   try { ({ JSDOM } = require('jsdom')); }
   catch { throw new Error('jsdom が無い＝押せない。★緑ではない★'); }
@@ -290,8 +301,8 @@ await T('③ ★[やめる]を実際に押す→1バイトも作られない／[
   if (!lastBytes || !lastBytes.length) throw new Error('作られたファイルが空');
 
   /* ★窓に出した数と、知らせに出た数が同じか（見せた数と書いた数を2通りに分けない）★ */
-  const m1 = /(\d+)か所/.exec(shownText), m2 = /この(\d+)か所を書き込む/.exec(goLabel);
-  const m3 = /(\d+)か所 書き込みました/.exec(toasts.join(' '));
+  const m1 = /(\d+)か所/.exec(shownText), m2 = /この(\d+)か所を直して 書き出す/.exec(goLabel);
+  const m3 = /(\d+)か所 直して 書き出しました/.exec(toasts.join(' '));
   if (!m1 || !m2 || !m3) throw new Error('数が出ていない（窓=' + shownText + ' / ボタン=' + goLabel + ' / 知らせ=' + toasts.join(' | ') + '）');
   if (!(m1[1] === m2[1] && m2[1] === m3[1])) {
     throw new Error('★窓・ボタン・知らせで数が違う★ ' + m1[1] + ' / ' + m2[1] + ' / ' + m3[1]);
@@ -309,7 +320,13 @@ await T('③ ★[やめる]を実際に押す→1バイトも作られない／[
            ★計算しか見ずに直すと6か所（売上表!E1 が 1,298,210 のまま）★
    ＝ #ERROR は出ない。★合計が古いまま黙って保存される★（527,000→186,000 と同じ型）。
    直し方＝★最初の1直しの前に 全シートの控えを取る★。ここでそれを固定する。 */
-await T('★開いていないシートに波及した値も 書かれる（合計が古いまま保存されない）', async () => {
+/* ★2通りを両方 回す★（指示役 2026-08-18）
+     「見た所だけ」… 直すシートしか開かない＝★普通の使い方★
+     「全部見た」  … 先に全シートを開いてから直す
+   2026-08-09 に直したはずの「合計が古いまま」が条件で残っていたのは、
+   ★条件を変えたテストが無かった★から。だから条件そのものを2通り回す。 */
+for (const mode of (OPEN_PAGES.length ? ['見た所だけ（普通の使い方）', '全部見た'] : [])) {
+await T('★' + mode + 'でも 開いていないシートに波及した値が書かれる（合計が古いまま保存されない）', async () => {
   let JSDOM;
   try { ({ JSDOM } = require('jsdom')); } catch { throw new Error('jsdom が無い＝★緑ではない★'); }
   const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
@@ -342,9 +359,9 @@ await T('★開いていないシートに波及した値も 書かれる（合�
   const res3 = await win.BookOpen.openFile(fakeFile('cross-sheet-sample.xlsb', orig));
   win.sheets = res3.sheets; win.activeSheet = 0; win._engineLoaded = {}; win._editedCells = {}; win._baselineTaken = false;
   win.initFormulaEngine(res3.sheets.map(s => s.name));
-  /* ★「4月」しか開かない（普通の使い方）。まとめ は開かない★ */
   const i4 = res3.sheets.findIndex(s => s.name === '4月');
-  win.loadSheetIntoEngine(i4);
+  if (mode === '全部見た') { for (let i = 0; i < res3.sheets.length; i++) win.loadSheetIntoEngine(i); }
+  else { win.loadSheetIntoEngine(i4); }   /* ★「4月」しか開かない＝普通の使い方★ */
   win.activeSheet = i4;
   win.setCell(3, 2, '99');
   const p3 = win.saveOpenedBook();
@@ -361,9 +378,20 @@ await T('★開いていないシートに波及した値も 書かれる（合�
   console.log('      ── 実測 ── 窓「' + head + '」／ ' + sumName + '!B4 ' + beforeSum + ' → ' + afterSum);
   if (!/2つのシート/.test(head)) throw new Error('★開いていないシートの分が窓に出ていない★（' + head + '）');
   if (String(beforeSum) === String(afterSum)) {
-    throw new Error('★開いていないシートの合計が古いまま保存された★（' + sumName + '!B4 = ' + afterSum + '）');
+    throw new Error('★開いていないシートの合計が古いまま書き出された★（' + sumName + '!B4 = ' + afterSum + '）');
   }
+  /* ★2通りで同じ数になる事★（片方だけ少ないのが今回の穴だった） */
+  const mHead = /（(\d+)か所/.exec(head);
+  if (!mHead) throw new Error('窓に数が出ていない: ' + head);
+  seenCounts[mode] = +mHead[1];
   try { win.close(); } catch (e) { /* 閉じられなくても検査は済んでいる */ }
+});
+}
+if (OPEN_PAGES.length) await T('★「見た所だけ」と「全部見た」で 数が同じ（条件で変わらない）', () => {
+  const a = seenCounts['見た所だけ（普通の使い方）'], b = seenCounts['全部見た'];
+  console.log('      ── 実測 ── 見た所だけ ' + a + 'か所 ／ 全部見た ' + b + 'か所');
+  if (a === undefined || b === undefined) throw new Error('片方が走っていない');
+  if (a !== b) throw new Error('★条件で数が変わる★（見た所だけ ' + a + ' / 全部見た ' + b + '）');
 });
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
