@@ -49,6 +49,11 @@ const FILES = [
   ['diff-preview.test.mjs', '--self-test'],
   'word-export-import.test.mjs',          // ★言い方を「書き出す↔読み込む」に固定(同じ動きに2通りの名前を付けない)
   ['word-export-import.test.mjs', '--self-test'],
+  'excel-parity.test.mjs',                // ★Excelとの差を機械で数え直す(表が古くなったら赤)
+  ['excel-parity.test.mjs', '--self-test'],
+  'grid-refedit.test.mjs',                // ★式の中の参照を直せるか(=B1+30 の B1 を A1 に直す)
+  ['grid-refedit.test.mjs', '--self-test'],
+  'grid-edit-ui.mjs',                     // ★本物の book.html で insertRefAddr を動かす(画面の中で直せるか)
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
