@@ -52,8 +52,29 @@ if (process.argv.includes('--self-test')) {
   ways.push(['① 件数を省略しない（4件を4と数える）', p.total === 4 && p.sheets[0].count === 4]);
   ways.push(['② 中身だけ先頭3行に絞る', p.sheets[0].rows.length === 3 && p.sheets[0].more === 1]);
   ways.push(['③ 「あなたが直した所」を分ける', p.userCount === 1 && p.spreadCount === 3]);
-  ways.push(['④ 直した所に印が付く', p.sheets[0].rows[1].byUser === true]);
-  ways.push(['⑤ 直していない所に印を付けない', p.sheets[0].rows[0].byUser === false]);
+  /* ★2026-08-18 変更: 人が直した行を先頭に出す（実物を撮って気づいた。
+     シートの並び順のままだと 14シートの11枚目を直した人が 自分の1つを探す事になる） */
+  ways.push(['④ ★人が直した行が先頭に来る★', p.sheets[0].rows[0].byUser === true]);
+  ways.push(['⑤ 波及しただけの行に印を付けない', p.sheets[0].rows[1].byUser === false]);
+  ways.push(['④b ★人が直したシートが一番上に来る★', (() => {
+    const s5 = [{ name: 'A', data: {} }, { name: 'B', data: {} }];
+    const q = DiffPreview.build({
+      sheets: s5,
+      changedCells: (sh) => (sh.name === 'A' ? { '0,0': 1 } : { '0,0': 2 }),
+      base: {}, edited: { 'B|0,0': { beforeF: null } },
+    });
+    return q.sheets[0].name === 'B' && q.sheets[1].name === 'A';
+  })()]);
+  ways.push(['④c ★先頭3行に入らない所を直した時も そのシートを上に出す★', (() => {
+    const many = {}; for (let i = 0; i < 8; i++) many[i + ',0'] = i;
+    const s6 = [{ name: 'A', data: {} }, { name: 'B', data: {} }];
+    const q = DiffPreview.build({
+      sheets: s6,
+      changedCells: (sh) => (sh.name === 'A' ? { '0,0': 1 } : many),
+      base: {}, edited: { 'B|7,0': { beforeF: null } },
+    });
+    return q.sheets[0].name === 'B';
+  })()]);
   ways.push(['⑥ ★前が控えに無ければ「分かりません」★', (() => {
     const q = DiffPreview.build({ sheets, changedCells: ch, base: {} });
     return q.sheets[0].rows[0].before === DiffPreview.UNKNOWN && q.sheets[0].rows[0].beforeUnknown === true;
