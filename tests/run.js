@@ -47,6 +47,8 @@ const FILES = [
   'book-open.test.mjs',                   // ★受け取ったブックを「開いて何も変えずに保存」しても壊れない(実機で出た事故)
   'diff-preview.test.mjs',                // ★直す前に必ず見せる(方針ver.6の②)。1直しで3シート18本 書き換わる
   ['diff-preview.test.mjs', '--self-test'],
+  'excel-parity.test.mjs',                // ★Excelとの差を機械で数え直す(表が古くなったら赤)
+  ['excel-parity.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
