@@ -1144,17 +1144,17 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=41a5f0a4"></script>
+<script src="hyperformula.full.min.js?v=845945b5"></script>
 
-<script src="exally-formula.js?v=41a5f0a4"></script>
+<script src="exally-formula.js?v=845945b5"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=41a5f0a4"></script>
+<script src="js/file-out.js?v=845945b5"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=41a5f0a4"></script>
-<script src="lib/grid-xlsx.js?v=41a5f0a4"></script>
-<script src="lib/excel-version.js?v=41a5f0a4"></script>
+<script src="lib/typed-value.js?v=845945b5"></script>
+<script src="lib/grid-xlsx.js?v=845945b5"></script>
+<script src="lib/excel-version.js?v=845945b5"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2779,6 +2779,24 @@ function detectTimePattern(values){
   </div>
 </div>
 
+<!-- ★直す前に必ず見せる窓（方針ver.6「絶対に守る3つ」の②）。alert/confirm は使わない★ -->
+<div id="diffOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:520px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:18px 20px 12px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">保存する前に確かめてください</div>
+      <div id="diffHead" style="font-size:13px;color:#333333;margin-top:6px;line-height:1.6;"></div>
+    </div>
+    <div id="diffBody" style="padding:14px 18px;overflow:auto;font-size:13px;color:#333333;line-height:1.7;"></div>
+    <div style="padding:10px 18px 14px;border-top:1px solid #D4EDE1;">
+      <div style="font-size:12px;color:#333333;margin-bottom:10px;">変えない物：罫線・判子・グラフ・結合・列幅・式そのもの</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button id="diffCancel" style="background:#ffffff;border:1.5px solid #D4EDE1;color:#333333;font-size:14px;font-weight:600;padding:10px 18px;border-radius:12px;cursor:pointer;">やめる</button>
+        <button id="diffGo" style="background:#2E7D54;border:1.5px solid #2E7D54;color:#ffffff;font-size:14px;font-weight:700;padding:10px 18px;border-radius:12px;cursor:pointer;"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="bookVerOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #D4EDE1;">
@@ -3464,6 +3482,19 @@ function resize() {
 function getCell(r,c){ return sheets[activeSheet].data[r+','+c] || {v:'',f:'',d:''}; }
 var undoStack = [], redoStack = [];
 function setCell(r,c,v,noUndo){
+  /* ★最初の1直しの前に、全シートの控えを取る★（2026-08-18 実物で見つけた）
+     控え(base)は「うちのエンジンから見た、まだ触っていないファイル」でなければならない。
+     ところが 開いていないシートは ★保存の時に初めて流されて その場で控えを取り直す★ので、
+     そこへ波及した値が「変わっていない」ことになり ★ファイルに書かれなかった★。
+       実物で実測: 計算!C10 を直して保存 →
+         全シートを見てから直すと 18か所（売上表!E1 = 1,302,609 に更新）
+         ★計算シートしか見ずに直すと 6か所（売上表!E1 = 1,298,210 のまま）★
+       ＝ #ERROR は出ない。★合計が古いまま黙って保存される★（527,000→186,000 と同じ型）
+     ★触る前に控えを取る★のが唯一の直し方。開くだけなら今までどおり軽いまま。 */
+  if (!_baselineTaken && typeof BookOpen !== 'undefined' && BookOpen.isOpened()) {
+    _baselineTaken = true;
+    for (var _bi = 0; _bi < sheets.length; _bi++) loadSheetIntoEngine(_bi);
+  }
   // 全角→半角正規化（日本語IMEキーボード対応）
   if(v && typeof v==='string'){
     v = v.replace(/[！-～]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
@@ -3503,6 +3534,13 @@ function setCell(r,c,v,noUndo){
   }
   // 既存の書式プロパティを保持してv/f/dのみ更新
   var existing = sheets[activeSheet].data[key] || {};
+  /* ★人が直したセルを覚えておく（差分プレビューで「あなたが直した所」と 波及した所 を分ける）★
+     前の式も一緒に控える＝式を直した時に「前の式 → 後の式」で見せられる。
+     控えていなければ 窓には ★分かりません★ と出す（黙って空にしない）。 */
+  try {
+    var _ek = sheets[activeSheet].name + '|' + key;
+    if(!_editedCells[_ek]) _editedCells[_ek] = { beforeF: (typeof existing.f==='string' && existing.f.charAt(0)==='=') ? existing.f : null };
+  } catch(e){}
   var next = Object.assign({}, existing, {v:v, f:v, d:String(d)});
   /* ★日付には日付の表示形式を自動で付ける（Excelと同じ）。人が選んだ書式は上書きしない。
      これが無いと「30日後」が 46295 という裸の数字で出て、客には壊れて見える。 */
@@ -6103,6 +6141,7 @@ function _ensureXlsx(){
        実物の式 11,669本が 1本残らず #ERROR になる（2026-08-18 実測）。
        ★zip-surgeon より後・book-open.js より前★（book-open.js がこれを呼ぶ） */
     .then(function(){ return _loadScript('lib/table-refs.js' + v); })
+    .then(function(){ return _loadScript('lib/diff-preview.js' + v); })
     .then(function(){ return _loadScript('js/book-open.js' + v); });
   return _xlsxLoading;
 }
@@ -6112,6 +6151,10 @@ function _ensureXlsx(){
    その状態で1文字でも打つと ★同じシートの式の答えが全部 空になる★（実際にそうなった）。
    14シート・2万セルを開いた瞬間に全部 流すと固まるので、★見ているシートだけ★流す。 */
 var _engineLoaded = {};
+/* ★人が直したセル（差分プレビュー用）。ファイルを開いた時と 保存し終えた時に空にする★ */
+var _editedCells = {};
+/* ★全シートの控えを取ったか（最初の1直しの前に1回だけ取る）★ */
+var _baselineTaken = false;
 /* ★日本語や数字で始まるシート名は、式の中で ' ' で囲まないと計算する側が読めない★
    実測(2026-08-09): `=4月!E14` を渡すと
      「Parsing error. unexpected character: ->月<- at offset: 2」
@@ -6237,6 +6280,8 @@ function openBookFile(file){
   }).then(function(res){
     sheets = res.sheets;
     activeSheet = 0;
+    _editedCells = {};   // ★別のファイルを開いたら 前のファイルの「直した所」を持ち越さない★
+    _baselineTaken = false;
     selR1=selC1=selR2=selC2=0;
     _engineLoaded = {};
     // ★計算する側を作り直す（シートの名前と数が変わるため）★
@@ -6280,6 +6325,69 @@ function _isArrayFormula(sheetIdx, r, c){
   } catch(e){ return false; }
 }
 /* ★受け取ったファイルを直して返す★（元のバイト列を書き換える。作り直さない） */
+/* ★窓に出す1つ分の値を、画面と同じ書式で作る★
+   （内部の値をそのまま出すと 961827.2727272727 になって読めない。実測でそうなっていた） */
+function _diffFmt(v, cell){
+  if(v === null || v === undefined || v === '') return '';
+  /* ★画面が描くのに使う関数（fmtForDisplay）を そのまま呼ぶ★
+     ＝窓に出る字が「画面に出ている字」と1文字も違わない。
+     ★applyNumFmt は「知らない書式」の時に値をそのまま返してくる★ので、それを答えにしない
+     （2026-08-18 実ブラウザで踏んだ: 499.95000000000005 と 1298210 が生のまま窓に出た）。 */
+  try {
+    if(cell && cell.numFmt && typeof fmtForDisplay === 'function'){
+      var s = fmtForDisplay(v, cell.numFmt);
+      if(s !== undefined && s !== null && String(s) !== '' && String(s) !== String(v)) return String(s);
+    }
+    if(typeof forDisplay === 'function') return String(forDisplay(v));
+  } catch(e){}
+  return String(v);
+}
+/* ★直す前に必ず見せる窓★。押されるまで待つ（true=書き込む / false=やめる）。
+   ★alert・confirm は使わない（画面が止まる／中の言葉が出る）★ */
+function _askBeforeWrite(plan, fileName){
+  return new Promise(function(resolve){
+    var ov = document.getElementById('diffOverlay');
+    var head = document.getElementById('diffHead');
+    var body = document.getElementById('diffBody');
+    var go = document.getElementById('diffGo');
+    var cancel = document.getElementById('diffCancel');
+    head.textContent = DiffPreview.headline(plan, fileName);
+    /* ★件数は省略しない（シートごとの数は全部 出す）／中身だけ先頭3行★ */
+    var html = '';
+    for(var i=0;i<plan.sheets.length;i++){
+      var s = plan.sheets[i];
+      html += '<div style="margin-bottom:12px;">';
+      html += '<div style="font-weight:700;color:#333333;">▸ ' + _esc(s.name) + '（' + s.count + 'か所）</div>';
+      for(var j=0;j<s.rows.length;j++){
+        var r = s.rows[j];
+        html += '<div style="padding-left:14px;color:#333333;">'
+             + '<span style="display:inline-block;min-width:64px;">' + _esc(r.addr) + '</span>'
+             + _esc(String(r.before)) + ' → ' + _esc(String(r.after))
+             + (r.byUser ? ' <span style="color:#2E7D54;font-weight:700;">← あなたが直した所</span>' : '')
+             + '</div>';
+      }
+      if(s.more > 0){
+        html += '<div style="padding-left:14px;color:#333333;">… ' + s.count + 'か所のうち ' + s.rows.length + 'つを出しています</div>';
+      }
+      html += '</div>';
+    }
+    body.innerHTML = html;
+    go.textContent = 'この' + plan.total + 'か所を書き込む';
+    ov.style.display = 'flex';
+    var done = function(v){
+      ov.style.display = 'none';
+      go.onclick = null; cancel.onclick = null; ov.onclick = null;
+      resolve(v);
+    };
+    go.onclick = function(){ done(true); };
+    cancel.onclick = function(){ done(false); };
+    /* 外側を押したら やめる扱い（★書き込む方には倒さない★） */
+    ov.onclick = function(e){ if(e.target === ov) done(false); };
+  });
+}
+function _esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function saveOpenedBook(){
   var cur = BookOpen.current();
   /* ★保存の前に、まだ計算していないシートも全部 計算する★（2026-08-09 実機で分かった）
@@ -6290,13 +6398,43 @@ function saveOpenedBook(){
     loadSheetIntoEngine(i);      // ★まだ開いていないシートは ここで流して控えも取り直す★
     if (typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
   }
-  _ensureXlsx().then(function(){
-    return BookOpen.saveOpened(sheets);
-  }).then(function(res){
+  /* ★ここで書き込まない。まず「何を書き込むか」を見せる（方針ver.6 の②）★
+     ★数える場所は1か所★＝窓も書き込みも BookOpen.changedCells を使う。数え直さない。
+     ★終わりまでの約束を返す★（返さないと「押した後どうなったか」を機械で確かめられない。
+       実際 返していなかったので、検査が「押す前」の答えを見ていた） */
+  return _ensureXlsx().then(function(){
+    var plan = DiffPreview.build({
+      sheets: sheets,
+      changedCells: BookOpen.changedCells,   // ★書き込む側と同じ物★
+      base: (BookOpen.current() || {}).base || {},
+      edited: _editedCells,
+      format: function(v, cell){ return _diffFmt(v, cell); }
+    });
+    if(!plan.total){
+      /* ★0か所なら窓を出さない★。元のバイト列をそのまま返す（1バイトも変えない）。 */
+      return BookOpen.saveOpened(sheets).then(function(res0){
+        var b0 = res0 && res0.bytes ? res0.bytes : res0;
+        return FileOut.deliver(b0, cur.name).then(function(){
+          showToast('<span class="toast-h">変える所はありません</span>元のまま返しました（1バイトも変えていません）', 4000);
+        });
+      });
+    }
+    return _askBeforeWrite(plan, cur.name).then(function(go){
+      if(!go){
+        /* ★やめる＝ファイルを1バイトも作らない★ */
+        showToast('やめました。ファイルは作っていません。', 3000);
+        return null;
+      }
+      return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan }; });
+    });
+  }).then(function(pack){
+    if(!pack) return;                       // 0か所 か やめる
+    var res = pack.res, plan = pack.plan;
     var buf = res && res.bytes ? res.bytes : res;      // xlsb は素の Uint8Array を返す
     var log = res && res.log;
     return FileOut.deliver(buf, cur.name).then(function(){
-      showToast('<span class="toast-h">保存しました（元の書式はそのまま）</span>'
+      _editedCells = {};                     // ★書き終えたら「直した所」を空にする★
+      showToast('<span class="toast-h">' + plan.total + 'か所 書き込みました（元の書式はそのまま）</span>'
         + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
         + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
                  + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);
