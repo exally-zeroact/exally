@@ -2693,9 +2693,9 @@ function detectTimePattern(values){
   <div style="display:flex;align-items:center;gap:6px;">
     <!-- ★受け取り口★ 元のファイルは預からない。開いた瞬間に作業用の控えを持ち、保存はそれを書き換える -->
     <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
-    <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを開く（.xlsx / .xlsm / .xlsb）">📂 <span class="hdr-lb">Excelを開く</span></button>
+    <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）">📂 <span class="hdr-lb">Excelを読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-    <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイル(.xlsx)として保存">💾 <span class="hdr-lb">Excelに保存</span></button>
+    <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）">💾 <span class="hdr-lb">Excelに書き出す</span></button>
     <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
   </div>
 </div>
@@ -2788,7 +2788,7 @@ function detectTimePattern(values){
       <!-- ★書き出す名前を先に出す（全アプリの決まり）。既定は開いた時と同じ名前。
            同じ名前だと ★書き出し先で元と並ぶ★ので、名前を見せて迷わせない。
            ★直せるようにするのは次のコミット（今回は出すだけ）★ -->
-      <div id="diffName" style="font-size:13px;color:#333333;margin-top:4px;line-height:1.6;"></div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.6;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>書き出す名前</span><input id="diffName" type="text" style="flex:1 1 220px;min-width:180px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 10px;font-family:inherit;"></div>
       <div style="font-size:12px;color:#333333;margin-top:6px;line-height:1.6;">元のファイルは変わりません。同じ名前で1本 書き出します。</div>
     </div>
     <div id="diffBody" style="padding:14px 18px;overflow:auto;font-size:13px;color:#333333;line-height:1.7;"></div>
@@ -6279,7 +6279,7 @@ function onPickBookFile(el){
   if (f) openBookFile(f);
 }
 function openBookFile(file){
-  showToast('開いています…', 1200);
+  showToast('読み込んでいます…', 1200);
   return _ensureXlsx().then(function(){
     return BookOpen.openFile(file);
   }).then(function(res){
@@ -6357,8 +6357,12 @@ function _askBeforeWrite(plan, fileName){
     var go = document.getElementById('diffGo');
     var cancel = document.getElementById('diffCancel');
     head.textContent = DiffPreview.headline(plan, fileName);
+    /* ★書き出す名前は「開いた時と同じ名前」が既定★（Excelの流儀に近い）。
+        ★推奨の名前を作らない★＝中身から作ると 元のファイルと結び付かなくなる
+        （請求書や明細とは事情が違う。2026-08-18 裁定）。
+        ★その場で直せる★＝同じ名前だと書き出し先で元と並ぶので、迷う人はここで変えられる。 */
     var nameEl = document.getElementById('diffName');
-    if (nameEl) nameEl.textContent = '書き出す名前：' + fileName;
+    if (nameEl) nameEl.value = fileName;
     /* ★件数は省略しない（シートごとの数は全部 出す）／中身だけ先頭3行★ */
     var html = '';
     for(var i=0;i<plan.sheets.length;i++){
@@ -6384,7 +6388,10 @@ function _askBeforeWrite(plan, fileName){
     var done = function(v){
       ov.style.display = 'none';
       go.onclick = null; cancel.onclick = null; ov.onclick = null;
-      resolve(v);
+      /* ★書き出す時の名前は「窓に出ている名前」★（人が直したらその名前で書き出す）。
+         空にされたら 開いた時の名前へ戻す＝★名前の無いファイルを作らない★ */
+      var typed = nameEl && String(nameEl.value || '').trim();
+      resolve(v ? { go: true, name: typed || fileName } : { go: false });
     };
     go.onclick = function(){ done(true); };
     cancel.onclick = function(){ done(false); };
@@ -6426,20 +6433,21 @@ function saveOpenedBook(){
         });
       });
     }
-    return _askBeforeWrite(plan, cur.name).then(function(go){
-      if(!go){
+    return _askBeforeWrite(plan, cur.name).then(function(ans){
+      if(!ans || !ans.go){
         /* ★やめる＝ファイルを1バイトも作らない★ */
         showToast('やめました。ファイルは1本も書き出していません。', 3000);
         return null;
       }
-      return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan }; });
+      return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan, name: ans.name }; });
     });
   }).then(function(pack){
     if(!pack) return;                       // 0か所 か やめる
     var res = pack.res, plan = pack.plan;
+    var outName = pack.name || cur.name;    // ★窓で直した名前で書き出す★
     var buf = res && res.bytes ? res.bytes : res;      // xlsb は素の Uint8Array を返す
     var log = res && res.log;
-    return FileOut.deliver(buf, cur.name).then(function(){
+    return FileOut.deliver(buf, outName).then(function(){
       _editedCells = {};                     // ★書き終えたら「直した所」を空にする★
       showToast('<span class="toast-h">' + plan.total + 'か所 直して 書き出しました</span>'
         + '★元のファイルは変わっていません★。同じ名前で1本 書き出しました。'
@@ -6449,7 +6457,7 @@ function saveOpenedBook(){
     });
   }).catch(function(err){
     // ★歩けない・直せないファイルは、壊さずに断る★
-    showToast('<span class="toast-h">保存しませんでした</span>' + ((err && err.message) || err), 6000, 'warn');
+    showToast('<span class="toast-h">書き出しませんでした</span>' + ((err && err.message) || err), 6000, 'warn');
   });
 }
 function saveXlsx(){
@@ -6477,13 +6485,13 @@ function saveXlsx(){
       // ★止めない。落ちる物を具体的に伝えるだけ（客が自分で直せる形にする）
       //   長い文章なので「読ませる用」の見た目(白地・濃い文字・左揃え)にする。
       var esc1 = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-      var html = '<span class="toast-h">⚠️ 保存しました。ただしExcelで開くと違う所があります</span><ul>'
+      var html = '<span class="toast-h">⚠️ 書き出しました。ただしExcelで読み込むと違う所があります</span><ul>'
         + warns.map(function(w){ return '<li>' + esc1(w.msg) + '</li>'; }).join('') + '</ul>'
         + '<span class="toast-n">対象は「' + (ExcelVersion.VER_LBL[getBookVer()] || getBookVer())
         + '」で見ています（右上の 📊 で変えられます）。</span>';
       showToast(html, 14000, 'warn');
     } else {
-      showToast('✅ Excelファイルを保存しました', 2500);
+      showToast('✅ Excelファイルを書き出しました', 2500);
     }
   }).catch(function(e){
     // ★「保存しました」と嘘をつかない
