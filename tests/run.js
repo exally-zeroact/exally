@@ -54,6 +54,8 @@ const FILES = [
   'grid-refedit.test.mjs',                // ★式の中の参照を直せるか(=B1+30 の B1 を A1 に直す)
   ['grid-refedit.test.mjs', '--self-test'],
   'grid-edit-ui.mjs',                     // ★本物の book.html で insertRefAddr を動かす(画面の中で直せるか)
+  'excel-shortcuts.test.mjs',             // ★Excelと同じキー割り当てを 本物の画面に実際に押して確かめる(真値は実Excelから機械で取った)
+  ['excel-shortcuts.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
