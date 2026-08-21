@@ -24,6 +24,7 @@ const FILES = [
   'refs-resolve.test.mjs',      // ★読んでいるファイルが実在するか(require/importも参照として数える)
   ['refs-resolve.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   'api-claude.test.mjs',        // ★チャットが客に言う基準数値(実数リテラル・NaN混入検知)
+  ['api-claude.test.mjs', '--self-test'],  // ★失敗しても200で「答えのふり」をしていた穴(2026-08-22)
   'ios-unsupported.test.mjs',   // ★iPhoneで動かない書き方(type=month/octet-stream/writeFile/Blob散在)
   ['ios-unsupported.test.mjs', '--self-test'],
   'op-registry.test.mjs',       // ★契約の入口(二重登録は投げる)
@@ -74,6 +75,8 @@ const FILES = [
   ['grid-stats.test.mjs', '--self-test'],
   'ctx-menu.test.mjs',                    // ★右クリックが画面の中に収まる(743pxが619pxの画面で 上へ470px はみ出した事故)
   ['ctx-menu.test.mjs', '--self-test'],
+  'ai-reason.test.mjs',                   // ★AIに繋がらない時の理由と次の一手／★空のセルでAIを呼ばない(お金)★
+  ['ai-reason.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
