@@ -64,6 +64,8 @@ const FILES = [
   ['grid-filter.test.mjs', '--self-test'],
   'grid-freeze.test.mjs',                 // ★ウィンドウ枠の固定(実Excelで実測)＋描き方を触った後に 前からある物が壊れていないか
   ['grid-freeze.test.mjs', '--self-test'],
+  'grid-find.test.mjs',                   // ★検索と置換(実Excelで実測: ★置換は式を見る＝答えが変わる★／* ? ~ のワイルドカード)
+  ['grid-find.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
