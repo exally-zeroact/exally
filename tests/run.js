@@ -58,6 +58,8 @@ const FILES = [
   ['excel-shortcuts.test.mjs', '--self-test'],
   'mobile-labels.test.mjs',               // ★スマホの幅で 字を消して「絵だけ」にするのを禁じる(司さんのiPhoneで 📂💾📊 の絵だけになっていた)
   ['mobile-labels.test.mjs', '--self-test'],
+  'grid-sort.test.mjs',                   // ★並べ替え(実Excelを COM で動かして測った並び順・見出し判定・式の運ばれ方)
+  ['grid-sort.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
