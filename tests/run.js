@@ -108,7 +108,11 @@ for (const f of FILES) {
      その時 出ていたのは「★ N ファイルで失敗」だけで、
      ★中で死んだのか（signal）／自分で1を返したのか（status）が 分からなかった★。
      ⇒ ★どちらかを 必ず1行 出す★（次に赤くなった時、新しい壊れ か ムラ かを その場で見分ける） */
-  try { execFileSync(process.execPath, [path.join(__dirname, file), ...args], { stdio: 'inherit' }); }
+  /* ★中で殺される(SIGTRAP)のを止める（2026-08-24）★
+     CIで excel-parity が ★signal=SIGTRAP★ で死んだ＝V8 が力尽きた（本物の壊れではない）。
+     本物の画面(book.html)を jsdom に丸ごと載せる検査は 重い。★積める量を増やす★。
+     ⇒ 落ちた理由を出す1行が無ければ ★「新しい壊れ」と区別できなかった★ */
+  try { execFileSync(process.execPath, ['--max-old-space-size=4096', path.join(__dirname, file), ...args], { stdio: 'inherit' }); }
   catch (e) {
     ng++;
     const 印 = e && e.signal ? ('★中で殺された(signal=' + e.signal + ')★＝新しい壊れではない可能性')
