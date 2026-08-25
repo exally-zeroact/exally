@@ -1477,7 +1477,7 @@ function sortRange(dir){
   var 何行 = 順.length;
   showToast(何行 + '行を' + (dir==='asc'?'昇順':'降順') + 'に並べ替えました'
     + (見出し ? '（先頭行は見出しとして動かしていません）' : '')
-    + (ドル付き ? '／★$付きの参照が' + ドル付き + '本 在ります＝Excelと同じく 指す先が変わります★' : ''));
+    + (ドル付き ? '／<b>$付きの参照が' + ドル付き + '本 在ります＝Excelと同じく 指す先が変わります</b>' : ''));
 }
 
 /* ══ 絞り込み（フィルター）══════════════════════════════════════════
@@ -1520,7 +1520,7 @@ function filterByValue(){
   var ctl = document.getElementById('ctx-clear-filter'); if(ctl) ctl.style.display = '';
   render();
   showToast('「' + (res.value || '（空）') + '」の ' + res.keep.length + '行だけ見せています'
-    + '（' + res.hide.length + '行を隠しました。★消していません・合計も変わりません★）');
+    + '（' + res.hide.length + '行を隠しました。<b>消していません・合計も変わりません</b>）');
 }
 function clearFilter(){
   hideCtxMenu();
@@ -1828,7 +1828,7 @@ function applyValid(){
   var bad = GridValid.countBad(sh.data, sh.validations, GridPrint.shown);
   var 何個 = (Math.abs(selR2-selR1)+1) * (Math.abs(selC2-selC1)+1);
   showToast(何個 + 'マスに 決まりを付けました（' + GridValid.describe(rule) + '）'
-    + (bad.count ? '／★合っていない値が ' + bad.count + '個 在ります（消していません）★' : ''));
+    + (bad.count ? '／<b>合っていない値が ' + bad.count + '個 在ります（消していません）</b>' : ''));
   render();
 }
 
@@ -1852,7 +1852,7 @@ function showBadCells(){
   var f = bad.cells[0];
   selR1=selR2=f.r; selC1=selC2=f.c;
   scrollToCell(f.r,f.c); updateBar(); render();
-  showToast('★合っていない値が ' + bad.count + '個★（' + 決まり数 + 'マス中）／'
+  showToast('合っていない値が ' + bad.count + '個（' + 決まり数 + 'マス中）／'
     + colLetter(f.c)+(f.r+1) + '「' + f.text + '」' + f.why);
 }
 
@@ -1941,10 +1941,10 @@ function replaceAll(){
   updateBar(); render();
   /* ★式を何本 書き換えたかを 必ず出す★（Excelと同じ動きだが 黙って値を変えない） */
   _findMsg(直す.length + 'か所 置き換えました'
-    + (式の数 ? '／★うち 式が ' + 式の数 + '本＝答えが変わります★' : '')
+    + (式の数 ? '／うち 式が ' + 式の数 + '本＝答えが変わります' : '')
     + '（違ったら Ctrl+Z で戻せます）');
   showToast(直す.length + 'か所 置き換えました'
-    + (式の数 ? '（★式が ' + 式の数 + '本 含まれます＝答えが変わります★）' : ''));
+    + (式の数 ? '（<b>式が ' + 式の数 + '本 含まれます＝答えが変わります</b>）' : ''));
 }
 
 /* ══ ウィンドウ枠の固定 ══════════════════════════════════════════════
@@ -1971,7 +1971,7 @@ function freezePanes(){
   var ctl = document.getElementById('ctx-unfreeze'); if(ctl) ctl.style.display = '';
   render();
   showToast('上の' + sh.freezeRow + '行 と 左の' + sh.freezeCol + '列 を固定しました'
-    + '（★計算は何も変わりません★）');
+    + '（<b>計算は何も変わりません</b>）');
 }
 function unfreezePanes(){
   hideCtxMenu();
@@ -7539,10 +7539,10 @@ function openBookFile(file){
        これが在るから「別のシートも見て答えます」が言える（2026-08-25 司さん） */
     参照の網を作り始める(function(g){
       if(!g) return;
-      var 別 = g.別シート参照.length, 式 = 0, 見た = {};
+      var 式 = 0, 見た = {};
       for(var i=0;i<g.別シート参照.length;i++){ var k=g.別シート参照[i].from+':'+g.別シート参照[i].fromCell; if(!見た[k]){見た[k]=1;式++;} }
       showToast('<span class="toast-h">ブック全体を調べました</span>'
-        + g.シート数 + 'シート・式' + g.式の数 + '本／★別のシートを見ている式 ' + 式 + '本★'
+        + g.シート数 + 'シート・式' + g.式の数 + '本／別のシートを見ている式 ' + 式 + '本'
         + (g.別ファイル参照.length ? '／別のファイルを見ている式 ' + g.別ファイル参照.length + '本' : '')
         + '（' + g.かかった秒 + '秒）', 5000);
     });
@@ -7559,7 +7559,7 @@ function openBookFile(file){
       showToast('<span class="toast-h">開きました（見るだけ）</span>' + BookOpen.MSG_XLS, 6000, 'warn');
     } else {
       showToast('開きました：' + file.name + '（' + res.sheets.length + 'シート）'
-        + '<br>保存すると★元の書式・判子・グラフはそのまま★で、値だけ書き換えます。', 5000);
+        + '<br>保存すると<b>元の書式・判子・グラフはそのまま</b>で、値だけ書き換えます。', 5000);
     }
   }).catch(function(err){
     showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
@@ -7708,7 +7708,7 @@ function saveOpenedBook(){
     return FileOut.deliver(buf, outName).then(function(){
       _editedCells = {};                     // ★書き終えたら「直した所」を空にする★
       showToast('<span class="toast-h">' + plan.total + 'か所 直して 書き出しました</span>'
-        + '★元のファイルは変わっていません★。同じ名前で1本 書き出しました。'
+        + '<b>元のファイルは変わっていません</b>。同じ名前で1本 書き出しました。'
         + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
         + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
                  + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);

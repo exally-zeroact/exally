@@ -82,6 +82,51 @@ T('★客に見せる字に ★ を書かない★', () => {
   for (const t of 出す字) ok(t.indexOf('★') < 0, '★客の字に ★ が出ている★：' + t);
 });
 
+/* ★2026-08-25 実際に撮ってみたら、★終わった時の知らせ★に ★ が出ていた★
+   ＝この検査は「調べている間」の字しか見ていなかった。⇒ ★画面に出る知らせ 全部★を見る。 */
+T('★客に見せる知らせ 全部に ★ を書かない（showToast をひとつ残らず）★', () => {
+  const 出す = [];
+  let i = 0;
+  while ((i = book.indexOf('showToast(', i)) >= 0) {
+    let d = 0, j = i + 'showToast'.length;
+    for (; j < book.length; j++) {
+      const c = book[j];
+      if (c === '(') d++;
+      else if (c === ')') { d--; if (d === 0) break; }
+    }
+    出す.push(book.slice(i, j));
+    i = j;
+  }
+  ok(出す.length >= 10, '知らせが見つからない（' + 出す.length + '件）');
+  const 悪い = [];
+  for (const t of 出す) {
+    /* 文字列の中だけを見る（変数名や注記は 客に出ない） */
+    const 字 = (t.match(/'[^']*'/g) || []).join('');
+    if (字.indexOf('★') >= 0) 悪い.push(字.slice(0, 60));
+  }
+  eq(悪い.length, 0, '★客の知らせに ★ が出ている：' + 悪い.join(' ／ '));
+  console.log('       … 知らせ ' + 出す.length + '件を 数えた');
+});
+
+/* ★同じ回で もう1つ踏んだ：知らせの出口は2つ在る（showToast=HTML／_findMsg=字だけ）★
+   ＝_findMsg に <b> を書くと 画面に「<b>」と そのまま出る。 */
+T('★字だけの知らせ(_findMsg)に タグを書かない★', () => {
+  const 悪い = [];
+  let i = 0;
+  while ((i = book.indexOf('_findMsg(', i)) >= 0) {
+    let d = 0, j = i + '_findMsg'.length;
+    for (; j < book.length; j++) {
+      const c = book[j];
+      if (c === '(') d++;
+      else if (c === ')') { d--; if (d === 0) break; }
+    }
+    const 字 = (book.slice(i, j).match(/'[^']*'/g) || []).join('');
+    if (/<[a-zA-Z/]/.test(字)) 悪い.push(字.slice(0, 60));
+    i = j;
+  }
+  eq(悪い.length, 0, '★字だけの所に タグが出ている：' + 悪い.join(' ／ '));
+});
+
 /* ── 実際に動かす（jsdom）── */
 let JSDOM;
 try { ({ JSDOM } = await import('jsdom')); }
@@ -124,6 +169,8 @@ if (SELF) {
     ['★何枚目を 出さない★', (s) => s.replace('枚目（', '（')],
     ['★100%で止まって見える（99で止めない）★', (s) => s.replace('Math.min(99,', 'Math.min(100,')],
     ['★客の字に ★ を書く★', (s) => s.replace("'ブック全体を調べています… '", "'★ブック全体を調べています…★ '")],
+    ['★終わった時の知らせに ★ を書く★', (s) => s.replace("'本／別のシートを見ている式 '", "'本／★別のシートを見ている式 '")],
+    ['★字だけの知らせに タグを書く★', (s) => s.replace("'／うち 式が '", "'／<b>うち 式が '")],
   ];
   let red = 0;
   for (const [name, brk] of BREAKS) {
