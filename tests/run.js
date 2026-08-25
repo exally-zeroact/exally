@@ -85,6 +85,10 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
+  ['shindan.test.mjs', '--self-test'],
+  'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
+  ['shindan-ui.test.mjs', '--self-test'],
   'ai-jiko-dome.test.mjs',                // ★4 事故止め（1分10回・1日100回・40,000字・2万トークン・429の言い方・記録）
   ['ai-jiko-dome.test.mjs', '--self-test'],
   'xlsm-vba.test.mjs',                    // ★VBA入り(.xlsm)＝開ける・VBAは1バイトも触らない・動かさない・言葉で先に言う
