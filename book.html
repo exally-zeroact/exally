@@ -1197,38 +1197,39 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=fa54e3c9"></script>
+<script src="hyperformula.full.min.js?v=ff1041c4"></script>
 
-<script src="exally-formula.js?v=fa54e3c9"></script>
+<script src="exally-formula.js?v=ff1041c4"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=fa54e3c9"></script>
+<script src="js/file-out.js?v=ff1041c4"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=fa54e3c9"></script>
-<script src="lib/grid-xlsx.js?v=fa54e3c9"></script>
+<script src="lib/typed-value.js?v=ff1041c4"></script>
+<script src="lib/grid-xlsx.js?v=ff1041c4"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=fa54e3c9"></script>
-<script src="lib/autosum.js?v=fa54e3c9"></script>
-<script src="lib/grid-sort.js?v=fa54e3c9"></script>
-<script src="lib/grid-filter.js?v=fa54e3c9"></script>
-<script src="lib/grid-find.js?v=fa54e3c9"></script>
-<script src="lib/grid-print.js?v=fa54e3c9"></script>
-<script src="lib/ai-reason.js?v=fa54e3c9"></script>
-<script src="lib/menu-place.js?v=fa54e3c9"></script>
-<script src="lib/grid-stats.js?v=fa54e3c9"></script>
-<script src="lib/grid-valid.js?v=fa54e3c9"></script>
-<script src="lib/cond-format.js?v=fa54e3c9"></script>
-<script src="lib/excel-version.js?v=fa54e3c9"></script>
+  <script src="lib/grid-refedit.js?v=ff1041c4"></script>
+<script src="lib/autosum.js?v=ff1041c4"></script>
+<script src="lib/grid-sort.js?v=ff1041c4"></script>
+<script src="lib/grid-filter.js?v=ff1041c4"></script>
+<script src="lib/grid-find.js?v=ff1041c4"></script>
+<script src="lib/grid-print.js?v=ff1041c4"></script>
+<script src="lib/ai-reason.js?v=ff1041c4"></script>
+<script src="lib/menu-place.js?v=ff1041c4"></script>
+<script src="lib/grid-stats.js?v=ff1041c4"></script>
+<script src="lib/grid-valid.js?v=ff1041c4"></script>
+<script src="lib/cond-format.js?v=ff1041c4"></script>
+<script src="lib/ref-graph.js?v=ff1041c4"></script>
+<script src="lib/excel-version.js?v=ff1041c4"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=fa54e3c9"></script>
-<script src="js/exally-login.js?v=fa54e3c9"></script>
-<script src="js/auth.js?v=fa54e3c9"></script>
+<script src="js/supa-config.js?v=ff1041c4"></script>
+<script src="js/exally-login.js?v=ff1041c4"></script>
+<script src="js/auth.js?v=ff1041c4"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -7340,7 +7341,43 @@ function quoteSheetRefs(f){
    ここを見ずに「見ているシートだけ」流すと、まとめの ='5月'!E14 が
    ★空のシートを参照して 空を返す★。#ERROR が出ないので、
    ★合計が黙って小さくなる★（2026-08-11 指示役が実機で発見：527,000 が 186,000 になった）。 */
+/* ══ ブック全体の参照の網（2026-08-25）══════════════════
+   ★「全部やると固まる」の正体は 参照を数える事ではない★＝
+   重いのは ★計算する側へ全シートを流す事★。網は ★式の字を読むだけ★で作れる。
+   実測（司さんの実物 代行計算表2026・14シート・式15,126本）
+     ★網を作る 0.037秒／小分けにすると 1回の最長 12ミリ秒★＝画面は固まらない
+     別シートを見ている式 ★401本★（のべ 1,508本）
+   ⇒ ★開いた直後に 網だけ先に作る★。計算は 今までどおり 見るシートから。 */
+var _refGraph = null, _refGraphBusy = false;
+function 参照の網(){ return _refGraph; }
+function 参照の網を作り始める(done){
+  if(typeof RefGraph === 'undefined'){ if(done) done(null); return; }
+  if(_refGraphBusy) return;
+  _refGraphBusy = true;
+  var t0 = (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now();
+  var it = RefGraph.作る途中(sheets, { 一度に: 3000 });
+  function 続き(){
+    var r;
+    try { r = it.next(); } catch(e){ _refGraphBusy = false; if(done) done(null); return; }
+    if(r.done){
+      _refGraph = r.value;
+      _refGraph.かかった秒 = Math.round(((typeof performance!=='undefined'&&performance.now?performance.now():Date.now()) - t0)) / 1000;
+      _refGraphBusy = false;
+      if(done) done(_refGraph);
+      return;
+    }
+    /* ★止めない★＝1回ぶん読んだら 画面に順番を返す */
+    setTimeout(続き, 0);
+  }
+  setTimeout(続き, 0);
+}
+
 function _sheetsReferencedBy(idx){
+  /* ★網が出来ていれば そこから答える（間接の参照も辿れる＝今までは直接だけだった）★ */
+  if(_refGraph && _refGraph.シートの網 && _refGraph.シートの網[idx]) return _refGraph.シートの網[idx].slice();
+  return _sheetsReferencedBySlow(idx);
+}
+function _sheetsReferencedBySlow(idx){
   var sh = sheets[idx];
   if(!sh || !sh.data) return [];
   var alts = [], byName = {}, i;
@@ -7452,7 +7489,18 @@ function openBookFile(file){
     // ★計算する側を作り直す（シートの名前と数が変わるため）★
     if (typeof initFormulaEngine === 'function') initFormulaEngine(sheets.map(function(s){ return s.name; }));
     rebuildSheetTabs();          // ★14枚あってもタブを出す（出さないと1枚目しか触れない）★
-    loadSheetIntoEngine(0);      // ★開いたシートだけ流す（全部やると固まる）★
+    loadSheetIntoEngine(0);      // ★計算に流すのは 見るシートから（全部流すと固まる）★
+    /* ★参照の網だけは ブック全体ぶん 先に作る（0.04秒・小分けなので固まらない）★
+       これが在るから「別のシートも見て答えます」が言える（2026-08-25 司さん） */
+    参照の網を作り始める(function(g){
+      if(!g) return;
+      var 別 = g.別シート参照.length, 式 = 0, 見た = {};
+      for(var i=0;i<g.別シート参照.length;i++){ var k=g.別シート参照[i].from+':'+g.別シート参照[i].fromCell; if(!見た[k]){見た[k]=1;式++;} }
+      showToast('<span class="toast-h">ブック全体を調べました</span>'
+        + g.シート数 + 'シート・式' + g.式の数 + '本／★別のシートを見ている式 ' + 式 + '本★'
+        + (g.別ファイル参照.length ? '／別のファイルを見ている式 ' + g.別ファイル参照.length + '本' : '')
+        + '（' + g.かかった秒 + '秒）', 5000);
+    });
     render(); updateBar();
     var lbl = document.getElementById('openedFileLabel');
     if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';

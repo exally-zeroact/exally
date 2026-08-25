@@ -79,6 +79,8 @@ const FILES = [
   ['cond-format.test.mjs', '--self-test'],
   'cond-format-ui.test.mjs',              // ★本物の画面で 実際に押す(部品が緑=画面で使える ではない)
   ['cond-format-ui.test.mjs', '--self-test'],
+  'ref-graph.test.mjs',                   // ★ブック全体の参照の網（別シート401本を落とさない・固まらない）
+  ['ref-graph.test.mjs', '--self-test'],
   'login-gate.test.mjs',                  // ★表の画面にもログイン／忘れた人の逃げ道（無いと二度と入れない）
   ['login-gate.test.mjs', '--self-test'],
   'ai-reason.test.mjs',                   // ★AIに繋がらない時の理由と次の一手／★空のセルでAIを呼ばない(お金)★
