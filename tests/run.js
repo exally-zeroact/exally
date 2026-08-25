@@ -85,6 +85,8 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'ai-jiko-dome.test.mjs',                // ★4 事故止め（1分10回・1日100回・40,000字・2万トークン・429の言い方・記録）
+  ['ai-jiko-dome.test.mjs', '--self-test'],
   'xlsm-vba.test.mjs',                    // ★VBA入り(.xlsm)＝開ける・VBAは1バイトも触らない・動かさない・言葉で先に言う
   ['xlsm-vba.test.mjs', '--self-test'],
   'login-gate.test.mjs',                  // ★表の画面にもログイン／忘れた人の逃げ道（無いと二度と入れない）
