@@ -1197,39 +1197,39 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=ff1041c4"></script>
+<script src="hyperformula.full.min.js?v=bdfd333f"></script>
 
-<script src="exally-formula.js?v=ff1041c4"></script>
+<script src="exally-formula.js?v=bdfd333f"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=ff1041c4"></script>
+<script src="js/file-out.js?v=bdfd333f"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=ff1041c4"></script>
-<script src="lib/grid-xlsx.js?v=ff1041c4"></script>
+<script src="lib/typed-value.js?v=bdfd333f"></script>
+<script src="lib/grid-xlsx.js?v=bdfd333f"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=ff1041c4"></script>
-<script src="lib/autosum.js?v=ff1041c4"></script>
-<script src="lib/grid-sort.js?v=ff1041c4"></script>
-<script src="lib/grid-filter.js?v=ff1041c4"></script>
-<script src="lib/grid-find.js?v=ff1041c4"></script>
-<script src="lib/grid-print.js?v=ff1041c4"></script>
-<script src="lib/ai-reason.js?v=ff1041c4"></script>
-<script src="lib/menu-place.js?v=ff1041c4"></script>
-<script src="lib/grid-stats.js?v=ff1041c4"></script>
-<script src="lib/grid-valid.js?v=ff1041c4"></script>
-<script src="lib/cond-format.js?v=ff1041c4"></script>
-<script src="lib/ref-graph.js?v=ff1041c4"></script>
-<script src="lib/excel-version.js?v=ff1041c4"></script>
+  <script src="lib/grid-refedit.js?v=bdfd333f"></script>
+<script src="lib/autosum.js?v=bdfd333f"></script>
+<script src="lib/grid-sort.js?v=bdfd333f"></script>
+<script src="lib/grid-filter.js?v=bdfd333f"></script>
+<script src="lib/grid-find.js?v=bdfd333f"></script>
+<script src="lib/grid-print.js?v=bdfd333f"></script>
+<script src="lib/ai-reason.js?v=bdfd333f"></script>
+<script src="lib/menu-place.js?v=bdfd333f"></script>
+<script src="lib/grid-stats.js?v=bdfd333f"></script>
+<script src="lib/grid-valid.js?v=bdfd333f"></script>
+<script src="lib/cond-format.js?v=bdfd333f"></script>
+<script src="lib/ref-graph.js?v=bdfd333f"></script>
+<script src="lib/excel-version.js?v=bdfd333f"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=ff1041c4"></script>
-<script src="js/exally-login.js?v=ff1041c4"></script>
-<script src="js/auth.js?v=ff1041c4"></script>
+<script src="js/supa-config.js?v=bdfd333f"></script>
+<script src="js/exally-login.js?v=bdfd333f"></script>
+<script src="js/auth.js?v=bdfd333f"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3399,6 +3399,20 @@ function detectTimePattern(values){
    ログインの窓(#loginOv)だけ 残す。★[hidden] は class の display に負けるので !important を付ける★。 */
 body.exally-locked > *:not(#loginOv){display:none!important;}
 </style>
+<style>
+/* ★調べている間の知らせ（2026-08-25 司さん「ぐるぐり／何%を出せ」）★
+   ★人は 画面が変わらないと「固まった」と思う★。300ミリ秒を超えたら出す（それ未満は出さない＝チカチカする）。
+   ★[hidden] は class の display に負ける★ので この1行を必ず置く（他アプリで2回 事故） */
+#bookScan[hidden]{display:none!important;}
+#bookScan{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;
+ background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.14);
+ padding:10px 16px;display:flex;align-items:center;gap:10px;max-width:92vw;}
+/* ★字は 箱に押し込めない（flex/grid の中で1文字ずつ縦に割れる事故が在る）★ */
+#bookScan .bs-t{font-size:13px;color:#333333;line-height:1.6;white-space:nowrap;}
+#bookScan .bs-s{width:16px;height:16px;flex:0 0 16px;border:2px solid #D4EDE1;border-top-color:#52B788;
+ border-radius:50%;animation:bs-spin .8s linear infinite;}
+@keyframes bs-spin{to{transform:rotate(360deg);}}
+</style>
 </head>
 <body>
 
@@ -3583,6 +3597,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 
 <!-- トースト通知 -->
 
+<!-- ★調べている間だけ出す（終わったら必ず消す）★ -->
+<div id="bookScan" hidden><span class="bs-s"></span><span class="bs-t" id="bookScanTxt">ブック全体を調べています…</span></div>
 <div id="toast"></div>
 
 <!-- 関数パレット -->
@@ -7355,11 +7371,33 @@ function 参照の網を作り始める(done){
   if(_refGraphBusy) return;
   _refGraphBusy = true;
   var t0 = (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now();
+  var 全部 = 0;
+  for (var _i = 0; _i < sheets.length; _i++) 全部 += Object.keys((sheets[_i] && sheets[_i].data) || {}).length;
+  var 知らせ = document.getElementById('bookScan');
+  var 知らせ字 = document.getElementById('bookScanTxt');
+  var 出した = false;
+  /* ★300ミリ秒を超えてから出す★（それ未満で出すと チカチカして かえって不安になる） */
+  var 出すtimer = setTimeout(function(){
+    出した = true;
+    if(知らせ) 知らせ.hidden = false;
+  }, 300);
+  function 消す(){
+    clearTimeout(出すtimer);
+    if(知らせ) 知らせ.hidden = true;      /* ★終わったら 必ず消す（失敗した時も）★ */
+  }
   var it = RefGraph.作る途中(sheets, { 一度に: 3000 });
   function 続き(){
     var r;
-    try { r = it.next(); } catch(e){ _refGraphBusy = false; if(done) done(null); return; }
+    try { r = it.next(); }
+    catch(e){
+      消す(); _refGraphBusy = false;
+      /* ★失敗しても 何が起きたか1行 出す（黙って消えない）★ */
+      showToast('<span class="toast-h">ブック全体は調べられませんでした</span>'
+        + '見ているシートの計算は そのまま使えます。' + ((e && e.message) ? '（' + e.message + '）' : ''), 5000, 'warn');
+      if(done) done(null); return;
+    }
     if(r.done){
+      消す();
       _refGraph = r.value;
       _refGraph.かかった秒 = Math.round(((typeof performance!=='undefined'&&performance.now?performance.now():Date.now()) - t0)) / 1000;
       _refGraphBusy = false;
@@ -7367,6 +7405,13 @@ function 参照の網を作り始める(done){
       return;
     }
     /* ★止めない★＝1回ぶん読んだら 画面に順番を返す */
+    if(出した && 知らせ字 && r.value && 全部){
+      var 済 = r.value.進み || 0;
+      var 割 = Math.min(99, Math.round(済 * 100 / 全部));
+      var 枚 = 0, 数 = 0;
+      for(var q=0;q<sheets.length;q++){ 数 += Object.keys((sheets[q]&&sheets[q].data)||{}).length; if(数 <= 済) 枚 = q+1; }
+      知らせ字.textContent = 'ブック全体を調べています… ' + Math.min(sheets.length, 枚+1) + ' / ' + sheets.length + ' 枚目（' + 割 + '%）';
+    }
     setTimeout(続き, 0);
   }
   setTimeout(続き, 0);
