@@ -1197,39 +1197,39 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=bdfd333f"></script>
+<script src="hyperformula.full.min.js?v=96349c6f"></script>
 
-<script src="exally-formula.js?v=bdfd333f"></script>
+<script src="exally-formula.js?v=96349c6f"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=bdfd333f"></script>
+<script src="js/file-out.js?v=96349c6f"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=bdfd333f"></script>
-<script src="lib/grid-xlsx.js?v=bdfd333f"></script>
+<script src="lib/typed-value.js?v=96349c6f"></script>
+<script src="lib/grid-xlsx.js?v=96349c6f"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=bdfd333f"></script>
-<script src="lib/autosum.js?v=bdfd333f"></script>
-<script src="lib/grid-sort.js?v=bdfd333f"></script>
-<script src="lib/grid-filter.js?v=bdfd333f"></script>
-<script src="lib/grid-find.js?v=bdfd333f"></script>
-<script src="lib/grid-print.js?v=bdfd333f"></script>
-<script src="lib/ai-reason.js?v=bdfd333f"></script>
-<script src="lib/menu-place.js?v=bdfd333f"></script>
-<script src="lib/grid-stats.js?v=bdfd333f"></script>
-<script src="lib/grid-valid.js?v=bdfd333f"></script>
-<script src="lib/cond-format.js?v=bdfd333f"></script>
-<script src="lib/ref-graph.js?v=bdfd333f"></script>
-<script src="lib/excel-version.js?v=bdfd333f"></script>
+  <script src="lib/grid-refedit.js?v=96349c6f"></script>
+<script src="lib/autosum.js?v=96349c6f"></script>
+<script src="lib/grid-sort.js?v=96349c6f"></script>
+<script src="lib/grid-filter.js?v=96349c6f"></script>
+<script src="lib/grid-find.js?v=96349c6f"></script>
+<script src="lib/grid-print.js?v=96349c6f"></script>
+<script src="lib/ai-reason.js?v=96349c6f"></script>
+<script src="lib/menu-place.js?v=96349c6f"></script>
+<script src="lib/grid-stats.js?v=96349c6f"></script>
+<script src="lib/grid-valid.js?v=96349c6f"></script>
+<script src="lib/cond-format.js?v=96349c6f"></script>
+<script src="lib/ref-graph.js?v=96349c6f"></script>
+<script src="lib/excel-version.js?v=96349c6f"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=bdfd333f"></script>
-<script src="js/exally-login.js?v=bdfd333f"></script>
-<script src="js/auth.js?v=bdfd333f"></script>
+<script src="js/supa-config.js?v=96349c6f"></script>
+<script src="js/exally-login.js?v=96349c6f"></script>
+<script src="js/auth.js?v=96349c6f"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -7549,6 +7549,11 @@ function openBookFile(file){
     render(); updateBar();
     var lbl = document.getElementById('openedFileLabel');
     if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';
+    /* ★マクロ(VBA)が入っていた時は 先に「どうなるか」を言う（2026-08-25）★
+       ★「まだ出来ません」ではなく「そのまま残す・ここでは動かない・代わりにこう出来る」★ */
+    if (res.hasVba && typeof BookOpen !== 'undefined' && BookOpen.MSG_VBA) {
+      showToast('<span class="toast-h">マクロ（VBA）が入っています</span>' + BookOpen.MSG_VBA, 7000);
+    }
     if (res.kind === 'xls') {
       // ★「対応していません」ではなく「まだ直せません」★（後で作る）
       showToast('<span class="toast-h">開きました（見るだけ）</span>' + BookOpen.MSG_XLS, 6000, 'warn');

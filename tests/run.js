@@ -85,6 +85,8 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'xlsm-vba.test.mjs',                    // ★VBA入り(.xlsm)＝開ける・VBAは1バイトも触らない・動かさない・言葉で先に言う
+  ['xlsm-vba.test.mjs', '--self-test'],
   'login-gate.test.mjs',                  // ★表の画面にもログイン／忘れた人の逃げ道（無いと二度と入れない）
   ['login-gate.test.mjs', '--self-test'],
   'ai-reason.test.mjs',                   // ★AIに繋がらない時の理由と次の一手／★空のセルでAIを呼ばない(お金)★
