@@ -85,6 +85,8 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'chizu-horu.test.mjs',                  // ★7 地図＋掘る（地図は数千文字・掘りっぱなしにしない・金額はAIに書かせない）
+  ['chizu-horu.test.mjs', '--self-test'],
   'recipe.test.mjs',                      // ★6 レシピ＝手順を覚えて 2回目からはAIを呼ばない（記録の行数で数える）
   ['recipe.test.mjs', '--self-test'],
   'rireki.test.mjs',                      // ★6 履歴＝見る場所（別の入り口から同じに見える・客のブックにタブ0件）
