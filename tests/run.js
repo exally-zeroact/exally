@@ -85,6 +85,8 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'chuki.test.mjs',                       // ★注記を外してから読む（見張りの共通部品・同じ型を3回踏んだので決まりにした）
+  ['chuki.test.mjs', '--self-test'],
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
   ['shindan.test.mjs', '--self-test'],
   'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
