@@ -340,7 +340,10 @@ T('★客の画面に 中の言葉（掘る／もっと見せて／5回／2,000�
      ＝★中の言葉を 客に見せない★は うちの決まり（他アプリで STEP6 を見せて踏んだ）。 */
   const book = fs.readFileSync(OVERRIDE['book.html'] || path.join(ROOT, 'book.html'), 'utf8');
   const 出す所 = [];
-  for (const 名 of ['showToast(', 'addAIChatMsg(']) {
+  /* ★出す口が 増えたら ここも増やす★＝口を1つ 作り忘れると、見張りは そこを 見ないまま緑になる。
+     ★実際に そうなった（2026-08-27）★＝AIの答えを 口.足す() 経由にした瞬間、
+     この見張りは 客に出る字を 1件も 見ていなかった（壊しても 赤くならなかった）。 */
+  for (const 名 of ['showToast(', 'addAIChatMsg(', '_addPopupMsg(', '口.足す(', '言う(', '開いた知らせに足す(']) {
     let i = 0;
     while ((i = book.indexOf(名, i)) >= 0) {
       let d = 0, j = i + 名.length - 1;
