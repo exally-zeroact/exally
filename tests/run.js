@@ -85,6 +85,8 @@ const FILES = [
   ['ref-graph.test.mjs', '--self-test'],
   'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
   ['book-scan-ui.test.mjs', '--self-test'],
+  'html-script-syntax.test.mjs',          // ★HTMLの中の<script>が 構文で死んでいないか（lint緑・テスト緑でも 死ぬ）
+  ['html-script-syntax.test.mjs', '--self-test'],
   'recipe-ui.test.mjs',                   // ★8-③ 覚えた手順を 画面で押す（AIを呼ぶ前に 機械が当てる・上限を置かない）
   ['recipe-ui.test.mjs', '--self-test'],
   'teian.test.mjs',                       // ★8 提案＝うちから「こう直せますよ」（0円・向こうから出る）
