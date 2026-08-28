@@ -232,6 +232,15 @@ T('★きっかけ（Worksheet_Change）を 先に見る★', () => {
   eq(v.分類[0].名, '自動で動く（きっかけ）', '先頭が きっかけ ではない');
   eq(v.可否, 'かえる');
 });
+T('★段取りの話（ちらつき止め）を 先頭に 出さない★（数だけで 並べない）', () => {
+  const 文 = ['Sub 集計()', '  Application.ScreenUpdating = False',
+    '  Range("A1:D100").Sort Key1:=Range("A1")',
+    '  Application.ScreenUpdating = True', 'End Sub'].join('\n');
+  const v = M.見立てる1本(M.手続きに切る(文)[0]);
+  /* ちらつき止めは 2回・並べ替えは 1回＝数だけで 並べると 段取りが 先頭に来る */
+  eq(v.分類[0].名, '並べ替え', '先頭が 仕事の中身ではない（' + v.分類.map((a) => a.名).join(',') + '）');
+  ok(v.何をしているか.indexOf('表を 並べ替えています。') === 0, v.何をしているか);
+});
 T('取り込みは GetOpenFilename で 当てている', () => {
   const v = 見立て.手続き.find((x) => x.名 === 'CSV取り込み');
   ok(v.分類.some((a) => a.key === 'torikomi'), '取り込みが 出ない');
@@ -376,8 +385,11 @@ if (SELF) {
       (s) => s.replace("数: n, 手掛かり: d.印 || d.key,", "数: n, 手掛かり: 中.slice(0, 60),")],
     ['vba-mikata.js', '★End が 無い物を 次と 1本に まとめる★',
       (s) => s.replace('if (m && 今) 閉じる(true);', '')],
+    ['vba-mikata.js', '★段取りの話を 先頭に 出す（数だけで 並べる）★',
+      (s) => s.replace('var 順 = function (x) { return x.先に見る ? 0 : (x.後回し ? 2 : 1); };',
+        'var 順 = function (x) { return 0; };')],
     ['vba-mikata.js', '★きっかけを 後回しにする★',
-      (s) => s.replace("      if (a.先に見る !== b.先に見る) return a.先に見る ? -1 : 1;", '')],
+      (s) => s.replace('return x.先に見る ? 0 : (x.後回し ? 2 : 1);', 'return x.後回し ? 2 : 1;')],
     ['vba-mikata.js', '★客に見せる字に ★ を書く★',
       (s) => s.replace("var s = 'マクロが '", "var s = '★マクロが '")],
   ];
