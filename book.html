@@ -1236,50 +1236,53 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=651b3862"></script>
+<script src="hyperformula.full.min.js?v=9282d87f"></script>
 
-<script src="exally-formula.js?v=651b3862"></script>
+<script src="exally-formula.js?v=9282d87f"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=651b3862"></script>
+<script src="js/file-out.js?v=9282d87f"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=651b3862"></script>
-<script src="lib/grid-xlsx.js?v=651b3862"></script>
+<script src="lib/typed-value.js?v=9282d87f"></script>
+<script src="lib/grid-xlsx.js?v=9282d87f"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=651b3862"></script>
-<script src="lib/autosum.js?v=651b3862"></script>
-<script src="lib/grid-sort.js?v=651b3862"></script>
-<script src="lib/grid-filter.js?v=651b3862"></script>
-<script src="lib/grid-find.js?v=651b3862"></script>
-<script src="lib/grid-print.js?v=651b3862"></script>
-<script src="lib/ai-reason.js?v=651b3862"></script>
-<script src="lib/menu-place.js?v=651b3862"></script>
-<script src="lib/grid-stats.js?v=651b3862"></script>
-<script src="lib/grid-valid.js?v=651b3862"></script>
-<script src="lib/cond-format.js?v=651b3862"></script>
-<script src="lib/ref-graph.js?v=651b3862"></script>
-<script src="lib/shindan.js?v=651b3862"></script>
-<script src="lib/rireki.js?v=651b3862"></script>
-<script src="lib/chizu.js?v=651b3862"></script>
-<script src="lib/horu.js?v=651b3862"></script>
-<script src="lib/excel-version.js?v=651b3862"></script>
-<script src="lib/teian.js?v=651b3862"></script>
-<script src="lib/kikan.js?v=651b3862"></script>
-<script src="lib/recipe.js?v=651b3862"></script>
-<script src="lib/kirikae.js?v=651b3862"></script>
-<script src="js/recipe-store.js?v=651b3862"></script>
-<script src="js/rireki-store.js?v=651b3862"></script>
-<script src="lib/excel-version.js?v=651b3862"></script>
+  <script src="lib/grid-refedit.js?v=9282d87f"></script>
+<script src="lib/autosum.js?v=9282d87f"></script>
+<script src="lib/grid-sort.js?v=9282d87f"></script>
+<script src="lib/grid-filter.js?v=9282d87f"></script>
+<script src="lib/grid-find.js?v=9282d87f"></script>
+<script src="lib/grid-print.js?v=9282d87f"></script>
+<script src="lib/ai-reason.js?v=9282d87f"></script>
+<script src="lib/menu-place.js?v=9282d87f"></script>
+<script src="lib/grid-stats.js?v=9282d87f"></script>
+<script src="lib/grid-valid.js?v=9282d87f"></script>
+<script src="lib/cond-format.js?v=9282d87f"></script>
+<script src="lib/ref-graph.js?v=9282d87f"></script>
+<script src="lib/shindan.js?v=9282d87f"></script>
+<!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
+<script src="lib/vba.js?v=9282d87f"></script>
+<script src="lib/vba-mikata.js?v=9282d87f"></script>
+<script src="lib/rireki.js?v=9282d87f"></script>
+<script src="lib/chizu.js?v=9282d87f"></script>
+<script src="lib/horu.js?v=9282d87f"></script>
+<script src="lib/excel-version.js?v=9282d87f"></script>
+<script src="lib/teian.js?v=9282d87f"></script>
+<script src="lib/kikan.js?v=9282d87f"></script>
+<script src="lib/recipe.js?v=9282d87f"></script>
+<script src="lib/kirikae.js?v=9282d87f"></script>
+<script src="js/recipe-store.js?v=9282d87f"></script>
+<script src="js/rireki-store.js?v=9282d87f"></script>
+<script src="lib/excel-version.js?v=9282d87f"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=651b3862"></script>
-<script src="js/exally-login.js?v=651b3862"></script>
-<script src="js/auth.js?v=651b3862"></script>
+<script src="js/supa-config.js?v=9282d87f"></script>
+<script src="js/exally-login.js?v=9282d87f"></script>
+<script src="js/auth.js?v=9282d87f"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3476,6 +3479,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
    ★[hidden] は class の display に負ける★ので この1行を必ず置く（他アプリで2回 事故） */
 #bookScan[hidden]{display:none!important;}
 #shindanBtn[hidden]{display:none!important;}
+#macroBtn[hidden]{display:none!important;}
+/* 横に動かす筋は 出さない（見た目は 今までと 同じ） */
+#headerTools::-webkit-scrollbar{display:none;}
 #teianBtn[hidden]{display:none!important;}
 #bookScan{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;
  background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.14);
@@ -3652,7 +3658,10 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <button class="book-header-nav-item" onclick="openBookVerModal()" title="Excelバージョン">📊</button>
     <button class="book-header-nav-item" onclick="location.href='chat.html?tab=settings'" title="設定">⚙️</button>
   </nav>
-  <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+  <!-- ★狭い画面で 右の端が 切れる★（2026-08-28 実測・幅390で
+         「マクロ」と「Excel版」の2つが ★画面の外★に出て、横に動かす道も 無かった）。
+       ⇒ ★横に 動かせるようにする★（幅が 足りる時は 今までと 同じ）。 -->
+  <div id="headerTools" style="display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
     <!-- ★受け取り口★ 元のファイルは預からない。開いた瞬間に作業用の控えを持ち、保存はそれを書き換える -->
     <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
     <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
@@ -3664,6 +3673,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <button id="rirekiBtn" onclick="openRireki('page')" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="これまでにやった事（見る場所）"><span class="hdr-ic">🕘</span> <span class="hdr-lb">これまで</span></button>
     <!-- ★8 提案★ 見つかった時だけ 出す（出来ていない物のボタンを見せない） -->
     <button id="teianBtn" hidden onclick="openTeian()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="うちが見つけた「もっと短く書ける所」"></button>
+    <button id="macroBtn" hidden onclick="openMacro()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="このファイルの マクロが 何をしているか"></button>
     <button id="shindanBtn" hidden onclick="openShindan()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="開いた時に うちが見つけた「気づけない所」"></button>
     <button id="bookVerBtn" onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="相手が使っているExcelの版を選ぶ"><span class="hdr-ic">📊</span> <span class="hdr-lb"><span class="hdr-lb-long">Excel</span>版 <span id="bookVerLabel">365</span></span> ▼</button>
   </div>
@@ -3859,6 +3869,25 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     </div>
     <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
       <button onclick="closeShindan()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★マクロ（VBA）★ 何をしているかを 日本語で出す窓。
+     ★VBAは 動かさない・書き換えない★。読んで 言うだけ。
+     ★分けるのは 機械（AIは0回）★。正しく読めなかった物は 未測定と言う（0本と言わない）。 -->
+<div id="mcOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:640px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">マクロが 何をしているか</div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="mcBody"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="mcList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:52vh;"></div>
+      <div id="mcMore" style="font-size:12px;color:#333333;margin-top:8px;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="closeMacro()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
     </div>
   </div>
 </div>
@@ -8379,6 +8408,68 @@ function openShindan(){
   ov.style.display = 'flex';
 }
 function closeShindan(){ var ov = document.getElementById('dgOverlay'); if(ov) ov.style.display = 'none'; }
+
+/* ══ ★5 E2診断の中の「マクロ（VBA）を読む」（2026-08-28）★ ═══════════
+   ★なぜ在るか（司さん）★＝「マクロを組んだ人が 辞めて 誰も触れない」。
+   だから ★何をしているのかを こちらから 日本語で出す★。
+   ★VBAは 動かさない・書き換えない★。★分けるのは 機械＝AIは 0回★。 */
+var _マクロ = null;
+function マクロを受け取る(m){
+  _マクロ = m || null;
+  var b = document.getElementById('macroBtn');
+  if(!b) return;
+  var 見 = _マクロ && _マクロ.見立て;
+  var 未 = (_マクロ && _マクロ.読み && _マクロ.読み.モジュール) ? _マクロ.読み.モジュール.filter(function(x){ return !x.確か; }).length : 0;
+  /* ★出来ていない物のボタンは 見せない★＝読めた本数も 未測定も 0 なら 出さない */
+  if(!見 || (!見.本数 && !未)){ b.hidden = true; return; }
+  b.hidden = false;
+  b.textContent = 見.本数 ? ('マクロ ' + 見.本数 + '本') : ('マクロ 未測定 ' + 未 + '本');
+  開いた知らせに足す('マクロが 何をしているか 出せます', VbaMikata.知らせの字(見)
+    + '<br>中身を 見て、うちで どう出来るかを 1本ずつ 出します。（AIは 使っていません）', true);
+}
+function openMacro(){
+  var 見 = _マクロ && _マクロ.見立て;
+  if(!見) return;
+  var 未 = (_マクロ.読み.モジュール || []).filter(function(x){ return !x.確か; });
+  document.getElementById('mcBody').textContent = VbaMikata.知らせの字(見);
+  var box = document.getElementById('mcList');
+  box.innerHTML = '';
+  var 色 = { 'できる':'#2E7D54', 'かえる':'#8A5A00', 'べつの道':'#8A5A00', 'わからない':'#333333' };
+  var 言い方 = { 'できる':'そのまま できます', 'かえる':'やり方を かえます', 'べつの道':'別の道が いります', 'わからない':'読み取れません' };
+  for(var i=0;i<見.手続き.length;i++){
+    var v = 見.手続き[i];
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 12px;border-bottom:1px solid #EAF6F0;';
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'font-weight:700;font-size:13px;color:' + (色[v.可否] || '#333333') + ';';
+    頭.textContent = v.モジュール + ' の ' + v.名 + '（' + v.行数 + '行）　' + (言い方[v.可否] || '');
+    var 何 = document.createElement('div');
+    何.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;line-height:1.7;';
+    何.textContent = v.何をしているか;
+    row.appendChild(頭); row.appendChild(何);
+    /* ★終わりの印が 無い物は そう言う★（実物に 在る。黙って 次と 1本に しない） */
+    if(v.閉じていない){
+      var 閉 = document.createElement('div');
+      閉.style.cssText = 'font-size:12px;color:#8A5A00;margin-top:2px;line-height:1.7;';
+      閉.textContent = 'この1本は 終わりの印（End Sub）が 見つかりません。ここまでを 1本として 読んでいます。';
+      row.appendChild(閉);
+    }
+    if(v.うちのやり方){
+      var う = document.createElement('div');
+      う.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;line-height:1.7;';
+      う.textContent = 'ここでは → ' + v.うちのやり方;
+      row.appendChild(う);
+    }
+    box.appendChild(row);
+  }
+  /* ★読めなかった物を 黙って落とさない★ */
+  document.getElementById('mcMore').textContent = 未.length
+    ? ('正しく読めたと 言えない物が ' + 未.length + '本 あります（' + 未.map(function(x){ return x.名; }).join('・') + '）。この分は 数に入れていません。')
+    : '';
+  var ov = document.getElementById('mcOverlay');
+  ov.style.display = 'flex';
+}
+function closeMacro(){ var ov = document.getElementById('mcOverlay'); if(ov) ov.style.display = 'none'; }
 function 診断の場所へ行く(x){
   closeShindan();
   var i = -1;
@@ -8598,6 +8689,10 @@ function openBookFile(file){
     if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';
     /* ★マクロ(VBA)が入っていた時は 先に「どうなるか」を言う（2026-08-25）★
        ★「まだ出来ません」ではなく「そのまま残す・ここでは動かない・代わりにこう出来る」★ */
+    /* ★前のファイルの物を 残さない★＝マクロの無いファイルを 開いた時は 必ず 消す。
+       （2026-08-28 実物の画面で 押して 見つけた＝マクロ入りの次に 普通の物を開くと
+         ★前のファイルの「マクロ 4本」が 出たまま★だった） */
+    if (typeof マクロを受け取る === 'function') マクロを受け取る(res.hasVba ? res.マクロ : null);
     if (res.hasVba && typeof BookOpen !== 'undefined' && BookOpen.MSG_VBA) {
       開いた知らせに足す('マクロ（VBA）が入っています', BookOpen.MSG_VBA);
     }

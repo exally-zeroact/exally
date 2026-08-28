@@ -91,6 +91,10 @@ const FILES = [
   ['kirikae-egaku.test.mjs', '--self-test'],
   'kirikae.test.mjs',                     // ★切り替え＝見る人・見る月を変える（シートは増えない・戻すと元どおり）
   ['kirikae.test.mjs', '--self-test'],
+  'vba-ui.test.mjs',                      // ★マクロが 何をしているかを 画面で 出す（描かれた字で 数える）
+  ['vba-ui.test.mjs', '--self-test'],
+  'vba.test.mjs',                         // ★マクロ（VBA）を 読む・見立てる＝読めた≠正しく読めた・AIには要約だけ
+  ['vba.test.mjs', '--self-test'],
   'kikan.test.mjs',                       // ★何月分・◯日からの分（締め期間は Timeally が正本・124通り）
   ['kikan.test.mjs', '--self-test'],
   'kiridashi-jitsubutsu.test.mjs',        // ★司さんの実物で 1人分×何月分を 切り出す（描かれた字で 数え直す）

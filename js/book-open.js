@@ -78,12 +78,27 @@
           if (root.console) root.console.warn('[Exally] 表の参照を直せませんでした', e);
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba); });
+      /* ★マクロ(VBA)は 開いた時に 読んでおく★（★読むだけ・動かさない★・AIは0回）
+         ★読めなくても 画面は そのまま動く★＝読めない時は「未測定」と言う（0本と言わない） */
+      var マクロ = null;
+      if (hasVba && root.Vba && root.ZipSurgeon) {
+        pre = pre.then(function () {
+          return root.ZipSurgeon.read(bytes).bytes('xl/vbaProject.bin').then(function (bin) {
+            var 読み = root.Vba.読む(bin, root.XLSX && root.XLSX.CFB);
+            var 見立て = (読み.ok && root.VbaMikata) ? root.VbaMikata.見立てる(読み.モジュール) : null;
+            マクロ = { 読み: 読み, 見立て: 見立て };
+          }).catch(function (e) {
+            マクロ = { 読み: { ok: false, モジュール: [], なぜ: '読めませんでした' }, 見立て: null };
+            if (root.console) root.console.warn('[Exally] マクロを読めませんでした', e);
+          });
+        });
+      }
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ); });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ) {
       var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
@@ -111,7 +126,7 @@
         base: base,
         tableRefs: trStats,        // ★何本 直したか（見張りと報告が読む。画面には出さない）
       };
-      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba };
+      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null };
   }
 
   /* ★日本語の曜日（aaa / aaaa）を先に本物の文字へ置き換える★
