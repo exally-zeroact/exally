@@ -641,12 +641,46 @@ box-shadow:0 -2px 10px rgba(30,60,40,0.06);
   #openedFileLabel { display: none; }
   .exally-logo-ja { display: none; }          /* ロゴの読み仮名を畳んで 字の場所にする */
   #header { padding: 0 10px; }
+  /* ★スマホで ロゴが 切れていた★（2026-08-29 司さんのiPhone・実測 幅390で
+       「Exally」57px が 52px の枠に 押し込まれて 右が 切れていた）
+     ⇒ ★ロゴは 縮めない・字を 小さくして 幅を 作る★（消しはしない） */
+  .exally-logo-en { font-size: 16px; }
+  #header > div:first-child { flex: 0 0 auto; overflow: visible; }
+  /* ★上の帯が 端で 切れて見える★（実測 幅390で 318pxの枠に 347px）
+     ⇒ ★字は 1文字も 消さず★ 絵の方をやめ、間を 詰めて 収める */
+  #rirekiBtn .hdr-ic { display: none; }
+  #rirekiBtn, #teianBtn, #macroBtn, #shindanBtn { padding: 4px 8px !important; }
+  #headerTools { gap: 4px; flex-wrap: wrap; }
+  /* ★スマホは 2段★＝1段目は「読み込む・書き出す・Excel版」、
+       2段目に「これまで・こちらで出来る事・マクロ・危ない所」。
+     ★字を 消さずに 収める★ための 段分け（2026-08-29 実測：
+       マクロ入りを 開くと 6個で 492px＝310pxの枠に 182px はみ出していた）。
+     ★2段目は 出る物が 在る時だけ 場所を取る★（何も無ければ 高さ0）。 */
+  /* ★1段目＝いつも在る物（読み込む・書き出す・Excel版）／2段目＝在る時だけ★
+     並ぶ順を 決め打ちしないと ★Excel版だけ 2段目に 落ちる★（実測で そうなった）。 */
+  #openBookBtn { order: 1; }
+  #openedFileLabel { order: 2; }
+  #saveBookBtn { order: 3; }
+  #bookVerBtn { order: 4; }
+  #headerSay { display: flex; flex: 0 0 100%; order: 9; gap: 4px;
+    overflow-x: auto; scrollbar-width: none; align-items: center; }
+  #headerSay::-webkit-scrollbar { display: none; }
+  #headerSay:empty { display: none; }
+  #header { height: auto; min-height: 52px; padding: 4px 10px; align-items: center; flex-wrap: wrap; }
 }
 /* ★一番狭い機種（320px＝iPhone SE 第1世代）★ 字は消さないまま ロゴが切れるのを止める
    （実測: 直す前は「Exally」57px が 27px の枠に押し込まれて切れていた） */
 @media (max-width: 360px) {
   .exally-logo-en { font-size: 16px; }
   #openBookBtn, #saveBookBtn, #bookVerBtn { padding: 4px 7px !important; }
+  /* ★一番狭い機種では 上の帯が どうしても 入りきらない★（2026-08-29 実測 幅320で
+       読み込む64＋書き出す64＋これまで66＋Excel版95＝301 が 262の枠）
+     ⇒ ★字は 1文字も 消さない★まま、間と 余白を 詰めて 45px→0 に する。
+        （それでも 入らない機種では 帯を 横に 動かせる） */
+  #rirekiBtn, #teianBtn, #macroBtn, #shindanBtn { padding: 4px 6px !important; }
+  #bookVerBtn .hdr-lb-long { display: none; }   /* 「Excel版」の「Excel」だけ畳む＝版の字は 残す */
+  #headerTools { gap: 3px; }
+  #header { padding: 0 6px; }
 }
 #sheet-tabs {
 position:relative;
@@ -3487,6 +3521,10 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 #bookScan[hidden]{display:none!important;}
 #shindanBtn[hidden]{display:none!important;}
 #macroBtn[hidden]{display:none!important;}
+/* ★PCでは 箱が 無い物として 並べる★（今までの 見た目を 1ミリも 変えない）
+   ★幅で 分ける★＝ただ書くと この行が 後ろに在るぶん スマホの決まりを 打ち消す
+   （2026-08-29 実測：スマホで 2段目に 行くはずの物が 1段目に 残っていた）。 */
+@media (min-width: 561px) { #headerSay { display: contents; } }
 /* 横に動かす筋は 出さない（見た目は 今までと 同じ） */
 #headerTools::-webkit-scrollbar{display:none;}
 #teianBtn[hidden]{display:none!important;}
@@ -3677,11 +3715,15 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <!-- ★5 E2診断★ ★見つかった時だけ 出す★（出来ていない物のボタンを見せない）。
          色は「押せる物」に使う＝琥珀（赤ではない＝止まってはいない） -->
     <!-- ★入り口②＝履歴ページ★（見る場所。ここから 何かを始めさせない） -->
+    <!-- ★「こちらから言う」物★＝スマホでは 2段目に 逃がす（字は 1文字も 消さない）
+         PCでは display:contents なので 今までと 同じ 1列に 並ぶ -->
+    <div id="headerSay">
     <button id="rirekiBtn" onclick="openRireki('page')" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="これまでにやった事（見る場所）"><span class="hdr-ic">🕘</span> <span class="hdr-lb">これまで</span></button>
     <!-- ★8 提案★ 見つかった時だけ 出す（出来ていない物のボタンを見せない） -->
     <button id="teianBtn" hidden onclick="openTeian()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="うちが見つけた「もっと短く書ける所」"></button>
     <button id="macroBtn" hidden onclick="openMacro()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="このファイルの マクロが 何をしているか"></button>
     <button id="shindanBtn" hidden onclick="openShindan()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="開いた時に うちが見つけた「気づけない所」"></button>
+    </div>
     <button id="bookVerBtn" onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="相手が使っているExcelの版を選ぶ"><span class="hdr-ic">📊</span> <span class="hdr-lb"><span class="hdr-lb-long">Excel</span>版 <span id="bookVerLabel">365</span></span> ▼</button>
   </div>
 </div>
@@ -9212,10 +9254,10 @@ document.addEventListener('DOMContentLoaded', function(){ checkRequiredFns(); })
     <button id="add-sheet-btn" onclick="addSheet()">＋</button>
   </div>
   <nav class="book-bn">
-    <button class="book-bn-i" onclick="location.href='home.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
+    <button class="book-bn-i" onclick="location.href='hub.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html'"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></button>
     <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
-    <button class="book-bn-i" onclick="location.href='template.html'"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></button>
+    <button class="book-bn-i book-bn-notyet" onclick="showToast('テンプレは まだ出来ていません（準備中）')" title="まだ出来ていません（準備中）"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></button>
     <button class="book-bn-i book-bn-notyet" onclick="showToast('電子ハンコは まだ出来ていません（準備中）')"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=book'"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=quiz'"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></button>

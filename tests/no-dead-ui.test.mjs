@@ -304,6 +304,37 @@ T('★⑤ 出来ていない物は「灰色＋理由」で出す（消したボ�
   }
 });
 
+T('★⑥ 下の帯の 行き先が 実在する（押したら 404 にならない）', () => {
+  /* ★2026-08-29 司さんのiPhoneで 見つかった★＝
+       「ホーム」→ home.html ／「テンプレ」→ template.html は ★この repo に 無い★＝404。
+     ★押せるボタンの 行き先は 必ず 実在するファイル★（出来ていない物は 灰色＋理由）。 */
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+  const 頭 = html.indexOf('<nav class="book-bn">');
+  const 帯 = html.slice(頭, html.indexOf('</nav>', 頭));
+  const 行き先 = [...帯.matchAll(/location\.href='([^']+)'/g)].map((m) => m[1]);
+  const 無い = [];
+  for (const url of 行き先) {
+    const f = String(url).split('?')[0].split('#')[0];
+    if (!f || /^https?:/.test(f)) continue;
+    if (!fs.existsSync(path.join(ROOT, f))) 無い.push(url);
+  }
+  if (無い.length) throw new Error('★行き先が 無い★: ' + 無い.join(' / '));
+  if (行き先.length < 3) throw new Error('下の帯の 行き先が 数えられていない（' + 行き先.length + '件）');
+});
+
+T('★⑦ スマホでは 上の帯を 2段に する（字を 消さずに 収める）', () => {
+  /* ★実測（2026-08-29・幅390）★＝マクロ入りを開くと 6個で 492px が 310pxの枠に 入らず
+     182px はみ出していた。★字は 1文字も 消さない★ので 2段に 分ける。 */
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+  if (!/id="headerSay"/.test(html)) throw new Error('2段目の 箱（headerSay）が 無い');
+  if (html.indexOf('#headerSay { display: flex; flex: 0 0 100%;') < 0) {
+    throw new Error('2段目が 1行を 占める形に なっていない');
+  }
+  if (html.indexOf('@media (min-width: 561px) { #headerSay { display: contents; } }') < 0) {
+    throw new Error('PCで 1段に 戻す決まりが 無い（スマホの決まりを 打ち消す書き方に なっていないか）');
+  }
+});
+
 win.close();
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
