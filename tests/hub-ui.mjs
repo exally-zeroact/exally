@@ -100,9 +100,19 @@ T('0. ★中身(.app)は最初 hidden＝未ログインで画面を見せない'
 doc.getElementById('app').hidden = false;   // 以降はログイン済みとして描画を見る
 
 /* ═══ 1. ハブ ═══ */
-T('1. ハブが出る・タイルは5つ(給与/日次台帳/集計/共有データ/表)', () => {
+T('1. ハブが出る・押せるタイルは5つ(給与/日次台帳/集計/共有データ/表)＋準備中1つ', () => {
+  /* ★2026-08-29★ ブックの下の帯が 8個で ごちゃごちゃ だったので（司さん「整理しろ」）
+     ★電子ハンコを ここへ 移した★＝★消したのでは ない★（灰色＋理由で 見える所に 残す）。
+     ★テンプレは 移していない★＝あれは「まだ」ではなく ★消したページ★（下の見張りが 戻りを 止める）。 */
   ok(doc.getElementById('scr-hub').classList.contains('active'), 'ハブが表示されていない');
-  ok(doc.querySelectorAll('#scr-hub .tile').length === 5, 'タイル数=' + doc.querySelectorAll('#scr-hub .tile').length);
+  const 全部 = [...doc.querySelectorAll('#scr-hub .tile')];
+  const 押せる = 全部.filter((e) => !e.disabled);
+  const 準備中 = 全部.filter((e) => e.disabled);
+  ok(押せる.length === 5, '押せるタイル数=' + 押せる.length);
+  ok(準備中.length === 1, '準備中のタイル数=' + 準備中.length + '（電子ハンコ）');
+  for (const e of 準備中) {
+    ok(/まだ出来ていません|準備中/.test(e.textContent), '準備中の理由が 画面の字で 読めない: ' + e.textContent.slice(0, 40));
+  }
 });
 // 2026-08-01 統合: 給与は別サイト(payslip-app-olive)ではなく【同一オリジンの /kyuyo/】になった。
 //   同一オリジンであることが「ログイン1回で両方使える」の条件そのものなので、そこを見張る。

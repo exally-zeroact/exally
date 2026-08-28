@@ -661,7 +661,9 @@ box-shadow:0 -2px 10px rgba(30,60,40,0.06);
   #openBookBtn { order: 1; }
   #openedFileLabel { order: 2; }
   #saveBookBtn { order: 3; }
-  #bookVerBtn { order: 4; }
+  /* ★Excel版は 毎日 押す物ではない★＝2段目に 置く（HTMLで headerSay の中に 移した）。
+     1段目は「読み込む・書き出す」だけ＝スマホの 1行目が すっきりする
+     （2026-08-29 司さん「上のぐちゃぐちゃ」） */
   #headerSay { display: flex; flex: 0 0 100%; order: 9; gap: 4px;
     overflow-x: auto; scrollbar-width: none; align-items: center; }
   #headerSay::-webkit-scrollbar { display: none; }
@@ -3723,8 +3725,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <button id="teianBtn" hidden onclick="openTeian()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="うちが見つけた「もっと短く書ける所」"></button>
     <button id="macroBtn" hidden onclick="openMacro()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="このファイルの マクロが 何をしているか"></button>
     <button id="shindanBtn" hidden onclick="openShindan()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="開いた時に うちが見つけた「気づけない所」"></button>
-    </div>
-    <button id="bookVerBtn" onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="相手が使っているExcelの版を選ぶ"><span class="hdr-ic">📊</span> <span class="hdr-lb"><span class="hdr-lb-long">Excel</span>版 <span id="bookVerLabel">365</span></span> ▼</button>
+        <button id="bookVerBtn" onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="相手が使っているExcelの版を選ぶ"><span class="hdr-ic">📊</span> <span class="hdr-lb"><span class="hdr-lb-long">Excel</span>版 <span id="bookVerLabel">365</span></span> ▼</button>
+</div>
   </div>
 </div>
 
@@ -9253,14 +9255,15 @@ document.addEventListener('DOMContentLoaded', function(){ checkRequiredFns(); })
     <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
     <button id="add-sheet-btn" onclick="addSheet()">＋</button>
   </div>
+  <!-- ★下の帯は 5つまで★（2026-08-29 司さん「フッターも整理しろよ」）
+       ・テンプレ／電子ハンコ … ★まだ出来ていない★ので ホーム画面に「灰色＋理由」で 移した
+       ・クイズ … AIの中のタブ（chat.html?tab=quiz）＝AIから 行ける
+       ★押せる物の 行き先は 必ず 実在する★（no-dead-ui が 見張る） -->
   <nav class="book-bn">
     <button class="book-bn-i" onclick="location.href='hub.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html'"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></button>
     <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
-    <button class="book-bn-i book-bn-notyet" onclick="showToast('テンプレは まだ出来ていません（準備中）')" title="まだ出来ていません（準備中）"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></button>
-    <button class="book-bn-i book-bn-notyet" onclick="showToast('電子ハンコは まだ出来ていません（準備中）')"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=book'"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></button>
-    <button class="book-bn-i" onclick="location.href='chat.html?tab=quiz'"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=settings'"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></button>
   </nav>
 </div>
