@@ -25,7 +25,7 @@ const OVERRIDE = process.env.EXALLY_VBATEJUN_OVERRIDE ? JSON.parse(process.env.E
 const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
 const T = require_(OVERRIDE['lib/vba-tejun.js'] || path.join(ROOT, 'lib/vba-tejun.js'));
 const M = require_(path.join(ROOT, 'lib/vba-mikata.js'));
-const R = require_(path.join(ROOT, 'lib/recipe.js'));
+const R = require_(OVERRIDE['lib/recipe.js'] || path.join(ROOT, 'lib/recipe.js'));
 
 let pass = 0, fail = 0;
 const T_ = (n, fn) => { try { fn(); pass++; console.log('  ok   ' + n); } catch (e) { fail++; console.log('  NG   ' + n + '\n       ' + (e && e.message)); } };
@@ -109,19 +109,59 @@ T_('知らない書き方は 理由つきで 落とす', () => {
   eq(r.手順.length, 0);
   eq(r.取り出せなかった.length, 1);
 });
+T_('写して貼る（丸ごと／値だけ）', () => {
+  const a = 読む(['Sub a()', '  Range("A1:D9").Copy Destination:=Range("F1")', 'End Sub']);
+  eq(a.手順.length, 1);
+  eq(a.手順[0].種類, '写す'); eq(a.手順[0].元, 'A1:D9'); eq(a.手順[0].先, 'F1');
+  eq(a.手順[0].値だけ, false, '丸ごとの はずが 値だけに なっている');
+  const b = 読む(['Sub b()', '  Range("F1:I9").Value = Range("A1:D9").Value', 'End Sub']);
+  eq(b.手順[0].元, 'A1:D9', '★元と 先が 逆★（VBAは 左が 貼り先）');
+  eq(b.手順[0].先, 'F1');
+  eq(b.手順[0].値だけ, true);
+});
+T_('★別のシートへ 写す物は 断る（同じシートに 当てない）★', () => {
+  const 例 = ['  Sheets("集計").Range("A1:D9").Value = Sheets("明細").Range("A1:D9").Value',
+    '  Range("A1:D9").Copy Destination:=Sheets("集計").Range("A1")'];
+  for (const 行 of 例) {
+    const r = 読む(['Sub c()', 行, 'End Sub']);
+    eq(r.手順.length, 0, 行);
+    ok(r.取り出せなかった[0].なぜ.indexOf('別のシート') >= 0, 行 + ' → ' + r.取り出せなかった[0].なぜ);
+  }
+});
+T_('写す先が 変数なら 手順にしない（理由を残す）', () => {
+  const r = 読む(['Sub d()', '  Range("A1:D9").Copy Destination:=Cells(行, 1)', 'End Sub']);
+  eq(r.手順.length, 0);
+  ok(r.取り出せなかった[0].なぜ.indexOf('写す先') >= 0, r.取り出せなかった[0].なぜ);
+});
 T_('★入れ物を置く行・条件の行・With は 母数に 入れない★（読めない行に 数えない）', () => {
   /* ★これを 数えると「読み取れない所が 5か所」と 嘘の数が 出る★＝
      Set / If / With / End With は ★表を いじっている行ではない★。 */
   const r = 読む(['Sub a()', '  Set ws = Sheets("集計")', '  With ActiveSheet',
     '    If Cells(2, 1).Value = "" Then Exit Sub', '    Columns("C").Delete', '  End With', 'End Sub']);
-  eq(r.数.効く行, 1, '効く行（Columns("C").Delete の 1つだけ）');
+  eq(r.数.変える行, 1, '効く行（Columns("C").Delete の 1つだけ）');
   eq(r.数.読めない行, 0, '読めない行');
   eq(r.数.手順, 1);
+});
+T_('★読んでいるだけの行は 母数に 入れない★（実物で 42行の 半分ちかくが これだった）', () => {
+  /* Set（日本語の変数名）／For の 頭／最終行を 取る行 … ★1セルも 変えていない★ */
+  const r = 読む(['Sub a()', '  Set 集計シート = Sheets("集計")',
+    '  For i = 2 To 集計シート.Cells(Rows.Count, 1).End(xlUp).Row',
+    '    最終行 = 集計シート.Cells(Rows.Count, 4).End(xlUp).Row',
+    '    担当 = 集計シート.Cells(1, 3).Value',
+    '  Next i', '  Columns("C").Delete', 'End Sub']);
+  eq(r.数.変える行, 1, '変える行（Columns("C").Delete の 1つだけ）');
+  eq(r.数.読めない行, 0, '読めない行');
+});
+T_('★書く行は 数える（右側で 読んでいても 左側が セルなら 変える行）★', () => {
+  const r = 読む(['Sub a()', '  ws.Cells(行, 3).Value = ws.Cells(行, 2).Value', 'End Sub']);
+  eq(r.数.変える行, 1);
+  eq(r.数.読めない行, 1, '読めない行');
+  eq(r.数.手順, 0);
 });
 T_('段取りの行（ちらつき止め・Dim・コメント）は 母数に 入れない', () => {
   const r = 読む(['Sub a()', '  Dim i As Long', "  ' メモ", '  Application.ScreenUpdating = False',
     '  Columns("C").Delete', '  Application.ScreenUpdating = True', 'End Sub']);
-  eq(r.数.効く行, 1, '効く行');
+  eq(r.数.変える行, 1, '変える行');
   eq(r.数.手順, 1);
 });
 
@@ -130,13 +170,13 @@ console.log('  -- 数 --');
 T_('★効く行 ＝ 読めた行 ＋ 読めない行★', () => {
   const r = 読む(['Sub a()', '  Range("A1:D9").Sort Key1:=Range("B2")', '  Columns("C").Delete',
     '  ActiveSheet.Range("A1").CurrentRegion.RemoveDuplicates Columns:=1', 'End Sub']);
-  eq(r.数.効く行, 3);
-  eq(r.数.読めた行 + r.数.読めない行, r.数.効く行, '足して 合わない');
+  eq(r.数.変える行, 3);
+  eq(r.数.読めた行 + r.数.読めない行, r.数.変える行, '足して 合わない');
   eq(r.数.読めない行, 1);
 });
 T_('★行の数と 手順の数を 混ぜない★（2行で 1つの手順になる）', () => {
   const r = 読む(['Sub a()', '  Range("E1").Value = "税込"', '  Range("E2:E9").Formula = "=D2*1.1"', 'End Sub']);
-  eq(r.数.効く行, 2, '効く行');
+  eq(r.数.変える行, 2, '変える行');
   eq(r.数.手順, 1, '手順');
 });
 T_('★読み取れない所が 在れば 1行で そう言う★', () => {
@@ -154,7 +194,7 @@ T_('1つも 取り出せない時は そう言う（0本と 言い切らない�
 });
 T_('表をいじる所が 無い時', () => {
   const r = 読む(['Sub a()', '  MsgBox "こんにちは"', 'End Sub']);
-  eq(r.数.効く行, 0);
+  eq(r.数.変える行, 0);
   ok(T.知らせの字(r).indexOf('見つかりません') >= 0, T.知らせの字(r));
 });
 
@@ -210,6 +250,41 @@ T_('★手順が 0本の時は 表を 1セルも 触らない★', () => {
   eq(Object.keys(当.変える).length, 0, '触っている');
 });
 
+T_('★写す＝実際に セルが 写る（丸ごとは 式も 運ぶ・値だけは 値に する）★', () => {
+  const sh = { name: '売上', data: { '0,0': { v: 'あ' }, '0,1': { v: 1 }, '1,0': { f: '=A1' }, '1,1': { v: 2 } } };
+  const 出 = 読む(['Sub a()', '  Range("A1:B2").Copy Destination:=Range("D1")', 'End Sub']);
+  const 読 = R.手順を読む(JSON.stringify({ 手順: 出.手順 }));
+  eq(読.ok, true, 読.なぜ);
+  const 当 = R.手順を当てる(sh, 読.手順, { 見出しの行: 0 });
+  eq(Object.keys(当.変える).length, 4, '写した数');
+  eq(当.変える['0,3'].v, 'あ', 'D1');
+  eq(当.変える['1,3'].f, '=A1', '★式を 値に 潰している★');
+  const 出2 = 読む(['Sub b()', '  Range("D1:E2").Value = Range("A1:B2").Value', 'End Sub']);
+  const 当2 = R.手順を当てる(sh, R.手順を読む(JSON.stringify({ 手順: 出2.手順 })).手順, { 見出しの行: 0 });
+  eq(当2.変える['1,3'].f, undefined, '★値だけの はずが 式を 運んでいる★');
+});
+T_('★手順は 上から 順に 起きる（並べ替えた後の 物を 写す）★', () => {
+  /* ★実機で 押して 見つけた（2026-08-28）★＝写す時に 元の表だけを 見ていたので、
+     並べ替えの 後に 写しても ★並べ替える前の 並び★を 写していた。 */
+  const data = { '0,0': { v: '名前' }, '0,1': { v: '金額' } };
+  const 名 = ['え', 'あ', 'う', 'い', 'お'];
+  for (let r = 1; r <= 5; r++) { data[r + ',0'] = { v: 名[r - 1] }; data[r + ',1'] = { v: r * 100 }; }
+  const 当 = R.手順を当てる({ name: 'a', data },
+    [{ 種類: '並べ替え', 列: 'A', 向き: '降順' }, { 種類: '写す', 元: 'A1:B6', 先: 'D1' }], { 見出しの行: 0 });
+  const 並べた = [], 写した = [];
+  for (let r = 1; r <= 5; r++) {
+    並べた.push(当.変える[r + ',0'] ? 当.変える[r + ',0'].v : data[r + ',0'].v);
+    写した.push(当.変える[r + ',3'] ? 当.変える[r + ',3'].v : '(無)');
+  }
+  eq(並べた.join(','), 'お,え,う,い,あ', '並べ替えが 効いていない');
+  eq(写した.join(','), 並べた.join(','), '★写す時に 並べ替える前の 物を 見ている★');
+});
+T_('★写す先が 読めない手順は レシピの検品で 断られる★', () => {
+  const 読 = R.手順を読む(JSON.stringify({ 手順: [{ 種類: '写す', 元: 'A:A', 先: 'D1' }] }));
+  eq(読.ok, false, '通してしまっている');
+  ok((読.断った || []).join('').indexOf('写す') >= 0, JSON.stringify(読.断った));
+});
+
 /* ══ ④客に見せる字 ═══════════════════════════════════════ */
 console.log('  -- 客に見せる字 --');
 T_('★客に見せる字に ★ を書かない★', () => {
@@ -241,39 +316,50 @@ if (SELF) {
   console.log('[vba-tejun --self-test] ★壊したら 赤くなるか★');
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'exally-vbatejun-'));
   const BREAKS = [
-    ['★読み取れない行を 黙って 落とす★',
+    ['vba-tejun.js', '★読み取れない行を 黙って 落とす★',
       (s) => s.replace("      取り出せなかった.push({ 行: i + 1, なぜ: 'この書き方は まだ 手順に 出来ません' });", '')],
-    ['★列の名前が 無い式に 勝手に 名前を つける★',
+    ['vba-tejun.js', '★列の名前が 無い式に 勝手に 名前を つける★',
       (s) => s.replace("      if (!名) { 取り出せなかった.push({ 行: w.行, なぜ: 'この式の 列の名前が どこにも 書かれていません' }); continue; }",
         "      if (!名) 名 = '列' + w.列;")],
-    ['★式の中の 数字を 全部 置き換える★',
+    ['vba-tejun.js', '★式の中の 数字を 全部 置き換える★',
       (s) => s.replace("var 直した = 式.replace(new RegExp('(\\\\$?[A-Z]{1,3}\\\\$?)' + 始まり + '(?![0-9])', 'g'), '$1{行}');",
         "var 直した = 式.replace(/(\\$?[A-Z]{1,3}\\$?)\\d+/g, '$1{行}');")],
-    ['★行を消すのを 列を消すと 間違える★',
+    ['vba-tejun.js', '★行を消すのを 列を消すと 間違える★',
       (s) => s.replace("    if (/Rows\\(|EntireRow/i.test(行)) return { だめ: '行を消す作業は まだ 手順に 出来ません' };", '')],
-    ['★並べ替えの 向きを 見ない（いつも 昇順）★',
+    ['recipe.js', '★写す時に 1つ前の手順の 結果を 見ない（元の表を 写す）★',
+      (s) => s.replace('var から = Object.prototype.hasOwnProperty.call(変える, 元番地) ? 変える[元番地] : data[元番地];',
+        'var から = data[元番地];')],
+    ['vba-tejun.js', '★写す 元と 先を 逆にする★',
+      (s) => s.replace("if (v) return { 手順: { 種類: '写す', 元: v[2].toUpperCase(), 先: String(v[1]).toUpperCase().split(':')[0], 値だけ: true } };",
+        "if (v) return { 手順: { 種類: '写す', 元: v[1].toUpperCase().split(':')[0], 先: v[2].toUpperCase(), 値だけ: true } };")],
+    ['vba-tejun.js', '★別のシートへ 写す物を 同じシートに 当てる★',
+      (s) => s.replace("    if (よそのシート.test(l)) return { だめ: '別のシートへ 写す物は まだ 手順に 出来ません' };", '')],
+    ['vba-tejun.js', '★値だけ の 印を 落とす（式を 運んでしまう）★',
+      (s) => s.replace("値だけ: true } };", "値だけ: false } };")],
+    ['vba-tejun.js', '★並べ替えの 向きを 見ない（いつも 昇順）★',
       (s) => s.replace('var 降順 = /Order1?\\s*:=\\s*xlDescending/i.test(行);', 'var 降順 = false;')],
-    ['★列が 書いていない並べ替えを 手順にしてしまう★',
+    ['vba-tejun.js', '★列が 書いていない並べ替えを 手順にしてしまう★',
       (s) => s.replace("      if (!c) return { だめ: '並べ替える列が 書かれていません' };",
         "      if (!c) return { 手順: { 種類: '並べ替え', 列: 'A', 向き: '昇順' } };")],
-    ['★段取りの行まで 母数に 入れる★',
-      (s) => s.replace('      if (読み飛ばす.test(行)) continue;', '')],
-    ['★行の数と 手順の数を 同じにする★',
+    ['vba-tejun.js', '★読むだけの行まで 母数に 入れる★',
+      (s) => s.replace('    if (読み飛ばす.test(l)) return false;', '')],
+    ['vba-tejun.js', '★代入の 右側だけで 変える行と 決める★（読むだけの行を 数える）',
+      (s) => s.replace('    return 場所.test(l.slice(0, i));', '    return 場所.test(l);')],
+    ['vba-tejun.js', '★行の数と 手順の数を 同じにする★',
       (s) => s.replace('        手順: 手順.length,', '        手順: Math.max(0, 効いた - 取り出せなかった.length),')],
-    ['★読み取れなかった事を 客に 言わない★',
+    ['vba-tejun.js', '★読み取れなかった事を 客に 言わない★',
       (s) => s.replace('    if (出.数.読めない行) {', '    if (false) {')],
-    ['★1つも 取り出せない時に 出来たように 言う★',
-      (s) => s.replace("      return '表をいじる所が ' + 出.数.効く行 + 'か所 ありますが、'\n        + 'まだ 手順として 覚えられる書き方では ありません。';",
-        "      return '手順に 出来ました。';")],
+    ['vba-tejun.js', '★1つも 取り出せない時に 出来たように 言う★',
+      (s) => s.replace("      return '表を 変える所が ' + 出.数.変える行 + 'か所 ありますが、'", "      return '手順に 出来ました。'; //")],
   ];
   let red = 0;
-  for (const [name, brk] of BREAKS) {
-    const 元 = fs.readFileSync(path.join(ROOT, 'lib/vba-tejun.js'), 'utf8');
+  for (const [対象, name, brk] of BREAKS) {
+    const 元 = fs.readFileSync(path.join(ROOT, 'lib', 対象), 'utf8');
     const 壊 = brk(元);
     if (壊 === 元) { console.log('  ★置換できず★  ' + name); continue; }
-    const f = path.join(TMP, 'vba-tejun.js');
+    const f = path.join(TMP, 対象);
     fs.writeFileSync(f, 壊, 'utf8');
-    const env = Object.assign({}, process.env, { EXALLY_VBATEJUN_OVERRIDE: JSON.stringify({ 'lib/vba-tejun.js': f }) });
+    const env = Object.assign({}, process.env, { EXALLY_VBATEJUN_OVERRIDE: JSON.stringify({ ['lib/' + 対象]: f }) });
     const r = spawnSync(process.execPath, [path.join(__dirname, 'vba-tejun.test.mjs')], { encoding: 'utf8', env });
     if (r.status !== 0) { red++; console.log('  赤くなった  ' + name); }
     else console.log('  ★素通り★  ' + name);
