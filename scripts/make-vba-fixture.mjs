@@ -33,6 +33,7 @@ const 元の所 = path.join(ROOT, 'tests/fixtures/vba-src');
 const モジュール = [
   { 名: 'Module1', 種類: 0x0021, 生: fs.readFileSync(path.join(元の所, 'Module1.bas')) },
   { 名: 'Module2', 種類: 0x0021, 生: fs.readFileSync(path.join(元の所, 'Module2.bas')) },
+  { 名: 'Module3', 種類: 0x0021, 生: fs.readFileSync(path.join(元の所, 'Module3.bas')) },
   { 名: 'Sheet1', 種類: 0x0022, 生: fs.readFileSync(path.join(元の所, 'Sheet1.bas')) },
 ];
 
@@ -101,7 +102,7 @@ export function 入れ物を組み立てる(決め) {
   CFB.utils.cfb_add(cfb, '/VBA/_VBA_PROJECT', [0xCC, 0x61, 0x00, 0x00, 0x00, 0x00]);
   CFB.utils.cfb_add(cfb, '/PROJECT', 字([
     'ID="{00000000-0000-0000-0000-000000000000}"',
-    'Module=Module1', 'Module=Module2', 'Document=Sheet1/&H00000000',
+    'Module=Module1', 'Module=Module2', 'Module=Module3', 'Document=Sheet1/&H00000000',
     'Name="ExallyTest"', '',
   ].join('\r\n')));
   /* ★vbaraw は バイト列で 渡す★ */

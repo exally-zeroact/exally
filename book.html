@@ -1182,6 +1182,12 @@ max-height:calc(100vh - 24px);
 overflow:auto;
 box-shadow:0 8px 28px rgba(30,60,40,0.22);
 }
+/* ★見出しと 補足は 普通の知らせでも 行を 分ける★
+   （2026-08-28 実物の画面で 見つけた＝この形は #toast.warn にしか 無く、
+     普通の知らせでは ★「18か所 直しました覚えた手順で やりました。」★と 字が くっついていた。
+     ★注意の色と 太さは 下の .warn の方が 強い★ので 上書きされない。） */
+#toast .toast-h { display:block; font-weight:700; margin-bottom:4px; }
+#toast .toast-n { display:block; margin-top:8px; font-size:12px; opacity:0.85; line-height:1.6; }
 #toast.warn b { color:#8A5A00; }
 #toast.warn .toast-h { display:block; font-weight:800; font-size:14px; margin-bottom:6px; color:#8A5A00; }
 #toast.warn ul { margin:0; padding-left:1.1em; }
@@ -1236,53 +1242,54 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=3a8e88b1"></script>
+<script src="hyperformula.full.min.js?v=e36ac453"></script>
 
-<script src="exally-formula.js?v=3a8e88b1"></script>
+<script src="exally-formula.js?v=e36ac453"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=3a8e88b1"></script>
+<script src="js/file-out.js?v=e36ac453"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=3a8e88b1"></script>
-<script src="lib/grid-xlsx.js?v=3a8e88b1"></script>
+<script src="lib/typed-value.js?v=e36ac453"></script>
+<script src="lib/grid-xlsx.js?v=e36ac453"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=3a8e88b1"></script>
-<script src="lib/autosum.js?v=3a8e88b1"></script>
-<script src="lib/grid-sort.js?v=3a8e88b1"></script>
-<script src="lib/grid-filter.js?v=3a8e88b1"></script>
-<script src="lib/grid-find.js?v=3a8e88b1"></script>
-<script src="lib/grid-print.js?v=3a8e88b1"></script>
-<script src="lib/ai-reason.js?v=3a8e88b1"></script>
-<script src="lib/menu-place.js?v=3a8e88b1"></script>
-<script src="lib/grid-stats.js?v=3a8e88b1"></script>
-<script src="lib/grid-valid.js?v=3a8e88b1"></script>
-<script src="lib/cond-format.js?v=3a8e88b1"></script>
-<script src="lib/ref-graph.js?v=3a8e88b1"></script>
-<script src="lib/shindan.js?v=3a8e88b1"></script>
+  <script src="lib/grid-refedit.js?v=e36ac453"></script>
+<script src="lib/autosum.js?v=e36ac453"></script>
+<script src="lib/grid-sort.js?v=e36ac453"></script>
+<script src="lib/grid-filter.js?v=e36ac453"></script>
+<script src="lib/grid-find.js?v=e36ac453"></script>
+<script src="lib/grid-print.js?v=e36ac453"></script>
+<script src="lib/ai-reason.js?v=e36ac453"></script>
+<script src="lib/menu-place.js?v=e36ac453"></script>
+<script src="lib/grid-stats.js?v=e36ac453"></script>
+<script src="lib/grid-valid.js?v=e36ac453"></script>
+<script src="lib/cond-format.js?v=e36ac453"></script>
+<script src="lib/ref-graph.js?v=e36ac453"></script>
+<script src="lib/shindan.js?v=e36ac453"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=3a8e88b1"></script>
-<script src="lib/vba-mikata.js?v=3a8e88b1"></script>
-<script src="lib/rireki.js?v=3a8e88b1"></script>
-<script src="lib/chizu.js?v=3a8e88b1"></script>
-<script src="lib/horu.js?v=3a8e88b1"></script>
-<script src="lib/excel-version.js?v=3a8e88b1"></script>
-<script src="lib/teian.js?v=3a8e88b1"></script>
-<script src="lib/kikan.js?v=3a8e88b1"></script>
-<script src="lib/recipe.js?v=3a8e88b1"></script>
-<script src="lib/kirikae.js?v=3a8e88b1"></script>
-<script src="js/recipe-store.js?v=3a8e88b1"></script>
-<script src="js/rireki-store.js?v=3a8e88b1"></script>
-<script src="lib/excel-version.js?v=3a8e88b1"></script>
+<script src="lib/vba.js?v=e36ac453"></script>
+<script src="lib/vba-mikata.js?v=e36ac453"></script>
+<script src="lib/vba-tejun.js?v=e36ac453"></script>
+<script src="lib/rireki.js?v=e36ac453"></script>
+<script src="lib/chizu.js?v=e36ac453"></script>
+<script src="lib/horu.js?v=e36ac453"></script>
+<script src="lib/excel-version.js?v=e36ac453"></script>
+<script src="lib/teian.js?v=e36ac453"></script>
+<script src="lib/kikan.js?v=e36ac453"></script>
+<script src="lib/recipe.js?v=e36ac453"></script>
+<script src="lib/kirikae.js?v=e36ac453"></script>
+<script src="js/recipe-store.js?v=e36ac453"></script>
+<script src="js/rireki-store.js?v=e36ac453"></script>
+<script src="lib/excel-version.js?v=e36ac453"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=3a8e88b1"></script>
-<script src="js/exally-login.js?v=3a8e88b1"></script>
-<script src="js/auth.js?v=3a8e88b1"></script>
+<script src="js/supa-config.js?v=e36ac453"></script>
+<script src="js/exally-login.js?v=e36ac453"></script>
+<script src="js/auth.js?v=e36ac453"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -8414,6 +8421,7 @@ function closeShindan(){ var ov = document.getElementById('dgOverlay'); if(ov) o
    だから ★何をしているのかを こちらから 日本語で出す★。
    ★VBAは 動かさない・書き換えない★。★分けるのは 機械＝AIは 0回★。 */
 var _マクロ = null;
+var _マクロの手順 = {};   /* 「モジュール.名前」→ VbaTejun.取り出す() の結果 */
 function マクロを受け取る(m){
   _マクロ = m || null;
   var b = document.getElementById('macroBtn');
@@ -8424,6 +8432,15 @@ function マクロを受け取る(m){
   if(!見 || (!見.本数 && !未)){ b.hidden = true; return; }
   b.hidden = false;
   b.textContent = 見.本数 ? ('マクロ ' + 見.本数 + '本') : ('マクロ 未測定 ' + 未 + '本');
+  /* ★手順は ここで まとめて 取り出しておく★（AIは 0回・押した時に 待たせない） */
+  _マクロの手順 = {};
+  if(typeof VbaTejun !== 'undefined'){
+    for(var i=0;i<見.手続き.length;i++){
+      var v = 見.手続き[i];
+      try{ _マクロの手順[v.モジュール + '.' + v.名] = VbaTejun.取り出す(v); }
+      catch(e){ /* 1本 読めなくても 残りは 出す */ }
+    }
+  }
 }
 /* ★知らせは 別にする★＝「マクロが入っています」を 先に言ってから この話をする
    （順番を 逆にすると 何の話か 分からないまま 本数が出る） */
@@ -8468,6 +8485,26 @@ function openMacro(){
       う.textContent = 'ここでは → ' + v.うちのやり方;
       row.appendChild(う);
     }
+    /* ★③レシピにして 会社に残す★
+       ★手順が 取り出せた時だけ 出す★（出来ていない物のボタンを 見せない）。
+       ★AIは 1回も 呼ばない★＝機械が VBAの字から そのまま 取り出す。 */
+    var 取 = _マクロの手順 && _マクロの手順[v.モジュール + '.' + v.名];
+    if(取 && 取.手順.length){
+      var 手 = document.createElement('div');
+      手.style.cssText = 'font-size:12px;color:#333333;margin-top:6px;line-height:1.7;';
+      手.textContent = VbaTejun.知らせの字(取);
+      row.appendChild(手);
+      var 並 = document.createElement('div');
+      並.style.cssText = 'font-size:12px;color:#2E7D54;margin-top:2px;line-height:1.7;';
+      並.textContent = '手順：' + 取.手順.map(function(t){ return VbaTejun.手順の字(t); }).join(' → ');
+      row.appendChild(並);
+      var b2 = document.createElement('button');
+      b2.style.cssText = 'margin-top:6px;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;'
+        + 'border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+      b2.textContent = 'この手順を 覚える';
+      b2.onclick = (function(名){ return function(){ マクロの手順を覚える(名); }; })(v.モジュール + '.' + v.名);
+      row.appendChild(b2);
+    }
     box.appendChild(row);
   }
   /* ★読めなかった物を 黙って落とさない★ */
@@ -8478,6 +8515,44 @@ function openMacro(){
   ov.style.display = 'flex';
 }
 function closeMacro(){ var ov = document.getElementById('mcOverlay'); if(ov) ov.style.display = 'none'; }
+
+/* ══ ★③レシピにして 会社に残す（2026-08-28）★ ═══════════════
+   ★司さんの言葉★「マクロを組んだ人が 辞めて 誰も触れない」
+   ⇒ ★人ではなく 会社に残す★＝マクロの中身を そのまま「手順」にして 倉庫に 置く。
+   ★AIは 1回も 呼ばない★（機械が VBAの字から 取り出す＝0円）。
+   ★1セルも 書かずに 先に見せる★（直すかどうかは 見てから 決めてもらう）。 */
+async function マクロの手順を覚える(名){
+  var 取 = _マクロの手順 && _マクロの手順[名];
+  if(!取 || !取.手順.length) return;
+  if(typeof Recipe === 'undefined'){ showToast('この画面では 覚えられません', 4000, 'warn'); return; }
+  var 要約 = いまの表の要約();
+  if(!要約){ showToast('この画面では 覚えられません（表が 読めませんでした）', 5000, 'warn'); return; }
+  var 頼み = 'マクロ ' + 名 + ' と 同じ事';
+  var レ = Recipe.レシピを作る(頼み, 頼み, 要約, 取.手順);
+  _覚えた手順.push(レ);
+  var 倉庫に入った = true;
+  if(typeof RecipeStore !== 'undefined'){
+    try{ 倉庫に入った = await RecipeStore.覚える(レ); }
+    catch(e){ 倉庫に入った = false; }
+  }
+  履歴に残す('自動化', 'マクロを 手順にした：' + 名,
+    { やった: 'マクロの中身から 手順を 取り出して 覚えた（AIは 呼んでいない）',
+      手順の数: 取.手順.length, 読めなかった所: 取.数.読めない行 }, null, 0);
+  closeMacro();
+  /* ★覚えた事と、覚えていない所を 両方 言う★（減った事を 隠さない） */
+  var 言 = '「' + 名 + '」の手順を ' + 取.手順.length + 'つ 覚えました。'
+    + '次からは 同じ形の表で AIを 呼ばずに 出せます。';
+  if(取.数.読めない行) 言 += ' 読み取れなかった所が ' + 取.数.読めない行 + 'か所 あります（そこは 覚えていません）。';
+  if(!倉庫に入った) 言 += ' この画面を閉じるまでは 覚えています（倉庫に 残せませんでした）。';
+  showToast(言, 7000);
+  /* ★当てた結果を 先に見せる★（ここでは 1セルも 書かない） */
+  var 出 = Recipe.手順を当てる(sheets[activeSheet], 取.手順);
+  var 出すシート = (出 && 出.出すシート) ? 出.出すシート.filter(function(x){ return !!x.data; }) : [];
+  if(出 && (Object.keys(出.変える).length || 出すシート.length)){
+    手順を見せる('マクロと 同じ事を します', 'マクロ ' + 名 + ' の 手順です。押すまで 1セルも 変えません。',
+      出.なに, 出.変える, 出すシート);
+  }
+}
 function 診断の場所へ行く(x){
   closeShindan();
   var i = -1;

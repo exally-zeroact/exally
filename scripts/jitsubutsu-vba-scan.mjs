@@ -26,6 +26,7 @@ const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
 const ZS = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
 const V = require_(path.join(ROOT, 'lib/vba.js'));
 const M = require_(path.join(ROOT, 'lib/vba-mikata.js'));
+const TJ = require_(path.join(ROOT, 'lib/vba-tejun.js'));
 
 const 元 = process.argv[2];
 if (!元) { console.log('★どこを見るか 教えてください★'); process.exit(1); }
@@ -56,7 +57,7 @@ const 数 = {
   本: ファイル.length, 開けない: 0,
   マクロ在り: 0, 読めた: 0, 読めない: 0,
   モジュール: 0, 正しく読めた: 0, 未測定: 0, 詰め方も同じ: 0, 名前一致: 0, 往復: 0,
-  手続き: 0,
+  手続き: 0, 手順が取れた手続き: 0, 手順: 0, 手順の効く行: 0, 手順の読めない行: 0,
 };
 const 可否 = { 'できる': 0, 'かえる': 0, 'べつの道': 0, 'わからない': 0 };
 const 分類ごと = {};
@@ -92,6 +93,14 @@ for (const f of ファイル) {
   数.手続き += 見.本数;
   for (const k of Object.keys(見.数)) 可否[k] = (可否[k] || 0) + 見.数[k];
   for (const v of 見.手続き) for (const a of v.分類) 分類ごと[a.名] = (分類ごと[a.名] || 0) + 1;
+  /* ★③レシピにして 会社に残す★＝手順が どれだけ 取り出せるか（★取れない事も 数える★） */
+  for (const v of 見.手続き) {
+    const t = TJ.取り出す(v);
+    数.手順の効く行 += t.数.効く行;
+    数.手順の読めない行 += t.数.読めない行;
+    数.手順 += t.数.手順;
+    if (t.数.手順) 数.手順が取れた手続き++;
+  }
 }
 
 const 率 = (a, b) => (b ? (Math.round(a / b * 1000) / 10) + '%' : '—');
@@ -114,6 +123,12 @@ console.log('  そのまま できる … ' + 可否['できる'] + '本（' + �
 console.log('  やり方を かえる … ' + 可否['かえる'] + '本（' + 率(可否['かえる'], 数.手続き) + '）');
 console.log('  別の道が いる  … ' + 可否['べつの道'] + '本（' + 率(可否['べつの道'], 数.手続き) + '）');
 console.log('  読み取れない   … ' + 可否['わからない'] + '本（' + 率(可否['わからない'], 数.手続き) + '）');
+
+console.log('');
+console.log('★母数⑤★ 手順が 取り出せた手続き … ' + 数.手順が取れた手続き + '本／' + 数.手続き + '本（'
+  + 率(数.手順が取れた手続き, 数.手続き) + '）');
+console.log('  取り出せた手順 … ' + 数.手順 + 'つ');
+console.log('  表をいじる行 … ' + 数.手順の効く行 + '行（そのうち 読み取れない ' + 数.手順の読めない行 + '行）');
 
 const 並び = Object.keys(分類ごと).sort((a, b) => 分類ごと[b] - 分類ごと[a]);
 if (並び.length) {

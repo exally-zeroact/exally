@@ -28,6 +28,8 @@ const 読む = (rel) => fs.readFileSync(OVERRIDE[rel] || path.join(ROOT, rel), '
 const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
 const V = require_(path.join(ROOT, 'lib/vba.js'));
 const M = require_(path.join(ROOT, 'lib/vba-mikata.js'));
+const TJ = require_(path.join(ROOT, 'lib/vba-tejun.js'));
+const R = require_(path.join(ROOT, 'lib/recipe.js'));
 const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
 const ZS = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
 
@@ -48,6 +50,7 @@ const 切る = (頭, 尻, なに) => {
   return book.slice(i, j);
 };
 const 動きの所 = () => 切る('var _マクロ = null;', 'function 参照の網を作り始める(', 'マクロの動き');
+const 窓の字2 = () => 切る('<div id="rcOverlay"', '<!-- ★6 履歴', 'レシピの窓');
 const 窓の字 = () => 切る('<div id="mcOverlay"', '<!-- ★条件付き書式★', 'マクロの窓');
 const ボタンの字 = () => 切る('<button id="macroBtn"', '<button id="shindanBtn"', 'マクロのボタン');
 
@@ -56,20 +59,34 @@ try { ({ JSDOM } = await import('jsdom')); }
 catch { console.log('★jsdomが入っていません。この検証は飛ばせません（SKIPを緑と呼ばない）'); process.exit(1); }
 
 /** ★本物の画面の字を そのまま動かす★（周りだけ こちらで用意する） */
-function 台() {
-  const dom = new JSDOM('<!doctype html><html><body>' + ボタンの字() + '</button>' + 窓の字() + '</body></html>',
+function 台(opt) {
+  const dom = new JSDOM('<!doctype html><html><body>' + ボタンの字() + '</button>' + 窓の字() + 窓の字2() + '</body></html>',
     { pretendToBeVisual: true });
   const w = dom.window;
-  const 記録 = { 知らせ: [] };
+  const 記録 = { 知らせ: [], 覚えた: [], 倉庫: [], 履歴: [], 見せた: null, 書いた: 0 };
   const 台本 = {
     document: w.document,
     VbaMikata: M,
+    VbaTejun: TJ,
+    Recipe: R,
+    RecipeStore: { 覚える: (レ) => { 記録.倉庫.push(レ); return Promise.resolve(true); } },
+    sheets: (opt && opt.sheets) || [],
+    activeSheet: 0,
+    _覚えた手順: 記録.覚えた,
+    いまの表の要約: () => (((opt && opt.sheets) || [])[0] ? R.要約を作る(opt.sheets[0]) : null),
+    履歴に残す: (種類, 見出し, 中身, f, credit) => 記録.履歴.push({ 種類, 見出し, 中身, credit }),
+    showToast: (t) => 記録.知らせ.push({ 題: '', 本文: String(t) }),
+    手順を見せる: (題, 本文, 何, 変える, 出すシート) => {
+      記録.見せた = { 題, 本文, 何, 変える, 出すシート };
+      記録.書いた = 0;   /* ★見せた所では 1セルも 書かない★ */
+    },
+    DiffPreview: require_(path.join(ROOT, 'lib/diff-preview.js')),
     開いた知らせに足す: (題, 本文) => 記録.知らせ.push({ 題: String(題), 本文: String(本文) }),
   };
   const 名 = Object.keys(台本);
   const f = new w.Function(...名, 動きの所()
     + ';return { マクロを受け取る: マクロを受け取る, マクロの知らせを出す: マクロの知らせを出す,'
-    + ' openMacro: openMacro, closeMacro: closeMacro };');
+    + ' openMacro: openMacro, closeMacro: closeMacro, マクロの手順を覚える: マクロの手順を覚える };');
   return { api: f(...名.map((k) => 台本[k])), 記録, w };
 }
 
@@ -96,7 +113,7 @@ T('マクロが 在れば ボタンに 本数が 出る', () => {
   api.マクロを受け取る(マクロ);
   const b = w.document.getElementById('macroBtn');
   eq(b.hidden, false, 'ボタンが 隠れている');
-  eq(b.textContent, 'マクロ 4本');
+  eq(b.textContent, 'マクロ 5本');
   eq(記録.知らせ.length, 0, '★ボタンを 出した所で 知らせまで 出している（順番が 逆になる）★');
   api.マクロの知らせを出す();
   eq(記録.知らせ.length, 1, '知らせが 出ていない');
@@ -136,15 +153,15 @@ T('★開く道の 中で 必ず 呼ぶ（マクロが 無い時も）★', () =
 });
 
 /* ══ ②窓＝★画面に 描かれた字を 数える★ ═══════════════════ */
-T('★4本 全部が 画面に 描かれている（見つけた数ではなく 描かれた数）★', () => {
+T('★5本 全部が 画面に 描かれている（見つけた数ではなく 描かれた数）★', () => {
   const { api, w } = 台();
   api.マクロを受け取る(マクロ);
   api.openMacro();
   eq(w.document.getElementById('mcOverlay').style.display, 'flex', '窓が 開いていない');
   const 行 = w.document.getElementById('mcList').children;
-  eq(行.length, 4, '描かれた行数');
+  eq(行.length, 5, '描かれた行数');
   const 字 = w.document.getElementById('mcList').textContent;
-  for (const 名 of ['月次締め', '印刷', 'CSV取り込み', 'Worksheet_Change']) {
+  for (const 名 of ['月次締め', '印刷', 'CSV取り込み', '月次の並べ替え', 'Worksheet_Change']) {
     ok(字.indexOf(名) >= 0, 名 + ' が 描かれていない');
   }
 });
@@ -190,7 +207,7 @@ T('★未測定は 窓の中に 名前つきで 書く（数に 混ぜない）�
   const t = w.document.getElementById('mcMore').textContent;
   ok(t.indexOf('Module9') >= 0, '名前が 出ていない: ' + t);
   ok(t.indexOf('1本') >= 0, '本数が 出ていない: ' + t);
-  eq(w.document.getElementById('mcList').children.length, 4, '未測定を 一覧に 混ぜている');
+  eq(w.document.getElementById('mcList').children.length, 5, '未測定を 一覧に 混ぜている');
 });
 T('未測定が 無い時は 何も 書かない（空の言い訳を 出さない）', () => {
   const { api, w } = 台();
@@ -214,6 +231,114 @@ T('★狭い画面で 帯を 横に 動かせる作りに なっている★', (
   const 帯 = book.slice(i, book.indexOf('>', i));
   ok(/overflow-x:\s*auto/.test(帯), '横に 動かせない: ' + 帯);
   ok(/min-width:\s*0/.test(帯), '縮まない作りに なっている: ' + 帯);
+});
+
+/* ══ ②-c ★③レシピにして 会社に残す★（AIは 0回） ══════════════ */
+console.log('  -- 手順を 覚える（AIは 0回）--');
+const 表 = () => {
+  const data = { '0,0': { v: '日付' }, '0,1': { v: '名前' }, '0,2': { v: '金額' } };
+  const 名 = ['え', 'あ', 'う', 'い', 'お'];
+  for (let r = 1; r <= 5; r++) {
+    data[r + ',0'] = { v: '8/' + r }; data[r + ',1'] = { v: 名[r - 1] }; data[r + ',2'] = { v: r * 100 };
+  }
+  return [{ name: '売上', data }];
+};
+const 手順つき = () => M.見立てる([{ 名: 'Module1', 確か: true, 中身: ['Attribute VB_Name = "Module1"',
+  'Sub 月次()', '  Range("A1:C6").Sort Key1:=Range("B2"), Order1:=xlDescending',
+  '  Range("D1").Value = "税込"', '  Range("D2:D6").Formula = "=C2*1.1"', 'End Sub'].join('\r\n') }]);
+
+T('★手順が 取り出せた本だけ「覚える」ボタンを 出す★', () => {
+  const { api, w } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 手順つき() });
+  api.openMacro();
+  const 行 = w.document.getElementById('mcList').children;
+  eq(行.length, 1, '描かれた行数');
+  const ボタン = [...行[0].querySelectorAll('button')].map((b) => b.textContent);
+  eq(ボタン.join(','), 'この手順を 覚える', 'ボタン');
+  const t = 行[0].textContent;
+  ok(t.indexOf('手順は 2つです') >= 0, '手順の数が 出ていない: ' + t);
+  ok(t.indexOf('列 B で 降順に 並べ替える') >= 0, '手順の中身が 出ていない: ' + t);
+});
+T('★2本目以降の 手順も 取り出す（先頭だけで 止めない）★', () => {
+  /* ★同じ形のループが 画面に 2つ ある★（手順を取り出す所と 描く所）。
+     片方だけ 止まっても 気づけるように ★2本 入れて 両方に ボタンが 出る事★を 数える。 */
+  const 見 = M.見立てる([{ 名: 'Module1', 確か: true, 中身: ['Attribute VB_Name = "Module1"',
+    'Sub 一つ目()', '  Columns("C").Delete', 'End Sub', '',
+    'Sub 二つ目()', '  Range("A1:C6").Sort Key1:=Range("B2")', 'End Sub'].join('\r\n') }]);
+  const { api, w } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 見 });
+  api.openMacro();
+  const 行 = w.document.getElementById('mcList').children;
+  eq(行.length, 2, '描かれた行数');
+  eq(行[0].querySelectorAll('button').length, 1, '1本目に ボタンが 無い');
+  eq(行[1].querySelectorAll('button').length, 1, '★2本目に ボタンが 無い（先頭だけで 止まっている）★');
+});
+T('★手順が 取り出せない本には ボタンを 出さない★（出来ていない物のボタンを 見せない）', () => {
+  const { api, w } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: M.見立てる([{ 名: 'M', 確か: true,
+    中身: ['Attribute VB_Name = "M"', 'Sub a()', '  MsgBox "hi"', 'End Sub'].join('\r\n') }]) });
+  api.openMacro();
+  const 行 = w.document.getElementById('mcList').children;
+  eq(行.length, 1);
+  eq(行[0].querySelectorAll('button').length, 0, 'ボタンが 出ている');
+});
+T('★覚えると 倉庫にも 入る（会社に残る）／AIは 0回★', async () => {
+  const { api, 記録 } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 手順つき() });
+  api.openMacro();
+  await api.マクロの手順を覚える('Module1.月次');
+  eq(記録.覚えた.length, 1, 'この画面に 覚えていない');
+  eq(記録.倉庫.length, 1, '倉庫に 入れていない');
+  eq(記録.倉庫[0].手順.length, 2, '覚えた手順の数');
+  eq(記録.履歴.length, 1, '履歴に 残していない');
+  eq(記録.履歴[0].credit, 0, '★AIを 使った事に している★');
+});
+T('★覚えた所では 1セルも 書かず、先に 見せる★', async () => {
+  const { api, 記録 } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 手順つき() });
+  await api.マクロの手順を覚える('Module1.月次');
+  ok(記録.見せた, '見せていない');
+  eq(記録.書いた, 0, '書いている');
+  const 番地 = Object.keys(記録.見せた.変える);
+  ok(番地.length > 0, '変える所が 空');
+  /* ★見せる中身が 本当に 並べ替えと 式か★（名前だけ 出して 何もしない を 防ぐ） */
+  eq(記録.見せた.変える['0,3'].v, '税込', '新しい列の 見出し');
+  eq(記録.見せた.変える['1,3'].f, '=C2*1.1', '式');
+  ok(記録.見せた.何.some((x) => x.indexOf('並べ替え') >= 0), '並べ替えが 無い: ' + JSON.stringify(記録.見せた.何));
+});
+T('★読み取れなかった所は 覚えた時にも 言う（黙って 減らさない）★', async () => {
+  const { api, 記録 } = 台({ sheets: 表() });
+  const 見 = M.見立てる([{ 名: 'M2', 確か: true, 中身: ['Attribute VB_Name = "M2"', 'Sub b()',
+    '  Columns("C").Delete', '  ActiveSheet.Range("A1").CurrentRegion.RemoveDuplicates Columns:=1',
+    'End Sub'].join('\r\n') }]);
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 見 });
+  await api.マクロの手順を覚える('M2.b');
+  const 字 = 記録.知らせ.map((x) => x.本文).join(' ');
+  ok(字.indexOf('1つ 覚えました') >= 0, 字);
+  ok(字.indexOf('読み取れなかった所が 1か所') >= 0, 字);
+});
+T('★倉庫に 入らなかった時は そう言う（入ったふりを しない）★', async () => {
+  const { api, 記録, w } = 台({ sheets: 表() });
+  api.マクロを受け取る({ 読み: { ok: true, モジュール: [] }, 見立て: 手順つき() });
+  /* 倉庫が 断る形に する */
+  const 台2 = 台({ sheets: 表() });
+  台2.記録.倉庫 = null;
+  await api.マクロの手順を覚える('Module1.月次');
+  ok(記録.知らせ.length > 0, '何も 言っていない');
+});
+
+T('★知らせの 見出しと 補足は 行を 分ける（字が くっつかない）★', () => {
+  /* ★実物の画面で 見つけた（2026-08-28）★＝この形は #toast.warn にしか 無く、
+     普通の知らせでは「18か所 直しました覚えた手順で やりました。」と 1行に くっついていた。
+     ★幅は jsdom では 測れない★ので ここでは 形が 在る事だけを 見る
+     （実機では 3行に 分かれる事を 押して 確かめた）。 */
+  const i = book.indexOf('#toast .toast-h');
+  ok(i > 0, '普通の知らせの 見出しの形が 無い');
+  const 行 = book.slice(i, book.indexOf('}', i));
+  ok(/display:\s*block/.test(行), '行を 分けていない: ' + 行);
+  const j = book.indexOf('#toast .toast-n');
+  ok(j > 0, '普通の知らせの 補足の形が 無い');
+  ok(/display:\s*block/.test(book.slice(j, book.indexOf('}', j))), '補足が 行を 分けていない');
 });
 
 /* ══ ③客に見せる字 ════════════════════════════════════ */
@@ -257,12 +382,18 @@ if (SELF) {
         'if (res.hasVba && typeof マクロを受け取る === \'function\') マクロを受け取る(res.マクロ);')],
     ['★マクロが 無くても ボタンを 出す★',
       (s) => s.replace('if(!見 || (!見.本数 && !未)){ b.hidden = true; return; }', '')],
-    ['★一覧を 先頭1本で 打ち切る★',
-      (s) => s.replace('for(var i=0;i<見.手続き.length;i++){', 'for(var i=0;i<1;i++){')],
+    ['★一覧を 先頭1本で 打ち切る（描く所）★',
+      (s) => s.replace('  for(var i=0;i<見.手続き.length;i++){\n    var v = 見.手続き[i];\n    var row = document.createElement',
+        '  for(var i=0;i<1;i++){\n    var v = 見.手続き[i];\n    var row = document.createElement')],
+    ['★手順を 先頭1本しか 取り出さない★',
+      (s) => s.replace('    for(var i=0;i<見.手続き.length;i++){\n      var v = 見.手続き[i];\n      try{ _マクロの手順',
+        '    for(var i=0;i<1;i++){\n      var v = 見.手続き[i];\n      try{ _マクロの手順')],
     ['★「ここでは どうするか」を 描かない★',
       (s) => s.replace('if(v.うちのやり方){', 'if(false){')],
     ['★未測定を 黙って 落とす★',
       (s) => s.replace("document.getElementById('mcMore').textContent = 未.length", "document.getElementById('mcMore').textContent = false")],
+    ['★知らせの 見出しを 行で 分けない★',
+      (s) => s.replace('#toast .toast-h { display:block;', '#toast .toast-h { display:inline;')],
     ['★狭い画面で 帯が 動かせなくなる★',
       (s) => s.replace('overflow-x:auto;overflow-y:hidden;', '')],
     ['★終わりの印が 無い事を 言わない★',

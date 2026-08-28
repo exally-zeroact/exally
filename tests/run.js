@@ -91,6 +91,8 @@ const FILES = [
   ['kirikae-egaku.test.mjs', '--self-test'],
   'kirikae.test.mjs',                     // ★切り替え＝見る人・見る月を変える（シートは増えない・戻すと元どおり）
   ['kirikae.test.mjs', '--self-test'],
+  'vba-tejun.test.mjs',                   // ★マクロから 手順を取り出して レシピにする（取り出せた分だけ・数で言う）
+  ['vba-tejun.test.mjs', '--self-test'],
   'vba-ui.test.mjs',                      // ★マクロが 何をしているかを 画面で 出す（描かれた字で 数える）
   ['vba-ui.test.mjs', '--self-test'],
   'vba.test.mjs',                         // ★マクロ（VBA）を 読む・見立てる＝読めた≠正しく読めた・AIには要約だけ
