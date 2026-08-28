@@ -35,7 +35,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 
 | ケース | 式 | 見方 | 期待 | 実際 | 判定 |
 |---|---|---|---|---|---|
-| TODAY_serial | `=TODAY()*1` | 実行時点の日付シリアルと一致するか | 46262 | 46262 | OK |
+| TODAY_serial | `=TODAY()*1` | 実行時点の日付シリアルと一致するか | 46263 | 46263 | OK |
 | NOW_int_is_today | `=INT(NOW())-TODAY()` | NOWの整数部がTODAYと一致するか | 0 | 0 | OK |
 
 ## 不一致（新規）＝赤
@@ -71,7 +71,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 ## 経路の固定（将来 生HF に落ちたら気付くための錠）
 
 - 独自層(_jsComputeFormula)が答えたケース: **0件**
-- 生HFと本番経路で答えが違うケース: **227件** … この差が消えたら「素通りに落ちた」ということ
+- 生HFと本番経路で答えが違うケース: **211件** … この差が消えたら「素通りに落ちた」ということ
 - 独自層の入口: {"jsSetCount":1,"entryPoints":1,"pluginRegistered":true,"pluginCount":43}（1つだけであること）
 
 ## 全ケース
@@ -191,10 +191,10 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | VLOOKUP | VLOOKUP_col2 | `=VLOOKUP(50,C1:E6,2,FALSE)` | B | B | 未検証 | #NAME? | 一致 |  |
 | VLOOKUP | VLOOKUP_text_key | `=VLOOKUP("C",D1:E6,2,FALSE)` | 400 | 400 | 未検証 | #NAME? | 一致 |  |
 | VLOOKUP | VLOOKUP_badcol | `=IFERROR(VLOOKUP(20,C1:E6,9,FALSE),"ERR")` | ERR | ERR | 未検証 | ERR | 一致 |  |
-| XLOOKUP | XLOOKUP_basic | `=XLOOKUP(20,C1:C6,E1:E6)` | 400 | 400 | 未検証 | #NAME? | 一致 |  |
-| XLOOKUP | XLOOKUP_notfound | `=XLOOKUP(999,C1:C6,E1:E6,"なし")` | なし | なし | 未検証 | #NAME? | 一致 |  |
-| XLOOKUP | XLOOKUP_text | `=XLOOKUP("C",D1:D6,E1:E6,"なし")` | 400 | 400 | 未検証 | #NAME? | 一致 |  |
-| XLOOKUP | XLOOKUP_first_dup | `=XLOOKUP("A",D1:D6,E1:E6,"なし")` | 100 | 100 | 未検証 | #NAME? | 一致 |  |
+| XLOOKUP | XLOOKUP_basic | `=XLOOKUP(20,C1:C6,E1:E6)` | 400 | 400 | 未検証 | 400 | 一致 |  |
+| XLOOKUP | XLOOKUP_notfound | `=XLOOKUP(999,C1:C6,E1:E6,"なし")` | なし | なし | 未検証 | なし | 一致 |  |
+| XLOOKUP | XLOOKUP_text | `=XLOOKUP("C",D1:D6,E1:E6,"なし")` | 400 | 400 | 未検証 | 400 | 一致 |  |
+| XLOOKUP | XLOOKUP_first_dup | `=XLOOKUP("A",D1:D6,E1:E6,"なし")` | 100 | 100 | 未検証 | 100 | 一致 |  |
 | XLOOKUP | XLOOKUP_no_default | `=IFERROR(XLOOKUP(999,C1:C6,E1:E6),"NA")` | NA | NA | 未検証 | NA | 一致 |  |
 | INDEX | INDEX_row | `=INDEX(E1:E6,4)` | 400 | 400 | 未検証 | 400 | 一致 |  |
 | INDEX | INDEX_2d | `=INDEX(C1:E6,4,3)` | 400 | 400 | 未検証 | 400 | 一致 |  |
@@ -205,7 +205,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | MATCH | MATCH_approx_asc | `=MATCH(30,C1:C6,1)` | 4 | 4 | 未検証 | 4 | 一致 |  |
 | MATCH | MATCH_text | `=MATCH("C",D1:D6,0)` | 4 | 4 | 未検証 | 4 | 一致 |  |
 | MATCH | MATCH_wildcard | `=MATCH("りん*",B1:B8,0)` | 1 | 1 | 未検証 | #N/A | 一致 |  |
-| XLOOKUP | XLOOKUP_nested | `=ROUND(XLOOKUP(20,C1:C6,E1:E6),0)` | 400 | 400 | 未検証 | #NAME? | 一致 |  |
+| XLOOKUP | XLOOKUP_nested | `=ROUND(XLOOKUP(20,C1:C6,E1:E6),0)` | 400 | 400 | 未検証 | 400 | 一致 |  |
 | MATCH | MATCH_nested_wild | `=INDEX(E1:E6,MATCH("りん*",B1:B8,0))` | 100 | 100 | 未検証 | #N/A | 一致 |  |
 | INDEX | INDEX_MATCH_combo | `=INDEX(E1:E6,MATCH(20,C1:C6,0))` | 400 | 400 | 未検証 | 400 | 一致 |  |
 | INDEX | INDEX_MATCH_text | `=INDEX(E1:E6,MATCH("C",D1:D6,0))` | 400 | 400 | 未検証 | 400 | 一致 |  |
@@ -285,10 +285,10 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | TRIM | TRIM_pad | `="["&TRIM(B4)&"]"` | [pad] | [pad] | 未検証 | [pad] | 一致 |  |
 | TRIM | TRIM_inner | `="["&TRIM(B8)&"]"` | [山田 太郎] | [山田 太郎] | 未検証 | [山田 太郎] | 一致 |  |
 | TRIM | TRIM_none | `="["&TRIM(B3)&"]"` | [apple] | [apple] | 未検証 | [apple] | 一致 |  |
-| VALUE | VALUE_num_text | `=VALUE(B6)` | 7 | 7 | 未検証 | #NAME? | 一致 |  |
+| VALUE | VALUE_num_text | `=VALUE(B6)` | 7 | 7 | 未検証 | 7 | 一致 |  |
 | VALUE | VALUE_comma | `=IFERROR(VALUE(B7),"NA")` | 1234 | 1234 | 未検証 | NA | 一致 |  |
 | VALUE | VALUE_bad | `=IFERROR(VALUE(B1),"NA")` | NA | NA | 未検証 | NA | 一致 |  |
-| VALUE | VALUE_zero_text | `=VALUE(G3)` | 0 | 0 | 未検証 | #NAME? | 一致 |  |
+| VALUE | VALUE_zero_text | `=VALUE(G3)` | 0 | 0 | 未検証 | 0 | 一致 |  |
 | TEXT | TEXT_pct_zero | `=TEXT(0.5,"0%")` | 50% | 50% | 未検証 | 1% | 一致 |  |
 | TEXT | TEXT_dec_round | `=TEXT(2.675,"0.00")` | 2.68 | 2.68 | 未検証 | 2.67 | 一致 |  |
 | TEXT | TEXT_neg_number | `=TEXT(-1234.5,"#,##0")` | -1,235 | -1,235 | 未検証 | -1235,##0 | 一致 |  |
@@ -297,7 +297,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | VALUE | VALUE_empty | `=IFERROR(VALUE(""),"NA")` | NA | NA | 未検証 | NA | 一致 |  |
 | VALUE | VALUE_nested_calc | `=IFERROR(VALUE(B7)+1,"NA")` | 1235 | 1235 | 未検証 | NA | 一致 |  |
 | TEXTJOIN | TEXTJOIN_nested_len | `=LEN(TEXTJOIN(",",TRUE,D1:D3))` | 5 | 5 | 未検証 | #NAME? | 一致 |  |
-| VALUE | VALUE_nested_sum | `=SUM(VALUE(B7),1)` | 1235 | 1235 | 未検証 | #NAME? | 一致 |  |
+| VALUE | VALUE_nested_sum | `=SUM(VALUE(B7),1)` | 1235 | 1235 | 未検証 | #VALUE! | 一致 |  |
 | TEXT | TEXT_nested_concat | `="["&TEXT(A2,"#,##0")&"]"` | [2,500] | [2,500] | 未検証 | [2500,##0] | 一致 |  |
 | TEXTJOIN | TEXTJOIN_skip | `=TEXTJOIN("\|",TRUE,B1:B3)` | りんご\|みかん\|apple | りんご\|みかん\|apple | 未検証 | #NAME? | 一致 |  |
 | TEXTJOIN | TEXTJOIN_delim_comma | `=TEXTJOIN(",",TRUE,"a","b")` | a,b | a,b | 未検証 | #NAME? | 一致 |  |
@@ -323,24 +323,24 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | TEXT | TEXT_weekday_nested | `=LEN(TEXT(F1,"aaaa"))` | 3 | 3 | 未検証 | 4 | 一致 |  |
 | TEXT | TEXT_era_wareki | `=TEXT(F1,"ge.m.d")` | ge.1.31 | R8.1.31 | 未検証 | ge.1.31 | 不一致(既知) | A |
 | TEXT | TEXT_elapsed_hours | `=TEXT(F1,"[h]:mm")` | [0]:00 | 1105272:00 | 未検証 | [0]:00 | 不一致(既知) | A |
-| SORT | SORT_bare | `=SORT(E1:E6)` | 100 | 100 | 未検証 | #NAME? | 一致 |  |
-| UNIQUE | UNIQUE_bare | `=UNIQUE(D1:D6)` | A | A | 未検証 | #NAME? | 一致 |  |
+| SORT | SORT_bare | `=SORT(E1:E6)` | 100 | 100 | 未検証 | 100 | 一致 |  |
+| UNIQUE | UNIQUE_bare | `=UNIQUE(D1:D6)` | A | A | 未検証 | A | 一致 |  |
 | FILTER | FILTER_bare | `=FILTER(E1:E6,D1:D6="A")` | 100 | 100 | 未検証 | 100 | 一致 |  |
-| SORT | SORT_empty | `=SORT(Z1:Z3)` | 0 | 0 | 未検証 | #NAME? | 一致 |  |
-| UNIQUE | UNIQUE_empty | `=UNIQUE(Z1:Z3)` | 0 | 0 | 未検証 | #NAME? | 一致 |  |
+| SORT | SORT_empty | `=SORT(Z1:Z3)` | 0 | 0 | 未検証 | (null) | 一致 |  |
+| UNIQUE | UNIQUE_empty | `=UNIQUE(Z1:Z3)` | 0 | 0 | 未検証 | (null) | 一致 |  |
 | FILTER | FILTER_nomatch | `=IFERROR(FILTER(E1:E6,E1:E6>9999),"NA")` | NA | NA | 未検証 | NA | 一致 |  |
-| SORT | SORT_nested_sum | `=SUM(SORT(E1:E6))` | 2100 | 2100 | 未検証 | #NAME? | 一致 |  |
-| SORT | SORT_nested_index2 | `=INDEX(SORT(E1:E6,1,-1),2)` | 500 | 500 | 未検証 | #NAME? | 一致 |  |
-| UNIQUE | UNIQUE_nested_sum | `=SUM(UNIQUE(E1:E6))` | 2100 | 2100 | 未検証 | #NAME? | 一致 |  |
+| SORT | SORT_nested_sum | `=SUM(SORT(E1:E6))` | 2100 | 2100 | 未検証 | 2100 | 一致 |  |
+| SORT | SORT_nested_index2 | `=INDEX(SORT(E1:E6,1,-1),2)` | 500 | 500 | 未検証 | 500 | 一致 |  |
+| UNIQUE | UNIQUE_nested_sum | `=SUM(UNIQUE(E1:E6))` | 2100 | 2100 | 未検証 | 2100 | 一致 |  |
 | UNIQUE | UNIQUE_nested_count | `=COUNT(UNIQUE(D1:D6))` | 0 | 0 | 未検証 | 0 | 一致 |  |
 | FILTER | FILTER_nested_count | `=COUNT(FILTER(E1:E6,D1:D6="A"))` | 3 | 3 | 未検証 | 3 | 一致 |  |
 | SORT | SORT_asc_join | `=TEXTJOIN(",",TRUE,SORT(E1:E6))` | 100,200,300,400,500,600 | 100,200,300,400,500,600 | 未検証 | #NAME? | 一致 |  |
 | SORT | SORT_desc_join | `=TEXTJOIN(",",TRUE,SORT(E1:E6,1,-1))` | 600,500,400,300,200,100 | 600,500,400,300,200,100 | 未検証 | #NAME? | 一致 |  |
-| SORT | SORT_first | `=INDEX(SORT(E1:E6,1,-1),1)` | 600 | 600 | 未検証 | #NAME? | 一致 |  |
+| SORT | SORT_first | `=INDEX(SORT(E1:E6,1,-1),1)` | 600 | 600 | 未検証 | 600 | 一致 |  |
 | SORT | SORT_text | `=TEXTJOIN(",",TRUE,SORT(D1:D6))` | A,A,A,B,B,C | A,A,A,B,B,C | 未検証 | #NAME? | 一致 |  |
-| SORT | SORT_count | `=COUNTA(SORT(E1:E6))` | 6 | 6 | 未検証 | 1 | 一致 |  |
+| SORT | SORT_count | `=COUNTA(SORT(E1:E6))` | 6 | 6 | 未検証 | 6 | 一致 |  |
 | UNIQUE | UNIQUE_join | `=TEXTJOIN(",",TRUE,UNIQUE(D1:D6))` | A,B,C | A,B,C | 未検証 | #NAME? | 一致 |  |
-| UNIQUE | UNIQUE_count | `=COUNTA(UNIQUE(D1:D6))` | 3 | 3 | 未検証 | 1 | 一致 |  |
+| UNIQUE | UNIQUE_count | `=COUNTA(UNIQUE(D1:D6))` | 3 | 3 | 未検証 | 3 | 一致 |  |
 | UNIQUE | UNIQUE_nums | `=TEXTJOIN(",",TRUE,UNIQUE(E1:E6))` | 100,200,300,400,500,600 | 100,200,300,400,500,600 | 未検証 | #NAME? | 一致 |  |
 | UNIQUE | UNIQUE_all_same | `=COUNTA(UNIQUE(D1:D1))` | 1 | 1 | 未検証 | 1 | 一致 |  |
 | FILTER | FILTER_sum | `=SUM(FILTER(E1:E6,D1:D6="A"))` | 1000 | 1000 | 未検証 | 1000 | 一致 |  |
@@ -484,9 +484,9 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | FORECAST | FORECAST_bare | `=FORECAST(30,E1:E6,C1:C6)` | 345.59228650137743 | 345.59228650137743 | 未検証 | #NAME? | 一致 |  |
 | FORECAST.LINEAR | FORECAST_linear | `=FORECAST.LINEAR(30,E1:E6,C1:C6)` | 345.59228650137743 | 345.59228650137743 | 未検証 | #NAME? | 一致 |  |
 | FORECAST | FORECAST_nested | `=ROUND(FORECAST(30,E1:E6,C1:C6),2)` | 345.59 | 345.59 | 未検証 | #NAME? | 一致 |  |
-| IRR | IRR_bare | `=IRR(J1:J5)` | 0.15322137877181535 | 0.15322137877181552 | 未検証 | #NAME? | 一致 |  |
-| IRR | IRR_guess | `=IRR(J1:J5,0.2)` | 0.15322137877181524 | 0.15322137876909325 | 未検証 | #NAME? | 一致 |  |
-| IRR | IRR_nested | `=ROUND(IRR(J1:J5)*100,2)` | 15.32 | 15.32 | 未検証 | #NAME? | 一致 |  |
+| IRR | IRR_bare | `=IRR(J1:J5)` | 0.15322137877181535 | 0.15322137877181552 | 未検証 | 0.15322137877 | 一致 |  |
+| IRR | IRR_guess | `=IRR(J1:J5,0.2)` | 0.15322137877181524 | 0.15322137876909325 | 未検証 | 0.15322137877 | 一致 |  |
+| IRR | IRR_nested | `=ROUND(IRR(J1:J5)*100,2)` | 15.32 | 15.32 | 未検証 | 15.32 | 一致 |  |
 | PERMUT | PERMUT_bare | `=PERMUT(6,3)` | 120 | 120 | 未検証 | #NAME? | 一致 |  |
 | PERMUT | PERMUT_k0 | `=PERMUT(6,0)` | 1 | 1 | 未検証 | #NAME? | 一致 |  |
 | PERMUT | PERMUT_nested | `=PERMUT(6,3)/6` | 20 | 20 | 未検証 | #NAME? | 一致 |  |
