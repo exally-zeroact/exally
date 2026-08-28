@@ -319,7 +319,9 @@ T('★⑥ 下の帯の 行き先が 実在する（押したら 404 にならな
     if (!fs.existsSync(path.join(ROOT, f))) 無い.push(url);
   }
   if (無い.length) throw new Error('★行き先が 無い★: ' + 無い.join(' / '));
-  if (行き先.length < 3) throw new Error('下の帯の 行き先が 数えられていない（' + 行き先.length + '件）');
+  /* ★2026-08-29 の 形★＝下の帯は 5つ（ホーム／読み込む／書き出す／その他／設定）。
+     ページへ 飛ぶのは ★ホームと 設定の 2つだけ★（読み込む・書き出す・その他は この画面の中で 動く）。 */
+  if (行き先.length < 2) throw new Error('下の帯の 行き先が 数えられていない（' + 行き先.length + '件）');
 });
 
 T('★⑦ スマホの 上の帯は 1段（残りは「その他」に しまう）', () => {
@@ -329,18 +331,28 @@ T('★⑦ スマホの 上の帯は 1段（残りは「その他」に しまう
      ★字は 1文字も 消さない★＝しまった先でも 同じ言葉で 出る。 */
   const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
   if (!/id="headerSay"/.test(html)) throw new Error('しまう箱（headerSay）が 無い');
-  if (!/id="headerMoreBtn"/.test(html)) throw new Error('「その他」ボタンが 無い');
-  if (!/その他 ▾/.test(html)) throw new Error('「その他」の字が 無い（絵だけに なっていないか）');
-  if (html.indexOf('#headerSay { display: none;') < 0) {
-    throw new Error('スマホで しまう形に なっていない');
+  if (!/id="bnMoreBtn"/.test(html)) throw new Error('下の帯に「その他」が 無い');
+  if (!/book-bn-lb">その他</.test(html)) throw new Error('「その他」の字が 無い（絵だけに なっていないか）');
+  if (!/id="sushikichoBtn"/.test(html)) throw new Error('数式帳が「その他」の中に 無い（設定に 埋めていないか）');
+  if (html.indexOf('#openBookBtn, #saveBookBtn { display: none !important; }') < 0) {
+    throw new Error('スマホの 上の帯に 押す物が 残っている（操作は 下に 集める）');
+  }
+  if (html.indexOf('#headerSay { display: none; position: fixed;') < 0) {
+    throw new Error('「その他」の板が 下から 出る形に なっていない');
   }
   if (html.indexOf('#headerSay.open { display: flex; }') < 0) {
     throw new Error('押しても 開かない（open の決まりが 無い）');
   }
   if (html.indexOf('@media (min-width: 561px) { #headerSay { display: contents; } }') < 0) {
-    throw new Error('PCで 1段に 戻す決まりが 無い（スマホの決まりを 打ち消す書き方に なっていないか）');
+    throw new Error('PCで 元に戻す決まりが 無い（スマホの決まりを 打ち消す書き方に なっていないか）');
   }
-  if (!/function 上の他を出す\(/.test(html)) throw new Error('開け閉めの 動きが 無い');
+  if (!/function その他を出す\(/.test(html)) throw new Error('開け閉めの 動きが 無い');
+  /* ★描かれているか★は 幅を持つ本物のブラウザで 測った（実測 2026-08-29）。
+     ここでは ★板が 下の帯より 上に 描かれる決まり★が 消えていない事を 見る
+     （z-index 60 だった時、シートのタブ(z-index:100)が 上に 乗って Excel版が 隠れた）。 */
+  if (!/#headerSay \{ display: none; position: fixed;[^}]*z-index: 101/.test(html.replace(/\s+/g, ' '))) {
+    throw new Error('「その他」の板が 下の帯より 下に 描かれる（隠れる）');
+  }
 });
 
 win.close();

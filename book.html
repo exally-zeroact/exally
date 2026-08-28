@@ -664,11 +664,26 @@ box-shadow:0 -2px 10px rgba(30,60,40,0.06);
   /* ★Excel版は 毎日 押す物ではない★＝2段目に 置く（HTMLで headerSay の中に 移した）。
      1段目は「読み込む・書き出す」だけ＝スマホの 1行目が すっきりする
      （2026-08-29 司さん「上のぐちゃぐちゃ」） */
-  /* ★スマホは 1段★＝その他は「その他 ▾」の中に しまう（押した時だけ 出る） */
-  #headerMoreBtn { display: inline-flex !important; order: 4; }
-  #headerSay { display: none; flex: 0 0 100%; order: 9; gap: 4px; flex-wrap: wrap;
-    padding: 6px 0 2px; align-items: center; }
+  /* ★スマホの 上には 押す物を 置かない★（飲み屋Castallyの形／Timeallyの「今 押せる物だけ」）
+     ・読み込む／書き出す … ★下の帯（親指の届く所）★へ 移す
+     ・うちから言う物（これまで／出来る事／マクロ／危ない所／Excel版）… ★在る時だけ★ 上に 1行
+       ★「その他」に しまわない★＝1回 押して 目的に 着かないのは 押させてから断るのと 同じ型 */
+  /* ★上の帯には 押す物を 置かない★（指示役 裁定）＝名前と ファイル名だけ */
+  #openBookBtn, #saveBookBtn { display: none !important; }
+  #openedFileLabel { display: inline !important; order: 2; font-size: 12px;
+    max-width: 62vw; overflow: hidden; white-space: nowrap; text-overflow: clip; }
+  /* ★「その他」の中身は 下から 出す★（親指の所で 開く・上まで 手を伸ばさせない） */
+  /* ★下の帯の 高さと 合わせる★（2026-08-29 実測：帯を 51px に したのに 板は 43px の所に
+     置いたままで ★Excel版の1行が 帯の下に 隠れていた★）。 */
+  /* ★下の帯より 上に 描く★（2026-08-29 実測：z-index 60 では
+     ★シートのタブ（.bottom-stack は z-index:100）が 上に 乗って Excel版が 見えなかった★。
+     ★「在る」と「描かれている」は 別★＝elementFromPoint で 見つけた） */
+  #headerSay { display: none; position: fixed; left: 0; right: 0; bottom: 51px; z-index: 101;
+    max-height: 40vh; overflow-y: auto;
+    background: #ffffff; border-top: 1px solid #D4EDE1; box-shadow: 0 -6px 20px rgba(30,60,40,0.12);
+    padding: 10px 12px; gap: 8px; flex-wrap: wrap; align-items: center; }
   #headerSay.open { display: flex; }
+  #sushikichoBtn { display: inline-flex !important; }   /* 数式帳は スマホの「その他」の中だけ */
   #header { height: auto; min-height: 52px; padding: 4px 10px; align-items: center; flex-wrap: wrap; }
 }
 /* ★一番狭い機種（320px＝iPhone SE 第1世代）★ 字は消さないまま ロゴが切れるのを止める
@@ -712,6 +727,9 @@ display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
+/* ★押す的は 44px 以上★（2026-08-29 実測で 42px だった＝指の的として 小さい）
+   飲み屋(Castally)は 50px で 揃えている＝★測って 決めた数字を 借りる★（画面は 借りない） */
+min-height:50px;
 padding:6px 1px 5px;
 cursor:pointer;
 border:none;
@@ -3524,6 +3542,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 #bookScan[hidden]{display:none!important;}
 #shindanBtn[hidden]{display:none!important;}
 #macroBtn[hidden]{display:none!important;}
+.book-bn-i[hidden]{display:none!important;}
 /* ★PCでは 箱が 無い物として 並べる★（今までの 見た目を 1ミリも 変えない）
    ★幅で 分ける★＝ただ書くと この行が 後ろに在るぶん スマホの決まりを 打ち消す
    （2026-08-29 実測：スマホで 2段目に 行くはずの物が 1段目に 残っていた）。 */
@@ -3720,11 +3739,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <!-- ★入り口②＝履歴ページ★（見る場所。ここから 何かを始めさせない） -->
     <!-- ★「こちらから言う」物★＝スマホでは 2段目に 逃がす（字は 1文字も 消さない）
          PCでは display:contents なので 今までと 同じ 1列に 並ぶ -->
-    <!-- ★スマホは 1段に する★（2026-08-29 司さん「上はこの見せ方で最適解と思っとん？」）
-         ＝毎日 押す物（読み込む・書き出す）だけ 出して、残りは この中に しまう。
-         ★字は 消さない★＝しまった先でも 同じ言葉で 出る。 -->
-    <button id="headerMoreBtn" onclick="上の他を出す()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="ほかに できる事">その他 ▾</button>
     <div id="headerSay">
+      <!-- ★数式帳は 見る所★＝設定（動き方を変える所）には 入れない（指示役 裁定 2026-08-29） -->
+      <button id="sushikichoBtn" onclick="location.href='chat.html?tab=book'" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="数式の 覚え書き">📖 数式帳</button>
     <button id="rirekiBtn" onclick="openRireki('page')" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="これまでにやった事（見る場所）"><span class="hdr-ic">🕘</span> <span class="hdr-lb">これまで</span></button>
     <!-- ★8 提案★ 見つかった時だけ 出す（出来ていない物のボタンを見せない） -->
     <button id="teianBtn" hidden onclick="openTeian()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="うちが見つけた「もっと短く書ける所」"></button>
@@ -8565,22 +8582,45 @@ function openMacro(){
 }
 function closeMacro(){ var ov = document.getElementById('mcOverlay'); if(ov) ov.style.display = 'none'; }
 
-/* ★上の帯の「その他」★（スマホだけ 出る）
-   ★字を 消さずに 1段に する★ための 開け閉め。中身は 同じボタンを そのまま 使う
-   （2つ作らない＝押した時の 動きも 1か所）。 */
-function 上の他を出す(){
+/* ★下の帯の「その他」★（スマホだけ）
+   ★中身は 上の帯と 同じボタンを そのまま 使う★＝2つ作らない（押した時の動きも 1か所）。
+   ★字は 1文字も 消さない★（しまった先でも 同じ言葉）。 */
+/** ★開いているファイルの名前を 上に 出す★（スマホは 場所が 狭い）
+ *  ★頭を 残して 尻を 削る★＝実物150本を 数えた結果：
+ *    ★頭8文字なら 108本/150本が 別物になる★のに ★尻8文字では 48本/150本しか 分かれない★。
+ *    ＝見分けているのは ★頭★。尻を 残すと「どれも 同じ」に 見える
+ *      （経営者セッションの実測でも 32本中30本が 同じ末尾だった）。
+ *  ★拡張子だけは 残す★（.xlsm＝マクロ入り など 形が 分かる）。 */
+function ファイル名を短く(名, 上限){
+  var s = String(名 || '');
+  var 上 = 上限 || 20;
+  if(s.length <= 上) return s;
+  var i = s.lastIndexOf('.');
+  var 拡 = (i > 0 && s.length - i <= 6) ? s.slice(i) : '';
+  var 頭 = s.slice(0, Math.max(4, 上 - 拡.length - 1));
+  return 頭 + '…' + 拡;
+}
+
+function その他を出す(){
   var 箱 = document.getElementById('headerSay');
-  var b = document.getElementById('headerMoreBtn');
   if(!箱) return;
   var 開く = !箱.classList.contains('open');
   箱.classList.toggle('open', 開く);
-  if(b) b.textContent = 開く ? 'その他 ▴' : 'その他 ▾';
-  /* ★上の帯の 高さが 変わる＝表の 描く場所も 変わる★（開け閉めの後に 測り直す）
-     ★在れば呼ぶ の書き方は しない★＝この画面には resize と render が 必ず 在る
-     （見張り tests/no-silent-optional.test.mjs が「表に無い守り」を 赤にする）。 */
-  resize();
-  render();
+  var b = document.getElementById('bnMoreBtn');
+  if(b) b.classList.toggle('active', 開く);
 }
+/* 画面の どこかを 押したら 閉じる（開けっぱなしに しない） */
+document.addEventListener('click', function(e){
+  var 箱 = document.getElementById('headerSay');
+  if(!箱 || !箱.classList.contains('open')) return;
+  if(箱.contains(e.target)) return;
+  var b = document.getElementById('bnMoreBtn');
+  if(b && b.contains(e.target)) return;
+  箱.classList.remove('open');
+  if(b) b.classList.remove('active');
+}, true);
+
+
 
 /* ══ ★③レシピにして 会社に残す（2026-08-28）★ ═══════════════
    ★司さんの言葉★「マクロを組んだ人が 辞めて 誰も触れない」
@@ -8835,7 +8875,7 @@ function openBookFile(file){
     });
     render(); updateBar();
     var lbl = document.getElementById('openedFileLabel');
-    if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';
+    if (lbl) lbl.textContent = ファイル名を短く(file.name) + '（' + res.sheets.length + 'シート）';
     /* ★マクロ(VBA)が入っていた時は 先に「どうなるか」を言う（2026-08-25）★
        ★「まだ出来ません」ではなく「そのまま残す・ここでは動かない・代わりにこう出来る」★ */
     /* ★前のファイルの物を 残さない★＝マクロの無いファイルを 開いた時は 必ず 消す。
@@ -9286,9 +9326,16 @@ document.addEventListener('DOMContentLoaded', function(){ checkRequiredFns(); })
        ・ブック … ★今 いる画面★＝押しても 何も起きないので 外した
        ・テンプレ … 前に 消したページ（どこにも 出さない）
        ・電子ハンコ … まだ出来ていない物＝ホーム画面に 灰色＋理由で 置いてある -->
+  <!-- ★下の帯＝親指の届く所★（指示役 裁定 2026-08-29・B案）
+       ホーム／読み込む／書き出す／その他／設定 の 5つ。
+       ・数式帳は ★設定に入れない★（設定＝動き方を変える所／数式帳＝見る所）⇒「その他」の中
+       ・AIは 右下に 浮いている1つだけ（★入口を1つに★）＝帯に 入れて 6つにしない
+       ・PCでは この帯は 出ない（上の帯が 在る） -->
   <nav class="book-bn">
     <button class="book-bn-i" onclick="location.href='hub.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
-    <button class="book-bn-i" onclick="location.href='chat.html?tab=book'"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></button>
+    <button class="book-bn-i" onclick="document.getElementById('bookFileInput').click()"><span class="book-bn-ic">📂</span><span class="book-bn-lb">読み込む</span></button>
+    <button id="bnSaveBtn" class="book-bn-i" onclick="saveXlsx()"><span class="book-bn-ic">💾</span><span class="book-bn-lb">書き出す</span></button>
+    <button id="bnMoreBtn" class="book-bn-i" onclick="その他を出す()"><span class="book-bn-ic">➕</span><span class="book-bn-lb">その他</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=settings'"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></button>
   </nav>
 </div>
