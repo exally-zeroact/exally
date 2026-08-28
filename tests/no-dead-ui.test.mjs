@@ -322,17 +322,25 @@ T('★⑥ 下の帯の 行き先が 実在する（押したら 404 にならな
   if (行き先.length < 3) throw new Error('下の帯の 行き先が 数えられていない（' + 行き先.length + '件）');
 });
 
-T('★⑦ スマホでは 上の帯を 2段に する（字を 消さずに 収める）', () => {
-  /* ★実測（2026-08-29・幅390）★＝マクロ入りを開くと 6個で 492px が 310pxの枠に 入らず
-     182px はみ出していた。★字は 1文字も 消さない★ので 2段に 分ける。 */
+T('★⑦ スマホの 上の帯は 1段（残りは「その他」に しまう）', () => {
+  /* ★2026-08-29 司さん「上はこの見せ方で最適解と思っとん？」★
+     2段に 並べるのは「入った」だけで 最適では なかった。
+     ⇒ ★毎日 押す物（読み込む・書き出す）だけ 出して、残りは「その他」の中★。
+     ★字は 1文字も 消さない★＝しまった先でも 同じ言葉で 出る。 */
   const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
-  if (!/id="headerSay"/.test(html)) throw new Error('2段目の 箱（headerSay）が 無い');
-  if (html.indexOf('#headerSay { display: flex; flex: 0 0 100%;') < 0) {
-    throw new Error('2段目が 1行を 占める形に なっていない');
+  if (!/id="headerSay"/.test(html)) throw new Error('しまう箱（headerSay）が 無い');
+  if (!/id="headerMoreBtn"/.test(html)) throw new Error('「その他」ボタンが 無い');
+  if (!/その他 ▾/.test(html)) throw new Error('「その他」の字が 無い（絵だけに なっていないか）');
+  if (html.indexOf('#headerSay { display: none;') < 0) {
+    throw new Error('スマホで しまう形に なっていない');
+  }
+  if (html.indexOf('#headerSay.open { display: flex; }') < 0) {
+    throw new Error('押しても 開かない（open の決まりが 無い）');
   }
   if (html.indexOf('@media (min-width: 561px) { #headerSay { display: contents; } }') < 0) {
     throw new Error('PCで 1段に 戻す決まりが 無い（スマホの決まりを 打ち消す書き方に なっていないか）');
   }
+  if (!/function 上の他を出す\(/.test(html)) throw new Error('開け閉めの 動きが 無い');
 });
 
 win.close();
