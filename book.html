@@ -8424,6 +8424,14 @@ function マクロを受け取る(m){
   if(!見 || (!見.本数 && !未)){ b.hidden = true; return; }
   b.hidden = false;
   b.textContent = 見.本数 ? ('マクロ ' + 見.本数 + '本') : ('マクロ 未測定 ' + 未 + '本');
+}
+/* ★知らせは 別にする★＝「マクロが入っています」を 先に言ってから この話をする
+   （順番を 逆にすると 何の話か 分からないまま 本数が出る） */
+function マクロの知らせを出す(){
+  var 見 = _マクロ && _マクロ.見立て;
+  if(!見) return;
+  var b = document.getElementById('macroBtn');
+  if(!b || b.hidden) return;
   開いた知らせに足す('マクロが 何をしているか 出せます', VbaMikata.知らせの字(見)
     + '<br>中身を 見て、うちで どう出来るかを 1本ずつ 出します。（AIは 使っていません）', true);
 }
@@ -8695,6 +8703,7 @@ function openBookFile(file){
     if (typeof マクロを受け取る === 'function') マクロを受け取る(res.hasVba ? res.マクロ : null);
     if (res.hasVba && typeof BookOpen !== 'undefined' && BookOpen.MSG_VBA) {
       開いた知らせに足す('マクロ（VBA）が入っています', BookOpen.MSG_VBA);
+      if (typeof マクロの知らせを出す === 'function') マクロの知らせを出す();
     }
     if (res.kind === 'xls') {
       // ★「対応していません」ではなく「まだ直せません」★（後で作る）

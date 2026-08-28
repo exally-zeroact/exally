@@ -68,7 +68,8 @@ function 台() {
   };
   const 名 = Object.keys(台本);
   const f = new w.Function(...名, 動きの所()
-    + ';return { マクロを受け取る: マクロを受け取る, openMacro: openMacro, closeMacro: closeMacro };');
+    + ';return { マクロを受け取る: マクロを受け取る, マクロの知らせを出す: マクロの知らせを出す,'
+    + ' openMacro: openMacro, closeMacro: closeMacro };');
   return { api: f(...名.map((k) => 台本[k])), 記録, w };
 }
 
@@ -79,9 +80,9 @@ const 見立て = M.見立てる(読み.モジュール);
 const マクロ = { 読み: 読み, 見立て: 見立て };
 
 /* ══ ①ボタン＝★在る時だけ 出す★ ══════════════════════════ */
-T('マクロが 無いファイルでは ボタンを 出さない', () => {
+T('マクロが 無いファイルでは ボタンも 知らせも 出さない', () => {
   const { api, w, 記録 } = 台();
-  api.マクロを受け取る(null);
+  api.マクロを受け取る(null); api.マクロの知らせを出す();
   eq(w.document.getElementById('macroBtn').hidden, true, 'ボタンが 出ている');
   eq(記録.知らせ.length, 0, '知らせまで 出している');
 });
@@ -96,6 +97,8 @@ T('マクロが 在れば ボタンに 本数が 出る', () => {
   const b = w.document.getElementById('macroBtn');
   eq(b.hidden, false, 'ボタンが 隠れている');
   eq(b.textContent, 'マクロ 4本');
+  eq(記録.知らせ.length, 0, '★ボタンを 出した所で 知らせまで 出している（順番が 逆になる）★');
+  api.マクロの知らせを出す();
   eq(記録.知らせ.length, 1, '知らせが 出ていない');
 });
 T('★正しく読めなかった物しか 無い時も ボタンは 出す（黙って 落とさない）★', () => {
@@ -124,6 +127,12 @@ T('★開く道の 中で 必ず 呼ぶ（マクロが 無い時も）★', () =
   /* ★hasVba の中だけで 呼んでいない事★を 見る */
   const j = book.indexOf("if (res.hasVba && typeof BookOpen");
   ok(i < j, 'マクロが 在る時しか 呼んでいない');
+  /* ★知らせは 「マクロが入っています」の 後★（順番を 逆にすると 何の話か 分からない） */
+  const k = book.indexOf("開いた知らせに足す('マクロ（VBA）が入っています'");
+  const l = book.indexOf('マクロの知らせを出す();', j);
+  ok(k > 0, '「マクロ（VBA）が入っています」が 無い');
+  ok(l > 0, '開く道で マクロの知らせを 出していない');
+  ok(k < l, '知らせの順番が 逆（本数が 先に出る）');
 });
 
 /* ══ ②窓＝★画面に 描かれた字を 数える★ ═══════════════════ */
@@ -210,7 +219,7 @@ T('★狭い画面で 帯を 横に 動かせる作りに なっている★', (
 /* ══ ③客に見せる字 ════════════════════════════════════ */
 T('★客に見せる字に ★ を書かない★', () => {
   const { api, w, 記録 } = 台();
-  api.マクロを受け取る(マクロ); api.openMacro();
+  api.マクロを受け取る(マクロ); api.マクロの知らせを出す(); api.openMacro();
   const 見る = [w.document.getElementById('mcList').textContent,
     w.document.getElementById('mcBody').textContent,
     w.document.getElementById('macroBtn').textContent]
@@ -219,7 +228,7 @@ T('★客に見せる字に ★ を書かない★', () => {
 });
 T('★中の言葉を そのまま 客に 出さない★（CFB・dir・stream・undefined）', () => {
   const { api, w, 記録 } = 台();
-  api.マクロを受け取る(マクロ); api.openMacro();
+  api.マクロを受け取る(マクロ); api.マクロの知らせを出す(); api.openMacro();
   const 全部 = w.document.body.textContent + 記録.知らせ.map((x) => x.題 + x.本文).join('');
   for (const 語 of ['CFB', 'undefined', 'NaN', 'MS-OVBA', 'vbaProject', '[object']) {
     ok(全部.indexOf(語) < 0, 語 + ' が 客に 出ている');
@@ -227,7 +236,7 @@ T('★中の言葉を そのまま 客に 出さない★（CFB・dir・stream�
 });
 T('★AIを 使っていないと 言う★（押す前に 回数を 書かない）', () => {
   const { api, 記録 } = 台();
-  api.マクロを受け取る(マクロ);
+  api.マクロを受け取る(マクロ); api.マクロの知らせを出す();
   const s = 記録.知らせ[0].題 + 記録.知らせ[0].本文;
   ok(s.indexOf('AIは 使っていません') >= 0, 'AIを使っていないと 言っていない: ' + s);
 });
@@ -241,6 +250,8 @@ if (SELF) {
   console.log('[vba-ui --self-test] ★壊したら 赤くなるか★');
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'exally-vbaui-'));
   const BREAKS = [
+    ['★知らせを「マクロが入っています」より 先に 出す★',
+      (s) => s.replace("      if (typeof マクロの知らせを出す === 'function') マクロの知らせを出す();", '')],
     ['★次のファイルで 前の物を 消さない★',
       (s) => s.replace('if (typeof マクロを受け取る === \'function\') マクロを受け取る(res.hasVba ? res.マクロ : null);',
         'if (res.hasVba && typeof マクロを受け取る === \'function\') マクロを受け取る(res.マクロ);')],
