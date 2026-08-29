@@ -12,6 +12,7 @@ const FILES = [
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
   ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで かたまりが丸ごと動かない★
+  ['ribbon.test.mjs', '--self-test'],        // ★リボン＝Excelと同じ配置／押して 届くかまで 見る★
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

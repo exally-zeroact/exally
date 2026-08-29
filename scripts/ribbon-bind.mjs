@@ -1,0 +1,154 @@
+/* ribbon-bind.mjs — ★リボンの並びに「うちの働き」を 結ぶ★ 2026-08-29
+ *
+ *  ★手で 288個 書かない★＝結び先の一覧を ここに 書いて、機械で lib/ribbon-spec.js に 差し込む。
+ *  ★結び先が 本当に 在るか★（book.html に その関数が 在るか）を 機械で 確かめてから 書く。
+ *  ★無い物は 結ばない＝null のまま＝ボタンを 出さない★（司さんの決まり）。
+ *
+ *  使い方: node scripts/ribbon-bind.mjs        … 結んで 書き込む
+ *          node scripts/ribbon-bind.mjs --check … 数えるだけ（書き込まない）
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
+const SPEC = path.join(ROOT, 'lib/ribbon-spec.js');
+const BOOK = path.join(ROOT, 'book.html');
+
+/* ══ 結び表 ══════════════════════════════════════════════════
+ *  'タブ|グループ|部品': { fn, arg, icon }
+ *  icon は ★うちの印★（字か 自作の形）。★Excelの絵は 1つも 写さない★
+ *  ★ここに 書く前に 必ず 実物で 押して 確かめる★ */
+export const 結び = {
+  /* ── ホーム / クリップボード ── */
+  'ホーム|クリップボード|貼り付け':   { act: '貼り付け',   icon: '貼' },
+  'ホーム|クリップボード|切り取り':   { act: '切り取り',   icon: '✂' },
+  'ホーム|クリップボード|コピー':     { act: 'コピー',     icon: '⧉' },
+
+  /* ── ホーム / フォント ── */
+  'ホーム|フォント|太字':                 { act: '太字',       icon: 'B' },
+  'ホーム|フォント|斜体':                 { act: '斜体',       icon: 'I' },
+  'ホーム|フォント|下線':                 { act: '下線',       icon: 'U' },
+  'ホーム|フォント|罫線':                 { act: '罫線',       icon: '⊞' },
+  'ホーム|フォント|下罫線':               { act: '下罫線',     icon: '⊥' },
+  'ホーム|フォント|塗りつぶしの色':       { act: '塗りつぶしの色', icon: '塗' },
+  'ホーム|フォント|フォントの色':         { act: 'フォントの色',   icon: 'A' },
+  'ホーム|フォント|塗りつぶしの色 RGB (255、255、0)': { act: '黄色で塗る',   icon: '黄' },
+  'ホーム|フォント|フォントの色 RGB (255、0、0)':     { act: '赤い字にする', icon: '赤' },
+  'ホーム|フォント|フォント サイズの拡大': { act: '字を大きく', icon: 'A+' },
+  'ホーム|フォント|フォント サイズの縮小': { act: '字を小さく', icon: 'A-' },
+  'ホーム|フォント|セルのフォントの設定':  { act: 'フォントの設定', icon: '⚙' },
+
+  /* ── ホーム / 配置 ── */
+  'ホーム|配置|左揃え':                   { act: '左揃え',     icon: '⬅' },
+  'ホーム|配置|中央揃え':                 { act: '中央揃え',   icon: '⬌' },
+  'ホーム|配置|右揃え':                   { act: '右揃え',     icon: '➡' },
+  'ホーム|配置|上揃え':                   { act: '上揃え',     icon: '⬆' },
+  'ホーム|配置|上下中央揃え':             { act: '上下中央',   icon: '⬍' },
+  'ホーム|配置|下揃え':                   { act: '下揃え',     icon: '⬇' },
+  'ホーム|配置|インデントを増やす':       { act: '字下げを増やす', icon: '→|' },
+  'ホーム|配置|インデントを減らす':       { act: '字下げを減らす', icon: '|←' },
+  'ホーム|配置|折り返して全体を表示する': { act: '折り返す',   icon: '↵' },
+  'ホーム|配置|セルを結合して中央揃え':   { act: '結合して中央', icon: '⬓' },
+  'ホーム|配置|セルの配置の設定':         { act: '配置の設定', icon: '⚙' },
+
+  /* ── ホーム / 数値 ── */
+  'ホーム|数値|数値の書式':                   { act: '書式の設定', icon: '書' },
+  'ホーム|数値|通貨表示形式':                 { act: '通貨',       icon: '¥' },
+  'ホーム|数値|パーセント スタイル':          { act: 'パーセント', icon: '%' },
+  'ホーム|数値|桁区切りスタイル':             { act: '桁区切り',   icon: ',' },
+  'ホーム|数値|小数点以下の表示桁数を増やす': { act: '小数を増やす', icon: '.0' },
+  'ホーム|数値|セルの書式設定':               { act: '書式の設定', icon: '⚙' },
+
+  /* ── ホーム / スタイル ── */
+  'ホーム|スタイル|条件付き書式':     { act: '条件付き書式', icon: '◧' },
+
+  /* ── ホーム / セル ── */
+  'ホーム|セル|セルの挿入':           { act: '行を挿入',   icon: '＋' },
+  'ホーム|セル|削除':                 { act: '行を削除',   icon: '－' },
+
+  /* ── ホーム / 編集 ── */
+  'ホーム|編集|検索と選択':           { act: '検索と選択', icon: '🔍' },
+
+  /* ── 数式 ── */
+  '数式|関数ライブラリ|関数の挿入...': { act: '関数の挿入', icon: 'fx' },
+
+  /* ── データ ── */
+  'データ|並べ替えとフィルター|昇順':         { act: '昇順',   icon: '↑' },
+  'データ|並べ替えとフィルター|降順':         { act: '降順',   icon: '↓' },
+  'データ|並べ替えとフィルター|フィルター':   { act: '絞り込む', icon: '▽' },
+  'データ|並べ替えとフィルター|クリア':       { act: '絞り込みを解除', icon: '▽✕' },
+  'データ|データ ツール|データの入力規則...': { act: '入力の決まり', icon: '規' },
+
+  /* ── 表示 ── */
+  '表示|ウィンドウ|ウィンドウ枠の固定': { act: '枠を固定', icon: '❄' },
+
+  /* ── ページ レイアウト ── */
+  'ページ レイアウト|ページ設定|印刷タイトル': { act: '印刷', icon: '🖶' },
+};
+
+/* ══ ★対象外★（作らないと 決めた物・理由つき）════════════════
+ *  ★黙って 分母から 引かない★＝ここに 理由を 書いた物だけ 引く。
+ *  ★Excelの中の「Microsoftの都合」や「UIAの写り込み」は うちの仕事では ない★ */
+export const 対象外 = {
+  'ホーム|アドイン|アドイン':                 'Excelのアドインの仕組み＝うちには アドインが 無い',
+  'ホーム|Claude|Claude':                     '司さんのExcelに 入っている Claudeアドイン＝Excelの機能では ない',
+  'ヘルプ|モバイル|Excel モバイル アプリの入手': 'Microsoftのアプリの宣伝',
+};
+/* Sheet1 タブは ★UIAが「タブ名と同じ入れ物」を 1つ返す★ 写り込み（中身は ヘルプと 同じ）。
+   ここで まとめて 対象外に する（8個）。 */
+export const 対象外タブ = { 'Sheet1': 'UIAの写り込み＝Excelのタブでは ない（中身は ヘルプと 同じ）' };
+
+/* ★正本の 三つ組を 読む★（並びの元） */
+function 正本の三つ組() {
+  const txt = fs.readFileSync(path.join(ROOT, 'docs/excel-ribbon-flat.tsv'), 'utf8');
+  const NL = String.fromCharCode(10);
+  const 行 = Array.from(new Set(txt.split(NL).map((l) => l.replace(String.fromCharCode(13), '')).filter((l) => l.trim())));
+  return 行.map((l) => l.split(String.fromCharCode(9))).filter((c) => c.length >= 3);
+}
+/* ── ★結び先が 本当に 在るか★（動作の層に その名前が 在るか）── */
+const ACT = require_(path.join(ROOT, 'lib/ribbon-actions.js'));
+const 無い = [];
+for (const k of Object.keys(結び)) if (typeof ACT[結び[k].act] !== 'function') 無い.push(k + ' → ' + 結び[k].act);
+if (無い.length) {
+  console.error('★動作の層に その働きが 無い★（★無い物は 結ばない★）:');
+  for (const x of 無い) console.error('   ' + x);
+  process.exit(1);
+}
+/* ── 差し込む ─────────────────────────────────────── */
+let spec = fs.readFileSync(SPEC, 'utf8');
+const q = (s) => "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+let 差した = 0, 見つからない = [];
+for (const k of Object.keys(結び)) {
+  const [t, g, p] = k.split('|');
+  const 印 = '{ t: ' + q(t) + ', g: ' + q(g) + ', p: ' + q(p) + ', ';
+  const i = spec.indexOf(印);
+  if (i < 0) { 見つからない.push(k); continue; }
+  const j = spec.indexOf(' },', i);
+  const a = 結び[k];
+  const 中 = 'a: { act: ' + q(a.act) + (a.icon ? ', icon: ' + q(a.icon) : '') + ' }';
+  spec = spec.slice(0, i + 印.length) + 中 + spec.slice(j);
+  差した++;
+}
+if (見つからない.length) {
+  console.error('★並びの中に 見つからない★（正本と 字が 違う）:');
+  for (const x of 見つからない) console.error('   ' + x);
+  process.exit(1);
+}
+if (!process.argv.includes('--check')) fs.writeFileSync(SPEC, spec, 'utf8');
+const 全 = (spec.match(/\{ t: '/g) || []).length;
+/* ★対象外を 数える（理由が 書いてある物だけ）★ */
+const 三 = 正本の三つ組();
+let 外 = 0;
+for (const [t, g, p] of 三) {
+  if (対象外タブ[t] || 対象外[t + '|' + g + '|' + p]) 外++;
+}
+const 相手 = 全 - 外;
+console.log('[ribbon-bind]');
+console.log('  Excelの部品 … ' + 全 + '個');
+console.log('  ★対象外 … ' + 外 + '個★（理由を 書いた物だけ）');
+console.log('  ★うちが 作る相手 … ' + 相手 + '個★');
+console.log('  ★結んだ … ' + 差した + ' / ' + 相手 + '（' + (差した / 相手 * 100).toFixed(1) + '%）★'
+  + (process.argv.includes('--check') ? '  ※--check＝書き込んでいない' : ''));
