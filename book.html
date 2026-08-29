@@ -1304,63 +1304,64 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=5330f6a9"></script>
+<script src="hyperformula.full.min.js?v=06b75940"></script>
 
-<script src="exally-formula.js?v=5330f6a9"></script>
+<script src="exally-formula.js?v=06b75940"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=5330f6a9"></script>
+<script src="js/file-out.js?v=06b75940"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=5330f6a9"></script>
-<script src="lib/grid-xlsx.js?v=5330f6a9"></script>
+<script src="lib/typed-value.js?v=06b75940"></script>
+<script src="lib/grid-xlsx.js?v=06b75940"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=5330f6a9"></script>
-<script src="lib/autosum.js?v=5330f6a9"></script>
-<script src="lib/grid-sort.js?v=5330f6a9"></script>
-<script src="lib/grid-filter.js?v=5330f6a9"></script>
-<script src="lib/grid-find.js?v=5330f6a9"></script>
-<script src="lib/grid-print.js?v=5330f6a9"></script>
-<script src="lib/ai-reason.js?v=5330f6a9"></script>
-<script src="lib/menu-place.js?v=5330f6a9"></script>
-<script src="lib/grid-stats.js?v=5330f6a9"></script>
-<script src="lib/grid-valid.js?v=5330f6a9"></script>
-<script src="lib/cond-format.js?v=5330f6a9"></script>
-<script src="lib/ref-graph.js?v=5330f6a9"></script>
-<script src="lib/shindan.js?v=5330f6a9"></script>
+  <script src="lib/grid-refedit.js?v=06b75940"></script>
+<script src="lib/autosum.js?v=06b75940"></script>
+<script src="lib/grid-sort.js?v=06b75940"></script>
+<script src="lib/grid-filter.js?v=06b75940"></script>
+<script src="lib/grid-find.js?v=06b75940"></script>
+<script src="lib/grid-print.js?v=06b75940"></script>
+<script src="lib/ai-reason.js?v=06b75940"></script>
+<script src="lib/menu-place.js?v=06b75940"></script>
+<script src="lib/grid-stats.js?v=06b75940"></script>
+<script src="lib/grid-valid.js?v=06b75940"></script>
+<script src="lib/cond-format.js?v=06b75940"></script>
+<script src="lib/ref-graph.js?v=06b75940"></script>
+<script src="lib/shindan.js?v=06b75940"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=5330f6a9"></script>
-<script src="lib/vba-mikata.js?v=5330f6a9"></script>
-<script src="lib/vba-tejun.js?v=5330f6a9"></script>
-<script src="lib/rireki.js?v=5330f6a9"></script>
-<script src="lib/chizu.js?v=5330f6a9"></script>
-<script src="lib/horu.js?v=5330f6a9"></script>
-<script src="lib/excel-version.js?v=5330f6a9"></script>
-<script src="lib/teian.js?v=5330f6a9"></script>
-<script src="lib/kikan.js?v=5330f6a9"></script>
-<script src="lib/recipe.js?v=5330f6a9"></script>
-<script src="lib/kirikae.js?v=5330f6a9"></script>
-<script src="js/recipe-store.js?v=5330f6a9"></script>
-<script src="js/rireki-store.js?v=5330f6a9"></script>
-<script src="lib/excel-version.js?v=5330f6a9"></script>
+<script src="lib/vba.js?v=06b75940"></script>
+<script src="lib/vba-mikata.js?v=06b75940"></script>
+<script src="lib/vba-tejun.js?v=06b75940"></script>
+<script src="lib/rireki.js?v=06b75940"></script>
+<script src="lib/chizu.js?v=06b75940"></script>
+<script src="lib/horu.js?v=06b75940"></script>
+<script src="lib/excel-version.js?v=06b75940"></script>
+<script src="lib/teian.js?v=06b75940"></script>
+<script src="lib/kikan.js?v=06b75940"></script>
+<script src="lib/recipe.js?v=06b75940"></script>
+<script src="lib/kirikae.js?v=06b75940"></script>
+<script src="js/recipe-store.js?v=06b75940"></script>
+<script src="js/rireki-store.js?v=06b75940"></script>
+<script src="lib/excel-version.js?v=06b75940"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=5330f6a9">
-<script src="lib/named-ranges.js?v=5330f6a9"></script>
-<script src="lib/cell-styles.js?v=5330f6a9"></script>
-<script src="lib/chart.js?v=5330f6a9"></script>
-<script src="lib/sparkline.js?v=5330f6a9"></script>
-<script src="lib/ribbon-spec.js?v=5330f6a9"></script>
-<script src="lib/ribbon-actions.js?v=5330f6a9"></script>
-<script src="lib/ribbon.js?v=5330f6a9"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=06b75940">
+<script src="lib/named-ranges.js?v=06b75940"></script>
+<script src="lib/cell-styles.js?v=06b75940"></script>
+<script src="lib/chart.js?v=06b75940"></script>
+<script src="lib/sparkline.js?v=06b75940"></script>
+<script src="lib/table.js?v=06b75940"></script>
+<script src="lib/ribbon-spec.js?v=06b75940"></script>
+<script src="lib/ribbon-actions.js?v=06b75940"></script>
+<script src="lib/ribbon.js?v=06b75940"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=5330f6a9"></script>
-<script src="js/exally-login.js?v=5330f6a9"></script>
-<script src="js/auth.js?v=5330f6a9"></script>
+<script src="js/supa-config.js?v=06b75940"></script>
+<script src="js/exally-login.js?v=06b75940"></script>
+<script src="js/auth.js?v=06b75940"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1619,7 +1620,9 @@ function sortRange(dir){
      ・★合計は 絞っても変わらない★（SUM=15 のまま。隠れた行も足す）
      ・★フィルターで隠れた行と 手で隠した行は 別物★（SUBTOTAL(9) の効き方が違う）
        ⇒ うちも sheet.filterHidden と sheet.hiddenRows を ★分けて持つ★
-   ★作っていない物★ 色・フォント色・アイコンでの絞り込み／再適用／見出しの▼ボタン */
+   ★2026-08-30★ ★見出しの▼ボタンは 作った★（テーブルの 見出しに 出す。実測 ShowAutoFilter=True）
+     ⇒ ▼から 昇順/降順 と ★値に ✓ を 付けて 絞る★（GridFilter.byValues）
+   ★まだ 作っていない物★ 色・フォント色・アイコンでの絞り込み／再適用 */
 function _表の範囲(){
   var data = sheets[activeSheet].data;
   if(selR1!==selR2 || selC1!==selC2) return { r1:selR1, c1:selC1, r2:selR2, c2:selC2 };
@@ -2727,13 +2730,17 @@ function _renderPass() {
   for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++){
     var cell=getCell(r,c);
     var cf=cfFormatAt(r,c,cell);
-    var 塗り=(cf&&cf.塗り)||cell.bgColor;
+    /* ★テーブルの 帯★（手の 塗りと 条件付き書式が 勝つ＝上書きしない） */
+    var 塗り=(cf&&cf.塗り)||cell.bgColor||表の塗り(r,c);
     if(!塗り) continue;
     var cx=colX(c),cy=rowY(r),cw=cW(c),ch=rH(r);
     if(cx+cw<HDR_W||cx>wrapW||cy+ch<HDR_H||cy>wrapH) continue;
     ctx.fillStyle=塗り;
     ctx.fillRect(cx,cy,cw,ch);
   }
+
+  // 2.5 ★テーブルの 見出しの ▼★（実測 ShowAutoFilter=True）
+  見出しの印を描く(sR, eR, sC, eC);
 
   // 3. 選択セル背景（半透明: bgColorが透けて見える） ※autoMainReset時はスキップ
   ctx.fillStyle='rgba(30,136,229,0.18)';
@@ -3019,13 +3026,22 @@ function drawText(r,c){
   var isFormula = cell.f && cell.f[0]==='=';
   var showRaw = isFormula && cell.d===cell.f;
   ctx.fillStyle = showRaw ? C_FORMULA : ((_cf&&_cf.文字色) || cell.color || C_CELL_TXT);
+  /* ★テーブルの 見出しは 白い字★（濃い 緑の 上に 出す＝読めなく しない） */
+  if(表の見出しか(r,c)){
+    ctx.fillStyle = Table.色.見出しの字;
+    ctx.font = style+' bold '+fontSize+'px "Noto Sans JP",sans-serif';
+  }
 
   // 文字揃え
   var align = cell.align||'left';
 
   ctx.textBaseline='middle';
   ctx.save();
-  ctx.rect(x+1,y,w-2,h); ctx.clip();
+  /* ★テーブルの 見出しは ▼ の 分だけ 字の場所を 狭める★
+     （2026-08-30 実ブラウザで 「売上」の 字に ▼ が 重なって 読めなかった）
+     ★DOMに 在る≠読める★ */
+  var _印の幅 = 表の見出しか(r,c) ? (見出しの印の場所(x,y,w,h).w + 6) : 0;
+  ctx.rect(x+1,y,Math.max(1,w-2-_印の幅),h); ctx.clip();
 
   var tx;
   var indentPx = (cell.indent||0) * 12;
@@ -4152,6 +4168,73 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★スパークライン（挿入→スパークライン）★ 2026-08-30
      実Excel実測＝飾りは 何も 出さない／勝敗だけ マイナスを 別に 出す／
      縦軸は スパークラインごと／空は 隙間 -->
+<!-- ★テーブル（挿入→テーブル / Ctrl+T）★ 2026-08-30
+     実Excel実測＝名前は テーブル1／見出し行あり／自動フィルタあり／しま（行）あり／集計行なし -->
+<!-- ★見出しの ▼（自動フィルタ）★ 2026-08-30
+     実Excel実測＝テーブルは ShowAutoFilter=True（見出しに ▼ が 出る） -->
+<div id="headFilterOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;max-height:82vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:15px;font-weight:700;color:#2E7D54;" id="hfTitle">列</div>
+    </div>
+    <div style="padding:10px 18px 0;display:flex;gap:8px;">
+      <button onclick="見出しから並べ替え('asc')" style="flex:1;min-height:44px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">昇順</button>
+      <button onclick="見出しから並べ替え('desc')" style="flex:1;min-height:44px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">降順</button>
+    </div>
+    <div style="padding:10px 18px 4px;font-size:12px;color:#7A9A87;">
+      見せる 物に ✓ を 付けます（★行は 消えません。隠れるだけ★）
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="見出しの絞りを全部(true)" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">すべて</button>
+      <button onclick="見出しの絞りを全部(false)" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">なし</button>
+    </div>
+    <div id="hfList" style="padding:8px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;min-height:60px;"></div>
+    <div id="hfWhy" style="padding:0 18px;font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="見出しの絞りを戻す()" style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">絞りを 戻す</button>
+      <button onclick="見出しの絞りを閉じる()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="見出しの絞りを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">絞る</button>
+    </div>
+  </div>
+</div>
+<div id="tableOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">テーブル</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">選んだ 所を 表に します</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">範囲</span>
+        <input id="tblRange" type="text" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">名前</span>
+        <input id="tblName" type="text" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
+        <input type="checkbox" id="tblHeader" style="width:20px;height:20px;">
+        <span>先頭行を 見出しに する</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
+        <input type="checkbox" id="tblTotals" style="width:20px;height:20px;">
+        <span>集計行を 出す（★一番 右の列だけ 合計＝実Excelと 同じ★）</span>
+      </label>
+      <div id="tblWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★実Excelを 測って 合わせています★＝名前は テーブル1／見出し行あり／
+        しま（1つおきの帯）あり／★見出しの ▼ から 並べ替えと 絞り込み★が 出来ます。<br>
+        ★違う所★＝集計の 式を 実Excel は「[列名]」で 書きます。
+        うちの 計算は まだ それを 読めないので ★A1の 形★で 書きます（出る数は 同じ）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button id="tblDel" onclick="表をやめる()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">表を やめる</button>
+      <button onclick="表の窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="表を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">作る</button>
+    </div>
+  </div>
+</div>
 <div id="sparkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6131,6 +6214,10 @@ function onMD(e){
   }
   var c=xToC(p.x),r=yToR(p.y);
 
+  /* ★テーブルの 見出しの ▼ を 押したら 絞りの 窓★（実測 ShowAutoFilter=True） */
+  var 押した表 = 見出しの印を押したか(r, c, p.x, p.y);
+  if(押した表){ sel(r,c,r,c); 見出しの絞りを開く(押した表, c); return; }
+
   // STEP3: 複数選択モード ON 時の挙動（PC・スマホ共通）
   if(multiSelectMode && !e.shiftKey){
     // selRanges内のセルタップ → その range を削除（即確定）
@@ -6570,6 +6657,8 @@ function onKD(e){
     if(ek==='b'){ e.preventDefault(); toggleFormat('bold'); return; }
     if(ek==='i'){ e.preventDefault(); toggleFormat('italic'); return; }
     if(ek==='u'){ e.preventDefault(); toggleFormat('underline'); return; }
+    /* ★Ctrl+T＝テーブルに する（実Excelと 同じ）★ */
+    if(ek==='t'){ e.preventDefault(); 表の窓を開く(); return; }
     if(e.key==='1'){ e.preventDefault(); openFmtModal(); return; }
     if(ek==='f'){ e.preventDefault(); openFind(false); return; }
     if(ek==='h'){ e.preventDefault(); openFind(true); return; }
@@ -7797,6 +7886,305 @@ function スパークラインを描く(r, c, x, y, w, h){
   return Sparkline.描く(ctx, Sparkline.値にする(並び), 決め.種類, x, y, w, h);
 }
 
+/* ★テーブル（挿入→テーブル ／ Ctrl+T）★ 2026-08-30
+ *   真値は lib/table.js の 見出しに 実測どおり 書いた。
+ *   ★alert / prompt / confirm は 使わない★ */
+/* ★見出しの ▼（自動フィルタ）★ 2026-08-30
+ *   実Excel実測＝テーブルは ShowAutoFilter=True。前は ★作っていない物★ と 書いていた。
+ *   ★行は 消えない。隠れるだけ★（絞りは sheet.filterHidden・手で隠したのとは 別物） */
+var _絞る列 = null, _絞る表 = null;
+
+/* 見出しの セルの 右はしに 出す ▼ の 場所（押した所の あたり判定と 描く所で 同じ物を 使う） */
+function 見出しの印の場所(x, y, w, h){
+  var 大きさ = Math.min(14, Math.max(9, h - 6));
+  return { x: x + w - 大きさ - 3, y: y + (h - 大きさ) / 2, w: 大きさ, h: 大きさ };
+}
+function 見出しの印を描く(sR, eR, sC, eC){
+  var t = sheets[activeSheet].tables;
+  if (!t || !t.length) return;
+  for (var i = 0; i < t.length; i++) {
+    var tb = t[i];
+    if (!tb.見出し行) continue;
+    if (tb.r1 < sR - 1 || tb.r1 > eR + 1) continue;
+    for (var c = Math.max(tb.c1, sC); c <= Math.min(tb.c2, eC + 1); c++) {
+      var x = colX(c), y = rowY(tb.r1), w = cW(c), h = rH(tb.r1);
+      if (w <= 8 || h <= 6) continue;
+      if (x + w < HDR_W || x > wrapW || y + h < HDR_H || y > wrapH) continue;
+      var b = 見出しの印の場所(x, y, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.fillStyle = Table.色.見出し;
+      ctx.beginPath();
+      ctx.moveTo(b.x + b.w * 0.22, b.y + b.h * 0.38);
+      ctx.lineTo(b.x + b.w * 0.78, b.y + b.h * 0.38);
+      ctx.lineTo(b.x + b.w * 0.50, b.y + b.h * 0.70);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+/* 押した所が ▼ か（表の 見出しの 右はし） */
+function 見出しの印を押したか(r, c, px, py){
+  var t = sheets[activeSheet].tables;
+  if (!t) return null;
+  for (var i = 0; i < t.length; i++) {
+    var tb = t[i];
+    if (!tb.見出し行 || r !== tb.r1 || c < tb.c1 || c > tb.c2) continue;
+    var b = 見出しの印の場所(colX(c), rowY(r), cW(c), rH(r));
+    if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) return tb;
+  }
+  return null;
+}
+function 見出しの絞りを開く(表, c){
+  hideCtxMenu();
+  var ov = document.getElementById('headFilterOverlay');
+  if (!ov) return 0;
+  _絞る表 = 表; _絞る列 = c;
+  var 名 = 表.列名 ? 表.列名[c - 表.c1] : cellAddr(表.r1, c);
+  document.getElementById('hfTitle').textContent = '「' + 名 + '」で 絞る';
+  var data = sheets[activeSheet].data;
+  var get = function (r, cc) { return data[r + ',' + cc]; };
+  var rng = { r1: 表.r1, c1: 表.c1, r2: 表.集計行 ? 表.r2 - 1 : 表.r2, c2: 表.c2 };
+  var 値たち = GridFilter.values(get, rng, !!表.見出し行, c);
+  var 隠れ = sheets[activeSheet].filterHidden || {};
+  var 出ている = {};
+  for (var r = rng.r1 + (表.見出し行 ? 1 : 0); r <= rng.r2; r++) {
+    if (!隠れ[r]) 出ている[GridFilter.text(get(r, c))] = true;
+  }
+  var 何も隠れていない = Object.keys(隠れ).length === 0;
+  var h = '';
+  for (var i = 0; i < 値たち.length; i++) {
+    var v = 値たち[i];
+    var 見せ = v === '' ? '（空）' : v;
+    var 印 = (何も隠れていない || 出ている[v]) ? ' checked' : '';
+    h += '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;">'
+      + '<input type="checkbox" class="hf-v" data-v="' + String(v).replace(/"/g, '&quot;') + '"'
+      + 印 + ' style="width:18px;height:18px;">'
+      + '<span>' + 見せ.replace(/</g, '&lt;') + '</span></label>';
+  }
+  document.getElementById('hfList').innerHTML = h || '<div style="color:#7A9A87;">中身が ありません</div>';
+  document.getElementById('hfWhy').textContent = '';
+  ov.style.display = 'flex';
+  return 1;
+}
+function 見出しの絞りを閉じる(){
+  var ov = document.getElementById('headFilterOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 見出しの絞りを全部(つける){
+  var 箱 = document.querySelectorAll('#hfList .hf-v');
+  for (var i = 0; i < 箱.length; i++) 箱[i].checked = !!つける;
+  return 箱.length;
+}
+function 見出しの絞りを決める(){
+  if (!_絞る表) return 0;
+  var 残す = {}, 数 = 0;
+  var 箱 = document.querySelectorAll('#hfList .hf-v');
+  for (var i = 0; i < 箱.length; i++) if (箱[i].checked) { 残す[箱[i].getAttribute('data-v')] = true; 数++; }
+  if (!数) { document.getElementById('hfWhy').textContent = '★1つも ✓ が ありません★（全部 消えてしまいます）'; return 0; }
+  var sh = sheets[activeSheet], data = sh.data;
+  var get = function (r, cc) { return data[r + ',' + cc]; };
+  var rng = { r1: _絞る表.r1, c1: _絞る表.c1, r2: _絞る表.集計行 ? _絞る表.r2 - 1 : _絞る表.r2, c2: _絞る表.c2 };
+  var res = GridFilter.byValues(get, rng, !!_絞る表.見出し行, _絞る列, 残す);
+  sh.filterHidden = {};
+  for (var j = 0; j < res.hide.length; j++) sh.filterHidden[res.hide[j]] = true;
+  var ctl = document.getElementById('ctx-clear-filter'); if (ctl) ctl.style.display = '';
+  見出しの絞りを閉じる();
+  render();
+  showToast(res.keep.length + '行だけ 見せています（' + res.hide.length
+    + '行を 隠しました。<b>消していません・合計も 変わりません</b>）');
+  return 1;
+}
+function 見出しの絞りを戻す(){
+  見出しの絞りを閉じる();
+  clearFilter();
+  return 1;
+}
+function 見出しから並べ替え(dir){
+  if (!_絞る表) return 0;
+  var 先頭 = _絞る表.r1 + (_絞る表.見出し行 ? 1 : 0);
+  見出しの絞りを閉じる();
+  sel(先頭, _絞る列, _絞る表.集計行 ? _絞る表.r2 - 1 : _絞る表.r2, _絞る列);
+  sortRange(dir);                      /* ★並べ替えの 正本は 1つ（同じ物を 2つ 持たない）★ */
+  return 1;
+}
+
+function 表の箱(){
+  var s = sheets[activeSheet];
+  if (!s.tables) s.tables = [];
+  return s.tables;
+}
+function 今いる表(){
+  var t = 表の箱();
+  for (var i = 0; i < t.length; i++) {
+    if (selR1 >= t[i].r1 && selR1 <= t[i].r2 && selC1 >= t[i].c1 && selC1 <= t[i].c2) return t[i];
+  }
+  return null;
+}
+function 表の窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('tableOverlay');
+  if (!ov) return;
+  var 今 = 今いる表();
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  if (今) { r1 = 今.r1; r2 = 今.r2; c1 = 今.c1; c2 = 今.c2; }
+  else if (r1 === r2 && c1 === c2) {
+    /* ★1マスしか 選んでいない時は まわりを 見て 当てる★（実Excelも 同じ） */
+    var 塊 = 表のまわりを当てる(r1, c1);
+    r1 = 塊.r1; c1 = 塊.c1; r2 = 塊.r2; c2 = 塊.c2;
+  }
+  document.getElementById('tblRange').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  document.getElementById('tblName').value = 今 ? 今.名 :
+    Table.名前を決める(表の箱().map(function (t) { return t.名; }));
+  var 一行目 = [];
+  for (var c = c1; c <= c2; c++) {
+    var cell = sheets[activeSheet].data[r1 + ',' + c];
+    一行目.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+  }
+  document.getElementById('tblHeader').checked = 今 ? !!今.見出し行 : Table.見出しか(一行目);
+  document.getElementById('tblTotals').checked = 今 ? !!今.集計行 : false;
+  document.getElementById('tblWhy').textContent = '';
+  document.getElementById('tblDel').style.display = 今 ? '' : 'none';
+  ov.style.display = 'flex';
+}
+/* まわりの 中身の 塊を 取る（上下左右に 中身が 続く 間だけ 広げる） */
+function 表のまわりを当てる(r, c){
+  var 中身か = function (rr, cc) {
+    var cell = sheets[activeSheet].data[rr + ',' + cc];
+    if (!cell) return false;
+    var v = (cell.d !== undefined && cell.d !== '') ? cell.d : cell.v;
+    return v !== undefined && v !== null && v !== '';
+  };
+  if (!中身か(r, c)) return { r1: r, c1: c, r2: r, c2: c };
+  var r1 = r, r2 = r, c1 = c, c2 = c;
+  while (r1 > 0 && 中身か(r1 - 1, c)) r1--;
+  while (r2 < ROWS - 1 && 中身か(r2 + 1, c)) r2++;
+  while (c1 > 0 && 中身か(r, c1 - 1)) c1--;
+  while (c2 < COLS - 1 && 中身か(r, c2 + 1)) c2++;
+  /* 角の 行/列も 見て 広げる（1行目が 見出しの 形に 多い） */
+  var のびた = true;
+  while (のびた) {
+    のびた = false;
+    for (var cc = c1; cc <= c2; cc++) {
+      if (r1 > 0 && 中身か(r1 - 1, cc)) { r1--; のびた = true; break; }
+      if (r2 < ROWS - 1 && 中身か(r2 + 1, cc)) { r2++; のびた = true; break; }
+    }
+    for (var rr = r1; rr <= r2; rr++) {
+      if (c1 > 0 && 中身か(rr, c1 - 1)) { c1--; のびた = true; break; }
+      if (c2 < COLS - 1 && 中身か(rr, c2 + 1)) { c2++; のびた = true; break; }
+    }
+  }
+  return { r1: r1, c1: c1, r2: r2, c2: c2 };
+}
+function 表の窓を閉じる(){
+  var ov = document.getElementById('tableOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 表の範囲を読む(字){
+  var m = String(字 || '').toUpperCase().replace(/\s/g, '').match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
+  if (!m) return null;
+  var a = addrToRC(m[1]), b = addrToRC(m[2]);
+  if (!a || !b) return null;
+  return { r1: Math.min(a.r, b.r), c1: Math.min(a.c, b.c), r2: Math.max(a.r, b.r), c2: Math.max(a.c, b.c) };
+}
+function 表を決める(){
+  var 欄 = document.getElementById('tblWhy');
+  var 場所 = 表の範囲を読む(document.getElementById('tblRange').value);
+  if (!場所) { 欄.textContent = '範囲は A1:C4 の 形で 入れてください'; return 0; }
+  var 名 = String(document.getElementById('tblName').value || '').trim();
+  if (!名) { 欄.textContent = '名前を 入れてください'; return 0; }
+  var 見出し行 = document.getElementById('tblHeader').checked;
+  var 集計行 = document.getElementById('tblTotals').checked;
+  var 今 = 今いる表();
+  var ほか = 表の箱().filter(function (t) { return t !== 今; });
+  if (ほか.some(function (t) { return t.名 === 名; })) {
+    欄.textContent = '★その 名前は もう 使われています★'; return 0;
+  }
+  var ぶつかる = Table.重なる(ほか, 場所.r1, 場所.c1, 場所.r2, 場所.c2);
+  if (ぶつかる) { 欄.textContent = '★「' + ぶつかる.名 + '」と 重なっています★'; return 0; }
+
+  /* ★見出しが 無いなら 見出し行を 1行 足す（実測②）★ */
+  var r1 = 場所.r1, r2 = 場所.r2;
+  var 列名;
+  if (!見出し行) {
+    列名 = Table.列名を作る(null, 場所.c2 - 場所.c1 + 1, false);
+    if (!今) {
+      var 前R1 = selR1, 前R2 = selR2, 前C1 = selC1, 前C2 = selC2;
+      selR1 = selR2 = r1;
+      ctxInsertRow();                    /* ★1行 足す（行ごと 下へ ずらす＝実測②と 同じ）★ */
+      selR1 = 前R1; selR2 = 前R2; selC1 = 前C1; selC2 = 前C2;
+      r2 = r2 + 1;
+      for (var i = 0; i < 列名.length; i++) setCell(r1, 場所.c1 + i, 列名[i], true);
+    }
+    見出し行 = true;
+  } else {
+    var 一行目 = [];
+    for (var c = 場所.c1; c <= 場所.c2; c++) {
+      var cell = sheets[activeSheet].data[r1 + ',' + c];
+      一行目.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+    }
+    列名 = Table.列名を作る(一行目, 場所.c2 - 場所.c1 + 1, true);
+  }
+
+  var 表 = 今 || {};
+  表.名 = 名; 表.r1 = r1; 表.c1 = 場所.c1; 表.r2 = r2; 表.c2 = 場所.c2;
+  表.見出し行 = 見出し行; 表.列名 = 列名; 表.集計行 = false;
+  if (!今) 表の箱().push(表);
+  if (集計行) 集計行を出す(表); else 集計行をしまう(表);
+  表の窓を閉じる();
+  render(); updateBar();
+  notify('「' + 名 + '」を 作りました');
+  return 1;
+}
+/* ★集計行★＝実測どおり 左端は '集計'・★一番 右の列だけ★ SUBTOTAL(109,…)・間は 空 */
+function 集計行を出す(表){
+  if (表.集計行) return 0;
+  var 行 = 表.r2 + 1;
+  var 中身の上 = 表.r1 + (表.見出し行 ? 1 : 0);
+  var 右端 = cellAddr(中身の上, 表.c2) + ':' + cellAddr(表.r2, 表.c2);
+  var 並び = Table.集計行の中身(表.c2 - 表.c1 + 1, 右端);
+  for (var i = 0; i < 並び.length; i++) if (並び[i] !== '') setCell(行, 表.c1 + i, 並び[i], true);
+  表.r2 = 行; 表.集計行 = true;
+  return 1;
+}
+function 集計行をしまう(表){
+  if (!表.集計行) return 0;
+  for (var c = 表.c1; c <= 表.c2; c++) delete sheets[activeSheet].data[表.r2 + ',' + c];
+  表.r2 = 表.r2 - 1; 表.集計行 = false;
+  return 1;
+}
+function 表をやめる(){
+  var 今 = 今いる表();
+  if (!今) { 表の窓を閉じる(); return 0; }
+  var t = 表の箱();
+  t.splice(t.indexOf(今), 1);
+  表の窓を閉じる();
+  render();
+  notify('表を やめました（中身は 残ります）');
+  return 1;
+}
+/* 画面に 描く（塗りの 所から 呼ぶ） */
+function 表の塗り(r, c){
+  var t = sheets[activeSheet].tables;
+  if (!t || !t.length) return null;
+  for (var i = 0; i < t.length; i++) {
+    var どこ = Table.どこか(t[i], r, c);
+    if (!どこ) continue;
+    if (どこ === '見出し') return Table.色.見出し;
+    if (どこ === '集計') return Table.色.しま;
+    var 何行目 = r - t[i].r1 - (t[i].見出し行 ? 1 : 0);
+    return Table.しまか(何行目) ? Table.色.しま : null;
+  }
+  return null;
+}
+function 表の見出しか(r, c){
+  var t = sheets[activeSheet].tables;
+  if (!t) return false;
+  for (var i = 0; i < t.length; i++) if (Table.どこか(t[i], r, c) === '見出し') return true;
+  return false;
+}
+
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
@@ -7812,20 +8200,55 @@ function _pushRowColUndo(){
 }
 /* ★行や列を 入れたり消したりした時、入力の決まりも 一緒に動かす★
    動かさないと 決まりが 別の行に付いたまま残る＝★黙って嘘をつく★ */
+/* ★行・列を 足したり 消したりした時に 一緒に 動かす 棚★（2026-08-30）
+   ここに 名前を 書き忘れると ★その棚だけ 元の場所に 置いていかれる★
+   ＝付箋が 別の行に 付く／リンクが 別のセルを 指す、という ★黙って ずれる★事故に なる。
+   ★新しく セルごとの 棚を 増やしたら ここにも 足す★（見張り: tests/shift-keeps-everything.test.mjs） */
+var セルごとの棚 = ['validations', 'links', 'sparklines', 'comments'];
+
 function _moveValidations(s, 縦, 入れる){
-  var v = s.validations; if(!v) return;
   var 上 　= 縦 ? selR1 : selC1;
   var 下 　= 縦 ? selR2 : selC2;
   var 幅 　= 下 - 上 + 1;
-  var out = {};
-  Object.keys(v).forEach(function(k){
-    var p = k.split(','), r = parseInt(p[0]), c = parseInt(p[1]);
-    var n = 縦 ? r : c;
-    if(入れる){ if(n >= 上) n += 1; }
-    else { if(n >= 上 && n <= 下) return; if(n > 下) n -= 幅; }
-    out[(縦 ? n : r) + ',' + (縦 ? c : n)] = v[k];
-  });
-  s.validations = out;
+  for (var i = 0; i < セルごとの棚.length; i++) {
+    var 名 = セルごとの棚[i];
+    var v = s[名];
+    if (!v) continue;
+    var out = {};
+    Object.keys(v).forEach(function(k){
+      var p = k.split(','), r = parseInt(p[0]), c = parseInt(p[1]);
+      if (isNaN(r) || isNaN(c)) { out[k] = v[k]; return; }   /* 番地でない鍵は そのまま */
+      var n = 縦 ? r : c;
+      if(入れる){ if(n >= 上) n += 1; }
+      else { if(n >= 上 && n <= 下) return; if(n > 下) n -= 幅; }
+      out[(縦 ? n : r) + ',' + (縦 ? c : n)] = v[k];
+    });
+    s[名] = out;
+  }
+  _表を動かす(s, 縦, 入れる, 上, 下);
+}
+
+/* ★テーブルは 四角なので 別に 動かす★（消した所に すっぽり 入っていたら 表ごと 消す） */
+function _表を動かす(s, 縦, 入れる, 上, 下){
+  if (!s.tables || !s.tables.length) return;
+  var 幅 = 下 - 上 + 1;
+  var 残り = [];
+  for (var i = 0; i < s.tables.length; i++) {
+    var t = s.tables[i];
+    var a = 縦 ? t.r1 : t.c1, b = 縦 ? t.r2 : t.c2;
+    if (入れる) {
+      if (a >= 上) a += 1;
+      if (b >= 上) b += 1;
+    } else {
+      if (a >= 上 && b <= 下) continue;                 /* ★丸ごと 消えた＝表も 消す★ */
+      if (a > 下) a -= 幅; else if (a >= 上) a = 上;
+      if (b > 下) b -= 幅; else if (b >= 上) b = 上 - 1;
+      if (b < a) continue;
+    }
+    if (縦) { t.r1 = a; t.r2 = b; } else { t.c1 = a; t.c2 = b; }
+    残り.push(t);
+  }
+  s.tables = 残り;
 }
 function ctxInsertRow(){
   _pushRowColUndo();
