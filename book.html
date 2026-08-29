@@ -1298,61 +1298,61 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=46cc356d"></script>
+<script src="hyperformula.full.min.js?v=05b17054"></script>
 
-<script src="exally-formula.js?v=46cc356d"></script>
+<script src="exally-formula.js?v=05b17054"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=46cc356d"></script>
+<script src="js/file-out.js?v=05b17054"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=46cc356d"></script>
-<script src="lib/grid-xlsx.js?v=46cc356d"></script>
+<script src="lib/typed-value.js?v=05b17054"></script>
+<script src="lib/grid-xlsx.js?v=05b17054"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=46cc356d"></script>
-<script src="lib/autosum.js?v=46cc356d"></script>
-<script src="lib/grid-sort.js?v=46cc356d"></script>
-<script src="lib/grid-filter.js?v=46cc356d"></script>
-<script src="lib/grid-find.js?v=46cc356d"></script>
-<script src="lib/grid-print.js?v=46cc356d"></script>
-<script src="lib/ai-reason.js?v=46cc356d"></script>
-<script src="lib/menu-place.js?v=46cc356d"></script>
-<script src="lib/grid-stats.js?v=46cc356d"></script>
-<script src="lib/grid-valid.js?v=46cc356d"></script>
-<script src="lib/cond-format.js?v=46cc356d"></script>
-<script src="lib/ref-graph.js?v=46cc356d"></script>
-<script src="lib/shindan.js?v=46cc356d"></script>
+  <script src="lib/grid-refedit.js?v=05b17054"></script>
+<script src="lib/autosum.js?v=05b17054"></script>
+<script src="lib/grid-sort.js?v=05b17054"></script>
+<script src="lib/grid-filter.js?v=05b17054"></script>
+<script src="lib/grid-find.js?v=05b17054"></script>
+<script src="lib/grid-print.js?v=05b17054"></script>
+<script src="lib/ai-reason.js?v=05b17054"></script>
+<script src="lib/menu-place.js?v=05b17054"></script>
+<script src="lib/grid-stats.js?v=05b17054"></script>
+<script src="lib/grid-valid.js?v=05b17054"></script>
+<script src="lib/cond-format.js?v=05b17054"></script>
+<script src="lib/ref-graph.js?v=05b17054"></script>
+<script src="lib/shindan.js?v=05b17054"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=46cc356d"></script>
-<script src="lib/vba-mikata.js?v=46cc356d"></script>
-<script src="lib/vba-tejun.js?v=46cc356d"></script>
-<script src="lib/rireki.js?v=46cc356d"></script>
-<script src="lib/chizu.js?v=46cc356d"></script>
-<script src="lib/horu.js?v=46cc356d"></script>
-<script src="lib/excel-version.js?v=46cc356d"></script>
-<script src="lib/teian.js?v=46cc356d"></script>
-<script src="lib/kikan.js?v=46cc356d"></script>
-<script src="lib/recipe.js?v=46cc356d"></script>
-<script src="lib/kirikae.js?v=46cc356d"></script>
-<script src="js/recipe-store.js?v=46cc356d"></script>
-<script src="js/rireki-store.js?v=46cc356d"></script>
-<script src="lib/excel-version.js?v=46cc356d"></script>
+<script src="lib/vba.js?v=05b17054"></script>
+<script src="lib/vba-mikata.js?v=05b17054"></script>
+<script src="lib/vba-tejun.js?v=05b17054"></script>
+<script src="lib/rireki.js?v=05b17054"></script>
+<script src="lib/chizu.js?v=05b17054"></script>
+<script src="lib/horu.js?v=05b17054"></script>
+<script src="lib/excel-version.js?v=05b17054"></script>
+<script src="lib/teian.js?v=05b17054"></script>
+<script src="lib/kikan.js?v=05b17054"></script>
+<script src="lib/recipe.js?v=05b17054"></script>
+<script src="lib/kirikae.js?v=05b17054"></script>
+<script src="js/recipe-store.js?v=05b17054"></script>
+<script src="js/rireki-store.js?v=05b17054"></script>
+<script src="lib/excel-version.js?v=05b17054"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=46cc356d">
-<script src="lib/named-ranges.js?v=46cc356d"></script>
-<script src="lib/chart.js?v=46cc356d"></script>
-<script src="lib/ribbon-spec.js?v=46cc356d"></script>
-<script src="lib/ribbon-actions.js?v=46cc356d"></script>
-<script src="lib/ribbon.js?v=46cc356d"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=05b17054">
+<script src="lib/named-ranges.js?v=05b17054"></script>
+<script src="lib/chart.js?v=05b17054"></script>
+<script src="lib/ribbon-spec.js?v=05b17054"></script>
+<script src="lib/ribbon-actions.js?v=05b17054"></script>
+<script src="lib/ribbon.js?v=05b17054"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=46cc356d"></script>
-<script src="js/exally-login.js?v=46cc356d"></script>
-<script src="js/auth.js?v=46cc356d"></script>
+<script src="js/supa-config.js?v=05b17054"></script>
+<script src="js/exally-login.js?v=05b17054"></script>
+<script src="js/auth.js?v=05b17054"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4110,6 +4110,29 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★ページ設定★ 2026-08-29
      実Excel実測＝縦／A4／余白 上下19.1mm・左右17.8mm／★枠線も 見出しも 刷らない★
      alert / prompt / confirm は 使わない -->
+<!-- ★行の高さ／列の幅★ 2026-08-29
+     実Excel実測＝既定の 行の高さ 17.7pt／列の幅 8.44文字（54pt）
+     alert / prompt / confirm は 使わない -->
+<div id="sizeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div id="sizeTitle" style="font-size:16px;font-weight:700;color:#2E7D54;">大きさ</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="sizeWhere">1行目</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <input id="sizeValue" type="number" step="0.1" min="1" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span id="sizeUnit" style="color:#7A9A87;font-size:12px;">ポイント</span>
+      </div>
+      <div id="sizeWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="大きさの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="大きさを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
+
 <div id="pageOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -7057,6 +7080,149 @@ function 枠線の表示を切り替える(){
   notify('画面の 枠線 … ' + (枠線を出す ? '★出す★' : '消す'));
   return 枠線を出す;
 }
+/* ★セルの挿入／削除（1つだけ ずらす）★ 2026-08-29
+ *   ★真値（実Excel 16.0 で 実測）★
+ *     A1..A3 / B1..B3 が 在る所で A2 を「下へ ずらして 挿入」:
+ *        行1 A1 B1 ／ 行2 （空） B2 ／ 行3 A2 B3 ／ 行4 A3 （空）
+ *        ⇒ ★選んだ セルの 列だけ 動く。B列は 動かない★
+ *     A2 を「上へ ずらして 削除」:
+ *        行1 A1 B1 ／ 行2 A3 B2 ／ 行3 （空） B3
+ *   ⇒ 行や列を まるごと 動かす物とは 別（あちらは ctxInsertRow など）
+ */
+function セルを挿入(向き){
+  var s = sheets[activeSheet];
+  _pushRowColUndo();
+  var 下へ = (向き !== 'right');
+  var 数 = 0;
+  if (下へ) {
+    var 幅 = selC2 - selC1 + 1, 高 = selR2 - selR1 + 1;
+    for (var c = selC1; c <= selC2; c++) {
+      /* 下から 順に 動かす（上書きしない） */
+      for (var r = 100000; r >= selR1; r--) {
+        var 元 = s.data[r + ',' + c];
+        if (!元) continue;
+        delete s.data[r + ',' + c];
+        s.data[(r + 高) + ',' + c] = 元;
+        数++;
+      }
+      for (var r2 = selR1; r2 <= selR2; r2++) delete s.data[r2 + ',' + c];
+    }
+  } else {
+    var 幅2 = selC2 - selC1 + 1;
+    for (var r3 = selR1; r3 <= selR2; r3++) {
+      for (var c2 = 16000; c2 >= selC1; c2--) {
+        var 元2 = s.data[r3 + ',' + c2];
+        if (!元2) continue;
+        delete s.data[r3 + ',' + c2];
+        s.data[r3 + ',' + (c2 + 幅2)] = 元2;
+        数++;
+      }
+      for (var c3 = selC1; c3 <= selC2; c3++) delete s.data[r3 + ',' + c3];
+    }
+  }
+  render(); updateBar();
+  notify('セルを 入れました（' + (下へ ? '下' : '右') + 'へ ずらしました）');
+  return 数;
+}
+function セルを削除(向き){
+  var s = sheets[activeSheet];
+  _pushRowColUndo();
+  var 上へ = (向き !== 'left');
+  var 数 = 0;
+  if (上へ) {
+    var 高 = selR2 - selR1 + 1;
+    for (var c = selC1; c <= selC2; c++) {
+      for (var r = selR1; r <= selR2; r++) delete s.data[r + ',' + c];
+      for (var r2 = selR1 + 高; r2 <= 100000; r2++) {
+        var 元 = s.data[r2 + ',' + c];
+        if (!元) continue;
+        delete s.data[r2 + ',' + c];
+        s.data[(r2 - 高) + ',' + c] = 元;
+        数++;
+      }
+    }
+  } else {
+    var 幅 = selC2 - selC1 + 1;
+    for (var r3 = selR1; r3 <= selR2; r3++) {
+      for (var c2 = selC1; c2 <= selC2; c2++) delete s.data[r3 + ',' + c2];
+      for (var c3 = selC1 + 幅; c3 <= 16000; c3++) {
+        var 元2 = s.data[r3 + ',' + c3];
+        if (!元2) continue;
+        delete s.data[r3 + ',' + c3];
+        s.data[r3 + ',' + (c3 - 幅)] = 元2;
+        数++;
+      }
+    }
+  }
+  render(); updateBar();
+  notify('セルを 消しました（' + (上へ ? '上' : '左') + 'へ 詰めました）');
+  return 数;
+}
+function セルを下へ挿入(){ return セルを挿入('down'); }
+function セルを右へ挿入(){ return セルを挿入('right'); }
+function セルを上へ削除(){ return セルを削除('up'); }
+function セルを左へ削除(){ return セルを削除('left'); }
+
+/* ★行の高さ／列の幅★（ホーム→セル→書式）2026-08-29
+ *   ★真値（実Excel 16.0 で 実測）★
+ *     既定の フォント … 游ゴシック 11
+ *     ★既定の 行の高さ … 17.7 ポイント★
+ *     ★既定の 列の幅 … 8.44 文字（＝54 ポイント）★
+ *     「あいうえおかきくけこ」を 入れて 自動調整 … 19.06 文字
+ *   ⇒ うちは 画面の 点（px）で 持っているので ★ポイント→点は 1:1★ と し、
+ *      ★数字は 実Excelと 同じ 単位（ポイント／文字）で 見せる★。
+ *
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。
+ */
+function 行の高さを開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('sizeOverlay');
+  if (!ov) return;
+  window._大きさの種類 = 'row';
+  document.getElementById('sizeTitle').textContent = '行の高さ';
+  document.getElementById('sizeUnit').textContent = 'ポイント（既定 17.7）';
+  document.getElementById('sizeWhere').textContent = (selR1 + 1) + '行目'
+    + (selR1 !== selR2 ? '〜' + (selR2 + 1) + '行目' : '');
+  document.getElementById('sizeValue').value =
+    String(sheets[activeSheet].rowH && sheets[activeSheet].rowH[selR1] ? sheets[activeSheet].rowH[selR1] : ROW_H);
+  ov.style.display = 'flex';
+}
+function 列の幅を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('sizeOverlay');
+  if (!ov) return;
+  window._大きさの種類 = 'col';
+  document.getElementById('sizeTitle').textContent = '列の幅';
+  document.getElementById('sizeUnit').textContent = 'ポイント（既定 54）';
+  document.getElementById('sizeWhere').textContent = colLetter(selC1) + '列'
+    + (selC1 !== selC2 ? '〜' + colLetter(selC2) + '列' : '');
+  document.getElementById('sizeValue').value =
+    String(sheets[activeSheet].colW && sheets[activeSheet].colW[selC1] ? sheets[activeSheet].colW[selC1] : COL_W);
+  ov.style.display = 'flex';
+}
+function 大きさの窓を閉じる(){
+  var ov = document.getElementById('sizeOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 大きさを決める(){
+  var v = parseFloat(document.getElementById('sizeValue').value);
+  if (!(v > 0)) { document.getElementById('sizeWhy').textContent = '0より 大きい数を 入れてください'; return 0; }
+  if (v > 2000) { document.getElementById('sizeWhy').textContent = '大きすぎます（2000まで）'; return 0; }
+  var s = sheets[activeSheet];
+  var 数 = 0;
+  if (window._大きさの種類 === 'row') {
+    if (!s.rowH) s.rowH = {};
+    for (var r = selR1; r <= selR2; r++) { s.rowH[r] = v; 数++; }
+  } else {
+    if (!s.colW) s.colW = {};
+    for (var c = selC1; c <= selC2; c++) { s.colW[c] = v; 数++; }
+  }
+  大きさの窓を閉じる();
+  resize(); render(); updateBar();
+  notify(数 + (window._大きさの種類 === 'row' ? '行' : '列') + 'の 大きさを ' + v + ' に しました');
+  return 数;
+}
+
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
@@ -7956,6 +8122,72 @@ function toggleDecimal() {
   applyFormat('numFmt', newFmt);
 }
 
+/* ★小数の 桁を 増やす／減らす★（Excelの ボタンは 2つ）2026-08-29
+ *   前は toggleDecimal 1つで ★回るだけ★だった＝Excelと 違う。
+ *   ★上限は 30桁★＝実Excelは 書式として 31桁でも 受け付けるが、
+ *   Excelの 表示形式の 決まりは 小数30桁まで。★勝手に 6桁で 止めない★（測って 直した）。
+ *   ★下限は 0桁★。どちらも 端まで 来たら ★理由を 出して 止まる★（黙って 何も 起きない、を しない）。 */
+function _小数の桁(fmt){
+  /* ★点は 逃がす★＝逃がさないと 何の1文字でも 当たり、'#,##0' が 1桁に なる
+     （2026-08-29 見張りが 捕まえた。私の 書き込み時の 逃がし落ち） */
+  var m = String(fmt||'').match(/\.(0+)/);
+  return m ? m[1].length : 0;
+}
+function _桁で書式を作る(fmt, 桁){
+  var 区切り = /#,##0/.test(String(fmt||'')) || !fmt;
+  var 頭 = 区切り ? '#,##0' : '0';
+  return 桁 > 0 ? 頭 + '.' + new Array(桁+1).join('0') : 頭;
+}
+function 小数を増やす(){
+  var cell = getCell(selR1, selC1);
+  var 今 = _小数の桁(cell.numFmt);
+  if(今 >= 30){ notify('これ以上は 増やせません（小数 30桁まで）'); return 今; }
+  applyFormat('numFmt', _桁で書式を作る(cell.numFmt, 今+1));
+  return 今+1;
+}
+function 小数を減らす(){
+  var cell = getCell(selR1, selC1);
+  var 今 = _小数の桁(cell.numFmt);
+  if(今 <= 0){ notify('これ以上は 減らせません（0桁）'); return 0; }
+  applyFormat('numFmt', _桁で書式を作る(cell.numFmt, 今-1));
+  return 今-1;
+}
+
+/* ★書式のコピー／貼り付け★（Excelの 刷毛）2026-08-29
+ *   ★中身は 写さない。書式だけ★（実Excelと 同じ）。
+ *   1回 押すと 覚え、次に 選んだ所へ 貼る。 */
+var _写した書式 = null;
+function 書式をコピー(){
+  var cell = getCell(selR1, selC1);
+  _写した書式 = {};
+  for(var i=0;i<書式のキー.length;i++){
+    var k = 書式のキー[i];
+    if(cell[k] !== undefined) _写した書式[k] = cell[k];
+  }
+  notify(Object.keys(_写した書式).length + '個の 書式を 覚えました（次に 選んだ所へ 貼ります）');
+  return _写した書式;
+}
+function 書式を貼る(){
+  if(!_写した書式){ notify('先に 書式のコピーを 押してください'); return 0; }
+  var snap = [], 数 = 0;
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k2 = r+','+c;
+    if(!sheets[activeSheet].data[k2]) sheets[activeSheet].data[k2] = {v:'',f:'',d:''};
+    var cell2 = sheets[activeSheet].data[k2];
+    for(var j=0;j<書式のキー.length;j++){
+      var key = 書式のキー[j];
+      var 新 = _写した書式[key];
+      if(cell2[key] === 新) continue;
+      snap.push({key:k2, prop:key, old:cell2[key], nw:新});
+      if(新 === undefined) delete cell2[key]; else cell2[key] = 新;
+    }
+    数++;
+  }
+  if(snap.length){ undoStack.push({type:'format', snap:snap}); redoStack=[]; }
+  render(); updateBar();
+  notify(数 + '個の セルに 書式を 貼りました（中身は 変えていません）');
+  return 数;
+}
 // 外枠罫線
 function applyBorderOuter(style) {
   var snap = [];
