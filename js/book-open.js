@@ -28,6 +28,10 @@
   }
 
   var MSG_XLS = 'この形式（.xls）は まだ直せません。今は開いて見るだけです。';
+  /* ★VBAが入っていた時に 客へ出す言葉（★どうなるかを 先に言う★）★ */
+  var MSG_VBA = 'このファイルには マクロ（VBA）が入っています。'
+    + 'マクロは そのまま残しますが、ここでは 動きません。'
+    + '毎月の繰り返しは、このあと「手順を覚えさせる」で 代わりに出来ます。';
 
   /** ファイルを開く。★元のバイト列をそのまま持つ★ */
   function openFile(file) {
@@ -37,11 +41,17 @@
       if (kind === 'unknown') throw new Error('Excelのファイルとして読めませんでした');
 
       // 中身で確定させる（zip の時だけ）
+      /* ★VBA入り(.xlsm)の扱い＝決めた（2026-08-25 司さん方針・指示役の指示）★
+         ①★開ける★（読むだけ ではない。直して書き出せる）
+         ②★VBAには 触らない。そのまま残す★（実測：書き出しても xl/vbaProject.bin は1バイトも変わらない）
+         ③★VBAは 動かさない★（うちはブラウザ。Windows＋マクロ有効化が要る物は 勧めない）
+         ④★VBAが要る仕事は うちの側（レシピ）で済ませる★＝画面でも そう言う */
+      var hasVba = false;
       if (kind !== 'xls' && root.ZipSurgeon) {
         try {
           var z = root.ZipSurgeon.read(bytes);
           if (z.has('xl/workbook.bin')) kind = 'xlsb';
-          else if (z.has('xl/vbaProject.bin')) kind = 'xlsm';
+          else if (z.has('xl/vbaProject.bin')) { kind = 'xlsm'; hasVba = true; }
           else if (z.has('xl/workbook.xml')) kind = 'xlsx';
         } catch (e) { /* 読めなければ名前のままにする */ }
       }
@@ -68,12 +78,27 @@
           if (root.console) root.console.warn('[Exally] 表の参照を直せませんでした', e);
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats); });
+      /* ★マクロ(VBA)は 開いた時に 読んでおく★（★読むだけ・動かさない★・AIは0回）
+         ★読めなくても 画面は そのまま動く★＝読めない時は「未測定」と言う（0本と言わない） */
+      var マクロ = null;
+      if (hasVba && root.Vba && root.ZipSurgeon) {
+        pre = pre.then(function () {
+          return root.ZipSurgeon.read(bytes).bytes('xl/vbaProject.bin').then(function (bin) {
+            var 読み = root.Vba.読む(bin, root.XLSX && root.XLSX.CFB);
+            var 見立て = (読み.ok && root.VbaMikata) ? root.VbaMikata.見立てる(読み.モジュール) : null;
+            マクロ = { 読み: 読み, 見立て: 見立て };
+          }).catch(function (e) {
+            マクロ = { 読み: { ok: false, モジュール: [], なぜ: '読めませんでした' }, 見立て: null };
+            if (root.console) root.console.warn('[Exally] マクロを読めませんでした', e);
+          });
+        });
+      }
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ); });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ) {
       var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
@@ -101,7 +126,7 @@
         base: base,
         tableRefs: trStats,        // ★何本 直したか（見張りと報告が読む。画面には出さない）
       };
-      return { kind: kind, sheets: out, opened: opened };
+      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null };
   }
 
   /* ★日本語の曜日（aaa / aaaa）を先に本物の文字へ置き換える★
@@ -150,7 +175,19 @@
     (ws['!cols'] || []).forEach(function (col, i) {
       if (col && (col.wpx || col.wch)) colW[i] = col.wpx || Math.round(col.wch * 7);
     });
-    return { name: name, data: data, colW: colW, rowH: {}, hiddenRows: {}, hiddenCols: {}, _fromFile: true };
+    /* ★表の枠（!ref）も 覚えておく★（2026-08-27 指示役の指摘）
+       ＝★「値か式が在る所」と「表の枠」は 違う★。
+         実物 計算シート … ★値か式 400行×72列／表の枠 404行×152列★
+       ★地図が 72列と言うと AIは 73列目から先を 一生 掘らない★ので、
+       ★両方を 名前つきで 出す★ため ここで拾う（捨てない）。 */
+    var 枠 = null;
+    try {
+      if (ws['!ref']) {
+        var rg = X.utils.decode_range(ws['!ref']);
+        枠 = { 行数: rg.e.r + 1, 列数: rg.e.c + 1 };
+      }
+    } catch (e) { /* 読めない時は null＝「未測定」（0にしない） */ }
+    return { name: name, data: data, colW: colW, rowH: {}, hiddenRows: {}, hiddenCols: {}, 枠: 枠, _fromFile: true };
   }
 
   /* ── 保存：★元のバイト列を書き換える★ ── */
@@ -317,5 +354,6 @@
     baselineOf: baselineOf, changedCells: changedCells, valueOf: valueOf, withWeekday: withWeekday,
     anyChanged: anyChanged, normForCompare: normForCompare, rebaseSheet: rebaseSheet,
     MSG_XLS: MSG_XLS,
+    MSG_VBA: MSG_VBA,
   };
 })(typeof self !== 'undefined' ? self : this);

@@ -24,6 +24,7 @@ const FILES = [
   'refs-resolve.test.mjs',      // ★読んでいるファイルが実在するか(require/importも参照として数える)
   ['refs-resolve.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   'api-claude.test.mjs',        // ★チャットが客に言う基準数値(実数リテラル・NaN混入検知)
+  ['api-claude.test.mjs', '--self-test'],  // ★失敗しても200で「答えのふり」をしていた穴(2026-08-22)
   'ios-unsupported.test.mjs',   // ★iPhoneで動かない書き方(type=month/octet-stream/writeFile/Blob散在)
   ['ios-unsupported.test.mjs', '--self-test'],
   'op-registry.test.mjs',       // ★契約の入口(二重登録は投げる)
@@ -47,8 +48,83 @@ const FILES = [
   'book-open.test.mjs',                   // ★受け取ったブックを「開いて何も変えずに保存」しても壊れない(実機で出た事故)
   'diff-preview.test.mjs',                // ★直す前に必ず見せる(方針ver.6の②)。1直しで3シート18本 書き換わる
   ['diff-preview.test.mjs', '--self-test'],
+  'word-export-import.test.mjs',          // ★言い方を「書き出す↔読み込む」に固定(同じ動きに2通りの名前を付けない)
+  ['word-export-import.test.mjs', '--self-test'],
   'excel-parity.test.mjs',                // ★Excelとの差を機械で数え直す(表が古くなったら赤)
   ['excel-parity.test.mjs', '--self-test'],
+  'grid-refedit.test.mjs',                // ★式の中の参照を直せるか(=B1+30 の B1 を A1 に直す)
+  ['grid-refedit.test.mjs', '--self-test'],
+  'grid-edit-ui.mjs',                     // ★本物の book.html で insertRefAddr を動かす(画面の中で直せるか)
+  'excel-shortcuts.test.mjs',             // ★Excelと同じキー割り当てを 本物の画面に実際に押して確かめる(真値は実Excelから機械で取った)
+  ['excel-shortcuts.test.mjs', '--self-test'],
+  'mobile-labels.test.mjs',               // ★スマホの幅で 字を消して「絵だけ」にするのを禁じる(司さんのiPhoneで 📂💾📊 の絵だけになっていた)
+  ['mobile-labels.test.mjs', '--self-test'],
+  'grid-sort.test.mjs',                   // ★並べ替え(実Excelを COM で動かして測った並び順・見出し判定・式の運ばれ方)
+  ['grid-sort.test.mjs', '--self-test'],
+  'grid-filter.test.mjs',                 // ★絞り込み(実Excelで実測: 行は消えず隠れるだけ・★合計は変わらない★)
+  ['grid-filter.test.mjs', '--self-test'],
+  'grid-freeze.test.mjs',                 // ★ウィンドウ枠の固定(実Excelで実測)＋描き方を触った後に 前からある物が壊れていないか
+  ['grid-freeze.test.mjs', '--self-test'],
+  'grid-find.test.mjs',                   // ★検索と置換(実Excelで実測: ★置換は式を見る＝答えが変わる★／* ? ~ のワイルドカード)
+  ['grid-find.test.mjs', '--self-test'],
+  'grid-print.test.mjs',                  // ★印刷(実Excelの既定＝A4縦・余白・枠線なし)＋★白紙の印刷ダイアログを出さない★
+  ['grid-print.test.mjs', '--self-test'],
+  'grid-valid.test.mjs',                  // ★入力の決まり(一覧から選ぶ/整数の範囲)＝打った時だけ止める・合っていない値を数える
+  ['grid-valid.test.mjs', '--self-test'],
+  'grid-stats.test.mjs',                  // ★選んだ所の合計・平均・個数(帯)＝黙って小さい合計を出さない
+  ['grid-stats.test.mjs', '--self-test'],
+  'ctx-menu.test.mjs',                    // ★右クリックが画面の中に収まる(743pxが619pxの画面で 上へ470px はみ出した事故)
+  ['ctx-menu.test.mjs', '--self-test'],
+  'cond-format.test.mjs',                 // ★条件付き書式の当たり判定(実Excelの真値と突き合わせ)
+  ['cond-format.test.mjs', '--self-test'],
+  'cond-format-ui.test.mjs',              // ★本物の画面で 実際に押す(部品が緑=画面で使える ではない)
+  ['cond-format-ui.test.mjs', '--self-test'],
+  'ref-graph-forms.test.mjs',             // ★Excelの仕様の側から形を1つずつ（41形＋重い形3つ）
+  ['ref-graph-forms.test.mjs', '--self-test'],
+  'ref-graph.test.mjs',                   // ★ブック全体の参照の網（別シート401本を落とさない・固まらない）
+  ['ref-graph.test.mjs', '--self-test'],
+  'book-scan-ui.test.mjs',                // ★調べている間の知らせ（300ms・何枚目・％・必ず消す）
+  ['book-scan-ui.test.mjs', '--self-test'],
+  'html-script-syntax.test.mjs',          // ★HTMLの中の<script>が 構文で死んでいないか（lint緑・テスト緑でも 死ぬ）
+  ['html-script-syntax.test.mjs', '--self-test'],
+  'kirikae-egaku.test.mjs',               // ★切り替えた行が「画面に描かれる所」に在るか（選ばれた数ではなく 描かれた物）
+  ['kirikae-egaku.test.mjs', '--self-test'],
+  'kirikae.test.mjs',                     // ★切り替え＝見る人・見る月を変える（シートは増えない・戻すと元どおり）
+  ['kirikae.test.mjs', '--self-test'],
+  'vba-tejun.test.mjs',                   // ★マクロから 手順を取り出して レシピにする（取り出せた分だけ・数で言う）
+  ['vba-tejun.test.mjs', '--self-test'],
+  'vba-ui.test.mjs',                      // ★マクロが 何をしているかを 画面で 出す（描かれた字で 数える）
+  ['vba-ui.test.mjs', '--self-test'],
+  'vba.test.mjs',                         // ★マクロ（VBA）を 読む・見立てる＝読めた≠正しく読めた・AIには要約だけ
+  ['vba.test.mjs', '--self-test'],
+  'kikan.test.mjs',                       // ★何月分・◯日からの分（締め期間は Timeally が正本・124通り）
+  ['kikan.test.mjs', '--self-test'],
+  'kiridashi-jitsubutsu.test.mjs',        // ★司さんの実物で 1人分×何月分を 切り出す（描かれた字で 数え直す）
+  ['kiridashi-jitsubutsu.test.mjs', '--self-test'],
+  'recipe-ui.test.mjs',                   // ★8-③ 覚えた手順を 画面で押す（AIを呼ぶ前に 機械が当てる・上限を置かない）
+  ['recipe-ui.test.mjs', '--self-test'],
+  'teian.test.mjs',                       // ★8 提案＝うちから「こう直せますよ」（0円・向こうから出る）
+  ['teian.test.mjs', '--self-test'],
+  'chizu-horu.test.mjs',                  // ★7 地図＋掘る（地図は数千文字・掘りっぱなしにしない・金額はAIに書かせない）
+  ['chizu-horu.test.mjs', '--self-test'],
+  'recipe.test.mjs',                      // ★6 レシピ＝手順を覚えて 2回目からはAIを呼ばない（記録の行数で数える）
+  ['recipe.test.mjs', '--self-test'],
+  'rireki.test.mjs',                      // ★6 履歴＝見る場所（別の入り口から同じに見える・客のブックにタブ0件）
+  ['rireki.test.mjs', '--self-test'],
+  'chuki.test.mjs',                       // ★注記を外してから読む（見張りの共通部品・同じ型を3回踏んだので決まりにした）
+  ['chuki.test.mjs', '--self-test'],
+  'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
+  ['shindan.test.mjs', '--self-test'],
+  'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
+  ['shindan-ui.test.mjs', '--self-test'],
+  'ai-jiko-dome.test.mjs',                // ★4 事故止め（1分10回・1日100回・40,000字・2万トークン・429の言い方・記録）
+  ['ai-jiko-dome.test.mjs', '--self-test'],
+  'xlsm-vba.test.mjs',                    // ★VBA入り(.xlsm)＝開ける・VBAは1バイトも触らない・動かさない・言葉で先に言う
+  ['xlsm-vba.test.mjs', '--self-test'],
+  'login-gate.test.mjs',                  // ★表の画面にもログイン／忘れた人の逃げ道（無いと二度と入れない）
+  ['login-gate.test.mjs', '--self-test'],
+  'ai-reason.test.mjs',                   // ★AIに繋がらない時の理由と次の一手／★空のセルでAIを呼ばない(お金)★
+  ['ai-reason.test.mjs', '--self-test'],
   'no-dark-green.test.mjs',               // ★使わないと決めた濃い緑(コードは直ったのにCLAUDE.mdの色の表が教え続けていた)
   ['no-dark-green.test.mjs', '--self-test'],
   // P1② 版対応 検証ハーネス
@@ -64,12 +140,33 @@ const FILES = [
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'] // ★入れ子で壊れる式が増えていないか
 ];
 
+/* ★直に叩いた時だけ 走る★（2026-08-29）
+   ここを 守らないと 一覧を 読むだけの道具が ★全部の試験を 走らせてしまう★（実際に 起きた）。 */
+if (require.main !== module) { module.exports = { FILES }; return; }
+
 let ng = 0;
+const 失敗一覧 = [];
 for (const f of FILES) {
   const [file, ...args] = Array.isArray(f) ? f : [f];
   console.log('\n=== ' + file + (args.length ? ' ' + args.join(' ') : '') + ' ===');
-  try { execFileSync(process.execPath, [path.join(__dirname, file), ...args], { stdio: 'inherit' }); }
-  catch (e) { ng++; }
+  /* ★落ちた理由を必ず出す（2026-08-23）★
+     CIで1回 赤になったのに ★同じコミットを回し直したら緑★＝★ムラ★だった。
+     その時 出ていたのは「★ N ファイルで失敗」だけで、
+     ★中で死んだのか（signal）／自分で1を返したのか（status）が 分からなかった★。
+     ⇒ ★どちらかを 必ず1行 出す★（次に赤くなった時、新しい壊れ か ムラ かを その場で見分ける） */
+  /* ★中で殺される(SIGTRAP)のを止める（2026-08-24）★
+     CIで excel-parity が ★signal=SIGTRAP★ で死んだ＝V8 が力尽きた（本物の壊れではない）。
+     本物の画面(book.html)を jsdom に丸ごと載せる検査は 重い。★積める量を増やす★。
+     ⇒ 落ちた理由を出す1行が無ければ ★「新しい壊れ」と区別できなかった★ */
+  try { execFileSync(process.execPath, ['--max-old-space-size=4096', path.join(__dirname, file), ...args], { stdio: 'inherit' }); }
+  catch (e) {
+    ng++;
+    const 印 = e && e.signal ? ('★中で殺された(signal=' + e.signal + ')★＝新しい壊れではない可能性')
+      : ('自分で ' + (e && e.status !== undefined && e.status !== null ? e.status : '?') + ' を返した');
+    console.log('  ★落ちた★ ' + file + (args.length ? ' ' + args.join(' ') : '') + ' … ' + 印);
+    失敗一覧.push(file + (args.length ? ' ' + args.join(' ') : '') + '（' + 印 + '）');
+  }
 }
 console.log('\n' + (ng ? '★ ' + ng + ' ファイルで失敗' : '全テストファイル 緑'));
+for (const 名 of 失敗一覧) console.log('   ・' + 名);
 process.exit(ng ? 1 : 0);

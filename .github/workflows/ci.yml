@@ -24,6 +24,10 @@ jobs:
         run: npm install --no-audit --no-fund
 
       # ── Exally 由来（据置） ──
+      - name: ★試験は登録するまで1本も走らない (在る試験と 走る試験を突き合わせる)
+        run: node scripts/tests-registered.mjs
+      - name: ★その見張り自身の自己確認 (わざと壊して赤になるか)
+        run: node scripts/tests-registered.mjs --self-test
       - name: Cache-buster stamp guard (貼り忘れ検知・コードより先に見る)
         run: node scripts/stamp-build.mjs --check
       - name: Stamp tool tests (ハッシュが決定論か=CRLF/LF・OS差でブレないか)

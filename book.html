@@ -337,17 +337,70 @@ body {
   background:transparent;
   color:#1A2B22;
 }
+/* ★切り替えの帯★（見る人・見る月）。★読ませる字は薄い黒★・色は押せる物だけ。
+   ★1文字ずつ縦に割れないように★ 折り返さない＋横に流す（前科3回）。 */
+#kirikaeBar {
+display:flex; align-items:center; gap:8px;
+padding:6px 10px; background:#F7FBF9; border-bottom:1px solid #D4EDE1;
+font-size:13px; color:#333333; white-space:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+#kirikaeBar[hidden]{ display:none !important; }
+#kirikaeBar .kk-lb { color:#333333; font-weight:700; flex:none; }
+#kirikaeBar select {
+font-family:inherit; font-size:16px;      /* ★iPhoneで 勝手に拡大しない＝16px★ */
+padding:4px 8px; border:1px solid #C8ECD8; border-radius:8px; background:#ffffff; color:#333333;
+max-width:44vw; flex:none;
+}
+#kirikaeBar button {
+font-family:inherit; font-size:13px; padding:5px 10px; border-radius:8px;
+border:1px solid #C8ECD8; background:#ffffff; color:#333333; cursor:pointer; flex:none;
+}
+#kirikaeBar #kkDasu { border-color:#2E7D54; color:#2E7D54; }
+#kirikaeBar .kk-now { color:#333333; flex:none; }
+/* ★スマホでは「今 何を見ているか」を 2行目に 丸ごと出す★
+   ＝1行に並べると 画面の外へ出て、★横に動かさないと 読めない★（390pxで実測 2026-08-28）。
+   ★字は 折り返さない（縦に割れない）／箱ごと 次の行へ★ */
+@media (max-width: 600px) {
+  #kirikaeBar { flex-wrap:wrap; }
+  #kirikaeBar #kkModosu { order:8; }
+  #kirikaeBar .kk-now { order:9; flex-basis:100%; padding-top:2px; }
+  #kirikaeBar #kkDasu { order:10; }
+}
+
 #grid-wrap {
   flex:1;
   min-height:80px;
   position:relative;
   overflow:hidden;
   background:#F0FAF4;
+}
+
+/* ★hidden と書いても class の display に打ち消される事があるので 1行 入れておく★ */
+[hidden]{display:none !important;}
+
+/* ★選んだ所の 合計・平均・個数の帯★
+   ★字が1文字ずつ縦に割れないよう flex の箱を 縮めさせない（flex:0 0 auto）★
+   ★字は割らずに 箱ごと 折り返す（flex-wrap:wrap）★
+     → 375px の実機で測ったら 帯が 679px になり、★注意が画面の外★だった。
+        注意を先頭に出し、箱ごと折り返すようにした（2026-08-21）。 */
+#status-bar{
+  flex:0 0 auto;
+  display:flex; align-items:center; gap:14px;
+  min-height:28px; padding:4px 10px;
+  background:#FFFFFF; border-top:1px solid #D4EDE1;
+  font-size:12px; color:#333333; line-height:1.5;
+  white-space:nowrap; overflow-x:auto; overflow-y:hidden;
+  flex-wrap:wrap; row-gap:2px;
   margin-bottom:calc(86px + env(safe-area-inset-bottom));
 }
 @media(min-width:769px){
-  #grid-wrap{margin-bottom:calc(32px + env(safe-area-inset-bottom));}
+  #status-bar{margin-bottom:calc(32px + env(safe-area-inset-bottom));}
 }
+#status-bar .sb-i{flex:0 0 auto; white-space:nowrap;}
+#status-bar .sb-n{color:#5A6B63; margin-right:5px;}
+#status-bar .sb-v{color:#333333; font-weight:700;}
+#status-bar .sb-i.sb-warn .sb-n,
+#status-bar .sb-i.sb-warn .sb-v{color:#B3261E;}
 
 #grid-canvas {
 position:absolute;
@@ -423,7 +476,7 @@ display:flex !important;
 #ai-float-btn {
 display:flex;
 position:fixed;
-bottom:calc(32px + 16px);
+bottom:calc(32px + 16px + var(--sb-h, 0px));
 right:20px;
 background:#3D9E72;
 color:#fff;
@@ -485,7 +538,7 @@ overflow-y:auto;
 #ai-float-btn {
 display:flex !important;
 position:fixed;
-bottom:96px;
+bottom:calc(96px + var(--sb-h, 0px));
 right:16px;
 background:#3D9E72;
 color:#fff;
@@ -566,12 +619,86 @@ box-shadow:0 -2px 10px rgba(30,60,40,0.06);
 }
 
 /* ★スマホの幅で頭が詰まるのを止める（2026-08-09 iPhone 390px で実際に詰まった）★
-   「Excelを開く」を足したら、ロゴが切れて 365 の切替が画面の外へ出た。
-   狭い時は ★絵文字だけにして、開いているファイル名は隠す★（名前は保存の時のお知らせにも出る）。 */
+   当時の言い方だった「Excelを開く」を足したら、ロゴが切れて 365 の切替が画面の外へ出た。
+   （★この1件だけ 昔の言い方をそのまま残す＝何が起きたかの記録。今の言い方は「Excelを読み込む」★
+     tests/word-export-import.test.mjs の 注記台帳に 理由つきで載せてある）
+
+   ★2026-08-19 直し：狭い時に「絵だけ」にしていたのが間違いだった★
+     司さんのiPhoneで 上の3つが 📂 / 💾 / 📊365 の ★絵だけ★ になっていて、
+     せっかく言い方を「Excelを読み込む／Excelに書き出す」に揃えたのに ★字が1文字も出ていなかった★。
+     💾（フロッピー）は今の人に通じないし、📂 も「開く」か「読み込む」か分からない。
+   ⇒★字は消さない。入らないなら 絵の方をやめて 字を残す★
+     （tests/mobile-labels.test.mjs が、幅を狭くして字が消えたら赤にする） */
 @media (max-width: 560px) {
-  #openBookBtn .hdr-lb, #saveBookBtn .hdr-lb { display: none; }
-  #openBookBtn, #saveBookBtn { padding: 4px 10px; }
+  /* ★絵をやめる（字の場所を空ける）★ */
+  #openBookBtn .hdr-ic, #saveBookBtn .hdr-ic, #bookVerBtn .hdr-ic { display: none; }
+  /* ★長い方の言葉「Excelを／Excelに」だけ落として、動きの言葉は必ず残す★
+     （版の切替は「Excel版 365」で入る＝実測 105px。幅320でもはみ出さない） */
+  #openBookBtn .hdr-lb-long, #saveBookBtn .hdr-lb-long { display: none; }
+  /* ★padding はタグに直書き（style=）してあるので !important でないと効かない★
+     ＝実測して気づいた（78pxのまま動かなかった） */
+  #openBookBtn, #saveBookBtn, #bookVerBtn { padding: 4px 9px !important; }
   #openedFileLabel { display: none; }
+  .exally-logo-ja { display: none; }          /* ロゴの読み仮名を畳んで 字の場所にする */
+  #header { padding: 0 10px; }
+  /* ★スマホで ロゴが 切れていた★（2026-08-29 司さんのiPhone・実測 幅390で
+       「Exally」57px が 52px の枠に 押し込まれて 右が 切れていた）
+     ⇒ ★ロゴは 縮めない・字を 小さくして 幅を 作る★（消しはしない） */
+  .exally-logo-en { font-size: 16px; }
+  #header > div:first-child { flex: 0 0 auto; overflow: visible; }
+  /* ★上の帯が 端で 切れて見える★（実測 幅390で 318pxの枠に 347px）
+     ⇒ ★字は 1文字も 消さず★ 絵の方をやめ、間を 詰めて 収める */
+  #rirekiBtn .hdr-ic { display: none; }
+  #rirekiBtn, #teianBtn, #macroBtn, #shindanBtn { padding: 4px 8px !important; }
+  #headerTools { gap: 4px; flex-wrap: wrap; }
+  /* ★スマホは 2段★＝1段目は「読み込む・書き出す・Excel版」、
+       2段目に「これまで・こちらで出来る事・マクロ・危ない所」。
+     ★字を 消さずに 収める★ための 段分け（2026-08-29 実測：
+       マクロ入りを 開くと 6個で 492px＝310pxの枠に 182px はみ出していた）。
+     ★2段目は 出る物が 在る時だけ 場所を取る★（何も無ければ 高さ0）。 */
+  /* ★1段目＝いつも在る物（読み込む・書き出す・Excel版）／2段目＝在る時だけ★
+     並ぶ順を 決め打ちしないと ★Excel版だけ 2段目に 落ちる★（実測で そうなった）。 */
+  #openBookBtn { order: 1; }
+  #openedFileLabel { order: 2; }
+  #saveBookBtn { order: 3; }
+  /* ★Excel版は 毎日 押す物ではない★＝2段目に 置く（HTMLで headerSay の中に 移した）。
+     1段目は「読み込む・書き出す」だけ＝スマホの 1行目が すっきりする
+     （2026-08-29 司さん「上のぐちゃぐちゃ」） */
+  /* ★スマホの 上には 押す物を 置かない★（飲み屋Castallyの形／Timeallyの「今 押せる物だけ」）
+     ・読み込む／書き出す … ★下の帯（親指の届く所）★へ 移す
+     ・うちから言う物（これまで／出来る事／マクロ／危ない所／Excel版）… ★在る時だけ★ 上に 1行
+       ★「その他」に しまわない★＝1回 押して 目的に 着かないのは 押させてから断るのと 同じ型 */
+  /* ★上の帯には 押す物を 置かない★（指示役 裁定）＝名前と ファイル名だけ */
+  #openBookBtn, #saveBookBtn { display: none !important; }
+  #openedFileLabel { display: inline !important; order: 2; font-size: 12px;
+    max-width: 62vw; overflow: hidden; white-space: nowrap; text-overflow: clip; }
+  /* ★「その他」の中身は 下から 出す★（親指の所で 開く・上まで 手を伸ばさせない） */
+  /* ★下の帯の 高さと 合わせる★（2026-08-29 実測：帯を 51px に したのに 板は 43px の所に
+     置いたままで ★Excel版の1行が 帯の下に 隠れていた★）。 */
+  /* ★下の帯より 上に 描く★（2026-08-29 実測：z-index 60 では
+     ★シートのタブ（.bottom-stack は z-index:100）が 上に 乗って Excel版が 見えなかった★。
+     ★「在る」と「描かれている」は 別★＝elementFromPoint で 見つけた） */
+  #headerSay { display: none; position: fixed; left: 0; right: 0; bottom: 51px; z-index: 101;
+    max-height: 40vh; overflow-y: auto;
+    background: #ffffff; border-top: 1px solid #D4EDE1; box-shadow: 0 -6px 20px rgba(30,60,40,0.12);
+    padding: 10px 12px; gap: 8px; flex-wrap: wrap; align-items: center; }
+  #headerSay.open { display: flex; }
+  #sushikichoBtn { display: inline-flex !important; }   /* 数式帳は スマホの「その他」の中だけ */
+  #header { height: auto; min-height: 52px; padding: 4px 10px; align-items: center; flex-wrap: wrap; }
+}
+/* ★一番狭い機種（320px＝iPhone SE 第1世代）★ 字は消さないまま ロゴが切れるのを止める
+   （実測: 直す前は「Exally」57px が 27px の枠に押し込まれて切れていた） */
+@media (max-width: 360px) {
+  .exally-logo-en { font-size: 16px; }
+  #openBookBtn, #saveBookBtn, #bookVerBtn { padding: 4px 7px !important; }
+  /* ★一番狭い機種では 上の帯が どうしても 入りきらない★（2026-08-29 実測 幅320で
+       読み込む64＋書き出す64＋これまで66＋Excel版95＝301 が 262の枠）
+     ⇒ ★字は 1文字も 消さない★まま、間と 余白を 詰めて 45px→0 に する。
+        （それでも 入らない機種では 帯を 横に 動かせる） */
+  #rirekiBtn, #teianBtn, #macroBtn, #shindanBtn { padding: 4px 6px !important; }
+  #bookVerBtn .hdr-lb-long { display: none; }   /* 「Excel版」の「Excel」だけ畳む＝版の字は 残す */
+  #headerTools { gap: 3px; }
+  #header { padding: 0 6px; }
 }
 #sheet-tabs {
 position:relative;
@@ -600,6 +727,10 @@ display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
+/* ★押す的は 44px 以上★
+   ★実測（2026-08-29・幅375/390/430）で 42px しか 無かった★＝44px を 満たしていない。
+   ⇒ ★50px に 上げた★（余裕を 6px 取る）。この数字は ★うちの画面で 測って 決めた物★。 */
+min-height:50px;
 padding:6px 1px 5px;
 cursor:pointer;
 border:none;
@@ -611,6 +742,9 @@ text-decoration:none;
 .book-bn-i.active{color:#2E4038;}
 .book-bn-i.active .book-bn-lb{font-weight:700;}
 .book-bn-i.book-bn-disabled{cursor:not-allowed;opacity:0.45;pointer-events:none;}
+/* ★まだ出来ていない物★ 薄いのは同じだが ★押せる★＝押したら理由が出る
+   （2026-08-19 司さん：薄いだけで理由が出ていない＝何が起きたか分からない） */
+.book-bn-i.book-bn-notyet{opacity:0.45;cursor:pointer;}
 .book-bn-ic{font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;height:16px;}
 .book-bn-ic svg{width:15px;height:15px;}
 .book-bn-lb{font-size:9px;font-weight:700;letter-spacing:-0.3px;margin-top:2px;white-space:nowrap;color:inherit;}
@@ -764,6 +898,11 @@ padding:4px 0;
 z-index:1000;
 min-width:160px;
 display:none;
+/* ★画面に入り切らない時は 中で動かせる★
+   （2026-08-21 実測：高さ743px、画面619px で 上へ470px はみ出していた） */
+overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+overscroll-behavior:contain;
 }
 #ctx-menu.show { display:block; }
 .ctx-item {
@@ -784,7 +923,7 @@ gap:8px;
 #ai-float-btn {
 display:flex !important;
 position:fixed;
-bottom:96px;
+bottom:calc(96px + var(--sb-h, 0px));
 right:16px;
 background:#3D9E72;
 color:#fff;
@@ -1079,7 +1218,10 @@ white-space:pre-line;
    紙のように白地・濃い文字にして、行頭を揃える(中央寄せをやめる)。左の橙帯で警告と分かる。 */
 #toast.warn {
 background:#fff;
-color:#2E7D54;
+/* ★読ませる字は 薄い黒★（色は 押せる物と 選ばれている物だけ）。
+   ★2026-08-25 自分で押して気づいた★＝ここだけ 本文が緑のままだった。
+   題と 太字は 琥珀（#8A5A00）で 目立たせる＝そちらが「見てほしい所」。 */
+color:#333333;
 border:1px solid #E6D9A8;
 border-left:5px solid #E5A100;
 text-align:left;
@@ -1087,9 +1229,21 @@ font-size:14px;
 font-weight:500;
 line-height:1.8;
 padding:16px 20px;
-max-width:min(560px,88vw);
+/* ★left:50% だと 使える幅が 画面の半分しか無い★＝実測 375pxの画面で 188px・高さ990pxになり
+   上下に 162pxずつ はみ出して 読めなかった（2026-08-27 実機の幅で測って気づいた）。
+   ⇒ 幅は 中身の分だけ取り、画面から 12px 内側で止める。高さも 画面に収める。 */
+width:max-content;
+max-width:min(560px,calc(100vw - 24px));
+max-height:calc(100vh - 24px);
+overflow:auto;
 box-shadow:0 8px 28px rgba(30,60,40,0.22);
 }
+/* ★見出しと 補足は 普通の知らせでも 行を 分ける★
+   （2026-08-28 実物の画面で 見つけた＝この形は #toast.warn にしか 無く、
+     普通の知らせでは ★「18か所 直しました覚えた手順で やりました。」★と 字が くっついていた。
+     ★注意の色と 太さは 下の .warn の方が 強い★ので 上書きされない。） */
+#toast .toast-h { display:block; font-weight:700; margin-bottom:4px; }
+#toast .toast-n { display:block; margin-top:8px; font-size:12px; opacity:0.85; line-height:1.6; }
 #toast.warn b { color:#8A5A00; }
 #toast.warn .toast-h { display:block; font-weight:800; font-size:14px; margin-bottom:6px; color:#8A5A00; }
 #toast.warn ul { margin:0; padding-left:1.1em; }
@@ -1144,17 +1298,54 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=391784fa"></script>
+<script src="hyperformula.full.min.js?v=dd007c4c"></script>
 
-<script src="exally-formula.js?v=391784fa"></script>
+<script src="exally-formula.js?v=dd007c4c"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
-     初回の「Excelに保存」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=391784fa"></script>
+     初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
+<script src="js/file-out.js?v=dd007c4c"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=391784fa"></script>
-<script src="lib/grid-xlsx.js?v=391784fa"></script>
-<script src="lib/excel-version.js?v=391784fa"></script>
+<script src="lib/typed-value.js?v=dd007c4c"></script>
+<script src="lib/grid-xlsx.js?v=dd007c4c"></script>
+  <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
+       2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
+       「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
+       ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
+  <script src="lib/grid-refedit.js?v=dd007c4c"></script>
+<script src="lib/autosum.js?v=dd007c4c"></script>
+<script src="lib/grid-sort.js?v=dd007c4c"></script>
+<script src="lib/grid-filter.js?v=dd007c4c"></script>
+<script src="lib/grid-find.js?v=dd007c4c"></script>
+<script src="lib/grid-print.js?v=dd007c4c"></script>
+<script src="lib/ai-reason.js?v=dd007c4c"></script>
+<script src="lib/menu-place.js?v=dd007c4c"></script>
+<script src="lib/grid-stats.js?v=dd007c4c"></script>
+<script src="lib/grid-valid.js?v=dd007c4c"></script>
+<script src="lib/cond-format.js?v=dd007c4c"></script>
+<script src="lib/ref-graph.js?v=dd007c4c"></script>
+<script src="lib/shindan.js?v=dd007c4c"></script>
+<!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
+<script src="lib/vba.js?v=dd007c4c"></script>
+<script src="lib/vba-mikata.js?v=dd007c4c"></script>
+<script src="lib/vba-tejun.js?v=dd007c4c"></script>
+<script src="lib/rireki.js?v=dd007c4c"></script>
+<script src="lib/chizu.js?v=dd007c4c"></script>
+<script src="lib/horu.js?v=dd007c4c"></script>
+<script src="lib/excel-version.js?v=dd007c4c"></script>
+<script src="lib/teian.js?v=dd007c4c"></script>
+<script src="lib/kikan.js?v=dd007c4c"></script>
+<script src="lib/recipe.js?v=dd007c4c"></script>
+<script src="lib/kirikae.js?v=dd007c4c"></script>
+<script src="js/recipe-store.js?v=dd007c4c"></script>
+<script src="js/rireki-store.js?v=dd007c4c"></script>
+<script src="lib/excel-version.js?v=dd007c4c"></script>
+<!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
+     ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supa-config.js?v=dd007c4c"></script>
+<script src="js/exally-login.js?v=dd007c4c"></script>
+<script src="js/auth.js?v=dd007c4c"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1249,6 +1440,684 @@ function _typedNumFmt(v){
   var t = TypedValue.parseTyped(v);
   return (t && t.numFmt) ? t.numFmt : null;
 }
+/* ══ Excel と同じ割り当てのショートカットが呼ぶ物（2026-08-18） ══════════
+   ★どう動くかは実Excelで測ってから作った★（tests/excel-shortcuts.test.mjs に真値） */
+
+/** Ctrl+D / Ctrl+R … 上（左）のセルを 選んだ所へ写す。
+ *  ★実Excelで測った通り 式も書式も写す★（FillDown/FillRight）。
+ *  ★写した先の元の書式は上書きされる★（斜体が消えるのも実測どおり）。
+ *  式の中の参照は ずらす（=A2*2 を右へ写すと =B2*2。実測）。 */
+function fillFromEdge(dir){
+  var FMT = ['numFmt','bold','italic','underline','strike','align','color','bgColor','wrap','indent','fontSize','border'];
+  var data = sheets[activeSheet].data;
+  var r1=selR1, c1=selC1, r2=selR2, c2=selC2;
+  var single = (r1===r2 && c1===c2);
+  /* 1セルだけ選んでいる時は すぐ上（すぐ左）から写す。範囲を選んでいる時は その先頭の行（列）から。 */
+  var srcR = (dir==='down')  ? (single ? r1-1 : r1) : -1;
+  var srcC = (dir==='right') ? (single ? c1-1 : c1) : -1;
+  if(dir==='down'  && srcR<0) return;
+  if(dir==='right' && srcC<0) return;
+  var startR = (dir==='down')  ? (single ? r1 : r1+1) : r1;
+  var startC = (dir==='right') ? (single ? c1 : c1+1) : c1;
+  var changed = 0;
+  for(var r=startR; r<=r2; r++){
+    for(var c=startC; c<=c2; c++){
+      var sr = (dir==='down')  ? srcR : r;
+      var sc = (dir==='right') ? srcC : c;
+      var src = data[sr+','+sc];
+      if(!src) continue;
+      /* ★書式も写す＝写した先の元の書式は捨てる（実Excel FillDown で実測）★
+         打ち消しの斜体が消えるのも実測どおり。 */
+      var prev = data[r+','+c] || {};
+      var keep = {};
+      for(var i=0;i<FMT.length;i++){ if(src[FMT[i]]!==undefined) keep[FMT[i]] = src[FMT[i]]; }
+      keep.v = prev.v; keep.f = prev.f; keep.d = prev.d;   /* 元に戻す用に 前の値は残す */
+      data[r+','+c] = keep;
+      /* 式は ずらす（=A2*2 を右へ写すと =B2*2。実測） */
+      var raw;
+      if(typeof src.f==='string' && src.f.charAt(0)==='='){ raw = shiftFormula(src.f, r-sr, c-sc); }
+      else { raw = (src.v===undefined || src.v===null) ? '' : String(src.v); }
+      setCell(r,c,raw);   /* setCell は既に在る書式を残すので、上で入れ替えた書式が残る */
+      changed++;
+    }
+  }
+  if(changed){ updateBar(); render(); }
+}
+
+/** Ctrl+; / Ctrl+: … 今日の日付／今の時刻を「値」で入れる（式ではない）。
+ *  ★書式は実Excelで測った物★（日付 yyyy/m/d ／ 時刻 h:mm）。 */
+function putNowValue(kind){
+  var d = new Date();
+  var p2 = function(n){ return (n<10?'0':'')+n; };
+  var v, fmt;
+  if(kind==='time'){ v = d.getHours()+':'+p2(d.getMinutes()); fmt='h:mm'; }
+  else { v = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(); fmt='yyyy/m/d'; }
+  for(var r=selR1;r<=selR2;r++){
+    for(var c=selC1;c<=selC2;c++){
+      setCell(r,c,v);
+      var cell = sheets[activeSheet].data[r+','+c];
+      if(cell) cell.numFmt = fmt;
+    }
+  }
+  updateBar(); render();
+}
+
+/** 1画面 上下（PageUp / PageDown） */
+function movePage(dir){
+  /* ★今 画面に見えている行を数える★（行の高さがバラバラでも合う） */
+  var top = yToR(HDR_H+1), bot = yToR(wrapH-1);
+  var n = Math.max(1, bot - top);
+  var r = Math.max(0, Math.min(ROWS-1, selR1 + dir*n));
+  sel(r, selC1, r, selC1);   /* sel が scrollToCell と render を呼ぶ */
+}
+
+/** Alt+= … オートSUM。★当てる範囲の決め方は lib/autosum.js（実Excelで測った3通りが真値）★
+ *  見つからなければ ★何も入れず「分かりません」と知らせる★（勝手に広げない）。 */
+function autoSum(){
+  var data = sheets[activeSheet].data;
+  var got = AutoSum.suggest(function(r,c){ return data[r+','+c]; }, selR1, selC1);
+  if(!got){ showToast('足す数が見つかりません（すぐ上か すぐ左に数を並べてね）'); return; }
+  setCell(selR1, selC1, got.formula);
+  updateBar(); render();
+  /* ★上と左の両方に数が並んでいる時は 未測定★（指示役が3回 試して測れなかった）。
+     ⇒ ★黙って選ばない★＝どちらを取ったかを出して、違ったら戻せると伝える。 */
+  if(got.ambiguous){
+    showToast((got.dir==='up' ? '上' : '左') + 'の ' + got.from + ':' + got.to + ' を足しました'
+      + '（' + (got.dir==='up' ? '左' : '上') + 'にも数が並んでいます。違ったら Ctrl+Z で戻してね）');
+  }
+}
+
+/** 並べ替え … ★どう並ぶかは lib/grid-sort.js（実Excelで測った真値）★
+ *  ・1セルだけ選んでいる時は ★その周りの表を丸ごと★（Excel の CurrentRegion と同じ）
+ *  ・範囲を選んでいる時は ★その範囲だけ★
+ *  ・見出し行が在るかは 実Excelと同じ判定（先頭が文字で 下に数）
+ *  ・★行はセットで動く★（名前と数がバラバラにならない）
+ *  ・★式は 移った先の行に読み替える★＝相対参照だけの式は各行で正しいまま。
+ *    $付きは動かない＝Excel と同じく ★指す先が変わる★ので その時だけ 一言 知らせる。 */
+function sortRange(dir){
+  hideCtxMenu();
+  var s = sheets[activeSheet], data = s.data;
+  var 一つだけ = (selR1===selR2 && selC1===selC2);
+  var rng;
+  if(一つだけ){
+    var 中身がある = function(r,c){
+      var x = data[r+','+c]; if(!x) return false;
+      var v = (x.d!==undefined && x.d!==null && x.d!=='') ? x.d : x.v;
+      return v!==undefined && v!==null && String(v)!=='';
+    };
+    rng = GridSort.region(中身がある, selR1, selC1, ROWS-1, COLS-1);
+  } else {
+    rng = { r1:selR1, c1:selC1, r2:selR2, c2:selC2 };
+  }
+  var get = function(r,c){ return data[r+','+c]; };
+  var 見出し = GridSort.guessHeader(get, rng.r1, rng.c1, rng.r2, rng.c2);
+  var 先頭 = rng.r1 + (見出し ? 1 : 0);
+  if(先頭 >= rng.r2){ showToast('並べ替える行が足りません'); return; }
+  var キー列 = Math.max(rng.c1, Math.min(selC1, rng.c2));
+  var 並び = [];
+  for(var r=先頭; r<=rng.r2; r++) 並び.push(data[r+','+キー列]);
+  var 順 = GridSort.order(並び, dir);
+  var 同じ = true;
+  for(var i=0;i<順.length;i++) if(順[i]!==i){ 同じ=false; break; }
+  if(同じ){ showToast('もう ' + (dir==='asc'?'昇順':'降順') + ' に並んでいます'); return; }
+
+  _pushRowColUndo();                       /* ★1回の取り消しで丸ごと戻せる★ */
+  var 元 = {};
+  for(var r2=先頭; r2<=rng.r2; r2++) for(var c2=rng.c1; c2<=rng.c2; c2++) 元[(r2-先頭)+','+c2] = data[r2+','+c2];
+  var ドル付き = 0;
+  for(var i2=0;i2<順.length;i2++){
+    var ずれ = i2 - 順[i2];
+    for(var c3=rng.c1; c3<=rng.c2; c3++){
+      var src = 元[順[i2]+','+c3];
+      var key = (先頭+i2)+','+c3;
+      if(src===undefined){ delete data[key]; continue; }
+      var next = Object.assign({}, src);
+      if(typeof src.f==='string' && src.f.charAt(0)==='='){
+        if(GridSort.hasAbsRef(src.f)) ドル付き++;
+        next.f = shiftFormula(src.f, ずれ, 0);   /* ★$ は動かない（Excelと同じ）★ */
+        next.v = next.f;
+      }
+      data[key] = next;
+    }
+  }
+  /* ★計算側にも 並べ替えた後の形を流し直して 答えを取り直す★（2026-08-21 実際に踏んだ）
+     ① セルを動かしただけでは、そのセルが持っている「前の答え(d)」が一緒に運ばれて
+        ★並べ替えたのに 値が古いまま出た★（黙って嘘をつく）。
+     ② loadSheetIntoEngine は ★一度 流したシートは何もしない★ ので、
+        呼んでも計算側は 前の形のままだった。⇒ _pushGrid で丸ごと流し直す。
+     ★控えの取り直し（rebaseSheet）はしない★＝並べ替えは「人が直した事」なので
+       書き出しの差分に出さないといけない。 */
+  _pushGrid(activeSheet, s);
+  recalcSheet(activeSheet, data);
+  updateBar(); render();
+  var 何行 = 順.length;
+  showToast(何行 + '行を' + (dir==='asc'?'昇順':'降順') + 'に並べ替えました'
+    + (見出し ? '（先頭行は見出しとして動かしていません）' : '')
+    + (ドル付き ? '／<b>$付きの参照が' + ドル付き + '本 在ります＝Excelと同じく 指す先が変わります</b>' : ''));
+}
+
+/* ══ 絞り込み（フィルター）══════════════════════════════════════════
+   ★Excel の右クリックにも 同じ物が在る★（実物から取った）:
+     フィルター > フィルターのクリア／再適用／★選択したセルの値でフィルター★／色／フォント色／アイコン
+   ★実Excelで測った通り★
+     ・行は ★消えない。隠れるだけ★／★見出し行は隠れない★
+     ・★合計は 絞っても変わらない★（SUM=15 のまま。隠れた行も足す）
+     ・★フィルターで隠れた行と 手で隠した行は 別物★（SUBTOTAL(9) の効き方が違う）
+       ⇒ うちも sheet.filterHidden と sheet.hiddenRows を ★分けて持つ★
+   ★作っていない物★ 色・フォント色・アイコンでの絞り込み／再適用／見出しの▼ボタン */
+function _表の範囲(){
+  var data = sheets[activeSheet].data;
+  if(selR1!==selR2 || selC1!==selC2) return { r1:selR1, c1:selC1, r2:selR2, c2:selC2 };
+  var 中身がある = function(r,c){
+    var x = data[r+','+c]; if(!x) return false;
+    var v = (x.d!==undefined && x.d!==null && x.d!=='') ? x.d : x.v;
+    return v!==undefined && v!==null && String(v)!=='';
+  };
+  return GridSort.region(中身がある, selR1, selC1, ROWS-1, COLS-1);
+}
+function _絞り込み中(){
+  var f = sheets[activeSheet].filterHidden;
+  if(!f) return false;
+  for(var k in f) if(f[k]) return true;
+  return false;
+}
+function filterByValue(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet], data = sh.data;
+  var rng = _表の範囲();
+  var get = function(r,c){ return data[r+','+c]; };
+  var 見出し = GridSort.guessHeader(get, rng.r1, rng.c1, rng.r2, rng.c2);
+  var 値 = GridFilter.text(get(selR1, selC1));
+  if(見出し && selR1===rng.r1){ showToast('見出しの行では絞り込めません（下の行を選んでね）'); return; }
+  var res = GridFilter.byValue(get, rng, 見出し, selC1, 値);
+  if(!res.keep.length){ showToast('その値の行が見つかりません'); return; }
+  sh.filterHidden = {};
+  for(var i=0;i<res.hide.length;i++) sh.filterHidden[res.hide[i]] = true;
+  var ctl = document.getElementById('ctx-clear-filter'); if(ctl) ctl.style.display = '';
+  render();
+  showToast('「' + (res.value || '（空）') + '」の ' + res.keep.length + '行だけ見せています'
+    + '（' + res.hide.length + '行を隠しました。<b>消していません・合計も変わりません</b>）');
+}
+function clearFilter(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet];
+  var 戻す = sh.filterHidden ? Object.keys(sh.filterHidden).length : 0;
+  sh.filterHidden = {};
+  var ctl = document.getElementById('ctx-clear-filter'); if(ctl) ctl.style.display = 'none';
+  render();
+  showToast(戻す ? (戻す + '行を戻しました') : '絞り込みはかかっていません');
+}
+
+/* ══ 印刷 ══════════════════════════════════════════════════════════════
+   ★紙だけの新しい窓で刷る★（全アプリの決まり。画面のCSSを紙用に切り替えない）
+   ★実Excel の既定に合わせた★（COMで読んだ）
+     A4縦／余白 上下1.90cm・左右1.78cm／★枠線は刷らない★／★行と列の番号も刷らない★
+   ★真似られない事★
+     ★1ページに何行 入るかは 印刷する機械で変わる★（実Excelは39行だが 紙の計算では41行）。
+     ブラウザに刷ってもらうので ★ページの切れ目は Excel と同じにならない★。
+   ★うちの方が良い所★
+     Excel は 列の幅より長い字が ★紙で欠ける★。うちは 表で刷るので ★折り返して全部 出る★。
+   ★白紙の印刷ダイアログを出さない★＝中身が0なら 刷らずに理由を出す。 */
+function printSheet(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet];
+  /* 2セル以上 選んでいれば その範囲だけ。1セルなら 中身が在る所ぜんぶ。 */
+  var 範囲 = (selR1!==selR2 || selC1!==selC2)
+    ? { r1:selR1, c1:selC1, r2:selR2, c2:selC2 } : null;
+  var html = GridPrint.buildHtml({
+    data: sh.data, range: 範囲, sheetName: sh.name,
+    fileName: (typeof BookOpen!=='undefined' && BookOpen.isOpened && BookOpen.isOpened())
+      ? (BookOpen.current && BookOpen.current().name) || '' : '',
+  });
+  if(!html){ showToast('刷る中身が在りません（先に何か入れてね）'); return; }
+  var w = window.open('', '_blank');
+  if(!w){ showToast('新しい窓を開けませんでした（ポップアップを許してね）'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  /* 中身が出来てから刷る（★下絵0枚のまま印刷ダイアログを出さない★） */
+  setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){ /* 窓が閉じられたら何もしない */ } }, 200);
+  showToast('紙の窓を開きました（そのまま印刷を押してね）');
+}
+
+/* ══ 条件付き書式 ══════════════════════════════════════
+   ★実Excel 16.0.20228 を COM で押して測った通り★（2026-08-22・真値 tests/fixtures/cond-format-golden.json）
+     ・当たり判定は lib/cond-format.js（純関数）。ここは ★見せ方と 置き場所★ だけ
+     ・★見た目だけ。値も式も 1バイトも変えない（合計は1円も動かない）★
+     ・★手で塗った色は 消さない★＝条件を外すと 元の色に戻る（Excelと同じ）
+     ・★番号の小さいルールが勝つ★
+   ルールは sheets[i].condFormats に [{範囲,種類,演算,値1,値2,書式}] で持つ。
+   ★第1弾では ファイルに書き出さない★（色は styles.xml の dxfs に足す事になり
+     「元のファイルを1バイトも触らない」に触れるため。docs/SPEC_cond_format.md の4） */
+
+var _cfPassCache = null;                 /* 1回の描き直しの間だけ 範囲の値を覚える */
+function _cfBeginPass(){ _cfPassCache = null; }
+function _cfRules(){
+  var sh = sheets[activeSheet];
+  if(!sh.condFormats) sh.condFormats = [];
+  return sh.condFormats;
+}
+function _cfInRange(r,c,範囲){
+  return 範囲 && r>=範囲.r1 && r<=範囲.r2 && c>=範囲.c1 && c<=範囲.c2;
+}
+function _cfRangeVals(i,ru){
+  if(!_cfPassCache) _cfPassCache = {};
+  if(_cfPassCache[i]) return _cfPassCache[i];
+  var 出 = [];
+  for(var r=ru.範囲.r1;r<=ru.範囲.r2;r++) for(var c=ru.範囲.c1;c<=ru.範囲.c2;c++) 出.push(getCell(r,c));
+  _cfPassCache[i] = 出;
+  return 出;
+}
+/** ★式のルールは 本物の計算エンジンで測る（決め打ちしない）★ */
+function _cfFormulaHit(ru,r,c){
+  try{
+    var 式 = CondFormat.式をずらす(ru.値1, r-ru.範囲.r1, c-ru.範囲.c1);
+    if(式.charAt(0)!=='=') 式 = '='+式;
+    var v = hf.calculateFormula(式, _hfSid(activeSheet));
+    return v===true || v===1;
+  }catch(e){ return false; }        /* ★分からない時は 当てない★ */
+}
+/** そのセルに 実際に描く書式（当たらなければ null） */
+function cfFormatAt(r,c,cell){
+  var rules = (sheets[activeSheet]||{}).condFormats;
+  if(!rules || !rules.length) return null;
+  var 出 = null;
+  for(var i=0;i<rules.length;i++){
+    var ru = rules[i];
+    if(!_cfInRange(r,c,ru.範囲)) continue;
+    var 文脈 = { 範囲の値たち: _cfRangeVals(i,ru) };
+    if(ru.種類==='式'){ (function(ru2,r2,c2){ 文脈.式で判定 = function(){ return _cfFormulaHit(ru2,r2,c2); }; })(ru,r,c); }
+    if(!CondFormat.当たるか(cell, ru, 文脈)) continue;
+    var f = ru.書式 || {};
+    出 = 出 || {};
+    if(出.塗り===undefined && f.塗り) 出.塗り = f.塗り;
+    if(出.文字色===undefined && f.文字色) 出.文字色 = f.文字色;
+    if(出.太字===undefined && f.太字!==undefined) 出.太字 = !!f.太字;
+  }
+  return 出;
+}
+
+/* ── 窓 ─────────────────────────────────────────── */
+function _cfSel(){ return { r1:Math.min(selR1,selR2), c1:Math.min(selC1,selC2), r2:Math.max(selR1,selR2), c2:Math.max(selC1,selC2) }; }
+function _cfWhere(範囲){
+  return colLetter(範囲.c1)+(範囲.r1+1) + ((範囲.r1===範囲.r2&&範囲.c1===範囲.c2)?'':('〜'+colLetter(範囲.c2)+(範囲.r2+1)));
+}
+function openCondFormat(){
+  hideCtxMenu();
+  var 範囲 = _cfSel();
+  document.getElementById('cfWhere').textContent = _cfWhere(範囲);
+  document.getElementById('cfKind').value = 'セルの値';
+  document.getElementById('cfOp').value = 'より大きい';
+  document.getElementById('cfV1').value = '';
+  document.getElementById('cfV2').value = '';
+  document.getElementById('cfFill').value = CondFormat.既定の書式.塗り;
+  document.getElementById('cfColor').value = CondFormat.既定の書式.文字色;
+  document.getElementById('cfBold').checked = false;
+  cfKindChange();
+  renderCfList();
+  document.getElementById('cfOverlay').style.display='flex';
+}
+function closeCondFormat(){ document.getElementById('cfOverlay').style.display='none'; }
+function cfKindChange(){
+  var k = document.getElementById('cfKind').value;
+  var op = document.getElementById('cfOp');
+  var 見せる = function(id,出す){ document.getElementById(id).style.display = 出す ? 'flex' : 'none'; };
+  op.innerHTML = '';
+  var 並び = (k==='セルの値') ? ['より大きい','より小さい','以上','以下','等しい','等しくない','範囲内']
+           : (k==='上位下位') ? ['上位','下位'] : [];
+  for(var i=0;i<並び.length;i++){ var o=document.createElement('option'); o.value=並び[i]; o.textContent=並び[i]; op.appendChild(o); }
+  見せる('cfOpRow', 並び.length>0);
+  見せる('cfV1Row', k==='セルの値'||k==='文字を含む'||k==='上位下位'||k==='式');
+  見せる('cfV2Row', k==='セルの値');
+  document.getElementById('cfV1Label').textContent =
+    (k==='文字を含む') ? '含む字' : (k==='上位下位') ? '何個' : (k==='式') ? '式' : '数か文字';
+  document.getElementById('cfV1').placeholder =
+    (k==='文字を含む') ? 'りんご' : (k==='上位下位') ? '10' : (k==='式') ? '=$A1>25' : '25';
+  if(k==='上位下位' && !document.getElementById('cfV1').value) document.getElementById('cfV1').value = '10';
+  cfCount();
+}
+function _cfFormFromWindow(){
+  var k = document.getElementById('cfKind').value;
+  var v1 = document.getElementById('cfV1').value;
+  /* ★数の読み方は lib/typed-value.js の1本だけ★（カンマを外す規則を ここに写さない）
+     1,234 と打たれても 実Excelと同じ読み方になる。 */
+  var 数に = function(t){
+    var 字 = String(t);
+    if(字.trim()==='') return t;
+    /* ★1,234 のような 桁区切りは TypedValue が読む（規則は1本だけ）★ */
+    var r = (typeof TypedValue!=='undefined') ? TypedValue.parseTyped(字) : null;
+    if(r && typeof r.num==='number') return r.num;
+    var n = Number(字);
+    return (!isNaN(n) && 字.trim()!=='') ? n : t;
+  };
+  var 値1 = (k==='セルの値' || k==='上位下位') ? 数に(v1) : v1;
+  var 値2 = 数に(document.getElementById('cfV2').value);
+  return {
+    範囲: _cfSel(),
+    種類: k,
+    演算: document.getElementById('cfOp').value,
+    値1: 値1,
+    値2: 値2,
+    書式: {
+      塗り: document.getElementById('cfFill').value,
+      文字色: document.getElementById('cfColor').value,
+      太字: document.getElementById('cfBold').checked,
+    },
+  };
+}
+/** ★押す前に「今 何個 当たるか」を出す★ */
+function cfCount(){
+  var ru = _cfFormFromWindow();
+  var セルたち = [], 位置 = [];
+  for(var r=ru.範囲.r1;r<=ru.範囲.r2;r++) for(var c=ru.範囲.c1;c<=ru.範囲.c2;c++){ セルたち.push(getCell(r,c)); 位置.push([r,c]); }
+  var n = 0;
+  for(var i=0;i<セルたち.length;i++){
+    var 文脈 = { 範囲の値たち: セルたち };
+    if(ru.種類==='式'){ (function(p){ 文脈.式で判定 = function(){ return _cfFormulaHit(ru,p[0],p[1]); }; })(位置[i]); }
+    if(CondFormat.当たるか(セルたち[i], ru, 文脈)) n++;
+  }
+  document.getElementById('cfCount').textContent =
+    '今の決め方だと ' + n + '個 当たります（' + セルたち.length + 'マス中）';
+  return n;
+}
+function applyCondFormat(){
+  var ru = _cfFormFromWindow();
+  if(ru.種類==='文字を含む' && !String(ru.値1).trim()){ document.getElementById('cfMsg').textContent='含む字を 入れてください'; return; }
+  if(ru.種類==='式' && !String(ru.値1).trim()){ document.getElementById('cfMsg').textContent='式を 入れてください'; return; }
+  if(ru.種類==='セルの値' && String(ru.値1).trim()===''){ document.getElementById('cfMsg').textContent='比べる物を 入れてください'; return; }
+  var n = cfCount();
+  _cfRules().unshift(ru);                 /* ★新しい物を先頭＝一番強い（Excelの画面と同じ）★ */
+  document.getElementById('cfMsg').textContent = '';
+  renderCfList();
+  _cfBeginPass(); render();
+  showToast('<span class="toast-h">' + n + '個に 色を付けました</span>'
+    + _cfWhere(ru.範囲) + '／見た目だけです。値も式も 変えていません。');
+}
+function cfDeleteRule(i){ _cfRules().splice(i,1); renderCfList(); _cfBeginPass(); render(); }
+function cfMoveRule(i,d){
+  var a = _cfRules();
+  var j = i + d;
+  if(j<0 || j>=a.length) return;
+  var t = a[i]; a[i]=a[j]; a[j]=t;
+  renderCfList(); _cfBeginPass(); render();
+}
+function _cfDescribe(ru){
+  var 場所 = _cfWhere(ru.範囲);
+  var 中 = (ru.種類==='セルの値') ? (ru.演算==='範囲内' ? (ru.値1+'〜'+ru.値2+' の間') : (ru.値1+' '+ru.演算))
+        : (ru.種類==='文字を含む') ? ('「'+ru.値1+'」を含む')
+        : (ru.種類==='上位下位') ? (ru.演算+' '+ru.値1+'個')
+        : (ru.種類==='式') ? ('式 '+ru.値1)
+        : ru.種類;
+  return 場所 + '／' + 中;
+}
+function renderCfList(){
+  var box = document.getElementById('cfList');
+  var a = _cfRules();
+  if(!a.length){ box.innerHTML = '<div style="font-size:12px;color:#333333;">まだ 1つも付けていません</div>'; return; }
+  var h = '';
+  for(var i=0;i<a.length;i++){
+    var f = a[i].書式||{};
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #EAF6F0;">'
+      +  '<span style="display:inline-block;width:22px;height:16px;border:1px solid #C8ECD8;border-radius:4px;background:'
+      +  (f.塗り||'#ffffff') + ';color:' + (f.文字色||'#333333') + ';font-size:10px;text-align:center;line-height:16px;'
+      +  (f.太字?'font-weight:700;':'') + '">あ</span>'
+      +  '<span style="flex:1;font-size:12px;color:#333333;">' + (i+1) + '. ' + _cfDescribe(a[i]) + '</span>'
+      +  '<button onclick="cfMoveRule(' + i + ',-1)" title="上へ（強くする）" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:8px;padding:2px 8px;font-size:12px;cursor:pointer;font-family:inherit;">↑</button>'
+      +  '<button onclick="cfMoveRule(' + i + ',1)" title="下へ" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:8px;padding:2px 8px;font-size:12px;cursor:pointer;font-family:inherit;">↓</button>'
+      +  '<button onclick="cfDeleteRule(' + i + ')" title="消す" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:8px;padding:2px 8px;font-size:12px;cursor:pointer;font-family:inherit;">消す</button>'
+      +  '</div>';
+  }
+  box.innerHTML = h;
+}
+
+/* ══ 入力の決まり（データの入力規則）══════════════════
+   ★実Excel 16.0.20228 を COM で押して測った通り★（2026-08-21）
+     ・一覧から選ぶ／整数の範囲 の2つ（測った物だけ作る）
+     ・★空は「合っている」扱い★（IgnoreBlank=True）
+     ・★止めるのは「打った時」だけ★＝貼り付け・読み込み・並べ替え・置換では 止めない。
+       （Excel も COM で入れると そのまま入った＝実測）
+     ・★先に入っていた合わない値は 消さない★（Excel も消えない＝実測）
+   ★うちの上乗せ★＝合っていないセルを ★数えて出す★（Excel は黙って抱える）
+   決まりは sheets[i].validations に { 'r,c': {kind,items|min,max} } で持つ。 */
+
+function _validRules(){
+  var sh = sheets[activeSheet];
+  if(!sh.validations) sh.validations = {};
+  return sh.validations;
+}
+function validRuleAt(r,c){ return _validRules()[r+','+c] || null; }
+
+/** 打った字が 決まりに合っているか（合わなければ 理由を出して false） */
+function validGate(r,c,text){
+  var rule = validRuleAt(r,c);
+  if(!rule) return true;
+  var res = GridValid.check(rule, text);
+  if(res.ok) return true;
+  showToast('入りません：' + res.why);
+  return false;
+}
+
+function openValid(){
+  hideCtxMenu();
+  var rule = validRuleAt(selR1,selC1);
+  var el = document.getElementById('validOverlay');
+  var 一マス = (selR1===selR2 && selC1===selC2);
+  document.getElementById('validWhere').textContent =
+    colLetter(selC1)+(selR1+1) + (一マス ? '' : '〜'+colLetter(selC2)+(selR2+1));
+  document.getElementById('validKind').value = rule ? (rule.kind==='list'?'list':'int') : 'list';
+  document.getElementById('validItems').value = (rule && rule.kind==='list') ? (rule.items||[]).join(',') : '';
+  document.getElementById('validMin').value = (rule && rule.kind!=='list' && rule.min!==null && rule.min!==undefined) ? rule.min : '';
+  document.getElementById('validMax').value = (rule && rule.kind!=='list' && rule.max!==null && rule.max!==undefined) ? rule.max : '';
+  document.getElementById('validNow').textContent = rule ? ('今の決まり … ' + GridValid.describe(rule)) : '今は 決まりが在りません';
+  document.getElementById('validClearBtn').style.display = rule ? '' : 'none';
+  document.getElementById('validMsg').textContent = '';
+  validKindChange();
+  el.style.display='flex';
+  setTimeout(function(){ var i=document.getElementById('validItems'); if(i && i.offsetParent) i.focus(); },0);
+}
+function closeValid(){ document.getElementById('validOverlay').style.display='none'; }
+function validKindChange(){
+  var list = document.getElementById('validKind').value === 'list';
+  document.getElementById('validListRow').style.display = list ? '' : 'none';
+  document.getElementById('validNumRow').style.display  = list ? 'none' : '';
+}
+
+function applyValid(){
+  var kind = document.getElementById('validKind').value;
+  var rule;
+  if(kind === 'list'){
+    var items = GridValid.parseList(document.getElementById('validItems').value);
+    if(!items.length){ document.getElementById('validMsg').textContent = '選ぶ物を カンマで区切って書いてね（例：りんご,みかん）'; return; }
+    rule = { kind:'list', items:items };
+  }else{
+    var mn = document.getElementById('validMin').value.trim();
+    var mx = document.getElementById('validMax').value.trim();
+    if(mn === '' && mx === ''){ document.getElementById('validMsg').textContent = '下か上か どちらかは 書いてね'; return; }
+    if((mn!=='' && isNaN(Number(mn))) || (mx!=='' && isNaN(Number(mx)))){
+      document.getElementById('validMsg').textContent = '下と上は 数で書いてね'; return; }
+    if(mn!=='' && mx!=='' && Number(mn) > Number(mx)){
+      document.getElementById('validMsg').textContent = '下が 上より大きくなっています'; return; }
+    rule = { kind:'int', min: mn==='' ? null : Number(mn), max: mx==='' ? null : Number(mx) };
+  }
+  var sh = sheets[activeSheet];
+  sh.validations = GridValid.setRange(_validRules(), selR1, selC1, selR2, selC2, rule);
+  closeValid();
+  /* ★先に入っていた値は 消さない（Excelと同じ実測）。だが 黙らない＝数えて出す★ */
+  var bad = GridValid.countBad(sh.data, sh.validations, GridPrint.shown);
+  var 何個 = (Math.abs(selR2-selR1)+1) * (Math.abs(selC2-selC1)+1);
+  showToast(何個 + 'マスに 決まりを付けました（' + GridValid.describe(rule) + '）'
+    + (bad.count ? '／<b>合っていない値が ' + bad.count + '個 在ります（消していません）</b>' : ''));
+  render();
+}
+
+function clearValid(){
+  var sh = sheets[activeSheet];
+  sh.validations = GridValid.setRange(_validRules(), selR1, selC1, selR2, selC2, null);
+  closeValid();
+  showToast('決まりを外しました');
+  render();
+}
+
+/** ★合っていないセルを 数えて 最初の1つへ飛ぶ★（Excel には無い） */
+function showBadCells(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet];
+  var rules = sh.validations || {};
+  var 決まり数 = Object.keys(rules).length;
+  if(!決まり数){ showToast('このシートには まだ 決まりが在りません'); return; }
+  var bad = GridValid.countBad(sh.data, rules, GridPrint.shown);
+  if(!bad.count){ showToast(決まり数 + 'マスの決まりを見て、合っていない値は 0個でした'); return; }
+  var f = bad.cells[0];
+  selR1=selR2=f.r; selC1=selC2=f.c;
+  scrollToCell(f.r,f.c); updateBar(); render();
+  showToast('合っていない値が ' + bad.count + '個（' + 決まり数 + 'マス中）／'
+    + colLetter(f.c)+(f.r+1) + '「' + f.text + '」' + f.why);
+}
+
+/* ══ 検索と置換 ══════════════════════════════════════════════════════
+   ★実Excel 16.0.20228 を COM で動かして測った通り★（2026-08-21）
+     ・★置換は「式」を見る★（=A1*2 に 2→9 で ★=A1*9★・答えが 4→81）
+     ・大文字と小文字は ★既定で区別しない★／一部でも置き換える（既定）
+     ・★全角と半角は 別物★／★* ? はワイルドカード・~* で * そのもの★
+     ・次を探すのは ★選んだセルの次から★
+   ★一番 危ない所（実測⑦）★
+     A1=10 ／ A2==A1+100 に 「10」→「20」で ★=A1+200★（答え 110→220）
+     ＝ ★Excel 自身が こうなる★。うちも同じにするが、
+       ★式を何本 書き換えたかを 必ず知らせる★（黙って値が変えない）。
+   ★作っていない物★ 書式で探す／シート全部を横断／「すべて検索」の一覧 */
+var _findReplaceMode = false;
+function _findOpts(){
+  return {
+    matchCase: !!document.getElementById('findCase').checked,
+    whole: !!document.getElementById('findWhole').checked,
+  };
+}
+function _findMsg(t){ var el=document.getElementById('findMsg'); if(el) el.textContent = t || ''; }
+function openFind(置換する){
+  _findReplaceMode = !!置換する;
+  document.getElementById('findTitle').textContent = 置換する ? '検索と置換' : '検索';
+  document.getElementById('findReplaceRow').style.display = 置換する ? 'flex' : 'none';
+  document.getElementById('findReplaceBtn').style.display = 置換する ? '' : 'none';
+  document.getElementById('findReplaceAllBtn').style.display = 置換する ? '' : 'none';
+  document.getElementById('findOverlay').style.display = 'flex';
+  _findMsg('');
+  var w = document.getElementById('findWhat');
+  setTimeout(function(){ w.focus(); w.select(); }, 30);
+}
+function closeFind(){ document.getElementById('findOverlay').style.display = 'none'; }
+/** 今 見ている広さ（空の所まで全部は見ない＝中身が在る一番外まで） */
+function _findRange(){
+  var data = sheets[activeSheet].data, maxR = 0, maxC = 0;
+  for(var k in data){ var p=k.split(','); var r=+p[0], c=+p[1]; if(r>maxR) maxR=r; if(c>maxC) maxC=c; }
+  return { rows: maxR+1, cols: maxC+1 };
+}
+function findNextCell(){
+  var what = document.getElementById('findWhat').value;
+  if(!what){ _findMsg('探す言葉を入れてね'); return null; }
+  var data = sheets[activeSheet].data, rc = _findRange();
+  var 見つけた = GridFind.findNext(function(r,c){ return data[r+','+c]; },
+    rc.rows, rc.cols, { r: selR1, c: selC1 }, what, _findOpts());
+  if(!見つけた){ _findMsg('見つかりません'); return null; }
+  sel(見つけた.r, 見つけた.c, 見つけた.r, 見つけた.c);
+  _findMsg(colLetter(見つけた.c) + (見つけた.r+1) + ' が見つかりました');
+  return 見つけた;
+}
+function replaceOne(){
+  var what = document.getElementById('findWhat').value;
+  var to = document.getElementById('findTo').value;
+  if(!what){ _findMsg('探す言葉を入れてね'); return; }
+  var data = sheets[activeSheet].data;
+  var cell = data[selR1+','+selC1];
+  var opts = _findOpts();
+  /* 今いる所が あたっていれば まず そこを置き換える */
+  if(GridFind.match(cell, what, opts)){
+    var 次の字 = GridFind.replacedText(cell, what, to, opts);
+    var 式だった = GridFind.isFormula(cell);
+    setCell(selR1, selC1, 次の字);
+    updateBar(); render();
+    _findMsg(colLetter(selC1) + (selR1+1) + ' を置き換えました'
+      + (式だった ? '（★式でした＝答えが変わります★）' : ''));
+  }
+  findNextCell();
+}
+function replaceAll(){
+  var what = document.getElementById('findWhat').value;
+  var to = document.getElementById('findTo').value;
+  if(!what){ _findMsg('探す言葉を入れてね'); return; }
+  var opts = _findOpts();
+  var data = sheets[activeSheet].data, rc = _findRange();
+  var 直す = [];
+  for(var r=0;r<rc.rows;r++) for(var c=0;c<rc.cols;c++){
+    var cell = data[r+','+c];
+    var 次の字 = GridFind.replacedText(cell, what, to, opts);
+    if(次の字!==null) 直す.push({ r:r, c:c, s:次の字, f:GridFind.isFormula(cell) });
+  }
+  if(!直す.length){ _findMsg('見つかりません'); return; }
+  _pushRowColUndo();                       /* ★取り消し1回で丸ごと戻る★ */
+  var 式の数 = 0;
+  for(var i=0;i<直す.length;i++){ if(直す[i].f) 式の数++; setCell(直す[i].r, 直す[i].c, 直す[i].s, true); }
+  updateBar(); render();
+  /* ★式を何本 書き換えたかを 必ず出す★（Excelと同じ動きだが 黙って値を変えない） */
+  _findMsg(直す.length + 'か所 置き換えました'
+    + (式の数 ? '／うち 式が ' + 式の数 + '本＝答えが変わります' : '')
+    + '（違ったら Ctrl+Z で戻せます）');
+  showToast(直す.length + 'か所 置き換えました'
+    + (式の数 ? '（<b>式が ' + 式の数 + '本 含まれます＝答えが変わります</b>）' : ''));
+}
+
+/* ══ ウィンドウ枠の固定 ══════════════════════════════════════════════
+   ★実Excel 16.0.20228 を COM で動かして測った（2026-08-21）★
+     B2→上1行/左1列 ／ A2→上1行/左0列 ／ B1→上0行/左1列 ／ ★C4→上3行/左2列★
+     ＝ ★選んだセルの「上の行」と「左の列」が固定される★
+     ★固定しても 合計は変わらない★（見た目だけ）
+   ★真似ない事★
+     A1 を選んで固定すると 実測は ★上9行/左10列★＝今 見えている範囲の真ん中で割る動き。
+     ★画面の大きさで数が変わる＝同じ数を焼き付けても 画面が違えば合わない★。
+     ⇒ うちは ★A1 では固定せず 理由を出す★。
+   ★作っていない物★ ウィンドウの分割／先頭行だけ・先頭列だけのボタン／色の付いた境目 */
+function freezePanes(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet];
+  if(selR1 === 0 && selC1 === 0){
+    showToast('A1 では固定できません（固定したい行の1つ下・列の1つ右を選んでね）');
+    return;
+  }
+  _pushRowColUndo();                       /* ★取り消し1回で戻る★ */
+  sh.freezeRow = selR1;                    /* 選んだセルの ★上の行★ を固定 */
+  sh.freezeCol = selC1;                    /* 選んだセルの ★左の列★ を固定 */
+  scrollTop = 0; scrollLeft = 0;           /* 固定した所が隠れないように 先頭へ戻す */
+  var ctl = document.getElementById('ctx-unfreeze'); if(ctl) ctl.style.display = '';
+  render();
+  showToast('上の' + sh.freezeRow + '行 と 左の' + sh.freezeCol + '列 を固定しました'
+    + '（<b>計算は何も変わりません</b>）');
+}
+function unfreezePanes(){
+  hideCtxMenu();
+  var sh = sheets[activeSheet];
+  if(!sh.freezeRow && !sh.freezeCol){ showToast('固定はしていません'); return; }
+  _pushRowColUndo();
+  sh.freezeRow = 0; sh.freezeCol = 0;
+  var ctl = document.getElementById('ctx-unfreeze'); if(ctl) ctl.style.display = 'none';
+  render();
+  showToast('固定をやめました');
+}
+
+/** F4 … カーソルの下の参照の $ を1つ進める（式を編集している時だけ）。
+ *  ★4つの形は実Excelで測った★／★回る順番だけは測れていない★（F4はCOMから押せない）。 */
+function toggleAbsRef(){
+  /* 今 字を打っている欄（数式バー か セルの入力欄）を取る */
+  var ae = document.activeElement;
+  var el = (ae && (ae.id==='formula-input' || ae.id==='cell-input')) ? ae : getRefInput();
+  if(!el || !el.value || (el.value.charAt(0)!=='=' && el.value.charAt(0)!=='＝')) return;
+  var pos;
+  try{ pos = el.selectionStart; }catch(e){ pos = null; }
+  if(pos===null||pos===undefined) pos = (el.id==='formula-input' && typeof _fiCursorPos==='number') ? _fiCursorPos : el.value.length;
+  var res = GridRefEdit.toggleAbsAt(el.value, pos);
+  if(!res.ok) return;
+  el.value = res.v;
+  try{ el.setSelectionRange(res.pos, res.pos); }catch(e){}
+  if(el.id==='formula-input') _fiCursorPos = res.pos;
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+}
+
 function toHFVal(v){
   if(v===''||v===null||v===undefined) return null;
   if(typeof v==='string'&&v[0]==='=') return v; // 数式はそのまま
@@ -1430,6 +2299,45 @@ function updateBar(){
   updateFormulaDisplay(cell.f||'');
   updateFormatBar(cell);
   updateActionBtn();
+  updateStatusBar();
+}
+
+/* ★選んだ所の 合計・平均・個数を 帯に出す★
+   数え方は lib/grid-stats.js（実Excel を COM で押して測った真値）。
+   ★黙って小さい合計を出さない★＝数の形の文字やエラーが在れば 理由を出す。 */
+function updateStatusBar(){
+  var el = document.getElementById('status-bar');
+  if(!el) return;
+  var data = sheets[activeSheet].data, cells = [];
+  var r1=Math.min(selR1,selR2), r2=Math.max(selR1,selR2);
+  var c1=Math.min(selC1,selC2), c2=Math.max(selC1,selC2);
+  for(var r=r1;r<=r2;r++) for(var c=c1;c<=c2;c++) cells.push(data[r+','+c] || null);
+  var 出す = GridStats.items(GridStats.summarize(cells));
+  if(!出す.length){
+    el.innerHTML = '<span class="sb-i" id="sb-ready">準備完了</span>';
+    return;
+  }
+  var h = '';
+  for(var i=0;i<出す.length;i++){
+    var it = 出す[i];
+    h += '<span class="sb-i' + (it.注意 ? ' sb-warn' : '')
+       + '" data-n="' + it.名 + '" data-v="' + it.値 + '">'
+       + '<span class="sb-n">' + it.名 　+ '</span>'
+       + '<span class="sb-v">' + it.値 + '</span></span>';
+  }
+  el.innerHTML = h;
+  _sbHeight(el);
+}
+
+/* ★帯の高さを 実測して AIボタンを その上に退かす★
+   375px の実機で測ったら ★AIボタンが 帯の「足していません」と合計を 隠していた★
+   （2026-08-21 実測）。★DOMに在る≠読める★ */
+function _sbHeight(el){
+  el = el || document.getElementById('status-bar');
+  if(!el) return 0;
+  var h = Math.round(el.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--sb-h', h + 'px');
+  return h;
 }
 var _canvasBCR=null, _canvasBCRDirty=true;
 function _getCanvasBCR(){ if(_canvasBCRDirty||!_canvasBCR){_canvasBCR=canvas.getBoundingClientRect();_canvasBCRDirty=false;} return _canvasBCR; }
@@ -1698,25 +2606,77 @@ function render(){
   _renderPending=true;
   requestAnimationFrame(function(){ _renderPending=false; _doRender(); });
 }
+/* ★固定した行・列の高さ／幅（画面の大きさに合わせた実寸）★ */
+function _freezeH(){ var n=sheets[activeSheet].freezeRow||0, h=0; for(var i=0;i<n;i++) h+=rH(i); return h; }
+function _freezeW(){ var n=sheets[activeSheet].freezeCol||0, w=0; for(var i=0;i<n;i++) w+=cW(i); return w; }
+
+/* ══ 画面を描く ══════════════════════════════════════════════════════
+   ★ウィンドウ枠の固定は「同じ絵を もう一度 スクロールなしで描いて 帯だけ切り抜く」★
+   （2026-08-21）。座標の計算（rowY/colX）は 1文字も変えていない＝
+   ★固定した帯は「スクロールしていない同じ画面」そのもの★ なので、
+   scrollTop / scrollLeft を 0 にして もう一度 描き、その帯だけ clip すれば合う。
+   ★描く順は 後ろほど 上に出る★ … ①流れる所 → ②上の帯 → ③左の帯 → ④左上の角 */
 function _doRender() {
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,wrapW,wrapH);
+  var _fzR = sheets[activeSheet].freezeRow||0, _fzC = sheets[activeSheet].freezeCol||0;
+  _renderPass();                                       /* ① 流れる所（今までどおり） */
+  if(_fzR>0 || _fzC>0){
+    var _sT=scrollTop, _sL=scrollLeft, _wH=wrapH, _wW=wrapW;
+    var _fH=_freezeH(), _fW=_freezeW();
+    if(_fzR>0){                                        /* ② 上の帯（固定した行） */
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,_wW,HDR_H+_fH); ctx.clip();
+      scrollTop=0; wrapH=HDR_H+_fH; _renderPass(); scrollTop=_sT; wrapH=_wH; ctx.restore();
+    }
+    if(_fzC>0){                                        /* ③ 左の帯（固定した列） */
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,HDR_W+_fW,_wH); ctx.clip();
+      scrollLeft=0; wrapW=HDR_W+_fW; _renderPass(); scrollLeft=_sL; wrapW=_wW; ctx.restore();
+    }
+    if(_fzR>0 && _fzC>0){                              /* ④ 左上の角（両方 固定） */
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,HDR_W+_fW,HDR_H+_fH); ctx.clip();
+      scrollTop=0; scrollLeft=0; wrapH=HDR_H+_fH; wrapW=HDR_W+_fW;
+      _renderPass();
+      scrollTop=_sT; scrollLeft=_sL; wrapH=_wH; wrapW=_wW; ctx.restore();
+    }
+    /* ★固定した所の境目に線を1本★（どこで固定されているか 目で分かるように） */
+    ctx.strokeStyle='#3D9E72'; ctx.lineWidth=1.5; ctx.beginPath();
+    if(_fzR>0){ var _ly=Math.round(HDR_H+_fH)+0.5; ctx.moveTo(0,_ly); ctx.lineTo(_wW,_ly); }
+    if(_fzC>0){ var _lx=Math.round(HDR_W+_fW)+0.5; ctx.moveTo(_lx,0); ctx.lineTo(_lx,_wH); }
+    ctx.stroke();
+  }
+}
 
+function _renderPass() {
+  _cfBeginPass();                      /* ★条件付き書式：1回の描き直しの間だけ 範囲の値を覚える★ */
   var sC=xToC(HDR_W), sR=yToR(HDR_H), eC=sC, eR=sR;
-  while(colX(eC)<wrapW && eC<COLS-1) eC++;
-  while(rowY(eR)<wrapH && eR<ROWS-1) eR++;
+  /* ★隠れている行が 多いと ここで 100万行 歩いて 画面が 真っ白になる★
+     （実測 2026-08-28＝切り替えで 334行 隠したら 表が 消えた）
+     ＝隠れた行は 高さ0なので rowY が 進まず、eR が ROWS-1 まで 伸びる。
+     ⇒ ★歩く所を 隠れている数だけ 伸ばして 止める★（今までの座標の計算は 1文字も変えない）。 */
+  var _sh = sheets[activeSheet];
+  var _隠れ行 = Object.keys(_sh.hiddenRows||{}).length
+              + Object.keys(_sh.kirikaeRows||{}).length
+              + Object.keys(_sh.filterHidden||{}).length;
+  var _隠れ列 = Object.keys(_sh.hiddenCols||{}).length
+              + Object.keys(_sh.kirikaeCols||{}).length;
+  var _行の端 = Math.min(ROWS-1, sR + Math.ceil(wrapH/Math.max(1,ROW_H*scale)) + _隠れ行 + 4);
+  var _列の端 = Math.min(COLS-1, sC + Math.ceil(wrapW/Math.max(1,COL_W*scale)) + _隠れ列 + 4);
+  while(colX(eC)<wrapW && eC<_列の端) eC++;
+  while(rowY(eR)<wrapH && eR<_行の端) eR++;
 
   // 1. 全体白背景（高速）
   ctx.fillStyle=C_CELL_BG;
   ctx.fillRect(HDR_W,HDR_H,wrapW,wrapH);
 
-  // 2. bgColorあるセルを上塗り
+  // 2. bgColorあるセルを上塗り（★条件付き書式が在れば そちらが勝つ＝手の塗りは消さない★）
   for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++){
     var cell=getCell(r,c);
-    if(!cell.bgColor) continue;
+    var cf=cfFormatAt(r,c,cell);
+    var 塗り=(cf&&cf.塗り)||cell.bgColor;
+    if(!塗り) continue;
     var cx=colX(c),cy=rowY(r),cw=cW(c),ch=rH(r);
     if(cx+cw<HDR_W||cx>wrapW||cy+ch<HDR_H||cy>wrapH) continue;
-    ctx.fillStyle=cell.bgColor;
+    ctx.fillStyle=塗り;
     ctx.fillRect(cx,cy,cw,ch);
   }
 
@@ -1800,6 +2760,9 @@ function _doRender() {
   ctx.font=fw+' '+fs+'px "Noto Sans JP",sans-serif';
   for(var c=sC;c<=eC+1;c++){
     var x=colX(c),w=cW(c); if(x+w<0||x>wrapW) continue;
+    /* ★隠れている列（幅0）に 字を 描かない★＝実測 2026-08-28、
+       C〜I を隠したら ★A B の隣に CDEFGHI が 重なって出た★（Excelは 出さない）。 */
+    if(w<=0) continue;
     ctx.fillStyle=_colInAnySel(c)?'#1E88E5':C_HDR_TXT;
     ctx.fillText(colLetter(c),x+w/2,HDR_H/2);
   }
@@ -1808,6 +2771,7 @@ function _doRender() {
   ctx.font=rf+'px "Noto Sans JP",sans-serif';
   for(var r=sR;r<=eR+1;r++){
     var y=rowY(r),h=rH(r); if(y+h<0||y>wrapH) continue;
+    if(h<=0) continue;                 /* ★隠れている行（高さ0）にも 字を 描かない★ */
     ctx.fillStyle=_rowInAnySel(r)?'#1E88E5':C_HDR_TXT;
     ctx.fillText(r+1,HDR_W-4,y+h/2);
   }
@@ -1942,6 +2906,10 @@ function _doRender() {
 
 function drawText(r,c){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
+  /* ★隠れている行・列には 字を 描かない★
+     ＝高さ0でも 字は 描けてしまい、★上下の行に 潰れて 重なって出た★
+       （2026-08-28 実物の絵で 見えた：2/28 の下に 別の見出しが 重なっていた）。 */
+  if(w<=0||h<=0) return;
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
   var cell=getCell(r,c);
 
@@ -1955,14 +2923,15 @@ function drawText(r,c){
 
   // フォント
   var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||12)*scale)));
-  var weight = cell.bold ? 'bold' : 'normal';
+  var _cf = (typeof cfFormatAt==='function') ? cfFormatAt(r,c,cell) : null;   /* ★条件付き書式★ */
+  var weight = ((_cf && _cf.太字!==undefined) ? _cf.太字 : cell.bold) ? 'bold' : 'normal';
   var style  = cell.italic ? 'italic' : 'normal';
   ctx.font = style+' '+weight+' '+fontSize+'px "Noto Sans JP",sans-serif';
 
   // 文字色
   var isFormula = cell.f && cell.f[0]==='=';
   var showRaw = isFormula && cell.d===cell.f;
-  ctx.fillStyle = showRaw ? C_FORMULA : (cell.color||C_CELL_TXT);
+  ctx.fillStyle = showRaw ? C_FORMULA : ((_cf&&_cf.文字色) || cell.color || C_CELL_TXT);
 
   // 文字揃え
   var align = cell.align||'left';
@@ -2034,6 +3003,7 @@ function drawBorder(r,c){
   if(!cell.border) return; // borderなし → 即return（最適化）
   var b=cell.border;
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
+  if(w<=0||h<=0) return;               /* ★隠れている所に 線を 描かない★ */
   if(x+w<HDR_W||x>wrapW||y+h<HDR_H||y>wrapH) return;
   ctx.save();
   if(b.top){
@@ -2100,21 +3070,41 @@ function insertRefAddr(r1,c1,r2,c2){
   var el = getRefInput();
   if(!el) return;
   var v = el.value;
-  // 最後がセル参照アドレス（A1 or A1:B2）なら置換、そうでなければ追加
-  var lastRefRe = /(\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?)$/;
-  if(lastRefRe.test(v)){
-    v = v.replace(lastRefRe, addr);
+
+  /* ★カーソルの位置で決める（2026-08-06・司さんが実機で踏んだ）★
+     以前は「末尾が参照なら置換／でなければ末尾に追加」だったため、
+     「=B1+30」の B1 を直そうとして A1 を触ると「=B1+30A1」になり、
+     ★B1 を直す手段が無かった★。判定は lib/grid-refedit.js（純関数・テスト済み）。
+     ★テスト線では 2026-08-06 に直っていたのに、本番には運ばれていなかった★
+     （2026-08-18 に本番とテスト線の差を数えて見つけた）。 */
+  var pos;
+  if(el.id==='formula-input'){
+    pos = (typeof _fiCursorPos==='number') ? _fiCursorPos : v.length;
   } else {
-    v = v + addr;
+    try{ pos = el.selectionStart; }catch(e){ pos = v.length; }
   }
+
+  var res = GridRefEdit.refEditAt(v, pos, addr);
+
+  if(!res.ok){
+    /* ★式を1文字も変えない。どうすればいいかだけ伝える★
+       （showToast は book.html 自身が持っている＝★typeof で守らない★。
+         守ると「無ければ黙って素通り」になり、押しても何も起きない画面ができる） */
+    showToast('直したい参照（例 <b>B1</b>）を<b>数式バーで触ってから</b>、セルを選んでください', 4000);
+    try{ el.focus(); }catch(e){}
+    return;
+  }
+
+  v = res.v;
   el.value = v;
   if(el.id==='formula-input'){
-    _fiCursorPos = v.length;
+    _fiCursorPos = res.pos;
+    try{ el.setSelectionRange(res.pos, res.pos); }catch(e){}
     if(typeof updateFormulaDisplay==='function') updateFormulaDisplay(v);
   } else if(el.id==='cell-input'){
-    // cell-input: カーソルを末尾に、input イベント発火で refMode 更新
-    try{ el.setSelectionRange(v.length, v.length); }catch(e){}
+    try{ el.setSelectionRange(res.pos, res.pos); }catch(e){}
     el.dispatchEvent(new Event('input', {bubbles:true}));
+    try{ el.setSelectionRange(res.pos, res.pos); }catch(e){}
   }
   refMode=(v.length>0&&(v[0]==='='||v[0]==='＝'));
   refStartR=r1; refStartC=c1;
@@ -2540,6 +3530,36 @@ function detectTimePattern(values){
 
 </script>
 
+<style>
+/* ★ログインが済むまで 中身を1バイトも見せない（2026-08-23）★
+   book.html は body の直下に箱が並ぶ作りなので ★包み直さずに body の印で隠す★（表の高さの計算を壊さない）。
+   ログインの窓(#loginOv)だけ 残す。★[hidden] は class の display に負けるので !important を付ける★。 */
+body.exally-locked > *:not(#loginOv){display:none!important;}
+</style>
+<style>
+/* ★調べている間の知らせ（2026-08-25 司さん「ぐるぐり／何%を出せ」）★
+   ★人は 画面が変わらないと「固まった」と思う★。300ミリ秒を超えたら出す（それ未満は出さない＝チカチカする）。
+   ★[hidden] は class の display に負ける★ので この1行を必ず置く（他アプリで2回 事故） */
+#bookScan[hidden]{display:none!important;}
+#shindanBtn[hidden]{display:none!important;}
+#macroBtn[hidden]{display:none!important;}
+.book-bn-i[hidden]{display:none!important;}
+/* ★PCでは 箱が 無い物として 並べる★（今までの 見た目を 1ミリも 変えない）
+   ★幅で 分ける★＝ただ書くと この行が 後ろに在るぶん スマホの決まりを 打ち消す
+   （2026-08-29 実測：スマホで 2段目に 行くはずの物が 1段目に 残っていた）。 */
+@media (min-width: 561px) { #headerSay { display: contents; } }
+/* 横に動かす筋は 出さない（見た目は 今までと 同じ） */
+#headerTools::-webkit-scrollbar{display:none;}
+#teianBtn[hidden]{display:none!important;}
+#bookScan{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;
+ background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.14);
+ padding:10px 16px;display:flex;align-items:center;gap:10px;max-width:92vw;}
+/* ★字は 箱に押し込めない（flex/grid の中で1文字ずつ縦に割れる事故が在る）★ */
+#bookScan .bs-t{font-size:13px;color:#333333;line-height:1.6;white-space:nowrap;}
+#bookScan .bs-s{width:16px;height:16px;flex:0 0 16px;border:2px solid #D4EDE1;border-top-color:#52B788;
+ border-radius:50%;animation:bs-spin .8s linear infinite;}
+@keyframes bs-spin{to{transform:rotate(360deg);}}
+</style>
 </head>
 <body>
 
@@ -2648,11 +3668,27 @@ function detectTimePattern(values){
   </div>
   <div class="explain-footer">
     <button onclick="copyExplain()">📋 コピー</button>
-    <button onclick="deepDiveExplain()">💬 深掘り</button>
+    <!-- ★繋がらなかった時は 出さない★＝押しても また同じ所で失敗する（出来ていない物のボタンを見せない） -->
+    <button id="explain-deep" onclick="deepDiveExplain()">💬 深掘り</button>
   </div>
 </div>
 
 <div id="ctx-menu" ontouchstart="event.stopPropagation()">
+  <!-- ★大事な物を 上に★（2026-08-21 指示役）
+       並べ替え・絞り込み・固定・印刷・入力の決まりが 真ん中に在ったため
+       メニューがはみ出した時に ★客の手に届いていなかった★。 -->
+  <div id="ctx-valid-list"></div>
+  <div class="ctx-item" onclick="sortRange('asc')">⬆️ 昇順で並べ替え</div>
+  <div class="ctx-item" onclick="sortRange('desc')">⬇️ 降順で並べ替え</div>
+  <div class="ctx-item" onclick="filterByValue()">🔽 選んだセルの値で絞り込む</div>
+  <div class="ctx-item" id="ctx-clear-filter" style="display:none" onclick="clearFilter()">🔽 絞り込みを解除</div>
+  <div class="ctx-item" onclick="freezePanes()">🧊 ここで固定（選んだセルの 上と左）</div>
+  <div class="ctx-item" id="ctx-unfreeze" style="display:none" onclick="unfreezePanes()">🧊 固定をやめる</div>
+  <div class="ctx-item" onclick="printSheet()">🖨️ 印刷（Ctrl+P）</div>
+  <div class="ctx-item" onclick="openCondFormat()">🎨 条件付き書式（当てはまったら 色を付ける）</div>
+  <div class="ctx-item" onclick="openValid()">✅ 入力の決まり（一覧から選ぶ／数の範囲）</div>
+  <div class="ctx-item" id="ctx-bad-cells" style="display:none" onclick="showBadCells()">⚠️ 決まりに合っていない値を数える</div>
+  <div class="ctx-divider"></div>
   <div class="ctx-item" onclick="explainCell()" style="color:#3D9E72;font-weight:700;">🤖 AIに解説させる</div>
   <div class="ctx-divider"></div>
   <div class="ctx-item" onclick="ctxCut()">✂️ 切り取り <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+X</span></div>
@@ -2675,7 +3711,7 @@ function detectTimePattern(values){
 </div>
 
 <div id="header">
-  <div style="display:flex;align-items:baseline;gap:5px;flex:1;">
+  <div style="display:flex;align-items:baseline;gap:5px;flex:1 1 auto;min-width:0;overflow:hidden;">
     <span class="exally-logo-en">Exally</span>
     <span class="exally-logo-ja">エクサリー</span>
   </div>
@@ -2690,13 +3726,30 @@ function detectTimePattern(values){
     <button class="book-header-nav-item" onclick="openBookVerModal()" title="Excelバージョン">📊</button>
     <button class="book-header-nav-item" onclick="location.href='chat.html?tab=settings'" title="設定">⚙️</button>
   </nav>
-  <div style="display:flex;align-items:center;gap:6px;">
+  <!-- ★狭い画面で 右の端が 切れる★（2026-08-28 実測・幅390で
+         「マクロ」と「Excel版」の2つが ★画面の外★に出て、横に動かす道も 無かった）。
+       ⇒ ★横に 動かせるようにする★（幅が 足りる時は 今までと 同じ）。 -->
+  <div id="headerTools" style="display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
     <!-- ★受け取り口★ 元のファイルは預からない。開いた瞬間に作業用の控えを持ち、保存はそれを書き換える -->
     <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
-    <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを開く（.xlsx / .xlsm / .xlsb）">📂 <span class="hdr-lb">Excelを開く</span></button>
+    <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-    <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイル(.xlsx)として保存">💾 <span class="hdr-lb">Excelに保存</span></button>
-    <button onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;" title="Excelバージョン切替">📊 <span id="bookVerLabel">365</span> ▼</button>
+    <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">💾</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelに</span>書き出す</span></button>
+    <!-- ★5 E2診断★ ★見つかった時だけ 出す★（出来ていない物のボタンを見せない）。
+         色は「押せる物」に使う＝琥珀（赤ではない＝止まってはいない） -->
+    <!-- ★入り口②＝履歴ページ★（見る場所。ここから 何かを始めさせない） -->
+    <!-- ★「こちらから言う」物★＝スマホでは 2段目に 逃がす（字は 1文字も 消さない）
+         PCでは display:contents なので 今までと 同じ 1列に 並ぶ -->
+    <div id="headerSay">
+      <!-- ★数式帳は 見る所★＝設定（動き方を変える所）には 入れない（指示役 裁定 2026-08-29） -->
+      <button id="sushikichoBtn" onclick="location.href='chat.html?tab=book'" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="数式の 覚え書き">📖 数式帳</button>
+    <button id="rirekiBtn" onclick="openRireki('page')" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="これまでにやった事（見る場所）"><span class="hdr-ic">🕘</span> <span class="hdr-lb">これまで</span></button>
+    <!-- ★8 提案★ 見つかった時だけ 出す（出来ていない物のボタンを見せない） -->
+    <button id="teianBtn" hidden onclick="openTeian()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="うちが見つけた「もっと短く書ける所」"></button>
+    <button id="macroBtn" hidden onclick="openMacro()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="このファイルの マクロが 何をしているか"></button>
+    <button id="shindanBtn" hidden onclick="openShindan()" style="background:#FFF6E0;border:1px solid #F0D9A0;color:#8A5A00;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap;" title="開いた時に うちが見つけた「気づけない所」"></button>
+        <button id="bookVerBtn" onclick="openBookVerModal()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="相手が使っているExcelの版を選ぶ"><span class="hdr-ic">📊</span> <span class="hdr-lb"><span class="hdr-lb-long">Excel</span>版 <span id="bookVerLabel">365</span></span> ▼</button>
+</div>
   </div>
 </div>
 
@@ -2708,6 +3761,8 @@ function detectTimePattern(values){
 
 <!-- トースト通知 -->
 
+<!-- ★調べている間だけ出す（終わったら必ず消す）★ -->
+<div id="bookScan" hidden><span class="bs-s"></span><span class="bs-t" id="bookScanTxt">ブック全体を調べています…</span></div>
 <div id="toast"></div>
 
 <!-- 関数パレット -->
@@ -2780,6 +3835,237 @@ function detectTimePattern(values){
 </div>
 
 <!-- ★直す前に必ず見せる窓（方針ver.6「絶対に守る3つ」の②）。alert/confirm は使わない★ -->
+<!-- ★検索と置換★ Excel の Ctrl+F / Ctrl+H に当たる窓。
+     ★出す物は 全部 動く物だけ★（出来ていない物のボタンを出さない）。 -->
+<div id="findOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div id="findTitle" style="font-size:16px;font-weight:700;color:#2E7D54;">検索</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">探す言葉</span>
+        <input id="findWhat" type="text" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <div id="findReplaceRow" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">置き換える</span>
+        <input id="findTo" type="text" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <label style="display:block;font-size:12px;color:#333333;"><input id="findCase" type="checkbox"> 大文字と小文字を区別する</label>
+      <label style="display:block;font-size:12px;color:#333333;"><input id="findWhole" type="checkbox"> セル全体が同じ物だけ</label>
+      <div style="font-size:12px;color:#333333;margin-top:8px;line-height:1.6;">
+        ★式のセルは 式の字を探します★（Excelと同じ）。<code>*</code> はいくつでも・<code>?</code> は1文字。
+        <code>~*</code> と書くと <code>*</code> そのものを探します。
+      </div>
+      <div id="findMsg" style="font-size:12px;color:#333333;margin-top:8px;min-height:1.6em;line-height:1.6;"></div>
+    </div>
+    <div style="padding:10px 18px 14px;border-top:1px solid #D4EDE1;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <button onclick="closeFind()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">閉じる</button>
+      <button onclick="findNextCell()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">次を探す</button>
+      <button id="findReplaceBtn" style="display:none;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="replaceOne()">置き換えて次へ</button>
+      <button id="findReplaceAllBtn" style="display:none;background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="replaceAll()">すべて置き換える</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ★8 提案★ うちから「こう直せますよ」と言う窓。
+     ★見つけるのは 機械（0円）・AIは 言葉にするだけ★／★勝手に直さない★＝出すだけ。 -->
+<div id="tnOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:680px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;" id="tnTitle">もっと短く書ける所が あります</div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="tnBody"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="tnList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:52vh;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="closeTeian()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★8-③ 覚えた手順で 直す前に 見せる窓★
+     ★勝手に直さない★＝当てた結果を そのまま書かず、先に「何か所 どうなるか」を出す。
+     ★出来ていない物のボタンを見せない★＝当たった時しか この窓は開かない。 -->
+<div id="rcOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:680px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;" id="rcTitle">覚えた手順で 直します</div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="rcBody"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="rcList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:52vh;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="手順をやめる()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">やめる</button>
+      <button id="rcGo" onclick="手順を書く()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:none;background:#2E7D54;color:#ffffff;font-weight:700;font-family:inherit;cursor:pointer;">直す</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★6 履歴＝見る場所★（司さん 2026-08-25）
+     ★探す入口にしない★＝ここから 何かを始めさせない。
+     ★置き場は 倉庫（会社の物）★／★客のブックに タブを1つも足さない★
+     （競合は 客のブックに「Claude Log」タブを作る。★真似しない★） -->
+<div id="rkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:680px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">これまでにやった事</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;" id="rkNote"></div>
+      <div id="rkFiles" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;"></div>
+      <div id="rkTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="rkList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:52vh;"></div>
+      <div id="rkMore" style="font-size:12px;color:#333333;margin-top:8px;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="closeRireki()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★5 E2診断★ うちから「ここが危ない」と言う窓。
+     ★聞かれてから答える★のではなく ★開いた時に こちらから出す★（客は 気づけないから）。
+     ★見つけて 場所を出すだけ★＝直しは まだ出さない（順番8＝提案機能）。 -->
+<div id="dgOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:640px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;" id="dgTitle">見えない所で 空になっています</div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="dgBody"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div style="font-size:12px;color:#333333;margin-bottom:6px;" id="dgNext"></div>
+      <div id="dgList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:46vh;"></div>
+      <div id="dgMore" style="font-size:12px;color:#333333;margin-top:8px;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="closeShindan()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★マクロ（VBA）★ 何をしているかを 日本語で出す窓。
+     ★VBAは 動かさない・書き換えない★。読んで 言うだけ。
+     ★分けるのは 機械（AIは0回）★。正しく読めなかった物は 未測定と言う（0本と言わない）。 -->
+<div id="mcOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:640px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">マクロが 何をしているか</div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="mcBody"></div>
+    </div>
+    <div style="padding:10px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="mcList" style="border:1px solid #D4EDE1;border-radius:12px;overflow:auto;max-height:52vh;"></div>
+      <div id="mcMore" style="font-size:12px;color:#333333;margin-top:8px;"></div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="closeMacro()" style="font-size:15px;padding:10px 18px;border-radius:12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★条件付き書式★ Excel の「ホーム→条件付き書式」に当たる窓。
+     ★1画面で終わらせる★（Excelの二段構えは真似ない＝迷わせない）。
+     ★押す前に「今 何個 当たるか」を出す★ -->
+<div id="cfOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:520px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">条件付き書式</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="cfWhere">A1</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">どうなったら</span>
+        <select id="cfKind" onchange="cfKindChange()" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;background:#ffffff;">
+          <option value="セルの値">セルの値が</option>
+          <option value="文字を含む">文字を含む</option>
+          <option value="重複する値">重複する値</option>
+          <option value="一意の値">一意の値</option>
+          <option value="上位下位">上位／下位</option>
+          <option value="式">式で決める</option>
+        </select>
+      </div>
+      <div id="cfOpRow" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">比べ方</span>
+        <select id="cfOp" onchange="cfCount()" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;background:#ffffff;"></select>
+      </div>
+      <div id="cfV1Row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span id="cfV1Label" style="min-width:5.5em;">数か文字</span>
+        <input id="cfV1" type="text" oninput="cfCount()" placeholder="25" style="flex:1;min-width:120px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <div id="cfV2Row" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">もう一つ</span>
+        <input id="cfV2" type="text" oninput="cfCount()" placeholder="範囲内の時だけ" style="flex:1;min-width:120px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">どう見せる</span>
+        <label style="display:inline-flex;align-items:center;gap:4px;">塗り
+          <input id="cfFill" type="color" value="#FFC7CE" style="width:38px;height:28px;border:1px solid #C8ECD8;border-radius:6px;background:#fff;padding:2px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">文字
+          <input id="cfColor" type="color" value="#9C0006" style="width:38px;height:28px;border:1px solid #C8ECD8;border-radius:6px;background:#fff;padding:2px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;"><input id="cfBold" type="checkbox">太字</label>
+      </div>
+      <div id="cfCount" style="font-size:12px;color:#3D9E72;font-weight:700;margin-top:6px;">今の決め方だと 0個 当たります</div>
+      <div style="font-size:12px;color:#333333;margin-top:8px;line-height:1.6;">
+        見た目だけです。値も式も 変わりません（合計も動きません）。
+        手で塗った色は 消しません（この決まりを消すと 元の色に戻ります）。
+        同じマスに 2つ当たった時は 上に在る方が勝ちます。
+      </div>
+      <div id="cfMsg" style="font-size:12px;color:#B3261E;margin-top:8px;min-height:1.6em;line-height:1.6;"></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:12px;font-weight:700;color:#2E7D54;">付けた決まり（上が強い）</div>
+        <div id="cfList" style="margin-top:4px;"></div>
+      </div>
+    </div>
+    <div style="padding:10px 18px 14px;border-top:1px solid #D4EDE1;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <button onclick="closeCondFormat()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">閉じる</button>
+      <button onclick="applyCondFormat()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">この決まりで 色を付ける</button>
+    </div>
+  </div>
+</div>
+<!-- ★入力の決まり★ Excel の「データの入力規則」に当たる窓。
+     ★出す物は 全部 動く物だけ★／★測った2つ（一覧から選ぶ・整数の範囲）だけ出す★ -->
+<div id="validOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">入力の決まり</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="validWhere">A1</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;">
+      <div id="validNow" style="font-size:12px;color:#333333;margin-bottom:10px;line-height:1.6;"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">決まりの形</span>
+        <select id="validKind" onchange="validKindChange()" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;background:#ffffff;">
+          <option value="list">一覧から選ぶ</option>
+          <option value="int">整数の範囲</option>
+        </select>
+      </div>
+      <div id="validListRow" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">選ぶ物</span>
+        <input id="validItems" type="text" placeholder="りんご,みかん,ぶどう" style="flex:1;min-width:150px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <div id="validNumRow" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5.5em;">下と上</span>
+        <input id="validMin" type="text" inputmode="numeric" placeholder="1" style="width:5.5em;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+        <span>〜</span>
+        <input id="validMax" type="text" inputmode="numeric" placeholder="10" style="width:5.5em;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
+      </div>
+      <div style="font-size:12px;color:#333333;margin-top:8px;line-height:1.6;">
+        ★止めるのは「打った時」だけ★です。貼り付けや ファイルの読み込みでは 止まりません（実物のExcelも同じ）。
+        空のマスは 決まりに合っている扱いです。
+        ★先に入っていた 合わない値は 消しません★（消さずに 何個 在るかを 数えて出します）。
+      </div>
+      <div id="validMsg" style="font-size:12px;color:#B3261E;margin-top:8px;min-height:1.6em;line-height:1.6;"></div>
+    </div>
+    <div style="padding:10px 18px 14px;border-top:1px solid #D4EDE1;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <button onclick="closeValid()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">閉じる</button>
+      <button id="validClearBtn" onclick="clearValid()" style="display:none;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">決まりを外す</button>
+      <button onclick="applyValid()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">この決まりにする</button>
+    </div>
+  </div>
+</div>
 <div id="diffOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:520px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:18px 20px 12px;border-bottom:1px solid #D4EDE1;">
@@ -2788,7 +4074,7 @@ function detectTimePattern(values){
       <!-- ★書き出す名前を先に出す（全アプリの決まり）。既定は開いた時と同じ名前。
            同じ名前だと ★書き出し先で元と並ぶ★ので、名前を見せて迷わせない。
            ★直せるようにするのは次のコミット（今回は出すだけ）★ -->
-      <div id="diffName" style="font-size:13px;color:#333333;margin-top:4px;line-height:1.6;"></div>
+      <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.6;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>書き出す名前</span><input id="diffName" type="text" style="flex:1 1 220px;min-width:180px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 10px;font-family:inherit;"></div>
       <div style="font-size:12px;color:#333333;margin-top:6px;line-height:1.6;">元のファイルは変わりません。同じ名前で1本 書き出します。</div>
     </div>
     <div id="diffBody" style="padding:14px 18px;overflow:auto;font-size:13px;color:#333333;line-height:1.7;"></div>
@@ -3042,6 +4328,24 @@ window.addEventListener('load',updateBookVerBadge);
   <button class="fmt-btn" onclick="applyIndent(-1)"      title="インデント減">◁−</button>
 </div>
 
+<!-- ★切り替え＝見る人・見る月を 変える（★シートは1枚も増えない★）★
+     ★切り出し（新しいシートに出す）とは 別物★＝言葉で 分ける。
+     ★当てはまる表の時だけ 出す★（出来ていない物のボタンを 見せない）。 -->
+<div id="kirikaeBar" hidden>
+  <span class="kk-lb">どれを見る</span>
+  <select id="kkHito" onchange="切り替える()"><option value="">全部</option></select>
+  <span class="kk-lb">見る月</span>
+  <select id="kkTsuki" onchange="切り替える()"><option value="">全期間</option></select>
+  <select id="kkShime" onchange="切り替える()" title="いつから いつまでを 1か月とするか">
+    <option value="1">1日から</option>
+    <option value="10">10日から</option>
+    <option value="21">21日から</option>
+  </select>
+  <button id="kkModosu" onclick="切り替えを戻す()">全部／全期間に戻す</button>
+  <span class="kk-now" id="kkNow"></span>
+  <button id="kkDasu" onclick="切り替えた分を新しいシートに出す()">この分を 新しいシートに 出す</button>
+</div>
+
 <div id="grid-wrap">
 
 <canvas id="grid-canvas" tabindex="0"></canvas>
@@ -3049,6 +4353,10 @@ window.addEventListener('load',updateBookVerBadge);
   <textarea id="cell-input" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 
 </div>
+
+<!-- ★選んだ所の 合計・平均・個数★（Excel のステータスバーに当たる）
+     ★出せる物だけ 出す＝中身が空の枠を 出さない★ -->
+<div id="status-bar"><span class="sb-i" id="sb-ready">準備完了</span></div>
 
 <button id="ai-float-btn" onclick="handleAIBtn()">💬 AIに話しかける</button>
 
@@ -3058,6 +4366,11 @@ window.addEventListener('load',updateBookVerBadge);
     <div class="ai-arrow">▲</div>
   </div>
   <div id="ai-panel-body">
+    <!-- ★入り口①＝AIタブの中★（★入口は AIタブ1つだけ★＝0円の別画面を作らない・司さんの決定）
+         ★組み立てる所は 履歴を描く() 1つ★なので、履歴ページと 同じ物が出る -->
+    <div style="padding:6px 10px 0;">
+      <button onclick="openRireki('ai')" style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #C8ECD8;background:#F0FAF4;color:#333333;font-family:inherit;cursor:pointer;">これまでにやった事</button>
+    </div>
     <div id="ai-response-area"></div>
     <div id="ai-input-row">
       <textarea id="ai-input" rows="1" placeholder="「売上の合計出して」「この表どういう意味？」"></textarea>
@@ -3471,6 +4784,21 @@ window.addEventListener('load', function() {
     window.visualViewport.addEventListener('scroll', _throttledVP);
   }
   setTimeout(function(){ scrollTop=0; scrollLeft=0; scale=1; resize(); if(typeof render==='function') render(); }, 150);
+
+  /* ★ログインが済むまで 中身は隠れている（body.exally-locked）★
+     ＝隠れている間に 大きさを測ると ★0×0★になり、ログインしても ★表が真っ白★のまま。
+     ★実測 2026-08-28★（測り直す人が 誰も居なかった）。
+     ⇒ 隠れが外れた その時に 測り直す。★測るのは この1か所だけ★（resize は 前からある物）。 */
+  try {
+    var _見えた = new MutationObserver(function(){
+      if(!document.body.classList.contains('exally-locked')){
+        dpr = window.devicePixelRatio || 1;
+        resize();
+        if(typeof render === 'function') render();
+      }
+    });
+    _見えた.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  } catch (e) { /* 古い画面でも 落とさない（前からの道は そのまま動く） */ }
 });
 function resize() {
   _canvasBCRDirty=true; // BCRキャッシュを無効化
@@ -3702,31 +5030,106 @@ function evalFormula(formula, selfR, selfC){
     return '#ERR';
   }
 }
-function cW(c){ if(sheets[activeSheet].hiddenCols&&sheets[activeSheet].hiddenCols[c]) return 0; return (sheets[activeSheet].colW[c] || COL_W) * scale; }
-function rH(r){ if(sheets[activeSheet].hiddenRows&&sheets[activeSheet].hiddenRows[r]) return 0; return (sheets[activeSheet].rowH[r] || ROW_H) * scale; }
+function cW(c){
+  var sh = sheets[activeSheet];
+  if(sh.hiddenCols && sh.hiddenCols[c]) return 0;
+  /* ★切り替えで 隠れている列★（人を選んだ時）。★手で隠した物とは 別の入れ物★＝
+     戻す時に 相手の分まで 戻さない。 */
+  if(sh.kirikaeCols && sh.kirikaeCols[c]) return 0;
+  return (sh.colW[c] || COL_W) * scale;
+}
+function rH(r){
+  var sh = sheets[activeSheet];
+  if(sh.hiddenRows && sh.hiddenRows[r]) return 0;                 /* 人が手で隠した行 */
+  if(sh.kirikaeRows && sh.kirikaeRows[r]) return 0;               /* ★切り替えで 隠れている行（別の入れ物）★ */
+  if(sh.filterHidden && sh.filterHidden[r]) return 0;             /* ★絞り込みで隠れた行（別物として持つ）★ */
+  return (sh.rowH[r] || ROW_H) * scale;
+}
 
 // ===== 座標 =====
+/* ══ ★隠れている行・列は 場所を取らない（Excelと同じ＝隙間を詰める）★ ═══
+   ★実測 2026-08-28（司さんが「形が変わっとる」と言った物）★
+     rowY は ★隠れた行も 高さ22で 数えていた★。だから 2/21から始まる28行は
+     y = 22 + 34行×22 = 770 に置かれ ★画面（590）の外★＝1行も 描かれなかった。
+     （1月分は 表の頭から 始まるので たまたま 出ていた＝★出る方しか 測っていなかった★）
+   ⇒ ★r より前に 隠れている行の数を 引く★。行番号は 元のまま（飛び飛びで 残る＝Excelと同じ）。
+   ★数え直しは 隠す物が 変わった時だけ★（並びを覚えて 二分探索する。ROWS=100万でも 速い） */
+var _隠し = { 行: { 印: null, 並び: [] }, 列: { 印: null, 並び: [] } };
+function _隠しの印(たち){
+  var 印 = '';
+  for(var i=0;i<たち.length;i++){
+    var o = たち[i] || {};
+    var n = 0, 和 = 0;
+    for(var k in o){ if(Object.prototype.hasOwnProperty.call(o,k) && o[k]){ n++; 和 += (+k)||0; } }
+    印 += n + ':' + 和 + '/';
+  }
+  return 印;
+}
+function _隠しの並び(どっち, たち){
+  var 印 = どっち + '|' + (sheets[activeSheet].name||'') + '|' + _隠しの印(たち);
+  var 箱 = _隠し[どっち];
+  if(箱.印 === 印) return 箱.並び;
+  var 印付き = {};
+  for(var i=0;i<たち.length;i++){
+    var o = たち[i] || {};
+    for(var k in o){ if(Object.prototype.hasOwnProperty.call(o,k) && o[k]) 印付き[+k] = 1; }
+  }
+  var 並び = Object.keys(印付き).map(Number).sort(function(a,b){ return a-b; });
+  箱.印 = 印; 箱.並び = 並び;
+  return 並び;
+}
+/** ★n より前に 隠れている数★（二分探索） */
+function _隠れた数(並び, n){
+  var lo = 0, hi = 並び.length;
+  while(lo < hi){ var m = (lo + hi) >> 1; if(並び[m] < n) lo = m + 1; else hi = m; }
+  return lo;
+}
+function _隠れ行の並び(){
+  var sh = sheets[activeSheet];
+  return _隠しの並び('行', [sh.hiddenRows, sh.kirikaeRows, sh.filterHidden]);
+}
+function _隠れ列の並び(){
+  var sh = sheets[activeSheet];
+  return _隠しの並び('列', [sh.hiddenCols, sh.kirikaeCols]);
+}
+
 function colX(c){
-  var x = HDR_W - scrollLeft + c * COL_W * scale;
+  var 隠 = _隠れた数(_隠れ列の並び(), c);
+  var x = HDR_W - scrollLeft + (c - 隠) * COL_W * scale;
   var cw = sheets[activeSheet].colW;
-  for(var k in cw){ if(parseInt(k) < c) x += (cw[k] - COL_W) * scale; }
+  for(var k in cw){ var kk = parseInt(k); if(kk < c && cW(kk) > 0) x += (cw[k] - COL_W) * scale; }
   return Math.round(x);
 }
 function rowY(r){
-  var y = HDR_H - scrollTop + r * ROW_H * scale;
+  var 隠 = _隠れた数(_隠れ行の並び(), r);
+  var y = HDR_H - scrollTop + (r - 隠) * ROW_H * scale;
   var rh = sheets[activeSheet].rowH;
-  for(var k in rh){ if(parseInt(k) < r) y += (rh[k] - ROW_H) * scale; }
+  for(var k in rh){ var kk = parseInt(k); if(kk < r && rH(kk) > 0) y += (rh[k] - ROW_H) * scale; }
   return Math.round(y);
 }
 function xToC(x){
+  /* ★固定した帯の中を押した時は 固定した列を返す★ */
+  var fzc = sheets[activeSheet].freezeCol||0;
+  if(fzc > 0){
+    var fx = HDR_W;
+    for(var fj = 0; fj < fzc; fj++){
+      var fw = cW(fj);
+      if(x < fx + fw) return fj;
+      fx += fw;
+    }
+    if(x < fx) return fzc - 1;
+  }
   var px = x - HDR_W + scrollLeft;
   if(px < 0) return 0;
   var cw = sheets[activeSheet].colW;
-  if(!Object.keys(cw).length){ return Math.min(Math.floor(px / (COL_W * scale)), COLS-1); }
+  if(!Object.keys(cw).length && !_隠れ列の並び().length){
+    return Math.min(Math.floor(px / (COL_W * scale)), COLS-1);
+  }
   var est = Math.max(0, Math.floor(px / (COL_W * scale)) - 5);
   var cx = colX(est);
   for(var c = est; c < COLS; c++){
     var w = cW(c);
+    if(w <= 0) continue;                 /* ★隠れている列は 選ばない★ */
     if(x >= cx && x < cx + w) return c;
     if(cx > x) return Math.max(0, c - 1);
     cx += w;
@@ -3734,14 +5137,29 @@ function xToC(x){
   return COLS - 1;
 }
 function yToR(y){
+  /* ★固定した帯の中を押した時は 固定した行を返す★（帯はスクロールしていない） */
+  var fz = sheets[activeSheet].freezeRow||0;
+  if(fz > 0){
+    var fy = HDR_H;
+    for(var fi = 0; fi < fz; fi++){
+      var fh = rH(fi);
+      if(y < fy + fh) return fi;
+      fy += fh;
+    }
+    if(y < fy) return fz - 1;
+  }
   var py = y - HDR_H + scrollTop;
   if(py < 0) return 0;
   var rh = sheets[activeSheet].rowH;
-  if(!Object.keys(rh).length){ return Math.min(Math.floor(py / (ROW_H * scale)), ROWS-1); }
+  /* ★隠れている行が在る時は 速い道を通れない★（隠れた分 番号が ずれる） */
+  if(!Object.keys(rh).length && !_隠れ行の並び().length){
+    return Math.min(Math.floor(py / (ROW_H * scale)), ROWS-1);
+  }
   var est = Math.max(0, Math.floor(py / (ROW_H * scale)) - 5);
   var ry = rowY(est);
   for(var r = est; r < ROWS; r++){
     var h = rH(r);
+    if(h <= 0) continue;                 /* ★隠れている行は 選ばない（Excelと同じ）★ */
     if(y >= ry && y < ry + h) return r;
     if(ry > y) return Math.max(0, r - 1);
     ry += h;
@@ -3790,11 +5208,18 @@ function selShift(ar,ac){
 
 // ===== スクロール =====
 function scrollToCell(r,c){
+  /* ★固定した行・列は いつも見えている＝動かさない★
+     動かすと「固定したのに 画面が飛ぶ」事になる。 */
+  var fzR = sheets[activeSheet].freezeRow||0, fzC = sheets[activeSheet].freezeCol||0;
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
-  if(x<HDR_W) scrollLeft=Math.max(0,scrollLeft-(HDR_W-x));
-  if(x+w>wrapW) scrollLeft+=(x+w-wrapW)+4;
-  if(y<HDR_H) scrollTop=Math.max(0,scrollTop-(HDR_H-y));
-  if(y+h>wrapH) scrollTop+=(y+h-wrapH)+4;
+  if(c >= fzC){
+    if(x<HDR_W+_freezeW()) scrollLeft=Math.max(0,scrollLeft-((HDR_W+_freezeW())-x));
+    if(x+w>wrapW) scrollLeft+=(x+w-wrapW)+4;
+  }
+  if(r >= fzR){
+    if(y<HDR_H+_freezeH()) scrollTop=Math.max(0,scrollTop-((HDR_H+_freezeH())-y));
+    if(y+h>wrapH) scrollTop+=(y+h-wrapH)+4;
+  }
 }
 
 // ===== イベント =====
@@ -3938,6 +5363,7 @@ function bindEvents(){
   fi.addEventListener('keyup',function(){ _fiCursorPos=this.selectionStart||0; });
   fi.addEventListener('blur',function(){ _fiCursorPos=this.selectionStart||_fiCursorPos; });
   fi.addEventListener('keydown',function(e){
+    if(e.key==='F4'){ e.preventDefault(); toggleAbsRef(); return; }   /* $ の付け方を1つ進める */
     if(e.key==='Enter'){e.preventDefault();fkbCommit();moveSel(1,0);}
     else if(e.key==='Escape'){fkbCancel();}
   });
@@ -3971,6 +5397,7 @@ function bindEvents(){
       if(e.key==='Enter'){ e.preventDefault(); startEdit(selR1,selC1); return; }
     }
     // 編集モード中
+    if(e.key==='F4'){ e.preventDefault(); toggleAbsRef(); return; }   /* $ の付け方を1つ進める */
     if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(1,0);}
     else if(e.key==='Tab'){e.preventDefault();refMode=false;refStartR=-1;commitEdit();moveSel(0,1);}
     else if(e.key==='Escape'){refMode=false;refStartR=-1;cancelEdit();}
@@ -4652,6 +6079,29 @@ function onKD(e){
     if(ek==='z' && !e.shiftKey){ e.preventDefault(); doUndo(); return; }
     if(ek==='y' || (ek==='z' && e.shiftKey)){ e.preventDefault(); doRedo(); return; }
     if(ek==='a'){ e.preventDefault(); sel(0,0,ROWS-1,COLS-1); render(); return; }
+    /* ★★Excel と同じ割り当てを写す（2026-08-18）★★
+       ★どう動くかを実Excelで測ってから作った物だけ入れている★
+         Ctrl+D / Ctrl+R … ★式も書式も写す★（FillDown/FillRight で実測。
+                            写した先の元の書式は上書きされる＝斜体が消えるのも実測どおり）
+         Ctrl+; / Ctrl+:  … 書式は yyyy/m/d ／ h:mm（実測）
+         F4               … $の4つの形は実測（$A$1 / A$1 / $A1 / A1）
+       ★Alt+=（オートSUM）は入れていない★＝Excelが当てる範囲を機械で測れなかった
+         （ExecuteMso("AutoSum") が COM から呼べない）。★測っていない物は作らない★ */
+    if(ek==='s'){ e.preventDefault(); saveXlsx(); return; }
+    if(ek==='b'){ e.preventDefault(); toggleFormat('bold'); return; }
+    if(ek==='i'){ e.preventDefault(); toggleFormat('italic'); return; }
+    if(ek==='u'){ e.preventDefault(); toggleFormat('underline'); return; }
+    if(e.key==='1'){ e.preventDefault(); openFmtModal(); return; }
+    if(ek==='f'){ e.preventDefault(); openFind(false); return; }
+    if(ek==='h'){ e.preventDefault(); openFind(true); return; }
+    if(ek==='p'){ e.preventDefault(); printSheet(); return; }
+    if(ek==='d'){ e.preventDefault(); fillFromEdge('down'); return; }
+    if(ek==='r'){ e.preventDefault(); fillFromEdge('right'); return; }
+    if(e.key===';'){ e.preventDefault(); putNowValue('date'); return; }
+    if(e.key===':'){ e.preventDefault(); putNowValue('time'); return; }   /* Ctrl+Shift+; と同じキー */
+    if(e.key===' '){ e.preventDefault(); sel(0,selC1,ROWS-1,selC2); render(); return; }   /* 列を選ぶ */
+    if(e.key==='PageDown'){ e.preventDefault(); switchSheet(Math.min(sheets.length-1, activeSheet+1)); return; }
+    if(e.key==='PageUp'){   e.preventDefault(); switchSheet(Math.max(0, activeSheet-1)); return; }
     if(e.key==='Home'){ e.preventDefault(); sel(0,0,0,0); scrollTop=0; scrollLeft=0; render(); return; }
     if(e.key==='End'){
       var lr=0,lc=0;
@@ -4688,6 +6138,15 @@ function onKD(e){
   if(e.key==='Home'){ sel(selR1,0,selR1,0); moved=true; }
   if(e.key==='End'){  sel(selR1,COLS-1,selR1,COLS-1); moved=true; }
   if(e.key==='F2'){startEdit(selR1,selC1);moved=true;}
+  if(e.altKey && e.key==='='){ e.preventDefault(); autoSum(); moved=true; }   /* オートSUM */
+  /* ★Excel と同じ割り当て（2026-08-18 追加）★ */
+  if(e.shiftKey && e.key===' '){ e.preventDefault(); sel(selR1,0,selR2,COLS-1); render(); moved=true; }   /* 行を選ぶ */
+  if(e.key==='PageDown'){ e.preventDefault(); movePage(1);  moved=true; }
+  if(e.key==='PageUp'){   e.preventDefault(); movePage(-1); moved=true; }
+  /* ★Esc（編集していない時）と F4（直前の操作を繰り返す）は入れていない★
+     ＝Excel の Esc は「コピーの点線を消す」だが うちは点線を描いていない。
+       F4 の「繰り返す」も どこまでを1操作と数えるかを測れていない。
+       ★F4 の $ 切替は 編集中だけ効く（cell-input / formula-input 側で受ける）★ */
   if(e.key==='Tab'&&!e.shiftKey){moveSel(0,1);moved=true;}
   if(e.key==='Tab'&&e.shiftKey){moveSel(0,-1);moved=true;}
   if(moved) e.preventDefault();
@@ -4700,7 +6159,8 @@ var copyBuffer = null;
 // 右クリックメニュー
 function showCtxMenu(x,y){
   var m=document.getElementById('ctx-menu');
-  m.style.left=x+'px'; m.style.top=y+'px';
+  /* ★大きさを測る前に 上限を外して 中身そのままの高さを取る★ */
+  m.style.maxHeight=''; m.style.left='0px'; m.style.top='0px';
   // 再表示ボタン: 選択範囲内/近辺に非表示行列があれば表示
   var hr=sheets[activeSheet].hiddenRows||{}, hc=sheets[activeSheet].hiddenCols||{};
   var hasHR=false, hasHC=false;
@@ -4708,12 +6168,42 @@ function showCtxMenu(x,y){
   for(var c=Math.max(0,selC1-1);c<=Math.min(COLS-1,selC2+1);c++) if(hc[c]){hasHC=true;break;}
   document.getElementById('ctx-unhide-row').style.display=hasHR?'block':'none';
   document.getElementById('ctx-unhide-col').style.display=hasHC?'block':'none';
+  /* ★一覧から選ぶ決まりが在るセルは その場で選べるように出す★（Excel の セル内▼ に当たる） */
+  var vl=document.getElementById('ctx-valid-list');
+  vl.innerHTML='';
+  var vr=validRuleAt(selR1,selC1);
+  if(vr && vr.kind==='list'){
+    for(var vi=0; vi<vr.items.length; vi++){
+      var d=document.createElement('div');
+      d.className='ctx-item';
+      d.textContent='✅ '+vr.items[vi];
+      d.setAttribute('data-valid-pick', vr.items[vi]);
+      d.onclick=(function(t){ return function(){ pickValidValue(t); }; })(vr.items[vi]);
+      vl.appendChild(d);
+    }
+    var dv=document.createElement('div'); dv.className='ctx-divider'; vl.appendChild(dv);
+  }
+  var 決まり数=Object.keys(sheets[activeSheet].validations||{}).length;
+  document.getElementById('ctx-bad-cells').style.display = 決まり数 ? 'block' : 'none';
   m.classList.add('show');
-  var rect=m.getBoundingClientRect();
-  if(rect.right>window.innerWidth) m.style.left=(x-rect.width)+'px';
-  if(rect.bottom>window.innerHeight) m.style.top=(y-rect.height)+'px';
+  /* ★画面の中に収める★…数え方は lib/menu-place.js（どの画面の高さでも 数え切れるように外に出してある） */
+  var 置く = MenuPlace.place({
+    x:x, y:y, w:m.offsetWidth, h:m.scrollHeight,
+    winW:window.innerWidth, winH:window.innerHeight, 余白:8
+  });
+  m.style.left = 置く.left+'px';
+  m.style.top  = 置く.top+'px';
+  m.style.maxHeight = 置く.maxHeight ? (置く.maxHeight+'px') : '';
+  m.scrollTop = 0;
 }
 function hideCtxMenu(){ document.getElementById('ctx-menu').classList.remove('show'); }
+
+/** ★一覧から選んだ物を そのまま入れる★（選んだ物は必ず決まりに合う） */
+function pickValidValue(t){
+  hideCtxMenu();
+  setCell(selR1,selC1,t);
+  updateBar(); render();
+}
 
 function ctxCopy(){
   // 選択範囲の値（f=数式含む）と表示値をコピー
@@ -4808,6 +6298,23 @@ function _pushRowColUndo(){
   undoStack.push({type:'rowcol', snap:_snapRowCol()});
   redoStack=[];
 }
+/* ★行や列を 入れたり消したりした時、入力の決まりも 一緒に動かす★
+   動かさないと 決まりが 別の行に付いたまま残る＝★黙って嘘をつく★ */
+function _moveValidations(s, 縦, 入れる){
+  var v = s.validations; if(!v) return;
+  var 上 　= 縦 ? selR1 : selC1;
+  var 下 　= 縦 ? selR2 : selC2;
+  var 幅 　= 下 - 上 + 1;
+  var out = {};
+  Object.keys(v).forEach(function(k){
+    var p = k.split(','), r = parseInt(p[0]), c = parseInt(p[1]);
+    var n = 縦 ? r : c;
+    if(入れる){ if(n >= 上) n += 1; }
+    else { if(n >= 上 && n <= 下) return; if(n > 下) n -= 幅; }
+    out[(縦 ? n : r) + ',' + (縦 ? c : n)] = v[k];
+  });
+  s.validations = out;
+}
 function ctxInsertRow(){
   _pushRowColUndo();
   var s=sheets[activeSheet], nd={}, nrh={};
@@ -4823,6 +6330,7 @@ function ctxInsertRow(){
     var r=parseInt(k); nhr[r>=selR1?r+1:r]=true;
   });
   s.data=nd; s.rowH=nrh; s.hiddenRows=nhr;
+  _moveValidations(s, true, true);
   render(); hideCtxMenu();
 }
 function ctxInsertCol(){
@@ -4840,6 +6348,7 @@ function ctxInsertCol(){
     var c=parseInt(k); nhc[c>=selC1?c+1:c]=true;
   });
   s.data=nd; s.colW=ncw; s.hiddenCols=nhc;
+  _moveValidations(s, false, true);
   render(); hideCtxMenu();
 }
 function ctxDeleteRow(){
@@ -4862,6 +6371,7 @@ function ctxDeleteRow(){
     nhr[r>selR2?r-(selR2-selR1+1):r]=true;
   });
   s.data=nd; s.rowH=nrh; s.hiddenRows=nhr;
+  _moveValidations(s, true, false);
   sel(Math.max(0,selR1),selC1,Math.max(0,selR1),selC2);
   render(); hideCtxMenu();
 }
@@ -4885,6 +6395,7 @@ function ctxDeleteCol(){
     nhc[c>selC2?c-(selC2-selC1+1):c]=true;
   });
   s.data=nd; s.colW=ncw; s.hiddenCols=nhc;
+  _moveValidations(s, false, false);
   sel(selR1,Math.max(0,selC1),selR2,Math.max(0,selC1));
   render(); hideCtxMenu();
 }
@@ -5019,6 +6530,7 @@ function fkbDelete(){
   render();
 }
 function fkbCommit(){
+  if(!validGate(selR1,selC1,document.getElementById('formula-input').value)) return;
   setCell(selR1,selC1,document.getElementById('formula-input').value);
   fkbHide();
   updateBar(); render();
@@ -5036,6 +6548,9 @@ function fkbCancel(){
 function commitEdit(){
   if(!editingCell) return;
   var el=document.getElementById('cell-input');
+  /* ★入力の決まりは「打った時」だけ止める（実Excelで測った通り）★
+     貼り付け・読み込み・並べ替え・置換は 止めない＝setCell 側には入れない */
+  if(!validGate(editingCell.r,editingCell.c,el.value)) return;
   setCell(editingCell.r,editingCell.c,el.value);
   el.classList.remove('editing');
   el.value='';
@@ -5080,6 +6595,9 @@ function switchSheet(idx){
      ここでは控えを取り直さない＝客の操作で変わった分は「変わった」と数えて保存に載せる。 */
   if (typeof recalcSheet === 'function' && sheets[idx]) recalcSheet(idx, sheets[idx].data);
   updateBar(); render();
+  /* ★シートを変えたら 切り替えの帯も 作り直す★（人▼・月▼は そのシートの表から作る）
+     ＝作り直さないと ★前のシートの人が 並んだまま★になる。 */
+  if(typeof 切り替えを整える === 'function') 切り替えを整える();
   document.querySelectorAll('.sheet-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
   // モード中はサブバーも更新（別シート範囲のチップ表示に反映）
   if(multiSelectMode && typeof updateMultiSelectBar==='function') updateMultiSelectBar();
@@ -5904,11 +7422,23 @@ function explainCell(){
     prompt+='このセルが何をしているか1〜3行で簡潔に解説してね。書き込み不要。';
   }
   _explainAddr=addr; _explainFormula=formula||''; _explainText='';
+  /* ★中身が無い物に AIを呼ばない（お金を使わない）★
+     （2026-08-21 指示役：空の A1 で AIが呼ばれていた） */
+  var 送る字 = isRange ? cells : [ (getCell(selR1,selC1).v||''), (getCell(selR1,selC1).f||'') ];
+  var 可否 = AiReason.呼んでよいか(送る字);
+  if(!可否.呼ぶ){
+    showExplainPopup(addr, formula, 可否.言葉, false);
+    return;
+  }
   showExplainPopup(addr,formula,null);
   _sendExplain(prompt);
 }
-function showExplainPopup(addr,formula,aiText){
+function showExplainPopup(addr,formula,aiText,繋がったか){
   var popup=document.getElementById('explain-popup');
+  /* ★繋がらなかった時に「深掘り」を見せない★（押しても また失敗するだけ）
+     2026-08-22：実配信を撮って見つけた。「コピー」は 管理者に貼って伝えられるので 残す。 */
+  var deep=document.getElementById('explain-deep');
+  if(deep) deep.style.display = (繋がったか === false) ? 'none' : '';
   document.getElementById('explain-title').textContent='🤖 '+addr+'の解説';
   var fEl=document.getElementById('explain-formula');
   if(formula&&formula[0]==='='){
@@ -5951,15 +7481,52 @@ function deepDiveExplain(){
     if(input){ input.value=prompt; document.getElementById('ai-send').click(); }
   },150);
 }
-async function _sendExplain(prompt){
+/* ★AIを呼ぶ口は ここの1本だけ★
+   （2026-08-21 指示役）前は 3か所とも
+   「AIに接続できなかったよ。もう一度試してみてね。」だけを出していた。
+   ★テスト線には AIの窓口がそもそも無いので、何度 試しても 失敗する★。
+   理由と 次の一手は lib/ai-reason.js（お金を使わずに測った真値付き）。 */
+async function _aiFetch(body){
+  var 本番か = /vercel\.app$/.test(location.hostname) || !/github\.io$/.test(location.hostname);
   try{
-    var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:prompt,history:[]})});
-    var data=await res.json();
-    showExplainPopup(_explainAddr,_explainFormula,data.text||'エラーが発生したよ');
+    /* ★4 事故止め（2026-08-25）★ 回数は ★人ごと★に数える。
+       ★誰かを サーバへ伝えないと、同じ入口(IP)の人が まとめて1人に数えられる★
+       （会社で1本の回線を使っていると 隣の人の分で 自分が止まる）。
+       ★名乗りが無くても 動く★＝その時は 入口(IP)だけで数える。 */
+    var 名乗り = null;
+    try{
+      var sb = (window.Auth && Auth.sb) || window._sb || null;
+      if(sb && sb.auth && sb.auth.getSession){
+        var sd = await sb.auth.getSession();
+        var tk = sd && sd.data && sd.data.session && sd.data.session.access_token;
+        if(tk) 名乗り = 'Bearer ' + tk;
+      }
+    }catch(e){ /* 名乗れなくても AIは使える（入口で数える） */ }
+    var 見出し = {'Content-Type':'application/json'};
+    if(名乗り) 見出し['Authorization'] = 名乗り;
+    var res = await fetch('/api/claude', {
+      method:'POST', headers: 見出し, body: JSON.stringify(body)
+    });
+    var 中身 = '', 理由 = '', 待ち秒 = 0, どれ = '';
+    if(res.ok){
+      try{ var d = await res.json(); 中身 = (d && d.text) || ''; }catch(e){ 中身 = ''; }
+    } else {
+      /* ★失敗した時は サーバが「なぜ」を 合言葉で返す（zandaka / kagi / komiai …）★
+         テスト線(GitHub Pages)の 404/405 は HTML なので ここは空のまま＝番号で読む */
+      /* ★4 事故止め：止めた時は「あと何秒で また使えるか」も 一緒に返る★
+         ＝これが無いと「しばらく待って」しか言えない（何回 押せばよいか 分からない） */
+      try{ var e2 = await res.json(); 理由 = (e2 && e2.error) || ''; 待ち秒 = (e2 && e2.待ち秒) || 0; どれ = (e2 && e2.どれ) || ''; }catch(e){ 理由 = ''; }
+    }
+    return AiReason.読む({ status: res.status, ネット切れ: false, 中身: 中身, 理由: 理由,
+      待ち秒: 待ち秒, どれ: どれ, 本番か: 本番か });
   }catch(e){
-    showExplainPopup(_explainAddr,_explainFormula,'AIに接続できなかったよ。もう一度試してみてね。');
+    return AiReason.読む({ status: null, ネット切れ: true, 中身: '', 本番か: 本番か });
   }
+}
+
+async function _sendExplain(prompt){
+  var r = await _aiFetch({ message: prompt, history: [] });
+  showExplainPopup(_explainAddr, _explainFormula, r.言葉, r.ok);
 }
 var aiHistory = [];
 
@@ -5980,11 +7547,49 @@ function addAIChatMsg(type, text){
   resp.scrollTop = resp.scrollHeight;
 }
 
-async function sendToAI(){
-  var input = document.getElementById('ai-input');
-  var text = input.value.trim();
-  if(!text) return;
+/* ══ ★聞く口は 1つだけ★（司さん決定 A／2026-08-25）════════════════
+   ★実際に押して 見つけた（2026-08-27）★＝スマホ（769px未満）は 別の道を通っていて、
+     ★地図も 掘るも 使った回数も 履歴も 覚えた手順も 何一つ 通っていなかった★。
+     ＝司さんは iPhone で見る人。★作った物が 半分 届いていなかった★。
+   ⇒ ★中身は この1本だけ★。画面（パネル／スマホの窓）は「出す所」を渡すだけにする。 */
+function _AIの出し口(どこ){
+  if(どこ === 'popup'){
+    return {
+      足す: function(t, x){ _addPopupMsg(t, x); },
+      考え中: function(on){
+        var old = document.getElementById('popup-thinking');
+        if(old) old.remove();
+        var resp = document.getElementById('popup-response-area');
+        if(!on || !resp) return;
+        var d = document.createElement('div');
+        d.id = 'popup-thinking';
+        d.className = 'ai-msg-ai';
+        d.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
+        resp.appendChild(d); resp.scrollTop = 9999;
+      },
+      止める: function(b){ var e = document.getElementById('popup-send'); if(e) e.disabled = b; },
+      覚える口: function(頼み){ 覚えるボタンを出す(頼み, 'popup-response-area'); },
+    };
+  }
+  return {
+    足す: function(t, x){ addAIChatMsg(t, x); },
+    考え中: function(on){
+      var old = document.getElementById('ai-thinking');
+      if(old) old.remove();
+      var resp = document.getElementById('ai-response-area');
+      if(!on || !resp) return;
+      var d = document.createElement('div');
+      d.id = 'ai-thinking';
+      d.className = 'ai-msg-ai';
+      d.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
+      resp.appendChild(d); resp.scrollTop = 9999;
+    },
+    止める: function(b){ var e = document.getElementById('ai-send'); if(e) e.disabled = b; },
+    覚える口: function(頼み){ 覚えるボタンを出す(頼み, 'ai-response-area'); },
+  };
+}
 
+async function AIに聞く(text, 口){
   var selData = getSelectionData();
   var ctxNote = selData.cells.length > 0
     ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
@@ -5993,28 +7598,66 @@ async function sendToAI(){
   var writeInstruction = '\nルール：ユーザーが「〜を入れて」「〜を書いて」「〜に設定して」など明示的にセルへの書き込みを求めた場合のみ、返答の最後に {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。説明・解説・使い方を教えるだけの質問ではJSONを出力しないこと。';
   var userMsg = text + ctxNote + writeInstruction;
 
-  addAIChatMsg('user', text);
-  input.value = '';
-  document.getElementById('ai-send').disabled = true;
+  口.足す('user', text);
 
-  var thinkDiv = document.createElement('div');
-  thinkDiv.className = 'ai-msg-ai';
-  thinkDiv.id = 'ai-thinking';
-  thinkDiv.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
-  document.getElementById('ai-response-area').appendChild(thinkDiv);
-  document.getElementById('ai-response-area').scrollTop = 9999;
+  /* ★AIを呼ぶ前に 機械が当てる★（2回目からは 0円）。
+     ★当てられなければ 普通に呼ぶ・黙って外さない★＝当たらなかった理由は 先に言う。 */
+  if(先に手順で当てる(text, 口)) return;
 
-  try {
-    var res = await fetch('/api/claude', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message: userMsg, history: aiHistory })
-    });
-    var data = await res.json();
-    var aiText = data.text || 'エラーが発生したよ';
+  口.止める(true);
+  口.考え中(true);
 
-    var th = document.getElementById('ai-thinking');
-    if(th) th.remove();
+  {
+    /* ══ ★7 地図＋掘る（2026-08-22 司さん決定・4段）★ ═══════════════
+       ①★地図を毎回 渡す（数千文字）★＝機械が0円で作った ブック全体の見取り図
+       ②★参照の網で辿る★（地図の中に「どのシートが どこを 何本 見ているか」が入る）
+       ③★AIが「もっと見せて」と言える★＝範囲を頼まれたら その場で返して もう一度 聞く
+       ④★地図とよく使う所は 置いたまま使い回す★（prompt caching・サーバ側で導入済み）
+       ★掘った回数は 数え場に残る★（1回 呼ぶごとに 1行） */
+    var 地図 = (typeof Chizu !== 'undefined')
+      ? Chizu.作る(sheets, (typeof _refGraph !== 'undefined' ? _refGraph : null),
+          (typeof _shindanResult !== 'undefined' ? _shindanResult : null),
+          { 今のシート: (sheets[activeSheet] || {}).name })
+      : { 字: '', 文字数: 0 };
+    var 材料 = 地図.字 ? [地図.字] : [];
+    var 掘った = 0, 動いた = 0, aiText = '', r = null;
+    for(var 回 = 0; 回 < 12; 回++){
+      var 送る = userMsg + (材料.length ? (String.fromCharCode(10) + String.fromCharCode(10) + 材料.join(String.fromCharCode(10) + String.fromCharCode(10))) : '');
+      r = await _aiFetch({ message: 送る, history: aiHistory });
+      動いた++;
+      if(!r.ok){ aiText = r.言葉; break; }
+      aiText = r.言葉;
+      if(typeof Horu === 'undefined') break;
+      var 頼み = Horu.頼みを読む(aiText);
+      if(!頼み.掘る.length){
+        /* ★どのセルを見て言ったかが 無い答えは 通さない★（1回だけ 付け直しを頼む） */
+        if(!Horu.見た所が在るか(aiText) && 回 < 11 && !材料.付け直した){
+          材料.push(Horu.見た所を付けてと言う());
+          材料.付け直した = true;
+          continue;
+        }
+        break;
+      }
+      if(Horu.もう掘れないか(掘った)){
+        材料.push(Horu.もう掘れない時の言葉(掘った));
+        continue;
+      }
+      掘った++;
+      材料.push(Horu.範囲を出す(sheets, 頼み.掘る, { 今のシート: (sheets[activeSheet]||{}).name }).字);
+    }
+
+    口.考え中(false);
+
+    if(!r || !r.ok){ 口.足す('ai', aiText); 口.止める(false); return; }
+
+    /* ★お金の数字は AIに出させない★＝{{シート!セル}} を うちの計算結果に差し替える */
+    if(typeof Horu !== 'undefined'){
+      var 差 = Horu.値を差し込む(aiText, sheets, function(sh, rr, cc){
+        var cell = (sh.data || {})[rr + ',' + cc];
+        return cell ? (cell.d !== undefined ? cell.d : cell.v) : undefined;
+      });
+      aiText = 差.字;
+    }
 
     // 括弧カウントでJSONを正確に抽出
     var extracted = extractWriteAction(aiText);
@@ -6022,7 +7665,14 @@ async function sendToAI(){
       ? (aiText.substring(0, extracted.start) + aiText.substring(extracted.end)).trim()
       : aiText;
 
-    addAIChatMsg('ai', displayText);
+    /* ★押した後は「AIを ◯回 使いました」＝数え場に残った実数と同じ★
+       （★押す前は「AIを使います」＝数は書かない★＝掘ると 何度も動くので 嘘になる） */
+    /* ★中の言葉（掘る／もっと見せて／5回／2,000セル）を 客に見せない★（指示役 2026-08-27）
+       ＝客は 掘り方を 知りません／知る必要もありません。出すのは ★使った回数だけ★。 */
+    口.足す('ai', displayText
+      + '<span class="toast-n">AIを ' + 動いた + '回 使いました</span>');
+    /* ★履歴に残す★（このファイルの分として） */
+    履歴に残す('関数', text.slice(0, 40), { 聞いた: text, やった: 'AIに聞いた（地図 ' + 地図.文字数 + '文字・掘った ' + 掘った + '回）' }, null, 動いた);
 
     aiHistory.push({role:'user',content:text});
     aiHistory.push({role:'assistant',content:displayText});
@@ -6030,12 +7680,19 @@ async function sendToAI(){
 
     if(extracted) showWriteConfirm(extracted.json.cells);
 
-  } catch(e) {
-    var th = document.getElementById('ai-thinking');
-    if(th) th.remove();
-    addAIChatMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
+    /* ★「毎月 同じ事」を 2回目から 0円にする★＝覚えるかどうかは 客が決める（勝手に覚えない）。
+       ★出来ていない物のボタンを見せない★＝手順に出来る形の表の時だけ 出す。 */
+    if(typeof Recipe !== 'undefined' && いまの表の要約()) 口.覚える口(text);
   }
-  document.getElementById('ai-send').disabled = false;
+  口.止める(false);
+}
+
+function sendToAI(){
+  var input = document.getElementById('ai-input');
+  var text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  return AIに聞く(text, _AIの出し口('panel'));
 }
 
 // セル書き込み確認モーダル
@@ -6089,7 +7746,7 @@ function doWrite(){
   }
 }
 
-/* ===== Excelに保存 =========================================================
+/* ===== Excelに書き出す ====================================================
  *  書き出しの中身は lib/xlsx-io.js（ハーネスと同じ1本＝_xlfn.の付与・JIS→DBCS・YEN→DOLLAR、
  *  壊れたファイルを作る式で止める仕組みが入っている）。グリッドの形への変換は lib/grid-xlsx.js。
  *  ★SheetJS(930KB)は重いので、初回の保存で初めて読み込む（グリッドの表示を遅くしない）。
@@ -6158,6 +7815,28 @@ function _ensureXlsx(){
 var _engineLoaded = {};
 /* ★人が直したセル（差分プレビュー用）。ファイルを開いた時と 保存し終えた時に空にする★ */
 var _editedCells = {};
+/* ══ ★直した所の控え（2026-08-25 指示役）★ ══════════════════
+   ★今まで 書き出した瞬間に 捨てていた★＝★待つほど 記録できたはずの物が 消え続ける★。
+   ⇒ ★捨てる前に 控えへ写す★。
+   ★ここは まだ「画面の中」だけ★＝倉庫へ残すのは 順番6（履歴ページ）と同じ回。
+   ★客のブックにタブを1つも足さない★（競合は 客のブックに記録タブを作る。真似しない）。 */
+var 直した控え = [];
+var 控えの上限 = 200;              /* ★際限なく溜めない（画面が重くなる）★ */
+function 控えへ写す(何を, 直した所, 何か所){
+  try{
+    var 中身 = [];
+    for(var k in 直した所){
+      if(!Object.prototype.hasOwnProperty.call(直した所, k)) continue;
+      中身.push({ 場所: k, 前の式: 直した所[k] && 直した所[k].beforeF });
+      if(中身.length >= 500) break;   /* 1回ぶんも 大きくしすぎない */
+    }
+    if(!中身.length) return null;
+    var 一件 = { いつ: Date.now(), 何を: 何を, 何か所: 何か所 || 中身.length, 中身: 中身 };
+    直した控え.push(一件);
+    while(直した控え.length > 控えの上限) 直した控え.shift();   /* ★古い方から捨てる★ */
+    return 一件;
+  }catch(e){ return null; }        /* ★控えで 本体を落とさない★ */
+}
 /* ★全シートの控えを取ったか（最初の1直しの前に1回だけ取る）★ */
 var _baselineTaken = false;
 /* ★日本語や数字で始まるシート名は、式の中で ' ' で囲まないと計算する側が読めない★
@@ -6180,7 +7859,882 @@ function quoteSheetRefs(f){
    ここを見ずに「見ているシートだけ」流すと、まとめの ='5月'!E14 が
    ★空のシートを参照して 空を返す★。#ERROR が出ないので、
    ★合計が黙って小さくなる★（2026-08-11 指示役が実機で発見：527,000 が 186,000 になった）。 */
+/* ══ ブック全体の参照の網（2026-08-25）══════════════════
+   ★「全部やると固まる」の正体は 参照を数える事ではない★＝
+   重いのは ★計算する側へ全シートを流す事★。網は ★式の字を読むだけ★で作れる。
+   実測（司さんの実物 代行計算表2026・14シート・式15,126本）
+     ★網を作る 0.037秒／小分けにすると 1回の最長 12ミリ秒★＝画面は固まらない
+     別シートを見ている式 ★401本★（のべ 1,508本）
+   ⇒ ★開いた直後に 網だけ先に作る★。計算は 今までどおり 見るシートから。 */
+var _refGraph = null, _refGraphBusy = false;
+function 参照の網(){ return _refGraph; }
+/* ══ ★8 提案＝うちから「こう直せますよ」と言う（2026-08-27）★ ═══════
+   ★競合は「聞かれたら答える」＝受け身★。うちは ★開いた時に 自分から★ 言う。
+   ★見つけるのは 機械（0円・AIを1回も呼ばない）★／★AIは 言葉にするだけ★
+   ★勝手に直さない★＝出すだけ。直すのは 客が押してから（差分プレビューを通す）。 */
+var _teianResult = null;
+var _teianBusy = false;
+function 提案を始める(){
+  if(typeof Teian === 'undefined'){ 開いた知らせは済んだ('提案'); return; }
+  if(_teianBusy){ 開いた知らせは済んだ('提案'); return; }
+  _teianBusy = true;
+  try{
+    var 版 = (typeof bookVerKey !== 'undefined' && bookVerKey) ? bookVerKey : 'excel_365';
+    /* ★マクロ（VBA）が入っている時は「代わりに 何が出来るか」も 出す★（VBAは勧めない） */
+    _teianResult = Teian.見つける(sheets, { 版: 版, マクロ: !!_bookHasVba });
+  }catch(e){ _teianBusy = false; 開いた知らせは済んだ('提案'); return; }   /* ★見つけられなくても 表は そのまま使える★ */
+  _teianBusy = false;
+  var 知 = Teian.知らせの字(_teianResult);
+  if(!知){ 開いた知らせは済んだ('提案'); return; }   /* ★0件・直せない時は 何も言わない★ */
+  var b = document.getElementById('teianBtn');
+  if(b){
+    b.hidden = false;
+    /* ★数える物（式の書き換え）だけ 数える★＝マクロの話を「0か所」と出さない
+       （★実際に .xlsm を開いて 見つけた 2026-08-27★＝「短くできる 0か所」と出ていた） */
+    var 合計 = 0;
+    for(var i=0;i<_teianResult.提案.length;i++){
+      var t = _teianResult.提案[i];
+      if(t.直し方 && t.数える物か) 合計 += t.何本;
+    }
+    b.textContent = 合計 ? ('短くできる ' + 合計 + 'か所') : 'こちらで 出来る事';
+  }
+  開いた知らせに足す(知.題, 知.本文 + '<br>' + 知.つぎ);
+  履歴に残す('関数', 知.題, { やった: 知.本文 }, null, 0);
+  開いた知らせは済んだ('提案');
+}
+function openTeian(){
+  if(!_teianResult || !_teianResult.提案.length) return;   /* 出来ていない物のボタンは 見せない */
+  提案を描く(_teianResult);
+  document.getElementById('tnOverlay').style.display = 'flex';
+}
+function closeTeian(){ var o = document.getElementById('tnOverlay'); if(o) o.style.display='none'; }
+
+/* ★組み立てる所は ここ1つだけ★ */
+function 提案を描く(r){
+  var 知 = Teian.知らせの字(r);
+  document.getElementById('tnTitle').textContent = (知 && 知.題) || 'もっと短く書ける所が あります';
+  document.getElementById('tnBody').textContent = (知 && 知.本文) || '';
+  var box = document.getElementById('tnList');
+  box.innerHTML = '';
+  for(var i=0;i<r.提案.length;i++){
+    var t = r.提案[i];
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 12px;border-bottom:1px solid #EAF6F0;';
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'font-weight:700;color:#2E7D54;font-size:13px;';
+    頭.textContent = t.題 + (t.数える物か ? ('（' + t.何本 + 'か所）') : '');
+    row.appendChild(頭);
+    var 本 = document.createElement('div');
+    本.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;';
+    本.textContent = t.本文 + (t.直し方 || t.使えない理由 || '');
+    row.appendChild(本);
+    if(t.場所 && t.場所.length){
+      var 場 = document.createElement('div');
+      場.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;';
+      場.textContent = '場所: ' + t.場所.join(' / ') + (t.何本 > t.場所.length ? (' ほか ' + (t.何本 - t.場所.length) + 'か所') : '');
+      row.appendChild(場);
+    }
+    if(t.例){
+      var 例 = document.createElement('div');
+      例.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;word-break:break-all;';
+      例.textContent = t.例.length > 120 ? (t.例.slice(0,120) + '…') : t.例;
+      row.appendChild(例);
+    }
+    box.appendChild(row);
+  }
+}
+
+/* ══ ★6 履歴＝見る場所（2026-08-25 司さん／08-26 指示役）★ ═══════════
+   ★入り口は2つ（AIタブ／履歴ページのボタン）だが、★組み立てる所は 1つだけ★★
+     ＝別の入り口から 同じに見える（2か所で作ると 必ず ずれる）。
+   ★ここから 何かを始めさせない★（見る場所であって 探す入口ではない）。
+   ★ファイル名は 長押しでコピー★＝携帯・PCの ふつうの仕組みのまま（自作の選択を作らない）。 */
+var _rirekiIma = null;      /* 今 出している一覧（絞り込みの為だけに持つ） */
+var _rirekiShurui = '';     /* 今の絞り（種類） */
+/* ★既定は「今 開いているファイルの分だけ」★（司さん 2026-08-26
+   「これはこのファイルに限ったことよな？別ファイルでやったことをごちゃごちゃにしてないよな？」）
+   ＝★他のファイルの分と 混ぜて出さない★。全部 見たい時だけ 客が「ぜんぶのファイル」を押す。 */
+var _rirekiFile = '';
+
+function openRireki(どこから){
+  var ov = document.getElementById('rkOverlay');
+  if(!ov) return;
+  ov.style.display = 'flex';
+  _rirekiShurui = '';
+  /* ★開いた時は いつも「今のファイル」から★（前に「ぜんぶ」を押していても 持ち越さない） */
+  _rirekiFile = ((BookOpen.current() || {}).name) || '';
+  履歴を読み直す(どこから);
+}
+function closeRireki(){ var ov = document.getElementById('rkOverlay'); if(ov) ov.style.display='none'; }
+
+function 履歴を読み直す(どこから){
+  var note = document.getElementById('rkNote');
+  if(note) note.textContent = '読み込んでいます…';
+  var 読む = (typeof RirekiStore !== 'undefined')
+    ? RirekiStore.読む({ 上限: 200 })
+    : Promise.resolve({ 行たち: [], 倉庫: false });
+  読む.then(function(r){
+    履歴を描く(r.行たち, { 倉庫: r.倉庫, どこから: どこから || '' });
+  }).catch(function(){
+    履歴を描く([], { 倉庫: false, どこから: どこから || '' });
+  });
+}
+
+/* ★組み立てる所は ここ1つだけ★（AIタブからでも 履歴ページからでも 同じ物が出る） */
+function 履歴を描く(行たち, opt){
+  opt = opt || {};
+  var r = Rireki.一覧にする(行たち, { 今: new Date(), 種類: _rirekiShurui, ファイル: _rirekiFile, 上限: 200 });
+  _rirekiIma = 行たち;
+  var note = document.getElementById('rkNote');
+  if(note){
+    /* ★どのファイルの分を 出しているかを 必ず言う★（黙って混ぜない・黙って絞らない） */
+    note.textContent = (_rirekiFile ? ('「' + _rirekiFile + '」の分 ') : '')
+      + r.件数 + '件'
+      + (opt.倉庫 === false ? '（この画面の中だけです。ログインすると 残ります）' : '');
+  }
+  /* ★ブックを開いている時は その ファイルの分だけ★（司さん 2026-08-26
+       「このタブに全部だしてどうするんど。ブック開いてからの画面なら そのファイルに限る方が
+         ごちゃごちゃせんやろが」）
+     ⇒ ★切り替えの帯は 出さない★。選ぶ物が無いなら 並べない。
+     ★ブックを開いていない時だけ★ ぜんぶ出す（その時は 絞りようが無い）。 */
+  var 場所 = document.getElementById('rkFiles');
+  if(場所){
+    場所.innerHTML = '';
+    /* ★同じ名前で 中身が違う物が 混ざっていたら 隠さずに 言う★（めったに出ない・出たら大事） */
+    if(r.同じ名前で違う物 > 0){
+      var 注 = document.createElement('div');
+      注.style.cssText = 'font-size:12px;color:#8A5A00;margin-top:2px;';
+      注.textContent = '同じ名前で 中身が違うファイルが ' + (r.同じ名前で違う物 + 1) + '本 混ざっています（名前だけでは 見分けられません）。';
+      場所.appendChild(注);
+    }
+  }
+  /* 種類の帯（★見る為だけ★＝ここから 何かを始めさせない）
+     ★数は この ファイルの中だけで数える★（「1件」なのに「ぜんぶ3」では 客が混乱する） */
+  var tabs = document.getElementById('rkTabs');
+  if(tabs){
+    tabs.innerHTML = '';
+    var 作る = function(名, 数, 選ばれている){
+      var b = document.createElement('button');
+      b.textContent = 名 + '（' + 数 + '）';
+      b.style.cssText = 'font-size:12px;padding:4px 10px;border-radius:14px;font-family:inherit;cursor:pointer;'
+        + (選ばれている ? 'background:#2E7D54;border:1px solid #2E7D54;color:#ffffff;'
+                        : 'background:#F0FAF4;border:1px solid #C8ECD8;color:#333333;');
+      b.onclick = function(){ _rirekiShurui = (名 === 'ぜんぶ') ? '' : 名; 履歴を描く(_rirekiIma, opt); };
+      tabs.appendChild(b);
+    };
+    作る('ぜんぶ', r.このファイルの件数, _rirekiShurui === '');
+    for(var i=0;i<Rireki.種類の順.length;i++){
+      var 名 = Rireki.種類の順[i];
+      作る(名, r.種類ごと[名] || 0, _rirekiShurui === 名);
+    }
+  }
+  var box = document.getElementById('rkList');
+  box.innerHTML = '';
+  if(!r.出す.length){
+    var 空 = document.createElement('div');
+    空.style.cssText = 'padding:14px 12px;color:#333333;';
+    空.textContent = 'まだ ありません。表を直したり、AIに聞いたりすると ここに残ります。';
+    box.appendChild(空);
+  }
+  for(var j=0;j<r.出す.length;j++){
+    var x = r.出す[j];
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 12px;border-bottom:1px solid #EAF6F0;';
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'font-size:13px;color:#333333;';
+    var 日 = document.createElement('span');
+    日.style.cssText = 'color:#2E7D54;font-weight:700;';
+    日.textContent = x.日付;
+    頭.appendChild(日);
+    頭.appendChild(document.createTextNode('　' + x.種類 + '　' + x.見出し));
+    row.appendChild(頭);
+    if(x.ファイル名){
+      var f = document.createElement('div');
+      /* ★長押しでコピー＝ふつうの仕組みのまま（user-select を切らない・自作の選択を作らない）★ */
+      f.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;user-select:text;-webkit-user-select:text;';
+      f.textContent = x.ファイル名;
+      row.appendChild(f);
+    }
+    var 中 = Rireki.中身の字(x);
+    if(中){
+      var d = document.createElement('div');
+      d.style.cssText = 'font-size:12px;color:#333333;margin-top:4px;white-space:pre-wrap;';
+      d.textContent = 中;
+      row.appendChild(d);
+    }
+    box.appendChild(row);
+  }
+  document.getElementById('rkMore').textContent =
+    r.出していない ? ('ほか ' + r.出していない + '件は 出していません（多いので 新しい200件）。') : '';
+}
+
+/* ★残す口は 1つ★（画面のどこから残しても 同じ形で入る） */
+function 履歴に残す(種類, 見出し, 中身, ファイル名, クレジット){
+  if(typeof RirekiStore === 'undefined') return;
+  try{
+    var 今の = BookOpen.current() || {};
+    RirekiStore.残す({ 種類: 種類, 見出し: 見出し, 中身: 中身 || {},
+      ファイル名: ファイル名 || (今の.name || ''),
+      /* ★バイト数も 一緒に残す★＝名前が同じでも 中身が違う物を 見分ける
+         （★ファイル名で同じ物だと思うな★＝同じ名前が5本 在って踏んだ） */
+      バイト: (今の.bytes && 今の.bytes.length) ? 今の.bytes.length : null,
+      クレジット: クレジット || 0 });
+  }catch(e){ /* ★履歴で 本体を落とさない★ */ }
+}
+
+/* ══ ★5 E2診断（2026-08-25）★ ══════════════════════════════
+   ★競合は「聞かれた事」に答える★＝人が「どこが変か」を知っている前提。
+   ★人が気づけない物は 一生 聞かれない★ので ★開いた時に うちから出す★。
+   ★機械が全セルを見るのは 0円★（AIを1回も呼ばない）。 */
+var _shindanResult = null;
+
+/* ★開いた時の知らせは 1つだけ★
+   ＝網・提案・診断が それぞれ showToast を呼ぶと、後の物が 前の物を 消す。
+     実際に 司さんの本を開いて 測った（2026-08-27）＝★提案の知らせが 一度も 出ていなかった★。
+     ⇒ 出そろうまで ためて、★1回だけ★ 出す（知らせの出口は 1つ）。 */
+var _開いた知らせ = null;
+function 開いた知らせを始める(名前たち){
+  _開いた知らせ = { 待ち: {}, 行: [], warn: false };
+  for(var i=0;i<名前たち.length;i++) _開いた知らせ.待ち[名前たち[i]] = 1;
+}
+function 開いた知らせに足す(題, 本文, warn){
+  if(!_開いた知らせ){ showToast('<span class="toast-h">' + 題 + '</span>' + 本文, 9000, warn ? 'warn' : undefined); return; }
+  _開いた知らせ.行.push({ 題: 題, 本文: 本文 });
+  if(warn) _開いた知らせ.warn = true;
+}
+function 開いた知らせは済んだ(名前){
+  if(!_開いた知らせ) return;
+  delete _開いた知らせ.待ち[名前];
+  for(var k in _開いた知らせ.待ち){ if(Object.prototype.hasOwnProperty.call(_開いた知らせ.待ち, k)) return; }
+  var s = _開いた知らせ; _開いた知らせ = null;
+  if(!s.行.length) return;                    /* 何も見つからなければ 何も言わない */
+  var h = '';
+  for(var i=0;i<s.行.length;i++) h += (i ? '<br>' : '') + '<span class="toast-h">' + s.行[i].題 + '</span>' + s.行[i].本文;
+  showToast(h, 12000, s.warn ? 'warn' : undefined);
+}
+var _shindanBusy = false;
+/* ══ ★切り替え＝見る人・見る月を 変える★ ═══════════════════════
+   ★司さんの言葉（2026-08-28）「綺麗な形で切り替えれるん？」★
+   ★シートは1枚も増えない／元の表は1セルも触らない／全員・全期間に すぐ戻せる★
+   ★切り出し（新しいシートに出す）は そのまま残す★＝紙にする・人に渡す時に要る。 */
+var _切り替えの姿 = null;
+
+function 切り替えを整える(){
+  var 帯 = document.getElementById('kirikaeBar');
+  if(!帯 || typeof Kirikae === 'undefined') return;
+  var sh = sheets[activeSheet];
+  var 姿 = null;
+  try{ 姿 = Kirikae.見る(sh); }catch(e){ 姿 = null; }
+  _切り替えの姿 = (姿 && 姿.つかえる) ? 姿 : null;
+  /* ★当てはまる表の時だけ 出す★（出来ていない物のボタンを 見せない） */
+  if(!_切り替えの姿){ 帯.hidden = true; return; }
+  帯.hidden = false;
+  var 人 = document.getElementById('kkHito');
+  var 月 = document.getElementById('kkTsuki');
+  var 前の人 = 人.value, 前の月 = 月.value;
+  人.innerHTML = '<option value="">全部</option>';
+  for(var i=0;i<姿.人たち.length;i++){
+    var o = document.createElement('option');
+    o.value = 姿.人たち[i].名; o.textContent = 姿.人たち[i].名;
+    人.appendChild(o);
+  }
+  月.innerHTML = '<option value="">全期間</option>';
+  for(var j=0;j<姿.月たち.length;j++){
+    var o2 = document.createElement('option');
+    o2.value = 姿.月たち[j];
+    o2.textContent = (+姿.月たち[j].slice(5,7)) + '月分（' + 姿.月たち[j].slice(0,4) + '年）';
+    月.appendChild(o2);
+  }
+  /* ★選んでいた物は 出来るだけ 残す★（シートを行き来しても 選び直させない） */
+  人.value = 前の人 || ''; 月.value = 前の月 || '';
+  if(人.value !== (前の人 || '')) 人.value = '';
+  if(月.value !== (前の月 || '')) 月.value = '';
+  切り替える();
+}
+
+function 切り替える(){
+  var sh = sheets[activeSheet];
+  if(!_切り替えの姿) return;
+  var えらび = {
+    人: document.getElementById('kkHito').value,
+    月: document.getElementById('kkTsuki').value,
+    始まりの日: Number(document.getElementById('kkShime').value || 1),
+  };
+  var 出 = (!えらび.人 && !えらび.月)
+    ? Kirikae.戻す()
+    : Kirikae.見る所を決める(sh, _切り替えの姿, えらび);
+  if(出.なぜ){
+    /* ★黙って 何も起きない を作らない★＝出せない時は 理由を出して 戻す */
+    document.getElementById('kkNow').textContent = 出.なぜ;
+    sh.kirikaeRows = {}; sh.kirikaeCols = {};
+    render(); updateBar();
+    return;
+  }
+  sh.kirikaeRows = 出.隠す行; sh.kirikaeCols = 出.隠す列;
+  document.getElementById('kkNow').textContent = 出.いま;
+  var 出す = document.getElementById('kkDasu');
+  if(出す) 出す.hidden = !(えらび.人 && えらび.月);
+  render(); updateBar();
+}
+
+function 切り替えを戻す(){
+  var sh = sheets[activeSheet];
+  document.getElementById('kkHito').value = '';
+  document.getElementById('kkTsuki').value = '';
+  sh.kirikaeRows = {}; sh.kirikaeCols = {};
+  document.getElementById('kkNow').textContent = Kirikae.戻す().いま;
+  var 出す = document.getElementById('kkDasu');
+  if(出す) 出す.hidden = true;
+  render(); updateBar();
+}
+
+/* ★切り替え（増えない）と 切り出し（増える）を つなぐ★
+   ＝今 見ている物を そのまま 新しいシートに出す。★言葉で 2つを 分ける★ */
+function 切り替えた分を新しいシートに出す(){
+  var sh = sheets[activeSheet];
+  if(!_切り替えの姿) return;
+  var 人 = document.getElementById('kkHito').value;
+  var 月 = document.getElementById('kkTsuki').value;
+  if(!人 || !月) return;
+  var 出 = Recipe.切り出す(sh, { 人: 人, 月: 月, 始まりの日: Number(document.getElementById('kkShime').value || 1) });
+  if(出.なぜ){ showToast(出.なぜ, 4000, 'warn'); return; }
+  手順を見せる('新しいシートに 出します',
+    '今 見ている分を そのまま 出します。中身を 見てから 決めてください。',
+    [出.なに], {}, [出]);
+}
+
+/* ══ ★8-③ 覚えた手順（レシピ）を 画面につなぐ★ ═══════════════════
+   ★2回目からは AIを呼ばない★＝機械が 先に当てる（0円）。
+   ★当てられなければ 普通に呼ぶ・黙って外さない★＝当たらなかった理由を その場で言う。
+   ★実行に上限を置かない★＝当てる時は 何行でも 全部に当てる。
+   ★直す前に必ず見せる★＝当てた結果を そのまま書かない。
+   ★押す前は「AIを使います」／押した後は「AIを ◯回 使いました」★
+     （掘ると 何度も動くので、押す前に 数は書かない） */
+var _bookHasVba = false;   /* ★開いたブックに マクロ（VBA）が入っていたか★（提案で使う） */
+var _覚えた手順 = [];
+var _手順の待ち = null;      /* 見せている最中の物（押されたら これを書く） */
+
+function 覚えた手順を読む(){
+  if(typeof RecipeStore === 'undefined') return Promise.resolve([]);
+  return RecipeStore.覚えた物().then(function(r){
+    _覚えた手順 = (r && r.レシピたち) || [];
+    return _覚えた手順;
+  }).catch(function(){ return _覚えた手順; });
+}
+
+function いまの表の要約(){
+  if(typeof Recipe === 'undefined') return null;
+  var sh = sheets[activeSheet];
+  if(!sh) return null;
+  try{ return Recipe.要約を作る(sh); }catch(e){ return null; }
+}
+
+/** ★当てた結果を 先に見せる★（ここでは 1セルも 書かない） */
+function 手順を見せる(題, 本文, 何, 変える, 出すシート){
+  _手順の待ち = { 変える: 変える, シート: activeSheet, 出すシート: 出すシート || [] };
+  document.getElementById('rcTitle').textContent = 題;
+  document.getElementById('rcBody').textContent = 本文;
+  var box = document.getElementById('rcList');
+  box.innerHTML = '';
+  for(var i=0;i<何.length;i++){
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:8px 12px;border-bottom:1px solid #EAF6F0;color:#333333;';
+    row.textContent = 何[i];
+    box.appendChild(row);
+  }
+  var 番地 = Object.keys(変える);
+  var 見本 = document.createElement('div');
+  見本.style.cssText = 'padding:8px 12px;color:#333333;';
+  var 出す = [];
+  for(var k=0;k<Math.min(3, 番地.length);k++){
+    var p = 番地[k].split(',');
+    var v = 変える[番地[k]];
+    出す.push(DiffPreview.colName(Number(p[1])) + (Number(p[0])+1) + ' → ' + (v.f || v.v));
+  }
+  見本.textContent = 出す.join('  /  ') + (番地.length > 3 ? ('  ほか ' + (番地.length - 3) + 'か所') : '');
+  if(出す.length) box.appendChild(見本);
+  /* ★新しいシートに出す時は「先頭の3行」を 見せる★（何が出るか 見てから 決めてもらう） */
+  var 新 = _手順の待ち.出すシート;
+  for(var m=0;m<新.length;m++){
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'padding:8px 12px;color:#333333;border-top:1px solid #EAF6F0;';
+    var 見せる行 = [];
+    for(var q=0;q<Math.min(3, 新[m].何行);q++){
+      var a = 新[m].data[(q+1) + ',0'], b = 新[m].data[(q+1) + ',1'];
+      見せる行.push(_きれいな値(a) + '　' + _きれいな値(b));
+    }
+    頭.textContent = '新しいシート「' + 新[m].name + '」に ' + 新[m].何行 + '行'
+      + (見せる行.length ? ('　' + 見せる行.join('　/　')) : '')
+      + (新[m].何行 > 3 ? ('　ほか ' + (新[m].何行 - 3) + '行') : '');
+    box.appendChild(頭);
+  }
+  var 直す数 = 番地.length;
+  document.getElementById('rcGo').textContent = 直す数
+    ? ('この ' + 直す数 + 'か所を 直す')
+    : ('新しいシートに ' + 新.reduce(function(a,x){ return a + x.何行; }, 0) + '行 出す');
+  document.getElementById('rcOverlay').style.display = 'flex';
+}
+function 手順をやめる(){
+  _手順の待ち = null;
+  var o = document.getElementById('rcOverlay');
+  if(o) o.style.display = 'none';
+}
+function 手順を書く(){
+  var 待 = _手順の待ち;
+  手順をやめる();
+  if(!待) return;
+  if(待.シート !== activeSheet) switchSheet(待.シート);
+  var 番地 = Object.keys(待.変える);
+  for(var i=0;i<番地.length;i++){
+    var p = 番地[i].split(',');
+    var v = 待.変える[番地[i]];
+    setCell(Number(p[0]), Number(p[1]), (v.f !== undefined ? v.f : v.v));
+  }
+  /* ★切り出しは 新しいシートに出す★＝元の表は 1セルも 触らない（原本を触らない） */
+  var 出した行 = 0, 出したシート = [];
+  for(var m=0;m<待.出すシート.length;m++){
+    var 名 = 使えるシート名(待.出すシート[m].name);
+    sheets.push({ name: 名, data: 待.出すシート[m].data, colW: {}, rowH: {},
+      hiddenRows: {}, hiddenCols: {} });
+    if(typeof addSheetToEngine === 'function'){ try{ addSheetToEngine(名); }catch(e){} }
+    出した行 += 待.出すシート[m].何行;
+    出したシート.push(名);
+  }
+  if(出したシート.length){
+    rebuildSheetTabs();
+    switchSheet(sheets.length - 1);
+    loadSheetIntoEngine(sheets.length - 1);
+  }
+  render();
+  var 文 = 番地.length
+    ? (番地.length + 'か所 直しました')
+    : (出したシート.join('・') + ' に ' + 出した行 + '行 出しました');
+  showToast('<span class="toast-h">' + 文 + '</span>覚えた手順で やりました。<span class="toast-n">AIを 0回 使いました</span>', 6000);
+  履歴に残す('自動化', '覚えた手順で ' + 文,
+    { やった: '覚えた手順を 当てた（AIは呼んでいない）', 何か所: 番地.length + 出した行 }, null, 0);
+}
+/* ★同じ名前のシートを 2枚 作らない★（Excelは 同じ名前を 許さない） */
+function 使えるシート名(名){
+  var 元 = String(名 || 'シート').slice(0, 28), 今 = 元, n = 2;
+  var 在る = function(x){
+    for(var i=0;i<sheets.length;i++) if(sheets[i].name === x) return true;
+    return false;
+  };
+  while(在る(今)){ 今 = 元 + '(' + n + ')'; n++; }
+  return 今;
+}
+/* 見せる時の 値の字（★中の値ではなく 客が見る字★）
+   ★実際に押して 見つけた（2026-08-28）★＝見せる窓に 10662.166666666664 と 出ていた。
+   ⇒ ★描く側と 同じ関数（fmtForDisplay）で 字にする★（2つ作らない）。 */
+function _きれいな値(cell){
+  if(!cell) return '';
+  var raw = (cell.v !== undefined && cell.v !== '') ? cell.v : cell.d;
+  if(raw === undefined || raw === null || raw === '') return '';
+  /* 日付の通し番号は 日付として見せる（★書式が日付の時だけ★＝金額を 日付にしない） */
+  if(typeof Kikan !== 'undefined' && cell.numFmt && /[ymd]/i.test(String(cell.numFmt))
+     && Number(raw) >= 20000 && Number(raw) < 90000){
+    var ymd = Kikan.通し番号を日付に(Number(raw));
+    if(ymd) return Kikan.日の字(ymd, false);
+  }
+  try { return String(fmtForDisplay(raw, cell.numFmt)).trim(); }
+  catch(e){ return String(raw); }
+}
+
+/** ★AIを呼ぶ前に 機械が当てる★ @returns {boolean} 当てたら true（AIは1回も呼ばない） */
+function 先に手順で当てる(頼み, 口){
+  var 言う = (口 && 口.足す) ? 口.足す : function(t, x){ addAIChatMsg(t, x); };
+  if(typeof Recipe === 'undefined') return false;
+  var 要約 = いまの表の要約();
+  if(!要約) return false;
+  var 答 = Recipe.前と同じか(頼み, 要約, _覚えた手順);
+  if(!答.やる){
+    /* ★黙って外さない★＝覚えた物が在るのに 当たらなかった時は 理由を言ってから 普通に呼ぶ */
+    if(_覚えた手順.length) 言う('ai', '覚えた手順は 使いませんでした（' + 答.なぜ + '）。AIに聞きます。');
+    return false;
+  }
+  var 出 = Recipe.手順を当てる(sheets[activeSheet], 答.レシピ.手順);
+  var 出すシート = (出 && 出.出すシート) ? 出.出すシート.filter(function(x){ return !!x.data; }) : [];
+  if(!出 || (!Object.keys(出.変える).length && !出すシート.length)){
+    /* ★出せない理由が 在れば そのまま言う★（黙って 外さない） */
+    var なぜ = (出 && 出.出すシート && 出.出すシート.length && 出.出すシート[0].なぜ)
+      ? ('（' + 出.出すシート[0].なぜ + '）') : '（当てても 変わる所が ありませんでした）';
+    言う('ai', '覚えた手順は 使いませんでした' + なぜ + '。AIに聞きます。');
+    return false;
+  }
+  言う('ai', '前と同じ事なので、覚えた手順で やります。AIは使いません。');
+  手順を見せる(出すシート.length ? '覚えた手順で 出します' : '覚えた手順で 直します',
+    答.なぜ + '。' + (出すシート.length ? '' : (出.何行 + '行 ぜんぶに 当てました。'))
+      + '中身を 見てから 決めてください。',
+    出.なに, 出.変える, 出すシート);
+  return true;
+}
+
+/** ★この やり方を 覚える★（★AIを使います★＝手順だけを もらう・答えの値は もらわない） */
+async function やり方を覚える(頼み, どこ){
+  var 言う = function(x){ if(どこ === 'popup-response-area') _addPopupMsg('ai', x); else addAIChatMsg('ai', x); };
+  if(typeof Recipe === 'undefined' || typeof RecipeStore === 'undefined') return;
+  var 要約 = いまの表の要約();
+  if(!要約){ 言う('この画面では 覚えられません（表が 読めませんでした）。'); return; }
+  言う('やり方を 手順にしています…');
+  var r = await _aiFetch({ message: Recipe.AIへ渡す物(要約, 頼み), history: [] });
+  if(!r.ok){ 言う(r.言葉); return; }
+  var 読 = Recipe.手順を読む(r.言葉);
+  if(!読.ok){
+    /* ★黙って外さない★＝覚えられなかった事を 理由つきで言う */
+    言う('覚えられませんでした（' + 読.なぜ + '）。<span class="toast-n">AIを 1回 使いました</span>');
+    return;
+  }
+  var レ = Recipe.レシピを作る(頼み, 頼み, 要約, 読.手順);
+  _覚えた手順.push(レ);
+  RecipeStore.覚える(レ).then(function(入った){
+    if(!入った) 言う('この画面を閉じるまでは 覚えています（倉庫に 残せませんでした）。');
+  });
+  履歴に残す('自動化', 'やり方を覚えた：' + String(頼み).slice(0, 30),
+    { 聞いた: 頼み, やった: '手順として覚えた（次からは AIを呼ばずに 当てます）' }, null, 1);
+  言う('覚えました。次に 同じ形の表で 同じ事を頼まれたら、AIを呼ばずに やります。'
+    + '<span class="toast-n">AIを 1回 使いました</span>');
+  var 出 = Recipe.手順を当てる(sheets[activeSheet], 読.手順);
+  var 出すシート2 = (出 && 出.出すシート) ? 出.出すシート.filter(function(x){ return !!x.data; }) : [];
+  if(出 && (Object.keys(出.変える).length || 出すシート2.length)){
+    手順を見せる(出すシート2.length ? '覚えた手順で 出します' : '覚えた手順で 直します',
+      '今の表にも 当てられます。' + (出すシート2.length ? '' : (出.何行 + '行 ぜんぶに 当てました。'))
+      + '中身を 見てから 決めてください。', 出.なに, 出.変える, 出すシート2);
+  }
+}
+
+function 覚えるボタンを出す(頼み, どこ){
+  var resp = document.getElementById(どこ || 'ai-response-area');
+  if(!resp) return;
+  var d = document.createElement('div');
+  d.className = 'ai-msg-ai';
+  var b = document.createElement('button');
+  b.textContent = 'この やり方を 覚える（AIを使います）';
+  b.style.cssText = 'font-size:12px;padding:6px 12px;border-radius:14px;border:1px solid #C8ECD8;background:#F0FAF4;color:#333333;font-family:inherit;cursor:pointer;';
+  b.onclick = function(){ d.remove(); やり方を覚える(頼み, どこ || 'ai-response-area'); };
+  d.appendChild(b);
+  resp.appendChild(d);
+  resp.scrollTop = resp.scrollHeight;
+}
+
+function 診断を始める(){
+  if(typeof Shindan === 'undefined'){ 開いた知らせは済んだ('診断'); return; }
+  if(_shindanBusy){ 開いた知らせは済んだ('診断'); return; }
+  _shindanBusy = true;
+  var it = Shindan.調べる途中(sheets, { 一度に: 3000 });
+  function 続き(){
+    var r;
+    try { r = it.next(); }
+    catch(e){ _shindanBusy = false; 開いた知らせは済んだ('診断'); return; }   /* ★調べられなくても 表は そのまま使える★ */
+    if(r.done){
+      _shindanBusy = false;
+      _shindanResult = r.value;
+      if(_shindanResult.式の本数 > 0){
+        診断の知らせを出す(_shindanResult);
+        /* ★履歴に残す（0円の道＝AIは使っていない）★ */
+        履歴に残す('診断', '危ない所 ' + _shindanResult.式の本数 + 'か所',
+          { やった: 'ブック全体を調べた（AIは呼んでいない）', 何か所: _shindanResult.式の本数,
+            どこ: _shindanResult.見つけた.slice(0, 5).map(function(x){ return { 場所: x.シート + '!' + x.セル, 前: x.いま出ている物, 後: x.いま出ている物 }; }) }, null, 0);
+      }
+      開いた知らせは済んだ('診断');
+      return;
+    }
+    (window.requestAnimationFrame || window.setTimeout)(続き, 0);
+  }
+  続き();
+}
+function 診断の知らせを出す(r){
+  var w = Shindan.言葉('kakureta_ref', r.式の本数);
+  if(!w) return;
+  /* ★出るまでの時間ではなく「調べるのにかかった時間」を言う★
+     （実測：仕事は0.01秒／出るまで5.6秒＝★開いた直後は 画面が別の仕事で忙しい★） */
+  開いた知らせに足す(w.題, w.本文
+    + '<br><b>場所を出せます</b>（ブック全体を ' + r.かかった秒 + '秒で見ました。AIは使っていません）', true);
+  var b = document.getElementById('shindanBtn');
+  if(b){ b.hidden = false; b.textContent = '危ない所 ' + r.式の本数 + 'か所'; }
+}
+function openShindan(){
+  var r = _shindanResult;
+  if(!r || !r.式の本数) return;              /* ★出来ていない物のボタンは 見せない★ */
+  var w = Shindan.言葉('kakureta_ref', r.式の本数);
+  document.getElementById('dgTitle').textContent = w.題;
+  document.getElementById('dgBody').textContent = w.本文;
+  document.getElementById('dgNext').textContent = w.つぎ;
+  var box = document.getElementById('dgList');
+  box.innerHTML = '';
+  var 出す = Math.min(r.見つけた.length, 200);   /* ★多い時は 先頭200件（何件 出していないかも 書く）★ */
+  for(var i=0;i<出す;i++){
+    var x = r.見つけた[i];
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 12px;border-bottom:1px solid #EAF6F0;cursor:pointer;';
+    row.onclick = (function(y){ return function(){ 診断の場所へ行く(y); }; })(x);
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'font-weight:700;color:#2E7D54;font-size:13px;';
+    頭.textContent = x.シート + ' の ' + x.セル + '　いま出ている物：' + x.いま出ている物;
+    var 式 = document.createElement('div');
+    式.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;word-break:break-all;';
+    式.textContent = x.式.length > 120 ? (x.式.slice(0,120) + '…') : x.式;
+    row.appendChild(頭); row.appendChild(式);
+    box.appendChild(row);
+  }
+  document.getElementById('dgMore').textContent =
+    (r.見つけた.length > 出す) ? ('ほか ' + (r.見つけた.length - 出す) + 'か所は 出していません（多いので 先頭' + 出す + 'か所）。') : '';
+  var ov = document.getElementById('dgOverlay');
+  ov.style.display = 'flex';
+}
+function closeShindan(){ var ov = document.getElementById('dgOverlay'); if(ov) ov.style.display = 'none'; }
+
+/* ══ ★5 E2診断の中の「マクロ（VBA）を読む」（2026-08-28）★ ═══════════
+   ★なぜ在るか（司さん）★＝「マクロを組んだ人が 辞めて 誰も触れない」。
+   だから ★何をしているのかを こちらから 日本語で出す★。
+   ★VBAは 動かさない・書き換えない★。★分けるのは 機械＝AIは 0回★。 */
+var _マクロ = null;
+var _マクロの手順 = {};   /* 「モジュール.名前」→ VbaTejun.取り出す() の結果 */
+function マクロを受け取る(m){
+  _マクロ = m || null;
+  var b = document.getElementById('macroBtn');
+  if(!b) return;
+  var 見 = _マクロ && _マクロ.見立て;
+  var 未 = (_マクロ && _マクロ.読み && _マクロ.読み.モジュール) ? _マクロ.読み.モジュール.filter(function(x){ return !x.確か; }).length : 0;
+  /* ★出来ていない物のボタンは 見せない★＝読めた本数も 未測定も 0 なら 出さない */
+  if(!見 || (!見.本数 && !未)){ b.hidden = true; return; }
+  b.hidden = false;
+  b.textContent = 見.本数 ? ('マクロ ' + 見.本数 + '本') : ('マクロ 未測定 ' + 未 + '本');
+  /* ★手順は ここで まとめて 取り出しておく★（AIは 0回・押した時に 待たせない） */
+  _マクロの手順 = {};
+  if(typeof VbaTejun !== 'undefined'){
+    for(var i=0;i<見.手続き.length;i++){
+      var v = 見.手続き[i];
+      try{ _マクロの手順[v.モジュール + '.' + v.名] = VbaTejun.取り出す(v); }
+      catch(e){ /* 1本 読めなくても 残りは 出す */ }
+    }
+  }
+}
+/* ★知らせは 別にする★＝「マクロが入っています」を 先に言ってから この話をする
+   （順番を 逆にすると 何の話か 分からないまま 本数が出る） */
+function マクロの知らせを出す(){
+  var 見 = _マクロ && _マクロ.見立て;
+  if(!見) return;
+  var b = document.getElementById('macroBtn');
+  if(!b || b.hidden) return;
+  開いた知らせに足す('マクロが 何をしているか 出せます', VbaMikata.知らせの字(見)
+    + '<br>中身を 見て、うちで どう出来るかを 1本ずつ 出します。（AIは 使っていません）', true);
+}
+function openMacro(){
+  var 見 = _マクロ && _マクロ.見立て;
+  if(!見) return;
+  var 未 = (_マクロ.読み.モジュール || []).filter(function(x){ return !x.確か; });
+  document.getElementById('mcBody').textContent = VbaMikata.知らせの字(見);
+  var box = document.getElementById('mcList');
+  box.innerHTML = '';
+  var 色 = { 'できる':'#2E7D54', 'かえる':'#8A5A00', 'べつの道':'#8A5A00', 'わからない':'#333333' };
+  var 言い方 = { 'できる':'そのまま できます', 'かえる':'やり方を かえます', 'べつの道':'別の道が いります', 'わからない':'読み取れません' };
+  for(var i=0;i<見.手続き.length;i++){
+    var v = 見.手続き[i];
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 12px;border-bottom:1px solid #EAF6F0;';
+    var 頭 = document.createElement('div');
+    頭.style.cssText = 'font-weight:700;font-size:13px;color:' + (色[v.可否] || '#333333') + ';';
+    頭.textContent = v.モジュール + ' の ' + v.名 + '（' + v.行数 + '行）　' + (言い方[v.可否] || '');
+    var 何 = document.createElement('div');
+    何.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;line-height:1.7;';
+    何.textContent = v.何をしているか;
+    row.appendChild(頭); row.appendChild(何);
+    /* ★終わりの印が 無い物は そう言う★（実物に 在る。黙って 次と 1本に しない） */
+    if(v.閉じていない){
+      var 閉 = document.createElement('div');
+      閉.style.cssText = 'font-size:12px;color:#8A5A00;margin-top:2px;line-height:1.7;';
+      閉.textContent = 'この1本は 終わりの印（End Sub）が 見つかりません。ここまでを 1本として 読んでいます。';
+      row.appendChild(閉);
+    }
+    if(v.うちのやり方){
+      var う = document.createElement('div');
+      う.style.cssText = 'font-size:12px;color:#333333;margin-top:2px;line-height:1.7;';
+      う.textContent = 'ここでは → ' + v.うちのやり方;
+      row.appendChild(う);
+    }
+    /* ★③レシピにして 会社に残す★
+       ★手順が 取り出せた時だけ 出す★（出来ていない物のボタンを 見せない）。
+       ★AIは 1回も 呼ばない★＝機械が VBAの字から そのまま 取り出す。 */
+    var 取 = _マクロの手順 && _マクロの手順[v.モジュール + '.' + v.名];
+    if(取 && 取.手順.length){
+      var 手 = document.createElement('div');
+      手.style.cssText = 'font-size:12px;color:#333333;margin-top:6px;line-height:1.7;';
+      手.textContent = VbaTejun.知らせの字(取);
+      row.appendChild(手);
+      var 並 = document.createElement('div');
+      並.style.cssText = 'font-size:12px;color:#2E7D54;margin-top:2px;line-height:1.7;';
+      並.textContent = '手順：' + 取.手順.map(function(t){ return VbaTejun.手順の字(t); }).join(' → ');
+      row.appendChild(並);
+      var b2 = document.createElement('button');
+      b2.style.cssText = 'margin-top:6px;background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;'
+        + 'border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+      b2.textContent = 'この手順を 覚える';
+      b2.onclick = (function(名){ return function(){ マクロの手順を覚える(名); }; })(v.モジュール + '.' + v.名);
+      row.appendChild(b2);
+    }
+    box.appendChild(row);
+  }
+  /* ★読めなかった物を 黙って落とさない★ */
+  document.getElementById('mcMore').textContent = 未.length
+    ? ('正しく読めたと 言えない物が ' + 未.length + '本 あります（' + 未.map(function(x){ return x.名; }).join('・') + '）。この分は 数に入れていません。')
+    : '';
+  var ov = document.getElementById('mcOverlay');
+  ov.style.display = 'flex';
+}
+function closeMacro(){ var ov = document.getElementById('mcOverlay'); if(ov) ov.style.display = 'none'; }
+
+/* ★下の帯の「その他」★（スマホだけ）
+   ★中身は 上の帯と 同じボタンを そのまま 使う★＝2つ作らない（押した時の動きも 1か所）。
+   ★字は 1文字も 消さない★（しまった先でも 同じ言葉）。 */
+/** ★開いているファイルの名前を 上に 出す★（スマホは 場所が 狭い）
+ *  ★頭を 残して 尻を 削る★
+ *    ★幅が 決まっている★＝尻を 残すと その分 ★頭の字が 削られる★。
+ *    ★見分ける力は 頭に 在る★（実物150本で ★頭8文字なら 108/150が 別物★）。
+ *    だから ★幅は 全部 頭に 使う★。
+ *    （経営者セッションの実測でも 客の32本中30本が 同じ末尾だった＝尻に 見分ける力は 無い）
+ *  ★頭だけでは 見分けられない物も 42/150 在る★＝一覧（これまで）では 足りない事が ある。
+ *  ★拡張子だけは 残す★（.xlsm＝マクロ入り など 形が 分かる）。 */
+function ファイル名を短く(名, 上限){
+  var s = String(名 || '');
+  var 上 = 上限 || 20;
+  if(s.length <= 上) return s;
+  var i = s.lastIndexOf('.');
+  var 拡 = (i > 0 && s.length - i <= 6) ? s.slice(i) : '';
+  var 頭 = s.slice(0, Math.max(4, 上 - 拡.length - 1));
+  return 頭 + '…' + 拡;
+}
+
+function その他を出す(){
+  var 箱 = document.getElementById('headerSay');
+  if(!箱) return;
+  var 開く = !箱.classList.contains('open');
+  箱.classList.toggle('open', 開く);
+  var b = document.getElementById('bnMoreBtn');
+  if(b) b.classList.toggle('active', 開く);
+}
+/* 画面の どこかを 押したら 閉じる（開けっぱなしに しない） */
+document.addEventListener('click', function(e){
+  var 箱 = document.getElementById('headerSay');
+  if(!箱 || !箱.classList.contains('open')) return;
+  if(箱.contains(e.target)) return;
+  var b = document.getElementById('bnMoreBtn');
+  if(b && b.contains(e.target)) return;
+  箱.classList.remove('open');
+  if(b) b.classList.remove('active');
+}, true);
+
+
+
+/* ══ ★③レシピにして 会社に残す（2026-08-28）★ ═══════════════
+   ★司さんの言葉★「マクロを組んだ人が 辞めて 誰も触れない」
+   ⇒ ★人ではなく 会社に残す★＝マクロの中身を そのまま「手順」にして 倉庫に 置く。
+   ★AIは 1回も 呼ばない★（機械が VBAの字から 取り出す＝0円）。
+   ★1セルも 書かずに 先に見せる★（直すかどうかは 見てから 決めてもらう）。 */
+async function マクロの手順を覚える(名){
+  var 取 = _マクロの手順 && _マクロの手順[名];
+  if(!取 || !取.手順.length) return;
+  if(typeof Recipe === 'undefined'){ showToast('この画面では 覚えられません', 4000, 'warn'); return; }
+  var 要約 = いまの表の要約();
+  if(!要約){ showToast('この画面では 覚えられません（表が 読めませんでした）', 5000, 'warn'); return; }
+  var 頼み = 'マクロ ' + 名 + ' と 同じ事';
+  var レ = Recipe.レシピを作る(頼み, 頼み, 要約, 取.手順);
+  _覚えた手順.push(レ);
+  var 倉庫に入った = true;
+  if(typeof RecipeStore !== 'undefined'){
+    try{ 倉庫に入った = await RecipeStore.覚える(レ); }
+    catch(e){ 倉庫に入った = false; }
+  }
+  履歴に残す('自動化', 'マクロを 手順にした：' + 名,
+    { やった: 'マクロの中身から 手順を 取り出して 覚えた（AIは 呼んでいない）',
+      手順の数: 取.手順.length, 読めなかった所: 取.数.読めない行 }, null, 0);
+  closeMacro();
+  /* ★覚えた事と、覚えていない所を 両方 言う★（減った事を 隠さない） */
+  var 言 = '「' + 名 + '」の手順を ' + 取.手順.length + 'つ 覚えました。'
+    + '次からは 同じ形の表で AIを 呼ばずに 出せます。';
+  if(取.数.読めない行) 言 += ' 読み取れなかった所が ' + 取.数.読めない行 + 'か所 あります（そこは 覚えていません）。';
+  if(!倉庫に入った) 言 += ' この画面を閉じるまでは 覚えています（倉庫に 残せませんでした）。';
+  showToast(言, 7000);
+  /* ★当てた結果を 先に見せる★（ここでは 1セルも 書かない） */
+  var 出 = Recipe.手順を当てる(sheets[activeSheet], 取.手順);
+  var 出すシート = (出 && 出.出すシート) ? 出.出すシート.filter(function(x){ return !!x.data; }) : [];
+  if(出 && (Object.keys(出.変える).length || 出すシート.length)){
+    手順を見せる('マクロと 同じ事を します', 'マクロ ' + 名 + ' の 手順です。押すまで 1セルも 変えません。',
+      出.なに, 出.変える, 出すシート);
+  }
+}
+function 診断の場所へ行く(x){
+  closeShindan();
+  var i = -1;
+  for(var k=0;k<sheets.length;k++) if(sheets[k].name === x.シート){ i = k; break; }
+  if(i < 0) return;
+  if(i !== activeSheet) switchSheet(i);
+  selR1 = selR2 = x.r; selC1 = selC2 = x.c;
+  /* ★自分で押して見つけた（2026-08-25）★
+     そのまま動かすと ★行き先が 画面のいちばん下の端★に来て、
+     浮いている「AIに話しかける」に ★半分 隠れて 見えなかった★。
+     ⇒ ★6行 下まで動かしてから 戻す★＝行き先が 下から6行の所に来る（端に貼り付かない）。 */
+  var 最終行 = Math.max(0, (sheets[activeSheet].rows || 0) - 1);
+  scrollToCell(Math.min(x.r + 6, 最終行 || (x.r + 6)), x.c);
+  scrollToCell(x.r, x.c); updateBar(); render();
+}
+
+function 参照の網を作り始める(done){
+  if(typeof RefGraph === 'undefined'){ if(done) done(null); return; }
+  if(_refGraphBusy) return;
+  _refGraphBusy = true;
+  var t0 = (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now();
+  var 全部 = 0;
+  for (var _i = 0; _i < sheets.length; _i++) 全部 += Object.keys((sheets[_i] && sheets[_i].data) || {}).length;
+  var 知らせ = document.getElementById('bookScan');
+  var 知らせ字 = document.getElementById('bookScanTxt');
+  var 出した = false;
+  /* ★300ミリ秒を超えてから出す★（それ未満で出すと チカチカして かえって不安になる） */
+  var 出すtimer = setTimeout(function(){
+    出した = true;
+    if(知らせ) 知らせ.hidden = false;
+  }, 300);
+  function 消す(){
+    clearTimeout(出すtimer);
+    if(知らせ) 知らせ.hidden = true;      /* ★終わったら 必ず消す（失敗した時も）★ */
+  }
+  var it = RefGraph.作る途中(sheets, { 一度に: 3000 });
+  function 続き(){
+    var r;
+    try { r = it.next(); }
+    catch(e){
+      消す(); _refGraphBusy = false;
+      /* ★失敗しても 何が起きたか1行 出す（黙って消えない）★ */
+      showToast('<span class="toast-h">ブック全体は調べられませんでした</span>'
+        + '見ているシートの計算は そのまま使えます。' + ((e && e.message) ? '（' + e.message + '）' : ''), 5000, 'warn');
+      if(done) done(null); return;
+    }
+    if(r.done){
+      消す();
+      _refGraph = r.value;
+      _refGraph.かかった秒 = Math.round(((typeof performance!=='undefined'&&performance.now?performance.now():Date.now()) - t0)) / 1000;
+      _refGraphBusy = false;
+      if(done) done(_refGraph);
+      return;
+    }
+    /* ★止めない★＝1回ぶん読んだら 画面に順番を返す */
+    if(出した && 知らせ字 && r.value && 全部){
+      var 済 = r.value.進み || 0;
+      var 割 = Math.min(99, Math.round(済 * 100 / 全部));
+      var 枚 = 0, 数 = 0;
+      for(var q=0;q<sheets.length;q++){ 数 += Object.keys((sheets[q]&&sheets[q].data)||{}).length; if(数 <= 済) 枚 = q+1; }
+      知らせ字.textContent = 'ブック全体を調べています… ' + Math.min(sheets.length, 枚+1) + ' / ' + sheets.length + ' 枚目（' + 割 + '%）';
+    }
+    setTimeout(続き, 0);
+  }
+  setTimeout(続き, 0);
+}
+
 function _sheetsReferencedBy(idx){
+  /* ★網が出来ていれば そこから答える（間接の参照も辿れる＝今までは直接だけだった）★ */
+  if(_refGraph && _refGraph.シートの網 && _refGraph.シートの網[idx]) return _refGraph.シートの網[idx].slice();
+  return _sheetsReferencedBySlow(idx);
+}
+function _sheetsReferencedBySlow(idx){
   var sh = sheets[idx];
   if(!sh || !sh.data) return [];
   var alts = [], byName = {}, i;
@@ -6279,12 +8833,16 @@ function onPickBookFile(el){
   if (f) openBookFile(f);
 }
 function openBookFile(file){
-  showToast('開いています…', 1200);
+  showToast('読み込んでいます…', 1200);
   return _ensureXlsx().then(function(){
     return BookOpen.openFile(file);
   }).then(function(res){
     sheets = res.sheets;
+    /* ★マクロが入っているかは 提案でも使う★（開いた時に こちらから 代わりの道を言う） */
+    _bookHasVba = !!res.hasVba;
     activeSheet = 0;
+    /* ★別のファイルを開く時も 捨てる前に写す★（書き出さずに開き直した分が 消えていた） */
+    控えへ写す((BookOpen.current() || {}).name || '（名前なし）', _editedCells, 0);
     _editedCells = {};   // ★別のファイルを開いたら 前のファイルの「直した所」を持ち越さない★
     _baselineTaken = false;
     selR1=selC1=selR2=selC2=0;
@@ -6292,18 +8850,55 @@ function openBookFile(file){
     // ★計算する側を作り直す（シートの名前と数が変わるため）★
     if (typeof initFormulaEngine === 'function') initFormulaEngine(sheets.map(function(s){ return s.name; }));
     rebuildSheetTabs();          // ★14枚あってもタブを出す（出さないと1枚目しか触れない）★
-    loadSheetIntoEngine(0);      // ★開いたシートだけ流す（全部やると固まる）★
+    loadSheetIntoEngine(0);      // ★計算に流すのは 見るシートから（全部流すと固まる）★
+    /* ★開いた時の知らせは ここから 1つにまとめる★
+       ＝「開きました」も 0.1秒で 調べた結果に 消されていた（実測 2026-08-27）。 */
+    開いた知らせを始める(['開いた', '網', '提案', '診断']);
+    /* ★参照の網だけは ブック全体ぶん 先に作る（0.04秒・小分けなので固まらない）★
+       これが在るから「別のシートも見て答えます」が言える（2026-08-25 司さん） */
+    参照の網を作り始める(function(g){
+      if(!g){ 開いた知らせは済んだ('網'); 開いた知らせは済んだ('提案'); 開いた知らせは済んだ('診断'); return; }
+      var 式 = 0, 見た = {};
+      for(var i=0;i<g.別シート参照.length;i++){ var k=g.別シート参照[i].from+':'+g.別シート参照[i].fromCell; if(!見た[k]){見た[k]=1;式++;} }
+      開いた知らせに足す('ブック全体を調べました',
+        g.シート数 + 'シート・式' + g.式の数 + '本／別のシートを見ている式 ' + 式 + '本'
+        + (g.別ファイル参照.length ? '／別のファイルを見ている式 ' + g.別ファイル参照.length + '本' : '')
+        + '（' + g.かかった秒 + '秒）');
+      開いた知らせは済んだ('網');
+      /* ★5 E2診断★ 網の次に 診断も走らせる（★0円・AIを1回も呼ばない★）。
+         ★開いた時に こちらから言う★＝客は「見えない空」に 一生 気づけない。 */
+      診断を始める();
+      /* ★8 提案も 開いた時に 自分から★（押されるまで 何もしない＝受け身＝競合と同じ） */
+      提案を始める();
+      /* ★覚えた手順は 開いた時に 読んでおく★＝AIを呼ぶ前に 機械が当てるため（0円）。
+         ★読めなくても 画面は動く★（その時は 普通にAIに聞く＝黙って外さない） */
+      覚えた手順を読む();
+      /* ★切り替えの帯は 開いた時に 整える★（人▼・月▼の中身は 表から作る） */
+      切り替えを整える();
+    });
     render(); updateBar();
     var lbl = document.getElementById('openedFileLabel');
-    if (lbl) lbl.textContent = file.name + '（' + res.sheets.length + 'シート）';
+    if (lbl) lbl.textContent = ファイル名を短く(file.name) + '（' + res.sheets.length + 'シート）';
+    /* ★マクロ(VBA)が入っていた時は 先に「どうなるか」を言う（2026-08-25）★
+       ★「まだ出来ません」ではなく「そのまま残す・ここでは動かない・代わりにこう出来る」★ */
+    /* ★前のファイルの物を 残さない★＝マクロの無いファイルを 開いた時は 必ず 消す。
+       （2026-08-28 実物の画面で 押して 見つけた＝マクロ入りの次に 普通の物を開くと
+         ★前のファイルの「マクロ 4本」が 出たまま★だった） */
+    if (typeof マクロを受け取る === 'function') マクロを受け取る(res.hasVba ? res.マクロ : null);
+    if (res.hasVba && typeof BookOpen !== 'undefined' && BookOpen.MSG_VBA) {
+      開いた知らせに足す('マクロ（VBA）が入っています', BookOpen.MSG_VBA);
+      if (typeof マクロの知らせを出す === 'function') マクロの知らせを出す();
+    }
     if (res.kind === 'xls') {
       // ★「対応していません」ではなく「まだ直せません」★（後で作る）
-      showToast('<span class="toast-h">開きました（見るだけ）</span>' + BookOpen.MSG_XLS, 6000, 'warn');
+      開いた知らせに足す('開きました（見るだけ）', BookOpen.MSG_XLS, true);
     } else {
-      showToast('開きました：' + file.name + '（' + res.sheets.length + 'シート）'
-        + '<br>保存すると★元の書式・判子・グラフはそのまま★で、値だけ書き換えます。', 5000);
+      開いた知らせに足す('開きました：' + file.name + '（' + res.sheets.length + 'シート）',
+        '保存すると<b>元の書式・判子・グラフはそのまま</b>で、値だけ書き換えます。');
     }
+    開いた知らせは済んだ('開いた');
   }).catch(function(err){
+    _開いた知らせ = null;   /* ★開けなかった時は ためた物を 捨てる（後で 混ざって出ない）★ */
     showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
   });
 }
@@ -6357,8 +8952,12 @@ function _askBeforeWrite(plan, fileName){
     var go = document.getElementById('diffGo');
     var cancel = document.getElementById('diffCancel');
     head.textContent = DiffPreview.headline(plan, fileName);
+    /* ★書き出す名前は「開いた時と同じ名前」が既定★（Excelの流儀に近い）。
+        ★推奨の名前を作らない★＝中身から作ると 元のファイルと結び付かなくなる
+        （請求書や明細とは事情が違う。2026-08-18 裁定）。
+        ★その場で直せる★＝同じ名前だと書き出し先で元と並ぶので、迷う人はここで変えられる。 */
     var nameEl = document.getElementById('diffName');
-    if (nameEl) nameEl.textContent = '書き出す名前：' + fileName;
+    if (nameEl) nameEl.value = fileName;
     /* ★件数は省略しない（シートごとの数は全部 出す）／中身だけ先頭3行★ */
     var html = '';
     for(var i=0;i<plan.sheets.length;i++){
@@ -6384,7 +8983,10 @@ function _askBeforeWrite(plan, fileName){
     var done = function(v){
       ov.style.display = 'none';
       go.onclick = null; cancel.onclick = null; ov.onclick = null;
-      resolve(v);
+      /* ★書き出す時の名前は「窓に出ている名前」★（人が直したらその名前で書き出す）。
+         空にされたら 開いた時の名前へ戻す＝★名前の無いファイルを作らない★ */
+      var typed = nameEl && String(nameEl.value || '').trim();
+      resolve(v ? { go: true, name: typed || fileName } : { go: false });
     };
     go.onclick = function(){ done(true); };
     cancel.onclick = function(){ done(false); };
@@ -6426,30 +9028,38 @@ function saveOpenedBook(){
         });
       });
     }
-    return _askBeforeWrite(plan, cur.name).then(function(go){
-      if(!go){
+    return _askBeforeWrite(plan, cur.name).then(function(ans){
+      if(!ans || !ans.go){
         /* ★やめる＝ファイルを1バイトも作らない★ */
         showToast('やめました。ファイルは1本も書き出していません。', 3000);
         return null;
       }
-      return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan }; });
+      return BookOpen.saveOpened(sheets).then(function(res){ return { res: res, plan: plan, name: ans.name }; });
     });
   }).then(function(pack){
     if(!pack) return;                       // 0か所 か やめる
     var res = pack.res, plan = pack.plan;
+    var outName = pack.name || cur.name;    // ★窓で直した名前で書き出す★
     var buf = res && res.bytes ? res.bytes : res;      // xlsb は素の Uint8Array を返す
     var log = res && res.log;
-    return FileOut.deliver(buf, cur.name).then(function(){
-      _editedCells = {};                     // ★書き終えたら「直した所」を空にする★
+    return FileOut.deliver(buf, outName).then(function(){
+      /* ★捨てる前に 控えへ写す（2026-08-25 指示役）★＝ここで捨てていたので 何も残らなかった */
+      控えへ写す(outName, _editedCells, plan.total);
+      /* ★履歴に残す（どのセルが どう変わったか まで）★ */
+      履歴に残す('直した所', plan.total + 'か所 直して 書き出した',
+        { やった: '値だけ書き換えて 書き出した（元のファイルは変えていない）', 何か所: plan.total,
+          どこ: (plan.rows || []).slice(0, 5).map(function(x){ return { 場所: x.where || x.場所 || '', 前: x.before, 後: x.after }; }) },
+        outName, 0);
+      _editedCells = {};                     // ★写してから「直した所」を空にする★
       showToast('<span class="toast-h">' + plan.total + 'か所 直して 書き出しました</span>'
-        + '★元のファイルは変わっていません★。同じ名前で1本 書き出しました。'
+        + '<b>元のファイルは変わっていません</b>。同じ名前で1本 書き出しました。'
         + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
         + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
                  + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);
     });
   }).catch(function(err){
     // ★歩けない・直せないファイルは、壊さずに断る★
-    showToast('<span class="toast-h">保存しませんでした</span>' + ((err && err.message) || err), 6000, 'warn');
+    showToast('<span class="toast-h">書き出しませんでした</span>' + ((err && err.message) || err), 6000, 'warn');
   });
 }
 function saveXlsx(){
@@ -6477,13 +9087,13 @@ function saveXlsx(){
       // ★止めない。落ちる物を具体的に伝えるだけ（客が自分で直せる形にする）
       //   長い文章なので「読ませる用」の見た目(白地・濃い文字・左揃え)にする。
       var esc1 = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-      var html = '<span class="toast-h">⚠️ 保存しました。ただしExcelで開くと違う所があります</span><ul>'
+      var html = '<span class="toast-h">⚠️ 書き出しました。ただしExcelで読み込むと違う所があります</span><ul>'
         + warns.map(function(w){ return '<li>' + esc1(w.msg) + '</li>'; }).join('') + '</ul>'
         + '<span class="toast-n">対象は「' + (ExcelVersion.VER_LBL[getBookVer()] || getBookVer())
         + '」で見ています（右上の 📊 で変えられます）。</span>';
       showToast(html, 14000, 'warn');
     } else {
-      showToast('✅ Excelファイルを保存しました', 2500);
+      showToast('✅ Excelファイルを書き出しました', 2500);
     }
   }).catch(function(e){
     // ★「保存しました」と嘘をつかない
@@ -6504,52 +9114,11 @@ function sendToAIMobile(){
   _sendToAIMobile(text);
 }
 
-async function _sendToAIMobile(text){
-  var selData = getSelectionData();
-  var ctxNote = selData.cells.length > 0
-    ? '\n【選択セル:'+selData.addr+'→'+selData.cells.join(',')+'】'
-    : '\n【選択セル:'+selData.addr+'（空）】';
-  var writeInstruction = '\nルール：ユーザーが「〜を入れて」「〜を書いて」「〜に設定して」など明示的にセルへの書き込みを求めた場合のみ、返答の最後に {"action":"write","cells":[{"addr":"A1","value":"=SUM(A1:C1)"}]} の形式のJSONを1行で出力してね。説明・解説・使い方を教えるだけの質問ではJSONを出力しないこと。';
-  var userMsg = text + ctxNote + writeInstruction;
-
-  var sendBtn = document.getElementById('popup-send');
-  if(sendBtn) sendBtn.disabled = true;
-
-  _addPopupMsg('user', text);
-
-  var respArea = document.getElementById('popup-response-area');
-  var thinkEl = document.createElement('div');
-  thinkEl.id = 'popup-thinking';
-  thinkEl.className = 'ai-msg-ai';
-  thinkEl.innerHTML = '<span style="color:#3D9E72;font-size:12px;">考え中...</span>';
-  if(respArea){ respArea.appendChild(thinkEl); respArea.scrollTop = 9999; }
-
-  try {
-    var res = await fetch('/api/claude', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message: userMsg, history: aiHistory })
-    });
-    var data = await res.json();
-    var aiText = data.text || 'エラーが発生したよ';
-    var th = document.getElementById('popup-thinking');
-    if(th) th.remove();
-    var extracted = extractWriteAction(aiText);
-    var displayText = extracted
-      ? (aiText.substring(0, extracted.start) + aiText.substring(extracted.end)).trim()
-      : aiText;
-    _addPopupMsg('ai', displayText);
-    aiHistory.push({role:'user',content:text});
-    aiHistory.push({role:'assistant',content:displayText});
-    if(aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
-    if(extracted) showWriteConfirm(extracted.json.cells);
-    if(respArea) respArea.scrollTop = respArea.scrollHeight;
-  } catch(e){
-    var th2 = document.getElementById('popup-thinking');
-    if(th2) th2.remove();
-    _addPopupMsg('ai','AIに接続できなかったよ。もう一度試してみてね。');
-  }
-  if(sendBtn) sendBtn.disabled = false;
+/* ★スマホの窓も 同じ1本を通す★（2026-08-27）
+   ＝ここに 同じ物を もう1つ 書かない。★同じ動きに 2つの作りを 持たせない★
+     （前は ここが 別物で、地図・掘る・使った回数・履歴・覚えた手順が 全部 抜けていた） */
+function _sendToAIMobile(text){
+  return AIに聞く(text, _AIの出し口('popup'));
 }
 
 function _addPopupMsg(type, text){
@@ -6693,7 +9262,7 @@ var REQUIRED_FNS = [
   'render', 'parseDate', 'parseDateStr', 'parseTime', 'dateFmtForFormula',
   'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
   'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
-  'recalcSheet', 'convertFormula', 'forDisplay', 'fmtForDisplay', 'applyNumFmt',
+  'recalcSheet', 'convertFormula', 'forDisplay', 'fmtForDisplay', 'applyNumFmt', 'cfFormatAt',
   // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）
   'initExallyFormula', 'addSheetToEngine'
 ];
@@ -6751,14 +9320,25 @@ document.addEventListener('DOMContentLoaded', function(){ checkRequiredFns(); })
     <button class="sheet-tab active" onclick="switchSheet(0)">Sheet1</button>
     <button id="add-sheet-btn" onclick="addSheet()">＋</button>
   </div>
+  <!-- ★下の帯は 5つまで★（2026-08-29 司さん「フッターも整理しろよ」）
+       ・テンプレ／電子ハンコ … ★まだ出来ていない★ので ホーム画面に「灰色＋理由」で 移した
+       ・クイズ … AIの中のタブ（chat.html?tab=quiz）＝AIから 行ける
+       ★押せる物の 行き先は 必ず 実在する★（no-dead-ui が 見張る） -->
+  <!-- ★下の帯は 3つ★（2026-08-29 司さん）
+       ・AI …… ★右下に「AIに話しかける」が 浮いている★＝二重なので 帯からは 外した
+       ・ブック … ★今 いる画面★＝押しても 何も起きないので 外した
+       ・テンプレ … 前に 消したページ（どこにも 出さない）
+       ・電子ハンコ … まだ出来ていない物＝ホーム画面に 灰色＋理由で 置いてある -->
+  <!-- ★下の帯＝親指の届く所★（指示役 裁定 2026-08-29・B案）
+       ホーム／読み込む／書き出す／その他／設定 の 5つ。
+       ・数式帳は ★設定に入れない★（設定＝動き方を変える所／数式帳＝見る所）⇒「その他」の中
+       ・AIは 右下に 浮いている1つだけ（★入口を1つに★）＝帯に 入れて 6つにしない
+       ・PCでは この帯は 出ない（上の帯が 在る） -->
   <nav class="book-bn">
-    <button class="book-bn-i" onclick="location.href='home.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
-    <button class="book-bn-i" onclick="location.href='chat.html'"><span class="book-bn-ic">🤖</span><span class="book-bn-lb">AI</span></button>
-    <button class="book-bn-i active"><span class="book-bn-ic"><svg><use href="#grid-sm"/></svg></span><span class="book-bn-lb">ブック</span></button>
-    <button class="book-bn-i" onclick="location.href='template.html'"><span class="book-bn-ic"><svg><use href="#template-sm"/></svg></span><span class="book-bn-lb">テンプレ</span></button>
-    <button class="book-bn-i book-bn-disabled"><span class="book-bn-ic"><svg><use href="#stamp-sm"/></svg></span><span class="book-bn-lb">ハンコ</span></button>
-    <button class="book-bn-i" onclick="location.href='chat.html?tab=book'"><span class="book-bn-ic"><svg><use href="#book-sm"/></svg></span><span class="book-bn-lb">数式帳</span></button>
-    <button class="book-bn-i" onclick="location.href='chat.html?tab=quiz'"><span class="book-bn-ic">🎯</span><span class="book-bn-lb">クイズ</span></button>
+    <button class="book-bn-i" onclick="location.href='hub.html'"><span class="book-bn-ic">🏠</span><span class="book-bn-lb">ホーム</span></button>
+    <button class="book-bn-i" onclick="document.getElementById('bookFileInput').click()"><span class="book-bn-ic">📂</span><span class="book-bn-lb">読み込む</span></button>
+    <button id="bnSaveBtn" class="book-bn-i" onclick="saveXlsx()"><span class="book-bn-ic">💾</span><span class="book-bn-lb">書き出す</span></button>
+    <button id="bnMoreBtn" class="book-bn-i" onclick="その他を出す()"><span class="book-bn-ic">➕</span><span class="book-bn-lb">その他</span></button>
     <button class="book-bn-i" onclick="location.href='chat.html?tab=settings'"><span class="book-bn-ic">⚙️</span><span class="book-bn-lb">設定</span></button>
   </nav>
 </div>

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/hub.css?v=391784fa">
+<link rel="stylesheet" href="css/hub.css?v=dd007c4c">
 
 </head>
 <body>
@@ -60,6 +60,18 @@
         <span class="tile-d">自分で表を組みたい時に</span>
         <span class="tile-go">開く →</span>
       </a>
+      <!-- ★まだ出来ていない物は「灰色＋理由」で 出す★（隠さない＝決めた形）
+           2026-08-29：ブックの画面の 下の帯が 8個で ごちゃごちゃ だったので
+           ★電子ハンコを 下の帯から ここへ 移した★。
+           ★テンプレは 別★＝「まだ」ではなく ★消したページ★（もう この repo に 無い）。
+           だから ★どこにも 出さない★（tests/hub-ui.mjs が「戻っていないか」を 見張っている）。 -->
+      
+      <button class="tile" id="tile-stamp" type="button" disabled title="まだ出来ていません（準備中）"
+        style="opacity:0.45;cursor:not-allowed;">
+        <span class="tile-ic">🖃</span>
+        <span class="tile-t">電子ハンコ</span>
+        <span class="tile-d">まだ出来ていません（準備中）</span>
+      </button>
     </div>
   </section>
 
@@ -285,16 +297,16 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=391784fa"></script>
-<script src="lib/access.js?v=391784fa"></script>
-<script src="lib/aggregate.js?v=391784fa"></script>
-<script src="lib/periods.js?v=391784fa"></script>
-<script src="lib/ledger-source.js?v=391784fa"></script>
-<script src="lib/cross-agg.js?v=391784fa"></script>
-<script src="js/suite-data.js?v=391784fa"></script>
-<script src="js/hub.js?v=391784fa"></script>
-<script src="js/ledger.js?v=391784fa"></script>
-<script src="js/exally-login.js?v=391784fa"></script>
-<script src="js/auth.js?v=391784fa"></script>
+<script src="js/supa-config.js?v=dd007c4c"></script>
+<script src="lib/access.js?v=dd007c4c"></script>
+<script src="lib/aggregate.js?v=dd007c4c"></script>
+<script src="lib/periods.js?v=dd007c4c"></script>
+<script src="lib/ledger-source.js?v=dd007c4c"></script>
+<script src="lib/cross-agg.js?v=dd007c4c"></script>
+<script src="js/suite-data.js?v=dd007c4c"></script>
+<script src="js/hub.js?v=dd007c4c"></script>
+<script src="js/ledger.js?v=dd007c4c"></script>
+<script src="js/exally-login.js?v=dd007c4c"></script>
+<script src="js/auth.js?v=dd007c4c"></script>
 </body>
 </html>
