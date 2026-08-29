@@ -1304,66 +1304,66 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=6ef70254"></script>
+<script src="hyperformula.full.min.js?v=168a7e5e"></script>
 
-<script src="exally-formula.js?v=6ef70254"></script>
+<script src="exally-formula.js?v=168a7e5e"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=6ef70254"></script>
+<script src="js/file-out.js?v=168a7e5e"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=6ef70254"></script>
-<script src="lib/grid-xlsx.js?v=6ef70254"></script>
+<script src="lib/typed-value.js?v=168a7e5e"></script>
+<script src="lib/grid-xlsx.js?v=168a7e5e"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=6ef70254"></script>
-<script src="lib/autosum.js?v=6ef70254"></script>
-<script src="lib/grid-sort.js?v=6ef70254"></script>
-<script src="lib/grid-filter.js?v=6ef70254"></script>
-<script src="lib/grid-find.js?v=6ef70254"></script>
-<script src="lib/grid-print.js?v=6ef70254"></script>
-<script src="lib/ai-reason.js?v=6ef70254"></script>
-<script src="lib/menu-place.js?v=6ef70254"></script>
-<script src="lib/grid-stats.js?v=6ef70254"></script>
-<script src="lib/grid-valid.js?v=6ef70254"></script>
-<script src="lib/cond-format.js?v=6ef70254"></script>
-<script src="lib/ref-graph.js?v=6ef70254"></script>
-<script src="lib/shindan.js?v=6ef70254"></script>
+  <script src="lib/grid-refedit.js?v=168a7e5e"></script>
+<script src="lib/autosum.js?v=168a7e5e"></script>
+<script src="lib/grid-sort.js?v=168a7e5e"></script>
+<script src="lib/grid-filter.js?v=168a7e5e"></script>
+<script src="lib/grid-find.js?v=168a7e5e"></script>
+<script src="lib/grid-print.js?v=168a7e5e"></script>
+<script src="lib/ai-reason.js?v=168a7e5e"></script>
+<script src="lib/menu-place.js?v=168a7e5e"></script>
+<script src="lib/grid-stats.js?v=168a7e5e"></script>
+<script src="lib/grid-valid.js?v=168a7e5e"></script>
+<script src="lib/cond-format.js?v=168a7e5e"></script>
+<script src="lib/ref-graph.js?v=168a7e5e"></script>
+<script src="lib/shindan.js?v=168a7e5e"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=6ef70254"></script>
-<script src="lib/vba-mikata.js?v=6ef70254"></script>
-<script src="lib/vba-tejun.js?v=6ef70254"></script>
-<script src="lib/rireki.js?v=6ef70254"></script>
-<script src="lib/chizu.js?v=6ef70254"></script>
-<script src="lib/horu.js?v=6ef70254"></script>
-<script src="lib/excel-version.js?v=6ef70254"></script>
-<script src="lib/teian.js?v=6ef70254"></script>
-<script src="lib/kikan.js?v=6ef70254"></script>
-<script src="lib/recipe.js?v=6ef70254"></script>
-<script src="lib/kirikae.js?v=6ef70254"></script>
-<script src="js/recipe-store.js?v=6ef70254"></script>
-<script src="js/rireki-store.js?v=6ef70254"></script>
-<script src="lib/excel-version.js?v=6ef70254"></script>
+<script src="lib/vba.js?v=168a7e5e"></script>
+<script src="lib/vba-mikata.js?v=168a7e5e"></script>
+<script src="lib/vba-tejun.js?v=168a7e5e"></script>
+<script src="lib/rireki.js?v=168a7e5e"></script>
+<script src="lib/chizu.js?v=168a7e5e"></script>
+<script src="lib/horu.js?v=168a7e5e"></script>
+<script src="lib/excel-version.js?v=168a7e5e"></script>
+<script src="lib/teian.js?v=168a7e5e"></script>
+<script src="lib/kikan.js?v=168a7e5e"></script>
+<script src="lib/recipe.js?v=168a7e5e"></script>
+<script src="lib/kirikae.js?v=168a7e5e"></script>
+<script src="js/recipe-store.js?v=168a7e5e"></script>
+<script src="js/rireki-store.js?v=168a7e5e"></script>
+<script src="lib/excel-version.js?v=168a7e5e"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=6ef70254">
-<script src="lib/named-ranges.js?v=6ef70254"></script>
-<script src="lib/cell-styles.js?v=6ef70254"></script>
-<script src="lib/chart.js?v=6ef70254"></script>
-<script src="lib/sparkline.js?v=6ef70254"></script>
-<script src="lib/table.js?v=6ef70254"></script>
-<script src="lib/flash-fill.js?v=6ef70254"></script>
-<script src="lib/symbols.js?v=6ef70254"></script>
-<script src="lib/ribbon-spec.js?v=6ef70254"></script>
-<script src="lib/ribbon-actions.js?v=6ef70254"></script>
-<script src="lib/ribbon.js?v=6ef70254"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=168a7e5e">
+<script src="lib/named-ranges.js?v=168a7e5e"></script>
+<script src="lib/cell-styles.js?v=168a7e5e"></script>
+<script src="lib/chart.js?v=168a7e5e"></script>
+<script src="lib/sparkline.js?v=168a7e5e"></script>
+<script src="lib/table.js?v=168a7e5e"></script>
+<script src="lib/flash-fill.js?v=168a7e5e"></script>
+<script src="lib/symbols.js?v=168a7e5e"></script>
+<script src="lib/ribbon-spec.js?v=168a7e5e"></script>
+<script src="lib/ribbon-actions.js?v=168a7e5e"></script>
+<script src="lib/ribbon.js?v=168a7e5e"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=6ef70254"></script>
-<script src="js/exally-login.js?v=6ef70254"></script>
-<script src="js/auth.js?v=6ef70254"></script>
+<script src="js/supa-config.js?v=168a7e5e"></script>
+<script src="js/exally-login.js?v=168a7e5e"></script>
+<script src="js/auth.js?v=168a7e5e"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1466,7 +1466,9 @@ function _typedNumFmt(v){
  *  ★写した先の元の書式は上書きされる★（斜体が消えるのも実測どおり）。
  *  式の中の参照は ずらす（=A2*2 を右へ写すと =B2*2。実測）。 */
 function fillFromEdge(dir){
-  var FMT = ['numFmt','bold','italic','underline','strike','align','color','bgColor','wrap','indent','fontSize','border'];
+  /* ★新しい 書式を 作ったら ここにも 足す★（足し忘れると 引っぱった先に 付いてこない）
+     2026-08-30＝fontName（フォント名）・向き（文字の向き）を 足した */
+  var FMT = ['numFmt','bold','italic','underline','strike','align','color','bgColor','wrap','indent','fontSize','border','fontName','向き'];
   var data = sheets[activeSheet].data;
   var r1=selR1, c1=selC1, r2=selR2, c2=selC2;
   var single = (r1===r2 && c1===c2);
@@ -3033,7 +3035,9 @@ function drawText(r,c){
   var _cf = (typeof cfFormatAt==='function') ? cfFormatAt(r,c,cell) : null;   /* ★条件付き書式★ */
   var weight = ((_cf && _cf.太字!==undefined) ? _cf.太字 : cell.bold) ? 'bold' : 'normal';
   var style  = cell.italic ? 'italic' : 'normal';
-  ctx.font = style+' '+weight+' '+fontSize+'px "Noto Sans JP",sans-serif';
+  /* ★フォント名（ホーム→フォント）★＝決めてあれば その字で 描く（実Excel既定は 游ゴシック 11） */
+  var _書体 = cell.fontName ? ('"' + cell.fontName + '","Noto Sans JP",sans-serif') : '"Noto Sans JP",sans-serif';
+  ctx.font = style+' '+weight+' '+fontSize+'px '+_書体;
 
   // 文字色
   var isFormula = cell.f && cell.f[0]==='=';
@@ -3055,6 +3059,30 @@ function drawText(r,c){
      ★DOMに 在る≠読める★ */
   var _印の幅 = 表の見出しか(r,c) ? (見出しの印の場所(x,y,w,h).w + 6) : 0;
   ctx.rect(x+1,y,Math.max(1,w-2-_印の幅),h); ctx.clip();
+  /* ★文字の 向き（ホーム→配置→方向）★＝実Excelの 数と 同じ（0/45/-45/90/-90/縦書き）
+     回した後は ★真ん中ぞろえ★で 描く（回すと 左ぞろえは 意味を なさない）。 */
+  var _向き = cell.向き;
+  if(_向き !== undefined && _向き !== 0){
+    ctx.translate(x + w/2, y + h/2);
+    if(_向き === 'tate'){
+      /* 縦書き＝1文字ずつ 下へ 並べる */
+      ctx.fillStyle = showRaw ? C_FORMULA : ((_cf&&_cf.文字色) || cell.color || C_CELL_TXT);
+      ctx.font = style+' '+weight+' '+fontSize+'px '+_書体;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      var _字たち = String(display).split('');
+      var _上 = -(_字たち.length-1)*fontSize/2;
+      for(var _i=0;_i<_字たち.length;_i++) ctx.fillText(_字たち[_i], 0, _上 + _i*fontSize);
+      ctx.restore();
+      return;
+    }
+    ctx.rotate(-_向き * Math.PI / 180);
+    ctx.fillStyle = showRaw ? C_FORMULA : ((_cf&&_cf.文字色) || cell.color || C_CELL_TXT);
+    ctx.font = style+' '+weight+' '+fontSize+'px '+_書体;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(display), 0, 0);
+    ctx.restore();
+    return;
+  }
 
   var tx;
   var indentPx = (cell.indent||0) * 12;
@@ -4201,6 +4229,53 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★余白／用紙／印刷範囲／シートのオプション（ページ レイアウト）★ 2026-08-30
      実Excel実測＝余白 上下54pt(1.905cm)・左右50.4pt(1.778cm)／用紙 A4=9／
      印刷範囲は 既定 空／枠線 表示True・印刷False／見出し 表示True・印刷False -->
+<!-- ★フォント／文字の向き／Office クリップボード（ホーム）★ 2026-08-30
+     実Excel実測＝既定の フォントは 游ゴシック 11／向きは 0→-4128・90→-4171・-90→-4170・縦書き -4166 -->
+<div id="fontOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">フォント</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">選んだ 所に かけます</div>
+    </div>
+    <div id="fontBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;"></div>
+    <div style="padding:0 18px 10px;font-size:12px;color:#7A9A87;line-height:1.6;">
+      ★実Excelの 既定は 游ゴシック 11★（測った値）。<br>
+      ★機械に 入っていない フォントは 出しません★＝出しても 別の 字で 出るだけなので。
+    </div>
+    <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
+      <button onclick="フォントの窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+<div id="orientOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">文字の 向き</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
+      <div id="orientBody" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">
+        ★実Excelの 数と 同じに しています★（0／45／-45／90／-90／縦書き）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="文字の向きの窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+<div id="clipOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">クリップボード</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">前に コピーした物から 貼れます（多くて 24個）</div>
+    </div>
+    <div id="clipBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;min-height:80px;"></div>
+    <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
+      <button onclick="クリップボードを空に()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#C0392B;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">全部 消す</button>
+      <button onclick="クリップボードを閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
 <div id="pageMoreOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -7147,6 +7222,8 @@ function ctxCopy(){
   }
   var text=rows.join('\n');
   copyBuffer={r1:selR1,c1:selC1,r2:selR2,c2:selC2,text:text,formulas:fRows,displays:dRows};
+  /* ★クリップボード（ホーム）に 覚えておく★＝前に コピーした物からも 貼れる（実Excelと 同じ 24個） */
+  if(typeof クリップに足す === 'function') クリップに足す(copyBuffer);
   hideCtxMenu();
 }
 // 切り取り：コピーしてから削除
@@ -7217,7 +7294,9 @@ function ctxPaste(){
  *   ⇒ Excelの「クリア ▼」の 中身。うちも 3つとも 作る。
  *   ★書式の キーは 1か所で 持つ★（増えた時に 消し漏れない）*/
 var 書式のキー = ['bold','italic','underline','strike','align','valign','wrap','indent',
-  'color','bg','fontSize','numFmt','borderTop','borderBottom','borderLeft','borderRight'];
+  'color','bg','fontSize','numFmt','borderTop','borderBottom','borderLeft','borderRight',
+  /* ★2026-08-30 に 足した★（書式を 消す／写す で 置いていかれないように） */
+  'fontName','向き'];
 function 中身を消す(){
   for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
   updateBar(); render(); hideCtxMenu();
@@ -8760,6 +8839,203 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★フォント（ホーム→フォント）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ 既定の フォント＝★游ゴシック／大きさ 11★
+ *   ★機械に 入っていない フォントは 出さない★＝出しても 別の 字で 出るだけで 嘘に なる。 */
+var フォントの候補 = ['游ゴシック', '游明朝', 'メイリオ', 'MS Pゴシック', 'MS P明朝',
+  'Yu Gothic UI', 'BIZ UDPゴシック', 'BIZ UDP明朝', 'Noto Sans JP', 'Meiryo UI',
+  'Arial', 'Times New Roman', 'Courier New', 'Segoe UI', 'Consolas'];
+function 入っているフォント(名){
+  /* ★本当に 入っているか 測る★＝同じ字を その フォントと 予備の フォントで 描いて 幅を 比べる */
+  try {
+    var cv = document.createElement('canvas');
+    var c2 = cv.getContext('2d');
+    var 見本 = 'あいうABC123';
+    c2.font = '32px monospace';
+    var 基 = c2.measureText(見本).width;
+    c2.font = '32px "' + 名 + '", monospace';
+    var 今 = c2.measureText(見本).width;
+    if (今 !== 基) return true;
+    c2.font = '32px serif';
+    var 基2 = c2.measureText(見本).width;
+    c2.font = '32px "' + 名 + '", serif';
+    return c2.measureText(見本).width !== 基2;
+  } catch (e) { return false; }
+}
+function 使えるフォント(){
+  var 出 = [];
+  for (var i = 0; i < フォントの候補.length; i++) {
+    if (入っているフォント(フォントの候補[i])) 出.push(フォントの候補[i]);
+  }
+  return 出;
+}
+function フォントの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('fontOverlay');
+  if (!ov) return 0;
+  var 使える = 使えるフォント();
+  var 今 = (sheets[activeSheet].data[selR1 + ',' + selC1] || {}).fontName || '';
+  var h = '';
+  if (!使える.length) {
+    h = '<div style="color:#C0392B;">★この 機械に 出せる フォントが 見つかりませんでした★</div>';
+  } else {
+    h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+    for (var i = 0; i < 使える.length; i++) {
+      var 名 = 使える[i];
+      h += '<button type="button" class="font-b" data-f="' + 名 + '" onclick="フォントを決める(this.getAttribute(\'data-f\'))"'
+        + ' style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:'
+        + (今 === 名 ? '#3D9E72' : '#ffffff') + ';color:' + (今 === 名 ? '#ffffff' : '#333333')
+        + ';border-radius:8px;font-size:15px;font-family:\'' + 名 + '\',sans-serif;cursor:pointer;text-align:left;">'
+        + 名 + '　あいうABC123</button>';
+    }
+    h += '</div>';
+  }
+  document.getElementById('fontBody').innerHTML = h;
+  ov.style.display = 'flex';
+  return 使える.length;
+}
+function フォントの窓を閉じる(){
+  var ov = document.getElementById('fontOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function フォントを決める(名){
+  if (!名) return 0;
+  var 数 = 0;
+  for (var r = Math.min(selR1, selR2); r <= Math.max(selR1, selR2); r++) {
+    for (var c = Math.min(selC1, selC2); c <= Math.max(selC1, selC2); c++) {
+      var k = r + ',' + c;
+      var cell = sheets[activeSheet].data[k];
+      if (!cell) { cell = { v: '', f: '', d: '' }; sheets[activeSheet].data[k] = cell; }
+      cell.fontName = 名;
+      数++;
+    }
+  }
+  フォントの窓を閉じる();
+  render(); updateBar();
+  notify('フォントを 「' + 名 + '」に しました（' + 数 + 'マス）');
+  return 数;
+}
+
+/* ★文字の 向き（ホーム→配置→方向）★ 2026-08-30
+ *   ★実測（実Excel 16.0 の Orientation）★
+ *     0 → -4128（横）／45 → 45／-45 → -45／90 → ★-4171★／-90 → ★-4170★／縦書き -4166 */
+var 向きの並び = [
+  { 名: '横（ふつう）', 角: 0, Excel: -4128 },
+  { 名: '斜め 上がり（45°）', 角: 45, Excel: 45 },
+  { 名: '斜め 下がり（-45°）', 角: -45, Excel: -45 },
+  { 名: '上へ（90°）', 角: 90, Excel: -4171 },
+  { 名: '下へ（-90°）', 角: -90, Excel: -4170 },
+  { 名: '縦書き', 角: 'tate', Excel: -4166 },
+];
+function 文字の向きの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('orientOverlay');
+  if (!ov) return 0;
+  var 今 = (sheets[activeSheet].data[selR1 + ',' + selC1] || {}).向き;
+  if (今 === undefined) 今 = 0;
+  var h = '';
+  for (var i = 0; i < 向きの並び.length; i++) {
+    var o = 向きの並び[i];
+    h += '<button type="button" class="orient-b" data-o="' + o.角 + '"'
+      + ' onclick="文字の向きを決める(this.getAttribute(\'data-o\'))"'
+      + ' style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:'
+      + (String(今) === String(o.角) ? '#3D9E72' : '#ffffff') + ';color:'
+      + (String(今) === String(o.角) ? '#ffffff' : '#333333')
+      + ';border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + o.名 + ' <span style="color:#7A9A87;font-size:11px;">（実Excelの 数 ' + o.Excel + '）</span></button>';
+  }
+  document.getElementById('orientBody').innerHTML = h;
+  ov.style.display = 'flex';
+  return 向きの並び.length;
+}
+function 文字の向きの窓を閉じる(){
+  var ov = document.getElementById('orientOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 文字の向きを決める(角){
+  var 値 = (角 === 'tate') ? 'tate' : Number(角);
+  var 数 = 0;
+  for (var r = Math.min(selR1, selR2); r <= Math.max(selR1, selR2); r++) {
+    for (var c = Math.min(selC1, selC2); c <= Math.max(selC1, selC2); c++) {
+      var k = r + ',' + c;
+      var cell = sheets[activeSheet].data[k];
+      if (!cell) { cell = { v: '', f: '', d: '' }; sheets[activeSheet].data[k] = cell; }
+      if (値 === 0) delete cell.向き; else cell.向き = 値;
+      数++;
+    }
+  }
+  文字の向きの窓を閉じる();
+  render(); updateBar();
+  notify('文字の 向きを 変えました（' + 数 + 'マス）');
+  return 数;
+}
+
+/* ★クリップボード（ホーム→クリップボード）★ 2026-08-30
+ *   実Excelの Office クリップボードは ★24個まで★ 覚える。うちも 同じ 数に する。
+ *   ★中の 物を 消す時も 何を 消すか 見せる★ */
+var クリップの箱 = [];
+var クリップの上限 = 24;   /* 実Excel と 同じ */
+function クリップに足す(中身){
+  if (!中身 || !中身.text) return クリップの箱.length;
+  クリップの箱.unshift({ text: 中身.text, 中身: 中身, 時: (クリップの箱.length + 1) });
+  if (クリップの箱.length > クリップの上限) クリップの箱.length = クリップの上限;
+  return クリップの箱.length;
+}
+function クリップボードを開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('clipOverlay');
+  if (!ov) return 0;
+  クリップボードを描く();
+  ov.style.display = 'flex';
+  return クリップの箱.length;
+}
+function クリップボードを閉じる(){
+  var ov = document.getElementById('clipOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function クリップボードを描く(){
+  var 体 = document.getElementById('clipBody');
+  if (!体) return 0;
+  if (!クリップの箱.length) {
+    体.innerHTML = '<div style="color:#7A9A87;">まだ 1つも コピーしていません</div>';
+    return 0;
+  }
+  var h = '';
+  for (var i = 0; i < クリップの箱.length; i++) {
+    var 見せ = String(クリップの箱[i].text).replace(/\t/g, ' │ ').split('\n').slice(0, 3).join(' ⏎ ');
+    if (見せ.length > 60) 見せ = 見せ.slice(0, 60) + '…';
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #F0FAF4;">'
+      + '<button onclick="クリップから貼る(' + i + ')" style="flex:1;min-height:38px;padding:0 10px;border:1px solid #C8ECD8;'
+      + 'background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + _esc(見せ) + '</button>'
+      + '<button onclick="クリップから消す(' + i + ')" style="min-height:32px;padding:0 8px;border:1px solid #C8ECD8;'
+      + 'background:#ffffff;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">×</button>'
+      + '</div>';
+  }
+  体.innerHTML = h;
+  return クリップの箱.length;
+}
+function クリップから貼る(i){
+  if (!(i >= 0 && i < クリップの箱.length)) return 0;
+  copyBuffer = クリップの箱[i].中身;
+  クリップボードを閉じる();
+  ctxPaste();
+  return 1;
+}
+function クリップから消す(i){
+  if (!(i >= 0 && i < クリップの箱.length)) return 0;
+  クリップの箱.splice(i, 1);
+  クリップボードを描く();
+  return クリップの箱.length;
+}
+function クリップボードを空に(){
+  var 数 = クリップの箱.length;
+  クリップの箱 = [];
+  クリップボードを描く();
+  notify(数 ? (数 + '個 消しました') : '中身は ありません');
+  return 数;
 }
 
 /* ★余白／用紙／印刷範囲／シートのオプション（ページ レイアウト）★ 2026-08-30
