@@ -46,7 +46,11 @@ console.log('\n[② 紙の 組み立てが 実測の 余白]');
   const html = GP.buildHtml({ data: { '0,0': { v: 'あ', d: 'あ' } }, sheetName: 'S' });
   ok('紙が 出来た', !!html);
   ok('★A4★', /size: A4/.test(html || ''));
-  ok('★余白 1.9cm / 1.78cm（＝54pt / 50.4pt）★', /margin: 1\.9cm 1\.78cm/.test(html || ''));
+  /* ★2026-08-30★ 余白を 4方向べつべつに 出せるように したので 4つ書きに なった。
+     数は ★丸めない 実測値★（54pt÷28.3464566929134=1.905 ／ 50.4pt÷…=1.778）。 */
+  ok('★余白 1.905cm / 1.778cm（＝54pt / 50.4pt）★',
+    /margin: 1\.905cm 1\.778cm 1\.905cm 1\.778cm/.test(html || ''),
+    (String(html).match(/margin:[^;]*/) || [''])[0]);
   ok('★既定は 縦★', /A4 portrait/.test(html || ''));
 }
 {

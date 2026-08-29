@@ -1304,66 +1304,66 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=2dc8750d"></script>
+<script src="hyperformula.full.min.js?v=6ef70254"></script>
 
-<script src="exally-formula.js?v=2dc8750d"></script>
+<script src="exally-formula.js?v=6ef70254"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=2dc8750d"></script>
+<script src="js/file-out.js?v=6ef70254"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=2dc8750d"></script>
-<script src="lib/grid-xlsx.js?v=2dc8750d"></script>
+<script src="lib/typed-value.js?v=6ef70254"></script>
+<script src="lib/grid-xlsx.js?v=6ef70254"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=2dc8750d"></script>
-<script src="lib/autosum.js?v=2dc8750d"></script>
-<script src="lib/grid-sort.js?v=2dc8750d"></script>
-<script src="lib/grid-filter.js?v=2dc8750d"></script>
-<script src="lib/grid-find.js?v=2dc8750d"></script>
-<script src="lib/grid-print.js?v=2dc8750d"></script>
-<script src="lib/ai-reason.js?v=2dc8750d"></script>
-<script src="lib/menu-place.js?v=2dc8750d"></script>
-<script src="lib/grid-stats.js?v=2dc8750d"></script>
-<script src="lib/grid-valid.js?v=2dc8750d"></script>
-<script src="lib/cond-format.js?v=2dc8750d"></script>
-<script src="lib/ref-graph.js?v=2dc8750d"></script>
-<script src="lib/shindan.js?v=2dc8750d"></script>
+  <script src="lib/grid-refedit.js?v=6ef70254"></script>
+<script src="lib/autosum.js?v=6ef70254"></script>
+<script src="lib/grid-sort.js?v=6ef70254"></script>
+<script src="lib/grid-filter.js?v=6ef70254"></script>
+<script src="lib/grid-find.js?v=6ef70254"></script>
+<script src="lib/grid-print.js?v=6ef70254"></script>
+<script src="lib/ai-reason.js?v=6ef70254"></script>
+<script src="lib/menu-place.js?v=6ef70254"></script>
+<script src="lib/grid-stats.js?v=6ef70254"></script>
+<script src="lib/grid-valid.js?v=6ef70254"></script>
+<script src="lib/cond-format.js?v=6ef70254"></script>
+<script src="lib/ref-graph.js?v=6ef70254"></script>
+<script src="lib/shindan.js?v=6ef70254"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=2dc8750d"></script>
-<script src="lib/vba-mikata.js?v=2dc8750d"></script>
-<script src="lib/vba-tejun.js?v=2dc8750d"></script>
-<script src="lib/rireki.js?v=2dc8750d"></script>
-<script src="lib/chizu.js?v=2dc8750d"></script>
-<script src="lib/horu.js?v=2dc8750d"></script>
-<script src="lib/excel-version.js?v=2dc8750d"></script>
-<script src="lib/teian.js?v=2dc8750d"></script>
-<script src="lib/kikan.js?v=2dc8750d"></script>
-<script src="lib/recipe.js?v=2dc8750d"></script>
-<script src="lib/kirikae.js?v=2dc8750d"></script>
-<script src="js/recipe-store.js?v=2dc8750d"></script>
-<script src="js/rireki-store.js?v=2dc8750d"></script>
-<script src="lib/excel-version.js?v=2dc8750d"></script>
+<script src="lib/vba.js?v=6ef70254"></script>
+<script src="lib/vba-mikata.js?v=6ef70254"></script>
+<script src="lib/vba-tejun.js?v=6ef70254"></script>
+<script src="lib/rireki.js?v=6ef70254"></script>
+<script src="lib/chizu.js?v=6ef70254"></script>
+<script src="lib/horu.js?v=6ef70254"></script>
+<script src="lib/excel-version.js?v=6ef70254"></script>
+<script src="lib/teian.js?v=6ef70254"></script>
+<script src="lib/kikan.js?v=6ef70254"></script>
+<script src="lib/recipe.js?v=6ef70254"></script>
+<script src="lib/kirikae.js?v=6ef70254"></script>
+<script src="js/recipe-store.js?v=6ef70254"></script>
+<script src="js/rireki-store.js?v=6ef70254"></script>
+<script src="lib/excel-version.js?v=6ef70254"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=2dc8750d">
-<script src="lib/named-ranges.js?v=2dc8750d"></script>
-<script src="lib/cell-styles.js?v=2dc8750d"></script>
-<script src="lib/chart.js?v=2dc8750d"></script>
-<script src="lib/sparkline.js?v=2dc8750d"></script>
-<script src="lib/table.js?v=2dc8750d"></script>
-<script src="lib/flash-fill.js?v=2dc8750d"></script>
-<script src="lib/symbols.js?v=2dc8750d"></script>
-<script src="lib/ribbon-spec.js?v=2dc8750d"></script>
-<script src="lib/ribbon-actions.js?v=2dc8750d"></script>
-<script src="lib/ribbon.js?v=2dc8750d"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=6ef70254">
+<script src="lib/named-ranges.js?v=6ef70254"></script>
+<script src="lib/cell-styles.js?v=6ef70254"></script>
+<script src="lib/chart.js?v=6ef70254"></script>
+<script src="lib/sparkline.js?v=6ef70254"></script>
+<script src="lib/table.js?v=6ef70254"></script>
+<script src="lib/flash-fill.js?v=6ef70254"></script>
+<script src="lib/symbols.js?v=6ef70254"></script>
+<script src="lib/ribbon-spec.js?v=6ef70254"></script>
+<script src="lib/ribbon-actions.js?v=6ef70254"></script>
+<script src="lib/ribbon.js?v=6ef70254"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=2dc8750d"></script>
-<script src="js/exally-login.js?v=2dc8750d"></script>
-<script src="js/auth.js?v=2dc8750d"></script>
+<script src="js/supa-config.js?v=6ef70254"></script>
+<script src="js/exally-login.js?v=6ef70254"></script>
+<script src="js/auth.js?v=6ef70254"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1684,10 +1684,18 @@ function printSheet(){
   /* 2セル以上 選んでいれば その範囲だけ。1セルなら 中身が在る所ぜんぶ。 */
   var 範囲 = (selR1!==selR2 || selC1!==selC2)
     ? { r1:selR1, c1:selC1, r2:selR2, c2:selC2 } : null;
-  /* ★ページ設定を 効かせる★（2026-08-29）＝向き・枠線・見出し */
+  /* ★印刷範囲を 決めてあれば そこを 刷る★（2026-08-30 実測＝Excelの PrintArea）
+     選んだ所が 在れば そちらが 勝つ（実Excelも 選択範囲の 印刷が 出来る）。 */
+  if(!範囲 && typeof ページ設定 !== 'undefined' && ページ設定.印刷範囲){
+    var _pa = 表の範囲を読む(ページ設定.印刷範囲);
+    if(_pa) 範囲 = { r1:_pa.r1, c1:_pa.c1, r2:_pa.r2, c2:_pa.c2 };
+  }
+  /* ★ページ設定を 効かせる★（2026-08-29／2026-08-30 に 余白・用紙も）＝向き・枠線・見出し */
+  if(typeof ページ設定の初期化 === 'function') ページ設定の初期化();
   var html = GridPrint.buildHtml({
     data: sh.data, range: 範囲, sheetName: sh.name,
     向き: ページ設定.向き, 枠線: ページ設定.枠線, 行列番号: ページ設定.行列番号,
+    余白: ページ設定.余白, 用紙: ページ設定.用紙,
     fileName: (typeof BookOpen!=='undefined' && BookOpen.isOpened && BookOpen.isOpened())
       ? (BookOpen.current && BookOpen.current().name) || '' : '',
   });
@@ -4190,6 +4198,73 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      実Excel実測＝10〜400 が 入る（5 も 401 も 入らない）／既定は 100 -->
 <!-- ★ゴールシーク（データ→What-If 分析）★ 2026-08-30
      実Excel実測＝D2=D1*3+5 で 50 を 目指すと D1=15／反復は 100回・変化の下限 0.001 -->
+<!-- ★余白／用紙／印刷範囲／シートのオプション（ページ レイアウト）★ 2026-08-30
+     実Excel実測＝余白 上下54pt(1.905cm)・左右50.4pt(1.778cm)／用紙 A4=9／
+     印刷範囲は 既定 空／枠線 表示True・印刷False／見出し 表示True・印刷False -->
+<div id="pageMoreOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;" id="pmTitle">ページ レイアウト</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;flex:1;">
+      <div id="pmMargin">
+        <div style="font-size:12px;color:#7A9A87;">余白（cm）</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <button onclick="余白を標準に()" style="min-height:38px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">標準に 戻す</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:4px;">上<input id="pmTop" type="number" step="0.1" min="0" max="10" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;"></label>
+          <label style="display:flex;align-items:center;gap:4px;">下<input id="pmBottom" type="number" step="0.1" min="0" max="10" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;"></label>
+          <label style="display:flex;align-items:center;gap:4px;">左<input id="pmLeft" type="number" step="0.1" min="0" max="10" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;"></label>
+          <label style="display:flex;align-items:center;gap:4px;">右<input id="pmRight" type="number" step="0.1" min="0" max="10" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;"></label>
+        </div>
+        <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:4px;">
+          ★標準は 実Excelから 測った値★＝上下 1.905cm・左右 1.778cm。<br>
+          ★実Excelの「広い／狭い」の 数は 外から 読めませんでした★ので 出していません
+          （★測っていない数を 並べない★）。
+        </div>
+      </div>
+      <div id="pmSize" style="margin-top:10px;">
+        <div style="font-size:12px;color:#7A9A87;">用紙</div>
+        <select id="pmPaper" style="width:100%;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="A4">A4（実Excelの 既定）</option>
+          <option value="A3">A3</option>
+          <option value="A5">A5</option>
+          <option value="B5">B5</option>
+          <option value="Letter">Letter</option>
+        </select>
+      </div>
+      <div id="pmArea" style="margin-top:10px;">
+        <div style="font-size:12px;color:#7A9A87;">印刷範囲（空なら 中身の 在る所ぜんぶ）</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input id="pmPrintArea" type="text" placeholder="A1:C10" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <button onclick="印刷範囲を今の選択に()" style="min-height:40px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">選んだ所に する</button>
+          <button onclick="印刷範囲を消す()" style="min-height:40px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">消す</button>
+        </div>
+      </div>
+      <div id="pmOpt" style="margin-top:10px;">
+        <div style="font-size:12px;color:#7A9A87;">シートの オプション（★実Excel実測＝表示は する・印刷は しない★）</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:12px;">枠線</div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="pmGridView" style="width:18px;height:18px;">表示</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="pmGridPrint" style="width:18px;height:18px;">印刷</label>
+          </div>
+          <div>
+            <div style="font-size:12px;">見出し（行と列の 番号）</div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="pmHeadView" style="width:18px;height:18px;">表示</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="pmHeadPrint" style="width:18px;height:18px;">印刷</label>
+          </div>
+        </div>
+      </div>
+      <div id="pmWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ページの詳しい設定を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ページの詳しい設定を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
 <div id="goalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -8685,6 +8760,99 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★余白／用紙／印刷範囲／シートのオプション（ページ レイアウト）★ 2026-08-30
+ *   ★真値（実Excel 16.0 で 実測）★ … tools/measure-home-page.ps1 / measure-margins.ps1
+ *     余白 … 上下 54pt（1.905cm）／左右 50.4pt（1.778cm）／ヘッダー・フッター 21.6pt
+ *     1cm = 28.3464566929134pt ／ 1inch = 72pt
+ *     用紙 … A4=9・A3=8・A5=11・B5=13・Letter=1（既定 A4）
+ *     印刷範囲 … 既定は ★空★（入れると $A$1:$C$10 の 形に なる）
+ *     枠線 … 表示 True・★印刷 False★／見出し … 表示 True・★印刷 False★
+ *   ★測れなかった★ 実Excelの「広い／狭い」の 数は COM から 読めない ⇒ ★出さない★
+ */
+var 余白の標準 = { 上: 1.905, 下: 1.905, 左: 1.778, 右: 1.778 };   /* cm・実測 */
+var 一cmのpt = 28.3464566929134;   /* 実測（1cm＝28.3464566929134pt） */
+
+function ページ設定の初期化(){
+  if (!ページ設定.余白) ページ設定.余白 = { 上: 余白の標準.上, 下: 余白の標準.下, 左: 余白の標準.左, 右: 余白の標準.右 };
+  if (!ページ設定.用紙) ページ設定.用紙 = 'A4';
+  if (ページ設定.印刷範囲 === undefined) ページ設定.印刷範囲 = '';
+  if (ページ設定.枠線を表示 === undefined) ページ設定.枠線を表示 = true;    /* 実測 True */
+  if (ページ設定.見出しを表示 === undefined) ページ設定.見出しを表示 = true; /* 実測 True */
+  return ページ設定;
+}
+function ページの詳しい設定を開く(どこ){
+  hideCtxMenu();
+  ページ設定の初期化();
+  var ov = document.getElementById('pageMoreOverlay');
+  if (!ov) return 0;
+  var 題 = { 余白: '余白', 用紙: '用紙の 大きさ', 印刷範囲: '印刷範囲',
+    表示: 'シートの オプション（表示）', 印刷: 'シートの オプション（印刷）' }[どこ] || 'ページ レイアウト';
+  document.getElementById('pmTitle').textContent = 題;
+  /* どの ボタンから 来ても 全部 出す（★出す物を 隠して 迷わせない★）。題だけ 変える。 */
+  document.getElementById('pmTop').value = ページ設定.余白.上;
+  document.getElementById('pmBottom').value = ページ設定.余白.下;
+  document.getElementById('pmLeft').value = ページ設定.余白.左;
+  document.getElementById('pmRight').value = ページ設定.余白.右;
+  document.getElementById('pmPaper').value = ページ設定.用紙;
+  document.getElementById('pmPrintArea').value = ページ設定.印刷範囲 || '';
+  document.getElementById('pmGridView').checked = !!ページ設定.枠線を表示;
+  document.getElementById('pmGridPrint').checked = !!ページ設定.枠線;
+  document.getElementById('pmHeadView').checked = !!ページ設定.見出しを表示;
+  document.getElementById('pmHeadPrint').checked = !!ページ設定.行列番号;
+  document.getElementById('pmWhy').textContent = '';
+  ov.style.display = 'flex';
+  return 1;
+}
+function ページの詳しい設定を閉じる(){
+  var ov = document.getElementById('pageMoreOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 余白を標準に(){
+  document.getElementById('pmTop').value = 余白の標準.上;
+  document.getElementById('pmBottom').value = 余白の標準.下;
+  document.getElementById('pmLeft').value = 余白の標準.左;
+  document.getElementById('pmRight').value = 余白の標準.右;
+  return 余白の標準;
+}
+function 印刷範囲を今の選択に(){
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  document.getElementById('pmPrintArea').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  return document.getElementById('pmPrintArea').value;
+}
+function 印刷範囲を消す(){
+  document.getElementById('pmPrintArea').value = '';
+  return '';
+}
+function ページの詳しい設定を決める(){
+  var 欄 = document.getElementById('pmWhy');
+  var 数 = function (id) { return Number(document.getElementById(id).value); };
+  var 上 = 数('pmTop'), 下 = 数('pmBottom'), 左 = 数('pmLeft'), 右 = 数('pmRight');
+  if (![上, 下, 左, 右].every(function (x) { return isFinite(x) && x >= 0 && x <= 10; })) {
+    欄.textContent = '★余白は 0〜10cm で 入れてください★'; return 0;
+  }
+  var 範囲 = String(document.getElementById('pmPrintArea').value || '').trim().toUpperCase();
+  if (範囲 && !表の範囲を読む(範囲)) {
+    欄.textContent = '★印刷範囲は A1:C10 の 形で 入れてください★（空なら 中身の 在る所ぜんぶ）'; return 0;
+  }
+  ページ設定の初期化();
+  ページ設定.余白 = { 上: 上, 下: 下, 左: 左, 右: 右 };
+  ページ設定.用紙 = document.getElementById('pmPaper').value;
+  ページ設定.印刷範囲 = 範囲;
+  ページ設定.枠線を表示 = document.getElementById('pmGridView').checked;
+  ページ設定.枠線 = document.getElementById('pmGridPrint').checked;
+  ページ設定.見出しを表示 = document.getElementById('pmHeadView').checked;
+  ページ設定.行列番号 = document.getElementById('pmHeadPrint').checked;
+  /* ★表示の ✓ は その場で 画面に 効かせる★（決めたのに 変わらないと 嘘に なる） */
+  枠線を出す = ページ設定.枠線を表示;
+  window.枠線を出す = ページ設定.枠線を表示;
+  window.見出しを出す = ページ設定.見出しを表示;
+  ページの詳しい設定を閉じる();
+  resize(); render();
+  notify('ページの 設定を 決めました');
+  return 1;
 }
 
 /* ★フラッシュ フィル（データ→フラッシュ フィル ／ Ctrl+E）★ 2026-08-30
