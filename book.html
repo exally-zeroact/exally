@@ -1304,62 +1304,62 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=76d128d7"></script>
+<script src="hyperformula.full.min.js?v=a90486b0"></script>
 
-<script src="exally-formula.js?v=76d128d7"></script>
+<script src="exally-formula.js?v=a90486b0"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=76d128d7"></script>
+<script src="js/file-out.js?v=a90486b0"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=76d128d7"></script>
-<script src="lib/grid-xlsx.js?v=76d128d7"></script>
+<script src="lib/typed-value.js?v=a90486b0"></script>
+<script src="lib/grid-xlsx.js?v=a90486b0"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=76d128d7"></script>
-<script src="lib/autosum.js?v=76d128d7"></script>
-<script src="lib/grid-sort.js?v=76d128d7"></script>
-<script src="lib/grid-filter.js?v=76d128d7"></script>
-<script src="lib/grid-find.js?v=76d128d7"></script>
-<script src="lib/grid-print.js?v=76d128d7"></script>
-<script src="lib/ai-reason.js?v=76d128d7"></script>
-<script src="lib/menu-place.js?v=76d128d7"></script>
-<script src="lib/grid-stats.js?v=76d128d7"></script>
-<script src="lib/grid-valid.js?v=76d128d7"></script>
-<script src="lib/cond-format.js?v=76d128d7"></script>
-<script src="lib/ref-graph.js?v=76d128d7"></script>
-<script src="lib/shindan.js?v=76d128d7"></script>
+  <script src="lib/grid-refedit.js?v=a90486b0"></script>
+<script src="lib/autosum.js?v=a90486b0"></script>
+<script src="lib/grid-sort.js?v=a90486b0"></script>
+<script src="lib/grid-filter.js?v=a90486b0"></script>
+<script src="lib/grid-find.js?v=a90486b0"></script>
+<script src="lib/grid-print.js?v=a90486b0"></script>
+<script src="lib/ai-reason.js?v=a90486b0"></script>
+<script src="lib/menu-place.js?v=a90486b0"></script>
+<script src="lib/grid-stats.js?v=a90486b0"></script>
+<script src="lib/grid-valid.js?v=a90486b0"></script>
+<script src="lib/cond-format.js?v=a90486b0"></script>
+<script src="lib/ref-graph.js?v=a90486b0"></script>
+<script src="lib/shindan.js?v=a90486b0"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=76d128d7"></script>
-<script src="lib/vba-mikata.js?v=76d128d7"></script>
-<script src="lib/vba-tejun.js?v=76d128d7"></script>
-<script src="lib/rireki.js?v=76d128d7"></script>
-<script src="lib/chizu.js?v=76d128d7"></script>
-<script src="lib/horu.js?v=76d128d7"></script>
-<script src="lib/excel-version.js?v=76d128d7"></script>
-<script src="lib/teian.js?v=76d128d7"></script>
-<script src="lib/kikan.js?v=76d128d7"></script>
-<script src="lib/recipe.js?v=76d128d7"></script>
-<script src="lib/kirikae.js?v=76d128d7"></script>
-<script src="js/recipe-store.js?v=76d128d7"></script>
-<script src="js/rireki-store.js?v=76d128d7"></script>
-<script src="lib/excel-version.js?v=76d128d7"></script>
+<script src="lib/vba.js?v=a90486b0"></script>
+<script src="lib/vba-mikata.js?v=a90486b0"></script>
+<script src="lib/vba-tejun.js?v=a90486b0"></script>
+<script src="lib/rireki.js?v=a90486b0"></script>
+<script src="lib/chizu.js?v=a90486b0"></script>
+<script src="lib/horu.js?v=a90486b0"></script>
+<script src="lib/excel-version.js?v=a90486b0"></script>
+<script src="lib/teian.js?v=a90486b0"></script>
+<script src="lib/kikan.js?v=a90486b0"></script>
+<script src="lib/recipe.js?v=a90486b0"></script>
+<script src="lib/kirikae.js?v=a90486b0"></script>
+<script src="js/recipe-store.js?v=a90486b0"></script>
+<script src="js/rireki-store.js?v=a90486b0"></script>
+<script src="lib/excel-version.js?v=a90486b0"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=76d128d7">
-<script src="lib/named-ranges.js?v=76d128d7"></script>
-<script src="lib/cell-styles.js?v=76d128d7"></script>
-<script src="lib/chart.js?v=76d128d7"></script>
-<script src="lib/ribbon-spec.js?v=76d128d7"></script>
-<script src="lib/ribbon-actions.js?v=76d128d7"></script>
-<script src="lib/ribbon.js?v=76d128d7"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=a90486b0">
+<script src="lib/named-ranges.js?v=a90486b0"></script>
+<script src="lib/cell-styles.js?v=a90486b0"></script>
+<script src="lib/chart.js?v=a90486b0"></script>
+<script src="lib/ribbon-spec.js?v=a90486b0"></script>
+<script src="lib/ribbon-actions.js?v=a90486b0"></script>
+<script src="lib/ribbon.js?v=a90486b0"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=76d128d7"></script>
-<script src="js/exally-login.js?v=76d128d7"></script>
-<script src="js/auth.js?v=76d128d7"></script>
+<script src="js/supa-config.js?v=a90486b0"></script>
+<script src="js/exally-login.js?v=a90486b0"></script>
+<script src="js/auth.js?v=a90486b0"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2333,7 +2333,24 @@ function updateStatusBar(){
   var data = sheets[activeSheet].data, cells = [];
   var r1=Math.min(selR1,selR2), r2=Math.max(selR1,selR2);
   var c1=Math.min(selC1,selC2), c2=Math.max(selC1,selC2);
-  for(var r=r1;r<=r2;r++) for(var c=c1;c<=c2;c++) cells.push(data[r+','+c] || null);
+  /* ★選んだマスの数だけ 積むと Ctrl+A（1,048,576×16,384＝170億）で 落ちる★
+     （2026-08-30 実測＝RangeError: Invalid array length ⇒ 帯だけでなく
+       すべて選ぶ操作そのものが 何も起きなくなっていた）
+     ★中身が入っているマスだけ 拾う★＝GridStats は 空マスを 数えない（実測④）ので
+     出る答えは 1つも 変わらない。 */
+  var 幅 = (c2 - c1 + 1), 高さ = (r2 - r1 + 1);
+  var マスの数 = 幅 * 高さ;
+  var 入っている = Object.keys(data);
+  if (マスの数 > 100000 || マスの数 > 入っている.length) {
+    for (var i=0;i<入っている.length;i++){
+      var k = 入っている[i], p = k.indexOf(',');
+      if (p < 0) continue;
+      var kr = +k.slice(0,p), kc = +k.slice(p+1);
+      if (kr>=r1 && kr<=r2 && kc>=c1 && kc<=c2) cells.push(data[k]);
+    }
+  } else {
+    for(var r=r1;r<=r2;r++) for(var c=c1;c<=c2;c++) cells.push(data[r+','+c] || null);
+  }
   var 出す = GridStats.items(GridStats.summarize(cells));
   if(!出す.length){
     el.innerHTML = '<span class="sb-i" id="sb-ready">準備完了</span>';
@@ -4124,6 +4141,42 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      中身は 実Excelから 読んだ 真値（lib/cell-styles.js） -->
 <!-- ★並べ替え（2つの鍵）★ 2026-08-29
      実Excel実測＝同じ点は 2つ目の鍵で 決まる／見出しの行は 動かない -->
+<!-- ★リンク（挿入→リンク）★ 2026-08-29
+     実Excel実測＝行き先／画面の字／説明を 持つ・字は #467886 の 下線つき
+     alert / prompt / confirm は 使わない -->
+<div id="linkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">リンク</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="linkWhere">A1</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4.5em;">行き先</span>
+        <input id="linkUrl" type="text" placeholder="https://…" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4.5em;">画面の字</span>
+        <input id="linkText" type="text" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4.5em;">説明</span>
+        <input id="linkTip" type="text" placeholder="（なくても よい）" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div id="linkWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★javascript: と data: は 入れられません★（危ないので）。<br>
+        押すと ★別の窓★で 開きます。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button id="linkDel" onclick="リンクを消す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">消す</button>
+      <button onclick="リンクの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="リンクを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">つける</button>
+    </div>
+  </div>
+</div>
+
 <div id="sortOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6046,6 +6099,10 @@ function onMD(e){
 
   sel(r,c,r,c);
   touchState={type:'msel',startR:r,startC:c};
+  /* ★リンクは 押したら 開く★（実Excel も 1回 押しただけで 飛ぶ）
+     ★未測定★ 実Excel の「押したままにすると 選ぶだけになる」は COM から 測れなかった。
+       うちは ★Ctrl（Macは⌘）を 押しながらなら 飛ばない★ にした（選ぶだけの道を 必ず 残す）。 */
+  if(!e.ctrlKey && !e.metaKey) リンクを開く(r,c);
 }
 function onMM(e){
   var p=cPos(e);
@@ -7454,6 +7511,84 @@ function 数式バーを出すか(){
   notify('数式バー … ' + (出す ? '★出す★' : '消す'));
   return 出す;
 }
+/* ★ハイパーリンク（挿入→リンク）★ 2026-08-29
+ *   ★真値（実Excel 16.0 で 実測）★
+ *     ・行き先（Address）／画面の字（TextToDisplay）／説明（ScreenTip）を 持つ
+ *     ・★字の色 BGR 867846 ＝ RGB #467886★／★下線 あり（xlUnderlineStyleSingle）★
+ *   ⇒ うちも 同じ 見た目に する（同じ書類を Excelで 開いた時に 同じに 見える）
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。
+ */
+function リンクの箱(){
+  var s = sheets[activeSheet];
+  if (!s.links) s.links = {};
+  return s.links;
+}
+function リンクの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('linkOverlay');
+  if (!ov) return;
+  var 今 = リンクの箱()[selR1 + ',' + selC1];
+  var cell = sheets[activeSheet].data[selR1 + ',' + selC1];
+  var 字 = cell ? String((cell.d !== undefined && cell.d !== '') ? cell.d : (cell.v || '')) : '';
+  document.getElementById('linkWhere').textContent = cellAddr(selR1, selC1);
+  document.getElementById('linkUrl').value = 今 ? 今.先 : '';
+  document.getElementById('linkText').value = 今 ? (今.字 || 字) : 字;
+  document.getElementById('linkTip').value = 今 ? (今.説明 || '') : '';
+  document.getElementById('linkWhy').textContent = '';
+  document.getElementById('linkDel').style.display = 今 ? '' : 'none';
+  ov.style.display = 'flex';
+}
+function リンクの窓を閉じる(){
+  var ov = document.getElementById('linkOverlay');
+  if (ov) ov.style.display = 'none';
+}
+/* ★行き先の 形を 確かめる★＝おかしい物を 黙って 入れない */
+function リンクの先を確かめる(先){
+  var s = String(先 || '').trim();
+  if (!s) return 'ここに 行き先を 入れてください';
+  if (/^javascript:/i.test(s)) return '★javascript: は 入れられません★（危ないので）';
+  if (/^data:/i.test(s)) return '★data: は 入れられません★（危ないので）';
+  if (!/^(https?:\/\/|mailto:|#)/i.test(s)) return 'https:// か mailto: で 始めてください';
+  return null;
+}
+function リンクを決める(){
+  var 先 = document.getElementById('linkUrl').value;
+  var なぜ = リンクの先を確かめる(先);
+  if (なぜ) { document.getElementById('linkWhy').textContent = なぜ; return 0; }
+  var 字 = document.getElementById('linkText').value;
+  var 説明 = document.getElementById('linkTip').value;
+  var k = selR1 + ',' + selC1;
+  リンクの箱()[k] = { 先: String(先).trim(), 字: String(字), 説明: String(説明) };
+  /* 画面の字を 入れ、★実Excelと 同じ 見た目★に する */
+  if (String(字).trim()) setCell(selR1, selC1, String(字));
+  var cell = sheets[activeSheet].data[k];
+  if (cell) { cell.color = '#467886'; cell.underline = true; }
+  リンクの窓を閉じる();
+  render(); updateBar();
+  notify('リンクを つけました');
+  return 1;
+}
+function リンクを消す(){
+  var k = selR1 + ',' + selC1;
+  delete リンクの箱()[k];
+  var cell = sheets[activeSheet].data[k];
+  if (cell) { delete cell.color; delete cell.underline; }
+  リンクの窓を閉じる();
+  render(); updateBar();
+  notify('リンクを 消しました');
+  return 1;
+}
+/* ★押したら 開く★（別の窓で・元の画面を 乗っ取らせない） */
+function リンクを開く(r, c){
+  var l = リンクの箱()[r + ',' + c];
+  if (!l) return false;
+  try {
+    var w = window.open(l.先, '_blank', 'noopener,noreferrer');
+    if (!w) notify('新しい窓を 開けませんでした（ポップアップを 許してね）');
+  } catch (e) { notify('開けませんでした'); }
+  return true;
+}
+
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
