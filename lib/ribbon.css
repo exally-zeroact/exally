@@ -18,6 +18,38 @@
   user-select: none;
 }
 
+/* ── クイック アクセス（元に戻す／やり直す）──────────────
+   Excelも ★リボンの外（上）★に 置いている。★288の 数には 入れない★ */
+.rb-qat {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px 0;
+  background: #ffffff;
+}
+.rb-q {
+  min-width: 40px;
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: #2E7D54;
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.rb-q:hover { background: #F0FAF4; }
+.rb-q:active { background: #D4EDE1; }
+
+/* ★元から 在る物を 置く枠★（作り直さない） */
+.rb-slot {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 2px;
+}
+.rb-slot > * { max-width: 68px; }
+
 /* ── タブの帯 ───────────────────────────────── */
 .rb-tabs {
   display: flex;
@@ -77,22 +109,29 @@
 }
 .rb-body[hidden] { display: none; }
 
+/* ★グループは 縮めない★（2026-08-29 実ブラウザで 踏んだ）
+   flex の 既定（縮む）だと 幅35pxまで 潰れ、ボタンが 縦に 12個 積まれて
+   ★リボンだけで 高さ637px＝画面の 4分の3★に なった。
+   ⇒ ★flex: 0 0 auto で 中身の 幅を 保ち、横に すべらせる★ */
 .rb-group {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 2px 8px 0;
   border-right: 1px solid #D4EDE1;
-  min-width: 0;
 }
 .rb-group:last-child { border-right: 0; }
 
+/* ★2段まで★（Excelも 3段だが、うちは 印が 大きいので 2段）
+   はみ出す物は 横へ 流れる（グループが 増える形） */
 .rb-items {
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   align-content: flex-start;
   gap: 2px;
-  min-height: 44px;
+  height: 96px;          /* 46px × 2段 + すき間 */
+  min-height: 96px;
 }
 
 .rb-gname {

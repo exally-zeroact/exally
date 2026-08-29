@@ -65,6 +65,7 @@ const ACT = require_(path.join(ROOT, 'lib/ribbon-actions.js'));
 const 結んだ = SPEC.ITEMS.filter((x) => x.a);
 ok('★1つ以上 結んである（試験が 空振りしていない）', 結んだ.length >= 20, 結んだ.length + '個');
 const 名無し = 結んだ.filter((x) => typeof ACT[x.a.act] !== 'function');
+/* ★引き取る物も 名前を 持つ★＝上の 検査に かかる（名前だけは 要る） */
 ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map((x) => x.p + '→' + x.a.act).join(', '));
 
 /* 画面の関数を にせ物に 差し替えて、★どれが 何を どう 呼んだか★ を 記録する */
@@ -94,7 +95,9 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
   for (const it of 結んだ) {
     記録.length = 0;
     try { ACT[it.a.act](); } catch (e) { 届かない.push(it.a.act + '（落ちた: ' + e.message.slice(0, 40) + '）'); continue; }
-    if (!記録.length && it.a.act !== '字を大きく' && it.a.act !== '字を小さく') {
+    /* ★引き取る物（元から在る 入力・色の見本）は 押す物では ない★＝除く。
+       押す働きは 元の物が 持っている（配線ごと リボンへ 引っ越すだけ）。 */
+    if (!記録.length && it.a.act !== '字を大きく' && it.a.act !== '字を小さく' && !it.a.取り込む) {
       届かない.push(it.a.act + '（画面の関数を 1つも 呼んでいない）');
     }
   }
@@ -170,7 +173,7 @@ const ボタン = [...el.querySelectorAll('.rb-item')];
 ok('★押せるボタンを 1つ以上 描いた★', ボタン.length >= 10, ボタン.length + '個');
 
 console.log('\n[② 出来ていない物の ボタンを 出していない]');
-const 結び済み名 = new Set(SPEC.ITEMS.filter((x) => x.t === 'ホーム' && x.a).map((x) => RB._名を短く(x.p)));
+const 結び済み名 = new Set(SPEC.ITEMS.filter((x) => x.t === 'ホーム' && x.a && !x.a.取り込む).map((x) => RB._名を短く(x.p)));
 const 出た名 = ボタン.map((b) => b.getAttribute('title'));
 const 余計 = 出た名.filter((n) => !結び済み名.has(n));
 ok('★結んでいない物が 画面に 出ていない★', 余計.length === 0, 余計.join(', '));

@@ -29,6 +29,8 @@ export const 結び = {
   'ホーム|クリップボード|書式のコピー/貼り付け': { act: '書式のコピー', icon: '刷' },
 
   /* ── ホーム / フォント ── */
+  /* ★元から 在る 作り込んだ物は 引き取る★（作り直さない＝配線が 生きたまま 動く） */
+  'ホーム|フォント|フォント サイズ':      { act: '字の大きさ', 取り込む: '#fmt-font-size' },
   'ホーム|フォント|太字':                 { act: '太字',       icon: 'B' },
   'ホーム|フォント|斜体':                 { act: '斜体',       icon: 'I' },
   'ホーム|フォント|下線':                 { act: '下線',       icon: 'U' },
@@ -188,7 +190,8 @@ for (const k of Object.keys(結び)) {
   if (i < 0) { 見つからない.push(k); continue; }
   const j = spec.indexOf(' },', i);
   const a = 結び[k];
-  const 中 = 'a: { act: ' + q(a.act) + (a.icon ? ', icon: ' + q(a.icon) : '') + ' }';
+  const 中 = 'a: { act: ' + q(a.act) + (a.icon ? ', icon: ' + q(a.icon) : '')
+    + (a.取り込む ? ', 取り込む: ' + q(a.取り込む) : '') + ' }';
   spec = spec.slice(0, i + 印.length) + 中 + spec.slice(j);
   差した++;
 }
