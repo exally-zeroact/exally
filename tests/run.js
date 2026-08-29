@@ -40,6 +40,7 @@ const FILES = [
   ['home-tab.test.mjs', '--self-test'],      /* ★ホーム＝フォント(在るか測る)／文字の向き(実測の数)／クリップボード24個★ */
   ['pivot.test.mjs', '--self-test'],         /* ★ピボット＝実測の形と 数（列なしは2列だけ）／読みで並べない事も 書く★ */
   ['data-tab2.test.mjs', '--self-test'],     /* ★統合／アウトライン(実測 段2・1段で隠れる)／スライサー(見た目は未測定)★ */
+  ['forecast.test.mjs', '--self-test'],      /* ★予測シート＝実測(傾き20・切片80・7つ目220)と 同じ／点検／メモ★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

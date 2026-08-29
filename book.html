@@ -1304,67 +1304,67 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=d22e9928"></script>
+<script src="hyperformula.full.min.js?v=c9d55535"></script>
 
-<script src="exally-formula.js?v=d22e9928"></script>
+<script src="exally-formula.js?v=c9d55535"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=d22e9928"></script>
+<script src="js/file-out.js?v=c9d55535"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=d22e9928"></script>
-<script src="lib/grid-xlsx.js?v=d22e9928"></script>
+<script src="lib/typed-value.js?v=c9d55535"></script>
+<script src="lib/grid-xlsx.js?v=c9d55535"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=d22e9928"></script>
-<script src="lib/autosum.js?v=d22e9928"></script>
-<script src="lib/grid-sort.js?v=d22e9928"></script>
-<script src="lib/grid-filter.js?v=d22e9928"></script>
-<script src="lib/grid-find.js?v=d22e9928"></script>
-<script src="lib/grid-print.js?v=d22e9928"></script>
-<script src="lib/ai-reason.js?v=d22e9928"></script>
-<script src="lib/menu-place.js?v=d22e9928"></script>
-<script src="lib/grid-stats.js?v=d22e9928"></script>
-<script src="lib/grid-valid.js?v=d22e9928"></script>
-<script src="lib/cond-format.js?v=d22e9928"></script>
-<script src="lib/ref-graph.js?v=d22e9928"></script>
-<script src="lib/shindan.js?v=d22e9928"></script>
+  <script src="lib/grid-refedit.js?v=c9d55535"></script>
+<script src="lib/autosum.js?v=c9d55535"></script>
+<script src="lib/grid-sort.js?v=c9d55535"></script>
+<script src="lib/grid-filter.js?v=c9d55535"></script>
+<script src="lib/grid-find.js?v=c9d55535"></script>
+<script src="lib/grid-print.js?v=c9d55535"></script>
+<script src="lib/ai-reason.js?v=c9d55535"></script>
+<script src="lib/menu-place.js?v=c9d55535"></script>
+<script src="lib/grid-stats.js?v=c9d55535"></script>
+<script src="lib/grid-valid.js?v=c9d55535"></script>
+<script src="lib/cond-format.js?v=c9d55535"></script>
+<script src="lib/ref-graph.js?v=c9d55535"></script>
+<script src="lib/shindan.js?v=c9d55535"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=d22e9928"></script>
-<script src="lib/vba-mikata.js?v=d22e9928"></script>
-<script src="lib/vba-tejun.js?v=d22e9928"></script>
-<script src="lib/rireki.js?v=d22e9928"></script>
-<script src="lib/chizu.js?v=d22e9928"></script>
-<script src="lib/horu.js?v=d22e9928"></script>
-<script src="lib/excel-version.js?v=d22e9928"></script>
-<script src="lib/teian.js?v=d22e9928"></script>
-<script src="lib/kikan.js?v=d22e9928"></script>
-<script src="lib/recipe.js?v=d22e9928"></script>
-<script src="lib/kirikae.js?v=d22e9928"></script>
-<script src="js/recipe-store.js?v=d22e9928"></script>
-<script src="js/rireki-store.js?v=d22e9928"></script>
-<script src="lib/excel-version.js?v=d22e9928"></script>
+<script src="lib/vba.js?v=c9d55535"></script>
+<script src="lib/vba-mikata.js?v=c9d55535"></script>
+<script src="lib/vba-tejun.js?v=c9d55535"></script>
+<script src="lib/rireki.js?v=c9d55535"></script>
+<script src="lib/chizu.js?v=c9d55535"></script>
+<script src="lib/horu.js?v=c9d55535"></script>
+<script src="lib/excel-version.js?v=c9d55535"></script>
+<script src="lib/teian.js?v=c9d55535"></script>
+<script src="lib/kikan.js?v=c9d55535"></script>
+<script src="lib/recipe.js?v=c9d55535"></script>
+<script src="lib/kirikae.js?v=c9d55535"></script>
+<script src="js/recipe-store.js?v=c9d55535"></script>
+<script src="js/rireki-store.js?v=c9d55535"></script>
+<script src="lib/excel-version.js?v=c9d55535"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=d22e9928">
-<script src="lib/named-ranges.js?v=d22e9928"></script>
-<script src="lib/cell-styles.js?v=d22e9928"></script>
-<script src="lib/chart.js?v=d22e9928"></script>
-<script src="lib/sparkline.js?v=d22e9928"></script>
-<script src="lib/table.js?v=d22e9928"></script>
-<script src="lib/flash-fill.js?v=d22e9928"></script>
-<script src="lib/pivot.js?v=d22e9928"></script>
-<script src="lib/symbols.js?v=d22e9928"></script>
-<script src="lib/ribbon-spec.js?v=d22e9928"></script>
-<script src="lib/ribbon-actions.js?v=d22e9928"></script>
-<script src="lib/ribbon.js?v=d22e9928"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=c9d55535">
+<script src="lib/named-ranges.js?v=c9d55535"></script>
+<script src="lib/cell-styles.js?v=c9d55535"></script>
+<script src="lib/chart.js?v=c9d55535"></script>
+<script src="lib/sparkline.js?v=c9d55535"></script>
+<script src="lib/table.js?v=c9d55535"></script>
+<script src="lib/flash-fill.js?v=c9d55535"></script>
+<script src="lib/pivot.js?v=c9d55535"></script>
+<script src="lib/symbols.js?v=c9d55535"></script>
+<script src="lib/ribbon-spec.js?v=c9d55535"></script>
+<script src="lib/ribbon-actions.js?v=c9d55535"></script>
+<script src="lib/ribbon.js?v=c9d55535"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=d22e9928"></script>
-<script src="js/exally-login.js?v=d22e9928"></script>
-<script src="js/auth.js?v=d22e9928"></script>
+<script src="js/supa-config.js?v=c9d55535"></script>
+<script src="js/exally-login.js?v=c9d55535"></script>
+<script src="js/auth.js?v=c9d55535"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4237,6 +4237,38 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      列を 使わない時は 2列だけ -->
 <!-- ★統合（データ→データ ツール→統合）★ 2026-08-30
      実Excel実測＝関数の 番号は 合計 -4157／個数 -4112／平均 -4106／最大 -4136／最小 -4139 -->
+<!-- ★予測シート（データ→予測）★ 2026-08-30
+     実Excel実測＝1..6 に 100..200 で FORECAST.LINEAR(7)=220・傾き20・切片80／
+     でこぼこの 数でも 予測(7)=170・傾き 12.857142857142858・切片 80 -->
+<div id="forecastOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">予測シート</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">今までの 数から この先を 出します</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;flex:1;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">元の 範囲</span>
+        <input id="fcFrom" type="text" placeholder="B1:B6" oninput="予測の見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">この先</span>
+        <input id="fcAhead" type="number" min="1" max="100" value="3" oninput="予測の見本()" style="width:90px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>つぶん</span>
+      </div>
+      <div id="fcWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div id="fcPreview" style="font-size:12px;font-family:monospace;white-space:pre;overflow:auto;max-height:26vh;border:1px solid #D4EDE1;border-radius:8px;padding:6px;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
+        ★まっすぐの 線で 伸ばします★（実Excelの FORECAST.LINEAR と 同じ 出し方）。<br>
+        ★実Excelの「予測シート」は 季節の くり返しも 見ます（ETS）。うちは まだ 直線だけです。★
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="予測の窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="予測を作る()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">新しい シートに 出す</button>
+    </div>
+  </div>
+</div>
 <div id="consolOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -8939,6 +8971,163 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★予測シート（データ→予測）★ 2026-08-30
+ *   ★真値（実Excel 16.0 で 実測）★ … tools/measure-forecast.ps1
+ *     1..6 に 100,120,140,160,180,200 → FORECAST.LINEAR(7)=★220★・傾き★20★・切片★80★
+ *     でこぼこ（100,90,130,120,160,150）→ 予測(7)=★170★・傾き★12.857142857142858★・切片★80★
+ *   ⇒ うちも ★同じ 出し方（最小二乗の 直線）★。
+ *   ★実Excelの「予測シート」は 季節の くり返し（ETS）も 見る★＝うちは まだ 直線だけ。窓に そう 書いた。 */
+function 直線を当てる(値たち){
+  var n = 0, sx = 0, sy = 0, sxy = 0, sxx = 0;
+  for (var i = 0; i < 値たち.length; i++) {
+    var y = Pivot._数にする(値たち[i]);
+    if (y === null) continue;
+    var x = i + 1;
+    n++; sx += x; sy += y; sxy += x * y; sxx += x * x;
+  }
+  if (n < 2) return null;
+  var 下 = n * sxx - sx * sx;
+  if (!下) return null;
+  var 傾き = (n * sxy - sx * sy) / 下;
+  var 切片 = (sy - 傾き * sx) / n;
+  return { 傾き: 傾き, 切片: 切片, 個数: n };
+}
+function 予測の元(範囲){
+  var 場所 = 表の範囲を読む(範囲);
+  if (!場所) return null;
+  var d = sheets[activeSheet].data, 値 = [];
+  for (var r = 場所.r1; r <= 場所.r2; r++) {
+    for (var c = 場所.c1; c <= 場所.c2; c++) {
+      var cell = d[r + ',' + c];
+      値.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+    }
+  }
+  return 値;
+}
+function 予測の窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('forecastOverlay');
+  if (!ov) return 0;
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  if (r1 === r2 && c1 === c2) {
+    var 塊 = 表のまわりを当てる(r1, c1);
+    r1 = 塊.r1; c1 = 塊.c1; r2 = 塊.r2; c2 = 塊.c2;
+    /* 1列だけに 絞る（数の 並びを 見たいので） */
+    c2 = c1;
+  }
+  document.getElementById('fcFrom').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  document.getElementById('fcWhy').textContent = '';
+  予測の見本();
+  ov.style.display = 'flex';
+  return 1;
+}
+function 予測の窓を閉じる(){
+  var ov = document.getElementById('forecastOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 予測の中身(){
+  var 値 = 予測の元(document.getElementById('fcFrom').value);
+  if (!値) return null;
+  var 線 = 直線を当てる(値);
+  if (!線) return { ok: false, なぜ: '★数が 2つ 以上 要ります★' };
+  var 先 = Math.max(1, Math.min(100, Number(document.getElementById('fcAhead').value) || 1));
+  var 出 = [['番', '今までの 数', '予測']];
+  for (var i = 0; i < 値.length; i++) {
+    出.push([i + 1, Pivot._数にする(値[i]), '']);
+  }
+  for (var j = 0; j < 先; j++) {
+    var x = 値.length + j + 1;
+    出.push([x, '', Math.round((線.傾き * x + 線.切片) * 1e6) / 1e6]);
+  }
+  return { ok: true, 表: 出, 傾き: 線.傾き, 切片: 線.切片, 個数: 線.個数, 先: 先 };
+}
+function 予測の見本(){
+  var 欄 = document.getElementById('fcPreview');
+  var r = 予測の中身();
+  if (!r) { 欄.textContent = '（範囲を B1:B6 の 形で 入れてください）'; return 0; }
+  if (!r.ok) { 欄.textContent = r.なぜ; return 0; }
+  var 行 = r.表.slice(0, 14).map(function (x) { return x.join('\t'); });
+  if (r.表.length > 14) 行.push('…（' + (r.表.length - 14) + '行 つづく）');
+  行.push('');
+  行.push('傾き = ' + (Math.round(r.傾き * 1e6) / 1e6) + ' ／ 切片 = ' + (Math.round(r.切片 * 1e6) / 1e6));
+  欄.textContent = 行.join('\n');
+  return r.表.length;
+}
+function 予測を作る(){
+  var 欄 = document.getElementById('fcWhy');
+  var r = 予測の中身();
+  if (!r) { 欄.textContent = '★範囲は B1:B6 の 形で 入れてください★'; return 0; }
+  if (!r.ok) { 欄.textContent = r.なぜ; return 0; }
+  var 前 = activeSheet;
+  addSheet();
+  if (activeSheet === 前) { 欄.textContent = '★新しい シートを 作れませんでした★'; return 0; }
+  for (var i = 0; i < r.表.length; i++) {
+    for (var j = 0; j < r.表[i].length; j++) {
+      var v = r.表[i][j];
+      if (v === '' || v === null || v === undefined) continue;
+      setCell(i, j, String(v), true);
+    }
+  }
+  予測の窓を閉じる();
+  render(); updateBar();
+  notify('この先 ' + r.先 + 'つぶんを 出しました（傾き ' + (Math.round(r.傾き * 100) / 100) + '）');
+  return r.表.length;
+}
+
+/* ★パフォーマンスをチェック（校閲）★ 2026-08-30
+ *   実Excelの「パフォーマンスをチェック」は ★中身が 無いのに 書式だけ 付いたセル★ を 見つける。
+ *   ★未測定★＝その 窓の 中身は COM から 読めない。数え方は うちの決め（下に 何を 数えたか 出す）。 */
+function 重さを調べる(){
+  hideCtxMenu();
+  var 出 = { 書式だけ: 0, 空の付箋: 0, 長い式: 0, セル: 0, シート: sheets.length, 所: [] };
+  for (var i = 0; i < sheets.length; i++) {
+    var d = sheets[i].data, 鍵 = Object.keys(d);
+    for (var j = 0; j < 鍵.length; j++) {
+      var cell = d[鍵[j]];
+      if (!cell) continue;
+      var v = (cell.d !== undefined && cell.d !== '') ? cell.d : cell.v;
+      var 中身あり = (v !== '' && v !== undefined && v !== null);
+      if (中身あり) 出.セル++;
+      var 書式あり = false;
+      for (var k = 0; k < 書式のキー.length; k++) {
+        if (cell[書式のキー[k]] !== undefined && cell[書式のキー[k]] !== '' && cell[書式のキー[k]] !== false) {
+          書式あり = true; break;
+        }
+      }
+      if (!中身あり && 書式あり) {
+        出.書式だけ++;
+        if (出.所.length < 20) 出.所.push(sheets[i].name + '!' + 鍵[j].split(',').map(Number).reduce(function (a, b, n) { return n === 0 ? b : a; }, 0) + '');
+      }
+      if (typeof cell.f === 'string' && cell.f.length > 200) 出.長い式++;
+    }
+    var cm = sheets[i].comments || {};
+    var ck = Object.keys(cm);
+    for (var m = 0; m < ck.length; m++) {
+      var t = cm[ck[m]] && (cm[ck[m]].文 || cm[ck[m]].text || '');
+      if (!String(t).trim()) 出.空の付箋++;
+    }
+  }
+  var 行 = [
+    ['シートの 数', 出.シート], ['中身の 在るセル', 出.セル],
+    ['★中身が 無いのに 書式だけ 付いたセル★', 出.書式だけ],
+    ['中身の 無い 付箋', 出.空の付箋],
+    ['200字より 長い 式', 出.長い式],
+  ];
+  var h = '';
+  for (var n2 = 0; n2 < 行.length; n2++) {
+    h += '<div style="display:flex;"><span style="flex:1;">' + 行[n2][0] + '</span><b>' + 行[n2][1] + '</b></div>';
+  }
+  h += '<div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">'
+    + (出.書式だけ ? '★書式だけの セルを 消すと 軽く なります★（ホーム→クリア→書式だけ）'
+      : '★重くする 物は 見つかりませんでした★')
+    + '<br>★数えたのは 上の 5つだけ★です（実Excelの 窓の 中身は 外から 読めないため、'
+    + 'うちが 数えられる 物を 出しています）。</div>';
+  document.getElementById('statsBody').innerHTML = h;
+  document.getElementById('statsOverlay').style.display = 'flex';
+  return 出;
 }
 
 /* ★統合（データ→データ ツール→統合）★ 2026-08-30
