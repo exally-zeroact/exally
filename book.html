@@ -1304,62 +1304,62 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=3a4671c4"></script>
+<script src="hyperformula.full.min.js?v=24d70a1b"></script>
 
-<script src="exally-formula.js?v=3a4671c4"></script>
+<script src="exally-formula.js?v=24d70a1b"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=3a4671c4"></script>
+<script src="js/file-out.js?v=24d70a1b"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=3a4671c4"></script>
-<script src="lib/grid-xlsx.js?v=3a4671c4"></script>
+<script src="lib/typed-value.js?v=24d70a1b"></script>
+<script src="lib/grid-xlsx.js?v=24d70a1b"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=3a4671c4"></script>
-<script src="lib/autosum.js?v=3a4671c4"></script>
-<script src="lib/grid-sort.js?v=3a4671c4"></script>
-<script src="lib/grid-filter.js?v=3a4671c4"></script>
-<script src="lib/grid-find.js?v=3a4671c4"></script>
-<script src="lib/grid-print.js?v=3a4671c4"></script>
-<script src="lib/ai-reason.js?v=3a4671c4"></script>
-<script src="lib/menu-place.js?v=3a4671c4"></script>
-<script src="lib/grid-stats.js?v=3a4671c4"></script>
-<script src="lib/grid-valid.js?v=3a4671c4"></script>
-<script src="lib/cond-format.js?v=3a4671c4"></script>
-<script src="lib/ref-graph.js?v=3a4671c4"></script>
-<script src="lib/shindan.js?v=3a4671c4"></script>
+  <script src="lib/grid-refedit.js?v=24d70a1b"></script>
+<script src="lib/autosum.js?v=24d70a1b"></script>
+<script src="lib/grid-sort.js?v=24d70a1b"></script>
+<script src="lib/grid-filter.js?v=24d70a1b"></script>
+<script src="lib/grid-find.js?v=24d70a1b"></script>
+<script src="lib/grid-print.js?v=24d70a1b"></script>
+<script src="lib/ai-reason.js?v=24d70a1b"></script>
+<script src="lib/menu-place.js?v=24d70a1b"></script>
+<script src="lib/grid-stats.js?v=24d70a1b"></script>
+<script src="lib/grid-valid.js?v=24d70a1b"></script>
+<script src="lib/cond-format.js?v=24d70a1b"></script>
+<script src="lib/ref-graph.js?v=24d70a1b"></script>
+<script src="lib/shindan.js?v=24d70a1b"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=3a4671c4"></script>
-<script src="lib/vba-mikata.js?v=3a4671c4"></script>
-<script src="lib/vba-tejun.js?v=3a4671c4"></script>
-<script src="lib/rireki.js?v=3a4671c4"></script>
-<script src="lib/chizu.js?v=3a4671c4"></script>
-<script src="lib/horu.js?v=3a4671c4"></script>
-<script src="lib/excel-version.js?v=3a4671c4"></script>
-<script src="lib/teian.js?v=3a4671c4"></script>
-<script src="lib/kikan.js?v=3a4671c4"></script>
-<script src="lib/recipe.js?v=3a4671c4"></script>
-<script src="lib/kirikae.js?v=3a4671c4"></script>
-<script src="js/recipe-store.js?v=3a4671c4"></script>
-<script src="js/rireki-store.js?v=3a4671c4"></script>
-<script src="lib/excel-version.js?v=3a4671c4"></script>
+<script src="lib/vba.js?v=24d70a1b"></script>
+<script src="lib/vba-mikata.js?v=24d70a1b"></script>
+<script src="lib/vba-tejun.js?v=24d70a1b"></script>
+<script src="lib/rireki.js?v=24d70a1b"></script>
+<script src="lib/chizu.js?v=24d70a1b"></script>
+<script src="lib/horu.js?v=24d70a1b"></script>
+<script src="lib/excel-version.js?v=24d70a1b"></script>
+<script src="lib/teian.js?v=24d70a1b"></script>
+<script src="lib/kikan.js?v=24d70a1b"></script>
+<script src="lib/recipe.js?v=24d70a1b"></script>
+<script src="lib/kirikae.js?v=24d70a1b"></script>
+<script src="js/recipe-store.js?v=24d70a1b"></script>
+<script src="js/rireki-store.js?v=24d70a1b"></script>
+<script src="lib/excel-version.js?v=24d70a1b"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=3a4671c4">
-<script src="lib/named-ranges.js?v=3a4671c4"></script>
-<script src="lib/cell-styles.js?v=3a4671c4"></script>
-<script src="lib/chart.js?v=3a4671c4"></script>
-<script src="lib/ribbon-spec.js?v=3a4671c4"></script>
-<script src="lib/ribbon-actions.js?v=3a4671c4"></script>
-<script src="lib/ribbon.js?v=3a4671c4"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=24d70a1b">
+<script src="lib/named-ranges.js?v=24d70a1b"></script>
+<script src="lib/cell-styles.js?v=24d70a1b"></script>
+<script src="lib/chart.js?v=24d70a1b"></script>
+<script src="lib/ribbon-spec.js?v=24d70a1b"></script>
+<script src="lib/ribbon-actions.js?v=24d70a1b"></script>
+<script src="lib/ribbon.js?v=24d70a1b"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=3a4671c4"></script>
-<script src="js/exally-login.js?v=3a4671c4"></script>
-<script src="js/auth.js?v=3a4671c4"></script>
+<script src="js/supa-config.js?v=24d70a1b"></script>
+<script src="js/exally-login.js?v=24d70a1b"></script>
+<script src="js/auth.js?v=24d70a1b"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4122,6 +4122,44 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      alert / prompt / confirm は 使わない -->
 <!-- ★セルのスタイル★ 2026-08-29
      中身は 実Excelから 読んだ 真値（lib/cell-styles.js） -->
+<!-- ★並べ替え（2つの鍵）★ 2026-08-29
+     実Excel実測＝同じ点は 2つ目の鍵で 決まる／見出しの行は 動かない -->
+<div id="sortOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">並べ替え</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="sortWhere">A1</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">1つ目の 列</span>
+        <select id="sortKey1" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+        <select id="sortDir1" style="font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="asc">昇順</option><option value="desc">降順</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">2つ目の 列</span>
+        <select id="sortKey2" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+        <select id="sortDir2" style="font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="asc">昇順</option><option value="desc">降順</option>
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
+        <input id="sortHeader" type="checkbox" style="width:20px;height:20px;">
+        <span>1行目は 見出し（動かさない）</span>
+      </label>
+      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
+        ★同じ値の 行は 2つ目の 列で 決まります★（実Excelと 同じ）。空白は いつも 最後です。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="並べ替えの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="並べ替えを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">並べ替える</button>
+    </div>
+  </div>
+</div>
+
 <div id="styleOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -7294,6 +7332,98 @@ function セルのスタイルを当てる(i){
   render(); updateBar();
   notify(数 + '個の セルを 「' + st.名 + '」に しました');
   return 数;
+}
+
+/* ★並べ替え（2つの鍵）★（データ→並べ替え…）2026-08-29
+ *   ★真値（実Excel 16.0 で 実測）★ 点↑ → 名前↑ で:
+ *     見出し / ようかん10 / あんこ20 / ★ういろう30 / かすてら30★
+ *     ⇒ ★同じ点は 2つ目の鍵で 決まる★／★見出しの行は 動かない★
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。 */
+function 並べ替えの範囲(){
+  var s = sheets[activeSheet], data = s.data;
+  var 一つだけ = (selR1 === selR2 && selC1 === selC2);
+  if (!一つだけ) return { r1: selR1, c1: selC1, r2: selR2, c2: selC2 };
+  var 中身がある = function (r, c) {
+    var x = data[r + ',' + c]; if (!x) return false;
+    var v = (x.d !== undefined && x.d !== null && x.d !== '') ? x.d : x.v;
+    return v !== undefined && v !== null && String(v) !== '';
+  };
+  return GridSort.region(中身がある, selR1, selC1, ROWS - 1, COLS - 1);
+}
+function 並べ替えの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('sortOverlay');
+  if (!ov) return;
+  var rng = 並べ替えの範囲();
+  window._並べ替えの範囲 = rng;
+  var data = sheets[activeSheet].data;
+  var 見出し = GridSort.guessHeader(function (r, c) { return data[r + ',' + c]; }, rng.r1, rng.c1, rng.r2, rng.c2);
+  document.getElementById('sortWhere').textContent =
+    cellAddr(rng.r1, rng.c1) + '〜' + cellAddr(rng.r2, rng.c2);
+  document.getElementById('sortHeader').checked = !!見出し;
+  /* 列の 一覧＝見出しが 在れば その字、無ければ 列の 名前 */
+  var h1 = '<option value="">（使わない）</option>', h0 = '';
+  for (var c = rng.c1; c <= rng.c2; c++) {
+    var 名 = colLetter(c) + '列';
+    if (見出し) {
+      var x = data[rng.r1 + ',' + c];
+      var v = x ? ((x.d !== undefined && x.d !== '') ? x.d : x.v) : '';
+      if (v !== undefined && v !== null && String(v) !== '') 名 = String(v);
+    }
+    h0 += '<option value="' + c + '">' + 名 + '</option>';
+    h1 += '<option value="' + c + '">' + 名 + '</option>';
+  }
+  document.getElementById('sortKey1').innerHTML = h0;
+  document.getElementById('sortKey2').innerHTML = h1;
+  document.getElementById('sortKey1').value = String(Math.max(rng.c1, Math.min(selC1, rng.c2)));
+  document.getElementById('sortKey2').value = '';
+  ov.style.display = 'flex';
+}
+function 並べ替えの窓を閉じる(){
+  var ov = document.getElementById('sortOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 並べ替えを決める(){
+  var rng = window._並べ替えの範囲;
+  if (!rng) return 0;
+  var data = sheets[activeSheet].data;
+  var 見出し = !!document.getElementById('sortHeader').checked;
+  var 先頭 = rng.r1 + (見出し ? 1 : 0);
+  if (先頭 >= rng.r2) { notify('並べ替える行が 足りません'); return 0; }
+  var k1 = parseInt(document.getElementById('sortKey1').value, 10);
+  var k2 = document.getElementById('sortKey2').value === '' ? null
+    : parseInt(document.getElementById('sortKey2').value, 10);
+  var d1 = document.getElementById('sortDir1').value;
+  var d2 = document.getElementById('sortDir2').value;
+  var 鍵 = [];
+  var 拾う = function (col) {
+    var a = [];
+    for (var r = 先頭; r <= rng.r2; r++) a.push(data[r + ',' + col]);
+    return a;
+  };
+  鍵.push({ cells: 拾う(k1), dir: d1 });
+  if (k2 !== null && k2 !== k1) 鍵.push({ cells: 拾う(k2), dir: d2 });
+  var 順 = GridSort.order2(鍵);
+  /* 行ごと 入れ替える（範囲の 中だけ） */
+  _pushRowColUndo();
+  var 元 = [];
+  for (var r2 = 先頭; r2 <= rng.r2; r2++) {
+    var 行 = {};
+    for (var c2 = rng.c1; c2 <= rng.c2; c2++) 行[c2] = data[r2 + ',' + c2];
+    元.push(行);
+  }
+  for (var i = 0; i < 順.length; i++) {
+    var 新 = 元[順[i]];
+    for (var c3 = rng.c1; c3 <= rng.c2; c3++) {
+      var k = (先頭 + i) + ',' + c3;
+      if (新[c3] === undefined) delete data[k];
+      else data[k] = 新[c3];
+    }
+  }
+  並べ替えの窓を閉じる();
+  render(); updateBar();
+  notify(順.length + '行を 並べ替えました' + (鍵.length > 1 ? '（2つの 列で）' : ''));
+  return 順.length;
 }
 
 function ctxDelete(){
