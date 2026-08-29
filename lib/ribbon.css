@@ -19,27 +19,30 @@
 }
 
 /* ── クイック アクセス（元に戻す／やり直す）──────────────
-   Excelも ★リボンの外（上）★に 置いている。★288の 数には 入れない★ */
-.rb-qat {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px 6px 0;
-  background: #ffffff;
-}
+   ★タブの帯の 中に 置く★＝別の行に すると それだけで 36px 使う（実測）。
+   Excelも タイトルの帯に 置いている。★288の 数には 入れない★ */
 .rb-q {
-  min-width: 40px;
-  min-height: 34px;
+  flex: 0 0 auto;
+  min-width: 34px;
+  min-height: 44px;
   border: 0;
   background: transparent;
   color: #2E7D54;
-  font-size: 16px;
+  font-size: 15px;
   font-family: inherit;
   cursor: pointer;
   border-radius: 8px;
 }
 .rb-q:hover { background: #F0FAF4; }
 .rb-q:active { background: #D4EDE1; }
+.rb-sep {
+  flex: 0 0 auto;
+  width: 1px;
+  align-self: center;
+  height: 22px;
+  background: #C8ECD8;
+  margin: 0 4px;
+}
 
 /* ★元から 在る物を 置く枠★（作り直さない） */
 .rb-slot {
@@ -130,8 +133,8 @@
   flex-flow: column wrap;
   align-content: flex-start;
   gap: 2px;
-  height: 96px;          /* 46px × 2段 + すき間 */
-  min-height: 96px;
+  height: 84px;          /* 41px × 2段 + すき間（実ブラウザで 測って 詰めた） */
+  min-height: 84px;
 }
 
 .rb-gname {
@@ -150,8 +153,8 @@
   justify-content: center;
   gap: 1px;
   min-width: 46px;
-  min-height: 46px;
-  padding: 3px 5px;
+  min-height: 41px;
+  padding: 2px 5px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
