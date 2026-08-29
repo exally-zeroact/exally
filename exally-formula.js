@@ -1345,28 +1345,92 @@ function registerExallyFunctions(HFns) {
     return new ArraySize(rangeWidth(a[0]), rangeHeight(a[0]));
   };
 
+  /* ★SORT / UNIQUE も 形を保つ★（2026-08-29 実Excel 16.0 で 測り直した）
+   *   A1:B4 = [[300,1],[100,2],[200,3],[100,2]] の 真値:
+   *     =COLUMNS(SORT(A1:B4))            → ★2★   （★行ごと★ 並べ替え・列は そのまま）
+   *     =ROWS(SORT(A1:B4))               → ★4★
+   *     =INDEX(SORT(A1:B4),1,1)          → ★100★
+   *     =INDEX(SORT(A1:B4,2),1,1)        → ★300★（2列目で 並べ替え）
+   *     =INDEX(SORT(A1:B4,2,-1),1,1)     → ★200★（降順）
+   *     =INDEX(SORT(A1:B4,1,1,TRUE),1,1) → ★1★  （by_col＝★列ごと★ 並べ替え）
+   *     =ROWS(UNIQUE(A1:B4))             → ★3★  （★行の重複★を 消す）
+   *     =COLUMNS(UNIQUE(A1:B4,TRUE))     → ★2★
+   *     =ROWS(UNIQUE(A1:B4,FALSE,TRUE))  → ★2★  （1度だけ出る行）
+   *   ★直す前は FILTER と 同じ作り★＝平らにして 縦1列で 返していたので
+   *   2列以上で 中身も 形も 壊れていた（実測 10項目中 6件が 実Excelと 違った）。
+   *
+   *   ★1列の時は 今までどおり★（空を落として 縦1列）。
+   *   ＝実Excel は 空を 残して 後ろに 置く（`=ROWS(SORT(D1:D4))` → 4）が、
+   *     ★ここは 突き合わせ台 tests/xlsx-harness の 見本値が 決めている所★なので
+   *     ★測っただけで 今回は 変えていない★（変えるなら 見本値ごと 取り直す）。 */
+  function 並び比べ(a, b, dir){
+    var A = (a===null||a===undefined||a==='');
+    var B = (b===null||b===undefined||b==='');
+    if(A && B) return 0;
+    if(A) return 1;            // ★空は いつも 後ろ★（実Excelで実測）
+    if(B) return -1;
+    if(typeof a==='number' && typeof b==='number') return (a-b)*dir;
+    return String(a).localeCompare(String(b))*dir;
+  }
+  function 転置(m){
+    var out=[], 幅=(m[0]?m[0].length:0);
+    for(var c=0;c<幅;c++){ var 行=[]; for(var r=0;r<m.length;r++) 行.push(m[r][c]); out.push(行); }
+    return out;
+  }
   ExallyPlugin.prototype.exSort = function(ast, state){
-    return this.runFunction(ast.args, state, this.metadata('EX.SORT'), function(range, idx, order){
-      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
-      var e = firstErr(arr); if(e) return e;
+    return this.runFunction(ast.args, state, this.metadata('EX.SORT'), function(range, idx, order, byCol){
+      var e = firstErr(flat(range)); if(e) return e;
+      var M = rect(range);
+      var 幅 = M[0] ? M[0].length : 0;
+      if(幅 <= 1){
+        var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+        var d1 = (toNum(order)===-1) ? -1 : 1;
+        arr.sort(function(a,b){ return 並び比べ(a,b,d1); });
+        return col(arr);
+      }
+      var 列で = (byCol===true || toNum(byCol)===1);
+      var 表 = 列で ? 転置(M) : M;
+      var k = Math.max(1, Math.round(toNum(idx)||1)) - 1;
       var dir = (toNum(order)===-1) ? -1 : 1;
-      arr.sort(function(a,b){
-        if(typeof a==='number' && typeof b==='number') return (a-b)*dir;
-        return String(a).localeCompare(String(b))*dir;
-      });
-      return col(arr);
+      表 = 表.slice().sort(function(x, y){ return 並び比べ(x[k], y[k], dir); });
+      return rectOut(列で ? 転置(表) : 表);
     });
   };
   ExallyPlugin.prototype.exUnique = function(ast, state){
-    return this.runFunction(ast.args, state, this.metadata('EX.UNIQUE'), function(range){
-      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
-      var e = firstErr(arr); if(e) return e;
-      var seen = [], out = [];
-      for(var i=0;i<arr.length;i++){
-        var key = (typeof arr[i]) + ' ' + String(arr[i]);
-        if(seen.indexOf(key)<0){ seen.push(key); out.push(arr[i]); }
+    return this.runFunction(ast.args, state, this.metadata('EX.UNIQUE'), function(range, byCol, once){
+      var e = firstErr(flat(range)); if(e) return e;
+      var M = rect(range);
+      var 幅 = M[0] ? M[0].length : 0;
+      if(幅 <= 1 && !(byCol===true || toNum(byCol)===1)){
+        /* ★1列は 今までどおり★（見本値が 決めている） */
+        var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+        var seen = [], out = [];
+        for(var i=0;i<arr.length;i++){
+          var key = (typeof arr[i]) + ' ' + String(arr[i]);
+          if(seen.indexOf(key)<0){ seen.push(key); out.push(arr[i]); }
+        }
+        if(once===true || toNum(once)===1){
+          var 数={};
+          for(var j=0;j<arr.length;j++){ var k2=(typeof arr[j])+' '+String(arr[j]); 数[k2]=(数[k2]||0)+1; }
+          out = out.filter(function(v){ return 数[(typeof v)+' '+String(v)]===1; });
+        }
+        return col(out);
       }
-      return col(out);
+      var 列で = (byCol===true || toNum(byCol)===1);
+      var 一度だけ = (once===true || toNum(once)===1);
+      var 表 = 列で ? 転置(M) : M;
+      var 鍵 = 表.map(function(行){ return 行.map(function(v){ return (typeof v)+' '+String(v); }).join(''); });
+      var 数え = {};
+      for(var m=0;m<鍵.length;m++) 数え[鍵[m]] = (数え[鍵[m]]||0) + 1;
+      var 見た = {}, 残り = [];
+      for(var n=0;n<表.length;n++){
+        if(見た[鍵[n]]) continue;
+        見た[鍵[n]] = true;
+        if(一度だけ && 数え[鍵[n]] !== 1) continue;
+        残り.push(表[n]);
+      }
+      if(!残り.length) return 0;
+      return rectOut(列で ? 転置(残り) : 残り);
     });
   };
   ExallyPlugin.prototype.exText = function(ast, state){
@@ -1850,8 +1914,8 @@ function registerExallyFunctions(HFns) {
   var OPT = { argumentType: T.ANY, optionalArg: true };
   ExallyPlugin.implementedFunctions = {
     //  ★arraySizeMethod = 出力の大きさの申告(R19)。これが無いと素の =SORT(A1:A10) が #VALUE! になる。
-    'EX.SORT':       { method: 'exSort',       parameters: [ANY, OPT, OPT, OPT], arrayFunction: true, arraySizeMethod: 'exArraySize' },
-    'EX.UNIQUE':     { method: 'exUnique',     parameters: [ANY, OPT, OPT],      arrayFunction: true, arraySizeMethod: 'exArraySize' },
+    'EX.SORT':       { method: 'exSort',       parameters: [ANY, OPT, OPT, OPT], arrayFunction: true, arraySizeMethod: 'exFilterArraySize' },
+    'EX.UNIQUE':     { method: 'exUnique',     parameters: [ANY, OPT, OPT],      arrayFunction: true, arraySizeMethod: 'exFilterArraySize' },
     'EX.TEXT':       { method: 'exText',       parameters: [ANY, ANY] },
     'EX.TEXTJOIN':   { method: 'exTextjoin',   parameters: [ANY, ANY, ANY], repeatLastArgs: 1 },
     'EX.INT':        { method: 'exInt',        parameters: [ANY] },

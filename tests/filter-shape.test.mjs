@@ -73,6 +73,43 @@ hf.setSheetContent(s, 表.map((x) => [x[1]]));
   ok('★直す前の 姿（102）に なっていない★', (v && v.value !== undefined ? v.value : v) !== 102);
 }
 
+/* ══ ①-b SORT / UNIQUE も 形を保つ ═══════════════════════════
+ *  ★FILTER と 同じ作りだったので 同じ壊れ方を していた★
+ *  （実測 2026-08-29＝10項目中 6件が 実Excelと 違った）。
+ *  真値は ★実Excel 16.0 を COM で 動かして 測った物★。
+ *  ★TRUE / FALSE は 本番の道（convertFormula）で TRUE() に なる★ので、
+ *  ここも ★convertFormula を 通してから★ エンジンに 渡す（素で渡すと #NAME? に なる）。 */
+console.log('\n[①-b SORT / UNIQUE も 形を保つ（真値＝実Excel 16.0 実測）]');
+{
+  const hf4 = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
+  hf4.addSheet('S'); hf4.addSheet('D');
+  const s4 = hf4.getSheetId('S');
+  hf4.setSheetContent(hf4.getSheetId('D'), [[300, 1], [100, 2], [200, 3], [100, 2]]);
+  const 表2 = [
+    ['SORT 2列 の 列の数', '=COLUMNS(SORT(D!A1:B4))', 2],
+    ['SORT 2列 の 行の数', '=ROWS(SORT(D!A1:B4))', 4],
+    ['SORT 2列 の 左上', '=INDEX(SORT(D!A1:B4),1,1)', 100],
+    ['SORT 2列 の 1行2列', '=INDEX(SORT(D!A1:B4),1,2)', 2],
+    ['★2列目で 並べ替え★', '=INDEX(SORT(D!A1:B4,2),1,1)', 300],
+    ['★2列目で 降順★', '=INDEX(SORT(D!A1:B4,2,-1),1,1)', 200],
+    ['1列目 降順', '=INDEX(SORT(D!A1:B4,1,-1),1,1)', 300],
+    ['★by_col＝列ごと 並べ替え★', '=INDEX(SORT(D!A1:B4,1,1,TRUE),1,1)', 1],
+    ['UNIQUE 2列 の 行の数', '=ROWS(UNIQUE(D!A1:B4))', 3],
+    ['UNIQUE 2列 の 列の数', '=COLUMNS(UNIQUE(D!A1:B4))', 2],
+    ['★UNIQUE by_col★', '=COLUMNS(UNIQUE(D!A1:B4,TRUE))', 2],
+    ['★UNIQUE 1度だけ★', '=ROWS(UNIQUE(D!A1:B4,FALSE,TRUE))', 2],
+    ['SORT 1列（前から在る形）', '=SUM(SORT(D!A1:A4))', 700],
+    ['UNIQUE 1列（前から在る形）', '=SUM(UNIQUE(D!A1:A4))', 600],
+  ];
+  hf4.setSheetContent(s4, 表2.map((x) => [EF.convertFormula(x[1])]));
+  表2.forEach((x, i) => {
+    let v = hf4.getCellValue({ sheet: s4, row: i, col: 0 });
+    if (v && v.value !== undefined) v = v.value;
+    ok(x[0] + '  ' + x[1], v === x[2], '出た=' + v + ' ／ 実Excel=' + x[2]);
+  });
+  hf4.destroy();
+}
+
 /* ══ ② Excelの内部の印を 外す ══════════════════════════════ */
 console.log('\n[② _xlfn. / _xlws. / _xludf. / _xlpm. を 外す]');
 const 印 = [
