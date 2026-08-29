@@ -38,6 +38,7 @@ const FILES = [
   ['view-review-tab.test.mjs', '--self-test'], /* ★ズーム(実測10〜400)／ブックの保護(守るとシートが足せない)／許可範囲／ブックの数★ */
   ['data-tab.test.mjs', '--self-test'],      /* ★フラッシュフィル(1つの見本で覚える)／再適用／ゴールシーク(実測100回・0.001)★ */
   ['home-tab.test.mjs', '--self-test'],      /* ★ホーム＝フォント(在るか測る)／文字の向き(実測の数)／クリップボード24個★ */
+  ['pivot.test.mjs', '--self-test'],         /* ★ピボット＝実測の形と 数（列なしは2列だけ）／読みで並べない事も 書く★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

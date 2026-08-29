@@ -1304,66 +1304,67 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=168a7e5e"></script>
+<script src="hyperformula.full.min.js?v=a9235ac8"></script>
 
-<script src="exally-formula.js?v=168a7e5e"></script>
+<script src="exally-formula.js?v=a9235ac8"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=168a7e5e"></script>
+<script src="js/file-out.js?v=a9235ac8"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=168a7e5e"></script>
-<script src="lib/grid-xlsx.js?v=168a7e5e"></script>
+<script src="lib/typed-value.js?v=a9235ac8"></script>
+<script src="lib/grid-xlsx.js?v=a9235ac8"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=168a7e5e"></script>
-<script src="lib/autosum.js?v=168a7e5e"></script>
-<script src="lib/grid-sort.js?v=168a7e5e"></script>
-<script src="lib/grid-filter.js?v=168a7e5e"></script>
-<script src="lib/grid-find.js?v=168a7e5e"></script>
-<script src="lib/grid-print.js?v=168a7e5e"></script>
-<script src="lib/ai-reason.js?v=168a7e5e"></script>
-<script src="lib/menu-place.js?v=168a7e5e"></script>
-<script src="lib/grid-stats.js?v=168a7e5e"></script>
-<script src="lib/grid-valid.js?v=168a7e5e"></script>
-<script src="lib/cond-format.js?v=168a7e5e"></script>
-<script src="lib/ref-graph.js?v=168a7e5e"></script>
-<script src="lib/shindan.js?v=168a7e5e"></script>
+  <script src="lib/grid-refedit.js?v=a9235ac8"></script>
+<script src="lib/autosum.js?v=a9235ac8"></script>
+<script src="lib/grid-sort.js?v=a9235ac8"></script>
+<script src="lib/grid-filter.js?v=a9235ac8"></script>
+<script src="lib/grid-find.js?v=a9235ac8"></script>
+<script src="lib/grid-print.js?v=a9235ac8"></script>
+<script src="lib/ai-reason.js?v=a9235ac8"></script>
+<script src="lib/menu-place.js?v=a9235ac8"></script>
+<script src="lib/grid-stats.js?v=a9235ac8"></script>
+<script src="lib/grid-valid.js?v=a9235ac8"></script>
+<script src="lib/cond-format.js?v=a9235ac8"></script>
+<script src="lib/ref-graph.js?v=a9235ac8"></script>
+<script src="lib/shindan.js?v=a9235ac8"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=168a7e5e"></script>
-<script src="lib/vba-mikata.js?v=168a7e5e"></script>
-<script src="lib/vba-tejun.js?v=168a7e5e"></script>
-<script src="lib/rireki.js?v=168a7e5e"></script>
-<script src="lib/chizu.js?v=168a7e5e"></script>
-<script src="lib/horu.js?v=168a7e5e"></script>
-<script src="lib/excel-version.js?v=168a7e5e"></script>
-<script src="lib/teian.js?v=168a7e5e"></script>
-<script src="lib/kikan.js?v=168a7e5e"></script>
-<script src="lib/recipe.js?v=168a7e5e"></script>
-<script src="lib/kirikae.js?v=168a7e5e"></script>
-<script src="js/recipe-store.js?v=168a7e5e"></script>
-<script src="js/rireki-store.js?v=168a7e5e"></script>
-<script src="lib/excel-version.js?v=168a7e5e"></script>
+<script src="lib/vba.js?v=a9235ac8"></script>
+<script src="lib/vba-mikata.js?v=a9235ac8"></script>
+<script src="lib/vba-tejun.js?v=a9235ac8"></script>
+<script src="lib/rireki.js?v=a9235ac8"></script>
+<script src="lib/chizu.js?v=a9235ac8"></script>
+<script src="lib/horu.js?v=a9235ac8"></script>
+<script src="lib/excel-version.js?v=a9235ac8"></script>
+<script src="lib/teian.js?v=a9235ac8"></script>
+<script src="lib/kikan.js?v=a9235ac8"></script>
+<script src="lib/recipe.js?v=a9235ac8"></script>
+<script src="lib/kirikae.js?v=a9235ac8"></script>
+<script src="js/recipe-store.js?v=a9235ac8"></script>
+<script src="js/rireki-store.js?v=a9235ac8"></script>
+<script src="lib/excel-version.js?v=a9235ac8"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=168a7e5e">
-<script src="lib/named-ranges.js?v=168a7e5e"></script>
-<script src="lib/cell-styles.js?v=168a7e5e"></script>
-<script src="lib/chart.js?v=168a7e5e"></script>
-<script src="lib/sparkline.js?v=168a7e5e"></script>
-<script src="lib/table.js?v=168a7e5e"></script>
-<script src="lib/flash-fill.js?v=168a7e5e"></script>
-<script src="lib/symbols.js?v=168a7e5e"></script>
-<script src="lib/ribbon-spec.js?v=168a7e5e"></script>
-<script src="lib/ribbon-actions.js?v=168a7e5e"></script>
-<script src="lib/ribbon.js?v=168a7e5e"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=a9235ac8">
+<script src="lib/named-ranges.js?v=a9235ac8"></script>
+<script src="lib/cell-styles.js?v=a9235ac8"></script>
+<script src="lib/chart.js?v=a9235ac8"></script>
+<script src="lib/sparkline.js?v=a9235ac8"></script>
+<script src="lib/table.js?v=a9235ac8"></script>
+<script src="lib/flash-fill.js?v=a9235ac8"></script>
+<script src="lib/pivot.js?v=a9235ac8"></script>
+<script src="lib/symbols.js?v=a9235ac8"></script>
+<script src="lib/ribbon-spec.js?v=a9235ac8"></script>
+<script src="lib/ribbon-actions.js?v=a9235ac8"></script>
+<script src="lib/ribbon.js?v=a9235ac8"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=168a7e5e"></script>
-<script src="js/exally-login.js?v=168a7e5e"></script>
-<script src="js/auth.js?v=168a7e5e"></script>
+<script src="js/supa-config.js?v=a9235ac8"></script>
+<script src="js/exally-login.js?v=a9235ac8"></script>
+<script src="js/auth.js?v=a9235ac8"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4231,6 +4232,55 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      印刷範囲は 既定 空／枠線 表示True・印刷False／見出し 表示True・印刷False -->
 <!-- ★フォント／文字の向き／Office クリップボード（ホーム）★ 2026-08-30
      実Excel実測＝既定の フォントは 游ゴシック 11／向きは 0→-4128・90→-4171・-90→-4170・縦書き -4166 -->
+<!-- ★ピボットテーブル（挿入→ピボットテーブル）★ 2026-08-30
+     実Excel実測＝左上「合計 / 金」・「列ラベル」「行ラベル」・総計は 行も 列も 出す／
+     列を 使わない時は 2列だけ -->
+<div id="pivotOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ピボットテーブル</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">同じ 物を まとめて 数えます</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;flex:1;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">元の 範囲</span>
+        <input id="pvFrom" type="text" placeholder="A1:D6" oninput="ピボットの見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">行</span>
+        <select id="pvRow" onchange="ピボットの見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">列</span>
+        <select id="pvCol" onchange="ピボットの見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">値</span>
+        <select id="pvVal" onchange="ピボットの見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+        <select id="pvAgg" onchange="ピボットの見本()" style="width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="合計">合計</option>
+          <option value="個数">データの個数</option>
+          <option value="数値の個数">数値の個数</option>
+          <option value="平均">平均</option>
+          <option value="最大">最大</option>
+          <option value="最小">最小</option>
+        </select>
+      </div>
+      <div id="pvWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div style="font-size:12px;color:#7A9A87;">出来上がりの 形（見本）</div>
+      <div id="pvPreview" style="font-size:12px;color:#333333;font-family:monospace;white-space:pre;overflow:auto;max-height:30vh;border:1px solid #D4EDE1;border-radius:8px;padding:6px;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
+        ★実Excelを 測って 形を 合わせています★（左上は「合計 / 金」・総計は 行も 列も 出す）。<br>
+        ★違う所★＝実Excel は 日本語を ★読み★で 並べます（にし→ひがし）。
+        うちは 読みの 辞書を 持っていないので ★字の 順★で 並べます。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ピボットの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ピボットを作る()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">新しい シートに 出す</button>
+    </div>
+  </div>
+</div>
 <div id="fontOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -8839,6 +8889,129 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★ピボットテーブル（挿入→ピボットテーブル）★ 2026-08-30
+ *   真値は lib/pivot.js の 見出しに 実測どおり 書いた。
+ *   ★新しい シートに 出す★（元の 表を 上書きしない）。 */
+function ピボットの元の表(範囲){
+  var 場所 = 表の範囲を読む(範囲);
+  if (!場所) return null;
+  var d = sheets[activeSheet].data, 表 = [];
+  for (var r = 場所.r1; r <= 場所.r2; r++) {
+    var 行 = [];
+    for (var c = 場所.c1; c <= 場所.c2; c++) {
+      var cell = d[r + ',' + c];
+      行.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+    }
+    表.push(行);
+  }
+  return 表;
+}
+function ピボットの窓を開く(おすすめか){
+  hideCtxMenu();
+  var ov = document.getElementById('pivotOverlay');
+  if (!ov) return 0;
+  /* ★範囲を 当てる★（1マスなら まわりの 塊） */
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  if (r1 === r2 && c1 === c2) {
+    var 塊 = 表のまわりを当てる(r1, c1);
+    r1 = 塊.r1; c1 = 塊.c1; r2 = 塊.r2; c2 = 塊.c2;
+  }
+  document.getElementById('pvFrom').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  var 表 = ピボットの元の表(document.getElementById('pvFrom').value);
+  if (!表 || 表.length < 2) {
+    notify('★見出しの 行と 中身が 1行 以上 要ります★');
+    return 0;
+  }
+  var 見出し = 表[0].map(function (x) { return (x === null || x === undefined) ? '' : String(x); });
+  var 入れる = function (id, 空を出すか) {
+    var el = document.getElementById(id);
+    var h = 空を出すか ? '<option value="">（使わない）</option>' : '';
+    for (var i = 0; i < 見出し.length; i++) {
+      h += '<option value="' + _esc(見出し[i]) + '">' + _esc(見出し[i] || ('列' + (i + 1))) + '</option>';
+    }
+    el.innerHTML = h;
+  };
+  入れる('pvRow', false); 入れる('pvCol', true); 入れる('pvVal', false);
+  /* ★どれを 行・列・値に するか 当てる★（おすすめボタンでも ふつうでも 当てる） */
+  var 当て = Pivot.おすすめ(表);
+  if (当て) {
+    document.getElementById('pvRow').value = 当て.行;
+    document.getElementById('pvCol').value = 当て.列 || '';
+    document.getElementById('pvVal').value = 当て.値;
+    var 値たち = [];
+    for (var r = 1; r < 表.length; r++) 値たち.push(表[r][見出し.indexOf(当て.値)]);
+    document.getElementById('pvAgg').value = Pivot.集計を当てる(値たち);
+  }
+  document.getElementById('pvWhy').textContent = '';
+  ピボットの見本();
+  ov.style.display = 'flex';
+  return 1;
+}
+function ピボットの窓を閉じる(){
+  var ov = document.getElementById('pivotOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function ピボットの決め(){
+  return {
+    行: document.getElementById('pvRow').value,
+    列: document.getElementById('pvCol').value || undefined,
+    値: document.getElementById('pvVal').value,
+    集計: document.getElementById('pvAgg').value,
+  };
+}
+/* ★作る前に 見せる★（押してから 驚かせない） */
+function ピボットの見本(){
+  var 表 = ピボットの元の表(document.getElementById('pvFrom').value);
+  var 欄 = document.getElementById('pvPreview');
+  if (!表) { 欄.textContent = '（範囲を A1:D6 の 形で 入れてください）'; return 0; }
+  var r = Pivot.作る(表, ピボットの決め());
+  if (!r.ok) { 欄.textContent = r.なぜ; return 0; }
+  var 行たち = r.表.slice(0, 12).map(function (行) {
+    return 行.map(function (v) { return String(v === null || v === undefined ? '' : v); }).join('\t');
+  });
+  if (r.表.length > 12) 行たち.push('…（' + (r.表.length - 12) + '行 つづく）');
+  欄.textContent = 行たち.join('\n');
+  return r.表.length;
+}
+function ピボットを作る(){
+  var 欄 = document.getElementById('pvWhy');
+  var 表 = ピボットの元の表(document.getElementById('pvFrom').value);
+  if (!表) { 欄.textContent = '★範囲は A1:D6 の 形で 入れてください★'; return 0; }
+  var r = Pivot.作る(表, ピボットの決め());
+  if (!r.ok) { 欄.textContent = r.なぜ; return 0; }
+  /* ★新しい シートに 出す★（元の 表を 消さない） */
+  var 前 = activeSheet;
+  addSheet();
+  if (activeSheet === 前) { 欄.textContent = '★新しい シートを 作れませんでした★'; return 0; }
+  for (var i = 0; i < r.表.length; i++) {
+    for (var j = 0; j < r.表[i].length; j++) {
+      var v = r.表[i][j];
+      if (v === '' || v === null || v === undefined) continue;
+      setCell(i, j, String(v), true);
+    }
+  }
+  ピボットの窓を閉じる();
+  render(); updateBar();
+  notify('ピボットを 作りました（' + (r.表.length - 2) + '行）');
+  return r.表.length;
+}
+/* ★ピボットグラフ★＝ピボットを 作って その まま グラフに する */
+function ピボットグラフを作る(){
+  var 表 = ピボットの元の表(document.getElementById('pvFrom')
+    ? document.getElementById('pvFrom').value : '');
+  if (!表) { return ピボットの窓を開く(); }
+  var n = ピボットを作る();
+  if (!n) return 0;
+  /* 出来た ピボットの 中身（見出しの 行を 1つに して）から グラフを 作る */
+  var r2 = Math.max(0, n - 1);
+  sel(1, 0, r2, 0);
+  var c = 1;
+  while (sheets[activeSheet].data['1,' + c]) c++;
+  sel(1, 0, r2 - 1, Math.max(1, c - 2));    /* 総計の 行と 列は 入れない */
+  return グラフを作る('column');
 }
 
 /* ★フォント（ホーム→フォント）★ 2026-08-30
