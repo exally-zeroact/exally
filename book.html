@@ -1298,61 +1298,61 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=e765cc02"></script>
+<script src="hyperformula.full.min.js?v=d8a0e0f6"></script>
 
-<script src="exally-formula.js?v=e765cc02"></script>
+<script src="exally-formula.js?v=d8a0e0f6"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=e765cc02"></script>
+<script src="js/file-out.js?v=d8a0e0f6"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=e765cc02"></script>
-<script src="lib/grid-xlsx.js?v=e765cc02"></script>
+<script src="lib/typed-value.js?v=d8a0e0f6"></script>
+<script src="lib/grid-xlsx.js?v=d8a0e0f6"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=e765cc02"></script>
-<script src="lib/autosum.js?v=e765cc02"></script>
-<script src="lib/grid-sort.js?v=e765cc02"></script>
-<script src="lib/grid-filter.js?v=e765cc02"></script>
-<script src="lib/grid-find.js?v=e765cc02"></script>
-<script src="lib/grid-print.js?v=e765cc02"></script>
-<script src="lib/ai-reason.js?v=e765cc02"></script>
-<script src="lib/menu-place.js?v=e765cc02"></script>
-<script src="lib/grid-stats.js?v=e765cc02"></script>
-<script src="lib/grid-valid.js?v=e765cc02"></script>
-<script src="lib/cond-format.js?v=e765cc02"></script>
-<script src="lib/ref-graph.js?v=e765cc02"></script>
-<script src="lib/shindan.js?v=e765cc02"></script>
+  <script src="lib/grid-refedit.js?v=d8a0e0f6"></script>
+<script src="lib/autosum.js?v=d8a0e0f6"></script>
+<script src="lib/grid-sort.js?v=d8a0e0f6"></script>
+<script src="lib/grid-filter.js?v=d8a0e0f6"></script>
+<script src="lib/grid-find.js?v=d8a0e0f6"></script>
+<script src="lib/grid-print.js?v=d8a0e0f6"></script>
+<script src="lib/ai-reason.js?v=d8a0e0f6"></script>
+<script src="lib/menu-place.js?v=d8a0e0f6"></script>
+<script src="lib/grid-stats.js?v=d8a0e0f6"></script>
+<script src="lib/grid-valid.js?v=d8a0e0f6"></script>
+<script src="lib/cond-format.js?v=d8a0e0f6"></script>
+<script src="lib/ref-graph.js?v=d8a0e0f6"></script>
+<script src="lib/shindan.js?v=d8a0e0f6"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=e765cc02"></script>
-<script src="lib/vba-mikata.js?v=e765cc02"></script>
-<script src="lib/vba-tejun.js?v=e765cc02"></script>
-<script src="lib/rireki.js?v=e765cc02"></script>
-<script src="lib/chizu.js?v=e765cc02"></script>
-<script src="lib/horu.js?v=e765cc02"></script>
-<script src="lib/excel-version.js?v=e765cc02"></script>
-<script src="lib/teian.js?v=e765cc02"></script>
-<script src="lib/kikan.js?v=e765cc02"></script>
-<script src="lib/recipe.js?v=e765cc02"></script>
-<script src="lib/kirikae.js?v=e765cc02"></script>
-<script src="js/recipe-store.js?v=e765cc02"></script>
-<script src="js/rireki-store.js?v=e765cc02"></script>
-<script src="lib/excel-version.js?v=e765cc02"></script>
+<script src="lib/vba.js?v=d8a0e0f6"></script>
+<script src="lib/vba-mikata.js?v=d8a0e0f6"></script>
+<script src="lib/vba-tejun.js?v=d8a0e0f6"></script>
+<script src="lib/rireki.js?v=d8a0e0f6"></script>
+<script src="lib/chizu.js?v=d8a0e0f6"></script>
+<script src="lib/horu.js?v=d8a0e0f6"></script>
+<script src="lib/excel-version.js?v=d8a0e0f6"></script>
+<script src="lib/teian.js?v=d8a0e0f6"></script>
+<script src="lib/kikan.js?v=d8a0e0f6"></script>
+<script src="lib/recipe.js?v=d8a0e0f6"></script>
+<script src="lib/kirikae.js?v=d8a0e0f6"></script>
+<script src="js/recipe-store.js?v=d8a0e0f6"></script>
+<script src="js/rireki-store.js?v=d8a0e0f6"></script>
+<script src="lib/excel-version.js?v=d8a0e0f6"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=e765cc02">
-<script src="lib/named-ranges.js?v=e765cc02"></script>
-<script src="lib/chart.js?v=e765cc02"></script>
-<script src="lib/ribbon-spec.js?v=e765cc02"></script>
-<script src="lib/ribbon-actions.js?v=e765cc02"></script>
-<script src="lib/ribbon.js?v=e765cc02"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=d8a0e0f6">
+<script src="lib/named-ranges.js?v=d8a0e0f6"></script>
+<script src="lib/chart.js?v=d8a0e0f6"></script>
+<script src="lib/ribbon-spec.js?v=d8a0e0f6"></script>
+<script src="lib/ribbon-actions.js?v=d8a0e0f6"></script>
+<script src="lib/ribbon.js?v=d8a0e0f6"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=e765cc02"></script>
-<script src="js/exally-login.js?v=e765cc02"></script>
-<script src="js/auth.js?v=e765cc02"></script>
+<script src="js/supa-config.js?v=d8a0e0f6"></script>
+<script src="js/exally-login.js?v=d8a0e0f6"></script>
+<script src="js/auth.js?v=d8a0e0f6"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2895,6 +2895,14 @@ function _renderPass() {
       }
     }
 
+    /* ★コメントの 印★（実Excelと 同じ＝右上に 小さい赤い三角）2026-08-29 */
+    var _cm = sheets[activeSheet].comments;
+    if(_cm && _cm[r+','+c]){
+      ctx.fillStyle='#E53935';
+      ctx.beginPath();
+      ctx.moveTo(x+w-6,y); ctx.lineTo(x+w,y); ctx.lineTo(x+w,y+6);
+      ctx.closePath(); ctx.fill();
+    }
     if(r>=selR1&&r<=selR2&&c>=selC1&&c<=selC2){
       ctx.fillStyle='rgba(30,136,229,0.18)'; ctx.fillRect(x,y,w,h);
     }
@@ -4091,6 +4099,31 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      ・実Excel実測＝既定は 集合縦棒／360×216／凡例は 系列2本以上／タイトルは 出す
      ・★Excelの 絵・配色は 1つも 写さない★（うちの緑・自前の canvas）
      ・alert / prompt / confirm は 使わない -->
+<!-- ★コメント（校閲タブ）★ 2026-08-29
+     実Excel実測＝セルに 付く／作者が 付く／★既定では 見えない（赤い印だけ）★
+     alert / prompt / confirm は 使わない -->
+<div id="commentOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">コメント</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">
+        場所 … <span id="commentWhere">A1</span> <span id="commentWho" style="color:#7A9A87;"></span>
+      </div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;overflow:auto;">
+      <textarea id="commentText" rows="4" placeholder="ここに 書きます" style="width:100%;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
+      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
+        コメントが 付いたセルには ★右上に 赤い印★ が 出ます（実Excelと 同じ）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button id="commentDel" onclick="コメントを消す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">消す</button>
+      <button onclick="コメントの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="コメントを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">つける</button>
+    </div>
+  </div>
+</div>
+
 <div id="chartOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6758,6 +6791,95 @@ function グラフを画像で保存(){
       notify('「' + 名 + '」で 出しました');
     }, 'image/png');
   } catch (e) { notify('画像に できませんでした'); }
+}
+
+/* ★コメント（校閲タブ）★ 2026-08-29
+ *   実Excel実測:
+ *     ・セルに 付く（ref="A1"）／作者が 付く／★既定では 見えない（赤い印だけ）★
+ *     ・ファイルの 中では xl/comments1.xml に 入る
+ *   ★うちの持ち方★＝シートごとに { "行,列": {文, 誰, いつ} }
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。
+ */
+function コメントの箱(){
+  var s = sheets[activeSheet];
+  if (!s.comments) s.comments = {};
+  return s.comments;
+}
+function コメントを取る(r, c){
+  var 箱 = コメントの箱();
+  return 箱[r + ',' + c] || null;
+}
+function コメントの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('commentOverlay');
+  if (!ov) return;
+  var 今 = コメントを取る(selR1, selC1);
+  document.getElementById('commentWhere').textContent = cellAddr(selR1, selC1);
+  document.getElementById('commentText').value = 今 ? 今.文 : '';
+  document.getElementById('commentWho').textContent = 今 ? ('（' + 今.誰 + ' ' + 今.いつ + '）') : '';
+  document.getElementById('commentDel').style.display = 今 ? '' : 'none';
+  ov.style.display = 'flex';
+}
+function コメントの窓を閉じる(){
+  var ov = document.getElementById('commentOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function コメントを決める(){
+  var 文 = document.getElementById('commentText').value;
+  var 箱 = コメントの箱();
+  var k = selR1 + ',' + selC1;
+  if (!String(文).trim()) { delete 箱[k]; }
+  else {
+    var d = new Date();
+    箱[k] = {
+      文: String(文),
+      誰: 'わたし',
+      いつ: d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate(),
+    };
+  }
+  コメントの窓を閉じる();
+  render();
+  notify(String(文).trim() ? 'コメントを つけました' : 'コメントを 消しました');
+}
+function コメントを消す(){
+  var 箱 = コメントの箱();
+  delete 箱[selR1 + ',' + selC1];
+  コメントの窓を閉じる();
+  render();
+  notify('コメントを 消しました');
+}
+/* ★次／前の コメントへ 移る★（Excelの「次のコメント」「前のコメント」） */
+function コメントへ移る(向き){
+  var 箱 = コメントの箱();
+  var 場所 = Object.keys(箱).map(function(k){
+    var p = k.split(','); return { r: parseInt(p[0], 10), c: parseInt(p[1], 10) };
+  }).sort(function(a, b){ return a.r === b.r ? a.c - b.c : a.r - b.r; });
+  if (!場所.length) { notify('コメントは まだ ありません'); return false; }
+  var 今 = -1;
+  for (var i = 0; i < 場所.length; i++) {
+    if (場所[i].r === selR1 && 場所[i].c === selC1) { 今 = i; break; }
+  }
+  var 次;
+  if (向き > 0) 次 = 場所[(今 + 1) % 場所.length];
+  else 次 = 場所[(今 <= 0 ? 場所.length : 今) - 1];
+  sel(次.r, 次.c, 次.r, 次.c);
+  render(); updateBar();
+  コメントの窓を開く();
+  return true;
+}
+function 次のコメントへ(){ return コメントへ移る(1); }
+function 前のコメントへ(){ return コメントへ移る(-1); }
+/* ★コメントの 一覧を 出す★（Excelの「コメントの表示」） */
+function コメントの一覧(){
+  var 箱 = コメントの箱();
+  var 鍵 = Object.keys(箱);
+  if (!鍵.length) { notify('コメントは まだ ありません'); return 0; }
+  var 行 = 鍵.sort().map(function(k){
+    var p = k.split(',');
+    return cellAddr(parseInt(p[0], 10), parseInt(p[1], 10)) + ' … ' + 箱[k].文 + '（' + 箱[k].誰 + '）';
+  });
+  notify(鍵.length + '個 あります：' + 行.join(' ／ '), 6000);
+  return 鍵.length;
 }
 
 function ctxDelete(){

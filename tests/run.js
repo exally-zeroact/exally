@@ -19,6 +19,7 @@ const FILES = [
   ['named-ranges.test.mjs', '--self-test'],  // ★名前の定義＝日本語の名前をエンジンに渡す前に開く★
   ['split-columns.test.mjs', '--self-test'], // ★区切り位置＝実Excelの TextToColumns どおり★
   ['chart.test.mjs', '--self-test'],         // ★グラフ＝実Excelの既定（360x216・凡例は2本以上）★
+  ['comment.test.mjs', '--self-test'],       // ★コメント＝実Excelどおり（作者つき・赤い印だけ）★
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)
