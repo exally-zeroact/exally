@@ -36,6 +36,7 @@ const FILES = [
   ['symbol-form.test.mjs', '--self-test'],   /* ★記号と特殊文字（並びは未測定＝理由つき）／フォーム（実測＝まわりの塊）★ */
   ['formula-tab.test.mjs', '--self-test'],   /* ★数式タブ＝計算方法(実測 既定は自動)／選択範囲から名前(見出しは入らない)／無い関数を出さない★ */
   ['view-review-tab.test.mjs', '--self-test'], /* ★ズーム(実測10〜400)／ブックの保護(守るとシートが足せない)／許可範囲／ブックの数★ */
+  ['data-tab.test.mjs', '--self-test'],      /* ★フラッシュフィル(1つの見本で覚える)／再適用／ゴールシーク(実測100回・0.001)★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

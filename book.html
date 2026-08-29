@@ -1304,65 +1304,66 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=960276c9"></script>
+<script src="hyperformula.full.min.js?v=2dc8750d"></script>
 
-<script src="exally-formula.js?v=960276c9"></script>
+<script src="exally-formula.js?v=2dc8750d"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=960276c9"></script>
+<script src="js/file-out.js?v=2dc8750d"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=960276c9"></script>
-<script src="lib/grid-xlsx.js?v=960276c9"></script>
+<script src="lib/typed-value.js?v=2dc8750d"></script>
+<script src="lib/grid-xlsx.js?v=2dc8750d"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=960276c9"></script>
-<script src="lib/autosum.js?v=960276c9"></script>
-<script src="lib/grid-sort.js?v=960276c9"></script>
-<script src="lib/grid-filter.js?v=960276c9"></script>
-<script src="lib/grid-find.js?v=960276c9"></script>
-<script src="lib/grid-print.js?v=960276c9"></script>
-<script src="lib/ai-reason.js?v=960276c9"></script>
-<script src="lib/menu-place.js?v=960276c9"></script>
-<script src="lib/grid-stats.js?v=960276c9"></script>
-<script src="lib/grid-valid.js?v=960276c9"></script>
-<script src="lib/cond-format.js?v=960276c9"></script>
-<script src="lib/ref-graph.js?v=960276c9"></script>
-<script src="lib/shindan.js?v=960276c9"></script>
+  <script src="lib/grid-refedit.js?v=2dc8750d"></script>
+<script src="lib/autosum.js?v=2dc8750d"></script>
+<script src="lib/grid-sort.js?v=2dc8750d"></script>
+<script src="lib/grid-filter.js?v=2dc8750d"></script>
+<script src="lib/grid-find.js?v=2dc8750d"></script>
+<script src="lib/grid-print.js?v=2dc8750d"></script>
+<script src="lib/ai-reason.js?v=2dc8750d"></script>
+<script src="lib/menu-place.js?v=2dc8750d"></script>
+<script src="lib/grid-stats.js?v=2dc8750d"></script>
+<script src="lib/grid-valid.js?v=2dc8750d"></script>
+<script src="lib/cond-format.js?v=2dc8750d"></script>
+<script src="lib/ref-graph.js?v=2dc8750d"></script>
+<script src="lib/shindan.js?v=2dc8750d"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=960276c9"></script>
-<script src="lib/vba-mikata.js?v=960276c9"></script>
-<script src="lib/vba-tejun.js?v=960276c9"></script>
-<script src="lib/rireki.js?v=960276c9"></script>
-<script src="lib/chizu.js?v=960276c9"></script>
-<script src="lib/horu.js?v=960276c9"></script>
-<script src="lib/excel-version.js?v=960276c9"></script>
-<script src="lib/teian.js?v=960276c9"></script>
-<script src="lib/kikan.js?v=960276c9"></script>
-<script src="lib/recipe.js?v=960276c9"></script>
-<script src="lib/kirikae.js?v=960276c9"></script>
-<script src="js/recipe-store.js?v=960276c9"></script>
-<script src="js/rireki-store.js?v=960276c9"></script>
-<script src="lib/excel-version.js?v=960276c9"></script>
+<script src="lib/vba.js?v=2dc8750d"></script>
+<script src="lib/vba-mikata.js?v=2dc8750d"></script>
+<script src="lib/vba-tejun.js?v=2dc8750d"></script>
+<script src="lib/rireki.js?v=2dc8750d"></script>
+<script src="lib/chizu.js?v=2dc8750d"></script>
+<script src="lib/horu.js?v=2dc8750d"></script>
+<script src="lib/excel-version.js?v=2dc8750d"></script>
+<script src="lib/teian.js?v=2dc8750d"></script>
+<script src="lib/kikan.js?v=2dc8750d"></script>
+<script src="lib/recipe.js?v=2dc8750d"></script>
+<script src="lib/kirikae.js?v=2dc8750d"></script>
+<script src="js/recipe-store.js?v=2dc8750d"></script>
+<script src="js/rireki-store.js?v=2dc8750d"></script>
+<script src="lib/excel-version.js?v=2dc8750d"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=960276c9">
-<script src="lib/named-ranges.js?v=960276c9"></script>
-<script src="lib/cell-styles.js?v=960276c9"></script>
-<script src="lib/chart.js?v=960276c9"></script>
-<script src="lib/sparkline.js?v=960276c9"></script>
-<script src="lib/table.js?v=960276c9"></script>
-<script src="lib/symbols.js?v=960276c9"></script>
-<script src="lib/ribbon-spec.js?v=960276c9"></script>
-<script src="lib/ribbon-actions.js?v=960276c9"></script>
-<script src="lib/ribbon.js?v=960276c9"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=2dc8750d">
+<script src="lib/named-ranges.js?v=2dc8750d"></script>
+<script src="lib/cell-styles.js?v=2dc8750d"></script>
+<script src="lib/chart.js?v=2dc8750d"></script>
+<script src="lib/sparkline.js?v=2dc8750d"></script>
+<script src="lib/table.js?v=2dc8750d"></script>
+<script src="lib/flash-fill.js?v=2dc8750d"></script>
+<script src="lib/symbols.js?v=2dc8750d"></script>
+<script src="lib/ribbon-spec.js?v=2dc8750d"></script>
+<script src="lib/ribbon-actions.js?v=2dc8750d"></script>
+<script src="lib/ribbon.js?v=2dc8750d"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=960276c9"></script>
-<script src="js/exally-login.js?v=960276c9"></script>
-<script src="js/auth.js?v=960276c9"></script>
+<script src="js/supa-config.js?v=2dc8750d"></script>
+<script src="js/exally-login.js?v=2dc8750d"></script>
+<script src="js/auth.js?v=2dc8750d"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4187,6 +4188,41 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      実測＝実Excel の Evaluate は「=」が 有っても 無くても 同じ答え -->
 <!-- ★ズーム（表示→ズーム）★ 2026-08-30
      実Excel実測＝10〜400 が 入る（5 も 401 も 入らない）／既定は 100 -->
+<!-- ★ゴールシーク（データ→What-If 分析）★ 2026-08-30
+     実Excel実測＝D2=D1*3+5 で 50 を 目指すと D1=15／反復は 100回・変化の下限 0.001 -->
+<div id="goalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ゴール シーク</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">答えを 決めて、元の 数を 逆に 求めます</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:6em;">式の セル</span>
+        <input id="gsTarget" type="text" style="flex:1;min-width:100px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:6em;">答えを</span>
+        <input id="gsValue" type="text" style="flex:1;min-width:100px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>に する</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:6em;">変える セル</span>
+        <input id="gsChange" type="text" style="flex:1;min-width:100px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div id="gsWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div id="gsOut" style="font-size:12px;color:#2E7D54;min-height:1.4em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★実Excelと 同じ 決め★＝多くて 100回 試し、変化が 0.001 より 小さく なったら 止めます。
+        ★見つからなければ 何も 直しません★（近い所で 止めたと 出します）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ゴールシークを閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ゴールシークをやる()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">求める</button>
+    </div>
+  </div>
+</div>
 <div id="zoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6901,6 +6937,8 @@ function onKD(e){
     if(ek==='b'){ e.preventDefault(); toggleFormat('bold'); return; }
     if(ek==='i'){ e.preventDefault(); toggleFormat('italic'); return; }
     if(ek==='u'){ e.preventDefault(); toggleFormat('underline'); return; }
+    /* ★Ctrl+E＝フラッシュ フィル（実Excelと 同じ）★ */
+    if(ek==='e'){ e.preventDefault(); フラッシュフィル(); return; }
     /* ★Ctrl+T＝テーブルに する（実Excelと 同じ）★ */
     if(ek==='t'){ e.preventDefault(); 表の窓を開く(); return; }
     if(e.key==='1'){ e.preventDefault(); openFmtModal(); return; }
@@ -8237,6 +8275,7 @@ function 見出しの絞りを決める(){
   var get = function (r, cc) { return data[r + ',' + cc]; };
   var rng = { r1: _絞る表.r1, c1: _絞る表.c1, r2: _絞る表.集計行 ? _絞る表.r2 - 1 : _絞る表.r2, c2: _絞る表.c2 };
   var res = GridFilter.byValues(get, rng, !!_絞る表.見出し行, _絞る列, 残す);
+  前の絞り = { 表: _絞る表, 列: _絞る列, 残す: 残す };   /* ★再適用の ために 覚える★ */
   sh.filterHidden = {};
   for (var j = 0; j < res.hide.length; j++) sh.filterHidden[res.hide[j]] = true;
   var ctl = document.getElementById('ctx-clear-filter'); if (ctl) ctl.style.display = '';
@@ -8646,6 +8685,186 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★フラッシュ フィル（データ→フラッシュ フィル ／ Ctrl+E）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ … tools/measure-data-tab.ps1
+ *     A列に「やまだ たろう」…、B1 に「やまだ」だけ 打って 呼ぶと B2/B3 も 姓だけに なる
+ *   ★分からない時は 何も しない★（でたらめに 埋めると 黙って 間違った 表が 出来る） */
+function フラッシュフィル(){
+  hideCtxMenu();
+  var s0 = sheets[activeSheet], d = s0.data;
+  var c = selC1;
+  if (c <= 0) { notify('★左に 元の 列が ありません★'); return 0; }
+  var 中身 = function (r, cc) {
+    var cell = d[r + ',' + cc];
+    if (!cell) return '';
+    var v = (cell.d !== undefined && cell.d !== '') ? cell.d : cell.v;
+    return (v === undefined || v === null) ? '' : String(v);
+  };
+  /* この列の 上から 見て、打ってある 所を 例に する */
+  var 上 = selR1;
+  while (上 > 0 && 中身(上 - 1, c) !== '') 上--;
+  var 例 = [], 最後に打った = -1;
+  for (var r = 上; r < ROWS; r++) {
+    var 左が空 = true;
+    for (var cc = 0; cc < c; cc++) if (中身(r, cc) !== '') { 左が空 = false; break; }
+    if (左が空) break;
+    var 答 = 中身(r, c);
+    if (答 !== '') {
+      var 元 = [];
+      for (var c2 = 0; c2 < c; c2++) 元.push(中身(r, c2));
+      例.push({ 元: 元, 答え: 答 });
+      最後に打った = r;
+    }
+  }
+  if (!例.length) { notify('★先に 1つ 見本を 打ってください★（この列に 1つだけ 答えを 書く）'); return 0; }
+  var 決まり = FlashFill.覚える(例);
+  if (!決まり) { notify('★どう すればよいか 分かりませんでした★（何も 直していません）'); return 0; }
+  var 埋めた = 0;
+  for (var r2 = 最後に打った + 1; r2 < ROWS; r2++) {
+    var 左が空2 = true, 元2 = [];
+    for (var c3 = 0; c3 < c; c3++) {
+      var v2 = 中身(r2, c3);
+      元2.push(v2);
+      if (v2 !== '') 左が空2 = false;
+    }
+    if (左が空2) break;
+    var 出 = 決まり.やる(元2);
+    if (出 === '' || 出 === null || 出 === undefined) continue;
+    setCell(r2, c, 出);
+    埋めた++;
+  }
+  render(); updateBar();
+  if (!埋めた) { notify('★埋める 行が ありませんでした★（' + 決まり.名 + '）'); return 0; }
+  notify(埋めた + '行 埋めました（' + 決まり.名 + '）');
+  return 埋めた;
+}
+
+/* ★再適用（データ→並べ替えとフィルター）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ 絞った後に 値を 直しても 数は 変わらず、
+ *   ★ApplyFilter を 呼ぶと 数が 変わる（2行 → 3行）★
+ *   ⇒ うちも ★前に かけた 絞りを もう一度 かけ直す★ */
+var 前の絞り = null;   /* { 表, 列, 残す } */
+function 絞りを再適用(){
+  hideCtxMenu();
+  if (!前の絞り) { notify('★まだ 絞っていません★'); return 0; }
+  var sh = sheets[activeSheet], data = sh.data;
+  var get = function (r, cc) { return data[r + ',' + cc]; };
+  var t = 前の絞り.表;
+  var rng = { r1: t.r1, c1: t.c1, r2: t.集計行 ? t.r2 - 1 : t.r2, c2: t.c2 };
+  var res = GridFilter.byValues(get, rng, !!t.見出し行, 前の絞り.列, 前の絞り.残す);
+  sh.filterHidden = {};
+  for (var j = 0; j < res.hide.length; j++) sh.filterHidden[res.hide[j]] = true;
+  render();
+  showToast('かけ直しました（' + res.keep.length + '行だけ 見せています）');
+  return res.keep.length;
+}
+
+/* ★ゴール シーク（データ→What-If 分析）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ D2=D1*3+5 で 50 を 目指すと ★D1=15★
+ *   反復の 決め＝★多くて 100回／変化の下限 0.001★（Application.MaxIterations / MaxChange）
+ *   ⇒ うちも 同じ 数で 止める。★見つからなければ 何も 直さない★ */
+var ゴールの回数 = 100, ゴールの下限 = 0.001;   /* 実測 */
+function ゴールシークを開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('goalOverlay');
+  if (!ov) return 0;
+  document.getElementById('gsTarget').value = cellAddr(selR1, selC1);
+  document.getElementById('gsValue').value = '';
+  document.getElementById('gsChange').value = '';
+  document.getElementById('gsWhy').textContent = '';
+  document.getElementById('gsOut').textContent = '';
+  ov.style.display = 'flex';
+  return 1;
+}
+function ゴールシークを閉じる(){
+  var ov = document.getElementById('goalOverlay');
+  if (ov) ov.style.display = 'none';
+}
+/* ★数の 読み方は lib/typed-value.js の 1本だけ★（カンマを外す規則を ここに 写さない）
+   2026-08-30＝見張り typed-value.test.mjs が 写した所を 見つけて 赤に した。 */
+function _ゴールの数(v){
+  if (typeof v === 'number') return isFinite(v) ? v : NaN;
+  var s = String(v === undefined || v === null ? '' : v).trim();
+  if (s === '') return NaN;
+  var t = TypedValue.parseTyped(s);
+  if (t && typeof t.num === 'number') return t.num;
+  var n = Number(TypedValue.toHalf(s));
+  return isFinite(n) ? n : NaN;
+}
+function ゴールシークをやる(){
+  var 欄 = document.getElementById('gsWhy');
+  var 出 = document.getElementById('gsOut');
+  出.textContent = '';
+  var 的 = addrToRC(String(document.getElementById('gsTarget').value || '').toUpperCase().replace(/\s/g, ''));
+  var 変 = addrToRC(String(document.getElementById('gsChange').value || '').toUpperCase().replace(/\s/g, ''));
+  var 目標 = _ゴールの数(document.getElementById('gsValue').value);
+  if (!的) { 欄.textContent = '式の セルを A1 の 形で 入れてください'; return 0; }
+  if (!変) { 欄.textContent = '変える セルを A1 の 形で 入れてください'; return 0; }
+  if (!isFinite(目標)) { 欄.textContent = '答えは 数で 入れてください'; return 0; }
+  var d = sheets[activeSheet].data;
+  var 式のセル = d[的.r + ',' + 的.c];
+  if (!式のセル || typeof 式のセル.f !== 'string' || 式のセル.f.charAt(0) !== '=') {
+    欄.textContent = '★式の セルは 式で なければ なりません★'; return 0;
+  }
+  if (的.r === 変.r && 的.c === 変.c) { 欄.textContent = '★同じ セルは 選べません★'; return 0; }
+  欄.textContent = '';
+
+  var 元の値 = (function () {
+    var cell = d[変.r + ',' + 変.c];
+    if (!cell) return 0;
+    var n = _ゴールの数(cell.v);
+    return isFinite(n) ? n : 0;
+  })();
+  var 読む = function () {
+    var cell = d[的.r + ',' + 的.c];
+    var v = cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '';
+    return _ゴールの数(v);
+  };
+  /* ★入れたら その場で 計算し直す★
+     （2026-08-30 実ブラウザ＝setCell の 波及は 後回し（_scheduleRecalc）なので、
+       すぐ 読むと ★前の 答えの まま★＝はさみうちが 1回も 進まず「0回で 見つからない」と 出た） */
+  var 置く = function (x) {
+    setCell(変.r, 変.c, String(x), true);
+    recalcSheet(activeSheet, d);
+    return 読む();
+  };
+
+  /* ★はさみうち（割線法）★＝多くて 100回・変化が 0.001 より 小さく なったら 止める（実測の 決め） */
+  var x0 = 元の値, x1 = (元の値 === 0 ? 1 : 元の値 * 1.1);
+  var f0 = 置く(x0) - 目標;
+  var f1 = 置く(x1) - 目標;
+  var 答え = null, 回 = 0;
+  if (isNaN(f0) || isNaN(f1)) {
+    置く(元の値);
+    欄.textContent = '★式の 答えが 数に なりません★（何も 直していません）';
+    return 0;
+  }
+  for (回 = 0; 回 < ゴールの回数; 回++) {
+    if (Math.abs(f1) <= ゴールの下限) { 答え = x1; break; }
+    if (f1 === f0) break;
+    var x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+    if (!isFinite(x2)) break;
+    var f2 = 置く(x2) - 目標;
+    if (isNaN(f2)) break;
+    x0 = x1; f0 = f1; x1 = x2; f1 = f2;
+    if (Math.abs(x1 - x0) <= ゴールの下限 && Math.abs(f1) <= ゴールの下限) { 答え = x1; break; }
+  }
+  if (答え === null && Math.abs(f1) <= ゴールの下限) 答え = x1;
+  if (答え === null) {
+    置く(元の値);
+    render(); updateBar();
+    欄.textContent = '★' + 回 + '回 試しても 見つかりませんでした★（元に 戻しました）';
+    return 0;
+  }
+  /* きれいな 数に 近ければ そちらに 寄せる（Excelも 15 と 出す） */
+  var 丸め = Math.round(答え * 1e6) / 1e6;
+  if (Math.abs(置く(丸め) - 目標) <= ゴールの下限) 答え = 丸め; else 置く(答え);
+  render(); updateBar();
+  出.textContent = '★見つかりました★ ' + cellAddr(変.r, 変.c) + ' = ' + 答え + '（' + (回 + 1) + '回で）';
+  notify('ゴール シーク … ' + cellAddr(変.r, 変.c) + ' = ' + 答え);
+  return 答え;
 }
 
 /* ★ズーム（表示→ズーム）★ 2026-08-30
