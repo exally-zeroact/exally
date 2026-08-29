@@ -26,6 +26,7 @@ const FILES = [
   ['shift-cells.test.mjs', '--self-test'],   // ★セルの挿入/削除＝実Excelどおり（選んだ列だけ動く）★
   ['cell-styles.test.mjs', '--self-test'],   // ★セルのスタイル＝実Excelから読んだ真値（BGR→RGB）★
   ['sort2.test.mjs', '--self-test'],         // ★並べ替え2つの鍵＝実Excelの並びと一致★
+  ['view-toggle.test.mjs', '--self-test'],   // ★表示の切り替え＝実Excelの既定（見出しも枠線も出す）★
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)
