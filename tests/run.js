@@ -29,6 +29,7 @@ const FILES = [
   ['view-toggle.test.mjs', '--self-test'],
   ['link.test.mjs', '--self-test'],
   ['select-all-statusbar.test.mjs', '--self-test'], // ★Ctrl+A（すべて選ぶ）で 帯が落ちない（170億マスを 積もうとして 死んでいた）★         // ★リンク＝実Excelどおり（#467886の下線）／javascript:とdata:は弾く★   // ★表示の切り替え＝実Excelの既定（見出しも枠線も出す）★
+  ['chart-types.test.mjs', '--self-test'],   /* ★グラフの種類（凡例の出る/出ない・軸の数・四分位は実測）★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

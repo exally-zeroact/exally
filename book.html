@@ -1304,62 +1304,62 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=a90486b0"></script>
+<script src="hyperformula.full.min.js?v=bdedb164"></script>
 
-<script src="exally-formula.js?v=a90486b0"></script>
+<script src="exally-formula.js?v=bdedb164"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=a90486b0"></script>
+<script src="js/file-out.js?v=bdedb164"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=a90486b0"></script>
-<script src="lib/grid-xlsx.js?v=a90486b0"></script>
+<script src="lib/typed-value.js?v=bdedb164"></script>
+<script src="lib/grid-xlsx.js?v=bdedb164"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=a90486b0"></script>
-<script src="lib/autosum.js?v=a90486b0"></script>
-<script src="lib/grid-sort.js?v=a90486b0"></script>
-<script src="lib/grid-filter.js?v=a90486b0"></script>
-<script src="lib/grid-find.js?v=a90486b0"></script>
-<script src="lib/grid-print.js?v=a90486b0"></script>
-<script src="lib/ai-reason.js?v=a90486b0"></script>
-<script src="lib/menu-place.js?v=a90486b0"></script>
-<script src="lib/grid-stats.js?v=a90486b0"></script>
-<script src="lib/grid-valid.js?v=a90486b0"></script>
-<script src="lib/cond-format.js?v=a90486b0"></script>
-<script src="lib/ref-graph.js?v=a90486b0"></script>
-<script src="lib/shindan.js?v=a90486b0"></script>
+  <script src="lib/grid-refedit.js?v=bdedb164"></script>
+<script src="lib/autosum.js?v=bdedb164"></script>
+<script src="lib/grid-sort.js?v=bdedb164"></script>
+<script src="lib/grid-filter.js?v=bdedb164"></script>
+<script src="lib/grid-find.js?v=bdedb164"></script>
+<script src="lib/grid-print.js?v=bdedb164"></script>
+<script src="lib/ai-reason.js?v=bdedb164"></script>
+<script src="lib/menu-place.js?v=bdedb164"></script>
+<script src="lib/grid-stats.js?v=bdedb164"></script>
+<script src="lib/grid-valid.js?v=bdedb164"></script>
+<script src="lib/cond-format.js?v=bdedb164"></script>
+<script src="lib/ref-graph.js?v=bdedb164"></script>
+<script src="lib/shindan.js?v=bdedb164"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=a90486b0"></script>
-<script src="lib/vba-mikata.js?v=a90486b0"></script>
-<script src="lib/vba-tejun.js?v=a90486b0"></script>
-<script src="lib/rireki.js?v=a90486b0"></script>
-<script src="lib/chizu.js?v=a90486b0"></script>
-<script src="lib/horu.js?v=a90486b0"></script>
-<script src="lib/excel-version.js?v=a90486b0"></script>
-<script src="lib/teian.js?v=a90486b0"></script>
-<script src="lib/kikan.js?v=a90486b0"></script>
-<script src="lib/recipe.js?v=a90486b0"></script>
-<script src="lib/kirikae.js?v=a90486b0"></script>
-<script src="js/recipe-store.js?v=a90486b0"></script>
-<script src="js/rireki-store.js?v=a90486b0"></script>
-<script src="lib/excel-version.js?v=a90486b0"></script>
+<script src="lib/vba.js?v=bdedb164"></script>
+<script src="lib/vba-mikata.js?v=bdedb164"></script>
+<script src="lib/vba-tejun.js?v=bdedb164"></script>
+<script src="lib/rireki.js?v=bdedb164"></script>
+<script src="lib/chizu.js?v=bdedb164"></script>
+<script src="lib/horu.js?v=bdedb164"></script>
+<script src="lib/excel-version.js?v=bdedb164"></script>
+<script src="lib/teian.js?v=bdedb164"></script>
+<script src="lib/kikan.js?v=bdedb164"></script>
+<script src="lib/recipe.js?v=bdedb164"></script>
+<script src="lib/kirikae.js?v=bdedb164"></script>
+<script src="js/recipe-store.js?v=bdedb164"></script>
+<script src="js/rireki-store.js?v=bdedb164"></script>
+<script src="lib/excel-version.js?v=bdedb164"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=a90486b0">
-<script src="lib/named-ranges.js?v=a90486b0"></script>
-<script src="lib/cell-styles.js?v=a90486b0"></script>
-<script src="lib/chart.js?v=a90486b0"></script>
-<script src="lib/ribbon-spec.js?v=a90486b0"></script>
-<script src="lib/ribbon-actions.js?v=a90486b0"></script>
-<script src="lib/ribbon.js?v=a90486b0"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=bdedb164">
+<script src="lib/named-ranges.js?v=bdedb164"></script>
+<script src="lib/cell-styles.js?v=bdedb164"></script>
+<script src="lib/chart.js?v=bdedb164"></script>
+<script src="lib/ribbon-spec.js?v=bdedb164"></script>
+<script src="lib/ribbon-actions.js?v=bdedb164"></script>
+<script src="lib/ribbon.js?v=bdedb164"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=a90486b0"></script>
-<script src="js/exally-login.js?v=a90486b0"></script>
-<script src="js/auth.js?v=a90486b0"></script>
+<script src="js/supa-config.js?v=bdedb164"></script>
+<script src="js/exally-login.js?v=bdedb164"></script>
+<script src="js/auth.js?v=bdedb164"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4314,7 +4314,20 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         <select id="chartKind" onchange="グラフを描き直す()" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
           <option value="column">縦棒</option>
           <option value="line">折れ線</option>
+          <option value="area">面</option>
           <option value="pie">円</option>
+          <option value="doughnut">ドーナツ</option>
+          <option value="scatter">散布図</option>
+          <option value="scatterLine">散布図（線つき）</option>
+          <option value="bubble">バブル</option>
+          <option value="radar">レーダー</option>
+          <option value="treemap">ツリーマップ</option>
+          <option value="sunburst">サンバースト</option>
+          <option value="histogram">ヒストグラム</option>
+          <option value="box">箱ひげ図</option>
+          <option value="waterfall">ウォーターフォール</option>
+          <option value="funnel">じょうご</option>
+          <option value="combo">複合（縦棒＋折れ線）</option>
         </select>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
@@ -4323,7 +4336,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <canvas id="chartCanvas" style="width:360px;height:216px;max-width:100%;border-radius:10px;"></canvas>
       <div style="font-size:12px;color:#7A9A87;margin-top:8px;line-height:1.6;">
-        凡例は 系列が 2本以上の時だけ 出ます（実Excelと 同じ）。
+        凡例の 出る/出ないは ★種類ごとに 実Excelを 測って 合わせています★
+        （ツリーマップは 1本でも 出る・ヒストグラムや 箱ひげは 出さない）。<br>
+        <span id="chartNote"></span>
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -6959,6 +6974,28 @@ function グラフを作る(種類){
   グラフを描き直す();
   return true;
 }
+/* ★おすすめグラフ★＝実Excel と 同じで「中身を 見て 決める」。
+   ★未測定★：実Excel が どの順で おすすめるかは 外から 読めない。
+   うちの 決め（理由つき）＝
+     ・見出しが 数だけ … 散布図（XとYの 関係を 見る形）
+     ・系列が 1本で 個数が 6つ 以下 … 円（割合が 読める）
+     ・系列が 1本で 個数が 多い    … ヒストグラム（散らばりが 読める）
+     ・それ以外                   … 縦棒（実Excelの 既定と 同じ） */
+function おすすめの種類(材料){
+  if (!材料 || !材料.ok) return 'column';
+  /* ★見出しが 字から 来ていない＝数だけの 塊★ ⇒ XとYの 関係を 見る形（散布図）
+     （★見出しの 字を 見るのでは なく、材料が 覚えている「字から 来たか」を 見る★
+       ＝2026-08-30 に 横に取る 直しを 入れた時、見出しが '1','2' に なって 見分けが つかなくなった） */
+  if (!材料.見出しが字) return 'scatter';
+  if (材料.系列.length === 1) return 材料.見出し.length <= 6 ? 'pie' : 'histogram';
+  return 'column';
+}
+function おすすめグラフ(){
+  if (typeof Chart === 'undefined') { notify('グラフの部品が 読めていません'); return false; }
+  var 材料 = Chart.材料を作る(選んだ表を取る());
+  if (!材料.ok) { notify(材料.なぜ); return false; }
+  return グラフを作る(おすすめの種類(材料));
+}
 function グラフを描き直す(){
   var cv = document.getElementById('chartCanvas');
   if (!cv || !window._グラフの材料) return;
@@ -6970,7 +7007,28 @@ function グラフを描き直す(){
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   var ctx = cv.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  Chart.描く(ctx, window._グラフの材料, 種類, W, H, document.getElementById('chartTitle').value);
+  var 描けた = Chart.描く(ctx, window._グラフの材料, 種類, W, H, document.getElementById('chartTitle').value);
+  /* ★出来ない事・違う事は 黙らない★（下に 断りを 出す） */
+  /* ★描けた時に 出す 断り★＝「うちと 実Excelで 違う所」だけ。
+     ★描けなかった時に 出す 訳★＝「何が 足りないか」。
+     ★この2つを 混ぜない★（混ぜると 描けているのに「4つ 要ります」と 出て、
+       ★失敗したように 読める★＝2026-08-30 実測で 見つけた） */
+  var 断り = {
+    combo: '★複合★は 実Excel だと 2本目を「第2軸」に 置きます。うちは まだ ★同じ軸★です。',
+    histogram: '区間の 数は 値の数の 平方根で 決めています（★実Excelの 決め方は 外から 読めず 未測定★）。',
+    bubble: 'バブルの 大きさは ★3列目★を 使います。',
+    scatter: '散布図は ★1列目が X★です（実Excelと 同じ 見立て）。',
+    scatterLine: '散布図は ★1列目が X★です（実Excelと 同じ 見立て）。',
+  }[種類] || '';
+  var 訳 = {
+    box:   '★描けません★＝箱ひげは ★4つ 以上の 数★が 要ります（実Excelと 同じ 排他の 四分位のため）。',
+    radar: '★描けません★＝レーダーは ★3つ 以上の 見出し★が 要ります。',
+  }[種類] || '★この 中身では 描けません★';
+  var 欄 = document.getElementById('chartNote');
+  if (欄) {
+    欄.textContent = 描けた ? 断り : 訳;
+    欄.style.color = 描けた ? '#7A9A87' : '#C0392B';
+  }
 }
 function グラフを閉じる(){
   var ov = document.getElementById('chartOverlay');
