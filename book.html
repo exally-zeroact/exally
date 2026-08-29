@@ -1298,59 +1298,60 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=ea9f388e"></script>
+<script src="hyperformula.full.min.js?v=c9eb3fc3"></script>
 
-<script src="exally-formula.js?v=ea9f388e"></script>
+<script src="exally-formula.js?v=c9eb3fc3"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=ea9f388e"></script>
+<script src="js/file-out.js?v=c9eb3fc3"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=ea9f388e"></script>
-<script src="lib/grid-xlsx.js?v=ea9f388e"></script>
+<script src="lib/typed-value.js?v=c9eb3fc3"></script>
+<script src="lib/grid-xlsx.js?v=c9eb3fc3"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=ea9f388e"></script>
-<script src="lib/autosum.js?v=ea9f388e"></script>
-<script src="lib/grid-sort.js?v=ea9f388e"></script>
-<script src="lib/grid-filter.js?v=ea9f388e"></script>
-<script src="lib/grid-find.js?v=ea9f388e"></script>
-<script src="lib/grid-print.js?v=ea9f388e"></script>
-<script src="lib/ai-reason.js?v=ea9f388e"></script>
-<script src="lib/menu-place.js?v=ea9f388e"></script>
-<script src="lib/grid-stats.js?v=ea9f388e"></script>
-<script src="lib/grid-valid.js?v=ea9f388e"></script>
-<script src="lib/cond-format.js?v=ea9f388e"></script>
-<script src="lib/ref-graph.js?v=ea9f388e"></script>
-<script src="lib/shindan.js?v=ea9f388e"></script>
+  <script src="lib/grid-refedit.js?v=c9eb3fc3"></script>
+<script src="lib/autosum.js?v=c9eb3fc3"></script>
+<script src="lib/grid-sort.js?v=c9eb3fc3"></script>
+<script src="lib/grid-filter.js?v=c9eb3fc3"></script>
+<script src="lib/grid-find.js?v=c9eb3fc3"></script>
+<script src="lib/grid-print.js?v=c9eb3fc3"></script>
+<script src="lib/ai-reason.js?v=c9eb3fc3"></script>
+<script src="lib/menu-place.js?v=c9eb3fc3"></script>
+<script src="lib/grid-stats.js?v=c9eb3fc3"></script>
+<script src="lib/grid-valid.js?v=c9eb3fc3"></script>
+<script src="lib/cond-format.js?v=c9eb3fc3"></script>
+<script src="lib/ref-graph.js?v=c9eb3fc3"></script>
+<script src="lib/shindan.js?v=c9eb3fc3"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=ea9f388e"></script>
-<script src="lib/vba-mikata.js?v=ea9f388e"></script>
-<script src="lib/vba-tejun.js?v=ea9f388e"></script>
-<script src="lib/rireki.js?v=ea9f388e"></script>
-<script src="lib/chizu.js?v=ea9f388e"></script>
-<script src="lib/horu.js?v=ea9f388e"></script>
-<script src="lib/excel-version.js?v=ea9f388e"></script>
-<script src="lib/teian.js?v=ea9f388e"></script>
-<script src="lib/kikan.js?v=ea9f388e"></script>
-<script src="lib/recipe.js?v=ea9f388e"></script>
-<script src="lib/kirikae.js?v=ea9f388e"></script>
-<script src="js/recipe-store.js?v=ea9f388e"></script>
-<script src="js/rireki-store.js?v=ea9f388e"></script>
-<script src="lib/excel-version.js?v=ea9f388e"></script>
+<script src="lib/vba.js?v=c9eb3fc3"></script>
+<script src="lib/vba-mikata.js?v=c9eb3fc3"></script>
+<script src="lib/vba-tejun.js?v=c9eb3fc3"></script>
+<script src="lib/rireki.js?v=c9eb3fc3"></script>
+<script src="lib/chizu.js?v=c9eb3fc3"></script>
+<script src="lib/horu.js?v=c9eb3fc3"></script>
+<script src="lib/excel-version.js?v=c9eb3fc3"></script>
+<script src="lib/teian.js?v=c9eb3fc3"></script>
+<script src="lib/kikan.js?v=c9eb3fc3"></script>
+<script src="lib/recipe.js?v=c9eb3fc3"></script>
+<script src="lib/kirikae.js?v=c9eb3fc3"></script>
+<script src="js/recipe-store.js?v=c9eb3fc3"></script>
+<script src="js/rireki-store.js?v=c9eb3fc3"></script>
+<script src="lib/excel-version.js?v=c9eb3fc3"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=ea9f388e">
-<script src="lib/ribbon-spec.js?v=ea9f388e"></script>
-<script src="lib/ribbon-actions.js?v=ea9f388e"></script>
-<script src="lib/ribbon.js?v=ea9f388e"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=c9eb3fc3">
+<script src="lib/named-ranges.js?v=c9eb3fc3"></script>
+<script src="lib/ribbon-spec.js?v=c9eb3fc3"></script>
+<script src="lib/ribbon-actions.js?v=c9eb3fc3"></script>
+<script src="lib/ribbon.js?v=c9eb3fc3"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=ea9f388e"></script>
-<script src="js/exally-login.js?v=ea9f388e"></script>
-<script src="js/auth.js?v=ea9f388e"></script>
+<script src="js/supa-config.js?v=c9eb3fc3"></script>
+<script src="js/exally-login.js?v=c9eb3fc3"></script>
+<script src="js/auth.js?v=c9eb3fc3"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4079,6 +4080,74 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 </div>
 <!-- ★入力の決まり★ Excel の「データの入力規則」に当たる窓。
      ★出す物は 全部 動く物だけ★／★測った2つ（一覧から選ぶ・整数の範囲）だけ出す★ -->
+<!-- ★名前の定義（名前付き範囲）★ 2026-08-29
+     ・alert / prompt は 使わない（★画面が 止まる★＝no-dead-ui が 赤にする）
+     ・押す所は 44px 以上・入力の字は 16px（iOSで 拡大されない） -->
+<!-- ★区切り位置（テキストを 列に 分ける）★ 2026-08-29
+     ・confirm / alert / prompt は 使わない（画面が 止まる）
+     ・★上書きする数を 押す前に 見せる★（黙って 消さない） -->
+<div id="splitOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">区切り位置</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="splitWhere">A1</span></div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">区切りの字</span>
+        <select id="splitKind" onchange="区切り位置を試す()" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value=",">カンマ　,</option>
+          <option value="tab">タブ</option>
+          <option value="space">空白</option>
+          <option value="/">スラッシュ　/</option>
+          <option value="-">ハイフン　-</option>
+          <option value="other">その他（自分で 入れる）</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">その他</span>
+        <input id="splitOther" type="text" oninput="区切り位置を試す()" placeholder="例: ／" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div id="splitWarn" style="font-size:12px;color:#333333;min-height:1.8em;"></div>
+      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
+        ★元の列は 上書きされます★（実Excelと 同じ）。足りない所は 空のままです。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="区切り位置を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="区切り位置を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">分ける</button>
+    </div>
+  </div>
+</div>
+
+<div id="nameOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">名前の定義</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">この範囲に 名前を 付けると、式で その名前が 使えます</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4.5em;">名前</span>
+        <input id="nameName" type="text" placeholder="うりあげ" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4.5em;">場所</span>
+        <input id="nameRef" type="text" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div id="nameWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
+      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
+        ★A1 のような 番地の形と、数で 始まる名前は 使えません★（実Excelも 断ります）
+      </div>
+      <div id="nameList" style="margin-top:12px;border-top:1px solid #D4EDE1;padding-top:10px;font-size:12px;"></div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="名前の窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="名前を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">名前を つける</button>
+    </div>
+  </div>
+</div>
+
 <div id="validOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6437,6 +6506,156 @@ function 重複を削除(){
   notify(消す.length+'行 消しました（同じ中身の行）');
   return 消す.length;
 }
+/* ★名前の定義（名前付き範囲）★ 2026-08-29
+ *   実Excel実測＝日本語の名前が 使える／A1の形と 数で始まる名前は 断られる。
+ *   HyperFormula は 日本語の名前を 受け付けないので ★式に入る前に 開く★
+ *   （lib/named-ranges.js／convertFormula の 中で 呼ぶ）。
+ *   ★alert / prompt は 使わない★＝画面が 止まるので 窓（#nameOverlay）で 聞く。 */
+var 名前の箱 = (typeof NamedRanges !== 'undefined') ? NamedRanges.作る() : null;
+window.名前の箱 = 名前の箱;
+
+function 名前の窓を開く(){
+  if(!名前の箱){ notify('名前の部品が 読めていません'); return; }
+  hideCtxMenu();
+  var 場所 = "='" + sheets[activeSheet].name + "'!" + cellAddr(selR1,selC1)
+    + ((selR1!==selR2||selC1!==selC2) ? ':'+cellAddr(selR2,selC2) : '');
+  document.getElementById('nameRef').value = 場所;
+  document.getElementById('nameName').value = '';
+  document.getElementById('nameWhy').textContent = '';
+  名前の一覧を描く();
+  var el = document.getElementById('nameOverlay');
+  el.style.display = 'flex';
+}
+function 名前の窓を閉じる(){
+  var el = document.getElementById('nameOverlay');
+  if(el) el.style.display = 'none';
+}
+function 名前の一覧を描く(){
+  var box = document.getElementById('nameList');
+  if(!box || !名前の箱) return;
+  var 一覧 = 名前の箱.全部();
+  if(!一覧.length){ box.textContent = 'まだ 1つも ありません'; return; }
+  var h = '<div style="color:#7A9A87;margin-bottom:4px;">今 ある名前（' + 一覧.length + '個）</div>';
+  for(var i=0;i<一覧.length;i++){
+    var n = 一覧[i];
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
+      + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">'
+      + _esc(n.名) + ' → ' + _esc(n.参照先) + (n.シート ? '（' + _esc(n.シート) + ' だけ）' : '')
+      + '</span>'
+      + '<button onclick="名前を消す(' + i + ')" style="min-height:32px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">消す</button>'
+      + '</div>';
+  }
+  box.innerHTML = h;
+}
+function _esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function 名前を決める(){
+  if(!名前の箱) return;
+  var 名 = document.getElementById('nameName').value;
+  var 場所 = document.getElementById('nameRef').value;
+  var r = 名前の箱.足す(名, 場所, null);
+  if(!r.ok){ document.getElementById('nameWhy').textContent = r.なぜ; return; }
+  document.getElementById('nameWhy').textContent = '';
+  document.getElementById('nameName').value = '';
+  名前の一覧を描く();
+  すべて再計算();
+  notify('名前「' + String(名).trim() + '」を つけました');
+}
+function 名前を消す(i){
+  if(!名前の箱) return;
+  var 一覧 = 名前の箱.全部();
+  if(!(i>=0 && i<一覧.length)) return;
+  名前の箱.消す(一覧[i].名, 一覧[i].シート);
+  名前の一覧を描く();
+  すべて再計算();
+  notify('名前「' + 一覧[i].名 + '」を 消しました');
+}
+
+/* ★区切り位置（テキストを 列に 分ける）★ 2026-08-29
+ *   実Excel実測（TextToColumns・カンマ区切り）:
+ *     "山田,太郎,30" → A=山田 B=太郎 C=30
+ *     "佐藤,一郎"     → A=佐藤 B=一郎 C=（空）
+ *   ⇒ ★元の列を 上書きする★／★足りない所は 空のまま★
+ *
+ *   ★confirm / alert / prompt は 使わない★（画面が 止まる＝no-dead-ui が 赤にする）。
+ *   上書きが 起きる時は ★窓で 聞いてから★ 消す（約束を 返す）。 */
+function 何列に分かれるか(印){
+  var s = sheets[activeSheet], 最大 = 1;
+  for (var r = selR1; r <= selR2; r++) {
+    var cell = s.data[r + ',' + selC1];
+    var 元 = cell ? String((cell.v === undefined || cell.v === '') ? (cell.d || '') : cell.v) : '';
+    if (!元) continue;
+    var n = 元.split(印).length;
+    if (n > 最大) 最大 = n;
+  }
+  return 最大;
+}
+function 上書きする数(最大){
+  var s = sheets[activeSheet], 数 = 0;
+  for (var r = selR1; r <= selR2; r++) {
+    for (var c = selC1 + 1; c < selC1 + 最大; c++) {
+      var x = s.data[r + ',' + c];
+      if (x && ((x.v !== undefined && x.v !== '') || x.f)) 数++;
+    }
+  }
+  return 数;
+}
+function 区切りで分ける(印){
+  var s = sheets[activeSheet];
+  var 最大 = 何列に分かれるか(印);
+  if (最大 <= 1) { notify('「' + 印 + '」で 分かれる所が ありませんでした'); return 0; }
+  _pushRowColUndo();
+  var 分けた = 0;
+  for (var r = selR1; r <= selR2; r++) {
+    var cell = s.data[r + ',' + selC1];
+    var 元 = cell ? String((cell.v === undefined || cell.v === '') ? (cell.d || '') : cell.v) : '';
+    if (!元) continue;
+    var 部品 = 元.split(印);
+    if (部品.length > 1) 分けた++;
+    for (var i = 0; i < 最大; i++) setCell(r, selC1 + i, i < 部品.length ? 部品[i] : '');
+  }
+  render(); updateBar();
+  notify(分けた + '行を ' + 最大 + '列に 分けました');
+  return 分けた;
+}
+function 区切り位置を開く(){
+  hideCtxMenu();
+  var el = document.getElementById('splitOverlay');
+  if (!el) return;
+  document.getElementById('splitWhere').textContent =
+    colLetter(selC1) + (selR1 + 1) + (selR1 !== selR2 ? '〜' + colLetter(selC1) + (selR2 + 1) : '');
+  document.getElementById('splitWarn').textContent = '';
+  el.style.display = 'flex';
+}
+function 区切り位置を閉じる(){
+  var el = document.getElementById('splitOverlay');
+  if (el) el.style.display = 'none';
+}
+function 区切りの字(){
+  var v = document.getElementById('splitKind').value;
+  if (v === 'other') return document.getElementById('splitOther').value;
+  if (v === 'tab') return String.fromCharCode(9);
+  if (v === 'space') return ' ';
+  return v;
+}
+function 区切り位置を試す(){
+  var 印 = 区切りの字();
+  var w = document.getElementById('splitWarn');
+  if (!印) { w.textContent = '区切りの字を 入れてください'; return; }
+  var 最大 = 何列に分かれるか(印);
+  if (最大 <= 1) { w.textContent = '「' + 印 + '」で 分かれる所が ありません'; return; }
+  var 消える = 上書きする数(最大);
+  w.textContent = 最大 + '列に 分かれます'
+    + (消える ? '。★右の ' + 消える + '個の セルを 上書きします★' : '。上書きする物は ありません');
+}
+function 区切り位置を決める(){
+  var 印 = 区切りの字();
+  if (!印) { document.getElementById('splitWarn').textContent = '区切りの字を 入れてください'; return; }
+  区切り位置を閉じる();
+  区切りで分ける(印);
+}
+
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
@@ -7050,10 +7269,12 @@ var FN_LIBRARY=[
 var FN_CATS=['すべて','数学','統計','論理','検索','文字列','日付','その他'];
 var _fnSelectedCat='すべて';
 var _fnSelected=null;
-function openFnPalette(){
+/* ★分類を 指定して 開ける★（Excelの「関数ライブラリ」の 財務／論理／文字列… に 当てる）
+   2026-08-29。分類の 名前は FN_CATS の 物。知らない名前なら「すべて」。 */
+function openFnPalette(分類){
   var pal=document.getElementById('fnPalette');
   if(!pal) return;
-  _fnSelectedCat='すべて'; _fnSelected=null;
+  _fnSelectedCat=(分類 && FN_CATS.indexOf(分類)>=0) ? 分類 : 'すべて'; _fnSelected=null;
   document.getElementById('fnSearch').value='';
   renderFnCats();
   renderFnList();

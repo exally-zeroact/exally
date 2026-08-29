@@ -79,7 +79,7 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
     'doUndo','doRedo','openFnPalette','sortRange','filterByValue','clearFilter','openValid',
     'freezePanes','unfreezePanes','printSheet',
     'autoSum','fillFromEdge','中身を消す','書式を消す','すべて消す',
-    '数式の表示を切り替える','すべて再計算','このシートを再計算','openShindan','重複を削除','ズーム100','openMacro'];
+    '数式の表示を切り替える','すべて再計算','このシートを再計算','openShindan','重複を削除','ズーム100','openMacro','名前の窓を開く','区切り位置を開く'];
   for (const n of 拾う名) にせ画面[n] = (function (nm) {
     return function () { 記録.push({ fn: nm, args: Array.prototype.slice.call(arguments) }); };
   }(n));
@@ -97,6 +97,17 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
   g.window = 前window; g.document = 前document;
   ok('★押したら 画面の関数に 届く（' + 結んだ.length + '個 全部 押した）★',
     届かない.length === 0, 届かない.join(' / '));
+}
+
+/* ★関数ライブラリの 分類★＝引数が 効いているか（2026-08-29 に 足した）
+ *   知らない分類（財務など・うちに まだ 無い物）は ★すべて★に なる＝黙って 落ちない。 */
+{
+  const g = globalThis, 前w = g.window;
+  const 受け = [];
+  g.window = { openFnPalette: function (c) { 受け.push(c); } };
+  ACT['論理の関数'](); ACT['日付の関数'](); ACT['関数の挿入']();
+  g.window = 前w;
+  ok('★分類を 渡している★', JSON.stringify(受け) === JSON.stringify(['論理', '日付', undefined]), JSON.stringify(受け));
 }
 
 /* ★引数の 取り違えを 名指しで 弾く★（前に やらかした形） */

@@ -16,6 +16,8 @@ const FILES = [
   ['valign.test.mjs', '--self-test'],        // ★上下揃え＝実Excelの既定は中央（実測）★
   ['clear.test.mjs', '--self-test'],         // ★クリア3通り＝中身だけ/書式だけ/すべて（実測）★
   ['ribbon-features.test.mjs', '--self-test'],  // ★数式の表示／再計算／ズーム／重複の削除★
+  ['named-ranges.test.mjs', '--self-test'],  // ★名前の定義＝日本語の名前をエンジンに渡す前に開く★
+  ['split-columns.test.mjs', '--self-test'], // ★区切り位置＝実Excelの TextToColumns どおり★
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)
