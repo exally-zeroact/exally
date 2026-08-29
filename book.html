@@ -1304,68 +1304,69 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=72c541cb"></script>
+<script src="hyperformula.full.min.js?v=7a74224e"></script>
 
-<script src="exally-formula.js?v=72c541cb"></script>
+<script src="exally-formula.js?v=7a74224e"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=72c541cb"></script>
+<script src="js/file-out.js?v=7a74224e"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=72c541cb"></script>
-<script src="lib/grid-xlsx.js?v=72c541cb"></script>
+<script src="lib/typed-value.js?v=7a74224e"></script>
+<script src="lib/grid-xlsx.js?v=7a74224e"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=72c541cb"></script>
-<script src="lib/autosum.js?v=72c541cb"></script>
-<script src="lib/grid-sort.js?v=72c541cb"></script>
-<script src="lib/grid-filter.js?v=72c541cb"></script>
-<script src="lib/grid-find.js?v=72c541cb"></script>
-<script src="lib/grid-print.js?v=72c541cb"></script>
-<script src="lib/ai-reason.js?v=72c541cb"></script>
-<script src="lib/menu-place.js?v=72c541cb"></script>
-<script src="lib/grid-stats.js?v=72c541cb"></script>
-<script src="lib/grid-valid.js?v=72c541cb"></script>
-<script src="lib/cond-format.js?v=72c541cb"></script>
-<script src="lib/ref-graph.js?v=72c541cb"></script>
-<script src="lib/shindan.js?v=72c541cb"></script>
+  <script src="lib/grid-refedit.js?v=7a74224e"></script>
+<script src="lib/autosum.js?v=7a74224e"></script>
+<script src="lib/grid-sort.js?v=7a74224e"></script>
+<script src="lib/grid-filter.js?v=7a74224e"></script>
+<script src="lib/grid-find.js?v=7a74224e"></script>
+<script src="lib/grid-print.js?v=7a74224e"></script>
+<script src="lib/ai-reason.js?v=7a74224e"></script>
+<script src="lib/menu-place.js?v=7a74224e"></script>
+<script src="lib/grid-stats.js?v=7a74224e"></script>
+<script src="lib/grid-valid.js?v=7a74224e"></script>
+<script src="lib/cond-format.js?v=7a74224e"></script>
+<script src="lib/ref-graph.js?v=7a74224e"></script>
+<script src="lib/shindan.js?v=7a74224e"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=72c541cb"></script>
-<script src="lib/vba-mikata.js?v=72c541cb"></script>
-<script src="lib/vba-tejun.js?v=72c541cb"></script>
-<script src="lib/rireki.js?v=72c541cb"></script>
-<script src="lib/chizu.js?v=72c541cb"></script>
-<script src="lib/horu.js?v=72c541cb"></script>
-<script src="lib/excel-version.js?v=72c541cb"></script>
-<script src="lib/teian.js?v=72c541cb"></script>
-<script src="lib/kikan.js?v=72c541cb"></script>
-<script src="lib/recipe.js?v=72c541cb"></script>
-<script src="lib/kirikae.js?v=72c541cb"></script>
-<script src="js/recipe-store.js?v=72c541cb"></script>
-<script src="js/rireki-store.js?v=72c541cb"></script>
-<script src="lib/excel-version.js?v=72c541cb"></script>
+<script src="lib/vba.js?v=7a74224e"></script>
+<script src="lib/vba-mikata.js?v=7a74224e"></script>
+<script src="lib/vba-tejun.js?v=7a74224e"></script>
+<script src="lib/rireki.js?v=7a74224e"></script>
+<script src="lib/chizu.js?v=7a74224e"></script>
+<script src="lib/horu.js?v=7a74224e"></script>
+<script src="lib/excel-version.js?v=7a74224e"></script>
+<script src="lib/teian.js?v=7a74224e"></script>
+<script src="lib/kikan.js?v=7a74224e"></script>
+<script src="lib/recipe.js?v=7a74224e"></script>
+<script src="lib/kirikae.js?v=7a74224e"></script>
+<script src="js/recipe-store.js?v=7a74224e"></script>
+<script src="js/rireki-store.js?v=7a74224e"></script>
+<script src="lib/excel-version.js?v=7a74224e"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=72c541cb">
-<script src="lib/named-ranges.js?v=72c541cb"></script>
-<script src="lib/cell-styles.js?v=72c541cb"></script>
-<script src="lib/chart.js?v=72c541cb"></script>
-<script src="lib/sparkline.js?v=72c541cb"></script>
-<script src="lib/table.js?v=72c541cb"></script>
-<script src="lib/flash-fill.js?v=72c541cb"></script>
-<script src="lib/pivot.js?v=72c541cb"></script>
-<script src="lib/csv-in.js?v=72c541cb"></script>
-<script src="lib/symbols.js?v=72c541cb"></script>
-<script src="lib/ribbon-spec.js?v=72c541cb"></script>
-<script src="lib/ribbon-actions.js?v=72c541cb"></script>
-<script src="lib/ribbon.js?v=72c541cb"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=7a74224e">
+<script src="lib/named-ranges.js?v=7a74224e"></script>
+<script src="lib/cell-styles.js?v=7a74224e"></script>
+<script src="lib/chart.js?v=7a74224e"></script>
+<script src="lib/sparkline.js?v=7a74224e"></script>
+<script src="lib/table.js?v=7a74224e"></script>
+<script src="lib/flash-fill.js?v=7a74224e"></script>
+<script src="lib/pivot.js?v=7a74224e"></script>
+<script src="lib/csv-in.js?v=7a74224e"></script>
+<script src="lib/objects.js?v=7a74224e"></script>
+<script src="lib/symbols.js?v=7a74224e"></script>
+<script src="lib/ribbon-spec.js?v=7a74224e"></script>
+<script src="lib/ribbon-actions.js?v=7a74224e"></script>
+<script src="lib/ribbon.js?v=7a74224e"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=72c541cb"></script>
-<script src="js/exally-login.js?v=72c541cb"></script>
-<script src="js/auth.js?v=72c541cb"></script>
+<script src="js/supa-config.js?v=7a74224e"></script>
+<script src="js/exally-login.js?v=7a74224e"></script>
+<script src="js/auth.js?v=7a74224e"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2995,6 +2996,9 @@ function _renderPass() {
     drawColoredFormulaOnCell(_editR, _editC, _editVal);
   }
 
+  /* ★シートに 浮かぶ 物（画像・図形・テキスト）★＝セルの 上に 出す */
+  物を描く();
+
   /* ★参照元・参照先の 矢印★（字の 上に 出す＝実Excelも 上に 出る） */
   トレースを描く();
 
@@ -3889,6 +3893,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
     <!-- ★CSV／テキストの 入り口★ 2026-08-30 -->
     <input type="file" id="csvFileInput" accept=".csv,.txt,.tsv" style="display:none" onchange="CSVを読む(this)">
+    <!-- ★画像の 入り口★ 2026-08-30 -->
+    <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="画像を読む(this)">
     <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
     <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">💾</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelに</span>書き出す</span></button>
@@ -4310,6 +4316,31 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★スライサー（挿入→フィルター→スライサー）★ 2026-08-30
      ★未測定★＝実Excelの スライサーは COM から 作れなかった（形・大きさが 読めない）。
      働きだけ 同じに する＝押した 値だけ 見せる（テーブルの 絞りと 同じ 道を 使う） -->
+<!-- ★図形／テキスト（挿入→図・テキスト）★ 2026-08-30
+     実Excel実測＝図形の 塗り #156082・線 #042433・線の太さ 1.5／テキスト箱は 白／
+     重なりは 1から（前面で 2・背面で 1）。★色は 写さず うちの緑★ -->
+<div id="shapeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">図形</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">選んだ 所に 置きます</div>
+    </div>
+    <div id="shapeBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;"></div>
+    <div style="padding:0 18px 12px;font-size:12px;color:#7A9A87;line-height:1.6;">
+      ★色は 実Excel の 物を 写さず うちの 緑を 使います★（形と 働きは 同じ）。
+    </div>
+    <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
+      <button onclick="図形の窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+<div id="objListPanel" style="display:none;position:fixed;right:12px;top:120px;z-index:9400;width:240px;max-width:80vw;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);overflow:hidden;">
+  <div style="padding:8px 12px;border-bottom:1px solid #D4EDE1;display:flex;align-items:center;gap:6px;">
+    <div style="font-size:13px;font-weight:700;color:#2E7D54;flex:1;">オブジェクト</div>
+    <button onclick="物の一覧を閉じる()" style="min-height:28px;padding:0 8px;border:1px solid #C8ECD8;background:#ffffff;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">×</button>
+  </div>
+  <div id="objListBody" style="padding:8px 12px;font-size:12px;max-height:50vh;overflow:auto;"></div>
+</div>
 <div id="slicerPanel" style="display:none;position:fixed;right:12px;top:120px;z-index:9400;width:220px;max-width:80vw;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);overflow:hidden;">
   <div style="padding:8px 12px;border-bottom:1px solid #D4EDE1;display:flex;align-items:center;gap:6px;">
     <div id="slicerTitle" style="font-size:13px;font-weight:700;color:#2E7D54;flex:1;">スライサー</div>
@@ -6770,6 +6801,20 @@ function onMD(e){
     canvas.style.cursor='crosshair';
     return;
   }
+  /* ★浮かぶ 物を 押したか★（セルより 先に 見る＝上に 在る 物が 勝つ）
+     押したら 選ぶ＋動かす（つまみで 大きさも 変える） */
+  var _o = 物を押したか(p.x, p.y);
+  if(_o){
+    選んだ物 = _o;
+    var _sx = 画面から物のX(p.x), _sy = 画面から物のY(p.y);
+    var _つまみ = (_sx >= _o.x + _o.w - 8 && _sy >= _o.y + _o.h - 8);
+    touchState = { type: _つまみ ? 'objsize' : 'objmove', 物: _o,
+      dx: _sx - _o.x, dy: _sy - _o.y, w0: _o.w, h0: _o.h, x0: _sx, y0: _sy };
+    render();
+    return;
+  }
+  if(選んだ物){ 選んだ物 = null; render(); }
+
   var c=xToC(p.x),r=yToR(p.y);
 
   /* ★テーブルの 見出しの ▼ を 押したら 絞りの 窓★（実測 ShowAutoFilter=True） */
@@ -6815,6 +6860,19 @@ function onMD(e){
 }
 function onMM(e){
   var p=cPos(e);
+  /* ★浮かぶ 物を 動かす／大きさを 変える★ */
+  if(touchState && (touchState.type==='objmove' || touchState.type==='objsize')){
+    var _o = touchState.物;
+    var _sx = 画面から物のX(p.x), _sy = 画面から物のY(p.y);
+    if(touchState.type==='objmove'){
+      _o.x = Math.max(0, _sx - touchState.dx);
+      _o.y = Math.max(0, _sy - touchState.dy);
+    } else {
+      _o.w = Math.max(16, touchState.w0 + (_sx - touchState.x0));
+      _o.h = Math.max(16, touchState.h0 + (_sy - touchState.y0));
+    }
+    render(); return;
+  }
   if(touchState&&touchState.type==='mrefsel'&&p.x>HDR_W&&p.y>HDR_H){
     var tr=yToR(p.y),tc=xToC(p.x);
     var el=getRefInput(); if(!el) return;
@@ -8974,6 +9032,198 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★シートに 浮かぶ 物（画像・図形・テキスト）★ 2026-08-30
+ *   真値は lib/objects.js の 見出しに 実測どおり 書いた。
+ *   ★色は 写さない★＝形と 働きは 同じに して 色は うちの 緑。 */
+var 選んだ物 = null;
+function 物の箱(){
+  var s0 = sheets[activeSheet];
+  if (!s0.objects) s0.objects = [];
+  return s0.objects;
+}
+/* ★物は「シートの 座標」で 持つ★（A1 の 左上からの ずれ）
+   ＝画面の 座標で 持つと ★スクロールした 時に 貼り付いた ままに なる★
+   （2026-08-30 実ブラウザで 見つけた＝実Excel は セルと 一緒に 動く）。 */
+function 物の画面X(o){ return colX(0) + o.x; }
+function 物の画面Y(o){ return rowY(0) + o.y; }
+function 画面から物のX(px){ return px - colX(0); }
+function 画面から物のY(py){ return py - rowY(0); }
+/* 今 選んでいる セルの 左上（★シートの 座標★） */
+function 物を置く場所(){
+  return { x: 画面から物のX(colX(selC1)) + 8, y: 画面から物のY(rowY(selR1)) + 8 };
+}
+function 物を足す(種類, 中身){
+  var 箱 = 物の箱();
+  var 場所 = 物を置く場所();
+  var o = {
+    種類: 種類,
+    名: SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), 種類),
+    x: 場所.x, y: 場所.y,
+    w: (種類 === 'テキスト') ? 120 : 100,
+    h: (種類 === 'テキスト') ? 30 : 50,
+    z: 箱.length + 1,
+    字: (種類 === 'テキスト') ? '字を 入れてね' : '',
+  };
+  if (中身) { for (var k in 中身) o[k] = 中身[k]; }
+  箱.push(o);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = o;
+  render();
+  notify('「' + o.名 + '」を 置きました（押して 動かせます）');
+  return o;
+}
+function 図形の窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('shapeOverlay');
+  if (!ov) return 0;
+  var h = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  for (var i = 0; i < SheetObjects.形たち.length; i++) {
+    var f = SheetObjects.形たち[i];
+    h += '<button type="button" class="shape-b" data-s="' + f.名 + '"'
+      + ' onclick="物を足す(this.getAttribute(\'data-s\'));図形の窓を閉じる()"'
+      + ' style="min-width:88px;min-height:44px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;'
+      + 'color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">'
+      + f.名 + (f.Excel ? '<span style="color:#7A9A87;font-size:10px;"> ' + f.Excel + '</span>' : '')
+      + '</button>';
+  }
+  h += '</div>';
+  document.getElementById('shapeBody').innerHTML = h;
+  ov.style.display = 'flex';
+  return SheetObjects.形たち.length;
+}
+function 図形の窓を閉じる(){
+  var ov = document.getElementById('shapeOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function テキストを置く(){ hideCtxMenu(); return 物を足す('テキスト'); }
+
+/* ★画像★＝ファイルを 選んで 置く（★外から 取ってこない★＝選んだ ファイルだけ） */
+function 画像の窓を開く(){
+  hideCtxMenu();
+  var el = document.getElementById('imgFileInput');
+  if (!el) { notify('★入り口が 見つかりません★'); return 0; }
+  el.value = '';
+  el.click();
+  return 1;
+}
+function 画像を読む(el){
+  var f = el && el.files && el.files[0];
+  if (!f) return 0;
+  var 読み手 = new FileReader();
+  読み手.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      /* ★元の 形の まま★（つぶれない）＝長い方を 240 に そろえる */
+      var 幅 = img.naturalWidth || 240, 高 = img.naturalHeight || 160;
+      var 倍 = 240 / Math.max(幅, 高);
+      物を足す('画像', { 画像: img, w: Math.max(20, Math.round(幅 * 倍)), h: Math.max(20, Math.round(高 * 倍)),
+        元の名: f.name, 中身: 読み手.result });
+      render();
+    };
+    img.onerror = function () { notify('★その 画像は 読めませんでした★'); };
+    img.src = String(読み手.result || '');
+  };
+  読み手.readAsDataURL(f);
+  return 1;
+}
+
+/* 描く（セルの 上・矢印の 下） */
+function 物を描く(){
+  var 箱 = sheets[activeSheet].objects;
+  if (!箱 || !箱.length) return 0;
+  var 並び = 箱.slice().sort(function (a, b) { return (a.z || 0) - (b.z || 0); });
+  var 出た = 0;
+  for (var i = 0; i < 並び.length; i++) {
+    var o = 並び[i];
+    /* ★シートの 座標 → 画面の 座標★（スクロールと 一緒に 動く） */
+    var 写し = { 種類: o.種類, x: 物の画面X(o), y: 物の画面Y(o), w: o.w, h: o.h,
+      字: o.字, 塗り: o.塗り, 線: o.線, 画像: o.画像 };
+    if (写し.x + 写し.w < HDR_W || 写し.y + 写し.h < HDR_H) continue;   /* 見出しの 下に 隠れる分 */
+    if (SheetObjects.描く(ctx, 写し, o === 選んだ物)) 出た++;
+  }
+  return 出た;
+}
+/* 押した時（onMD から） */
+function 物を押したか(px, py){
+  var 箱 = sheets[activeSheet].objects;
+  if (!箱 || !箱.length) return null;
+  /* ★押した 所（画面）を シートの 座標に 直してから 見る★ */
+  return SheetObjects.どれを押したか(箱, 画面から物のX(px), 画面から物のY(py));
+}
+function 前面へ移動(){
+  hideCtxMenu();
+  if (!選んだ物) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  SheetObjects.前面へ(物の箱(), 選んだ物);
+  render();
+  notify('「' + 選んだ物.名 + '」を 前面へ 出しました');
+  return 選んだ物.z;
+}
+function 背面へ移動(){
+  hideCtxMenu();
+  if (!選んだ物) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  SheetObjects.背面へ(物の箱(), 選んだ物);
+  render();
+  notify('「' + 選んだ物.名 + '」を 背面へ 送りました');
+  return 選んだ物.z;
+}
+function 物を消す(){
+  if (!選んだ物) return 0;
+  var 箱 = 物の箱();
+  var i = 箱.indexOf(選んだ物);
+  if (i >= 0) 箱.splice(i, 1);
+  var 名 = 選んだ物.名;
+  選んだ物 = null;
+  SheetObjects.順をそろえる(箱);
+  render();
+  notify('「' + 名 + '」を 消しました');
+  return 1;
+}
+/* ★オブジェクトの 選択と 表示★＝一覧（重なりの 順に） */
+function 物の一覧を開く(){
+  hideCtxMenu();
+  var el = document.getElementById('objListPanel');
+  if (!el) return 0;
+  物の一覧を描く();
+  el.style.display = 'block';
+  return (sheets[activeSheet].objects || []).length;
+}
+function 物の一覧を閉じる(){
+  var el = document.getElementById('objListPanel');
+  if (el) el.style.display = 'none';
+}
+function 物の一覧を描く(){
+  var 体 = document.getElementById('objListBody');
+  if (!体) return 0;
+  var 箱 = (sheets[activeSheet].objects || []).slice()
+    .sort(function (a, b) { return (b.z || 0) - (a.z || 0); });   /* ★上に 在る 物が 先★ */
+  if (!箱.length) {
+    体.innerHTML = '<div style="color:#7A9A87;">この シートに 浮かぶ 物は ありません</div>';
+    return 0;
+  }
+  var h = '';
+  for (var i = 0; i < 箱.length; i++) {
+    var o = 箱[i];
+    h += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #F0FAF4;">'
+      + '<button onclick="物を選ぶ(\'' + _esc(o.名) + '\')" style="flex:1;min-height:32px;padding:0 8px;'
+      + 'border:1px solid #C8ECD8;background:' + (o === 選んだ物 ? '#3D9E72' : '#ffffff') + ';color:'
+      + (o === 選んだ物 ? '#ffffff' : '#333333') + ';border-radius:8px;font-size:12px;font-family:inherit;'
+      + 'cursor:pointer;text-align:left;">' + _esc(o.名) + '</button>'
+      + '<button onclick="物を選ぶ(\'' + _esc(o.名) + '\');物を消す();物の一覧を描く()" '
+      + 'style="min-height:28px;padding:0 6px;border:1px solid #C8ECD8;background:#ffffff;border-radius:6px;'
+      + 'font-size:11px;font-family:inherit;cursor:pointer;">×</button>'
+      + '</div>';
+  }
+  体.innerHTML = h;
+  return 箱.length;
+}
+function 物を選ぶ(名){
+  var 箱 = sheets[activeSheet].objects || [];
+  for (var i = 0; i < 箱.length; i++) if (箱[i].名 === 名) { 選んだ物 = 箱[i]; break; }
+  render();
+  物の一覧を描く();
+  return 選んだ物 ? 選んだ物.名 : null;
 }
 
 /* ★テキストまたは CSV から（データ→データの取得と変換）★ 2026-08-30
