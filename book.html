@@ -1304,67 +1304,67 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=a9235ac8"></script>
+<script src="hyperformula.full.min.js?v=d22e9928"></script>
 
-<script src="exally-formula.js?v=a9235ac8"></script>
+<script src="exally-formula.js?v=d22e9928"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=a9235ac8"></script>
+<script src="js/file-out.js?v=d22e9928"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=a9235ac8"></script>
-<script src="lib/grid-xlsx.js?v=a9235ac8"></script>
+<script src="lib/typed-value.js?v=d22e9928"></script>
+<script src="lib/grid-xlsx.js?v=d22e9928"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=a9235ac8"></script>
-<script src="lib/autosum.js?v=a9235ac8"></script>
-<script src="lib/grid-sort.js?v=a9235ac8"></script>
-<script src="lib/grid-filter.js?v=a9235ac8"></script>
-<script src="lib/grid-find.js?v=a9235ac8"></script>
-<script src="lib/grid-print.js?v=a9235ac8"></script>
-<script src="lib/ai-reason.js?v=a9235ac8"></script>
-<script src="lib/menu-place.js?v=a9235ac8"></script>
-<script src="lib/grid-stats.js?v=a9235ac8"></script>
-<script src="lib/grid-valid.js?v=a9235ac8"></script>
-<script src="lib/cond-format.js?v=a9235ac8"></script>
-<script src="lib/ref-graph.js?v=a9235ac8"></script>
-<script src="lib/shindan.js?v=a9235ac8"></script>
+  <script src="lib/grid-refedit.js?v=d22e9928"></script>
+<script src="lib/autosum.js?v=d22e9928"></script>
+<script src="lib/grid-sort.js?v=d22e9928"></script>
+<script src="lib/grid-filter.js?v=d22e9928"></script>
+<script src="lib/grid-find.js?v=d22e9928"></script>
+<script src="lib/grid-print.js?v=d22e9928"></script>
+<script src="lib/ai-reason.js?v=d22e9928"></script>
+<script src="lib/menu-place.js?v=d22e9928"></script>
+<script src="lib/grid-stats.js?v=d22e9928"></script>
+<script src="lib/grid-valid.js?v=d22e9928"></script>
+<script src="lib/cond-format.js?v=d22e9928"></script>
+<script src="lib/ref-graph.js?v=d22e9928"></script>
+<script src="lib/shindan.js?v=d22e9928"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=a9235ac8"></script>
-<script src="lib/vba-mikata.js?v=a9235ac8"></script>
-<script src="lib/vba-tejun.js?v=a9235ac8"></script>
-<script src="lib/rireki.js?v=a9235ac8"></script>
-<script src="lib/chizu.js?v=a9235ac8"></script>
-<script src="lib/horu.js?v=a9235ac8"></script>
-<script src="lib/excel-version.js?v=a9235ac8"></script>
-<script src="lib/teian.js?v=a9235ac8"></script>
-<script src="lib/kikan.js?v=a9235ac8"></script>
-<script src="lib/recipe.js?v=a9235ac8"></script>
-<script src="lib/kirikae.js?v=a9235ac8"></script>
-<script src="js/recipe-store.js?v=a9235ac8"></script>
-<script src="js/rireki-store.js?v=a9235ac8"></script>
-<script src="lib/excel-version.js?v=a9235ac8"></script>
+<script src="lib/vba.js?v=d22e9928"></script>
+<script src="lib/vba-mikata.js?v=d22e9928"></script>
+<script src="lib/vba-tejun.js?v=d22e9928"></script>
+<script src="lib/rireki.js?v=d22e9928"></script>
+<script src="lib/chizu.js?v=d22e9928"></script>
+<script src="lib/horu.js?v=d22e9928"></script>
+<script src="lib/excel-version.js?v=d22e9928"></script>
+<script src="lib/teian.js?v=d22e9928"></script>
+<script src="lib/kikan.js?v=d22e9928"></script>
+<script src="lib/recipe.js?v=d22e9928"></script>
+<script src="lib/kirikae.js?v=d22e9928"></script>
+<script src="js/recipe-store.js?v=d22e9928"></script>
+<script src="js/rireki-store.js?v=d22e9928"></script>
+<script src="lib/excel-version.js?v=d22e9928"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=a9235ac8">
-<script src="lib/named-ranges.js?v=a9235ac8"></script>
-<script src="lib/cell-styles.js?v=a9235ac8"></script>
-<script src="lib/chart.js?v=a9235ac8"></script>
-<script src="lib/sparkline.js?v=a9235ac8"></script>
-<script src="lib/table.js?v=a9235ac8"></script>
-<script src="lib/flash-fill.js?v=a9235ac8"></script>
-<script src="lib/pivot.js?v=a9235ac8"></script>
-<script src="lib/symbols.js?v=a9235ac8"></script>
-<script src="lib/ribbon-spec.js?v=a9235ac8"></script>
-<script src="lib/ribbon-actions.js?v=a9235ac8"></script>
-<script src="lib/ribbon.js?v=a9235ac8"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=d22e9928">
+<script src="lib/named-ranges.js?v=d22e9928"></script>
+<script src="lib/cell-styles.js?v=d22e9928"></script>
+<script src="lib/chart.js?v=d22e9928"></script>
+<script src="lib/sparkline.js?v=d22e9928"></script>
+<script src="lib/table.js?v=d22e9928"></script>
+<script src="lib/flash-fill.js?v=d22e9928"></script>
+<script src="lib/pivot.js?v=d22e9928"></script>
+<script src="lib/symbols.js?v=d22e9928"></script>
+<script src="lib/ribbon-spec.js?v=d22e9928"></script>
+<script src="lib/ribbon-actions.js?v=d22e9928"></script>
+<script src="lib/ribbon.js?v=d22e9928"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=a9235ac8"></script>
-<script src="js/exally-login.js?v=a9235ac8"></script>
-<script src="js/auth.js?v=a9235ac8"></script>
+<script src="js/supa-config.js?v=d22e9928"></script>
+<script src="js/exally-login.js?v=d22e9928"></script>
+<script src="js/auth.js?v=d22e9928"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4235,6 +4235,56 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★ピボットテーブル（挿入→ピボットテーブル）★ 2026-08-30
      実Excel実測＝左上「合計 / 金」・「列ラベル」「行ラベル」・総計は 行も 列も 出す／
      列を 使わない時は 2列だけ -->
+<!-- ★統合（データ→データ ツール→統合）★ 2026-08-30
+     実Excel実測＝関数の 番号は 合計 -4157／個数 -4112／平均 -4106／最大 -4136／最小 -4139 -->
+<div id="consolOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">統合</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">同じ 名前の 行を まとめます</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;flex:1;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">元の 範囲</span>
+        <input id="csFrom" type="text" placeholder="A1:C10" oninput="統合の見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">まとめ方</span>
+        <select id="csAgg" onchange="統合の見本()" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="合計">合計</option>
+          <option value="個数">データの個数</option>
+          <option value="平均">平均</option>
+          <option value="最大">最大</option>
+          <option value="最小">最小</option>
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px;">
+        <input type="checkbox" id="csHeader" checked onchange="統合の見本()" style="width:20px;height:20px;">
+        <span>先頭行は 見出し</span>
+      </label>
+      <div id="csWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div style="font-size:12px;color:#7A9A87;">出来上がり（見本）</div>
+      <div id="csPreview" style="font-size:12px;font-family:monospace;white-space:pre;overflow:auto;max-height:26vh;border:1px solid #D4EDE1;border-radius:8px;padding:6px;"></div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="統合の窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="統合を作る()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">新しい シートに 出す</button>
+    </div>
+  </div>
+</div>
+<!-- ★スライサー（挿入→フィルター→スライサー）★ 2026-08-30
+     ★未測定★＝実Excelの スライサーは COM から 作れなかった（形・大きさが 読めない）。
+     働きだけ 同じに する＝押した 値だけ 見せる（テーブルの 絞りと 同じ 道を 使う） -->
+<div id="slicerPanel" style="display:none;position:fixed;right:12px;top:120px;z-index:9400;width:220px;max-width:80vw;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);overflow:hidden;">
+  <div style="padding:8px 12px;border-bottom:1px solid #D4EDE1;display:flex;align-items:center;gap:6px;">
+    <div id="slicerTitle" style="font-size:13px;font-weight:700;color:#2E7D54;flex:1;">スライサー</div>
+    <button onclick="スライサーを消す()" style="min-height:28px;padding:0 8px;border:1px solid #C8ECD8;background:#ffffff;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">×</button>
+  </div>
+  <div id="slicerBody" style="padding:8px 12px;font-size:12px;max-height:50vh;overflow:auto;"></div>
+  <div style="padding:0 12px 10px;">
+    <button onclick="スライサーを全部に()" style="width:100%;min-height:34px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">ぜんぶ 見せる</button>
+  </div>
+</div>
 <div id="pivotOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -8889,6 +8939,253 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★統合（データ→データ ツール→統合）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ まとめ方の 番号＝合計 -4157／個数 -4112／平均 -4106／
+ *   最大 -4136／最小 -4139（tools/measure-data2.ps1）
+ *   ★1列目を 名前と して 同じ 名前の 行を まとめる★（実Excel の「上端行・左端列」の うち 左端列） */
+function 統合の窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('consolOverlay');
+  if (!ov) return 0;
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  if (r1 === r2 && c1 === c2) {
+    var 塊 = 表のまわりを当てる(r1, c1);
+    r1 = 塊.r1; c1 = 塊.c1; r2 = 塊.r2; c2 = 塊.c2;
+  }
+  document.getElementById('csFrom').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  document.getElementById('csWhy').textContent = '';
+  統合の見本();
+  ov.style.display = 'flex';
+  return 1;
+}
+function 統合の窓を閉じる(){
+  var ov = document.getElementById('consolOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 統合の中身(){
+  var 表 = ピボットの元の表(document.getElementById('csFrom').value);
+  if (!表 || !表.length) return null;
+  var 見出しあり = document.getElementById('csHeader').checked;
+  var まとめ方 = document.getElementById('csAgg').value;
+  var 集計 = Pivot.集計たち[まとめ方] || Pivot.集計たち['合計'];
+  var 出 = [];
+  var 始 = 見出しあり ? 1 : 0;
+  if (見出しあり && 表[0]) 出.push(表[0].slice());
+  var 名たち = [], 箱 = {};
+  for (var r = 始; r < 表.length; r++) {
+    var 名 = String(表[r][0] === null || 表[r][0] === undefined ? '' : 表[r][0]);
+    if (!箱[名]) { 箱[名] = []; 名たち.push(名); }
+    箱[名].push(表[r]);
+  }
+  名たち.sort();
+  for (var i = 0; i < 名たち.length; i++) {
+    var 行 = [名たち[i]];
+    var 元たち = 箱[名たち[i]];
+    for (var c = 1; c < (表[0] ? 表[0].length : 0); c++) {
+      var 値 = [];
+      for (var j = 0; j < 元たち.length; j++) 値.push(元たち[j][c]);
+      var 答 = 集計(値);
+      行.push(答 === null || 答 === undefined ? '' : 答);
+    }
+    出.push(行);
+  }
+  return { 表: 出, まとめ方: まとめ方, 元の行: 表.length - 始, 出来た行: 名たち.length };
+}
+function 統合の見本(){
+  var 欄 = document.getElementById('csPreview');
+  var r = 統合の中身();
+  if (!r) { 欄.textContent = '（範囲を A1:C10 の 形で 入れてください）'; return 0; }
+  var 行たち = r.表.slice(0, 12).map(function (行) {
+    return 行.map(function (v) { return String(v === null || v === undefined ? '' : v); }).join('\t');
+  });
+  if (r.表.length > 12) 行たち.push('…（' + (r.表.length - 12) + '行 つづく）');
+  行たち.push('');
+  行たち.push('★' + r.元の行 + '行 → ' + r.出来た行 + '行に まとめます★');
+  欄.textContent = 行たち.join('\n');
+  return r.表.length;
+}
+function 統合を作る(){
+  var 欄 = document.getElementById('csWhy');
+  var r = 統合の中身();
+  if (!r) { 欄.textContent = '★範囲は A1:C10 の 形で 入れてください★'; return 0; }
+  var 前 = activeSheet;
+  addSheet();
+  if (activeSheet === 前) { 欄.textContent = '★新しい シートを 作れませんでした★'; return 0; }
+  for (var i = 0; i < r.表.length; i++) {
+    for (var j = 0; j < r.表[i].length; j++) {
+      var v = r.表[i][j];
+      if (v === '' || v === null || v === undefined) continue;
+      setCell(i, j, String(v), true);
+    }
+  }
+  統合の窓を閉じる();
+  render(); updateBar();
+  notify('統合しました（' + r.元の行 + '行 → ' + r.出来た行 + '行）');
+  return r.表.length;
+}
+
+/* ★アウトライン（データ→アウトライン）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ … tools/measure-data2.ps1
+ *     グループ化した 行は ★段=2★（外は 1）／★1段だけ 出すと 隠れる★／2段で また 出る
+ *     まとめの 行は ★下★（SummaryRow=1＝xlSummaryBelow）
+ *   ⇒ うちも ★段★を 行ごとに 持ち、★1段/2段/3段★で 出し入れする。 */
+function 段の箱(){
+  var s0 = sheets[activeSheet];
+  if (!s0.outline) s0.outline = {};
+  return s0.outline;
+}
+function グループ化(){
+  hideCtxMenu();
+  var 箱 = 段の箱();
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  for (var r = r1; r <= r2; r++) 箱[r] = Math.min(8, (箱[r] || 1) + 1);
+  render();
+  notify((r2 - r1 + 1) + '行を まとめました（データ→アウトライン で 出し入れ）');
+  return r2 - r1 + 1;
+}
+function グループ解除(){
+  hideCtxMenu();
+  var 箱 = 段の箱();
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  for (var r = r1; r <= r2; r++) {
+    var n = (箱[r] || 1) - 1;
+    if (n <= 1) delete 箱[r]; else 箱[r] = n;
+  }
+  /* 解除したら 隠れたままに しない */
+  var h = sheets[activeSheet].hiddenRows || {};
+  for (var r2b = r1; r2b <= r2; r2b++) delete h[r2b];
+  sheets[activeSheet].hiddenRows = h;
+  render();
+  notify('まとめを 外しました');
+  return r2 - r1 + 1;
+}
+function 段を出す(段){
+  hideCtxMenu();
+  var 箱 = 段の箱();
+  var h = sheets[activeSheet].hiddenRows || {};
+  var 隠した = 0, 出した = 0;
+  var 鍵 = Object.keys(箱);
+  for (var i = 0; i < 鍵.length; i++) {
+    var r = parseInt(鍵[i], 10);
+    if ((箱[鍵[i]] || 1) > 段) { h[r] = true; 隠した++; }
+    else { delete h[r]; 出した++; }
+  }
+  sheets[activeSheet].hiddenRows = h;
+  render();
+  notify(段 + '段まで 出しました（隠した ' + 隠した + '行／出した ' + 出した + '行）');
+  return 隠した;
+}
+function アウトラインの窓を開く(){
+  /* ★1つの ボタンで 全部 出来るように する★（Excelの アウトラインの 中身と 同じ） */
+  hideCtxMenu();
+  var 箱 = 段の箱();
+  var 段あり = Object.keys(箱).length;
+  var 出 = [
+    { 名: '選んだ 行を まとめる', やる: 'グループ化()' },
+    { 名: 'まとめを 外す', やる: 'グループ解除()' },
+    { 名: '1段だけ 出す（たたむ）', やる: '段を出す(1)' },
+    { 名: '2段まで 出す', やる: '段を出す(2)' },
+    { 名: '3段まで 出す（ぜんぶ）', やる: '段を出す(3)' },
+  ];
+  var h = '<div style="font-size:12px;color:#7A9A87;margin-bottom:6px;">'
+    + (段あり ? ('今 まとめてある 行 … ' + 段あり + '行') : 'まだ まとめていません') + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px;">';
+  for (var i = 0; i < 出.length; i++) {
+    h += '<button type="button" class="outline-b" onclick="' + 出[i].やる + ';アウトラインを閉じる()"'
+      + ' style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+      + 'border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + 出[i].名 + '</button>';
+  }
+  h += '</div>';
+  document.getElementById('funcTitle').textContent = 'アウトライン';
+  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 出.length;
+}
+function アウトラインを閉じる(){ 関数の窓を閉じる(); }
+
+/* ★スライサー（挿入→フィルター→スライサー）★ 2026-08-30
+ *   ★未測定★＝実Excelの スライサーは COM から 作れず、形・大きさが 読めなかった。
+ *   ⇒ ★見た目は うちの決め★。働きは 実Excelと 同じ（押した 値だけ 見せる）。
+ *   絞りは ★テーブルの 見出しの ▼ と 同じ 道★を 使う（同じ物を 2つ 持たない）。 */
+var スライサーの決め = null;   /* { 表, 列, 選び:{値:true} } */
+function スライサーを開く(){
+  hideCtxMenu();
+  var 表 = 今いる表();
+  if (!表) { notify('★先に テーブルに してください★（挿入→テーブル ／ Ctrl+T）'); return 0; }
+  var c = selC1;
+  if (c < 表.c1 || c > 表.c2) c = 表.c1;
+  var data = sheets[activeSheet].data;
+  var get = function (r, cc) { return data[r + ',' + cc]; };
+  var rng = { r1: 表.r1, c1: 表.c1, r2: 表.集計行 ? 表.r2 - 1 : 表.r2, c2: 表.c2 };
+  var 値たち = GridFilter.values(get, rng, !!表.見出し行, c);
+  var 選び = {};
+  for (var i = 0; i < 値たち.length; i++) 選び[値たち[i]] = true;
+  スライサーの決め = { 表: 表, 列: c, 値たち: 値たち, 選び: 選び };
+  document.getElementById('slicerTitle').textContent =
+    表.列名 ? 表.列名[c - 表.c1] : cellAddr(表.r1, c);
+  スライサーを描く();
+  document.getElementById('slicerPanel').style.display = 'block';
+  return 値たち.length;
+}
+function スライサーを描く(){
+  var 体 = document.getElementById('slicerBody');
+  if (!体 || !スライサーの決め) return 0;
+  var d = スライサーの決め;
+  var h = '';
+  for (var i = 0; i < d.値たち.length; i++) {
+    var v = d.値たち[i];
+    var 選んだ = !!d.選び[v];
+    h += '<button type="button" class="slicer-b" data-v="' + _esc(v) + '"'
+      + ' onclick="スライサーを押す(this.getAttribute(\'data-v\'))"'
+      + ' style="display:block;width:100%;margin-bottom:4px;min-height:34px;padding:0 8px;'
+      + 'border:1px solid #C8ECD8;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;'
+      + 'text-align:left;background:' + (選んだ ? '#3D9E72' : '#ffffff') + ';color:'
+      + (選んだ ? '#ffffff' : '#333333') + ';">' + _esc(v === '' ? '（空）' : v) + '</button>';
+  }
+  体.innerHTML = h || '<div style="color:#7A9A87;">中身が ありません</div>';
+  return d.値たち.length;
+}
+function スライサーを押す(値){
+  if (!スライサーの決め) return 0;
+  var d = スライサーの決め;
+  d.選び[値] = !d.選び[値];
+  var 数 = 0;
+  for (var k in d.選び) if (d.選び[k]) 数++;
+  if (!数) { d.選び[値] = true; notify('★1つも 選ばないと 全部 消えてしまいます★'); return 0; }
+  スライサーを描く();
+  return スライサーを効かせる();
+}
+function スライサーを全部に(){
+  if (!スライサーの決め) return 0;
+  var d = スライサーの決め;
+  for (var i = 0; i < d.値たち.length; i++) d.選び[d.値たち[i]] = true;
+  スライサーを描く();
+  return スライサーを効かせる();
+}
+function スライサーを効かせる(){
+  var d = スライサーの決め;
+  if (!d) return 0;
+  var sh = sheets[activeSheet], data = sh.data;
+  var get = function (r, cc) { return data[r + ',' + cc]; };
+  var rng = { r1: d.表.r1, c1: d.表.c1, r2: d.表.集計行 ? d.表.r2 - 1 : d.表.r2, c2: d.表.c2 };
+  var res = GridFilter.byValues(get, rng, !!d.表.見出し行, d.列, d.選び);
+  sh.filterHidden = {};
+  for (var j = 0; j < res.hide.length; j++) sh.filterHidden[res.hide[j]] = true;
+  前の絞り = { 表: d.表, 列: d.列, 残す: d.選び };
+  render();
+  return res.keep.length;
+}
+function スライサーを消す(){
+  スライサーの決め = null;
+  var el = document.getElementById('slicerPanel');
+  if (el) el.style.display = 'none';
+  clearFilter();
+  return 1;
 }
 
 /* ★ピボットテーブル（挿入→ピボットテーブル）★ 2026-08-30
