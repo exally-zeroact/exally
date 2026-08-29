@@ -33,6 +33,7 @@ const FILES = [
   ['sparkline.test.mjs', '--self-test'],     /* ★スパークライン＝実測（飾りなし・勝敗だけマイナス別・縦軸は1本ごと・空は隙間）★ */
   ['formula-bar-type.test.mjs', '--self-test'], /* ★数を入れると 数式バーが落ちて セル選択そのものが 出来なくなっていた★ */
   ['table.test.mjs', '--self-test'],         /* ★テーブル(Ctrl+T)＝実測／行列を足しても 付箋・リンク・表が 置いていかれない★ */
+  ['symbol-form.test.mjs', '--self-test'],   /* ★記号と特殊文字（並びは未測定＝理由つき）／フォーム（実測＝まわりの塊）★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

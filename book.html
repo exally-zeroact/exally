@@ -1304,64 +1304,65 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=06b75940"></script>
+<script src="hyperformula.full.min.js?v=dedcde11"></script>
 
-<script src="exally-formula.js?v=06b75940"></script>
+<script src="exally-formula.js?v=dedcde11"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=06b75940"></script>
+<script src="js/file-out.js?v=dedcde11"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=06b75940"></script>
-<script src="lib/grid-xlsx.js?v=06b75940"></script>
+<script src="lib/typed-value.js?v=dedcde11"></script>
+<script src="lib/grid-xlsx.js?v=dedcde11"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=06b75940"></script>
-<script src="lib/autosum.js?v=06b75940"></script>
-<script src="lib/grid-sort.js?v=06b75940"></script>
-<script src="lib/grid-filter.js?v=06b75940"></script>
-<script src="lib/grid-find.js?v=06b75940"></script>
-<script src="lib/grid-print.js?v=06b75940"></script>
-<script src="lib/ai-reason.js?v=06b75940"></script>
-<script src="lib/menu-place.js?v=06b75940"></script>
-<script src="lib/grid-stats.js?v=06b75940"></script>
-<script src="lib/grid-valid.js?v=06b75940"></script>
-<script src="lib/cond-format.js?v=06b75940"></script>
-<script src="lib/ref-graph.js?v=06b75940"></script>
-<script src="lib/shindan.js?v=06b75940"></script>
+  <script src="lib/grid-refedit.js?v=dedcde11"></script>
+<script src="lib/autosum.js?v=dedcde11"></script>
+<script src="lib/grid-sort.js?v=dedcde11"></script>
+<script src="lib/grid-filter.js?v=dedcde11"></script>
+<script src="lib/grid-find.js?v=dedcde11"></script>
+<script src="lib/grid-print.js?v=dedcde11"></script>
+<script src="lib/ai-reason.js?v=dedcde11"></script>
+<script src="lib/menu-place.js?v=dedcde11"></script>
+<script src="lib/grid-stats.js?v=dedcde11"></script>
+<script src="lib/grid-valid.js?v=dedcde11"></script>
+<script src="lib/cond-format.js?v=dedcde11"></script>
+<script src="lib/ref-graph.js?v=dedcde11"></script>
+<script src="lib/shindan.js?v=dedcde11"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=06b75940"></script>
-<script src="lib/vba-mikata.js?v=06b75940"></script>
-<script src="lib/vba-tejun.js?v=06b75940"></script>
-<script src="lib/rireki.js?v=06b75940"></script>
-<script src="lib/chizu.js?v=06b75940"></script>
-<script src="lib/horu.js?v=06b75940"></script>
-<script src="lib/excel-version.js?v=06b75940"></script>
-<script src="lib/teian.js?v=06b75940"></script>
-<script src="lib/kikan.js?v=06b75940"></script>
-<script src="lib/recipe.js?v=06b75940"></script>
-<script src="lib/kirikae.js?v=06b75940"></script>
-<script src="js/recipe-store.js?v=06b75940"></script>
-<script src="js/rireki-store.js?v=06b75940"></script>
-<script src="lib/excel-version.js?v=06b75940"></script>
+<script src="lib/vba.js?v=dedcde11"></script>
+<script src="lib/vba-mikata.js?v=dedcde11"></script>
+<script src="lib/vba-tejun.js?v=dedcde11"></script>
+<script src="lib/rireki.js?v=dedcde11"></script>
+<script src="lib/chizu.js?v=dedcde11"></script>
+<script src="lib/horu.js?v=dedcde11"></script>
+<script src="lib/excel-version.js?v=dedcde11"></script>
+<script src="lib/teian.js?v=dedcde11"></script>
+<script src="lib/kikan.js?v=dedcde11"></script>
+<script src="lib/recipe.js?v=dedcde11"></script>
+<script src="lib/kirikae.js?v=dedcde11"></script>
+<script src="js/recipe-store.js?v=dedcde11"></script>
+<script src="js/rireki-store.js?v=dedcde11"></script>
+<script src="lib/excel-version.js?v=dedcde11"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=06b75940">
-<script src="lib/named-ranges.js?v=06b75940"></script>
-<script src="lib/cell-styles.js?v=06b75940"></script>
-<script src="lib/chart.js?v=06b75940"></script>
-<script src="lib/sparkline.js?v=06b75940"></script>
-<script src="lib/table.js?v=06b75940"></script>
-<script src="lib/ribbon-spec.js?v=06b75940"></script>
-<script src="lib/ribbon-actions.js?v=06b75940"></script>
-<script src="lib/ribbon.js?v=06b75940"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=dedcde11">
+<script src="lib/named-ranges.js?v=dedcde11"></script>
+<script src="lib/cell-styles.js?v=dedcde11"></script>
+<script src="lib/chart.js?v=dedcde11"></script>
+<script src="lib/sparkline.js?v=dedcde11"></script>
+<script src="lib/table.js?v=dedcde11"></script>
+<script src="lib/symbols.js?v=dedcde11"></script>
+<script src="lib/ribbon-spec.js?v=dedcde11"></script>
+<script src="lib/ribbon-actions.js?v=dedcde11"></script>
+<script src="lib/ribbon.js?v=dedcde11"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=06b75940"></script>
-<script src="js/exally-login.js?v=06b75940"></script>
-<script src="js/auth.js?v=06b75940"></script>
+<script src="js/supa-config.js?v=dedcde11"></script>
+<script src="js/exally-login.js?v=dedcde11"></script>
+<script src="js/auth.js?v=dedcde11"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4172,6 +4173,56 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      実Excel実測＝名前は テーブル1／見出し行あり／自動フィルタあり／しま（行）あり／集計行なし -->
 <!-- ★見出しの ▼（自動フィルタ）★ 2026-08-30
      実Excel実測＝テーブルは ShowAutoFilter=True（見出しに ▼ が 出る） -->
+<!-- ★記号と特殊文字（挿入→記号と特殊文字）★ 2026-08-30
+     ★未測定★＝実Excel の 窓に 並ぶ 字は COM から 読めない。並びは うちの決め（lib/symbols.js に 理由） -->
+<!-- ★フォーム（挿入→テーブル→フォーム）★ 2026-08-30
+     実測＝実Excel の ShowDataForm は 「まわりの 塊（CurrentRegion）」を 相手に する。
+     ★未測定★＝窓の 中の 並び・列の 上限は COM から 読めない -->
+<div id="formOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;display:flex;align-items:baseline;gap:10px;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">フォーム</div>
+      <div style="font-size:12px;color:#333333;" id="formCount">1 / 1</div>
+    </div>
+    <div id="formBody" style="padding:12px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;min-height:100px;"></div>
+    <div id="formWhy" style="padding:0 18px;font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+    <div style="padding:8px 18px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="フォームを動かす(-1)" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">前へ</button>
+      <button onclick="フォームを動かす(1)" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">次へ</button>
+      <button onclick="フォームで足す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">新しく 足す</button>
+      <button onclick="フォームで消す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#C0392B;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">この行を 消す</button>
+    </div>
+    <div style="padding:0 18px 12px;font-size:12px;color:#7A9A87;line-height:1.6;">
+      打った字は ★前へ／次へ／閉じる の 時に 入ります★。
+    </div>
+    <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
+      <button onclick="フォームを閉じる()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">閉じて 入れる</button>
+    </div>
+  </div>
+</div>
+<div id="symOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:520px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">記号と特殊文字</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">押すと <span id="symWhere">A1</span> に 入ります</div>
+    </div>
+    <div style="padding:8px 18px 0;display:flex;gap:8px;">
+      <button id="symTab1" onclick="記号の面を切る('記号')" style="min-height:38px;padding:0 12px;border:1px solid #C8ECD8;background:#3D9E72;color:#ffffff;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">記号</button>
+      <button id="symTab2" onclick="記号の面を切る('特殊')" style="min-height:38px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">特殊文字</button>
+    </div>
+    <div id="symBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;min-height:120px;"></div>
+    <div style="padding:6px 18px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:#333333;">文字コード</span>
+      <input id="symCode" type="text" placeholder="U+00A9" oninput="記号のコードを見る()" style="width:120px;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;">
+      <span id="symPreview" style="font-size:20px;min-width:1.5em;"></span>
+      <button onclick="記号のコードを入れる()" style="min-height:38px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">これを 入れる</button>
+    </div>
+    <div id="symWhy" style="padding:2px 18px;font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+    <div style="padding:8px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="記号の窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
 <div id="headFilterOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;max-height:82vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -8007,6 +8058,218 @@ function 見出しから並べ替え(dir){
   sel(先頭, _絞る列, _絞る表.集計行 ? _絞る表.r2 - 1 : _絞る表.r2, _絞る列);
   sortRange(dir);                      /* ★並べ替えの 正本は 1つ（同じ物を 2つ 持たない）★ */
   return 1;
+}
+
+/* ★記号と特殊文字（挿入→記号と特殊文字）★ 2026-08-30
+ *   ★未測定★＝実Excel の 窓に 並ぶ 字は COM から 読めない。並びは lib/symbols.js（理由つき）。
+ *   ★押した字は そのセルの 後ろに 足す★（実Excel も カーソルの 所に 入れる） */
+/* ★フォーム（挿入→テーブル→フォーム）★ 2026-08-30
+ *   ★実測★ 実Excel の ShowDataForm は「まわりの 塊（CurrentRegion）」を 相手に する
+ *     （A2 を 選んで CurrentRegion = A1:B3＝見出しも 入る）。うちも 同じ 見立て。
+ *   ★未測定★ 窓の 中の 並び方・列の 上限は COM から 読めない。
+ *   ★alert / prompt / confirm は 使わない★ */
+var _フォーム = null;   /* { r1,c1,r2,c2, 見出し[], 今の行 } */
+
+function フォームの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('formOverlay');
+  if (!ov) return 0;
+  var t = 今いる表();
+  var 場所, 見出し;
+  if (t) {
+    場所 = { r1: t.r1, c1: t.c1, r2: t.集計行 ? t.r2 - 1 : t.r2, c2: t.c2 };
+    見出し = t.列名.slice();
+  } else {
+    場所 = 表のまわりを当てる(selR1, selC1);
+    見出し = [];
+    for (var c = 場所.c1; c <= 場所.c2; c++) {
+      var cell = sheets[activeSheet].data[場所.r1 + ',' + c];
+      var v = cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '';
+      見出し.push((v === '' || v === undefined || v === null) ? cellAddr(場所.r1, c) : String(v));
+    }
+  }
+  var 中身の上 = 場所.r1 + 1;                 /* 1行目は 見出し（実Excelの 見立てと 同じ） */
+  if (中身の上 > 場所.r2) {
+    notify('★中身の 行が ありません★（見出しの 下に 1行 以上 要ります）');
+    return 0;
+  }
+  _フォーム = { r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2, 見出し: 見出し, 今の行: 中身の上 };
+  フォームを描く();
+  ov.style.display = 'flex';
+  return 1;
+}
+function フォームを描く(){
+  var f = _フォーム; if (!f) return;
+  var 体 = document.getElementById('formBody');
+  var h = '';
+  for (var i = 0; i < f.見出し.length; i++) {
+    var c = f.c1 + i;
+    var cell = sheets[activeSheet].data[f.今の行 + ',' + c];
+    var v = cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
+    h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
+      + '<span style="min-width:6em;font-size:12px;color:#7A9A87;">' + String(f.見出し[i]).replace(/</g, '&lt;') + '</span>'
+      + '<input type="text" class="form-v" data-c="' + c + '" value="' + String(v).replace(/"/g, '&quot;') + '"'
+      + ' style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">'
+      + '</div>';
+  }
+  体.innerHTML = h;
+  document.getElementById('formCount').textContent =
+    (f.今の行 - f.r1) + ' / ' + (f.r2 - f.r1);
+  document.getElementById('formWhy').textContent = '';
+}
+/* ★打った字を セルに 入れる★（前へ／次へ／閉じる の 時） */
+function フォームを書き込む(){
+  var f = _フォーム; if (!f) return 0;
+  var 箱 = document.querySelectorAll('#formBody .form-v');
+  var 直した = 0;
+  for (var i = 0; i < 箱.length; i++) {
+    var c = parseInt(箱[i].getAttribute('data-c'), 10);
+    var cell = sheets[activeSheet].data[f.今の行 + ',' + c];
+    var 今 = cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
+    if (箱[i].value !== 今) { setCell(f.今の行, c, 箱[i].value); 直した++; }
+  }
+  return 直した;
+}
+function フォームを動かす(向き){
+  var f = _フォーム; if (!f) return 0;
+  フォームを書き込む();
+  var 次 = f.今の行 + 向き;
+  if (次 < f.r1 + 1 || 次 > f.r2) {
+    document.getElementById('formWhy').textContent =
+      向き > 0 ? '★これが 最後の 行です★' : '★これが 最初の 行です★';
+    return 0;
+  }
+  f.今の行 = 次;
+  フォームを描く();
+  render();
+  return 1;
+}
+function フォームで足す(){
+  var f = _フォーム; if (!f) return 0;
+  フォームを書き込む();
+  f.r2 = f.r2 + 1;
+  f.今の行 = f.r2;
+  /* ★表が 在れば 表の 下の端も 伸ばす★（表と 中身が ずれない） */
+  var t = 表の箱();
+  for (var i = 0; i < t.length; i++) {
+    if (t[i].c1 === f.c1 && t[i].r1 === f.r1) t[i].r2 = t[i].r2 + 1;
+  }
+  フォームを描く();
+  render();
+  return 1;
+}
+function フォームで消す(){
+  var f = _フォーム; if (!f) return 0;
+  if (f.r2 <= f.r1 + 1) {
+    document.getElementById('formWhy').textContent = '★最後の 1行は 消せません★';
+    return 0;
+  }
+  /* 下の行を 1つずつ 上へ 詰める（★表の 外は 触らない★） */
+  for (var r = f.今の行; r < f.r2; r++) {
+    for (var c = f.c1; c <= f.c2; c++) {
+      var 下 = sheets[activeSheet].data[(r + 1) + ',' + c];
+      if (下 === undefined) delete sheets[activeSheet].data[r + ',' + c];
+      else setCell(r, c, 下.f !== undefined && 下.f !== '' ? 下.f : 下.v, true);
+    }
+  }
+  for (var c2 = f.c1; c2 <= f.c2; c2++) delete sheets[activeSheet].data[f.r2 + ',' + c2];
+  f.r2 = f.r2 - 1;
+  var t2 = 表の箱();
+  for (var j = 0; j < t2.length; j++) {
+    if (t2[j].c1 === f.c1 && t2[j].r1 === f.r1) t2[j].r2 = t2[j].r2 - 1;
+  }
+  if (f.今の行 > f.r2) f.今の行 = f.r2;
+  フォームを描く();
+  render();
+  notify('1行 消しました');
+  return 1;
+}
+function フォームを閉じる(){
+  フォームを書き込む();
+  _フォーム = null;
+  var ov = document.getElementById('formOverlay');
+  if (ov) ov.style.display = 'none';
+  render(); updateBar();
+  return 1;
+}
+
+function 記号の窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('symOverlay');
+  if (!ov) return 0;
+  document.getElementById('symWhere').textContent = cellAddr(selR1, selC1);
+  document.getElementById('symCode').value = '';
+  document.getElementById('symPreview').textContent = '';
+  document.getElementById('symWhy').textContent = '';
+  記号の面を切る('記号');
+  ov.style.display = 'flex';
+  return 1;
+}
+function 記号の窓を閉じる(){
+  var ov = document.getElementById('symOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 記号の面を切る(どっち){
+  var 体 = document.getElementById('symBody');
+  var t1 = document.getElementById('symTab1'), t2 = document.getElementById('symTab2');
+  var 選び = function (el, on) {
+    el.style.background = on ? '#3D9E72' : '#ffffff';
+    el.style.color = on ? '#ffffff' : '#333333';
+  };
+  選び(t1, どっち === '記号'); 選び(t2, どっち !== '記号');
+  var h = '';
+  if (どっち === '記号') {
+    for (var g = 0; g < Symbols.記号.length; g++) {
+      var 組 = Symbols.記号[g];
+      h += '<div style="margin:6px 0 2px;font-size:12px;color:#7A9A87;">' + 組.組 + '</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      for (var i = 0; i < 組.字.length; i++) {
+        h += 記号のボタン(組.字[i], 組.字[i]);
+      }
+      h += '</div>';
+    }
+  } else {
+    h += '<div style="display:flex;flex-direction:column;gap:4px;">';
+    for (var j = 0; j < Symbols.特殊文字.length; j++) {
+      var t = Symbols.特殊文字[j];
+      h += '<div style="display:flex;align-items:center;gap:10px;">'
+        + 記号のボタン(t.字, t.名)
+        + '<span style="font-size:13px;">' + t.名 + '</span>'
+        + '<span style="font-size:11px;color:#7A9A87;">' + Symbols.字からコード(t.字) + '</span>'
+        + '</div>';
+    }
+    h += '</div>';
+  }
+  体.innerHTML = h;
+  return どっち;
+}
+function 記号のボタン(字, 題){
+  return '<button type="button" class="sym-b" data-c="' + String(字).replace(/"/g, '&quot;') + '"'
+    + ' title="' + String(題).replace(/"/g, '&quot;') + '"'
+    + ' onclick="記号を入れる(this.getAttribute(\'data-c\'))"'
+    + ' style="min-width:40px;min-height:40px;font-size:18px;border:1px solid #C8ECD8;background:#ffffff;'
+    + 'color:#333333;border-radius:8px;font-family:inherit;cursor:pointer;">' + 字 + '</button>';
+}
+function 記号を入れる(字){
+  if (!字) return 0;
+  var cell = sheets[activeSheet].data[selR1 + ',' + selC1];
+  var 今 = cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v || '')) : '';
+  setCell(selR1, selC1, 今 + 字);
+  render(); updateBar();
+  notify('「' + 字 + '」を 入れました');
+  return 1;
+}
+function 記号のコードを見る(){
+  var 字 = Symbols.コードから字(document.getElementById('symCode').value);
+  document.getElementById('symPreview').textContent = 字 || '';
+  document.getElementById('symWhy').textContent =
+    (document.getElementById('symCode').value && !字) ? '★その 文字コードは 読めません★（例 U+00A9）' : '';
+  return 字;
+}
+function 記号のコードを入れる(){
+  var 字 = 記号のコードを見る();
+  if (!字) { document.getElementById('symWhy').textContent = '★その 文字コードは 読めません★（例 U+00A9）'; return 0; }
+  return 記号を入れる(字);
 }
 
 function 表の箱(){
