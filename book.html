@@ -1304,65 +1304,65 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=59443765"></script>
+<script src="hyperformula.full.min.js?v=960276c9"></script>
 
-<script src="exally-formula.js?v=59443765"></script>
+<script src="exally-formula.js?v=960276c9"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=59443765"></script>
+<script src="js/file-out.js?v=960276c9"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=59443765"></script>
-<script src="lib/grid-xlsx.js?v=59443765"></script>
+<script src="lib/typed-value.js?v=960276c9"></script>
+<script src="lib/grid-xlsx.js?v=960276c9"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=59443765"></script>
-<script src="lib/autosum.js?v=59443765"></script>
-<script src="lib/grid-sort.js?v=59443765"></script>
-<script src="lib/grid-filter.js?v=59443765"></script>
-<script src="lib/grid-find.js?v=59443765"></script>
-<script src="lib/grid-print.js?v=59443765"></script>
-<script src="lib/ai-reason.js?v=59443765"></script>
-<script src="lib/menu-place.js?v=59443765"></script>
-<script src="lib/grid-stats.js?v=59443765"></script>
-<script src="lib/grid-valid.js?v=59443765"></script>
-<script src="lib/cond-format.js?v=59443765"></script>
-<script src="lib/ref-graph.js?v=59443765"></script>
-<script src="lib/shindan.js?v=59443765"></script>
+  <script src="lib/grid-refedit.js?v=960276c9"></script>
+<script src="lib/autosum.js?v=960276c9"></script>
+<script src="lib/grid-sort.js?v=960276c9"></script>
+<script src="lib/grid-filter.js?v=960276c9"></script>
+<script src="lib/grid-find.js?v=960276c9"></script>
+<script src="lib/grid-print.js?v=960276c9"></script>
+<script src="lib/ai-reason.js?v=960276c9"></script>
+<script src="lib/menu-place.js?v=960276c9"></script>
+<script src="lib/grid-stats.js?v=960276c9"></script>
+<script src="lib/grid-valid.js?v=960276c9"></script>
+<script src="lib/cond-format.js?v=960276c9"></script>
+<script src="lib/ref-graph.js?v=960276c9"></script>
+<script src="lib/shindan.js?v=960276c9"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=59443765"></script>
-<script src="lib/vba-mikata.js?v=59443765"></script>
-<script src="lib/vba-tejun.js?v=59443765"></script>
-<script src="lib/rireki.js?v=59443765"></script>
-<script src="lib/chizu.js?v=59443765"></script>
-<script src="lib/horu.js?v=59443765"></script>
-<script src="lib/excel-version.js?v=59443765"></script>
-<script src="lib/teian.js?v=59443765"></script>
-<script src="lib/kikan.js?v=59443765"></script>
-<script src="lib/recipe.js?v=59443765"></script>
-<script src="lib/kirikae.js?v=59443765"></script>
-<script src="js/recipe-store.js?v=59443765"></script>
-<script src="js/rireki-store.js?v=59443765"></script>
-<script src="lib/excel-version.js?v=59443765"></script>
+<script src="lib/vba.js?v=960276c9"></script>
+<script src="lib/vba-mikata.js?v=960276c9"></script>
+<script src="lib/vba-tejun.js?v=960276c9"></script>
+<script src="lib/rireki.js?v=960276c9"></script>
+<script src="lib/chizu.js?v=960276c9"></script>
+<script src="lib/horu.js?v=960276c9"></script>
+<script src="lib/excel-version.js?v=960276c9"></script>
+<script src="lib/teian.js?v=960276c9"></script>
+<script src="lib/kikan.js?v=960276c9"></script>
+<script src="lib/recipe.js?v=960276c9"></script>
+<script src="lib/kirikae.js?v=960276c9"></script>
+<script src="js/recipe-store.js?v=960276c9"></script>
+<script src="js/rireki-store.js?v=960276c9"></script>
+<script src="lib/excel-version.js?v=960276c9"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=59443765">
-<script src="lib/named-ranges.js?v=59443765"></script>
-<script src="lib/cell-styles.js?v=59443765"></script>
-<script src="lib/chart.js?v=59443765"></script>
-<script src="lib/sparkline.js?v=59443765"></script>
-<script src="lib/table.js?v=59443765"></script>
-<script src="lib/symbols.js?v=59443765"></script>
-<script src="lib/ribbon-spec.js?v=59443765"></script>
-<script src="lib/ribbon-actions.js?v=59443765"></script>
-<script src="lib/ribbon.js?v=59443765"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=960276c9">
+<script src="lib/named-ranges.js?v=960276c9"></script>
+<script src="lib/cell-styles.js?v=960276c9"></script>
+<script src="lib/chart.js?v=960276c9"></script>
+<script src="lib/sparkline.js?v=960276c9"></script>
+<script src="lib/table.js?v=960276c9"></script>
+<script src="lib/symbols.js?v=960276c9"></script>
+<script src="lib/ribbon-spec.js?v=960276c9"></script>
+<script src="lib/ribbon-actions.js?v=960276c9"></script>
+<script src="lib/ribbon.js?v=960276c9"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=59443765"></script>
-<script src="js/exally-login.js?v=59443765"></script>
-<script src="js/auth.js?v=59443765"></script>
+<script src="js/supa-config.js?v=960276c9"></script>
+<script src="js/exally-login.js?v=960276c9"></script>
+<script src="js/auth.js?v=960276c9"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4185,6 +4185,95 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
      実Excel実測＝既定は 自動（-4105）。手動（-4135）／データテーブル以外 自動（2）の 3つ -->
 <!-- ★数式の 検証（数式→ワークシート分析）★ 2026-08-30
      実測＝実Excel の Evaluate は「=」が 有っても 無くても 同じ答え -->
+<!-- ★ズーム（表示→ズーム）★ 2026-08-30
+     実Excel実測＝10〜400 が 入る（5 も 401 も 入らない）／既定は 100 -->
+<div id="zoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ズーム</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
+      <div id="zoomBtns" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>好きな 倍率</span>
+        <input id="zoomVal" type="number" min="10" max="400" step="5" style="width:90px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>％</span>
+      </div>
+      <div id="zoomWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★実Excelと 同じで 10％〜400％まで★（それより 外は 入りません）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="選択範囲に合わせる()" style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">選んだ所に 合わせる</button>
+      <button onclick="ズームの窓を閉じる()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ズームを決めて閉じる()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
+<!-- ★ブックの保護（校閲→保護）★ 2026-08-30
+     実Excel実測＝既定は 構造=False。守ると ★シートが 足せない★ -->
+<div id="bookProtOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ブックの 保護</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="bookProtOn" style="width:20px;height:20px;">
+        <span>シートの ★足す・消す・名前を変える★ を できなくする</span>
+      </label>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
+        ★実Excelを 測った通り★＝守ると シートが 足せなくなります。
+        セルの 中身は これでは 守れません（それは「シートの保護」です）。<br>
+        ★合い言葉（パスワード）は 付けられません★＝ブラウザの 中だけの 守りなので、
+        付けても ★守れているふり★に なるためです。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ブックの保護を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ブックの保護を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
+<!-- ★範囲の編集を許可する（校閲→保護）★ 2026-08-30
+     実Excel実測＝名前と 範囲を 持つ（既定 0個） -->
+<div id="editRangeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">範囲の 編集を 許可する</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">シートを 守っていても ★ここだけは 書ける★ 所を 決めます</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:3.5em;">名前</span>
+        <input id="erName" type="text" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:3.5em;">範囲</span>
+        <input id="erRange" type="text" style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+        <button onclick="範囲の編集を足す()" style="min-height:40px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">足す</button>
+      </div>
+      <div id="erWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div id="erList" style="font-size:12px;color:#333333;line-height:1.8;"></div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="範囲の編集を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
+<!-- ★ブックの統計情報（校閲→文章校正）★ 2026-08-30 -->
+<div id="statsOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ブックの 数</div>
+    </div>
+    <div id="statsBody" style="padding:12px 18px;font-size:13px;color:#333333;line-height:2;overflow:auto;"></div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ブックの数を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+</div>
 <div id="evalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -7058,7 +7147,9 @@ function このシートを再計算(){
 
 /* ★ズーム★（Excelの 100% / 拡大 / 縮小）*/
 function ズームを決める(倍){
-  scale = Math.max(0.25, Math.min(4, 倍));
+  /* ★実Excel実測＝10％〜400％まで（5 も 401 も 入らない）★
+     前は 25％〜400％にしていた＝下が 実物と 違っていた（2026-08-30 実測で 直した） */
+  scale = Math.max(0.10, Math.min(4, 倍));
   resize(); render();
 }
 function ズーム100(){ ズームを決める(1); }
@@ -7510,6 +7601,9 @@ function セルはロックされているか(r, c){
 /* ★書いてよいか★＝保護中で ロックされていたら 断る */
 function ここに書けるか(r, c){
   if (!このシートは保護中()) return true;
+  /* ★「範囲の編集を許可する」で 許した所は 守っていても 書ける★（実Excelと 同じ）
+     2026-08-30 実測＝AllowEditRanges は 名前と 範囲を 持つ（既定 0個）。 */
+  if (typeof 編集を許された所か === 'function' && 編集を許された所か(r, c)) return true;
   return !セルはロックされているか(r, c);
 }
 function シートを保護する(){
@@ -8554,6 +8648,220 @@ function ウォッチを描く(){
   return ウォッチの箱.length;
 }
 
+/* ★ズーム（表示→ズーム）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ 10〜400 が 入る（★5 も 401 も 入らない★）／既定は 100
+ *   選択範囲に 合わせた時の 倍率は ★窓の 大きさで 変わる★（実測 A1:E10 で 258）＝
+ *   そこは 数を 真似ずに ★同じ 考え方（入る 大きさに 合わせる）★で 出す。 */
+var ズームの下 = 10, ズームの上 = 400;    /* 実測 */
+function ズームの窓を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('zoomOverlay');
+  if (!ov) return 0;
+  var h = '';
+  var 並び = [25, 50, 75, 100, 200, 400];
+  for (var i = 0; i < 並び.length; i++) {
+    h += '<button type="button" class="zoom-b" data-z="' + 並び[i] + '"'
+      + ' onclick="ズームを決めて閉じる(' + 並び[i] + ')"'
+      + ' style="min-height:40px;padding:0 14px;border:1px solid #C8ECD8;background:'
+      + (Math.round(scale * 100) === 並び[i] ? '#3D9E72' : '#ffffff') + ';color:'
+      + (Math.round(scale * 100) === 並び[i] ? '#ffffff' : '#333333')
+      + ';border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">' + 並び[i] + '％</button>';
+  }
+  document.getElementById('zoomBtns').innerHTML = h;
+  document.getElementById('zoomVal').value = Math.round(scale * 100);
+  document.getElementById('zoomWhy').textContent = '';
+  ov.style.display = 'flex';
+  return 1;
+}
+function ズームの窓を閉じる(){
+  var ov = document.getElementById('zoomOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function ズームを決めて閉じる(倍){
+  var v = (倍 === undefined) ? Number(document.getElementById('zoomVal').value) : 倍;
+  if (!isFinite(v) || v < ズームの下 || v > ズームの上) {
+    document.getElementById('zoomWhy').textContent =
+      '★' + ズームの下 + '％から ' + ズームの上 + '％までです★（実Excelと 同じ）';
+    return 0;
+  }
+  ズームを決める(v / 100);
+  ズームの窓を閉じる();
+  notify(Math.round(v) + '％に しました');
+  return v;
+}
+/* ★選んだ所に 合わせる★＝選んだ 四角が 画面に ちょうど 入る 倍率 */
+function 選択範囲に合わせる(){
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  var s0 = sheets[activeSheet];
+  var 幅 = 0, 高 = 0;
+  for (var c = c1; c <= c2; c++) 幅 += (s0.colW[c] || COL_W);
+  for (var r = r1; r <= r2; r++) 高 += (s0.rowH[r] || ROW_H);
+  if (幅 <= 0 || 高 <= 0) return 0;
+  var 使える幅 = Math.max(1, wrapW - HDR_W - 8);
+  var 使える高 = Math.max(1, wrapH - HDR_H - 8);
+  var 倍 = Math.min(使える幅 / 幅, 使える高 / 高) * 100;
+  倍 = Math.max(ズームの下, Math.min(ズームの上, Math.floor(倍)));
+  ズームを決める(倍 / 100);
+  ズームの窓を閉じる();
+  notify('選んだ所に 合わせて ' + 倍 + '％に しました');
+  return 倍;
+}
+
+/* ★ブックの保護（校閲→保護）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ 既定は 構造=False。守ると ★シートが 足せない★・外すと 足せる。
+ *   ★合い言葉は 付けない★＝ブラウザの 中だけの 守りで 合い言葉を 出すと
+ *   ★守れているふり★に なる（人が 中を 見れば 外せる）。 */
+var ブックを守っている = false;
+function ブックの保護を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('bookProtOverlay');
+  if (!ov) return 0;
+  document.getElementById('bookProtOn').checked = ブックを守っている;
+  ov.style.display = 'flex';
+  return 1;
+}
+function ブックの保護を閉じる(){
+  var ov = document.getElementById('bookProtOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function ブックの保護を決める(){
+  ブックを守っている = document.getElementById('bookProtOn').checked;
+  ブックの保護を閉じる();
+  render();
+  notify(ブックを守っている ? '★シートの 足す・消す・名前を変える を 止めました★' : 'ブックの 守りを 外しました');
+  return ブックを守っている;
+}
+/* シートを いじる前に 通る 門（★黙って 素通りさせない★） */
+function ブックの守りに引っかかる(何を){
+  if (!ブックを守っている) return false;
+  notify('★ブックを 守っています★＝' + 何を + 'は できません（校閲→ブックの保護 で 外せます）');
+  return true;
+}
+
+/* ★範囲の編集を許可する（校閲→保護）★ 2026-08-30
+ *   ★実測★ 名前と 範囲を 持つ（既定 0個）。
+ *   ★シートを 守っていても ここだけは 書ける★ ＝ setCell の 門で 見る。 */
+function 編集を許す箱(){
+  var s0 = sheets[activeSheet];
+  if (!s0.allowEdit) s0.allowEdit = [];
+  return s0.allowEdit;
+}
+function 範囲の編集を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('editRangeOverlay');
+  if (!ov) return 0;
+  var r1 = Math.min(selR1, selR2), r2 = Math.max(selR1, selR2);
+  var c1 = Math.min(selC1, selC2), c2 = Math.max(selC1, selC2);
+  document.getElementById('erRange').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
+  document.getElementById('erName').value = 'はんい' + (編集を許す箱().length + 1);
+  document.getElementById('erWhy').textContent = '';
+  範囲の編集の一覧();
+  ov.style.display = 'flex';
+  return 1;
+}
+function 範囲の編集を閉じる(){
+  var ov = document.getElementById('editRangeOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 範囲の編集の一覧(){
+  var 箱 = 編集を許す箱();
+  var h = '';
+  if (!箱.length) h = '<div style="color:#7A9A87;">まだ 1つも ありません</div>';
+  for (var i = 0; i < 箱.length; i++) {
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
+      + '<span style="flex:1;">' + _esc(箱[i].名) + ' … ' + _esc(箱[i].範囲) + '</span>'
+      + '<button onclick="範囲の編集を消す(' + i + ')" style="min-height:30px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">消す</button>'
+      + '</div>';
+  }
+  document.getElementById('erList').innerHTML = h;
+  return 箱.length;
+}
+function 範囲の編集を足す(){
+  var 名 = String(document.getElementById('erName').value || '').trim();
+  var 範囲 = String(document.getElementById('erRange').value || '').trim().toUpperCase();
+  var 欄 = document.getElementById('erWhy');
+  if (!名) { 欄.textContent = '名前を 入れてください'; return 0; }
+  var 場所 = 表の範囲を読む(範囲);
+  if (!場所) { 欄.textContent = '範囲は A1:C4 の 形で 入れてください'; return 0; }
+  var 箱 = 編集を許す箱();
+  for (var i = 0; i < 箱.length; i++) if (箱[i].名 === 名) { 欄.textContent = '★その 名前は もう 在ります★'; return 0; }
+  箱.push({ 名: 名, 範囲: 範囲, r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2 });
+  欄.textContent = '';
+  document.getElementById('erName').value = 'はんい' + (箱.length + 1);
+  範囲の編集の一覧();
+  notify('「' + 名 + '」を 足しました');
+  return 箱.length;
+}
+function 範囲の編集を消す(i){
+  var 箱 = 編集を許す箱();
+  if (!(i >= 0 && i < 箱.length)) return 0;
+  var 名 = 箱[i].名;
+  箱.splice(i, 1);
+  範囲の編集の一覧();
+  notify('「' + 名 + '」を 消しました');
+  return 箱.length;
+}
+/* ここは 守っていても 書いてよいか */
+function 編集を許された所か(r, c){
+  var 箱 = sheets[activeSheet].allowEdit;
+  if (!箱 || !箱.length) return false;
+  for (var i = 0; i < 箱.length; i++) {
+    var a = 箱[i];
+    if (r >= a.r1 && r <= a.r2 && c >= a.c1 && c <= a.c2) return true;
+  }
+  return false;
+}
+
+/* ★ブックの統計情報（校閲→文章校正）★ 2026-08-30
+ *   ★実測（実Excel 16.0）★ シート数／中身の在るセル／式／字／数 を 数える。
+ *   ★数えた物だけ 出す★（Excelの 窓に 在る「単語数」は 表計算では 意味が 変わるので 出さない）。 */
+function ブックの数を数える(){
+  var 出 = { シート: sheets.length, セル: 0, 式: 0, 字: 0, 数: 0, 文字数: 0, 付箋: 0, リンク: 0 };
+  for (var i = 0; i < sheets.length; i++) {
+    var d = sheets[i].data, 鍵 = Object.keys(d);
+    for (var j = 0; j < 鍵.length; j++) {
+      var cell = d[鍵[j]];
+      if (!cell) continue;
+      var v = (cell.d !== undefined && cell.d !== '') ? cell.d : cell.v;
+      if (v === '' || v === undefined || v === null) continue;
+      出.セル++;
+      出.文字数 += String(v).length;
+      if (typeof cell.f === 'string' && cell.f.charAt(0) === '=') 出.式++;
+      else if (typeof v === 'number' || /^-?[0-9,.]+$/.test(String(v))) 出.数++;
+      else 出.字++;
+    }
+    if (sheets[i].comments) 出.付箋 += Object.keys(sheets[i].comments).length;
+    if (sheets[i].links) 出.リンク += Object.keys(sheets[i].links).length;
+  }
+  return 出;
+}
+function ブックの数を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('statsOverlay');
+  if (!ov) return 0;
+  var n = ブックの数を数える();
+  var 行 = [
+    ['シートの 数', n.シート], ['中身の 在るセル', n.セル], ['　うち 式', n.式],
+    ['　うち 数', n.数], ['　うち 字', n.字], ['字の 数（ぜんぶ）', n.文字数],
+    ['付箋', n.付箋], ['リンク', n.リンク],
+  ];
+  var h = '';
+  for (var i = 0; i < 行.length; i++) {
+    h += '<div style="display:flex;"><span style="flex:1;">' + 行[i][0] + '</span>'
+      + '<b>' + String(行[i][1]) + '</b></div>';
+  }
+  h += '<div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">'
+    + '★数えたのは 中身の 在るセルだけ★です（空のセルは 数えません）。</div>';
+  document.getElementById('statsBody').innerHTML = h;
+  ov.style.display = 'flex';
+  return n.セル;
+}
+function ブックの数を閉じる(){
+  var ov = document.getElementById('statsOverlay');
+  if (ov) ov.style.display = 'none';
+}
+
 /* ★計算方法の設定（数式→計算方法）★ 2026-08-30
  *   ★実測（実Excel 16.0）★ 既定は ★自動（-4105）★。手動は -4135、
  *   「データ テーブル以外 自動」は 2（うちに データテーブルが 無いので 出さない）。
@@ -9469,6 +9777,8 @@ function _switchSheetWithMultiSelect(newIdx){
   }
 }
 function addSheet(){
+  /* ★ブックの保護★（2026-08-30 実測＝守ると シートが 足せない） */
+  if(typeof ブックの守りに引っかかる === 'function' && ブックの守りに引っかかる('シートを 足す事')) return;
   var idx=sheets.length;
   sheets.push({name:'Sheet'+(idx+1),data:{},colW:{},rowH:{}});
   addSheetToEngine('Sheet'+(idx+1));
