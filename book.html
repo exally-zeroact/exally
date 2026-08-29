@@ -1298,60 +1298,61 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=c9eb3fc3"></script>
+<script src="hyperformula.full.min.js?v=e765cc02"></script>
 
-<script src="exally-formula.js?v=c9eb3fc3"></script>
+<script src="exally-formula.js?v=e765cc02"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=c9eb3fc3"></script>
+<script src="js/file-out.js?v=e765cc02"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=c9eb3fc3"></script>
-<script src="lib/grid-xlsx.js?v=c9eb3fc3"></script>
+<script src="lib/typed-value.js?v=e765cc02"></script>
+<script src="lib/grid-xlsx.js?v=e765cc02"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=c9eb3fc3"></script>
-<script src="lib/autosum.js?v=c9eb3fc3"></script>
-<script src="lib/grid-sort.js?v=c9eb3fc3"></script>
-<script src="lib/grid-filter.js?v=c9eb3fc3"></script>
-<script src="lib/grid-find.js?v=c9eb3fc3"></script>
-<script src="lib/grid-print.js?v=c9eb3fc3"></script>
-<script src="lib/ai-reason.js?v=c9eb3fc3"></script>
-<script src="lib/menu-place.js?v=c9eb3fc3"></script>
-<script src="lib/grid-stats.js?v=c9eb3fc3"></script>
-<script src="lib/grid-valid.js?v=c9eb3fc3"></script>
-<script src="lib/cond-format.js?v=c9eb3fc3"></script>
-<script src="lib/ref-graph.js?v=c9eb3fc3"></script>
-<script src="lib/shindan.js?v=c9eb3fc3"></script>
+  <script src="lib/grid-refedit.js?v=e765cc02"></script>
+<script src="lib/autosum.js?v=e765cc02"></script>
+<script src="lib/grid-sort.js?v=e765cc02"></script>
+<script src="lib/grid-filter.js?v=e765cc02"></script>
+<script src="lib/grid-find.js?v=e765cc02"></script>
+<script src="lib/grid-print.js?v=e765cc02"></script>
+<script src="lib/ai-reason.js?v=e765cc02"></script>
+<script src="lib/menu-place.js?v=e765cc02"></script>
+<script src="lib/grid-stats.js?v=e765cc02"></script>
+<script src="lib/grid-valid.js?v=e765cc02"></script>
+<script src="lib/cond-format.js?v=e765cc02"></script>
+<script src="lib/ref-graph.js?v=e765cc02"></script>
+<script src="lib/shindan.js?v=e765cc02"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=c9eb3fc3"></script>
-<script src="lib/vba-mikata.js?v=c9eb3fc3"></script>
-<script src="lib/vba-tejun.js?v=c9eb3fc3"></script>
-<script src="lib/rireki.js?v=c9eb3fc3"></script>
-<script src="lib/chizu.js?v=c9eb3fc3"></script>
-<script src="lib/horu.js?v=c9eb3fc3"></script>
-<script src="lib/excel-version.js?v=c9eb3fc3"></script>
-<script src="lib/teian.js?v=c9eb3fc3"></script>
-<script src="lib/kikan.js?v=c9eb3fc3"></script>
-<script src="lib/recipe.js?v=c9eb3fc3"></script>
-<script src="lib/kirikae.js?v=c9eb3fc3"></script>
-<script src="js/recipe-store.js?v=c9eb3fc3"></script>
-<script src="js/rireki-store.js?v=c9eb3fc3"></script>
-<script src="lib/excel-version.js?v=c9eb3fc3"></script>
+<script src="lib/vba.js?v=e765cc02"></script>
+<script src="lib/vba-mikata.js?v=e765cc02"></script>
+<script src="lib/vba-tejun.js?v=e765cc02"></script>
+<script src="lib/rireki.js?v=e765cc02"></script>
+<script src="lib/chizu.js?v=e765cc02"></script>
+<script src="lib/horu.js?v=e765cc02"></script>
+<script src="lib/excel-version.js?v=e765cc02"></script>
+<script src="lib/teian.js?v=e765cc02"></script>
+<script src="lib/kikan.js?v=e765cc02"></script>
+<script src="lib/recipe.js?v=e765cc02"></script>
+<script src="lib/kirikae.js?v=e765cc02"></script>
+<script src="js/recipe-store.js?v=e765cc02"></script>
+<script src="js/rireki-store.js?v=e765cc02"></script>
+<script src="lib/excel-version.js?v=e765cc02"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=c9eb3fc3">
-<script src="lib/named-ranges.js?v=c9eb3fc3"></script>
-<script src="lib/ribbon-spec.js?v=c9eb3fc3"></script>
-<script src="lib/ribbon-actions.js?v=c9eb3fc3"></script>
-<script src="lib/ribbon.js?v=c9eb3fc3"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=e765cc02">
+<script src="lib/named-ranges.js?v=e765cc02"></script>
+<script src="lib/chart.js?v=e765cc02"></script>
+<script src="lib/ribbon-spec.js?v=e765cc02"></script>
+<script src="lib/ribbon-actions.js?v=e765cc02"></script>
+<script src="lib/ribbon.js?v=e765cc02"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=c9eb3fc3"></script>
-<script src="js/exally-login.js?v=c9eb3fc3"></script>
-<script src="js/auth.js?v=c9eb3fc3"></script>
+<script src="js/supa-config.js?v=e765cc02"></script>
+<script src="js/exally-login.js?v=e765cc02"></script>
+<script src="js/auth.js?v=e765cc02"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -4086,6 +4087,41 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★区切り位置（テキストを 列に 分ける）★ 2026-08-29
      ・confirm / alert / prompt は 使わない（画面が 止まる）
      ・★上書きする数を 押す前に 見せる★（黙って 消さない） -->
+<!-- ★グラフ★ 2026-08-29
+     ・実Excel実測＝既定は 集合縦棒／360×216／凡例は 系列2本以上／タイトルは 出す
+     ・★Excelの 絵・配色は 1つも 写さない★（うちの緑・自前の canvas）
+     ・alert / prompt / confirm は 使わない -->
+<div id="chartOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">グラフ</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">選んだ所から 作ります</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.8;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:4em;">形</span>
+        <select id="chartKind" onchange="グラフを描き直す()" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="column">縦棒</option>
+          <option value="line">折れ線</option>
+          <option value="pie">円</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <span style="min-width:4em;">題</span>
+        <input id="chartTitle" type="text" oninput="グラフを描き直す()" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <canvas id="chartCanvas" style="width:360px;height:216px;max-width:100%;border-radius:10px;"></canvas>
+      <div style="font-size:12px;color:#7A9A87;margin-top:8px;line-height:1.6;">
+        凡例は 系列が 2本以上の時だけ 出ます（実Excelと 同じ）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="グラフを閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
+      <button onclick="グラフを画像で保存()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">画像で 出す</button>
+    </div>
+  </div>
+</div>
+
 <div id="splitOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -6654,6 +6690,74 @@ function 区切り位置を決める(){
   if (!印) { document.getElementById('splitWarn').textContent = '区切りの字を 入れてください'; return; }
   区切り位置を閉じる();
   区切りで分ける(印);
+}
+
+/* ★グラフ（挿入タブ）★ 2026-08-29
+ *   実Excel実測＝既定は 集合縦棒／360×216／凡例は 系列2本以上の時だけ／タイトルは 出す。
+ *   ★Excelの 絵・配色は 1つも 写さない★（うちの緑・自前の canvas）。
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。 */
+function 選んだ表を取る(){
+  var s = sheets[activeSheet], 表 = [];
+  for (var r = selR1; r <= selR2; r++) {
+    var 行 = [];
+    for (var c = selC1; c <= selC2; c++) {
+      var cell = s.data[r + ',' + c];
+      行.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+    }
+    表.push(行);
+  }
+  return 表;
+}
+function グラフを作る(種類){
+  if (typeof Chart === 'undefined') { notify('グラフの部品が 読めていません'); return false; }
+  var 材料 = Chart.材料を作る(選んだ表を取る());
+  if (!材料.ok) { notify(材料.なぜ); return false; }
+  var ov = document.getElementById('chartOverlay');
+  if (!ov) return false;
+  window._グラフの材料 = 材料;
+  window._グラフの種類 = 種類 || 'column';
+  document.getElementById('chartTitle').value =
+    (材料.系列.length === 1 ? 材料.系列[0].名 : 'グラフ');
+  var sel = document.getElementById('chartKind');
+  if (sel) sel.value = window._グラフの種類;
+  ov.style.display = 'flex';
+  グラフを描き直す();
+  return true;
+}
+function グラフを描き直す(){
+  var cv = document.getElementById('chartCanvas');
+  if (!cv || !window._グラフの材料) return;
+  var 種類 = document.getElementById('chartKind').value;
+  window._グラフの種類 = 種類;
+  var dpr = window.devicePixelRatio || 1;
+  var W = Chart.既定.幅, H = Chart.既定.高さ;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  Chart.描く(ctx, window._グラフの材料, 種類, W, H, document.getElementById('chartTitle').value);
+}
+function グラフを閉じる(){
+  var ov = document.getElementById('chartOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function グラフを画像で保存(){
+  var cv = document.getElementById('chartCanvas');
+  if (!cv) return;
+  try {
+    cv.toBlob(function(b){
+      if (!b) { notify('画像に できませんでした'); return; }
+      var 名 = (document.getElementById('chartTitle').value || 'グラフ') + '.png';
+      if (typeof FileOut !== 'undefined' && FileOut.deliver) FileOut.deliver(b, 名);
+      else {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(b); a.download = 名;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+      }
+      notify('「' + 名 + '」で 出しました');
+    }, 'image/png');
+  } catch (e) { notify('画像に できませんでした'); }
 }
 
 function ctxDelete(){

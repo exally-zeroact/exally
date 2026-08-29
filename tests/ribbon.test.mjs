@@ -79,7 +79,7 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
     'doUndo','doRedo','openFnPalette','sortRange','filterByValue','clearFilter','openValid',
     'freezePanes','unfreezePanes','printSheet',
     'autoSum','fillFromEdge','中身を消す','書式を消す','すべて消す',
-    '数式の表示を切り替える','すべて再計算','このシートを再計算','openShindan','重複を削除','ズーム100','openMacro','名前の窓を開く','区切り位置を開く'];
+    '数式の表示を切り替える','すべて再計算','このシートを再計算','openShindan','重複を削除','ズーム100','openMacro','名前の窓を開く','区切り位置を開く','グラフを作る'];
   for (const n of 拾う名) にせ画面[n] = (function (nm) {
     return function () { 記録.push({ fn: nm, args: Array.prototype.slice.call(arguments) }); };
   }(n));
