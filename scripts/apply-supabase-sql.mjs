@@ -34,20 +34,19 @@ function 止める(なぜ) {
   process.exit(1);
 }
 
-/* ── ② 向き先は repo から 読む ─────────────────────────── */
-const config = fs.readFileSync(path.join(ROOT, 'js/supa-config.js'), 'utf8');
-const 参照 = Array.from(new Set(
-  (config.match(/https:\/\/([a-z0-9]{20})\.supabase\.co/g) || [])
-    .map((u) => u.replace(/^https:\/\//, '').replace(/\.supabase\.co$/, ''))
-));
-if (参照.length !== 1) 止める('js/supa-config.js から 倉庫が 1つに 決まらない（' + 参照.join(', ') + '）');
-const REF = 参照[0];
+/* ── ② 向き先は repo から 読む ─────────────────────────────
+   ★倉庫の番号を ここに 直接 書かない★（見張り tests/no-hardcoded-supa.test.mjs が 赤にする）。
+   理由＝本番repo から 作った複製を テストrepo に 持ってくると 直書きが 付いてきて
+   ★テストのつもりで 本番の倉庫を 触る★という 最悪の事故になる（tests/repo-supa.mjs の頭より）。
+   ⇒ ★向き先は repoSupa()★ ／ ★本番/テストの見分けは check-warehouse-pointers.mjs の定数★
+      （どちらも repo に 1か所しか 無い物を 借りる。写さない） */
+const { repoSupa } = await import('../tests/repo-supa.mjs');
+const { PROD_REF, TEST_REF } = await import('./check-warehouse-pointers.mjs');
+let REF;
+try { REF = repoSupa(ROOT).ref; } catch (e) { 止める('向き先を 読めない: ' + e.message); }
+if (!REF) 止める('js/supa-config.js から 倉庫を 読めない');
 
-/* 本番かテストかを ★名前ではなく 向き先の照合で★ 決める
-   （check-warehouse-pointers.mjs と 同じ定数。ここに 直接 書いて 突き合わせる） */
-const 本番REF = 'tnfwipbgfgjaymlszeid';
-const テストREF = 'khawdrnvssdenumbiwfg';
-const 実際は = REF === 本番REF ? '本番' : REF === テストREF ? 'テスト' : '知らない倉庫';
+const 実際は = REF === PROD_REF ? '本番' : REF === TEST_REF ? 'テスト' : '知らない倉庫';
 if (実際は === '知らない倉庫') 止める('この repo の向き先 ' + REF + ' は 本番でも テストでもない');
 if (本番 && 実際は !== '本番') 止める('--honban と 言われたが この repo は ' + 実際は + ' を 指している');
 if (!本番 && 実際は === '本番') {
