@@ -1304,67 +1304,68 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=84271080"></script>
+<script src="hyperformula.full.min.js?v=72c541cb"></script>
 
-<script src="exally-formula.js?v=84271080"></script>
+<script src="exally-formula.js?v=72c541cb"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=84271080"></script>
+<script src="js/file-out.js?v=72c541cb"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=84271080"></script>
-<script src="lib/grid-xlsx.js?v=84271080"></script>
+<script src="lib/typed-value.js?v=72c541cb"></script>
+<script src="lib/grid-xlsx.js?v=72c541cb"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=84271080"></script>
-<script src="lib/autosum.js?v=84271080"></script>
-<script src="lib/grid-sort.js?v=84271080"></script>
-<script src="lib/grid-filter.js?v=84271080"></script>
-<script src="lib/grid-find.js?v=84271080"></script>
-<script src="lib/grid-print.js?v=84271080"></script>
-<script src="lib/ai-reason.js?v=84271080"></script>
-<script src="lib/menu-place.js?v=84271080"></script>
-<script src="lib/grid-stats.js?v=84271080"></script>
-<script src="lib/grid-valid.js?v=84271080"></script>
-<script src="lib/cond-format.js?v=84271080"></script>
-<script src="lib/ref-graph.js?v=84271080"></script>
-<script src="lib/shindan.js?v=84271080"></script>
+  <script src="lib/grid-refedit.js?v=72c541cb"></script>
+<script src="lib/autosum.js?v=72c541cb"></script>
+<script src="lib/grid-sort.js?v=72c541cb"></script>
+<script src="lib/grid-filter.js?v=72c541cb"></script>
+<script src="lib/grid-find.js?v=72c541cb"></script>
+<script src="lib/grid-print.js?v=72c541cb"></script>
+<script src="lib/ai-reason.js?v=72c541cb"></script>
+<script src="lib/menu-place.js?v=72c541cb"></script>
+<script src="lib/grid-stats.js?v=72c541cb"></script>
+<script src="lib/grid-valid.js?v=72c541cb"></script>
+<script src="lib/cond-format.js?v=72c541cb"></script>
+<script src="lib/ref-graph.js?v=72c541cb"></script>
+<script src="lib/shindan.js?v=72c541cb"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=84271080"></script>
-<script src="lib/vba-mikata.js?v=84271080"></script>
-<script src="lib/vba-tejun.js?v=84271080"></script>
-<script src="lib/rireki.js?v=84271080"></script>
-<script src="lib/chizu.js?v=84271080"></script>
-<script src="lib/horu.js?v=84271080"></script>
-<script src="lib/excel-version.js?v=84271080"></script>
-<script src="lib/teian.js?v=84271080"></script>
-<script src="lib/kikan.js?v=84271080"></script>
-<script src="lib/recipe.js?v=84271080"></script>
-<script src="lib/kirikae.js?v=84271080"></script>
-<script src="js/recipe-store.js?v=84271080"></script>
-<script src="js/rireki-store.js?v=84271080"></script>
-<script src="lib/excel-version.js?v=84271080"></script>
+<script src="lib/vba.js?v=72c541cb"></script>
+<script src="lib/vba-mikata.js?v=72c541cb"></script>
+<script src="lib/vba-tejun.js?v=72c541cb"></script>
+<script src="lib/rireki.js?v=72c541cb"></script>
+<script src="lib/chizu.js?v=72c541cb"></script>
+<script src="lib/horu.js?v=72c541cb"></script>
+<script src="lib/excel-version.js?v=72c541cb"></script>
+<script src="lib/teian.js?v=72c541cb"></script>
+<script src="lib/kikan.js?v=72c541cb"></script>
+<script src="lib/recipe.js?v=72c541cb"></script>
+<script src="lib/kirikae.js?v=72c541cb"></script>
+<script src="js/recipe-store.js?v=72c541cb"></script>
+<script src="js/rireki-store.js?v=72c541cb"></script>
+<script src="lib/excel-version.js?v=72c541cb"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=84271080">
-<script src="lib/named-ranges.js?v=84271080"></script>
-<script src="lib/cell-styles.js?v=84271080"></script>
-<script src="lib/chart.js?v=84271080"></script>
-<script src="lib/sparkline.js?v=84271080"></script>
-<script src="lib/table.js?v=84271080"></script>
-<script src="lib/flash-fill.js?v=84271080"></script>
-<script src="lib/pivot.js?v=84271080"></script>
-<script src="lib/symbols.js?v=84271080"></script>
-<script src="lib/ribbon-spec.js?v=84271080"></script>
-<script src="lib/ribbon-actions.js?v=84271080"></script>
-<script src="lib/ribbon.js?v=84271080"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=72c541cb">
+<script src="lib/named-ranges.js?v=72c541cb"></script>
+<script src="lib/cell-styles.js?v=72c541cb"></script>
+<script src="lib/chart.js?v=72c541cb"></script>
+<script src="lib/sparkline.js?v=72c541cb"></script>
+<script src="lib/table.js?v=72c541cb"></script>
+<script src="lib/flash-fill.js?v=72c541cb"></script>
+<script src="lib/pivot.js?v=72c541cb"></script>
+<script src="lib/csv-in.js?v=72c541cb"></script>
+<script src="lib/symbols.js?v=72c541cb"></script>
+<script src="lib/ribbon-spec.js?v=72c541cb"></script>
+<script src="lib/ribbon-actions.js?v=72c541cb"></script>
+<script src="lib/ribbon.js?v=72c541cb"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=84271080"></script>
-<script src="js/exally-login.js?v=84271080"></script>
-<script src="js/auth.js?v=84271080"></script>
+<script src="js/supa-config.js?v=72c541cb"></script>
+<script src="js/exally-login.js?v=72c541cb"></script>
+<script src="js/auth.js?v=72c541cb"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3886,6 +3887,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
   <div id="headerTools" style="display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
     <!-- ★受け取り口★ 元のファイルは預からない。開いた瞬間に作業用の控えを持ち、保存はそれを書き換える -->
     <input type="file" id="bookFileInput" accept=".xlsx,.xlsm,.xlsb,.xls" style="display:none" onchange="onPickBookFile(this)">
+    <!-- ★CSV／テキストの 入り口★ 2026-08-30 -->
+    <input type="file" id="csvFileInput" accept=".csv,.txt,.tsv" style="display:none" onchange="CSVを読む(this)">
     <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
     <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">💾</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelに</span>書き出す</span></button>
@@ -8971,6 +8974,92 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★テキストまたは CSV から（データ→データの取得と変換）★ 2026-08-30
+ *   ★真値（実Excel 16.0 で 実測）★ … tools/measure-csv.ps1
+ *     「"山田, 太郎",100」→ 1つの セル「山田, 太郎」／「"あ""い"」→「あ"い」／
+ *     「"1行目(改行)2行目"」→ ★1つの セルの 中の 改行★／使った範囲は A1:B4
+ *     Shift_JIS の CSV も 実Excel は そのまま 読める
+ *   ⇒ うちも 同じ。★UTF-8 で 読んで 化けていたら cp932 で 読み直す★
+ *     （日本の CSV は Shift_JIS が 多い。黙って 化けた字を 入れない） */
+function CSVの窓を開く(){
+  hideCtxMenu();
+  var el = document.getElementById('csvFileInput');
+  if (!el) { notify('★入り口が 見つかりません★'); return 0; }
+  el.value = '';
+  el.click();
+  return 1;
+}
+function CSVを読む(el){
+  var f = el && el.files && el.files[0];
+  if (!f) return 0;
+  var 読み手 = new FileReader();
+  読み手.onload = function () {
+    var 字 = String(読み手.result || '');
+    if (CsvIn.化けているか(字)) {
+      /* ★化けている＝日本の CSV に 多い Shift_JIS で 読み直す★ */
+      var 読み手2 = new FileReader();
+      読み手2.onload = function () {
+        var 生 = new Uint8Array(読み手2.result);
+        var 字2 = 字;
+        try { 字2 = new TextDecoder('shift_jis').decode(生); } catch (e) { /* 出来なければ 元の まま */ }
+        CSVを入れる(字2, f.name, CsvIn.化けているか(字2) ? 'よく分からない字' : 'Shift_JIS');
+      };
+      読み手2.readAsArrayBuffer(f);
+      return;
+    }
+    CSVを入れる(字, f.name, 'UTF-8');
+  };
+  読み手.readAsText(f, 'utf-8');
+  return 1;
+}
+function CSVを入れる(字, ファイル名, 字の種類){
+  var r = CsvIn.読む(字);
+  if (!r.表.length) { notify('★中身が ありませんでした★'); return 0; }
+  var 前 = activeSheet;
+  addSheet();
+  if (activeSheet === 前) { notify('★新しい シートを 作れませんでした★'); return 0; }
+  for (var i = 0; i < r.表.length; i++) {
+    for (var j = 0; j < r.表[i].length; j++) {
+      var v = r.表[i][j];
+      if (v === '' || v === null || v === undefined) continue;
+      setCell(i, j, String(v), true);
+    }
+  }
+  render(); updateBar();
+  var 区 = (r.区切り === '\t') ? 'タブ' : (r.区切り === ';' ? 'セミコロン' : 'カンマ');
+  notify('「' + (ファイル名 || 'CSV') + '」を 読みました（' + r.行 + '行 × ' + r.列 + '列／'
+    + 区 + '区切り／' + 字の種類 + '）'
+    + (字の種類 === 'よく分からない字' ? '★字が 化けているかもしれません★' : ''));
+  return r.行;
+}
+
+/* ★データの 取得（データ→データの取得と変換）★
+ *   ★実Excelの「データの取得」は Power Query（Microsoftの 仕組み）★。
+ *   うちは ★今 出来る 読み口を 並べる★＝出来ない物は 並べない。 */
+function データの取得を開く(){
+  hideCtxMenu();
+  var 出 = [
+    { 名: 'Excel の ファイルを 読み込む', やる: "document.getElementById('bookFileInput').click()" },
+    { 名: 'テキスト または CSV から', やる: 'CSVの窓を開く()' },
+    { 名: 'これまでの ファイル（最近 使った 物）', やる: 'openRireki()' },
+  ];
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  for (var i = 0; i < 出.length; i++) {
+    h += '<button type="button" class="get-b" onclick="' + 出[i].やる + ';関数の窓を閉じる()"'
+      + ' style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+      + 'border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + 出[i].名 + '</button>';
+  }
+  h += '</div><div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">'
+    + '★ここに 並んでいるのは 今 出来る 読み口だけ★です。<br>'
+    + '実Excelの「Web から」「画像から」「既存の接続」は ★まだ 出来ないので 並べていません★。</div>';
+  document.getElementById('funcTitle').textContent = 'データの 取得';
+  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 出.length;
 }
 
 /* ★自動化タブの 5つ（Office スクリプトの 見本と 同じ 中身）★ 2026-08-30
