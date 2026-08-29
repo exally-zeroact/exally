@@ -1298,59 +1298,59 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=2b694c57"></script>
+<script src="hyperformula.full.min.js?v=ea9f388e"></script>
 
-<script src="exally-formula.js?v=2b694c57"></script>
+<script src="exally-formula.js?v=ea9f388e"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=2b694c57"></script>
+<script src="js/file-out.js?v=ea9f388e"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=2b694c57"></script>
-<script src="lib/grid-xlsx.js?v=2b694c57"></script>
+<script src="lib/typed-value.js?v=ea9f388e"></script>
+<script src="lib/grid-xlsx.js?v=ea9f388e"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=2b694c57"></script>
-<script src="lib/autosum.js?v=2b694c57"></script>
-<script src="lib/grid-sort.js?v=2b694c57"></script>
-<script src="lib/grid-filter.js?v=2b694c57"></script>
-<script src="lib/grid-find.js?v=2b694c57"></script>
-<script src="lib/grid-print.js?v=2b694c57"></script>
-<script src="lib/ai-reason.js?v=2b694c57"></script>
-<script src="lib/menu-place.js?v=2b694c57"></script>
-<script src="lib/grid-stats.js?v=2b694c57"></script>
-<script src="lib/grid-valid.js?v=2b694c57"></script>
-<script src="lib/cond-format.js?v=2b694c57"></script>
-<script src="lib/ref-graph.js?v=2b694c57"></script>
-<script src="lib/shindan.js?v=2b694c57"></script>
+  <script src="lib/grid-refedit.js?v=ea9f388e"></script>
+<script src="lib/autosum.js?v=ea9f388e"></script>
+<script src="lib/grid-sort.js?v=ea9f388e"></script>
+<script src="lib/grid-filter.js?v=ea9f388e"></script>
+<script src="lib/grid-find.js?v=ea9f388e"></script>
+<script src="lib/grid-print.js?v=ea9f388e"></script>
+<script src="lib/ai-reason.js?v=ea9f388e"></script>
+<script src="lib/menu-place.js?v=ea9f388e"></script>
+<script src="lib/grid-stats.js?v=ea9f388e"></script>
+<script src="lib/grid-valid.js?v=ea9f388e"></script>
+<script src="lib/cond-format.js?v=ea9f388e"></script>
+<script src="lib/ref-graph.js?v=ea9f388e"></script>
+<script src="lib/shindan.js?v=ea9f388e"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=2b694c57"></script>
-<script src="lib/vba-mikata.js?v=2b694c57"></script>
-<script src="lib/vba-tejun.js?v=2b694c57"></script>
-<script src="lib/rireki.js?v=2b694c57"></script>
-<script src="lib/chizu.js?v=2b694c57"></script>
-<script src="lib/horu.js?v=2b694c57"></script>
-<script src="lib/excel-version.js?v=2b694c57"></script>
-<script src="lib/teian.js?v=2b694c57"></script>
-<script src="lib/kikan.js?v=2b694c57"></script>
-<script src="lib/recipe.js?v=2b694c57"></script>
-<script src="lib/kirikae.js?v=2b694c57"></script>
-<script src="js/recipe-store.js?v=2b694c57"></script>
-<script src="js/rireki-store.js?v=2b694c57"></script>
-<script src="lib/excel-version.js?v=2b694c57"></script>
+<script src="lib/vba.js?v=ea9f388e"></script>
+<script src="lib/vba-mikata.js?v=ea9f388e"></script>
+<script src="lib/vba-tejun.js?v=ea9f388e"></script>
+<script src="lib/rireki.js?v=ea9f388e"></script>
+<script src="lib/chizu.js?v=ea9f388e"></script>
+<script src="lib/horu.js?v=ea9f388e"></script>
+<script src="lib/excel-version.js?v=ea9f388e"></script>
+<script src="lib/teian.js?v=ea9f388e"></script>
+<script src="lib/kikan.js?v=ea9f388e"></script>
+<script src="lib/recipe.js?v=ea9f388e"></script>
+<script src="lib/kirikae.js?v=ea9f388e"></script>
+<script src="js/recipe-store.js?v=ea9f388e"></script>
+<script src="js/rireki-store.js?v=ea9f388e"></script>
+<script src="lib/excel-version.js?v=ea9f388e"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=2b694c57">
-<script src="lib/ribbon-spec.js?v=2b694c57"></script>
-<script src="lib/ribbon-actions.js?v=2b694c57"></script>
-<script src="lib/ribbon.js?v=2b694c57"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=ea9f388e">
+<script src="lib/ribbon-spec.js?v=ea9f388e"></script>
+<script src="lib/ribbon-actions.js?v=ea9f388e"></script>
+<script src="lib/ribbon.js?v=ea9f388e"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=2b694c57"></script>
-<script src="js/exally-login.js?v=2b694c57"></script>
-<script src="js/auth.js?v=2b694c57"></script>
+<script src="js/supa-config.js?v=ea9f388e"></script>
+<script src="js/exally-login.js?v=ea9f388e"></script>
+<script src="js/auth.js?v=ea9f388e"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2612,6 +2612,21 @@ function notify(msg, duration, kind){
   t._hideTimer = setTimeout(function(){ t.classList.remove('show'); }, duration || 3000);
 }
 
+/* ★セルの 上下の位置を 決める★（2026-08-29）
+ *   ★Excel(日本語版)の 既定は 中央★（実測：xlsx の中が <alignment vertical="center"/>）。
+ *   valign は top / middle / bottom。
+ *   ctx.textBaseline は middle なので ★行の 真ん中の y★ を 返す。
+ *   n＝行数（折り返しの 時は 1より 大きい）。
+ *   ★はみ出さない★＝上下に 3px の 余白を 取る。 */
+function _vY(valign, y, h, fs, n) {
+  var lh = fs * 1.4;
+  var 全 = Math.max(lh, lh * (n || 1));
+  var 余 = 3;
+  if (valign === 'top')    return y + 余 + lh / 2;
+  if (valign === 'middle') return y + Math.max(余 + lh / 2, (h - 全) / 2 + lh / 2);
+  /* bottom */
+  return y + Math.max(余 + lh / 2, h - 余 - 全 + lh / 2);
+}
 function render(){
   if(_renderPending) return;
   _renderPending=true;
@@ -2843,6 +2858,13 @@ function _renderPass() {
       ctx.fillStyle=cell.color||C_CELL_TXT;
       ctx.textBaseline='middle';
       var align=cell.align||'left';
+      /* ★上下の位置（valign）★ 2026-08-29＝リボンの『上揃え/上下中央/下揃え』が 効く様に した。
+         それまで y+h/2 の 決め打ちで、★押しても 何も 変わらない ボタン★に なる所だった。
+         ★既定は 中央★＝実Excel 16.0（日本語版）で 実測した。
+         ・COM … A1/シート全体/行/標準スタイル とも VerticalAlignment = -4108（xlCenter）
+         ・保存した xlsx の 中身 … <alignment vertical="center"/>
+         ★私は 最初『下揃え』と 書いた＝思い込みだった。測って 直した★ */
+      var valign=cell.valign||'middle';
       var indentPx=(cell.indent||0)*12;
       var hasBreak=String(display).indexOf('\n')>=0;
       if(cell.wrap||hasBreak){
@@ -2857,16 +2879,17 @@ function _renderPass() {
           }
           wLines2.push(wl2);
         }
-        var lh2=fs*1.4; var startY2=y+Math.max(lh2/2,(h-wLines2.length*lh2)/2+lh2/2);
+        var lh2=fs*1.4; var startY2=_vY(valign,y,h,fs,wLines2.length);
         if(align==='center') ctx.textAlign='center';
         else if(align==='right') ctx.textAlign='right';
         else ctx.textAlign='left';
         var tx2=align==='center'?x+w/2:align==='right'?x+w-4-indentPx:x+4+indentPx;
         for(var li2=0;li2<wLines2.length;li2++) ctx.fillText(wLines2[li2],tx2,startY2+li2*lh2);
       } else {
-        if(align==='center'){ctx.textAlign='center';ctx.fillText(display,x+w/2,y+h/2);}
-        else if(align==='right'){ctx.textAlign='right';ctx.fillText(display,x+w-4-indentPx,y+h/2);}
-        else{ctx.textAlign='left';ctx.fillText(display,x+4+indentPx,y+h/2);}
+        var vy=_vY(valign,y,h,fs,1);
+        if(align==='center'){ctx.textAlign='center';ctx.fillText(display,x+w/2,vy);}
+        else if(align==='right'){ctx.textAlign='right';ctx.fillText(display,x+w-4-indentPx,vy);}
+        else{ctx.textAlign='left';ctx.fillText(display,x+4+indentPx,vy);}
       }
     }
 
@@ -2928,6 +2951,15 @@ function drawText(r,c){
   if(cell.merged) return;
 
   // 表示値（numFmt適用）
+  /* ★数式の表示★（Excelの Ctrl+` と 同じ。2026-08-29）
+     値の 代わりに ★式そのもの★ を 出す。式でないセルは そのまま。 */
+  if(window.数式を表示 && cell.f && cell.f[0]==='='){
+    var display = cell.f;
+    ctx.font = 'normal normal '+Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)))+'px "Noto Sans JP",sans-serif';
+    ctx.fillStyle = '#333333'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(display, x+4, _vY(cell.valign||'middle', y, h, 12, 1));
+    return;
+  }
   var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
   if(!raw) return;
   var display = fmtForDisplay(raw, cell.numFmt);
@@ -2976,12 +3008,13 @@ function drawText(r,c){
     }
     var lh = fontSize * 1.4;
     var totalH = wLines.length * lh;
-    var startY = y + Math.max(lh/2, (h - totalH)/2 + lh/2);
+    /* ★上下揃え★（2026-08-29）＝ここも 決め打ちだった */
+    var startY = _vY(cell.valign||'middle', y, h, fontSize, wLines.length);
     for(var li=0;li<wLines.length;li++){
       ctx.fillText(wLines[li], tx, startY + li*lh);
     }
   } else {
-    ctx.fillText(display, tx, y+h/2);
+    ctx.fillText(display, tx, _vY(cell.valign||'middle', y, h, fontSize, 1));
   }
 
   // 下線・取り消し線
@@ -6327,6 +6360,83 @@ function ctxPaste(){
   render(); hideCtxMenu();
 }
 
+/* ★クリア（実Excelで 測った 3通り）★ 2026-08-29
+ *   ClearContents … 中身だけ 消す（★書式は 残る★／実測：太字 True・塗り 残った）
+ *   ClearFormats  … 書式だけ 消す（★中身は 残る★／実測：値 456 が 残った）
+ *   Clear         … すべて 消す
+ *   ⇒ Excelの「クリア ▼」の 中身。うちも 3つとも 作る。
+ *   ★書式の キーは 1か所で 持つ★（増えた時に 消し漏れない）*/
+var 書式のキー = ['bold','italic','underline','strike','align','valign','wrap','indent',
+  'color','bg','fontSize','numFmt','borderTop','borderBottom','borderLeft','borderRight'];
+function 中身を消す(){
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
+  updateBar(); render(); hideCtxMenu();
+}
+function 書式を消す(){
+  var snap=[];
+  for(var r=selR1;r<=selR2;r++) for(var c=selC1;c<=selC2;c++){
+    var k=r+','+c, cell=sheets[activeSheet].data[k];
+    if(!cell) continue;
+    for(var i=0;i<書式のキー.length;i++){
+      var key=書式のキー[i];
+      if(cell[key]===undefined) continue;
+      snap.push({key:k, prop:key, old:cell[key], nw:undefined});
+      delete cell[key];
+    }
+  }
+  if(snap.length){ undoStack.push({type:'format', snap:snap}); redoStack=[]; }
+  render(); updateBar(); hideCtxMenu();
+}
+function すべて消す(){ 書式を消す(); 中身を消す(); }
+/* ★数式の表示★（Excel Ctrl+` と 同じ）2026-08-29 */
+var 数式を表示 = false;
+function 数式の表示を切り替える(){
+  数式を表示 = !数式を表示;
+  window.数式を表示 = 数式を表示;
+  render();
+}
+
+/* ★再計算★（Excel F9＝すべて／Shift+F9＝このシート）*/
+function すべて再計算(){
+  for(var i=0;i<sheets.length;i++) recalcSheet(i, sheets[i].data);
+  render(); updateBar();
+}
+function このシートを再計算(){
+  recalcSheet(activeSheet, sheets[activeSheet].data);
+  render(); updateBar();
+}
+
+/* ★ズーム★（Excelの 100% / 拡大 / 縮小）*/
+function ズームを決める(倍){
+  scale = Math.max(0.25, Math.min(4, 倍));
+  resize(); render();
+}
+function ズーム100(){ ズームを決める(1); }
+
+/* ★重複の削除★（Excel データ→重複の削除）
+ *   ★選んだ範囲の 行★を 見て、中身が そっくり同じ行を 1つだけ 残す。
+ *   ★消した数を 必ず 出す★（黙って 減らさない）。*/
+function 重複を削除(){
+  var 見た = {}, 消す = [];
+  for(var r=selR1;r<=selR2;r++){
+    var 鍵 = [];
+    for(var c=selC1;c<=selC2;c++){
+      var cell = sheets[activeSheet].data[r+','+c];
+      鍵.push(cell ? String(cell.d!==undefined&&cell.d!=='' ? cell.d : (cell.v||'')) : '');
+    }
+    var k = 鍵.join(String.fromCharCode(31));
+    if(見た[k]) 消す.push(r); else 見た[k] = true;
+  }
+  if(!消す.length){ notify('同じ行は 見つかりませんでした'); return 0; }
+  _pushRowColUndo();
+  for(var i=消す.length-1;i>=0;i--){
+    var rr = 消す[i];
+    for(var c2=selC1;c2<=selC2;c2++) delete sheets[activeSheet].data[rr+','+c2];
+  }
+  render(); updateBar();
+  notify(消す.length+'行 消しました（同じ中身の行）');
+  return 消す.length;
+}
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
