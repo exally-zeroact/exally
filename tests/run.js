@@ -140,6 +140,10 @@ const FILES = [
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'] // ★入れ子で壊れる式が増えていないか
 ];
 
+/* ★直に叩いた時だけ 走る★（2026-08-29）
+   ここを 守らないと 一覧を 読むだけの道具が ★全部の試験を 走らせてしまう★（実際に 起きた）。 */
+if (require.main !== module) { module.exports = { FILES }; return; }
+
 let ng = 0;
 const 失敗一覧 = [];
 for (const f of FILES) {
