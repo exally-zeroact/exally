@@ -44,6 +44,7 @@ const FILES = [
   ['automation.test.mjs', '--self-test'],    /* ★自動化＝Officeスクリプトの見本と同じ中身を うちの道具で（10項目）★ */
   ['csv-in.test.mjs', '--self-test'],        /* ★CSV読み込み＝実測どおり（"…"の中のカンマ・""・中の改行）／化けたらShift_JIS★ */
   ['objects.test.mjs', '--self-test'],       /* ★浮かぶ物（画像・図形・テキスト）＝形の番号と重なりは実測・色は写さない★ */
+  ['ink.test.mjs', '--self-test'],           /* ★描画（手書き）＝ペンの色と太さは 正本の 項目名どおり／線もシートの座標★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

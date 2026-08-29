@@ -1304,69 +1304,70 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=7a74224e"></script>
+<script src="hyperformula.full.min.js?v=d16d8e93"></script>
 
-<script src="exally-formula.js?v=7a74224e"></script>
+<script src="exally-formula.js?v=d16d8e93"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=7a74224e"></script>
+<script src="js/file-out.js?v=d16d8e93"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=7a74224e"></script>
-<script src="lib/grid-xlsx.js?v=7a74224e"></script>
+<script src="lib/typed-value.js?v=d16d8e93"></script>
+<script src="lib/grid-xlsx.js?v=d16d8e93"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=7a74224e"></script>
-<script src="lib/autosum.js?v=7a74224e"></script>
-<script src="lib/grid-sort.js?v=7a74224e"></script>
-<script src="lib/grid-filter.js?v=7a74224e"></script>
-<script src="lib/grid-find.js?v=7a74224e"></script>
-<script src="lib/grid-print.js?v=7a74224e"></script>
-<script src="lib/ai-reason.js?v=7a74224e"></script>
-<script src="lib/menu-place.js?v=7a74224e"></script>
-<script src="lib/grid-stats.js?v=7a74224e"></script>
-<script src="lib/grid-valid.js?v=7a74224e"></script>
-<script src="lib/cond-format.js?v=7a74224e"></script>
-<script src="lib/ref-graph.js?v=7a74224e"></script>
-<script src="lib/shindan.js?v=7a74224e"></script>
+  <script src="lib/grid-refedit.js?v=d16d8e93"></script>
+<script src="lib/autosum.js?v=d16d8e93"></script>
+<script src="lib/grid-sort.js?v=d16d8e93"></script>
+<script src="lib/grid-filter.js?v=d16d8e93"></script>
+<script src="lib/grid-find.js?v=d16d8e93"></script>
+<script src="lib/grid-print.js?v=d16d8e93"></script>
+<script src="lib/ai-reason.js?v=d16d8e93"></script>
+<script src="lib/menu-place.js?v=d16d8e93"></script>
+<script src="lib/grid-stats.js?v=d16d8e93"></script>
+<script src="lib/grid-valid.js?v=d16d8e93"></script>
+<script src="lib/cond-format.js?v=d16d8e93"></script>
+<script src="lib/ref-graph.js?v=d16d8e93"></script>
+<script src="lib/shindan.js?v=d16d8e93"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=7a74224e"></script>
-<script src="lib/vba-mikata.js?v=7a74224e"></script>
-<script src="lib/vba-tejun.js?v=7a74224e"></script>
-<script src="lib/rireki.js?v=7a74224e"></script>
-<script src="lib/chizu.js?v=7a74224e"></script>
-<script src="lib/horu.js?v=7a74224e"></script>
-<script src="lib/excel-version.js?v=7a74224e"></script>
-<script src="lib/teian.js?v=7a74224e"></script>
-<script src="lib/kikan.js?v=7a74224e"></script>
-<script src="lib/recipe.js?v=7a74224e"></script>
-<script src="lib/kirikae.js?v=7a74224e"></script>
-<script src="js/recipe-store.js?v=7a74224e"></script>
-<script src="js/rireki-store.js?v=7a74224e"></script>
-<script src="lib/excel-version.js?v=7a74224e"></script>
+<script src="lib/vba.js?v=d16d8e93"></script>
+<script src="lib/vba-mikata.js?v=d16d8e93"></script>
+<script src="lib/vba-tejun.js?v=d16d8e93"></script>
+<script src="lib/rireki.js?v=d16d8e93"></script>
+<script src="lib/chizu.js?v=d16d8e93"></script>
+<script src="lib/horu.js?v=d16d8e93"></script>
+<script src="lib/excel-version.js?v=d16d8e93"></script>
+<script src="lib/teian.js?v=d16d8e93"></script>
+<script src="lib/kikan.js?v=d16d8e93"></script>
+<script src="lib/recipe.js?v=d16d8e93"></script>
+<script src="lib/kirikae.js?v=d16d8e93"></script>
+<script src="js/recipe-store.js?v=d16d8e93"></script>
+<script src="js/rireki-store.js?v=d16d8e93"></script>
+<script src="lib/excel-version.js?v=d16d8e93"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=7a74224e">
-<script src="lib/named-ranges.js?v=7a74224e"></script>
-<script src="lib/cell-styles.js?v=7a74224e"></script>
-<script src="lib/chart.js?v=7a74224e"></script>
-<script src="lib/sparkline.js?v=7a74224e"></script>
-<script src="lib/table.js?v=7a74224e"></script>
-<script src="lib/flash-fill.js?v=7a74224e"></script>
-<script src="lib/pivot.js?v=7a74224e"></script>
-<script src="lib/csv-in.js?v=7a74224e"></script>
-<script src="lib/objects.js?v=7a74224e"></script>
-<script src="lib/symbols.js?v=7a74224e"></script>
-<script src="lib/ribbon-spec.js?v=7a74224e"></script>
-<script src="lib/ribbon-actions.js?v=7a74224e"></script>
-<script src="lib/ribbon.js?v=7a74224e"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=d16d8e93">
+<script src="lib/named-ranges.js?v=d16d8e93"></script>
+<script src="lib/cell-styles.js?v=d16d8e93"></script>
+<script src="lib/chart.js?v=d16d8e93"></script>
+<script src="lib/sparkline.js?v=d16d8e93"></script>
+<script src="lib/table.js?v=d16d8e93"></script>
+<script src="lib/flash-fill.js?v=d16d8e93"></script>
+<script src="lib/pivot.js?v=d16d8e93"></script>
+<script src="lib/csv-in.js?v=d16d8e93"></script>
+<script src="lib/objects.js?v=d16d8e93"></script>
+<script src="lib/ink.js?v=d16d8e93"></script>
+<script src="lib/symbols.js?v=d16d8e93"></script>
+<script src="lib/ribbon-spec.js?v=d16d8e93"></script>
+<script src="lib/ribbon-actions.js?v=d16d8e93"></script>
+<script src="lib/ribbon.js?v=d16d8e93"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=7a74224e"></script>
-<script src="js/exally-login.js?v=7a74224e"></script>
-<script src="js/auth.js?v=7a74224e"></script>
+<script src="js/supa-config.js?v=d16d8e93"></script>
+<script src="js/exally-login.js?v=d16d8e93"></script>
+<script src="js/auth.js?v=d16d8e93"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2996,8 +2997,11 @@ function _renderPass() {
     drawColoredFormulaOnCell(_editR, _editC, _editVal);
   }
 
-  /* ★シートに 浮かぶ 物（画像・図形・テキスト）★＝セルの 上に 出す */
+/* ★シートに 浮かぶ 物（画像・図形・テキスト）★＝セルの 上に 出す */
   物を描く();
+
+  /* ★手書き（描画タブ）★＝浮かぶ 物の 上に 出す */
+  インクを描く();
 
   /* ★参照元・参照先の 矢印★（字の 上に 出す＝実Excelも 上に 出る） */
   トレースを描く();
@@ -4332,6 +4336,20 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
       <button onclick="図形の窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
     </div>
+  </div>
+</div>
+<!-- ★描画（手書き）★ 2026-08-30
+     ペンの 色と 太さは 実Excelの 項目名の とおり（黒0.35mm／赤0.35mm／灰0.5mm／黄6mm／濃青1mm／緑1mm） -->
+<div id="inkBar" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:56px;z-index:9400;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);padding:8px 10px;max-width:94vw;overflow:auto;">
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+    <span id="inkNow" style="font-size:12px;color:#2E7D54;font-weight:700;min-width:6em;">ペン（黒）</span>
+    <span id="inkPens" style="display:flex;gap:4px;flex-wrap:wrap;"></span>
+    <button onclick="消しゴムにする()" id="inkErase" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">消しゴム</button>
+    <button onclick="選ぶにする()" id="inkSelect" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">選択</button>
+    <button onclick="なげなわにする()" id="inkLasso" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">なげなわ</button>
+    <button onclick="インクを再生()" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">再生</button>
+    <button onclick="インクのヘルプ()" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">？</button>
+    <button onclick="描画を終わる()" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#F0FAF4;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">やめる</button>
   </div>
 </div>
 <div id="objListPanel" style="display:none;position:fixed;right:12px;top:120px;z-index:9400;width:240px;max-width:80vw;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);overflow:hidden;">
@@ -6375,6 +6393,8 @@ function bindEvents(){
   canvas.addEventListener('mousedown',onMD);
   canvas.addEventListener('mousemove',onMM);
   document.addEventListener('mouseup',function(){
+    /* ★描画の 道具★＝離した 時に なげなわの 中身を 決める・線を 切る */
+    if(typeof 描画の道具 !== 'undefined' && 描画の道具){ 描画で離した(); }
     if(!touchState) return;
     if(touchState.type==='colresize'){
       var nw=Math.max(10,Math.round(sheets[activeSheet].colW[touchState.col]||COL_W));
@@ -6801,6 +6821,9 @@ function onMD(e){
     canvas.style.cursor='crosshair';
     return;
   }
+  /* ★描画の 道具を 持っている 時は そちらが 先★（セルも 物も 触らない） */
+  if(描画の道具 && 描画で押した(p.x, p.y)) return;
+
   /* ★浮かぶ 物を 押したか★（セルより 先に 見る＝上に 在る 物が 勝つ）
      押したら 選ぶ＋動かす（つまみで 大きさも 変える） */
   var _o = 物を押したか(p.x, p.y);
@@ -6860,6 +6883,8 @@ function onMD(e){
 }
 function onMM(e){
   var p=cPos(e);
+  /* ★描画の 道具★（ペン・消しゴム・なげなわ） */
+  if(描画の道具 && 描画で動いた(p.x, p.y)) return;
   /* ★浮かぶ 物を 動かす／大きさを 変える★ */
   if(touchState && (touchState.type==='objmove' || touchState.type==='objsize')){
     var _o = touchState.物;
@@ -9032,6 +9057,236 @@ function ウォッチを描く(){
   }
   体.innerHTML = h;
   return ウォッチの箱.length;
+}
+
+/* ★描画（手書き）★ 2026-08-30
+ *   ★真値★＝実Excelの リボンの 項目名に ペンの 色と 太さが そのまま 書いてある
+ *     （ペン: 黒、0.35 mm／赤 0.35mm／鉛筆 灰 0.5mm／蛍光 黄 6mm／万年筆 濃青 1mm／ブラシ 緑 1mm）
+ *   ⇒ ★色も 太さも その とおり★（見た目では なく 道具の 仕様なので 合わせる）
+ *   ★前の 決めを 直した★＝前は「表計算に 絞る」ので 出さない と していたが、
+ *     ブラウザの canvas で ★本当に 書ける★ので 作った（司さん「サボるな」）。
+ *   ★線は シートの 座標で 持つ★（浮かぶ 物と 同じ＝スクロールで 一緒に 動く） */
+var 描画の道具 = null;        /* null＝描かない／{種類:'ペン',ペン}／{種類:'消しゴム'}／… */
+var 今ひいている線 = null;
+var えらんだ線たち = [];
+var なげなわの四角 = null;
+
+function 線の箱(){
+  var s0 = sheets[activeSheet];
+  if (!s0.ink) s0.ink = [];
+  return s0.ink;
+}
+function 描画を始める(){
+  hideCtxMenu();
+  if (!描画の道具) 描画の道具 = { 種類: 'ペン', ペン: Ink.ペンたち[0] };
+  描画バーを描く();
+  document.getElementById('inkBar').style.display = 'block';
+  notify('★指か マウスで 書けます★（やめる を 押すと 元に 戻ります）');
+  return 1;
+}
+function 描画を終わる(){
+  描画の道具 = null;
+  今ひいている線 = null;
+  えらんだ線たち = [];
+  なげなわの四角 = null;
+  var el = document.getElementById('inkBar');
+  if (el) el.style.display = 'none';
+  render();
+  return 0;
+}
+function ペンにする(番号){
+  var p = Ink.ペンたち[番号] || Ink.ペンたち[0];
+  描画の道具 = { 種類: 'ペン', ペン: p };
+  描画バーを描く();
+  return p.名;
+}
+function 消しゴムにする(){ 描画の道具 = { 種類: '消しゴム' }; 描画バーを描く(); return '消しゴム'; }
+function 選ぶにする(){ 描画の道具 = { 種類: '選ぶ' }; 描画バーを描く(); return '選ぶ'; }
+function なげなわにする(){ 描画の道具 = { 種類: 'なげなわ' }; 描画バーを描く(); return 'なげなわ'; }
+function ペンを足す(){
+  /* ★「追加」＝新しい ペンを 足す★（実Excelも ペンを 増やせる）
+     うちは ★今の ペンの 色ちがい★を 1本 足す（決めた 色だけ＝でたらめに 増やさない） */
+  var 色たち = ['#8B4513', '#800080', '#008B8B', '#FF8C00'];
+  var 次 = 色たち[(Ink.ペンたち.length - 6) % 色たち.length];
+  Ink.ペンたち.push({ 名: 'ペン' + (Ink.ペンたち.length + 1), 色: 次, mm: 0.5, 透け: 1,
+    Excel: '（うちで 足した ペン）' });
+  描画バーを描く();
+  notify('ペンを 1本 足しました（' + 次 + '）');
+  return Ink.ペンたち.length;
+}
+function 描画バーを描く(){
+  var 体 = document.getElementById('inkPens');
+  if (!体) return 0;
+  var h = '';
+  for (var i = 0; i < Ink.ペンたち.length; i++) {
+    var p = Ink.ペンたち[i];
+    var 今か = (描画の道具 && 描画の道具.種類 === 'ペン' && 描画の道具.ペン === p);
+    h += '<button type="button" class="ink-pen" data-i="' + i + '"'
+      + ' onclick="ペンにする(' + i + ')" title="' + _esc(p.Excel || p.名) + '"'
+      + ' style="min-width:34px;min-height:36px;border:' + (今か ? '2px solid #1E88E5' : '1px solid #C8ECD8')
+      + ';background:#ffffff;border-radius:8px;cursor:pointer;font-family:inherit;padding:0 6px;">'
+      + '<span style="display:inline-block;width:16px;height:' + Math.max(2, Math.round(Ink.mmを点に(p.mm))) + 'px;'
+      + 'background:' + p.色 + ';opacity:' + p.透け + ';border-radius:2px;vertical-align:middle;"></span>'
+      + '</button>';
+  }
+  h += '<button type="button" onclick="ペンを足す()" style="min-height:36px;padding:0 8px;border:1px dashed #C8ECD8;'
+    + 'background:#ffffff;color:#7A9A87;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">＋追加</button>';
+  体.innerHTML = h;
+  var 名 = document.getElementById('inkNow');
+  if (名) {
+    名.textContent = !描画の道具 ? '—'
+      : (描画の道具.種類 === 'ペン' ? 描画の道具.ペン.名 : 描画の道具.種類);
+  }
+  var 押し = function (id, on) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.background = on ? '#3D9E72' : '#ffffff';
+    el.style.color = on ? '#ffffff' : '#333333';
+  };
+  押し('inkErase', 描画の道具 && 描画の道具.種類 === '消しゴム');
+  押し('inkSelect', 描画の道具 && 描画の道具.種類 === '選ぶ');
+  押し('inkLasso', 描画の道具 && 描画の道具.種類 === 'なげなわ');
+  return Ink.ペンたち.length;
+}
+/* 押した・動かした・離した（onMD / onMM / onMU から） */
+function 描画で押した(px, py){
+  if (!描画の道具) return false;
+  var x = 画面から物のX(px), y = 画面から物のY(py);
+  if (描画の道具.種類 === 'ペン') {
+    今ひいている線 = Ink.線を始める(描画の道具.ペン, x, y);
+    線の箱().push(今ひいている線);
+    render();
+    return true;
+  }
+  if (描画の道具.種類 === '消しゴム') {
+    var s = Ink.近い線(線の箱(), x, y);
+    if (s) {
+      var 箱 = 線の箱();
+      箱.splice(箱.indexOf(s), 1);
+      render();
+    }
+    今ひいている線 = { 消し中: true };
+    return true;
+  }
+  if (描画の道具.種類 === '選ぶ') {
+    var s2 = Ink.近い線(線の箱(), x, y);
+    えらんだ線たち = s2 ? [s2] : [];
+    render();
+    return true;
+  }
+  if (描画の道具.種類 === 'なげなわ') {
+    なげなわの四角 = { x1: x, y1: y, x2: x, y2: y };
+    return true;
+  }
+  return false;
+}
+function 描画で動いた(px, py){
+  if (!描画の道具) return false;
+  var x = 画面から物のX(px), y = 画面から物のY(py);
+  if (描画の道具.種類 === 'ペン' && 今ひいている線) {
+    Ink.線を伸ばす(今ひいている線, x, y);
+    render();
+    return true;
+  }
+  if (描画の道具.種類 === '消しゴム' && 今ひいている線) {
+    var s = Ink.近い線(線の箱(), x, y);
+    if (s) { var 箱 = 線の箱(); 箱.splice(箱.indexOf(s), 1); render(); }
+    return true;
+  }
+  if (描画の道具.種類 === 'なげなわ' && なげなわの四角) {
+    なげなわの四角.x2 = x; なげなわの四角.y2 = y;
+    render();
+    return true;
+  }
+  return false;
+}
+function 描画で離した(){
+  if (!描画の道具) return false;
+  if (描画の道具.種類 === 'なげなわ' && なげなわの四角) {
+    えらんだ線たち = Ink.中に在る線(線の箱(), なげなわの四角.x1, なげなわの四角.y1,
+      なげなわの四角.x2, なげなわの四角.y2);
+    なげなわの四角 = null;
+    render();
+    notify(えらんだ線たち.length + '本 選びました（消しゴムで 消せます）');
+    return true;
+  }
+  今ひいている線 = null;
+  return true;
+}
+/* 描く（浮かぶ 物の あと・矢印の 前） */
+function インクを描く(){
+  var 箱 = sheets[activeSheet].ink;
+  var ずれX = colX(0), ずれY = rowY(0);
+  var 出た = 0;
+  if (箱 && 箱.length) {
+    for (var i = 0; i < 箱.length; i++) if (Ink.描く(ctx, 箱[i], ずれX, ずれY)) 出た++;
+  }
+  /* えらんだ 線に 印 */
+  for (var j = 0; j < えらんだ線たち.length; j++) {
+    var s = えらんだ線たち[j];
+    var 左 = null, 右 = null, 上 = null, 下 = null;
+    for (var k = 0; k < s.点.length; k++) {
+      var p = s.点[k];
+      if (左 === null || p.x < 左) 左 = p.x;
+      if (右 === null || p.x > 右) 右 = p.x;
+      if (上 === null || p.y < 上) 上 = p.y;
+      if (下 === null || p.y > 下) 下 = p.y;
+    }
+    if (左 === null) continue;
+    ctx.save();
+    ctx.strokeStyle = '#1E88E5'; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+    ctx.strokeRect(左 + ずれX - 4, 上 + ずれY - 4, (右 - 左) + 8, (下 - 上) + 8);
+    ctx.restore();
+  }
+  /* なげなわの 四角 */
+  if (なげなわの四角) {
+    ctx.save();
+    ctx.strokeStyle = '#1E88E5'; ctx.lineWidth = 1; ctx.setLineDash([6, 4]);
+    ctx.strokeRect(Math.min(なげなわの四角.x1, なげなわの四角.x2) + ずれX,
+      Math.min(なげなわの四角.y1, なげなわの四角.y2) + ずれY,
+      Math.abs(なげなわの四角.x2 - なげなわの四角.x1),
+      Math.abs(なげなわの四角.y2 - なげなわの四角.y1));
+    ctx.restore();
+  }
+  return 出た;
+}
+/* ★インクの 再生★＝引いた 順に 少しずつ 出す */
+function インクを再生(){
+  var 箱 = (sheets[activeSheet].ink || []).slice();
+  if (!箱.length) { notify('★まだ 何も 書いていません★'); return 0; }
+  var 元 = sheets[activeSheet].ink;
+  sheets[activeSheet].ink = [];
+  render();
+  var i = 0;
+  var 次 = function () {
+    if (i >= 箱.length) { sheets[activeSheet].ink = 元; render(); return; }
+    sheets[activeSheet].ink.push(箱[i]);
+    i++;
+    render();
+    setTimeout(次, 180);
+  };
+  setTimeout(次, 180);
+  notify(箱.length + '本を 引いた順に 出します');
+  return 箱.length;
+}
+function インクのヘルプ(){
+  document.getElementById('funcTitle').textContent = 'インクの ヘルプ';
+  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  var h = '<div style="line-height:1.9;">'
+    + '<div>★ペン★ … 押したまま 動かすと 線が 引けます。</div>'
+    + '<div>★消しゴム★ … 線の 上を なぞると その 線が 消えます。</div>'
+    + '<div>★選択★ … 線を 押すと その 線を 選びます。</div>'
+    + '<div>★なげなわ★ … 囲むと 中に 入っている 線を まとめて 選びます。</div>'
+    + '<div>★再生★ … 引いた 順に もう一度 出します。</div>'
+    + '<div>★追加★ … ペンを 1本 増やします。</div>'
+    + '<div style="color:#7A9A87;font-size:12px;margin-top:8px;">'
+    + 'ペンの 色と 太さは ★実Excelの 物と 同じ★です'
+    + '（黒0.35mm／赤0.35mm／鉛筆 灰0.5mm／蛍光 黄6mm／万年筆 濃青1mm／ブラシ 緑1mm）。<br>'
+    + '★まだ 出来ない物★＝「インクを 図形に 変換」「インクを 数式に 変換」'
+    + '（書いた 形を 読み取る 仕組みが 要ります）。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
 }
 
 /* ★シートに 浮かぶ 物（画像・図形・テキスト）★ 2026-08-30
