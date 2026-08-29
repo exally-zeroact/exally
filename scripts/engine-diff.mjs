@@ -12,6 +12,32 @@
  *    ・2つの版で 同じ表を 計算して ★1セルずつ 突き合わせる★
  *    ・★比べる相手は 先に 複製する★（同じ物を 指したまま だと 自分の答えで 上書きされる）
  *
+ *  ★★この道具を 作る時に 踏んだ 穴 4つ（★次の人へ★）★★
+ *    ①直しの鍵は ★「シート名|行,列」★（A1形式では 1本も 当たらない）… Excel一致 2,043→10,523
+ *    ②シートは ★先に 全部 addSheet してから setSheetContent★
+ *      （1枚ずつ 作ると、まだ 無いシートを 見る式が その場で #ERROR! になり 後で 直らない）
+ *    ③★HyperFormula は 日本語のシート名を そのままでは 読めない★
+ *      実測 … `=歩合!B1` → #ERROR! ／ `='歩合'!B2` → 20
+ *      ⇒ 本番と 同じ変換（convertFormula ＋ シート名を 引用符で 囲む）を 通す … 10,523→15,446
+ *    ④★Exallyの関数プラグインを 積み忘れていた★（★これが 一番 効いた★）
+ *      本番は exally-formula.js が TEXT/FILTER/MATCH/INDEX ほか 137本を 自前の物に 差し替える。
+ *      積まないと 素の HyperFormula が 答える。実測 … `=TEXT(A5,"aaa")` が
+ *      曜日「木」ではなく 字そのまま "aaa" ⇒ ★本番では 直っている 907本を「合わない」と 数えていた★
+ *      ★登録の旗（_pluginRegistered）は 1本しか 無い★ので 2つ目の エンジンには 積めない
+ *      ⇒ exally-formula.js を エンジンごとに 読み直す … 15,446→16,353
+ *    ★数字が おかしい時は まず 自分の 測り方を 疑う★（うちで 7回目・指示役 2026-08-29）
+ *
+ *  ★★測って 分かった事（2026-08-29 実測・司さんの実物 19,323本）★★
+ *    ・道具の入れ替え（2.6.1→3.4.0）で 答えが 変わった式 … ★0本★
+ *    ・Excelが 残した答えと 合った … ★16,353本（84.6%）★
+ *    ・合わない 2,970本の 中身 …
+ *        ★2,918本＝空のセルを 指した時★（Excelは 0・うちは 空。exally-formula.js:44）
+ *        ★52本＝.xlsb の 表の参照★＝★うちの計算では ない★。読み取りライブラリの この1行:
+ *            case "PtgList": f.push("Table"+w[1].idx+"[#"+w[1].rt+"]")
+ *          列の番号（w[1].c / w[1].C）を 持っているのに 使わないので 8列 全部が
+ *          `Table1[#Data]` に なる。★.xlsx は <f> の 字を そのまま 使うので 起きない★
+ *        ★数どうしで 違う＝0本★／★字で 違う＝0本★（＝お金の数字は 1本も 違わない）
+ *
  *  ★出す物★
  *    ・式の本数／答えが 違った本数／どの関数を 使っている式が 違ったか
  *    ・★Excelが ファイルに 残した答え（キャッシュ）とも 比べる★＝どちらが 正しいかの 手掛かり
@@ -56,7 +82,20 @@ function シート名を囲む(f, 名前たち) {
 
 /** 本番と 同じ設定で 表を 載せて 全部 計算する */
 function 計算する(道具, sheets) {
-  const { HyperFormula } = require_(道具);
+  const ns = require_(道具);
+  const { HyperFormula } = ns;
+  /* ★穴4（2026-08-29 実測）★＝★Exallyの関数（EX.TEXT など）を 積み忘れていた★。
+     本番は exally-formula.js が TEXT/FILTER/MATCH/INDEX ほか 137本を 自前の物に 差し替える。
+     積まないと 素の HyperFormula が 答えるので、例えば =TEXT(A5,"aaa") が
+     曜日「木」ではなく 字そのまま "aaa" を 返し、★本番では 直っている物を
+     「合わない」と 数えてしまう★（この積み忘れだけで 3,877本の うち 907本が 嘘だった）。
+     ★登録の旗（_pluginRegistered）は 1本しか 無いので、2つ目の エンジンには 積めない★
+     ⇒ exally-formula.js を エンジンごとに ★読み直して★ 別の旗を 持たせる。 */
+  delete require_.cache[require_.resolve(path.join(ROOT, 'exally-formula.js'))];
+  const EFn = require_(path.join(ROOT, 'exally-formula.js'));
+  if (typeof EFn.registerExallyFunctions !== 'function' || !EFn.registerExallyFunctions(ns)) {
+    throw new Error('★Exallyの関数プラグインを 積めなかった＝この測定は 本番の道では ない★');
+  }
   /* ★本番と 同じ設定★（book.html の initFormulaEngine より） */
   const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
   /* ★シートは 先に 全部 作ってから 中身を 入れる★（本番も addSheetToEngine → loadSheetIntoEngine の順）。
@@ -93,10 +132,20 @@ let 直し = {}, 直しの数 = 0;
 const r = await TableRefs.resolve(bytes, 形, wb, ZipSurgeon);
 if (r && r.ok) { 直し = r.fixes || {}; 直しの数 = Object.keys(直し).length; }
 else console.log('※ 表の名前での参照を 直せませんでした（' + (r && r.why) + '）');
+/* ★直せた数だけ 見て 満足しない★＝table-refs.js は 辻褄が 合わない時 わざと 直さない
+   （「壊すより断る」lib/table-refs.js:25）。★断った数を 数えないと 残った #ERROR の
+   出どころが 分からない★（2026-08-29 指示役の宿題で 要った）。 */
+if (r && r.stats) {
+  console.log('  表の参照の 直し … 直した ' + (r.stats.fixed || 0).toLocaleString()
+    + ' ／ ★わざと 断った ' + (r.stats.refused || 0).toLocaleString() + '★'
+    + ' ／ 見送り ' + (r.stats.skipped || 0).toLocaleString()
+    + ' ／ 見たセル ' + (r.stats.cells || 0).toLocaleString());
+}
 
 const sheets = [];
 let 式の本数 = 0;
 const Excelの答え = {};
+const 生の式 = {};   /* ★合わない時に 元の式を 見るため（直す前と 直した後の 両方）★ */
 for (const nm of wb.SheetNames) {
   const ws = wb.Sheets[nm];
   if (!ws) continue;
@@ -116,6 +165,7 @@ for (const nm of wb.SheetNames) {
       const 直った = 直し[nm + '|' + R + ',' + C];
       if (cell.f || 直った) {
         const f = 直った || cell.f;
+        生の式[nm + '!' + R + ',' + C] = { 元: String(cell.f || ''), 直: 直った ? String(直った) : null };
         /* ★本番と 同じ順で 通す★＝convertFormula（exally-formula.js）→ シート名を囲む */
         let 式 = '=' + String(f).replace(/^=/, '');
         if (EF && typeof EF.convertFormula === 'function') 式 = EF.convertFormula(式);
@@ -180,6 +230,28 @@ const 突合 = (答え) => {
   }
   return { 合, 差, 無 };
 };
+/** ★合わない式を 関数ごとに 数える★（何が 効いているかを 見る） */
+function 関数ごと(答え) {
+  const 数 = {};
+  for (const k of Object.keys(Excelの答え)) {
+    const e = Excelの答え[k], v = 答え[k];
+    if (v === undefined) continue;
+    const 数か = (typeof e === 'number' && typeof v === 'number');
+    if (数か ? Math.abs(e - v) <= Math.max(1e-9, Math.abs(e) * 1e-9) : String(e) === String(v)) continue;
+    const [sh, rc] = k.split('!');
+    const [R, C] = rc.split(',').map(Number);
+    const 式 = ((sheets.find((x) => x.name === sh) || {}).grid || [])[R] || [];
+    const f = String(式[C] || '');
+    const 見た = new Set();
+    const re = /([A-Z][A-Z0-9._]*)\s*\(/g;
+    let m;
+    while ((m = re.exec(f))) 見た.add(m[1]);
+    if (!見た.size) 見た.add('（関数なし＝式だけ）');
+    for (const n of 見た) 数[n] = (数[n] || 0) + 1;
+  }
+  return 数;
+}
+
 const a = 突合(前の答え), b = 突合(今.答え);
 console.log('');
 console.log('★Excelが ファイルに 残した答えとの 突き合わせ（' + Object.keys(Excelの答え).length.toLocaleString() + '本）★');
@@ -191,6 +263,15 @@ if (process.argv.includes('--見本')) {
     const 数 = (typeof e === 'number' && typeof v === 'number');
     const 合う = 数 ? Math.abs(e - v) <= Math.max(1e-9, Math.abs(e) * 1e-9) : String(e) === String(v);
     if (合う || n >= 12) continue;
+    /* --だけ=TEXT のように 群を 絞れる（★何が 効いているかを 1群ずつ 見る★） */
+    const 絞り = (process.argv.find((x) => x.startsWith('--だけ=')) || '').split('=')[1];
+    if (絞り) {
+      const [sh2, rc2] = k.split('!');
+      const [R2, C2] = rc2.split(',').map(Number);
+      const f2 = String((((sheets.find((x) => x.name === sh2) || {}).grid || [])[R2] || [])[C2] || '');
+      const 関数あり = /[A-Z][A-Z0-9._]*\s*\(/.test(f2);
+      if (絞り === 'なし' ? 関数あり : !new RegExp('\b' + 絞り + '\s*\(').test(f2)) continue;
+    }
     n++;
     const [sh, rc] = k.split('!');
     const [R, C] = rc.split(',').map(Number);
@@ -199,4 +280,82 @@ if (process.argv.includes('--見本')) {
   }
 }
 console.log('  今の道具 … 合う ' + b.合.toLocaleString() + ' ／ 違う ' + b.差.toLocaleString() + ' ／ 計算できず ' + b.無.toLocaleString());
+/* ★合わない物を「型」で 分ける★＝1つの決まりの違いで まとめて 説明できるか 見る */
+{
+  let 空ゼロ = 0, 数の差 = 0, 字の差 = 0, エラー = 0, その他 = 0;
+  for (const k of Object.keys(Excelの答え)) {
+    const e = Excelの答え[k], v = 今.答え[k];
+    if (v === undefined) continue;
+    const 数か = (typeof e === 'number' && typeof v === 'number');
+    if (数か ? Math.abs(e - v) <= Math.max(1e-9, Math.abs(e) * 1e-9) : String(e) === String(v)) continue;
+    if (e === 0 && (v === null || v === '' || v === undefined)) 空ゼロ++;
+    else if (typeof v === 'string' && /^#/.test(v)) エラー++;
+    else if (typeof e === 'number' && typeof v === 'number') 数の差++;
+    else if (typeof e === 'string' || typeof v === 'string') 字の差++;
+    else その他++;
+  }
+  console.log('');
+  /* ★本番は 先に 独自層(_jsComputeFormula)を 通る★＝この測り台が 本番の道と 言えるのは
+     「独自層が 1本も 答えていない」時だけ。★言い切る前に 数える★（指示役 2026-08-29）。
+     独自層は ★式の 一番外側の 関数名★が この26個の時だけ 答える（exally-formula.js:921-929）。 */
+  const 独自層の担当 = ('PERCENTILE QUARTILE XIRR DATESTRING OFFSET N CONVERT DSUM DAVERAGE DCOUNT '
+    + 'DCOUNTA DMAX DMIN DPRODUCT DGET DSTDEV DSTDEVP DVAR DVARP LINEST BINOM FREQUENCY '
+    + 'REDUCE SCAN MAP MAKEARRAY ISOMITTED').split(' ');
+  let 独自層が答える = 0;
+  const 独自層の内訳 = {};
+  for (const s2 of sheets) {
+    for (const 行 of s2.grid) {
+      for (const c of (行 || [])) {
+        if (typeof c !== 'string' || c[0] !== '=') continue;
+        const m = c.slice(1).trim().match(/^([A-Z][A-Z0-9.]*)\s*\(/i);
+        if (!m) continue;
+        const 名 = m[1].toUpperCase().split('.')[0];
+        if (独自層の担当.indexOf(名) >= 0) { 独自層が答える++; 独自層の内訳[名] = (独自層の内訳[名] || 0) + 1; }
+      }
+    }
+  }
+  console.log('');
+  console.log('★この測り台は 本番の道か★');
+  console.log('   独自層(_jsComputeFormula)が 答える式 … ' + 独自層が答える.toLocaleString() + '本'
+    + (独自層が答える ? '（' + Object.keys(独自層の内訳).map((k) => k + ' ' + 独自層の内訳[k]).join(' / ') + '）'
+      : ' ⇒ ★このブックでは 独自層は 出番なし＝HyperFormula だけで 本番と 同じ★'));
+  console.log('');
+  console.log('★合わない 3つ以上の 型で 分ける★');
+  console.log('   ★Excelは 0・うちは 空★ … ' + 空ゼロ.toLocaleString() + '本'
+    + '（Excelは 空のセルを 指すと 0 を返す。うち（HyperFormula）は 空のまま）');
+  console.log('   うちが エラー … ' + エラー.toLocaleString() + '本');
+  console.log('   数どうしで 違う … ' + 数の差.toLocaleString() + '本');
+  console.log('   字が 絡んで 違う … ' + 字の差.toLocaleString() + '本');
+  console.log('   その他 … ' + その他.toLocaleString() + '本');
+  /* ★中身を 見ないと 直せない★＝エラーと 字の差を 少しだけ 出す */
+  if (process.argv.includes('--中身')) {
+    let e1 = 0, e2 = 0;
+    for (const k of Object.keys(Excelの答え)) {
+      const e = Excelの答え[k], v = 今.答え[k];
+      if (v === undefined) continue;
+      const 数か = (typeof e === 'number' && typeof v === 'number');
+      if (数か ? Math.abs(e - v) <= Math.max(1e-9, Math.abs(e) * 1e-9) : String(e) === String(v)) continue;
+      const [sh, rc] = k.split('!');
+      const [R, C] = rc.split(',').map(Number);
+      const f = String((((sheets.find((x) => x.name === sh) || {}).grid || [])[R] || [])[C] || '');
+      if (typeof v === 'string' && /^#/.test(v) && e1 < 6) {
+        e1++;
+        const g = 生の式[k] || {};
+        console.log('   ［エラー］' + k + ' ／ Excel=' + JSON.stringify(e) + ' ／ うち=' + v);
+        console.log('        元の式 … ' + String(g.元).slice(0, 160));
+        if (g.直) console.log('        直した後 … ' + String(g.直).slice(0, 160));
+      } else if ((typeof e === 'string' || typeof v === 'string') && !/^#/.test(String(v)) && e2 < 6) {
+        e2++; console.log('   ［字］' + k + ' ' + f.slice(0, 70) + ' ／ Excel=' + JSON.stringify(e) + ' ／ うち=' + JSON.stringify(v));
+      }
+    }
+  }
+}
+
+const 内訳 = 関数ごと(今.答え);
+const 並び = Object.keys(内訳).sort((x, y) => 内訳[y] - 内訳[x]).slice(0, 12);
+if (並び.length) {
+  console.log('');
+  console.log('★合わない式の 関数ごとの 内訳（のべ・多い順）★');
+  for (const n of 並び) console.log('   ' + n.padEnd(16) + ' ' + 内訳[n].toLocaleString() + '本');
+}
 console.log('');
