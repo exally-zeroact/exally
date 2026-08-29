@@ -20,6 +20,8 @@ const FILES = [
   ['split-columns.test.mjs', '--self-test'], // ★区切り位置＝実Excelの TextToColumns どおり★
   ['chart.test.mjs', '--self-test'],         // ★グラフ＝実Excelの既定（360x216・凡例は2本以上）★
   ['comment.test.mjs', '--self-test'],       // ★コメント＝実Excelどおり（作者つき・赤い印だけ）★
+  ['page-setup.test.mjs', '--self-test'],    // ★ページ設定＝実Excelの既定（A4縦・枠線も見出しも刷らない）★
+  ['protect.test.mjs', '--self-test'],       // ★シートの保護＝実Excelどおり（既定は全セルロック・保護して初めて効く）★
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

@@ -1298,61 +1298,61 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=d8a0e0f6"></script>
+<script src="hyperformula.full.min.js?v=46cc356d"></script>
 
-<script src="exally-formula.js?v=d8a0e0f6"></script>
+<script src="exally-formula.js?v=46cc356d"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=d8a0e0f6"></script>
+<script src="js/file-out.js?v=46cc356d"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=d8a0e0f6"></script>
-<script src="lib/grid-xlsx.js?v=d8a0e0f6"></script>
+<script src="lib/typed-value.js?v=46cc356d"></script>
+<script src="lib/grid-xlsx.js?v=46cc356d"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=d8a0e0f6"></script>
-<script src="lib/autosum.js?v=d8a0e0f6"></script>
-<script src="lib/grid-sort.js?v=d8a0e0f6"></script>
-<script src="lib/grid-filter.js?v=d8a0e0f6"></script>
-<script src="lib/grid-find.js?v=d8a0e0f6"></script>
-<script src="lib/grid-print.js?v=d8a0e0f6"></script>
-<script src="lib/ai-reason.js?v=d8a0e0f6"></script>
-<script src="lib/menu-place.js?v=d8a0e0f6"></script>
-<script src="lib/grid-stats.js?v=d8a0e0f6"></script>
-<script src="lib/grid-valid.js?v=d8a0e0f6"></script>
-<script src="lib/cond-format.js?v=d8a0e0f6"></script>
-<script src="lib/ref-graph.js?v=d8a0e0f6"></script>
-<script src="lib/shindan.js?v=d8a0e0f6"></script>
+  <script src="lib/grid-refedit.js?v=46cc356d"></script>
+<script src="lib/autosum.js?v=46cc356d"></script>
+<script src="lib/grid-sort.js?v=46cc356d"></script>
+<script src="lib/grid-filter.js?v=46cc356d"></script>
+<script src="lib/grid-find.js?v=46cc356d"></script>
+<script src="lib/grid-print.js?v=46cc356d"></script>
+<script src="lib/ai-reason.js?v=46cc356d"></script>
+<script src="lib/menu-place.js?v=46cc356d"></script>
+<script src="lib/grid-stats.js?v=46cc356d"></script>
+<script src="lib/grid-valid.js?v=46cc356d"></script>
+<script src="lib/cond-format.js?v=46cc356d"></script>
+<script src="lib/ref-graph.js?v=46cc356d"></script>
+<script src="lib/shindan.js?v=46cc356d"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=d8a0e0f6"></script>
-<script src="lib/vba-mikata.js?v=d8a0e0f6"></script>
-<script src="lib/vba-tejun.js?v=d8a0e0f6"></script>
-<script src="lib/rireki.js?v=d8a0e0f6"></script>
-<script src="lib/chizu.js?v=d8a0e0f6"></script>
-<script src="lib/horu.js?v=d8a0e0f6"></script>
-<script src="lib/excel-version.js?v=d8a0e0f6"></script>
-<script src="lib/teian.js?v=d8a0e0f6"></script>
-<script src="lib/kikan.js?v=d8a0e0f6"></script>
-<script src="lib/recipe.js?v=d8a0e0f6"></script>
-<script src="lib/kirikae.js?v=d8a0e0f6"></script>
-<script src="js/recipe-store.js?v=d8a0e0f6"></script>
-<script src="js/rireki-store.js?v=d8a0e0f6"></script>
-<script src="lib/excel-version.js?v=d8a0e0f6"></script>
+<script src="lib/vba.js?v=46cc356d"></script>
+<script src="lib/vba-mikata.js?v=46cc356d"></script>
+<script src="lib/vba-tejun.js?v=46cc356d"></script>
+<script src="lib/rireki.js?v=46cc356d"></script>
+<script src="lib/chizu.js?v=46cc356d"></script>
+<script src="lib/horu.js?v=46cc356d"></script>
+<script src="lib/excel-version.js?v=46cc356d"></script>
+<script src="lib/teian.js?v=46cc356d"></script>
+<script src="lib/kikan.js?v=46cc356d"></script>
+<script src="lib/recipe.js?v=46cc356d"></script>
+<script src="lib/kirikae.js?v=46cc356d"></script>
+<script src="js/recipe-store.js?v=46cc356d"></script>
+<script src="js/rireki-store.js?v=46cc356d"></script>
+<script src="lib/excel-version.js?v=46cc356d"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=d8a0e0f6">
-<script src="lib/named-ranges.js?v=d8a0e0f6"></script>
-<script src="lib/chart.js?v=d8a0e0f6"></script>
-<script src="lib/ribbon-spec.js?v=d8a0e0f6"></script>
-<script src="lib/ribbon-actions.js?v=d8a0e0f6"></script>
-<script src="lib/ribbon.js?v=d8a0e0f6"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=46cc356d">
+<script src="lib/named-ranges.js?v=46cc356d"></script>
+<script src="lib/chart.js?v=46cc356d"></script>
+<script src="lib/ribbon-spec.js?v=46cc356d"></script>
+<script src="lib/ribbon-actions.js?v=46cc356d"></script>
+<script src="lib/ribbon.js?v=46cc356d"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=d8a0e0f6"></script>
-<script src="js/exally-login.js?v=d8a0e0f6"></script>
-<script src="js/auth.js?v=d8a0e0f6"></script>
+<script src="js/supa-config.js?v=46cc356d"></script>
+<script src="js/exally-login.js?v=46cc356d"></script>
+<script src="js/auth.js?v=46cc356d"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1671,8 +1671,10 @@ function printSheet(){
   /* 2セル以上 選んでいれば その範囲だけ。1セルなら 中身が在る所ぜんぶ。 */
   var 範囲 = (selR1!==selR2 || selC1!==selC2)
     ? { r1:selR1, c1:selC1, r2:selR2, c2:selC2 } : null;
+  /* ★ページ設定を 効かせる★（2026-08-29）＝向き・枠線・見出し */
   var html = GridPrint.buildHtml({
     data: sh.data, range: 範囲, sheetName: sh.name,
+    向き: ページ設定.向き, 枠線: ページ設定.枠線, 行列番号: ページ設定.行列番号,
     fileName: (typeof BookOpen!=='undefined' && BookOpen.isOpened && BookOpen.isOpened())
       ? (BookOpen.current && BookOpen.current().name) || '' : '',
   });
@@ -2725,6 +2727,8 @@ function _renderPass() {
   }
 
   // 2. グリッド線
+  /* ★画面の 枠線を 出すか★（Excelの 表示→枠線）2026-08-29。既定は 出す。 */
+  if(window.枠線を出す !== false){
   ctx.strokeStyle=C_CELL_LINE; ctx.lineWidth=0.5; ctx.beginPath();
   for(var r=sR;r<=eR+2;r++){
     var ly=Math.round(rowY(r))+0.5; if(ly<=HDR_H||ly>wrapH) continue;
@@ -2735,6 +2739,7 @@ function _renderPass() {
     ctx.moveTo(lx,HDR_H); ctx.lineTo(lx,wrapH);
   }
   ctx.stroke();
+  }
 
   // 3. セルテキスト
   for(var r=sR;r<=eR+1;r++) for(var c=sC;c<=eC+1;c++) drawText(r,c);
@@ -4102,6 +4107,43 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★コメント（校閲タブ）★ 2026-08-29
      実Excel実測＝セルに 付く／作者が 付く／★既定では 見えない（赤い印だけ）★
      alert / prompt / confirm は 使わない -->
+<!-- ★ページ設定★ 2026-08-29
+     実Excel実測＝縦／A4／余白 上下19.1mm・左右17.8mm／★枠線も 見出しも 刷らない★
+     alert / prompt / confirm は 使わない -->
+<div id="pageOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ページ設定</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">紙に 刷る時の 決まり</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">用紙の 向き</span>
+        <select id="pageOrient" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="portrait">縦</option>
+          <option value="landscape">横</option>
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
+        <input id="pageGrid" type="checkbox" style="width:20px;height:20px;">
+        <span>枠線を 刷る</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
+        <input id="pageHead" type="checkbox" style="width:20px;height:20px;">
+        <span>行と列の 見出し（1,2,3 / A,B,C）を 刷る</span>
+      </label>
+      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
+        用紙は A4・余白は 上下 19.1mm／左右 17.8mm（★実Excelの 既定を 測った値★）。<br>
+        枠線も 見出しも ★実Excelの 既定は 刷らない★です。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ページ設定を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="ページ設定を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
+
 <div id="commentOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -5028,6 +5070,18 @@ function resize() {
 function getCell(r,c){ return sheets[activeSheet].data[r+','+c] || {v:'',f:'',d:''}; }
 var undoStack = [], redoStack = [];
 function setCell(r,c,v,noUndo){
+  /* ★シートの保護★（2026-08-29）＝実Excel実測どおり
+     ・新しいセルは 全部 ロック／★ロックは 保護して 初めて 効く★
+     ・ロックを 外したセルだけ 保護中も 書ける
+     ★黙って 素通りさせない＝なぜ 書けないかを 出す★ */
+  if(typeof ここに書けるか === 'function' && !ここに書けるか(r,c)){
+    if(!window._保護の知らせ){
+      window._保護の知らせ = true;
+      notify('このシートは 保護中です（直すには 校閲→シートの保護を やめる）');
+      setTimeout(function(){ window._保護の知らせ = false; }, 1500);
+    }
+    return;
+  }
   /* ★最初の1直しの前に、全シートの控えを取る★（2026-08-18 実物で見つけた）
      控え(base)は「うちのエンジンから見た、まだ触っていないファイル」でなければならない。
      ところが 開いていないシートは ★保存の時に初めて流されて その場で控えを取り直す★ので、
@@ -6882,6 +6936,127 @@ function コメントの一覧(){
   return 鍵.length;
 }
 
+/* ★ページ設定（ページ レイアウト タブ）★ 2026-08-29
+ *   ★真値（実Excel 16.0 を COM で 実測）★
+ *     向き … 1（縦）／用紙 … 9（A4）／倍率 … 100
+ *     余白 … 上下 54pt（19.1mm）／左右 50.4pt（17.8mm）／ヘッダー・フッター 21.6pt
+ *     ★枠線を 印刷 … False★／★見出しを 印刷 … False★
+ *     中央に 寄せる … 横も 縦も False
+ *   ⇒ ★うちの 既定も 同じに する★（lib/grid-print.js は もう この値で 組んである）
+ *
+ *   ★alert / prompt / confirm は 使わない★（画面が 止まる）。
+ */
+var ページ設定 = { 向き: 'portrait', 枠線: false, 行列番号: false };
+
+function ページ設定を開く(){
+  hideCtxMenu();
+  var ov = document.getElementById('pageOverlay');
+  if (!ov) return;
+  document.getElementById('pageOrient').value = ページ設定.向き;
+  document.getElementById('pageGrid').checked = !!ページ設定.枠線;
+  document.getElementById('pageHead').checked = !!ページ設定.行列番号;
+  ov.style.display = 'flex';
+}
+function ページ設定を閉じる(){
+  var ov = document.getElementById('pageOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function ページ設定を決める(){
+  ページ設定.向き 　= document.getElementById('pageOrient').value === 'landscape' ? 'landscape' : 'portrait';
+  ページ設定.枠線 　= !!document.getElementById('pageGrid').checked;
+  ページ設定.行列番号 = !!document.getElementById('pageHead').checked;
+  ページ設定を閉じる();
+  notify('ページの 設定を 変えました（' + (ページ設定.向き === 'landscape' ? '横' : '縦')
+    + '／枠線 ' + (ページ設定.枠線 ? '刷る' : '刷らない')
+    + '／見出し ' + (ページ設定.行列番号 ? '刷る' : '刷らない') + '）');
+}
+/* リボンから 1つずつ 切り替える（Excelの「印刷の向き」「枠線」「見出し」） */
+function 向きを切り替える(){
+  ページ設定.向き 　= (ページ設定.向き === 'landscape') ? 'portrait' : 'landscape';
+  notify('用紙の 向き … ' + (ページ設定.向き === 'landscape' ? '★横★' : '★縦★'));
+  return ページ設定.向き;
+}
+function 枠線を刷るか(){
+  ページ設定.枠線 = !ページ設定.枠線;
+  notify('枠線 … ' + (ページ設定.枠線 ? '★刷る★' : '刷らない'));
+  return ページ設定.枠線;
+}
+function 見出しを刷るか(){
+  ページ設定.行列番号 = !ページ設定.行列番号;
+  notify('行と列の 見出し … ' + (ページ設定.行列番号 ? '★刷る★' : '刷らない'));
+  return ページ設定.行列番号;
+}
+
+/* ★シートの保護（校閲タブ）★ 2026-08-29
+ *   ★真値（実Excel 16.0 で 実測）★
+ *     ・新しいセルは ★全部 ロック（Locked=True）★
+ *     ・★ロックは 保護して 初めて 効く★（保護していない間は どこでも 書ける）
+ *     ・ロックを 外したセルだけ 保護中も 書ける
+ *   ⇒ うちも 同じに する。★合言葉は 掛けない★（忘れたら 二度と 開けないので）。
+ *      Excelの 合言葉は ★守りとしては 弱い★（外す道具が 出回っている）＝
+ *      「うっかり 直すのを 防ぐ」ための 物と 割り切る。
+ */
+function このシートは保護中(){
+  var s = sheets[activeSheet];
+  return !!(s && s.protect);
+}
+function セルはロックされているか(r, c){
+  var s = sheets[activeSheet];
+  var cell = s.data[r + ',' + c];
+  /* ★既定は ロック★（実Excelと 同じ）＝はっきり false の時だけ 書ける */
+  return !(cell && cell.locked === false);
+}
+/* ★書いてよいか★＝保護中で ロックされていたら 断る */
+function ここに書けるか(r, c){
+  if (!このシートは保護中()) return true;
+  return !セルはロックされているか(r, c);
+}
+function シートを保護する(){
+  var s = sheets[activeSheet];
+  s.protect = true;
+  render(); updateBar();
+  notify('このシートを 保護しました（ロックを 外したセルだけ 直せます）');
+  return true;
+}
+function シートの保護をやめる(){
+  var s = sheets[activeSheet];
+  s.protect = false;
+  render(); updateBar();
+  notify('保護を やめました');
+  return false;
+}
+function シートの保護を切り替える(){
+  return このシートは保護中() ? シートの保護をやめる() : シートを保護する();
+}
+/* ★選んだ所の ロックを 外す／掛ける★（Excelの「セルのロック」） */
+function 選んだ所のロックを切り替える(){
+  var s = sheets[activeSheet];
+  var 外す = セルはロックされているか(selR1, selC1);   /* 今 ロックされていれば 外す */
+  var 数 = 0;
+  for (var r = selR1; r <= selR2; r++) {
+    for (var c = selC1; c <= selC2; c++) {
+      var k = r + ',' + c;
+      if (!s.data[k]) s.data[k] = { v: '', f: '', d: '' };
+      s.data[k].locked = 外す ? false : true;
+      数++;
+    }
+  }
+  render(); updateBar();
+  notify(数 + '個の セルの ロックを ' + (外す ? '★外しました★（保護中でも 直せます）' : '★掛けました★'));
+  return 外す;
+}
+
+/* ★画面の 枠線を 出す／消す★（Excelの 表示→枠線）2026-08-29
+ *   ★紙に 刷る枠線とは 別物★（あちらは ページ設定）。Excelも 別々に 持っている。 */
+var 枠線を出す = true;
+window.枠線を出す = true;
+function 枠線の表示を切り替える(){
+  枠線を出す = !枠線を出す;
+  window.枠線を出す = 枠線を出す;
+  render();
+  notify('画面の 枠線 … ' + (枠線を出す ? '★出す★' : '消す'));
+  return 枠線を出す;
+}
 function ctxDelete(){
   for(var r=selR1;r<=selR2;r++)
     for(var c=selC1;c<=selC2;c++) setCell(r,c,'');
