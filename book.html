@@ -1304,62 +1304,63 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=bdedb164"></script>
+<script src="hyperformula.full.min.js?v=5330f6a9"></script>
 
-<script src="exally-formula.js?v=bdedb164"></script>
+<script src="exally-formula.js?v=5330f6a9"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=bdedb164"></script>
+<script src="js/file-out.js?v=5330f6a9"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=bdedb164"></script>
-<script src="lib/grid-xlsx.js?v=bdedb164"></script>
+<script src="lib/typed-value.js?v=5330f6a9"></script>
+<script src="lib/grid-xlsx.js?v=5330f6a9"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=bdedb164"></script>
-<script src="lib/autosum.js?v=bdedb164"></script>
-<script src="lib/grid-sort.js?v=bdedb164"></script>
-<script src="lib/grid-filter.js?v=bdedb164"></script>
-<script src="lib/grid-find.js?v=bdedb164"></script>
-<script src="lib/grid-print.js?v=bdedb164"></script>
-<script src="lib/ai-reason.js?v=bdedb164"></script>
-<script src="lib/menu-place.js?v=bdedb164"></script>
-<script src="lib/grid-stats.js?v=bdedb164"></script>
-<script src="lib/grid-valid.js?v=bdedb164"></script>
-<script src="lib/cond-format.js?v=bdedb164"></script>
-<script src="lib/ref-graph.js?v=bdedb164"></script>
-<script src="lib/shindan.js?v=bdedb164"></script>
+  <script src="lib/grid-refedit.js?v=5330f6a9"></script>
+<script src="lib/autosum.js?v=5330f6a9"></script>
+<script src="lib/grid-sort.js?v=5330f6a9"></script>
+<script src="lib/grid-filter.js?v=5330f6a9"></script>
+<script src="lib/grid-find.js?v=5330f6a9"></script>
+<script src="lib/grid-print.js?v=5330f6a9"></script>
+<script src="lib/ai-reason.js?v=5330f6a9"></script>
+<script src="lib/menu-place.js?v=5330f6a9"></script>
+<script src="lib/grid-stats.js?v=5330f6a9"></script>
+<script src="lib/grid-valid.js?v=5330f6a9"></script>
+<script src="lib/cond-format.js?v=5330f6a9"></script>
+<script src="lib/ref-graph.js?v=5330f6a9"></script>
+<script src="lib/shindan.js?v=5330f6a9"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=bdedb164"></script>
-<script src="lib/vba-mikata.js?v=bdedb164"></script>
-<script src="lib/vba-tejun.js?v=bdedb164"></script>
-<script src="lib/rireki.js?v=bdedb164"></script>
-<script src="lib/chizu.js?v=bdedb164"></script>
-<script src="lib/horu.js?v=bdedb164"></script>
-<script src="lib/excel-version.js?v=bdedb164"></script>
-<script src="lib/teian.js?v=bdedb164"></script>
-<script src="lib/kikan.js?v=bdedb164"></script>
-<script src="lib/recipe.js?v=bdedb164"></script>
-<script src="lib/kirikae.js?v=bdedb164"></script>
-<script src="js/recipe-store.js?v=bdedb164"></script>
-<script src="js/rireki-store.js?v=bdedb164"></script>
-<script src="lib/excel-version.js?v=bdedb164"></script>
+<script src="lib/vba.js?v=5330f6a9"></script>
+<script src="lib/vba-mikata.js?v=5330f6a9"></script>
+<script src="lib/vba-tejun.js?v=5330f6a9"></script>
+<script src="lib/rireki.js?v=5330f6a9"></script>
+<script src="lib/chizu.js?v=5330f6a9"></script>
+<script src="lib/horu.js?v=5330f6a9"></script>
+<script src="lib/excel-version.js?v=5330f6a9"></script>
+<script src="lib/teian.js?v=5330f6a9"></script>
+<script src="lib/kikan.js?v=5330f6a9"></script>
+<script src="lib/recipe.js?v=5330f6a9"></script>
+<script src="lib/kirikae.js?v=5330f6a9"></script>
+<script src="js/recipe-store.js?v=5330f6a9"></script>
+<script src="js/rireki-store.js?v=5330f6a9"></script>
+<script src="lib/excel-version.js?v=5330f6a9"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=bdedb164">
-<script src="lib/named-ranges.js?v=bdedb164"></script>
-<script src="lib/cell-styles.js?v=bdedb164"></script>
-<script src="lib/chart.js?v=bdedb164"></script>
-<script src="lib/ribbon-spec.js?v=bdedb164"></script>
-<script src="lib/ribbon-actions.js?v=bdedb164"></script>
-<script src="lib/ribbon.js?v=bdedb164"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=5330f6a9">
+<script src="lib/named-ranges.js?v=5330f6a9"></script>
+<script src="lib/cell-styles.js?v=5330f6a9"></script>
+<script src="lib/chart.js?v=5330f6a9"></script>
+<script src="lib/sparkline.js?v=5330f6a9"></script>
+<script src="lib/ribbon-spec.js?v=5330f6a9"></script>
+<script src="lib/ribbon-actions.js?v=5330f6a9"></script>
+<script src="lib/ribbon.js?v=5330f6a9"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=bdedb164"></script>
-<script src="js/exally-login.js?v=bdedb164"></script>
-<script src="js/auth.js?v=bdedb164"></script>
+<script src="js/supa-config.js?v=5330f6a9"></script>
+<script src="js/exally-login.js?v=5330f6a9"></script>
+<script src="js/auth.js?v=5330f6a9"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2989,6 +2990,10 @@ function drawText(r,c){
   // 結合子セルはスキップ
   if(cell.merged) return;
 
+  /* ★スパークライン★＝セルの 中の 小さな グラフ（字より 先に 描く）
+     ここに 置かないと ★中身が 空のセルは 早く return して 何も 出ない★ */
+  if(スパークラインを描く(r, c, x, y, w, h)) return;
+
   // 表示値（numFmt適用）
   /* ★数式の表示★（Excelの Ctrl+` と 同じ。2026-08-29）
      値の 代わりに ★式そのもの★ を 出す。式でないセルは そのまま。 */
@@ -4144,6 +4149,46 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 <!-- ★リンク（挿入→リンク）★ 2026-08-29
      実Excel実測＝行き先／画面の字／説明を 持つ・字は #467886 の 下線つき
      alert / prompt / confirm は 使わない -->
+<!-- ★スパークライン（挿入→スパークライン）★ 2026-08-30
+     実Excel実測＝飾りは 何も 出さない／勝敗だけ マイナスを 別に 出す／
+     縦軸は スパークラインごと／空は 隙間 -->
+<div id="sparkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">スパークライン</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">セルの 中に 入る 小さな グラフです</div>
+    </div>
+    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">形</span>
+        <select id="sparkKind" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          <option value="line">折れ線</option>
+          <option value="column">縦棒</option>
+          <option value="winloss">勝敗</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">元の 範囲</span>
+        <input id="sparkFrom" type="text" placeholder="A1:D1" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="min-width:5em;">置く所</span>
+        <input id="sparkTo" type="text" placeholder="F1" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+      </div>
+      <div id="sparkWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★実Excelと 同じに しています★＝飾り（高い点・低い点・印）は 出さない／
+        ★勝敗だけ マイナスを 別の色★／★縦の 目盛は その1本の 中だけ★／
+        ★空いている所は 隙間に する★。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button id="sparkDel" onclick="スパークラインを消す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">消す</button>
+      <button onclick="スパークラインの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="スパークラインを決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">入れる</button>
+    </div>
+  </div>
+</div>
 <div id="linkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
@@ -5300,7 +5345,11 @@ function setCell(r,c,v,noUndo){
     var _ek = sheets[activeSheet].name + '|' + key;
     if(!_editedCells[_ek]) _editedCells[_ek] = { beforeF: (typeof existing.f==='string' && existing.f.charAt(0)==='=') ? existing.f : null };
   } catch(e){}
-  var next = Object.assign({}, existing, {v:v, f:v, d:String(d)});
+  /* ★f（打った字）は 必ず 字で 持つ★
+     数を そのまま 入れると 数式バーが (cell.f||'').replace で ★落ちる★
+     （2026-08-30 実測＝TypeError: (cell.f || "").replace is not a function）。
+     v は 打った物の まま（数は 数）＝計算は 変えない。 */
+  var next = Object.assign({}, existing, {v:v, f:(v===null||v===undefined)?'':String(v), d:String(d)});
   /* ★日付には日付の表示形式を自動で付ける（Excelと同じ）。人が選んだ書式は上書きしない。
      これが無いと「30日後」が 46295 という裸の数字で出て、客には壊れて見える。 */
   if(!existing.numFmt){
@@ -7645,6 +7694,107 @@ function リンクを開く(r, c){
     if (!w) notify('新しい窓を 開けませんでした（ポップアップを 許してね）');
   } catch (e) { notify('開けませんでした'); }
   return true;
+}
+
+/* ★スパークライン（挿入→スパークライン）★ 2026-08-30
+ *   真値は lib/sparkline.js の 見出しに 実測どおり 書いた。
+ *   ★alert / prompt / confirm は 使わない★ */
+function スパークラインの箱(){
+  var s = sheets[activeSheet];
+  if (!s.sparklines) s.sparklines = {};
+  return s.sparklines;
+}
+function スパークラインの窓を開く(種類){
+  hideCtxMenu();
+  var ov = document.getElementById('sparkOverlay');
+  if (!ov) return;
+  var k = selR1 + ',' + selC1;
+  var 今 = スパークラインの箱()[k];
+  document.getElementById('sparkKind').value = 今 ? 今.種類 : (種類 || 'line');
+  document.getElementById('sparkFrom').value = 今 ? 今.元 : スパークラインの元を当てる();
+  document.getElementById('sparkTo').value = cellAddr(selR1, selC1);
+  document.getElementById('sparkWhy').textContent = '';
+  document.getElementById('sparkDel').style.display = 今 ? '' : 'none';
+  ov.style.display = 'flex';
+}
+/* ★空欄を 並べて 人に 埋めさせない＝当てる★
+   置く所の ★左隣まで★ に 数が 並んでいれば それを 元に する（実Excel も 同じ 使い方が 多い）。 */
+function スパークラインの元を当てる(){
+  var r = selR1, c = selC1;
+  var 数か = function (cc) {
+    var v = sheets[activeSheet].data[r + ',' + cc];
+    var 中 = v ? ((v.d !== undefined && v.d !== '') ? v.d : v.v) : '';
+    return Sparkline._数にする(中) !== null;
+  };
+  /* ★置いた所の すぐ左が 空いていても あきらめない★
+     ＝左へ たどって 最初に 見つかった 数の 並びを 使う（空の 列を またいでも 当てる）。
+     （2026-08-30 実ブラウザで A〜D に 数・F に 置いたら すぐ左の E が 空で 当てられなかった） */
+  var 端 = -1;
+  for (var i = c - 1; i >= 0; i--) { if (数か(i)) { 端 = i; break; } }
+  if (端 < 0) return '';
+  var 左 = 端;
+  while (左 > 0 && 数か(左 - 1)) 左--;
+  return cellAddr(r, 左) + ':' + cellAddr(r, 端);
+}
+function スパークラインの窓を閉じる(){
+  var ov = document.getElementById('sparkOverlay');
+  if (ov) ov.style.display = 'none';
+}
+/* 範囲の 字 → セルの 並び（1行 でも 1列 でも 読む） */
+function スパークラインの元を読む(範囲){
+  var m = String(範囲 || '').toUpperCase().replace(/\s/g, '').match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
+  if (!m) return null;
+  var a = addrToRC(m[1]), b = addrToRC(m[2]);
+  if (!a || !b) return null;
+  var r1 = Math.min(a.r, b.r), r2 = Math.max(a.r, b.r);
+  var c1 = Math.min(a.c, b.c), c2 = Math.max(a.c, b.c);
+  if ((r2 - r1) > 0 && (c2 - c1) > 0) return null;   /* ★1行 か 1列 だけ★ */
+  var 出 = [];
+  for (var r = r1; r <= r2; r++) for (var c = c1; c <= c2; c++) {
+    var cell = sheets[activeSheet].data[r + ',' + c];
+    出.push(cell ? ((cell.d !== undefined && cell.d !== '') ? cell.d : cell.v) : '');
+  }
+  return 出;
+}
+function スパークラインを決める(){
+  var 元 = document.getElementById('sparkFrom').value;
+  var 置く = document.getElementById('sparkTo').value;
+  var 欄 = document.getElementById('sparkWhy');
+  var 並び = スパークラインの元を読む(元);
+  if (!並び) { 欄.textContent = '元の 範囲は ★1行 か 1列★で 入れてください（例 A1:D1）'; return 0; }
+  var 値 = Sparkline.値にする(並び);
+  var ある = 0;
+  for (var i = 0; i < 値.length; i++) if (値[i] !== null) ある++;
+  if (!ある) { 欄.textContent = '★その 範囲に 数が 1つも ありません★'; return 0; }
+  var 先 = addrToRC(String(置く || '').toUpperCase().replace(/\s/g, ''));
+  if (!先) { 欄.textContent = '置く所は セル1つで 入れてください（例 F1）'; return 0; }
+  スパークラインの箱()[先.r + ',' + 先.c] = {
+    種類: document.getElementById('sparkKind').value,
+    元: String(元).toUpperCase().replace(/\s/g, ''),
+  };
+  スパークラインの窓を閉じる();
+  render();
+  notify('スパークラインを 入れました');
+  return 1;
+}
+function スパークラインを消す(){
+  var 置く = document.getElementById('sparkTo').value;
+  var 先 = addrToRC(String(置く || '').toUpperCase().replace(/\s/g, '')) || { r: selR1, c: selC1 };
+  delete スパークラインの箱()[先.r + ',' + 先.c];
+  スパークラインの窓を閉じる();
+  render();
+  notify('スパークラインを 消しました');
+  return 1;
+}
+/* 画面に 描く（drawText から 呼ぶ） */
+function スパークラインを描く(r, c, x, y, w, h){
+  var s = sheets[activeSheet].sparklines;
+  if (!s) return false;
+  var 決め = s[r + ',' + c];
+  if (!決め) return false;
+  var 並び = スパークラインの元を読む(決め.元);
+  if (!並び) return false;
+  return Sparkline.描く(ctx, Sparkline.値にする(並び), 決め.種類, x, y, w, h);
 }
 
 function ctxDelete(){

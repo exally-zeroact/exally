@@ -30,6 +30,8 @@ const FILES = [
   ['link.test.mjs', '--self-test'],
   ['select-all-statusbar.test.mjs', '--self-test'], // ★Ctrl+A（すべて選ぶ）で 帯が落ちない（170億マスを 積もうとして 死んでいた）★         // ★リンク＝実Excelどおり（#467886の下線）／javascript:とdata:は弾く★   // ★表示の切り替え＝実Excelの既定（見出しも枠線も出す）★
   ['chart-types.test.mjs', '--self-test'],   /* ★グラフの種類（凡例の出る/出ない・軸の数・四分位は実測）★ */
+  ['sparkline.test.mjs', '--self-test'],     /* ★スパークライン＝実測（飾りなし・勝敗だけマイナス別・縦軸は1本ごと・空は隙間）★ */
+  ['formula-bar-type.test.mjs', '--self-test'], /* ★数を入れると 数式バーが落ちて セル選択そのものが 出来なくなっていた★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)
