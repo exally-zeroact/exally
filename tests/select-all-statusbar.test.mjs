@@ -121,13 +121,28 @@ if (壊す) {
   console.log('\n★--self-test＝直す前の 書き方に 戻したら 赤に なるか★');
   let 素通り = 0;
   const data = { '0,0': { v: 10 } };
-  let 落ちた = false;
-  try {
-    /* ★直す前の 素朴な 書き方★（全マス 積む） */
-    const cells = [];
-    for (let r = 0; r <= ROWS - 1; r++) { for (let c = 0; c <= COLS - 1; c++) cells.push(data[r + ',' + c] || null); }
-  } catch (e) { 落ちた = true; console.log('  ok   直す前の 書き方は ちゃんと 死ぬ … ' + e.message); }
-  if (!落ちた) { 素通り++; console.log('  ★素通り★ 直す前の 書き方でも 死ななかった＝この試験は 何も 見ていない'); }
+  /* ★★直す前の 書き方を ★子どもの プロセス★ で 走らせる★★（2026-08-31）
+   *
+   *  ★なぜ 分けるか（実測）★
+   *    直す前の 書き方は ★17,179,869,184 マスを 積む★＝わざと 死なせる 検査。
+   *    手元（記憶が 多い）では `RangeError: Invalid array length` が 出て 終わる。
+   *    ★CI では 例外の 前に 機械ごと 殺される★（実測＝SIGTRAP／2026-08-31）。
+   *    ⇒ ★親を 巻き込む★ので ★別の プロセスで 走らせて 死んだ事だけ 見る★。
+   *    ★死に方（例外か 強制終了か）は 機械で 変わる★ので ★どちらでも 合格★に する。
+   *    ★中身は 前と 同じ 書き方★＝手加減して 小さくは していない。
+   */
+  const { spawnSync } = await import('node:child_process');
+  const 素朴 = 'const data={"0,0":{v:10}};const cells=[];'
+    + 'for(let r=0;r<=' + (ROWS - 1) + ';r++){for(let c=0;c<=' + (COLS - 1) + ';c++)'
+    + 'cells.push(data[r+","+c]||null);}console.log("死ななかった");';
+  const 子 = spawnSync(process.execPath, ['--max-old-space-size=256', '-e', 素朴],
+    { encoding: 'utf8', timeout: 120000 });
+  const 落ちた = 子.status !== 0 || !!子.signal;
+  if (落ちた) {
+    console.log('  ok   直す前の 書き方は ちゃんと 死ぬ … '
+      + (子.signal ? ('殺された signal=' + 子.signal)
+        : ((子.stderr || '').split('\n').find((l) => /Error/.test(l)) || ('exit=' + 子.status)).trim()));
+  } else { 素通り++; console.log('  ★素通り★ 直す前の 書き方でも 死ななかった＝この試験は 何も 見ていない'); }
   /* 今の画面が 素朴な 書き方に 戻っていないか */
   const いま = 抜く('updateStatusBar') || '';
   if (!/Object\.keys\(data\)/.test(いま)) { 素通り++; console.log('  ★素通り★ 中身の入ったマスだけ 拾う書き方が 消えている'); }
