@@ -1304,73 +1304,74 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=ff6e8a51"></script>
+<script src="hyperformula.full.min.js?v=25194926"></script>
 
-<script src="exally-formula.js?v=ff6e8a51"></script>
+<script src="exally-formula.js?v=25194926"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=ff6e8a51"></script>
+<script src="js/file-out.js?v=25194926"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=ff6e8a51"></script>
-<script src="lib/grid-xlsx.js?v=ff6e8a51"></script>
+<script src="lib/typed-value.js?v=25194926"></script>
+<script src="lib/grid-xlsx.js?v=25194926"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=ff6e8a51"></script>
-<script src="lib/autosum.js?v=ff6e8a51"></script>
-<script src="lib/grid-sort.js?v=ff6e8a51"></script>
-<script src="lib/grid-filter.js?v=ff6e8a51"></script>
-<script src="lib/grid-find.js?v=ff6e8a51"></script>
-<script src="lib/grid-print.js?v=ff6e8a51"></script>
-<script src="lib/ai-reason.js?v=ff6e8a51"></script>
-<script src="lib/menu-place.js?v=ff6e8a51"></script>
-<script src="lib/grid-stats.js?v=ff6e8a51"></script>
-<script src="lib/grid-valid.js?v=ff6e8a51"></script>
-<script src="lib/cond-format.js?v=ff6e8a51"></script>
-<script src="lib/ref-graph.js?v=ff6e8a51"></script>
-<script src="lib/shindan.js?v=ff6e8a51"></script>
+  <script src="lib/grid-refedit.js?v=25194926"></script>
+<script src="lib/autosum.js?v=25194926"></script>
+<script src="lib/grid-sort.js?v=25194926"></script>
+<script src="lib/grid-filter.js?v=25194926"></script>
+<script src="lib/grid-find.js?v=25194926"></script>
+<script src="lib/grid-print.js?v=25194926"></script>
+<script src="lib/ai-reason.js?v=25194926"></script>
+<script src="lib/menu-place.js?v=25194926"></script>
+<script src="lib/grid-stats.js?v=25194926"></script>
+<script src="lib/grid-valid.js?v=25194926"></script>
+<script src="lib/cond-format.js?v=25194926"></script>
+<script src="lib/ref-graph.js?v=25194926"></script>
+<script src="lib/shindan.js?v=25194926"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=ff6e8a51"></script>
-<script src="lib/vba-mikata.js?v=ff6e8a51"></script>
-<script src="lib/vba-tejun.js?v=ff6e8a51"></script>
-<script src="lib/rireki.js?v=ff6e8a51"></script>
-<script src="lib/chizu.js?v=ff6e8a51"></script>
-<script src="lib/horu.js?v=ff6e8a51"></script>
-<script src="lib/excel-version.js?v=ff6e8a51"></script>
-<script src="lib/teian.js?v=ff6e8a51"></script>
-<script src="lib/kikan.js?v=ff6e8a51"></script>
-<script src="lib/recipe.js?v=ff6e8a51"></script>
-<script src="lib/kirikae.js?v=ff6e8a51"></script>
-<script src="js/recipe-store.js?v=ff6e8a51"></script>
-<script src="js/rireki-store.js?v=ff6e8a51"></script>
-<script src="lib/excel-version.js?v=ff6e8a51"></script>
+<script src="lib/vba.js?v=25194926"></script>
+<script src="lib/vba-mikata.js?v=25194926"></script>
+<script src="lib/vba-tejun.js?v=25194926"></script>
+<script src="lib/rireki.js?v=25194926"></script>
+<script src="lib/chizu.js?v=25194926"></script>
+<script src="lib/horu.js?v=25194926"></script>
+<script src="lib/excel-version.js?v=25194926"></script>
+<script src="lib/teian.js?v=25194926"></script>
+<script src="lib/kikan.js?v=25194926"></script>
+<script src="lib/recipe.js?v=25194926"></script>
+<script src="lib/kirikae.js?v=25194926"></script>
+<script src="js/recipe-store.js?v=25194926"></script>
+<script src="js/rireki-store.js?v=25194926"></script>
+<script src="lib/excel-version.js?v=25194926"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=ff6e8a51">
-<script src="lib/named-ranges.js?v=ff6e8a51"></script>
-<script src="lib/cell-styles.js?v=ff6e8a51"></script>
-<script src="lib/chart.js?v=ff6e8a51"></script>
-<script src="lib/sparkline.js?v=ff6e8a51"></script>
-<script src="lib/table.js?v=ff6e8a51"></script>
-<script src="lib/flash-fill.js?v=ff6e8a51"></script>
-<script src="lib/pivot.js?v=ff6e8a51"></script>
-<script src="lib/csv-in.js?v=ff6e8a51"></script>
-<script src="lib/objects.js?v=ff6e8a51"></script>
-<script src="lib/ink.js?v=ff6e8a51"></script>
-<script src="lib/view-mode.js?v=ff6e8a51"></script>
-<script src="lib/sheet-view.js?v=ff6e8a51"></script>
-<script src="lib/theme.js?v=ff6e8a51"></script>
-<script src="lib/symbols.js?v=ff6e8a51"></script>
-<script src="lib/ribbon-spec.js?v=ff6e8a51"></script>
-<script src="lib/ribbon-actions.js?v=ff6e8a51"></script>
-<script src="lib/ribbon.js?v=ff6e8a51"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=25194926">
+<script src="lib/named-ranges.js?v=25194926"></script>
+<script src="lib/cell-styles.js?v=25194926"></script>
+<script src="lib/chart.js?v=25194926"></script>
+<script src="lib/sparkline.js?v=25194926"></script>
+<script src="lib/table.js?v=25194926"></script>
+<script src="lib/flash-fill.js?v=25194926"></script>
+<script src="lib/pivot.js?v=25194926"></script>
+<script src="lib/csv-in.js?v=25194926"></script>
+<script src="lib/objects.js?v=25194926"></script>
+<script src="lib/ink.js?v=25194926"></script>
+<script src="lib/view-mode.js?v=25194926"></script>
+<script src="lib/sheet-view.js?v=25194926"></script>
+<script src="lib/theme.js?v=25194926"></script>
+<script src="lib/diagram.js?v=25194926"></script>
+<script src="lib/symbols.js?v=25194926"></script>
+<script src="lib/ribbon-spec.js?v=25194926"></script>
+<script src="lib/ribbon-actions.js?v=25194926"></script>
+<script src="lib/ribbon.js?v=25194926"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=ff6e8a51"></script>
-<script src="js/exally-login.js?v=ff6e8a51"></script>
-<script src="js/auth.js?v=ff6e8a51"></script>
+<script src="js/supa-config.js?v=25194926"></script>
+<script src="js/exally-login.js?v=25194926"></script>
+<script src="js/auth.js?v=25194926"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3041,6 +3042,450 @@ function 分割の線を描く(){
   ctx.restore();
   return 出;
 }
+
+/* ═══ ★挿入タブ★ 図解（SmartArt）・アイコン・数式・チェックボックス ═══ 2026-08-30
+ *
+ *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-insert.ps1
+ *    SmartArt … 型 ★159個★／置いた 時の 節は ★5個★／形の 名前 `Diagram 1`
+ *    チェック ボックス（新しい形）… ★セルの 中の TRUE / FALSE★（大文字で 出る）
+ *      `=SUM(A1:A2)`=0（足されない）／`=A1+A2`=1／`=COUNTIF(A1:A2,TRUE)`=1
+ *    チェック ボックス（古い形）… `Check Box 1`／★100.125 × 20.25★／はじめ -4146／`チェック 1`
+ *    アイコン … ★COM から 一覧を 出せない（Microsoft の クラウドの 絵）★
+ *      ⇒ ★うちは うちで 線で 描く★（写さない）
+ *    数式 … 中の 数式は COM から 読めなかった ⇒ ★うちの 書き方で 描く★
+ *
+ *  ★出来ない事は 出来ないと 書く★
+ *    「3D モデル」… ブラウザだけで 3Dの ファイルは 読めない
+ *    「スクリーンショット」… ブラウザは ★他のアプリの 窓を 撮れない★
+ *      ⇒ ★この シートを 撮って 貼る★（出来る 事に 置き換え、画面に そう 書く）
+ */
+
+/** 図解（SmartArt）を 置く */
+function 図解を置く(種){
+  hideCtxMenu();
+  var 箱 = 物の箱();
+  var g = Diagram.図解を作る(種);
+  g.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), '図解');
+  g.x = 画面から物のX(HDR_W + 60); g.y = 画面から物のY(HDR_H + 60);
+  g.z = 箱.length + 1;
+  箱.push(g);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = g; えらんだ物たち = [g];
+  render();
+  関数の窓を閉じる();
+  notify('図解を 置きました（' + g.名 + '・節 ' + g.節.length + '個）★実Excel も はじめ 5個★');
+  return g.節.length;
+}
+function 図解の窓を開く(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'SmartArt（図解）';
+  窓の副題('形を 選ぶと 節 5個の 図解を 置きます');
+  var h = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  for (var i = 0; i < Diagram.図解たち.length; i++) {
+    var d = Diagram.図解たち[i];
+    h += '<button type="button" data-t="' + d.種 + '" onclick="図解を置く(this.getAttribute(\'data-t\'))"'
+      + ' style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+      + 'border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + _esc(d.名) + '</button>';
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★実Excel の 型は 159個★（実測）。うちは ★よく使う 8つ★を 作りました。'
+    + '置いた 時の 節が ★5個★なのは 実Excel と 同じです（実測）。<br>'
+    + '節の 字は 図解を 押してから ★「節を 直す」★で 変えられます。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return Diagram.図解たち.length;
+}
+function 図解の節を直す(){
+  hideCtxMenu();
+  var o = 選んだ物;
+  if (!o || o.種類 !== '図解') { notify('★図解を 選んでください★'); return 0; }
+  document.getElementById('funcTitle').textContent = '図解の 節';
+  窓の副題('1行に 1つ 書きます（今 ' + o.節.length + '個）');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<textarea id="nodeInput" rows="7" style="font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+    + 'border-radius:10px;padding:8px 10px;font-family:inherit;">' + _esc(o.節.join('\n')) + '</textarea>'
+    + '<button type="button" onclick="図解の節を決める()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">決める</button></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return o.節.length;
+}
+function 図解の節を決める(){
+  var o = 選んだ物;
+  var 入 = document.getElementById('nodeInput');
+  if (!o || !入) return 0;
+  var 行 = String(入.value || '').split('\n').map(function (v) { return v.trim(); })
+    .filter(function (v) { return v; });
+  if (!行.length) { notify('★1つも 書かれていません★'); return 0; }
+  o.節 = 行;
+  render();
+  関数の窓を閉じる();
+  notify('節を ' + 行.length + '個に しました');
+  return 行.length;
+}
+
+/** アイコンを 置く（★線だけ・うちが 描く★） */
+function アイコンを置く(種){
+  hideCtxMenu();
+  var 箱 = 物の箱();
+  var o = { 種類: 'アイコン', 絵: 種, w: 64, h: 64,
+    x: 画面から物のX(HDR_W + 40), y: 画面から物のY(HDR_H + 40), z: 箱.length + 1 };
+  o.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), 'アイコン');
+  箱.push(o);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = o; えらんだ物たち = [o];
+  render();
+  関数の窓を閉じる();
+  notify('アイコンを 置きました（' + o.名 + '）');
+  return 1;
+}
+function アイコンの窓を開く(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'アイコン';
+  窓の副題('線だけの 絵を 置きます（' + Diagram.アイコンたち.length + '種）');
+  var h = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
+  for (var i = 0; i < Diagram.アイコンたち.length; i++) {
+    var a = Diagram.アイコンたち[i];
+    h += '<button type="button" data-t="' + a.種 + '" onclick="アイコンを置く(this.getAttribute(\'data-t\'))"'
+      + ' style="min-height:56px;padding:6px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+      + 'border-radius:10px;font-size:12px;font-family:inherit;cursor:pointer;">' + _esc(a.名) + '</button>';
+  }
+  h += '</div><div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:8px;">'
+    + '★実Excel の アイコンは Microsoft の クラウドから 来ます★（機械からは 一覧が 出せませんでした）。'
+    + 'うちは ★うちで 線で 描いた 物★を 置きます。</div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return Diagram.アイコンたち.length;
+}
+
+/** 数式を 置く */
+function 数式を置く(){
+  var 入 = document.getElementById('mathInput');
+  var 字 = 入 ? String(入.value || '').trim() : '';
+  if (!字) { notify('★式を 書いてください★'); return 0; }
+  var 箱 = 物の箱();
+  var o = { 種類: '数式', 式: 字, w: 220, h: 60,
+    x: 画面から物のX(HDR_W + 40), y: 画面から物のY(HDR_H + 40), z: 箱.length + 1 };
+  o.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), '数式');
+  箱.push(o);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = o; えらんだ物たち = [o];
+  render();
+  関数の窓を閉じる();
+  notify('数式を 置きました（' + 字 + '）');
+  return 1;
+}
+function 数式の窓を開く(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = '数式';
+  窓の副題('分数・累乗・平方根・添え字が 書けます');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<input id="mathInput" type="text" value="a/b + x^2 = sqrt(c)" style="min-height:44px;font-size:16px;'
+    + 'color:#333333;border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 10px;font-family:inherit;">'
+    + '<button type="button" onclick="数式を置く()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">置く</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '書き方 … 分数 <b>a/b</b>／累乗 <b>x^2</b>／平方根 <b>sqrt(x)</b>／添え字 <b>a_1</b><br>'
+    + '★実Excel の 数式は 機械から 中身を 読めませんでした★ので、'
+    + '★うちの 書き方★を 決めました。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+
+/** チェック ボックス（★セルの 中の TRUE / FALSE★＝実Excel の 新しい 形と 同じ） */
+function チェックボックスを入れる(){
+  hideCtxMenu();
+  var n = 0;
+  for (var r = selR1; r <= selR2; r++) for (var c = selC1; c <= selC2; c++) {
+    var キー = r + ',' + c;
+    var 今 = sheets[activeSheet].data[キー];
+    var 今の字 = 今 ? String(今.d !== undefined ? 今.d : 今.v).toUpperCase() : '';
+    setCell(r, c, 今の字 === 'TRUE' ? 'FALSE' : 'TRUE');
+    n++;
+  }
+  render();
+  notify(n + '個の セルを ★TRUE / FALSE★ に しました'
+    + '（★実Excel の 新しい チェック ボックスも セルの 中の TRUE / FALSE です★）');
+  return n;
+}
+
+/** 画面を 撮って 貼る（★他のアプリの 窓は 撮れない★ので この シートを 撮る） */
+function 画面を撮って貼る(){
+  hideCtxMenu();
+  var cv = document.getElementById('grid-canvas');
+  if (!cv) { notify('★撮る 所が ありません★'); return 0; }
+  var 絵 = new Image();
+  絵.onload = function () {
+    var 箱 = 物の箱();
+    var o = { 種類: '画像', 画像: 絵, w: Math.min(400, cv.width / dpr / 2),
+      h: Math.min(300, cv.height / dpr / 2),
+      x: 画面から物のX(HDR_W + 30), y: 画面から物のY(HDR_H + 30), z: 箱.length + 1 };
+    o.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), '画面');
+    箱.push(o);
+    SheetObjects.順をそろえる(箱);
+    選んだ物 = o; えらんだ物たち = [o];
+    render();
+    notify('この シートを 撮って 貼りました（★ブラウザは 他のアプリの 窓を 撮れません★）');
+  };
+  try { 絵.src = cv.toDataURL('image/png'); } catch (e) { notify('★撮れませんでした★'); return 0; }
+  return 1;
+}
+
+/** 図解・アイコン・数式を 描く（浮かぶ物の 描き方に 足す） */
+/** 選んでいる 印（つまみ）＝部品と 同じ 見た目を 1か所で 描く */
+function 選んだ印を描く(x, y, w, h){
+  ctx.save();
+  ctx.strokeStyle = SheetObjects.色.えらんだ;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 3]);
+  ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
+  ctx.setLineDash([]);
+  ctx.fillStyle = SheetObjects.色.えらんだ;
+  ctx.fillRect(x + w - 4, y + h - 4, 8, 8);
+  ctx.restore();
+  return 1;
+}
+function 挿入した物を描く(ctx2, o, X, Y){
+  if (o.種類 === '図解') { 図解を描く(ctx2, o, X, Y); return true; }
+  if (o.種類 === 'アイコン') { アイコンを描く(ctx2, o.絵, X, Y, o.w, o.h); return true; }
+  if (o.種類 === '数式') { 数式を描く(ctx2, o.式, X, Y, o.w, o.h); return true; }
+  return false;
+}
+function 図解を描く(ctx2, o, X, Y){
+  var 場 = Diagram.節の場所(o.図, o.w, o.h, o.節.length);
+  ctx2.save();
+  ctx2.lineWidth = 1.5;
+  /* ぐるぐるの 矢印（★丸と 丸の あいだを 弧で つなぐ★） */
+  for (var q = 0; o.図 === 'cycle' && 場.length > 1 && q < 場.length; q++) {
+    var b = 場[q];
+    var x = X + b.x, y = Y + b.y;
+    var i = q;
+    var 次c = 場[(i + 1) % 場.length];
+    var a1x = x + b.w / 2, a1y = y + b.h / 2;
+    var a2x = X + 次c.x + 次c.w / 2, a2y = Y + 次c.y + 次c.h / 2;
+    var dx = a2x - a1x, dy = a2y - a1y;
+    var 長 = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / 長, uy = dy / 長;
+    var 端 = b.w / 2 + 4;
+    var sx = a1x + ux * 端, sy = a1y + uy * 端;
+    var ex = a2x - ux * 端, ey = a2y - uy * 端;
+    ctx2.strokeStyle = SheetObjects.色.線;
+    ctx2.beginPath(); ctx2.moveTo(sx, sy); ctx2.lineTo(ex, ey); ctx2.stroke();
+    ctx2.beginPath();
+    ctx2.moveTo(ex, ey);
+    ctx2.lineTo(ex - ux * 8 - uy * 4, ey - uy * 8 + ux * 4);
+    ctx2.lineTo(ex - ux * 8 + uy * 4, ey - uy * 8 - ux * 4);
+    ctx2.closePath(); ctx2.fillStyle = SheetObjects.色.線; ctx2.fill();
+  }
+  for (var i = 0; i < 場.length; i++) {
+    var b = 場[i];
+    var x = X + b.x, y = Y + b.y;
+    ctx2.globalAlpha = b.透け || 1;
+    ctx2.fillStyle = SheetObjects.色.塗り;
+    ctx2.strokeStyle = SheetObjects.色.線;
+    if (b.丸) {
+      ctx2.beginPath();
+      ctx2.ellipse(x + b.w / 2, y + b.h / 2, b.w / 2, b.h / 2, 0, 0, Math.PI * 2);
+      ctx2.fill(); ctx2.stroke();
+    } else if (b.台形) {
+      ctx2.beginPath();
+      ctx2.moveTo(x + b.w * 0.08, y);
+      ctx2.lineTo(x + b.w * 0.92, y);
+      ctx2.lineTo(x + b.w, y + b.h);
+      ctx2.lineTo(x, y + b.h);
+      ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+    } else {
+      ctx2.fillRect(x, y, b.w, b.h);
+      ctx2.strokeRect(x, y, b.w, b.h);
+    }
+    ctx2.globalAlpha = 1;
+    /* あいだの 矢印 */
+    if (b.矢 && o.図 === 'process' && i < 場.length - 1) {
+      var 次 = 場[i + 1];
+      var y2 = y + b.h / 2;
+      ctx2.beginPath();
+      ctx2.moveTo(x + b.w + 2, y2);
+      ctx2.lineTo(X + 次.x - 2, y2);
+      ctx2.stroke();
+      ctx2.beginPath();
+      ctx2.moveTo(X + 次.x - 2, y2);
+      ctx2.lineTo(X + 次.x - 8, y2 - 4);
+      ctx2.lineTo(X + 次.x - 8, y2 + 4);
+      ctx2.closePath(); ctx2.fillStyle = SheetObjects.色.線; ctx2.fill();
+    }
+    /* 木の 線 */
+    if (o.図 === 'tree' && i > 0) {
+      var 親 = 場[0];
+      ctx2.beginPath();
+      ctx2.moveTo(X + 親.x + 親.w / 2, Y + 親.y + 親.h);
+      ctx2.lineTo(x + b.w / 2, y);
+      ctx2.stroke();
+    }
+  }
+  /* ★字は 形を 全部 描いた 後に まとめて 出す★
+     ＝重なる 形（入れ子の 丸）では ★後の 形の 塗りが 前の 字を 隠す★
+       （08-30 実物の絵で 見えた：一番 上の 丸の「人」が 半分 消えていた）。 */
+  ctx2.fillStyle = SheetObjects.色.字;
+  ctx2.font = '12px "Noto Sans JP",sans-serif';
+  ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle';
+  for (var t = 0; t < 場.length; t++) {
+    var b2 = 場[t];
+    var tx2 = X + b2.x + b2.w / 2, ty2 = Y + b2.y + b2.h / 2;
+    /* 重なる 丸は ★真ん中では なく 外へ ずらす★（字どうしが 重ならない） */
+    if (o.図 === 'venn' && 場.length > 1) {
+      var mx2 = X + o.w / 2, my2 = Y + o.h / 2;
+      var vx = tx2 - mx2, vy = ty2 - my2;
+      var 長2 = Math.sqrt(vx * vx + vy * vy) || 1;
+      tx2 += (vx / 長2) * b2.w * 0.28;
+      ty2 += (vy / 長2) * b2.h * 0.28;
+    }
+    ctx2.save();
+    ctx2.beginPath(); ctx2.rect(X, Y, o.w, o.h); ctx2.clip();
+    ctx2.fillText(String(o.節[t] || ''), tx2, ty2);
+    ctx2.restore();
+  }
+  ctx2.restore();
+}
+function アイコンを描く(ctx2, 種, X, Y, W, H){
+  ctx2.save();
+  ctx2.strokeStyle = SheetObjects.色.線;
+  ctx2.fillStyle = SheetObjects.色.塗り;
+  ctx2.lineWidth = 2;
+  var cx = X + W / 2, cy = Y + H / 2, R = Math.min(W, H) * 0.36;
+  if (種 === 'person') {
+    ctx2.beginPath(); ctx2.arc(cx, Y + H * 0.3, R * 0.5, 0, Math.PI * 2); ctx2.fill(); ctx2.stroke();
+    ctx2.beginPath();
+    ctx2.moveTo(cx - R, Y + H * 0.9);
+    ctx2.quadraticCurveTo(cx, Y + H * 0.5, cx + R, Y + H * 0.9);
+    ctx2.stroke();
+  } else if (種 === 'home') {
+    ctx2.beginPath();
+    ctx2.moveTo(cx, Y + H * 0.15); ctx2.lineTo(X + W * 0.9, cy); ctx2.lineTo(X + W * 0.78, cy);
+    ctx2.lineTo(X + W * 0.78, Y + H * 0.85); ctx2.lineTo(X + W * 0.22, Y + H * 0.85);
+    ctx2.lineTo(X + W * 0.22, cy); ctx2.lineTo(X + W * 0.1, cy);
+    ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+  } else if (種 === 'star') {
+    ctx2.beginPath();
+    for (var k = 0; k < 10; k++) {
+      var 角 = -Math.PI / 2 + k * Math.PI / 5;
+      var 長 = (k % 2 === 0) ? R : R * 0.42;
+      var px = cx + Math.cos(角) * 長, py = cy + Math.sin(角) * 長;
+      if (k === 0) ctx2.moveTo(px, py); else ctx2.lineTo(px, py);
+    }
+    ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+  } else if (種 === 'check') {
+    ctx2.lineWidth = 3;
+    ctx2.beginPath();
+    ctx2.moveTo(X + W * 0.22, cy);
+    ctx2.lineTo(X + W * 0.44, Y + H * 0.72);
+    ctx2.lineTo(X + W * 0.8, Y + H * 0.28);
+    ctx2.stroke();
+  } else if (種 === 'clock') {
+    ctx2.beginPath(); ctx2.arc(cx, cy, R, 0, Math.PI * 2); ctx2.fill(); ctx2.stroke();
+    ctx2.beginPath(); ctx2.moveTo(cx, cy); ctx2.lineTo(cx, cy - R * 0.6); ctx2.stroke();
+    ctx2.beginPath(); ctx2.moveTo(cx, cy); ctx2.lineTo(cx + R * 0.45, cy); ctx2.stroke();
+  } else if (種 === 'mail') {
+    ctx2.fillRect(X + W * 0.12, Y + H * 0.26, W * 0.76, H * 0.48);
+    ctx2.strokeRect(X + W * 0.12, Y + H * 0.26, W * 0.76, H * 0.48);
+    ctx2.beginPath();
+    ctx2.moveTo(X + W * 0.12, Y + H * 0.26); ctx2.lineTo(cx, cy + H * 0.06);
+    ctx2.lineTo(X + W * 0.88, Y + H * 0.26); ctx2.stroke();
+  } else if (種 === 'chart') {
+    var 高 = [0.35, 0.6, 0.45, 0.8];
+    for (var b2 = 0; b2 < 4; b2++) {
+      var bw = W * 0.16, bx = X + W * 0.14 + b2 * W * 0.2;
+      var bh = H * 高[b2];
+      ctx2.fillRect(bx, Y + H * 0.88 - bh, bw, bh);
+      ctx2.strokeRect(bx, Y + H * 0.88 - bh, bw, bh);
+    }
+  } else if (種 === 'gear') {
+    ctx2.beginPath();
+    for (var g = 0; g < 16; g++) {
+      var 角g = g * Math.PI / 8;
+      var 長g = (g % 2 === 0) ? R : R * 0.78;
+      var gx = cx + Math.cos(角g) * 長g, gy = cy + Math.sin(角g) * 長g;
+      if (g === 0) ctx2.moveTo(gx, gy); else ctx2.lineTo(gx, gy);
+    }
+    ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+    ctx2.beginPath(); ctx2.arc(cx, cy, R * 0.34, 0, Math.PI * 2);
+    ctx2.fillStyle = '#ffffff'; ctx2.fill(); ctx2.stroke();
+  } else if (種 === 'arrow') {
+    ctx2.beginPath();
+    ctx2.moveTo(X + W * 0.14, cy - H * 0.1); ctx2.lineTo(X + W * 0.6, cy - H * 0.1);
+    ctx2.lineTo(X + W * 0.6, cy - H * 0.26); ctx2.lineTo(X + W * 0.9, cy);
+    ctx2.lineTo(X + W * 0.6, cy + H * 0.26); ctx2.lineTo(X + W * 0.6, cy + H * 0.1);
+    ctx2.lineTo(X + W * 0.14, cy + H * 0.1);
+    ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+  } else if (種 === 'triangle') {
+    ctx2.beginPath();
+    ctx2.moveTo(cx, Y + H * 0.16); ctx2.lineTo(X + W * 0.86, Y + H * 0.84);
+    ctx2.lineTo(X + W * 0.14, Y + H * 0.84);
+    ctx2.closePath(); ctx2.fill(); ctx2.stroke();
+  } else if (種 === 'square') {
+    ctx2.fillRect(X + W * 0.18, Y + H * 0.18, W * 0.64, H * 0.64);
+    ctx2.strokeRect(X + W * 0.18, Y + H * 0.18, W * 0.64, H * 0.64);
+  } else {
+    ctx2.beginPath(); ctx2.arc(cx, cy, R, 0, Math.PI * 2); ctx2.fill(); ctx2.stroke();
+  }
+  ctx2.restore();
+}
+function 数式を描く(ctx2, 式, X, Y, W, H){
+  var 並 = Diagram.数式を組む(式);
+  ctx2.save();
+  ctx2.fillStyle = SheetObjects.色.字;
+  ctx2.strokeStyle = SheetObjects.色.字;
+  ctx2.lineWidth = 1;
+  ctx2.textBaseline = 'middle';
+  ctx2.textAlign = 'left';
+  var 基 = 18;
+  var x = X + 8, cy = Y + H / 2;
+  for (var i = 0; i < 並.length; i++) {
+    var t = 並[i];
+    if (t.型 === '分数') {
+      ctx2.font = (基 * 0.8) + 'px "Noto Sans JP",sans-serif';
+      var w1 = ctx2.measureText(t.上).width, w2 = ctx2.measureText(t.下).width;
+      var w = Math.max(w1, w2) + 6;
+      ctx2.textAlign = 'center';
+      ctx2.fillText(t.上, x + w / 2, cy - 大きさの半分(基));
+      ctx2.fillText(t.下, x + w / 2, cy + 大きさの半分(基));
+      ctx2.beginPath();
+      ctx2.moveTo(x + 1, Math.round(cy) + 0.5); ctx2.lineTo(x + w - 1, Math.round(cy) + 0.5);
+      ctx2.stroke();
+      ctx2.textAlign = 'left';
+      x += w + 4;
+    } else if (t.型 === '累乗' || t.型 === '添え字') {
+      ctx2.font = 基 + 'px "Noto Sans JP",sans-serif';
+      ctx2.fillText(t.元, x, cy);
+      x += ctx2.measureText(t.元).width + 1;
+      ctx2.font = (基 * 0.62) + 'px "Noto Sans JP",sans-serif';
+      var 小 = (t.型 === '累乗') ? t.肩 : t.下;
+      ctx2.fillText(小, x, cy + (t.型 === '累乗' ? -基 * 0.34 : 基 * 0.34));
+      x += ctx2.measureText(小).width + 3;
+    } else if (t.型 === '根') {
+      ctx2.font = 基 + 'px "Noto Sans JP",sans-serif';
+      var wc = ctx2.measureText(t.中).width;
+      ctx2.beginPath();
+      ctx2.moveTo(x, cy);
+      ctx2.lineTo(x + 5, cy + 基 * 0.42);
+      ctx2.lineTo(x + 11, cy - 基 * 0.5);
+      ctx2.lineTo(x + 15 + wc, cy - 基 * 0.5);
+      ctx2.stroke();
+      ctx2.fillText(t.中, x + 13, cy);
+      x += 17 + wc;
+    } else {
+      ctx2.font = 基 + 'px "Noto Sans JP",sans-serif';
+      ctx2.fillText(t.字, x, cy);
+      x += ctx2.measureText(t.字).width;
+    }
+    if (x > X + W - 6) break;      /* 箱から はみ出さない */
+  }
+  ctx2.restore();
+}
+function 大きさの半分(基){ return 基 * 0.52; }
 
 /* ═══ ★テーマ（配色・フォント・効果）と 背景・ふりがな★ ═══ 2026-08-30
  *
@@ -10761,6 +11206,12 @@ function 物を描く(){
     写し.x = 物の画面X(o); 写し.y = 物の画面Y(o);
     if (写し.x + 写し.w < HDR_W || 写し.y + 写し.h < HDR_H) continue;   /* 見出しの 下に 隠れる分 */
     var えらんでいる = (o === 選んだ物) || (えらんだ物たち.indexOf(o) >= 0);
+    /* ★挿入タブの 物（図解・アイコン・数式）は うちで 描く★ */
+    if (挿入した物を描く(ctx, 写し, 写し.x, 写し.y)) {
+      if (えらんでいる) 選んだ印を描く(写し.x, 写し.y, 写し.w, 写し.h);
+      出た++;
+      continue;
+    }
     if (SheetObjects.描く(ctx, 写し, えらんでいる)) 出た++;
   }
   return 出た;

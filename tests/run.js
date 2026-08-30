@@ -49,7 +49,8 @@ const FILES = [
   ['view-window.test.mjs', '--self-test'],
   ['no-missing-call.test.mjs', '--self-test'],
   ['theme.test.mjs', '--self-test'],
-  ['boolean.test.mjs', '--self-test'],       /* ★TRUE/FALSEは大文字で出す／SUMは足さない・＋は数になる（実Excel実測）★ */         /* ★テーマ＝12の役割・濃淡は実Excelと15/15一致（0〜240で切り捨て）／色は写さない★ */ /* ★呼んでいるのに 無い 働きを 機械で 探す（08-30 colName 事故）★ */ /* ★表示タブ＝表示の番号1/2/3・分割はPanes4・窓の名前は空白2つ／紙の切れ目は列8で実Excelと同じ★ */       /* ★配置・回転・まとめる＋拡大縮小印刷＝そろえた後の 数は 実測どおり／倍率は 紙に 本当に 効く★ */
+  ['boolean.test.mjs', '--self-test'],
+  ['insert-diagram.test.mjs', '--self-test'], /* ★図解＝型159・節5は実測／字は形の後に出す（重なる丸で隠れた）／アイコンと数式はうちで描く★ */       /* ★TRUE/FALSEは大文字で出す／SUMは足さない・＋は数になる（実Excel実測）★ */         /* ★テーマ＝12の役割・濃淡は実Excelと15/15一致（0〜240で切り捨て）／色は写さない★ */ /* ★呼んでいるのに 無い 働きを 機械で 探す（08-30 colName 事故）★ */ /* ★表示タブ＝表示の番号1/2/3・分割はPanes4・窓の名前は空白2つ／紙の切れ目は列8で実Excelと同じ★ */       /* ★配置・回転・まとめる＋拡大縮小印刷＝そろえた後の 数は 実測どおり／倍率は 紙に 本当に 効く★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)
