@@ -422,6 +422,14 @@ function runnerKind(src, absFile) {
       || (isQuote(first[0]) && /(^|[\s;&|])(node|npx)[\s]/.test(lit));
     if (!nodeish) continue;                                 /* ★git など 別のexe＝一覧ではない★ */
     if (pointsAtSelf(args, absFile)) { self = true; continue; } /* ★自分自身＝自己診断・一覧ではない★ */
+    /* ★見張り自身の 6つめの嘘（2026-08-31 に 実際に 踏んだ）★
+       (f) ★`node -e '一行'` を「試験の 一覧を 持つ物」と 決めていた★
+           ・select-all-statusbar.test.mjs … spawnSync(process.execPath, ['-e', 一行])
+             ＝★わざと 死なせる 書き方を 別の プロセスで 走らせているだけ★
+               （CI では 例外の 前に 機械ごと 殺されるので 親から 出した）
+           これを「一覧が読めない（未測定）」＝赤に していた。★嘘の赤★。
+       ⇒ ★`-e` / `--eval` / `-p` / `--print` は ★その場の 一行★＝一覧では ない★ */
+    if (/(^|[\s,[])['"]?--?(e|eval|p|print)\b/.test(args)) continue;
     runner = true;
   }
   if (DYN_LOAD.test(src)) runner = true;               /* 変数を渡す読み込み＝一覧を順に走らせる形 */
