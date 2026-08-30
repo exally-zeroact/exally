@@ -1304,76 +1304,77 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=47119d63"></script>
+<script src="hyperformula.full.min.js?v=18aa6431"></script>
 
-<script src="exally-formula.js?v=47119d63"></script>
+<script src="exally-formula.js?v=18aa6431"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=47119d63"></script>
+<script src="js/file-out.js?v=18aa6431"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=47119d63"></script>
-<script src="lib/grid-xlsx.js?v=47119d63"></script>
+<script src="lib/typed-value.js?v=18aa6431"></script>
+<script src="lib/grid-xlsx.js?v=18aa6431"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=47119d63"></script>
-<script src="lib/autosum.js?v=47119d63"></script>
-<script src="lib/grid-sort.js?v=47119d63"></script>
-<script src="lib/grid-filter.js?v=47119d63"></script>
-<script src="lib/grid-find.js?v=47119d63"></script>
-<script src="lib/grid-print.js?v=47119d63"></script>
-<script src="lib/ai-reason.js?v=47119d63"></script>
-<script src="lib/menu-place.js?v=47119d63"></script>
-<script src="lib/grid-stats.js?v=47119d63"></script>
-<script src="lib/grid-valid.js?v=47119d63"></script>
-<script src="lib/cond-format.js?v=47119d63"></script>
-<script src="lib/ref-graph.js?v=47119d63"></script>
-<script src="lib/shindan.js?v=47119d63"></script>
+  <script src="lib/grid-refedit.js?v=18aa6431"></script>
+<script src="lib/autosum.js?v=18aa6431"></script>
+<script src="lib/grid-sort.js?v=18aa6431"></script>
+<script src="lib/grid-filter.js?v=18aa6431"></script>
+<script src="lib/grid-find.js?v=18aa6431"></script>
+<script src="lib/grid-print.js?v=18aa6431"></script>
+<script src="lib/ai-reason.js?v=18aa6431"></script>
+<script src="lib/menu-place.js?v=18aa6431"></script>
+<script src="lib/grid-stats.js?v=18aa6431"></script>
+<script src="lib/grid-valid.js?v=18aa6431"></script>
+<script src="lib/cond-format.js?v=18aa6431"></script>
+<script src="lib/ref-graph.js?v=18aa6431"></script>
+<script src="lib/shindan.js?v=18aa6431"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=47119d63"></script>
-<script src="lib/vba-mikata.js?v=47119d63"></script>
-<script src="lib/vba-tejun.js?v=47119d63"></script>
-<script src="lib/rireki.js?v=47119d63"></script>
-<script src="lib/chizu.js?v=47119d63"></script>
-<script src="lib/horu.js?v=47119d63"></script>
-<script src="lib/excel-version.js?v=47119d63"></script>
-<script src="lib/teian.js?v=47119d63"></script>
-<script src="lib/kikan.js?v=47119d63"></script>
-<script src="lib/recipe.js?v=47119d63"></script>
-<script src="lib/kirikae.js?v=47119d63"></script>
-<script src="js/recipe-store.js?v=47119d63"></script>
-<script src="js/rireki-store.js?v=47119d63"></script>
-<script src="lib/excel-version.js?v=47119d63"></script>
+<script src="lib/vba.js?v=18aa6431"></script>
+<script src="lib/vba-mikata.js?v=18aa6431"></script>
+<script src="lib/vba-tejun.js?v=18aa6431"></script>
+<script src="lib/rireki.js?v=18aa6431"></script>
+<script src="lib/chizu.js?v=18aa6431"></script>
+<script src="lib/horu.js?v=18aa6431"></script>
+<script src="lib/excel-version.js?v=18aa6431"></script>
+<script src="lib/teian.js?v=18aa6431"></script>
+<script src="lib/kikan.js?v=18aa6431"></script>
+<script src="lib/recipe.js?v=18aa6431"></script>
+<script src="lib/kirikae.js?v=18aa6431"></script>
+<script src="js/recipe-store.js?v=18aa6431"></script>
+<script src="js/rireki-store.js?v=18aa6431"></script>
+<script src="lib/excel-version.js?v=18aa6431"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=47119d63">
-<script src="lib/named-ranges.js?v=47119d63"></script>
-<script src="lib/cell-styles.js?v=47119d63"></script>
-<script src="lib/chart.js?v=47119d63"></script>
-<script src="lib/sparkline.js?v=47119d63"></script>
-<script src="lib/table.js?v=47119d63"></script>
-<script src="lib/flash-fill.js?v=47119d63"></script>
-<script src="lib/pivot.js?v=47119d63"></script>
-<script src="lib/csv-in.js?v=47119d63"></script>
-<script src="lib/objects.js?v=47119d63"></script>
-<script src="lib/ink.js?v=47119d63"></script>
-<script src="lib/view-mode.js?v=47119d63"></script>
-<script src="lib/sheet-view.js?v=47119d63"></script>
-<script src="lib/theme.js?v=47119d63"></script>
-<script src="lib/diagram.js?v=47119d63"></script>
-<script src="lib/adv-filter.js?v=47119d63"></script>
-<script src="lib/connections.js?v=47119d63"></script>
-<script src="lib/symbols.js?v=47119d63"></script>
-<script src="lib/ribbon-spec.js?v=47119d63"></script>
-<script src="lib/ribbon-actions.js?v=47119d63"></script>
-<script src="lib/ribbon.js?v=47119d63"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=18aa6431">
+<script src="lib/named-ranges.js?v=18aa6431"></script>
+<script src="lib/cell-styles.js?v=18aa6431"></script>
+<script src="lib/chart.js?v=18aa6431"></script>
+<script src="lib/sparkline.js?v=18aa6431"></script>
+<script src="lib/table.js?v=18aa6431"></script>
+<script src="lib/flash-fill.js?v=18aa6431"></script>
+<script src="lib/pivot.js?v=18aa6431"></script>
+<script src="lib/csv-in.js?v=18aa6431"></script>
+<script src="lib/objects.js?v=18aa6431"></script>
+<script src="lib/ink.js?v=18aa6431"></script>
+<script src="lib/view-mode.js?v=18aa6431"></script>
+<script src="lib/sheet-view.js?v=18aa6431"></script>
+<script src="lib/theme.js?v=18aa6431"></script>
+<script src="lib/diagram.js?v=18aa6431"></script>
+<script src="lib/adv-filter.js?v=18aa6431"></script>
+<script src="lib/connections.js?v=18aa6431"></script>
+<script src="lib/review.js?v=18aa6431"></script>
+<script src="lib/symbols.js?v=18aa6431"></script>
+<script src="lib/ribbon-spec.js?v=18aa6431"></script>
+<script src="lib/ribbon-actions.js?v=18aa6431"></script>
+<script src="lib/ribbon.js?v=18aa6431"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=47119d63"></script>
-<script src="js/exally-login.js?v=47119d63"></script>
-<script src="js/auth.js?v=47119d63"></script>
+<script src="js/supa-config.js?v=18aa6431"></script>
+<script src="js/exally-login.js?v=18aa6431"></script>
+<script src="js/auth.js?v=18aa6431"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3045,6 +3046,257 @@ function 分割の線を描く(){
   return 出;
 }
 
+/* ═══ ★校閲タブ★ 文章校正・見やすさ・翻訳・変更内容・共有・インク ═══ 2026-08-30
+ *
+ *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-review2.ps1
+ *    スペル … `recieve`→★False★／`receive`→True／`teh`→★False★／`the`→True／
+ *      `apple`→True／`こんにちは`→★True（日本語は いつも 通る）★
+ *      ★直しの 案（GetSpellingSuggestions）は COM から 呼べなかった★
+ *    代替テキスト … ★はじめは 空★／入れられる（`Title` も 在る）
+ *    共有 … `MultiUserEditing`=★False★／`KeepChangeHistory`=True／
+ *      `ChangeHistoryDuration`=★0★／`HighlightChangesOnScreen`=False
+ *      ★共有していないと `HighlightChangesOptions` は 通らない（0x800A03EC）★
+ *    インク … ★形（Shapes）の 1つとして 数える★
+ *    類義語・翻訳 … ★COM から 呼べない★（画面の 窓／Microsoft の サービス）
+ *
+ *  ★出来ない事は 出来ないと 書く★
+ *    うちは ★大きな 辞書を 持たない★ ⇒ よく まちがえる 英語 ＋
+ *    ★同じ ブックの 中の 1文字違い★で 見る。★日本語は 実Excel と 同じで 通す★。
+ *    類義語・翻訳は ★AIに つなぐ★（辞書と 外の サービスの 代わり）。
+ */
+
+function _このブックの字たち(){
+  var 出 = [];
+  for (var i = 0; i < sheets.length; i++) {
+    var d = sheets[i].data;
+    for (var k in d) {
+      if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
+      var x = d[k];
+      if (!x) continue;
+      var v = (x.d !== undefined && x.d !== null && x.d !== '') ? x.d : x.v;
+      if (v === undefined || v === null || v === '') continue;
+      if (x.f && String(x.f)[0] === '=') continue;      /* 式は 見ない */
+      var p = k.split(',');
+      出.push({ 値: v, 場所: sheets[i].name + '!' + cellAddr(Number(p[0]), Number(p[1])) });
+    }
+  }
+  return 出;
+}
+
+/* ── スペル チェック ── */
+function スペルを見る(){
+  hideCtxMenu();
+  var 出 = Review.スペルを見る(_このブックの字たち());
+  document.getElementById('funcTitle').textContent = 'スペル チェック';
+  窓の副題(出.length ? ('あやしい 言葉 ' + 出.length + '個') : 'あやしい 言葉は ありません');
+  var h = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  if (!出.length) {
+    h += '<div style="color:#7A9A87;">見つかりませんでした。</div>';
+  } else {
+    for (var i = 0; i < 出.length; i++) {
+      var v = 出[i];
+      h += '<div style="border:1px solid #C8ECD8;border-radius:10px;padding:8px 10px;">'
+        + '<div style="font-size:14px;"><b>' + _esc(v.語) + '</b> → <b style="color:#2E7D54;">'
+        + _esc(v.直し) + '</b></div>'
+        + '<div style="font-size:12px;color:#7A9A87;">' + _esc(v.場所) + '　' + _esc(v.訳) + '</div>'
+        + '<button type="button" data-p="' + _esc(v.場所) + '" data-w="' + _esc(v.語)
+        + '" data-n="' + _esc(v.直し) + '" onclick="スペルを直す(this)"'
+        + ' style="margin-top:6px;min-height:38px;padding:0 12px;border:1px solid #C8ECD8;'
+        + 'background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;'
+        + 'cursor:pointer;">この 言葉を 直す</button></div>';
+    }
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★日本語は 見ません★（実Excel も 「こんにちは」を 通しました＝実測）。<br>'
+    + '★うちは 大きな 辞書を 持ちません★＝「よく まちがえる 英語」と'
+    + '「★同じ ブックの 中で 1文字だけ 違う 言葉★」で 見つけます。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 出.length;
+}
+function スペルを直す(札){
+  var 場 = 札.getAttribute('data-p');
+  var 語 = 札.getAttribute('data-w');
+  var 新 = 札.getAttribute('data-n');
+  var m = /^(.*)!([A-Z]+\d+)$/.exec(場);
+  if (!m) { notify('★場所が 分かりません★'); return 0; }
+  var si = -1;
+  for (var i = 0; i < sheets.length; i++) if (sheets[i].name === m[1]) si = i;
+  if (si < 0) { notify('★シートが 見つかりません★'); return 0; }
+  var rc = _字を範囲に(m[2]);
+  if (!rc) { notify('★場所が 分かりません★'); return 0; }
+  var x = sheets[si].data[rc.r1 + ',' + rc.c1];
+  if (!x) { notify('★セルが 空です★'); return 0; }
+  var 元 = String(x.d !== undefined && x.d !== null ? x.d : x.v);
+  var 後 = 元.split(語).join(新);
+  if (後 === 元) { notify('★その 言葉が 見つかりません★'); return 0; }
+  if (si !== activeSheet) switchSheet(si);
+  setCell(rc.r1, rc.c1, 後);
+  render();
+  notify('「' + 語 + '」を 「' + 新 + '」に 直しました');
+  スペルを見る();
+  return 1;
+}
+
+/* ── 見やすさ（アクセシビリティ）── */
+function 見やすさを見る(){
+  hideCtxMenu();
+  var 物 = [];
+  var 結合 = [];
+  var 名 = [];
+  var 色組 = [];
+  for (var i = 0; i < sheets.length; i++) {
+    名.push(sheets[i].name);
+    var 箱 = sheets[i].objects || [];
+    for (var j = 0; j < 箱.length; j++) 物.push({ 名: 箱[j].名, 代替: 箱[j].代替 });
+    var d = sheets[i].data;
+    for (var k in d) {
+      if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
+      var x = d[k];
+      if (!x) continue;
+      var p = k.split(',');
+      var 所 = sheets[i].name + '!' + cellAddr(Number(p[0]), Number(p[1]));
+      if (x.merged || (x.mergeW > 1 || x.mergeH > 1)) 結合.push(所);
+      if (x.color || x.bgColor) {
+        色組.push({ 字: x.color || '#333333', 背: x.bgColor || '#FFFFFF', 場所: 所 });
+      }
+    }
+  }
+  var 出 = Review.見やすさを見る({ 物たち: 物, 結合たち: 結合, シート名たち: 名, 色の組たち: 色組 });
+  document.getElementById('funcTitle').textContent = 'アクセシビリティ チェック';
+  窓の副題(出.length ? ('気に なる 所 ' + 出.length + '個') : '気に なる 所は ありません');
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  if (!出.length) {
+    h += '<div style="color:#7A9A87;">見つかりませんでした。</div>';
+  } else {
+    for (var m2 = 0; m2 < 出.length; m2++) {
+      var v = 出[m2];
+      h += '<div style="border-left:4px solid ' + (v.程度 === '赤' ? '#C4534B' : '#E0A33E')
+        + ';padding:6px 10px;background:#F7FBF9;border-radius:6px;">'
+        + '<div style="font-size:13px;font-weight:700;">' + _esc(v.何) + '</div>'
+        + '<div style="font-size:12px;color:#7A9A87;line-height:1.7;">'
+        + _esc(v.どこ) + '<br>' + _esc(v.どうする) + '</div></div>';
+    }
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:6px;">'
+    + '見る 所 … ★絵の 説明（代替テキスト）★・セルの 結合・シートの 名前・'
+    + '★字と 背中の 色の 差（4.5:1 以上）★<br>'
+    + '実Excel の 代替テキストも ★はじめは 空★でした（実測）。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 出.length;
+}
+function 絵の説明を入れる(){
+  hideCtxMenu();
+  var o = 選んだ物;
+  if (!o) { notify('★絵や 図を 選んでください★'); return 0; }
+  document.getElementById('funcTitle').textContent = '代替テキスト';
+  窓の副題('「' + (o.名 || '物') + '」が 何の 絵か 一言で');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<input id="altInput" type="text" value="' + _esc(o.代替 || '')
+    + '" placeholder="例: 売上の 折れ線グラフ" style="min-height:44px;font-size:16px;color:#333333;'
+    + 'border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 10px;font-family:inherit;">'
+    + '<button type="button" onclick="絵の説明を決める()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">決める</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★実Excel の 代替テキストも はじめは 空★でした（実測）。'
+    + '目が 見えない 人は この 字を 読み上げで 聞きます。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+function 絵の説明を決める(){
+  var o = 選んだ物;
+  var 入 = document.getElementById('altInput');
+  if (!o || !入) return 0;
+  var v = String(入.value || '').trim();
+  if (v) o.代替 = v; else delete o.代替;
+  関数の窓を閉じる();
+  notify(v ? ('説明を「' + v + '」に しました') : '説明を 消しました');
+  return v ? 1 : 0;
+}
+
+/* ── 類義語辞典・翻訳（★辞書と 外の サービスの 代わりに AI へ★）── */
+function 類義語を聞く(){
+  hideCtxMenu();
+  var x = sheets[activeSheet].data[selR1 + ',' + selC1];
+  var 語 = x ? String(x.d !== undefined && x.d !== null ? x.d : x.v) : '';
+  if (!語) { notify('★言葉が 入っている セルを 選んでください★'); return 0; }
+  _AIに聞く('「' + 語 + '」の 言いかえ（似た 意味の 言葉）を 5つ 挙げてください。',
+    '類義語辞典', '★実Excel の 類義語辞典は 大きな 辞書を 使います★。'
+    + 'うちは 辞書を 持たないので ★AI に 聞きます★。');
+  return 1;
+}
+function 翻訳を聞く(){
+  hideCtxMenu();
+  var x = sheets[activeSheet].data[selR1 + ',' + selC1];
+  var 語 = x ? String(x.d !== undefined && x.d !== null ? x.d : x.v) : '';
+  if (!語) { notify('★字が 入っている セルを 選んでください★'); return 0; }
+  _AIに聞く('次の 字を 英語に して ください（答えだけ）。\n' + 語,
+    '翻訳', '★実Excel の 翻訳は Microsoft の サービスに つながります★。'
+    + 'うちは ★AI に 聞きます★。');
+  return 1;
+}
+function _AIに聞く(お願い, 題, 説明){
+  document.getElementById('funcTitle').textContent = 題;
+  窓の副題(cellAddr(selR1, selC1) + ' の 字について');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<div style="font-size:13px;line-height:1.8;">' + _esc(お願い) + '</div>'
+    + '<button type="button" data-q="' + _esc(お願い) + '" onclick="AIへ送る(this.getAttribute(\'data-q\'))"'
+    + ' style="min-height:44px;border:1px solid #C8ECD8;background:#3D9E72;color:#ffffff;'
+    + 'border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">AI に 聞く</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">' + 説明 + '</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+function AIへ送る(お願い){
+  関数の窓を閉じる();
+  var 入 = document.getElementById('ai-input');
+  if (!入) { notify('★AI の 入り口が 見つかりません★'); return 0; }
+  入.value = お願い;
+  var 札 = document.getElementById('ai-float-btn');
+  if (札) 札.click();
+  var 送 = document.getElementById('ai-send');
+  if (送) 送.click();
+  return 1;
+}
+
+/* ── 変更内容を表示 / ブックの共有を解除 ── */
+function 変更内容を見る(){
+  hideCtxMenu();
+  /* ★同じ 物を 2画面で 別々に 判定しない★＝
+     「これまでに やった 事」は ★履歴の 画面が 正本★なので そこを 開く。
+     ここで 別に 一覧を 組み立てると ★片方だけ 直る 事故★に なる。
+     ★実Excel の「変更内容を表示」は 何人かで 開いている 時の 物★
+     （実測＝共有していないと 断られた 0x800A03EC）ので、
+     うちは ★この ブックで やった 事★を 出す。 */
+  /* ★typeof で 守らない★＝openRireki は この ファイルの 中に 在る。
+     守ると 無くなった 時に ★黙って 素通り★する（見張り no-silent-optional が 赤に する）。
+     在るか どうかは ★呼んでいるのに 無い 働き★の 見張りが 見ている。 */
+  openRireki('校閲');
+  notify('★この ブックで やった 事★を 出しました'
+    + '（実Excel の「変更内容を表示」は 何人かで 開いている 時の 物です）');
+  return 1;
+}
+function 共有を解除(){
+  hideCtxMenu();
+  /* ★実測＝MultiUserEditing は False（共有していない）★ */
+  notify('★この ブックは 共有していません★（実Excel も 共有していない 時は 何も 起きません）');
+  return 0;
+}
+
+/* ── インクを 非表示に する ── */
+var インクを隠す = false;
+function インクを隠す切り替え(){
+  hideCtxMenu();
+  インクを隠す = !インクを隠す;
+  render();
+  notify(インクを隠す ? '手書きを しまいました（消えては いません）' : '手書きを また 出しました');
+  return インクを隠す ? 1 : 0;
+}
+
 /* ═══ ★データタブ★ 詳細設定・クエリと接続 ═══════════════ 2026-08-30
  *
  *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-data3.ps1
@@ -4700,7 +4952,7 @@ function _renderPass() {
   物を描く();
 
   /* ★手書き（描画タブ）★＝浮かぶ 物の 上に 出す */
-  インクを描く();
+  if (!インクを隠す) インクを描く();   /* ★校閲→インクを非表示★（消しては いない） */
 
   /* ★参照元・参照先の 矢印★（字の 上に 出す＝実Excelも 上に 出る） */
   トレースを描く();
