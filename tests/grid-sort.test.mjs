@@ -64,9 +64,18 @@ T('★画面が立ち上がっていて sortRange と GridSort が在る', () =>
   ok(win.GridSort && typeof win.GridSort.order === 'function', 'GridSort が無い');
 });
 T('★右クリックの中に 昇順・降順が在る（押す口が在る）', () => {
-  const items = [...doc.querySelectorAll('.ctx-item')].map((e) => (e.getAttribute('onclick') || '') + '|' + e.textContent.trim());
-  ok(items.some((x) => x.startsWith("sortRange('asc')")), '昇順の口が無い');
-  ok(items.some((x) => x.startsWith("sortRange('desc')")), '降順の口が無い');
+  /* ★2026-08-31：右クリックの 中身が ★開いた時に 作る★ 形に なった★
+     （実 Excel の 1,384命令に 合わせて 25→37個。組（▸）に した）
+     ⇒ ★開いてから 探す★。印は onclick では なく data-ctx。
+     ★昇順と 降順は 同じ 働き（sortRange）を 引数 違いで 呼ぶ★ので
+     ★字も 一緒に 見る★（口だけだと 2つを 見分けられない）。 */
+  win.sel(0, 0, 0, 0);
+  win.showCtxMenu(10, 10);
+  const items = [...doc.querySelectorAll('#ctx-menu .ctx-item')]
+    .map((e) => (e.getAttribute('data-ctx') || '') + '|' + e.textContent.trim());
+  ok(items.some((x) => x.startsWith('sortRange|') && x.indexOf('昇順') >= 0),
+    '昇順の口が無い：' + items.join(' / '));
+  ok(items.some((x) => x.startsWith('sortRange|') && x.indexOf('降順') >= 0), '降順の口が無い');
 });
 
 const A = (r, c) => win.sheets[win.activeSheet].data[r + ',' + c] || null;
@@ -196,7 +205,10 @@ if (SELF) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'exally-sort-'));
   console.log('\n[self-test] わざと壊して 赤くなるかを数える（★repo は読むだけ★）');
   const BREAKS = [
-    ['book.html', '右クリックの 昇順を消す', (s) => s.replace('<div class="ctx-item" onclick="sortRange(\'asc\')">⬆️ 昇順で並べ替え</div>', '')],
+    /* ★2026-08-31：中身の 正本が 画面から lib/ctx-menu.js へ 移った★
+       ★壊す 先も 一緒に 移す★（古いままだと ★素通り★＝見張りが 眠る） */
+    ['lib/ctx-menu.js', '右クリックの 昇順を消す',
+      (s) => s.replace("名: '昇順で 並べ替え', 画面: 'sortRange'", "名: '昇順で 並べ替え', 画面: 'ctxCopy'")],
     ['book.html', '★式を移った先の行に読み替えない★（相対参照が壊れる）', (s) => s.replace('next.f = shiftFormula(src.f, ずれ, 0);', 'next.f = src.f;')],
     ['book.html', '見出しを いつも動かす', (s) => s.replace('var 先頭 = rng.r1 + (見出し ? 1 : 0);', 'var 先頭 = rng.r1;')],
     ['book.html', '表を広げず 1セルだけ並べ替える', (s) => s.replace('rng = GridSort.region(中身がある, selR1, selC1, ROWS-1, COLS-1);', 'rng = { r1:selR1, c1:selC1, r2:selR1, c2:selC1 };')],

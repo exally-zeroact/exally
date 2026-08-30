@@ -907,6 +907,10 @@ display:none;
 /* ★画面に入り切らない時は 中で動かせる★
    （2026-08-21 実測：高さ743px、画面619px で 上へ470px はみ出していた） */
 overflow-y:auto;
+/* ★横には 動かさない★＝子メニューは 画面に 直接 出すので
+   ここで 横に 広がる 事は 無い。入れないと ★底に 横の帯が 出る★
+   （2026-08-31 実ブラウザで 絵を 見て 見つけた） */
+overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
 overscroll-behavior:contain;
 }
@@ -923,6 +927,30 @@ gap:8px;
 }
 .ctx-item:hover { background:#F0FAF4; }
 .ctx-divider { height:1px; background:#E8EFE8; margin:4px 0; }
+
+/* ===== ★組（ドロップダウン）★ 2026-08-31 =====
+   ★なぜ 入れたか★：平らに 37個 並べたら 高さ 1,193px に なり
+   画面（884px）に 入らず スクロールに なった（実測）。
+   司さん：★ごちゃごちゃに ならないよう ドロップダウンでも いいから 綺麗に★ */
+.ctx-sub { position:relative; }
+.ctx-arrow { margin-left:auto; color:#8AA79A; font-size:11px; }
+.ctx-sub-box {
+  display:none;
+  /* ★画面に 直接 出す★（親の 箱の 中に 入れると
+     親が 横に 広がって ★底に 横の帯が 出る★） */
+  position:fixed;
+  left:0; top:0;
+  min-width:190px;
+  background:#fff;
+  border:1px solid #E8EFE8;
+  border-radius:8px;
+  box-shadow:0 6px 20px rgba(0,0,0,.14);
+  padding:4px 0;
+  z-index:10;
+}
+/* ★当てても 押しても 開く★（マウスも 指も 同じ 手で 開ける） */
+/* ★場所は JS が 決める★（右に 入らなければ 左、下に 入らなければ 上へ） */
+.ctx-sub-box.open { display:block; }
 
 /* ===== モバイル：PCと同じ右スライドパネル ===== */
 @media (max-width:768px) {
@@ -1304,86 +1332,93 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=b97bbd56"></script>
+<script src="hyperformula.full.min.js?v=74c34a56"></script>
+<script src="lib/formula-extra.js?v=74c34a56"></script>
+<script src="lib/formula-extra-plug.js?v=74c34a56"></script>
 
-<script src="exally-formula.js?v=b97bbd56"></script>
+<script src="exally-formula.js?v=74c34a56"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=b97bbd56"></script>
+<script src="js/file-out.js?v=74c34a56"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=b97bbd56"></script>
-<script src="lib/grid-xlsx.js?v=b97bbd56"></script>
+<script src="lib/typed-value.js?v=74c34a56"></script>
+<script src="lib/grid-xlsx.js?v=74c34a56"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=b97bbd56"></script>
-<script src="lib/autosum.js?v=b97bbd56"></script>
-<script src="lib/grid-sort.js?v=b97bbd56"></script>
-<script src="lib/grid-filter.js?v=b97bbd56"></script>
-<script src="lib/grid-find.js?v=b97bbd56"></script>
-<script src="lib/grid-print.js?v=b97bbd56"></script>
-<script src="lib/ai-reason.js?v=b97bbd56"></script>
-<script src="lib/menu-place.js?v=b97bbd56"></script>
-<script src="lib/grid-stats.js?v=b97bbd56"></script>
-<script src="lib/grid-valid.js?v=b97bbd56"></script>
-<script src="lib/cond-format.js?v=b97bbd56"></script>
-<script src="lib/ref-graph.js?v=b97bbd56"></script>
-<script src="lib/shindan.js?v=b97bbd56"></script>
+  <script src="lib/grid-refedit.js?v=74c34a56"></script>
+<script src="lib/autosum.js?v=74c34a56"></script>
+<script src="lib/grid-sort.js?v=74c34a56"></script>
+<script src="lib/grid-filter.js?v=74c34a56"></script>
+<script src="lib/grid-find.js?v=74c34a56"></script>
+<script src="lib/grid-print.js?v=74c34a56"></script>
+<script src="lib/ai-reason.js?v=74c34a56"></script>
+<script src="lib/menu-place.js?v=74c34a56"></script>
+<script src="lib/grid-stats.js?v=74c34a56"></script>
+<script src="lib/grid-valid.js?v=74c34a56"></script>
+<script src="lib/cond-format.js?v=74c34a56"></script>
+<script src="lib/ref-graph.js?v=74c34a56"></script>
+<script src="lib/shindan.js?v=74c34a56"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=b97bbd56"></script>
-<script src="lib/vba-mikata.js?v=b97bbd56"></script>
-<script src="lib/vba-tejun.js?v=b97bbd56"></script>
-<script src="lib/rireki.js?v=b97bbd56"></script>
-<script src="lib/chizu.js?v=b97bbd56"></script>
-<script src="lib/horu.js?v=b97bbd56"></script>
-<script src="lib/excel-version.js?v=b97bbd56"></script>
-<script src="lib/teian.js?v=b97bbd56"></script>
-<script src="lib/kikan.js?v=b97bbd56"></script>
-<script src="lib/recipe.js?v=b97bbd56"></script>
-<script src="lib/kirikae.js?v=b97bbd56"></script>
-<script src="js/recipe-store.js?v=b97bbd56"></script>
-<script src="js/rireki-store.js?v=b97bbd56"></script>
-<script src="lib/excel-version.js?v=b97bbd56"></script>
+<script src="lib/vba.js?v=74c34a56"></script>
+<script src="lib/vba-mikata.js?v=74c34a56"></script>
+<script src="lib/vba-tejun.js?v=74c34a56"></script>
+<script src="lib/rireki.js?v=74c34a56"></script>
+<script src="lib/chizu.js?v=74c34a56"></script>
+<script src="lib/horu.js?v=74c34a56"></script>
+<script src="lib/excel-version.js?v=74c34a56"></script>
+<script src="lib/teian.js?v=74c34a56"></script>
+<script src="lib/kikan.js?v=74c34a56"></script>
+<script src="lib/recipe.js?v=74c34a56"></script>
+<script src="lib/kirikae.js?v=74c34a56"></script>
+<script src="js/recipe-store.js?v=74c34a56"></script>
+<script src="js/rireki-store.js?v=74c34a56"></script>
+<script src="lib/excel-version.js?v=74c34a56"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=b97bbd56">
-<script src="lib/named-ranges.js?v=b97bbd56"></script>
-<script src="lib/cell-styles.js?v=b97bbd56"></script>
-<script src="lib/chart.js?v=b97bbd56"></script>
-<script src="lib/sparkline.js?v=b97bbd56"></script>
-<script src="lib/table.js?v=b97bbd56"></script>
-<script src="lib/flash-fill.js?v=b97bbd56"></script>
-<script src="lib/pivot.js?v=b97bbd56"></script>
-<script src="lib/csv-in.js?v=b97bbd56"></script>
-<script src="lib/objects.js?v=b97bbd56"></script>
-<script src="lib/ink.js?v=b97bbd56"></script>
-<script src="lib/view-mode.js?v=b97bbd56"></script>
-<script src="lib/sheet-view.js?v=b97bbd56"></script>
-<script src="lib/theme.js?v=b97bbd56"></script>
-<script src="lib/diagram.js?v=b97bbd56"></script>
-<script src="lib/adv-filter.js?v=b97bbd56"></script>
-<script src="lib/connections.js?v=b97bbd56"></script>
-<script src="lib/review.js?v=b97bbd56"></script>
-<script src="lib/xml-map.js?v=b97bbd56"></script>
-<script src="lib/ink-shape.js?v=b97bbd56"></script>
-<script src="lib/jp-map.js?v=b97bbd56"></script>
-<script src="lib/timeline.js?v=b97bbd56"></script>
-<script src="lib/model3d.js?v=b97bbd56"></script>
-<script src="lib/data-model.js?v=b97bbd56"></script>
-<script src="lib/symbols.js?v=b97bbd56"></script>
-<script src="lib/view-extras.js?v=b97bbd56"></script>
-<script src="lib/ribbon-spec.js?v=b97bbd56"></script>
-<script src="lib/ribbon-label.js?v=b97bbd56"></script>
-<script src="lib/ribbon-scope.js?v=b97bbd56"></script>
-<script src="lib/ribbon-actions.js?v=b97bbd56"></script>
-<script src="lib/ribbon.js?v=b97bbd56"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=74c34a56">
+<script src="lib/named-ranges.js?v=74c34a56"></script>
+<script src="lib/cell-styles.js?v=74c34a56"></script>
+<script src="lib/chart.js?v=74c34a56"></script>
+<script src="lib/sparkline.js?v=74c34a56"></script>
+<script src="lib/table.js?v=74c34a56"></script>
+<script src="lib/flash-fill.js?v=74c34a56"></script>
+<script src="lib/pivot.js?v=74c34a56"></script>
+<script src="lib/csv-in.js?v=74c34a56"></script>
+<script src="lib/objects.js?v=74c34a56"></script>
+<script src="lib/ink.js?v=74c34a56"></script>
+<script src="lib/view-mode.js?v=74c34a56"></script>
+<script src="lib/sheet-view.js?v=74c34a56"></script>
+<script src="lib/theme.js?v=74c34a56"></script>
+<script src="lib/diagram.js?v=74c34a56"></script>
+<script src="lib/adv-filter.js?v=74c34a56"></script>
+<script src="lib/connections.js?v=74c34a56"></script>
+<script src="lib/review.js?v=74c34a56"></script>
+<script src="lib/xml-map.js?v=74c34a56"></script>
+<script src="lib/ink-shape.js?v=74c34a56"></script>
+<script src="lib/jp-map.js?v=74c34a56"></script>
+<script src="lib/timeline.js?v=74c34a56"></script>
+<script src="lib/model3d.js?v=74c34a56"></script>
+<script src="lib/data-model.js?v=74c34a56"></script>
+<script src="lib/symbols.js?v=74c34a56"></script>
+<script src="lib/view-extras.js?v=74c34a56"></script>
+<script src="lib/ribbon-spec.js?v=74c34a56"></script>
+<script src="lib/ribbon-label.js?v=74c34a56"></script>
+<script src="lib/ribbon-scope.js?v=74c34a56"></script>
+<script src="lib/ribbon-actions.js?v=74c34a56"></script>
+<script src="lib/ribbon-keys.js?v=74c34a56"></script>
+<script src="lib/ribbon-keytips.js?v=74c34a56"></script>
+<script src="lib/ribbon-launcher.js?v=74c34a56"></script>
+<script src="lib/ctx-menu.js?v=74c34a56"></script>
+<script src="lib/header-footer.js?v=74c34a56"></script>
+<script src="lib/ribbon.js?v=74c34a56"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=b97bbd56"></script>
-<script src="js/exally-login.js?v=b97bbd56"></script>
-<script src="js/auth.js?v=b97bbd56"></script>
+<script src="js/supa-config.js?v=74c34a56"></script>
+<script src="js/exally-login.js?v=74c34a56"></script>
+<script src="js/auth.js?v=74c34a56"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1419,6 +1454,17 @@ function initFormulaEngine(sheetNames) {
      ★書き出す時のキャッシュ値もうちの計算結果なので、切らないと渡した紙まで違う。★
      ★見にくさは表示側で直す。計算を歪めて見やすくしない。★
      ★tests/smart-rounding.test.mjs が、true に戻したら赤にする。★ */
+  /* ★足りない 関数を 先に 繋ぐ★（2026-08-31）
+     ★buildEmpty の 前★で ないと このブックに 入らない。
+     中身（計算）は lib/formula-extra.js（純粋）、
+     繋ぐ所は lib/formula-extra-plug.js。★同じ 計算を 2つ 書かない★。
+     実測（2026-08-31）：エンジンに 457個。事務で 使う 98個を 見て 62個 無かった。 */
+  try {
+    if (window.FormulaExtraPlug && window.FormulaExtra) {
+      var _足した = window.FormulaExtraPlug.つなぐ(HyperFormula, window.FormulaExtra);
+      if (window.console && _足した) console.log('関数を ' + _足した + '個 足しました');
+    }
+  } catch (e) { if (window.console) console.warn('関数を 足せませんでした', e); }
   hf = HyperFormula.buildEmpty({licenseKey:'gpl-v3', useArrayArithmetic:true, smartRounding:false});
   // FN_LIBRARY に HyperFormula の全関数を自動追加（既存重複は除く）
   try {
@@ -1721,6 +1767,14 @@ function printSheet(){
     印刷倍率: ページ設定.ページに合わせる ? null : ページ設定.印刷倍率,
     fileName: (typeof BookOpen!=='undefined' && BookOpen.isOpened && BookOpen.isOpened())
       ? (BookOpen.current && BookOpen.current().name) || '' : '',
+    /* ★紙の 上と 下に 入れる 字★（2026-08-31 司さんの 指示）
+       ★ページ番号（&P・&N）だけ 残して 渡す★＝
+       何ページに なるかは ★並べてみないと 分からない★ので
+       刷る 窓の 中で 数えて 差し替える。 */
+    ヘッダー: 刷る時のヘッダー('ヘッダー'),
+    フッター: 刷る時のヘッダー('フッター'),
+    頁印: (window.HeaderFooter||{}).頁印,
+    総印: (window.HeaderFooter||{}).総印,
   });
   if(!html){ showToast('刷る中身が在りません（先に何か入れてね）'); return; }
   var w = window.open('', '_blank');
@@ -6766,40 +6820,13 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 </div>
 
 <div id="ctx-menu" ontouchstart="event.stopPropagation()">
-  <!-- ★大事な物を 上に★（2026-08-21 指示役）
-       並べ替え・絞り込み・固定・印刷・入力の決まりが 真ん中に在ったため
-       メニューがはみ出した時に ★客の手に届いていなかった★。 -->
-  <div id="ctx-valid-list"></div>
-  <div class="ctx-item" onclick="sortRange('asc')">⬆️ 昇順で並べ替え</div>
-  <div class="ctx-item" onclick="sortRange('desc')">⬇️ 降順で並べ替え</div>
-  <div class="ctx-item" onclick="filterByValue()">🔽 選んだセルの値で絞り込む</div>
-  <div class="ctx-item" id="ctx-clear-filter" style="display:none" onclick="clearFilter()">🔽 絞り込みを解除</div>
-  <div class="ctx-item" onclick="freezePanes()">🧊 ここで固定（選んだセルの 上と左）</div>
-  <div class="ctx-item" id="ctx-unfreeze" style="display:none" onclick="unfreezePanes()">🧊 固定をやめる</div>
-  <div class="ctx-item" onclick="printSheet()">🖨️ 印刷（Ctrl+P）</div>
-  <div class="ctx-item" onclick="openCondFormat()">🎨 条件付き書式（当てはまったら 色を付ける）</div>
-  <div class="ctx-item" onclick="openValid()">✅ 入力の決まり（一覧から選ぶ／数の範囲）</div>
-  <div class="ctx-item" id="ctx-bad-cells" style="display:none" onclick="showBadCells()">⚠️ 決まりに合っていない値を数える</div>
-  <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="explainCell()" style="color:#3D9E72;font-weight:700;">🤖 AIに解説させる</div>
-  <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="ctxCut()">✂️ 切り取り <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+X</span></div>
-  <div class="ctx-item" onclick="ctxCopy()">📋 コピー <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+C</span></div>
-  <div class="ctx-item" onclick="ctxPaste()">📌 貼り付け <span style="color:#aaa;font-size:11px;margin-left:auto">Ctrl+V</span></div>
-  <div class="ctx-item" onclick="ctxPasteValue()">🔢 値のみ貼り付け</div>
-  <div class="ctx-item" onclick="ctxDelete()">🗑️ 削除 <span style="color:#aaa;font-size:11px;margin-left:auto">Del</span></div>
-  <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="ctxFormat()">🎨 セルの書式設定</div>
-  <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="ctxInsertRow()">➕ 行を挿入（上）</div>
-  <div class="ctx-item" onclick="ctxInsertCol()">➕ 列を挿入（左）</div>
-  <div class="ctx-item" onclick="ctxDeleteRow()">🗑️ 行を削除</div>
-  <div class="ctx-item" onclick="ctxDeleteCol()">🗑️ 列を削除</div>
-  <div class="ctx-divider"></div>
-  <div class="ctx-item" onclick="ctxHideRow()">👁️ 行を非表示</div>
-  <div class="ctx-item" onclick="ctxHideCol()">👁️ 列を非表示</div>
-  <div class="ctx-item" id="ctx-unhide-row" style="display:none" onclick="ctxUnhideRow()">👁️ 行を再表示</div>
-  <div class="ctx-item" id="ctx-unhide-col" style="display:none" onclick="ctxUnhideCol()">👁️ 列を再表示</div>
+  <!-- ★中身は lib/ctx-menu.js が 描く★ 2026-08-31
+       ★なぜ ここを 空に するか★
+         実 Excel の 右クリックは 1,384命令。うちは 25個だった。
+         足して 平らに 37個 並べたら ★高さ 1,193px★で 画面（884px）に 入らず
+         ★スクロール★に なった（2026-08-31 実ブラウザで 実測・絵も 撮った）。
+         司さん：★ごちゃごちゃに ならないよう ドロップダウンでも いいから 綺麗に★
+       ★新しい 働きは 1つも 作っていない★＝元から 在る 関数と リボンを 呼ぶだけ -->
 </div>
 
 <div id="header">
@@ -8007,6 +8034,55 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         用紙は A4・余白は 上下 19.1mm／左右 17.8mm（★実Excelの 既定を 測った値★）。<br>
         枠線も 見出しも ★実Excelの 既定は 刷らない★です。
       </div>
+
+      <!-- ★ヘッダーと フッター★（2026-08-31 司さんの 指示）
+           「ごちゃごちゃに ならないよう ★ドロップダウンでも いいから 綺麗に★」
+           ⇒ ★選ぶだけ★で 済むように し、細かく 直したい 人だけ ★自分で 書く★を 開く。
+           印（&P など）の 意味は ★実 Excel に PDF を 刷らせて 測った★。
+           中身の 正本：lib/header-footer.js -->
+      <div style="border-top:1px solid #D4EDE1;margin-top:12px;padding-top:12px;">
+        <div style="font-weight:700;color:#2E7D54;margin-bottom:6px;">紙の 上と 下に 入れる 字</div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <span style="min-width:5em;">上（ヘッダー）</span>
+          <select id="hfHead" style="flex:1;min-width:180px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <span style="min-width:5em;">下（フッター）</span>
+          <select id="hfFoot" style="flex:1;min-width:180px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
+          <input id="hfSelf" type="checkbox" style="width:20px;height:20px;" onchange="ヘッダーの自分で書くを切り替える()">
+          <span>自分で 書く（左・中央・右を 別々に）</span>
+        </label>
+
+        <div id="hfCustom" style="display:none;">
+          <div style="font-size:12px;color:#7A9A87;margin:4px 0 8px;line-height:1.7;">
+            ★印★… <span id="hfCodes"></span><br>
+            （印の 意味は ★実 Excel に 刷らせて 測った 物★）
+          </div>
+          <div style="font-weight:700;margin:6px 0 4px;">上（ヘッダー）</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <input id="hfHL" placeholder="左" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+            <input id="hfHC" placeholder="中央" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+            <input id="hfHR" placeholder="右" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          </div>
+          <div style="font-weight:700;margin:10px 0 4px;">下（フッター）</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <input id="hfFL" placeholder="左" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+            <input id="hfFC" placeholder="中央" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+            <input id="hfFR" placeholder="右" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
+          </div>
+        </div>
+
+        <div style="margin-top:10px;background:#F5FBF8;border:1px solid #D4EDE1;border-radius:8px;padding:8px 10px;font-size:12px;color:#333333;line-height:1.8;">
+          <div style="color:#7A9A87;">刷ると こう なります（1ページ目）</div>
+          <div id="hfPreviewH" style="display:flex;gap:8px;"></div>
+          <div style="color:#C8ECD8;">————— 表 —————</div>
+          <div id="hfPreviewF" style="display:flex;gap:8px;"></div>
+        </div>
+      </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
       <button onclick="ページ設定を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
@@ -8894,6 +8970,29 @@ window.addEventListener('load', function() {
         if (_rb) window.Ribbon.描く(_rb, window.RibbonSpec);
       }
     } catch (e) { if (window.console) console.warn('リボンを 描けませんでした', e); }
+    /* ★Alt の キー（キーヒント）を 受ける★ 2026-08-31
+       ★なぜ 一番 外側（capture）で 受けるか★
+         普段 字は cell-input が 受け取る。先に 止めないと
+         ★Alt,H と 打った 「H」が セルに 入る★。
+       ★Alt 単独は keyup でも 止める★＝Chrome は keyup で ブラウザの
+         メニューに 飛ぶ（飛ぶと 次の 字を 受けられない）。 */
+    try {
+      if (window.Ribbon && window.RibbonSpec) {
+        var _rbEl = document.getElementById('ribbon');
+        if (_rbEl) {
+          var _リボンキー = function (ev) {
+            if (!window.Ribbon || !window.RibbonSpec) return;
+            if (ev.ctrlKey || ev.metaKey) return;      /* Ctrl 系は 別の層 */
+            var 使った = window.Ribbon.キーを受ける(_rbEl, window.RibbonSpec, ev);
+            if (!使った) return;
+            ev.preventDefault(); ev.stopPropagation();
+            window.Ribbon.描く(_rbEl, window.RibbonSpec);
+          };
+          document.addEventListener('keydown', _リボンキー, true);
+          document.addEventListener('keyup', _リボンキー, true);
+        }
+      }
+    } catch (e) { if (window.console) console.warn('リボンの キーを 繋げませんでした', e); }
     initPopupDrag(); initPopupResize();
     // 初期セル選択＆cell-input に focus（IME常時ON化）
     var _ci = document.getElementById('cell-input');
@@ -9607,6 +9706,16 @@ function bindEvents(){
       this.style.width=Math.max(w,80)+'px';
       this.style.height=h+'px';
       this.classList.add('editing');
+      /* ★見た目を 変えると カーソルが 先頭に 戻る★（2026-08-30 実ブラウザで 実測）
+         ★症状★：セルを 選んで いきなり「あいう」と 打つと ★「いうあ」★に なる。
+           1字目の後 ★selectionStart が 0★に なり、2字目以降が 先頭に 入る。
+           英数は たまたま 1 のままだった★だから 今まで 気づかれなかった★。
+         ★入らないより 「黙って 違う字が 入る」方が 悪い★。
+         ⇒ ★末尾へ 戻す★。ただし ★IMEの 変換中は 触らない★（変換が 壊れる）。
+         見張り：tests/type-to-edit.test.mjs */
+      if(!_composing){
+        try { this.setSelectionRange(v.length, v.length); } catch(e){}
+      }
     }
     // 数式モード判定＋ref色付け
     refMode=(editingCell&&this.classList.contains('editing')&&v.length>0&&(v[0]==='='||v[0]==='＝'));
@@ -10412,6 +10521,99 @@ function showCtxMenu(x,y){
   var m=document.getElementById('ctx-menu');
   /* ★大きさを測る前に 上限を外して 中身そのままの高さを取る★ */
   m.style.maxHeight=''; m.style.left='0px'; m.style.top='0px';
+  /* ★右クリックの 中身を 描く★（2026-08-31）
+     ★中身の 正本は lib/ctx-menu.js★（実 Excel の 並びを 写した 表）。
+     ★新しい 働きは 1つも 作らない★＝
+       ・リボンの 働き … window.RibbonActions（249個）
+       ・画面の 働き … book.html の 関数（ctxCut など）
+     ★働きが 無い 物は 出さない★（司さんの 決まり）。
+     ★作るのは 1回だけ★＝出すたび 作ると 押し込みが 二重に なる。 */
+  if (!m.getAttribute('data-built') && window.CtxMenu) {
+    m.setAttribute('data-built', '1');
+    var _一覧 = window.CtxMenu.出す(window.RibbonActions, window);
+    var _押す = function (v) {
+      return function (ev) {
+        if (ev) ev.stopPropagation();
+        hideCtxMenu();
+        try {
+          if (v.リボン) window.RibbonActions[v.リボン]();
+          else if (v.引数 !== undefined) window[v.画面](v.引数);
+          else window[v.画面]();
+        } catch (err) { if (window.console) console.warn(err); }
+      };
+    };
+    var _1個 = function (v) {
+      var d = document.createElement('div');
+      d.className = 'ctx-item';
+      if (v.id) d.id = v.id;
+      if (v.隠す) d.style.display = 'none';
+      if (v.目立つ) { d.style.color = '#3D9E72'; d.style.fontWeight = '700'; }
+      d.appendChild(document.createTextNode(v.印 + ' ' + v.名));
+      if (v.鍵) {
+        var k = document.createElement('span');
+        k.style.cssText = 'color:#aaa;font-size:11px;margin-left:auto';
+        k.textContent = v.鍵;
+        d.appendChild(k);
+      }
+      if (v.Excel) d.title = v.Excel;      /* ★実 Excel での 名前を 残す★ */
+      d.setAttribute('data-ctx', v.リボン || v.画面 || '');
+      return d;
+    };
+    for (var _i = 0; _i < _一覧.length; _i++) {
+      var _v = _一覧[_i];
+      if (_v.穴) { var _h = document.createElement('div'); _h.id = _v.穴; m.appendChild(_h); continue; }
+      if (_v.区切り) { var _s = document.createElement('div'); _s.className = 'ctx-divider'; m.appendChild(_s); continue; }
+      if (_v.子) {
+        /* ★組（ドロップダウン）★＝当てるか 押すと 右に 出る */
+        var _g = document.createElement('div');
+        _g.className = 'ctx-item ctx-sub';
+        _g.appendChild(document.createTextNode(_v.印 + ' ' + _v.名));
+        var _ar = document.createElement('span');
+        _ar.className = 'ctx-arrow'; _ar.textContent = '▸';
+        _g.appendChild(_ar);
+        if (_v.Excel) _g.title = _v.Excel;
+        var _box = document.createElement('div');
+        _box.className = 'ctx-sub-box';
+        for (var _j = 0; _j < _v.子.length; _j++) {
+          var _c = _1個(_v.子[_j]);
+          _c.onclick = _押す(_v.子[_j]);
+          _box.appendChild(_c);
+        }
+        _g.appendChild(_box);
+        /* ★子メニューの 場所を 決める★（画面に 直接 出すので 自分で 置く）
+           右に 入らなければ 左、下に 入らなければ 上へ 寄せる。
+           ★当てても 押しても 開く★（マウスも 指も 同じ 手） */
+        (function (組, 箱) {
+          var 開く = function () {
+            var 兄 = 組.parentNode.querySelectorAll('.ctx-sub-box.open');
+            for (var z = 0; z < 兄.length; z++) if (兄[z] !== 箱) 兄[z].classList.remove('open');
+            箱.classList.add('open');
+            var r = 組.getBoundingClientRect();
+            箱.style.left = '0px'; 箱.style.top = '0px';
+            var w = 箱.offsetWidth, h = 箱.offsetHeight;
+            var x = r.right - 2, y = r.top - 4;
+            if (x + w > window.innerWidth - 8) x = r.left - w + 2;
+            if (x < 8) x = 8;
+            if (y + h > window.innerHeight - 8) y = window.innerHeight - h - 8;
+            if (y < 8) y = 8;
+            箱.style.left = x + 'px';
+            箱.style.top = y + 'px';
+          };
+          組.addEventListener('mouseenter', 開く);
+          組.addEventListener('click', function (ev) {
+            if (箱.contains(ev.target)) return;      /* 中の 項目を 押した 時は そちらに 任せる */
+            ev.stopPropagation(); 開く();
+          });
+          組.addEventListener('mouseleave', function () { 箱.classList.remove('open'); });
+        }(_g, _box));
+        m.appendChild(_g);
+        continue;
+      }
+      var _d1 = _1個(_v);
+      _d1.onclick = _押す(_v);
+      m.appendChild(_d1);
+    }
+  }
   // 再表示ボタン: 選択範囲内/近辺に非表示行列があれば表示
   var hr=sheets[activeSheet].hiddenRows||{}, hc=sheets[activeSheet].hiddenCols||{};
   var hasHR=false, hasHC=false;
@@ -10447,7 +10649,14 @@ function showCtxMenu(x,y){
   m.style.maxHeight = 置く.maxHeight ? (置く.maxHeight+'px') : '';
   m.scrollTop = 0;
 }
-function hideCtxMenu(){ document.getElementById('ctx-menu').classList.remove('show'); }
+function hideCtxMenu(){
+  var m = document.getElementById('ctx-menu');
+  m.classList.remove('show');
+  /* ★子メニューも 閉じる★＝画面に 直接 出しているので
+     親を 消しても ★子だけ 残る★（2026-08-31） */
+  var b = m.querySelectorAll('.ctx-sub-box.open');
+  for (var i = 0; i < b.length; i++) b[i].classList.remove('open');
+}
 
 /** ★一覧から選んだ物を そのまま入れる★（選んだ物は必ず決まりに合う） */
 function pickValidValue(t){
@@ -10990,6 +11199,7 @@ function ページ設定を開く(){
   document.getElementById('pageOrient').value = ページ設定.向き;
   document.getElementById('pageGrid').checked = !!ページ設定.枠線;
   document.getElementById('pageHead').checked = !!ページ設定.行列番号;
+  ヘッダーの窓を詰める();
   ov.style.display = 'flex';
 }
 function ページ設定を閉じる(){
@@ -11000,11 +11210,169 @@ function ページ設定を決める(){
   ページ設定.向き 　= document.getElementById('pageOrient').value === 'landscape' ? 'landscape' : 'portrait';
   ページ設定.枠線 　= !!document.getElementById('pageGrid').checked;
   ページ設定.行列番号 = !!document.getElementById('pageHead').checked;
+  ヘッダーを取り込む();
   ページ設定を閉じる();
   notify('ページの 設定を 変えました（' + (ページ設定.向き === 'landscape' ? '横' : '縦')
     + '／枠線 ' + (ページ設定.枠線 ? '刷る' : '刷らない')
     + '／見出し ' + (ページ設定.行列番号 ? '刷る' : '刷らない') + '）');
 }
+/* ══ ★紙の 上と 下に 入れる 字（ヘッダー／フッター）★ 2026-08-31 ══
+ *
+ *  司さんの 指示：「★ごちゃごちゃに ならないよう
+ *    ドロップダウンでも いいから 綺麗に★」
+ *  ⇒ 普段は ★選ぶだけ★。細かく 直したい 人だけ 「自分で 書く」を 開く。
+ *
+ *  ★印（&P など）の 意味は 実Excel に PDF を 刷らせて 測った★
+ *    中身の 正本は lib/header-footer.js。ここは 見せ方だけ。
+ */
+ページ設定.ヘッダー = { 左: '', 中: '', 右: '' };
+ページ設定.フッター = { 左: '', 中: '', 右: '' };
+
+function _hfEl(id){ return document.getElementById(id); }
+
+/** 選ぶ 一覧を 作る（上と 下の 両方） */
+function ヘッダーの一覧を作る(){
+  if (!window.HeaderFooter) return;
+  var 形 = window.HeaderFooter.よく使う形;
+  ['hfHead','hfFoot'].forEach(function(id){
+    var el = _hfEl(id);
+    if (!el || el.options.length) return;
+    for (var i = 0; i < 形.length; i++) {
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = 形[i].名;
+      el.appendChild(o);
+    }
+    el.addEventListener('change', ヘッダーの下絵を描く);
+  });
+  var c = _hfEl('hfCodes');
+  if (c && !c.textContent) {
+    c.textContent = window.HeaderFooter.印.map(function(v){
+      return v.印 + '＝' + v.名;
+    }).join('／');
+  }
+  ['hfHL','hfHC','hfHR','hfFL','hfFC','hfFR'].forEach(function(id){
+    var el = _hfEl(id);
+    if (el && !el.getAttribute('data-hf')) {
+      el.setAttribute('data-hf','1');
+      el.addEventListener('input', ヘッダーの下絵を描く);
+    }
+  });
+}
+
+/** 今の 中身が 一覧の どれか（無ければ -1） */
+function _hfどれ(o){
+  if (!window.HeaderFooter) return -1;
+  var 形 = window.HeaderFooter.よく使う形;
+  for (var i = 0; i < 形.length; i++) {
+    if (形[i].左 === (o.左||'') && 形[i].中 === (o.中||'') && 形[i].右 === (o.右||'')) return i;
+  }
+  return -1;
+}
+
+function ヘッダーの窓を詰める(){
+  ヘッダーの一覧を作る();
+  var h = ページ設定.ヘッダー, f = ページ設定.フッター;
+  var hi = _hfどれ(h), fi = _hfどれ(f);
+  /* ★一覧に 無い 中身なら 自動で「自分で 書く」に する★
+     （でないと ★書いた 字が 黙って 消える★） */
+  var 自分で = (hi < 0 || fi < 0);
+  var sw = _hfEl('hfSelf'); if (sw) sw.checked = 自分で;
+  if (_hfEl('hfHead')) _hfEl('hfHead').value = String(hi < 0 ? 0 : hi);
+  if (_hfEl('hfFoot')) _hfEl('hfFoot').value = String(fi < 0 ? 0 : fi);
+  var 入 = { hfHL:h.左, hfHC:h.中, hfHR:h.右, hfFL:f.左, hfFC:f.中, hfFR:f.右 };
+  for (var k in 入) if (_hfEl(k)) _hfEl(k).value = 入[k] || '';
+  ヘッダーの自分で書くを切り替える();
+}
+
+function ヘッダーの自分で書くを切り替える(){
+  var on = !!(_hfEl('hfSelf') && _hfEl('hfSelf').checked);
+  var box = _hfEl('hfCustom');
+  if (box) box.style.display = on ? 'block' : 'none';
+  /* ★選ぶ方に 戻した時は 選んでいる 形を 欄に 写す★
+     （選んだ 形と 手書きが ちぐはぐに ならないよう） */
+  if (!on && window.HeaderFooter) {
+    var 形 = window.HeaderFooter.よく使う形;
+    var h = 形[Number((_hfEl('hfHead')||{}).value || 0)] || 形[0];
+    var f = 形[Number((_hfEl('hfFoot')||{}).value || 0)] || 形[0];
+    if (_hfEl('hfHL')) { _hfEl('hfHL').value = h.左; _hfEl('hfHC').value = h.中; _hfEl('hfHR').value = h.右; }
+    if (_hfEl('hfFL')) { _hfEl('hfFL').value = f.左; _hfEl('hfFC').value = f.中; _hfEl('hfFR').value = f.右; }
+  }
+  ヘッダーの下絵を描く();
+}
+
+/** 今 窓に 出ている 中身を 読む */
+function ヘッダーを窓から読む(){
+  var on = !!(_hfEl('hfSelf') && _hfEl('hfSelf').checked);
+  if (on) {
+    return {
+      ヘッダー: { 左:(_hfEl('hfHL')||{}).value||'', 中:(_hfEl('hfHC')||{}).value||'', 右:(_hfEl('hfHR')||{}).value||'' },
+      フッター: { 左:(_hfEl('hfFL')||{}).value||'', 中:(_hfEl('hfFC')||{}).value||'', 右:(_hfEl('hfFR')||{}).value||'' }
+    };
+  }
+  var 形 = (window.HeaderFooter||{}).よく使う形 || [{左:'',中:'',右:''}];
+  var h = 形[Number((_hfEl('hfHead')||{}).value || 0)] || 形[0];
+  var f = 形[Number((_hfEl('hfFoot')||{}).value || 0)] || 形[0];
+  return { ヘッダー:{左:h.左,中:h.中,右:h.右}, フッター:{左:f.左,中:f.中,右:f.右} };
+}
+
+function ヘッダーを取り込む(){
+  var v = ヘッダーを窓から読む();
+  ページ設定.ヘッダー = v.ヘッダー;
+  ページ設定.フッター = v.フッター;
+}
+
+/** 今の 中身（印を 本物の 字に する時に 使う） */
+function ヘッダーの今(ページ, ページ数){
+  var d = new Date();
+  var 二 = function(n){ return (n < 10 ? '0' : '') + n; };
+  var 名 = '';
+  try {
+    名 = (typeof BookOpen !== 'undefined' && BookOpen.isOpened && BookOpen.isOpened()
+      && BookOpen.current && BookOpen.current().name) || '';
+  } catch(e) { 名 = ''; }
+  名 = String(名).replace(/\.[^.]+$/, '');           /* ★拡張子は 付けない★（実測） */
+  return {
+    ページ: ページ || 1,
+    ページ数: ページ数 || 1,
+    日付: d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate(),
+    時刻: d.getHours() + ':' + 二(d.getMinutes()),
+    ファイル名: 名,
+    シート名: (sheets[activeSheet] && sheets[activeSheet].name) || '',
+    置き場所: ''                                 /* ★ブラウザは 置き場所を 知らない★ */
+  };
+}
+
+function ヘッダーの下絵を描く(){
+  if (!window.HeaderFooter) return;
+  var v = ヘッダーを窓から読む();
+  var 今 = ヘッダーの今(1, 1);
+  [['hfPreviewH', v.ヘッダー], ['hfPreviewF', v.フッター]].forEach(function(p){
+    var el = _hfEl(p[0]);
+    if (!el) return;
+    el.innerHTML = '';
+    [['左','flex-start'], ['中','center'], ['右','flex-end']].forEach(function(w){
+      var d = document.createElement('div');
+      d.style.cssText = 'flex:1;display:flex;justify-content:' + w[1] + ';white-space:pre;overflow:hidden;';
+      d.textContent = window.HeaderFooter.差し込む(p[1][w[0]] || '', 今);
+      el.appendChild(d);
+    });
+  });
+}
+
+/** ★刷る時に 渡す 中身★（ページ番号だけ 残す） */
+function 刷る時のヘッダー(どちら){
+  if (!window.HeaderFooter) return null;
+  var o = ページ設定[どちら];
+  if (!window.HeaderFooter.使っているか(o)) return null;
+  var 今 = ヘッダーの今(1, 1);
+  var 出 = {};
+  ['左','中','右'].forEach(function(k){
+    出[k] = window.HeaderFooter.頁を後回しで差し込む(o[k] || '', 今);
+  });
+  return 出;
+}
+
 /* リボンから 1つずつ 切り替える（Excelの「印刷の向き」「枠線」「見出し」） */
 function 向きを切り替える(){
   ページ設定.向き 　= (ページ設定.向き === 'landscape') ? 'portrait' : 'landscape';
@@ -13521,6 +13889,13 @@ function ピボットの元の表(範囲){
   }
   return 表;
 }
+/* ★口「おすすめか」は ★死んでいない★（2026-08-30 確かめた）
+   lib/ribbon-actions.js が
+     おすすめピボットテーブル: 呼ぶ('ピボットの窓を開く', 'おすすめ')
+   で ★文字列で 渡している★。
+   ★道具（unused-param）は 「名前で 呼ぶ」形を 追えない★ので 候補に 出る。
+   ★一度 消しかけて 戻した★（呼ぶ側を 読まずに 消した）。
+   ⇒ ★消す前に 別の 呼び方（名前で 呼ぶ）を 探す事★。 */
 function ピボットの窓を開く(おすすめか){
   hideCtxMenu();
   var ov = document.getElementById('pivotOverlay');
@@ -15025,7 +15400,15 @@ function moveSel(dr,dc){
 }
 
 // セル編集
-function startEdit(r,c,init){
+/* ★この 関数は 「既に 在る 値を 出して 編集を 始める」専用★
+   （F2 ・ Enter ・ ダブルクリック）。
+
+   ★前は 第3の口 init（打った字）を 持っていたが
+     ★呼んでいる 5か所 とも 一度も 渡していなかった★（死んだ 口）。
+     「選んで いきなり 打つ」は ★cell-input の input が 受ける 作り★なので
+     この 口は 要らない。★使わない 口は 残さない★（次の 人が 迷う）。
+   見張り：tests/unused-param.test.mjs（★また 死んだ 口が 増えたら 赤★） */
+function startEdit(r,c){
   commitEdit();
   editingCell={r:r,c:c};
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
@@ -15033,10 +15416,9 @@ function startEdit(r,c,init){
   el.style.left=x+'px'; el.style.top=y+'px';
   el.style.width=Math.max(w,80)+'px'; el.style.height=h+'px';
   el.classList.add('editing');
-  el.value=init!==undefined?init:(getCell(r,c).v||'');
+  el.value=(getCell(r,c).v||'');
   el.focus();
-  if(init!==undefined) el.setSelectionRange(init.length,init.length);
-  else el.setSelectionRange(el.value.length,el.value.length);
+  el.setSelectionRange(el.value.length,el.value.length);
 }
 // ===== カスタムキーボード =====
 function fkbShow(){

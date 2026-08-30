@@ -1,0 +1,202 @@
+/* formula-extra.test.mjs — ★足りない 関数の 答えが 実Excel と 同じか★ 2026-08-31
+ *
+ *  ★なぜ★（司さん 2026-08-30）
+ *    「Excel を 細胞分解レベルまで 網羅して 把握した上で 持ち込み パクる」
+ *    実測（2026-08-31・実ブラウザ）＝エンジンに ★457個★。
+ *    事務で 使う 98個を 見て ★62個 無かった★。うち ★12個★を 足した。
+ *
+ *  ★★答えは 実Excel を 打って 取った★★（2026-08-31・新規の 空ブック・保存なし）
+ *      AVERAGEIFS(E1:E3,D1:D3,"A")   → 20
+ *      AVERAGEIFS(E1:E3,D1:D3,"Z")   → #DIV/0!
+ *      AVERAGEIFS(E1:E3,E1:E3,">=20")→ 25
+ *      TAKE(A1:B3,2)                 → 1,2,3,4
+ *      TAKE(A1:B3,-1)                → 5,6
+ *      DROP(A1:B3,1)                 → 3,4,5,6
+ *      DROP(A1:B3,0,1)               → 2,4,6
+ *      CHOOSECOLS(A1:B3,2)           → 2,4,6
+ *      CHOOSECOLS(A1:B3,3)           → #VALUE!
+ *      CHOOSEROWS(A1:B3,-1)          → 5,6
+ *      TOCOL(A1:B3)                  → 1,2,3,4,5,6
+ *      TOROW({1,2;3,4},0,TRUE)       → 1,3,2,4
+ *      WRAPROWS({1;2;3;4;5},2,0)     → 1,2,3,4,5,0
+ *      EXPAND(A1:B3,4,3,0)           → 1,2,0,3,4,0,5,6,0,0,0,0
+ *      EXPAND(A1:B3,2,2,0)           → #VALUE!（小さくは できない）
+ *      ARRAYTOTEXT({1,2;3,4})        → 1, 2, 3, 4
+ *      ARRAYTOTEXT({1,2;3,4},1)      → {1,2;3,4}
+ *      MODE.MULT({1;2;2;3;3})        → 2,3
+ *
+ *  ★足しかけて 止めた 物★
+ *    ★YEN は 実Excel に 無い★（実測＝#NAME?）。円は DOLLAR が 出す。
+ *    ★無い 関数を 足すのは 捏造★なので 止めた。
+ *
+ *  ★形（spill）を 保つ★
+ *    2026-08-29 に ★FILTER が 縦1列しか 返せず 月別合計が 全部 0★に なった。
+ *    ⇒ ★2列以上でも 形（行数×列数）を 保つ★事を ここで 見る。
+ *
+ *  ★実ブラウザでも 打った★（2026-08-31）
+ *    21通り 中 ★19通り 一致★。合わない 2つは ★`,,`（真ん中を 空ける）書き方★だけ
+ *    ＝エンジン側の 決まり（lib/formula-extra-plug.js に 記録）。
+ *
+ *  走らせ方: node tests/formula-extra.test.mjs  ／  --self-test
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(import.meta.url);
+let ok = 0, ng = 0;
+const 言う = (よい, 文, 添え) => {
+  if (よい) { ok++; console.log('  ok   ' + 文); }
+  else { ng++; console.log('  NG   ' + 文); if (添え) console.log('       ' + 添え); }
+};
+
+const F = require_(path.join(ROOT, 'lib/formula-extra.js'));
+
+/* 材料（実Excel で 打った 時と 同じ） */
+const 表 = [[1, 2], [3, 4], [5, 6]];
+const 印 = [['A'], ['B'], ['A']];
+const 値 = [[10], [20], [30]];
+
+/** 平らにして カンマで つなぐ（TEXTJOIN と 同じ 見え方） */
+function 平(v) {
+  if (!Array.isArray(v)) return String(v && v.誤り ? '#' + v.誤り : v);
+  const 出 = [];
+  for (const r of v) for (const c of r) 出.push(c && c.誤り ? '#' + c.誤り : c);
+  return 出.join(',');
+}
+const 誤り = (v) => (v && !Array.isArray(v) && v.誤り) ? v.誤り : null;
+
+console.log('★足りない 関数（答えは 実Excel の 実測）★');
+
+/* ── AVERAGEIFS ── */
+言う(F.条件つき平均(値, [[印, 'A']]) === 20, '★AVERAGEIFS(E1:E3,D1:D3,"A") ＝ 20★');
+言う(誤り(F.条件つき平均(値, [[印, 'Z']])) === 'DIV_BY_ZERO',
+  '★当たりが 無ければ #DIV/0!★（実Excel と 同じ）');
+言う(F.条件つき平均(値, [[値, '>=20']]) === 25, '★AVERAGEIFS(E1:E3,E1:E3,">=20") ＝ 25★');
+言う(F.条件つき平均(値, [[印, 'a']]) === 20, '★大文字小文字を 区別しない★（実Excel と 同じ）');
+言う(F.条件に合うか('売上円', '*円') === true, '★* が 使える★');
+言う(F.条件に合うか('あい', '?い') === true, '★? が 使える★');
+言う(F.条件に合うか(5, '<>5') === false, '★<> が 使える★');
+
+/* ── TAKE / DROP ── */
+言う(平(F.切り出す(表, 2, null, false)) === '1,2,3,4', '★TAKE(A1:B3,2) ＝ 1,2,3,4★');
+言う(平(F.切り出す(表, -1, null, false)) === '5,6', '★TAKE(A1:B3,-1) ＝ 5,6★（尻から）');
+言う(平(F.切り出す(表, 1, null, true)) === '3,4,5,6', '★DROP(A1:B3,1) ＝ 3,4,5,6★');
+言う(平(F.切り出す(表, 0, 1, true)) === '2,4,6', '★DROP(A1:B3,0,1) ＝ 2,4,6★');
+言う(誤り(F.切り出す(表, 9, null, true)) === 'VALUE', '★全部 落としたら #VALUE!★');
+
+/* ── CHOOSECOLS / CHOOSEROWS ── */
+言う(平(F.選び出す(表, [2], true)) === '2,4,6', '★CHOOSECOLS(A1:B3,2) ＝ 2,4,6★');
+言う(誤り(F.選び出す(表, [3], true)) === 'VALUE', '★CHOOSECOLS(A1:B3,3) ＝ #VALUE!★');
+言う(平(F.選び出す(表, [-1], false)) === '5,6', '★CHOOSEROWS(A1:B3,-1) ＝ 5,6★');
+言う(誤り(F.選び出す(表, [0], true)) === 'VALUE', '★0 は #VALUE!★（1から 数える）');
+
+/* ── TOCOL / TOROW ── */
+言う(平(F.一本にする(表, 0, false, true)) === '1,2,3,4,5,6', '★TOCOL(A1:B3) ＝ 1,2,3,4,5,6★');
+言う(平(F.一本にする([[1, 2], [3, 4]], 0, true, false)) === '1,3,2,4',
+  '★TOROW({1,2;3,4},0,TRUE) ＝ 1,3,2,4★（列の順に 読む）');
+言う(平(F.一本にする([[1, '', 2]], 1, false, true)) === '1,2', '★空を とばせる（2つ目の 引数＝1）★');
+
+/* ── WRAPROWS / WRAPCOLS ── */
+言う(平(F.折り返す([[1], [2], [3], [4], [5]], 2, 0, true)) === '1,2,3,4,5,0',
+  '★WRAPROWS({1;2;3;4;5},2,0) ＝ 1,2,3,4,5,0★');
+言う(誤り(F.折り返す(表, 0, 0, true)) === 'VALUE', '★幅0は #VALUE!★');
+
+/* ── EXPAND ── */
+言う(平(F.広げる(表, 4, 3, 0)) === '1,2,0,3,4,0,5,6,0,0,0,0',
+  '★EXPAND(A1:B3,4,3,0) ＝ 1,2,0,3,4,0,5,6,0,0,0,0★');
+言う(誤り(F.広げる(表, 2, 2, 0)) === 'VALUE', '★小さくは できない（#VALUE!）★');
+
+/* ── ARRAYTOTEXT ── */
+言う(F.表を字に([[1, 2], [3, 4]], 0) === '1, 2, 3, 4', '★ARRAYTOTEXT({1,2;3,4}) ＝ 1, 2, 3, 4★');
+言う(F.表を字に([[1, 2], [3, 4]], 1) === '{1,2;3,4}', '★ARRAYTOTEXT({1,2;3,4},1) ＝ {1,2;3,4}★');
+言う(F.表を字に([['a'], [true]], 1) === '{"a";TRUE}',
+  '★字は "" で 囲み・真偽は TRUE★（実Excel と 同じ）');
+
+/* ── MODE.MULT ── */
+言う(平(F.最頻値たち([[1], [2], [2], [3], [3]])) === '2,3', '★MODE.MULT({1;2;2;3;3}) ＝ 2,3★');
+言う(誤り(F.最頻値たち([[1], [2], [3]])) === 'NA', '★1回ずつなら #N/A★（実Excel と 同じ）');
+
+/* ── ★形（spill）を 保つ★ ── */
+const t = F.切り出す(表, 2, null, false);
+言う(Array.isArray(t) && t.length === 2 && t[0].length === 2,
+  '★TAKE は 2行2列の 形を 保つ★（★2026-08-29 の FILTER の 失敗を 繰り返さない★）',
+  JSON.stringify(t));
+const col = F.一本にする(表, 0, false, true);
+言う(col.length === 6 && col[0].length === 1, '★TOCOL は 縦1列（6行1列）★');
+const row = F.一本にする(表, 0, false, false);
+言う(row.length === 1 && row[0].length === 6, '★TOROW は 横1行（1行6列）★');
+const mm = F.最頻値たち([[1], [2], [2], [3], [3]]);
+言う(mm.length === 2 && mm[0].length === 1, '★MODE.MULT は 縦1列★（実Excel と 同じ）');
+
+/* ── ★足さない 物に 理由★ ── */
+const 数 = F.数える();
+言う(数.足す.length === 12, '★足すのは 12個★（今 ' + 数.足す.length + '個）');
+言う(数.足す.indexOf('YEN') < 0, '★YEN は 足していない（実Excel に 無い）★');
+言う(!!数.足さない.YEN && /存在しない/.test(数.足さない.YEN),
+  '★YEN を 足さない 理由が 書いてある★', 数.足さない.YEN);
+const 理由なし = Object.keys(数.足さない).filter((k) => !String(数.足さない[k]).trim());
+言う(理由なし.length === 0, '★足さない 物には 全部 理由が 書いてある★', 理由なし.join(' / '));
+言う(!!数.足さない.LAMBDA && !!数.足さない.PHONETIC,
+  '★作れない 物（LAMBDA・PHONETIC）も 数えている★');
+
+/* ── ★繋ぐ 側★ ── */
+const plug = fs.readFileSync(path.join(ROOT, 'lib/formula-extra-plug.js'), 'utf8');
+const { 注記を外す } = await import(
+  pathToFileURL(path.join(ROOT, 'scripts/lib/chuki.mjs')).href);
+const plug素 = 注記を外す(plug);
+言う(/class extends/.test(plug素), '★extends で 作っている★',
+  '★Object.create だと this.evaluateAst が undefined に なる（2026-08-31 実測）★');
+言う(/onlyValues/.test(plug素), '★形を 保って 返している★');
+言う(!/YEN/.test(plug素.replace(/\s/g, '')) || !/'YEN'/.test(plug素),
+  '★繋ぐ 側にも YEN が 残っていない★');
+const 実装 = (plug素.match(/'[A-Z.]+':\s*\{ method:/g) || []).length;
+言う(実装 === 12, '★繋ぐのも 12個★（今 ' + 実装 + '個）');
+const book = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+言う(/formula-extra\.js/.test(book) && /formula-extra-plug\.js/.test(book),
+  '★画面が 両方 読み込んでいる★');
+言う(/FormulaExtraPlug\.つなぐ\(HyperFormula/.test(注記を外す(book)),
+  '★画面が エンジンに 繋いでいる★');
+
+/* ── わざと 壊して 赤に なるか ── */
+if (process.argv.includes('--self-test')) {
+  console.log('\n★わざと 壊して 赤に なるか★');
+  言う(誤り(F.条件つき平均([[]], [])) === 'DIV_BY_ZERO', '★空でも 落ちない★');
+  言う(平(F.切り出す(表, null, null, false)) === '1,2,3,4,5,6', '★省くと 全部★');
+  言う(F.表を字に([[null]], 0) === '', '★空は 空のまま★');
+  言う(F.条件に合うか(null, null) === true, '★空どうしは 合う★');
+  言う(F.条件に合うか(1, '>abc') === false, '★数と 字は 比べない★');
+  /* ★実Excel でも 埋めを 省くと #N/A★（2026-08-31 実測）
+       WRAPROWS({1;2;3},2)    → #N/A
+       WRAPROWS({1;2;3},2,0)  → 1,2,3,0
+     ★4つ目（行でか）を 渡さないと 列で 折り返す★ので ここでは true を 渡す。 */
+  言う(平(F.折り返す([[1], [2], [3]], 2, undefined, true)) === '1,2,3,#NA',
+    '★埋めを 省くと #N/A★（実Excel と 同じ）',
+    平(F.折り返す([[1], [2], [3]], 2, undefined, true)));
+  言う(平(F.折り返す([[1], [2], [3]], 2, 0, true)) === '1,2,3,0',
+    '★埋めを 渡せば その 値★（実測＝1,2,3,0）');
+
+  /* ★★本当に 壊して 赤に なるかを 見る★★
+     ここまでは「端の 値を 通す」だけ＝★壊していない★。
+     ★見出しで「壊す」と 名乗る 以上 本当に 壊す★（tests/name-vs-body.test.mjs の 決まり）。
+     ★repo は 読むだけ★＝字の 上で 壊して 数え直す。 */
+  const 元字 = fs.readFileSync(path.join(ROOT, 'lib/formula-extra-plug.js'), 'utf8');
+  /* ★印は 実物どおりに★＝間に 空白が 並んでいる（そろえて 書いてある）。
+     ★合わない 印で 置き換えると 何も 壊れず「壊した つもり」に なる★ */
+  const 壊した = 元字.replace(/'TAKE':\s*\{ method:/, "'TAKE': { nope:");
+  言う(壊した !== 元字, '★壊せた（TAKE を 別名に した）★');
+  const 数え = (t) => (注記を外す(t).match(/'[A-Z.]+':\s*\{ method:/g) || []).length;
+  言う(数え(元字) === 12 && 数え(壊した) === 11,
+    '★1つ 消したら 12→11 に なる（数える所が 効いている）★',
+    '本物 ' + 数え(元字) + ' / 壊した ' + 数え(壊した));
+  const 表壊し = 元字.replace('class extends', 'class Nope');
+  言う(!/class extends/.test(表壊し),
+    '★extends を 外したら ③が 落ちる★');
+  言う(fs.readFileSync(path.join(ROOT, 'lib/formula-extra-plug.js'), 'utf8') === 元字,
+    '★★本物の ファイルは 1バイトも 触っていない★★');
+}
+
+console.log('\nformula-extra: ' + ok + '/' + (ok + ng) + ' passed');
+process.exit(ng ? 1 : 0);

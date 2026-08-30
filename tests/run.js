@@ -16,6 +16,14 @@ const FILES = [
   ['ribbon-label.test.mjs', '--self-test'], // ★札が 箱に 収まり 同じに 見えない（08-30 監査役の 差し戻し）★
   ['ribbon-scope.test.mjs', '--self-test'], // ★空の箱を (a)これから/(b)付けません/(c)出さない に 分ける★
   ['view-extras.test.mjs', '--self-test'],  // ★表示｜表示＝測り直しで 見つけた 組★
+  ['type-to-edit.test.mjs', '--self-test'],  // ★セルを 選んで いきなり 打つ（08-30 いうえおあ）★
+  ['unused-param.test.mjs', '--self-test'], // ★持っているのに 渡していない 口が 増えていないか★
+  ['ribbon-keytips.test.mjs', '--self-test'], // ★Alt の キーが 実 Excel と 同じ順で 効くか★
+  ['ctx-menu-items.test.mjs', '--self-test'], // ★右クリックの 中身が 実 Excel に 追いついているか★
+  ['header-footer.test.mjs', '--self-test'], // ★紙の 上と 下に 入れる 字（印は 実 Excel に 刷らせて 測った）★
+  ['ribbon-launcher.test.mjs', '--self-test'], // ★組の 右下の ↘（開く先の 窓は 既に 在る）★
+  ['ribbon-context.test.mjs', '--self-test'], // ★コンテキストタブ 8タブ／235部品の 正本★
+  ['formula-extra.test.mjs', '--self-test'], // ★足りない 関数 12個（答えは 実 Excel の 実測）★
   ['valign.test.mjs', '--self-test'],        // ★上下揃え＝実Excelの既定は中央（実測）★
   ['clear.test.mjs', '--self-test'],         // ★クリア3通り＝中身だけ/書式だけ/すべて（実測）★
   ['ribbon-features.test.mjs', '--self-test'],  // ★数式の表示／再計算／ズーム／重複の削除★

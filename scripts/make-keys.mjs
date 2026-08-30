@@ -37,18 +37,33 @@ for (const c of 生) {
 
 /* ── 部品の キー ── */
 const 部品キー = {};
+const 曖昧 = {};   /* ★名前で 引くと 決まらない 物★ */
 for (const c of 生) {
   if (c.length < 3) continue;
   const t = (c[0] || '').trim(), 名 = 尻(c[1]), ak = (c[2] || '').trim();
   if (!t || !名 || !ak) continue;
   if (タブ名.includes(名)) continue;                 /* タブは 上で 拾った */
+  /* ★`Alt+=` の形は 「押す順」では ない★（同時に 押す 別の層）
+     実測：4行（合計×2・Alt+F8・Ctrl+Alt+L）。
+     ★混ぜると 同じ 鍵に 2つ 当たって ぶつかる★（2026-08-31 実測）
+     ⇒ book.html の ショートカットの層が 受ける（Alt+= は 既に 動いている） */
+  if (!/^Alt,/.test(ak)) continue;
   const k = t + '|' + 名;
   const 押す = ak.replace(/^Alt,\s*/, '').split(/[\s,]+/).filter(Boolean);
-  /* ★同じ名前に 複数の キーが 在る時は 短い方★（＝本来の 経路） */
-  if (!部品キー[k] || 押す.length < 部品キー[k].length) 部品キー[k] = 押す;
+  /* ★同じ名前に ★違う★ キーが 2つ 在る時は ★決められない★★
+     例：ページ レイアウト|印刷 は P,Y,P G（枠線）と P,Y,P H（見出し）の 2つ。
+     ★名前で 引いている★以上、どちらか は 決められない＝★短い方を 選ぶと 嘘になる★
+     ⇒ ★両方 捨てる★（推さない）。測り直すなら tsv に 区別できる 印を 入れる。 */
+  const 前 
+    = 部品キー[k];
+  if (前 && 前.join(',') !== 押す.join(',')) { 曖昧[k] = true; continue; }
+  部品キー[k] = 押す;
 }
 
-const q = (s) => "'" + String(s).replace(/\/g, '\\').replace(/'/g, "\'") + "'";
+/* ★自前で 逃さない★（逃し方を 手で 書いて 2026-08-30 に 壊した） */
+const q = (s) => JSON.stringify(String(s));
+for (const k of Object.keys(曖昧)) delete 部品キー[k];
+
 const 行 = [];
 for (const k of Object.keys(部品キー).sort()) {
   行.push('    ' + q(k) + ': ' + JSON.stringify(部品キー[k]) + ',');
@@ -104,5 +119,6 @@ if (!process.argv.includes('--check')) fs.writeFileSync(OUT, 中身, 'utf8');
 console.log('[make-keys]');
 console.log('  元の 行 … ' + 生.length);
 console.log('  ★タブの 入口 … ' + Object.keys(タブキー).length + '個★');
+console.log('  ★名前で 決まらないので 捨てた … ' + Object.keys(曖昧).length + '個★');
 console.log('  ★部品の キー … ' + Object.keys(部品キー).length + '個★'
   + (process.argv.includes('--check') ? '  ※--check＝書き込んでいない' : ''));
