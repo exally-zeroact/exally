@@ -14,7 +14,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -200,6 +200,10 @@ T('★右クリックを 開くと 中身が 作られる★', () => {
   ok(n > 0, '★開いても 中身が 0個★');
 });
 
+/* ★前から 在った 物の 正本★（lib/ctx-menu.js が 持つ） */
+const 前からの物 = (await import(
+  pathToFileURL(path.join(ROOT, 'lib/ctx-menu.js')).href)).default.前からの物;
+
 const 上の段 = () => {
   const m = doc.getElementById('ctx-menu');
   return [...m.children].filter((e) => e.classList && e.classList.contains('ctx-item'));
@@ -212,11 +216,14 @@ const どこに居る = (act) => {
   }
   return -1;
 };
-T('★並べ替え・絞り込み・固定・印刷・入力の決まりが 上から8番目までに在る★', () => {
+/* ★2026-08-31 に 元の 並びへ 戻したので 9番目までに なった★
+   （前は 8番目まで。組を やめて 平らに 戻した分 1つ ずれた。
+     ★大事な5つが 上に 固まっている★のは 変わらない） */
+T('★並べ替え・絞り込み・固定・印刷・入力の決まりが 上から9番目までに在る★', () => {
   for (const act of ['sortRange', 'filterByValue', 'freezePanes', 'printSheet', 'openValid']) {
     const i = どこに居る(act);
     ok(i >= 0, '★' + act + ' がメニューに無い★');
-    ok(i < 8, '★' + act + ' が ' + (i + 1) + '番目まで沈んだ（上に物を足しすぎ）★');
+    ok(i < 9, '★' + act + ' が ' + (i + 1) + '番目まで沈んだ（上に物を足しすぎ）★');
   }
 });
 T('★作った7つは 全部 メニューに在る（1つでも欠けたら 客の手に届かない）★', () => {
@@ -225,9 +232,64 @@ T('★作った7つは 全部 メニューに在る（1つでも欠けたら 客
     ok(どこに居る(act) >= 0, '★' + act + ' が無い★');
   }
 });
-T('★上の段が 増えすぎていない（20行まで）★', () => {
-  const n = 上の段().length;
-  ok(n <= 20, '★上の段が ' + n + '行＝また 画面に 入らなくなる★');
+/* ★★2026-08-31 差し戻し（司さん「複雑にするなって言うてなかったか？」）★★
+ *  私は 37個 全部を 組（▸）に まとめ、★前から 在った 25個の うち 17個を
+ *  1押し → 2段★に 落とした（昇順・絞り込み・固定・印刷・行の挿入 …）。
+ *  ★司さんが 言ったのは「ヘッダーフッターを ドロップダウンで」だけ★。
+ *  ⇒ ★前からの 物は ずっと 1押し★を ここで 見張る。 */
+T('★★前から 在った 物が 2段に 落ちていない（1押しのまま）★★', () => {
+  const m = doc.getElementById('ctx-menu');
+  const 落ちた = [];
+  for (const g of [...m.querySelectorAll('.ctx-sub')]) {
+    for (const c of [...g.querySelectorAll('.ctx-sub-box .ctx-item')]) {
+      const act = c.getAttribute('data-ctx') || '';
+      if (前からの物.indexOf(act) >= 0) {
+        落ちた.push(g.childNodes[0].textContent.trim() + ' ▸ ' + c.textContent.trim());
+      }
+    }
+  }
+  eq(落ちた.length, 0, '★2段に 落ちた 前からの物★\n       ' + 落ちた.join('\n       '));
+});
+T('★前から 在った 物は 全部 上の段に 在る（24個）★', () => {
+  const 段 = 上の段().map((e) => e.getAttribute('data-ctx') || '');
+  const 無い = 前からの物.filter((a) => 段.indexOf(a) < 0);
+  eq(無い.length, 0, '★上の段から 消えた★：' + 無い.join(' / '));
+});
+/* ★★高さでは なく「大事な物が 送らずに 見えるか」で 見る★★
+   2026-08-21 の 事故は ★大事な5つが 真ん中に 埋もれて 届かなかった★事。
+   ⇒ ★画面の 高さを 変えて 総当たりで 測る★。
+   実測（2026-08-31 実ブラウザ）：大事な5つの 下端は 246px。
+   画面 400px でも 見える高さ 384px なので ★送らずに 見える★。 */
+T('★★どの 画面の 高さでも 大事な5つは 送らずに 見える★★', () => {
+  const m = doc.getElementById('ctx-menu');
+  const 大事 = ['sortRange', 'filterByValue', 'freezePanes', 'printSheet', 'openValid'];
+  /* 大事な5つの 下端（上からの px）を 並びから 数える
+     （jsdom に 高さは 無いので ★何行目か★× 1行の高さで 数える） */
+  const 行の高さ = 33;        /* 実測：padding 8+8 ∕ 字 13px ∕ 行間 → 約 33px */
+  const 段 = 上の段();
+  let 一番下 = -1;
+  for (const a of 大事) {
+    const i = どこに居る(a);
+    ok(i >= 0, '★' + a + ' が メニューに 無い★');
+    if (i > 一番下) 一番下 = i;
+  }
+  const 下端px = (一番下 + 1) * 行の高さ;
+  /* ★一番 狭い 画面（400px）で 測る★ */
+  const p = win.MenuPlace.place({ x: 8, y: 8, w: 330, h: 925, winW: 1440, winH: 400, 余白: 8 });
+  ok(下端px <= p.見える高さ,
+    '★大事な5つの 下端 ' + 下端px + 'px が 見える高さ ' + p.見える高さ + 'px を 超えた★'
+    + '（＝送らないと 届かない。上に 物を 足しすぎ）');
+  void 段;
+});
+
+T('★組（▸）は 一番 下に まとまっている（前からの物を 押しのけない）★', () => {
+  const 段 = 上の段();
+  let 最後の平ら = -1, 最初の組 = 段.length;
+  段.forEach((e, i) => {
+    if (e.classList.contains('ctx-sub')) { if (i < 最初の組) 最初の組 = i; }
+    else 最後の平ら = i;
+  });
+  ok(最初の組 > 最後の平ら, '★組が 平らな 物より 上に 居る（' + 最初の組 + ' ≦ ' + 最後の平ら + '）★');
 });
 
 /* ── ⑤ 前からある物を 押し直す ── */
@@ -299,16 +361,24 @@ if (SELF) {
       (s) => s.replace("  m.style.maxHeight = 置く.maxHeight ? (置く.maxHeight+'px') : '';", '')],
     /* ★2026-08-31 に 印を 直した★＝中身の 正本が 画面から lib/ctx-menu.js へ 移った。
        ★壊す 先も 一緒に 移す★（印が 古いままだと ★素通り★＝見張りが 眠る）。 */
+    /* ★2026-08-31：組を やめて 平らに 戻したので 壊す 印も 合わせる★ */
     ['lib/ctx-menu.js', '★大事な物の上に 物を足す（並べ替えが 沈む）★',
-      (s) => s.replace("    { 区切り: true },\n    { 印: '↕️', 名: '並べ替えと 絞り込み'",
-        "    { 区切り: true },\n" + Array.from({ length: 12 },
-          (_, i) => "    { 印: '+', 名: 'ふえた" + i + "', 画面: 'ctxCopy' },").join('\n')
-        + "\n    { 印: '↕️', 名: '並べ替えと 絞り込み'")],
+      (s) => s.replace("    { 印: '⬆️', 名: '昇順で並べ替え'",
+        Array.from({ length: 12 },
+          (_, i) => "    { 印: '+', 名: 'ふえた" + i + "', 画面: 'ctxCopy' },").join(String.fromCharCode(10))
+        + String.fromCharCode(10) + "    { 印: '⬆️', 名: '昇順で並べ替え'")],
     /* ★2つ 在るので 両方 消す★（片方だけだと まだ 見つかって 素通りする） */
     ['lib/ctx-menu.js', '★並べ替えを メニューから外す（客の手に届かない）★',
       (s) => s.split("画面: 'sortRange'").join("画面: 'ctxCopy'")],
     ['lib/ctx-menu.js', '★印刷を メニューから外す★',
-      (s) => s.replace("画面: 'printSheet', 鍵: 'Ctrl+P'", "画面: 'ctxCopy'")],
+      (s) => s.replace("画面: 'printSheet'", "画面: 'ctxCopy'")],
+    /* ★★司さんの 差し戻し（2026-08-31）を 見張る★★
+       前から 在った 物を 組（▸）の 中に 落としたら 赤に なるか */
+    ['lib/ctx-menu.js', '★前からの物（昇順）を 組の 中に 落とす★',
+      (s) => s.replace(
+        "    { 印: '⬆️', 名: '昇順で並べ替え', 画面: 'sortRange', 引数: 'asc',  Excel: '昇順(S)' },",
+        "    { 印: '↕️', 名: '並べ替え', 子: [" +
+        "{ 印: '⬆️', 名: '昇順で並べ替え', 画面: 'sortRange', 引数: 'asc' }] },")],
     ['lib/ctx-menu.js', '★元の 画面が 探している id を 消す（開いた途端に 落ちる）★',
       (s) => s.replace("id: 'ctx-unhide-row', ", '')],
     ['lib/ctx-menu.js', '★実Excel の 中身を 落とす（コメントの組を 丸ごと 消す）★',

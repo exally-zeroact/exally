@@ -257,7 +257,7 @@ if (SELF) {
     /* ★2026-08-31：右クリックの 中身の 正本が 画面から lib/ctx-menu.js へ 移った★
        ★壊す 先も 一緒に 移す★（印が 古いままだと ★素通り★＝見張りが 眠る） */
     ['lib/ctx-menu.js', '右クリックの 印刷を消す',
-      (s) => s.replace("画面: 'printSheet', 鍵: 'Ctrl+P'", "画面: 'ctxCopy'")],
+      (s) => s.replace("画面: 'printSheet'", "画面: 'ctxCopy'")],
     ['book.html', '★中身が0でも 窓を開く（白紙の印刷ダイアログ）★', (s) => s.replace("  if(!html){ showToast('刷る中身が在りません（先に何か入れてね）'); return; }", '  if(!html){ html = "<html></html>"; }')],
     ['book.html', '選んだ範囲を見ない（いつも全部 刷る）', (s) => s.replace("  var 範囲 = (selR1!==selR2 || selC1!==selC2)\n    ? { r1:selR1, c1:selC1, r2:selR2, c2:selC2 } : null;", '  var 範囲 = null;')],
     ['lib/grid-print.js', '★A4横にする（実測は縦）★', (s) => s.replace("    var 縦 = (o.向き 　!== 'landscape');", '    var 縦 = false;')],

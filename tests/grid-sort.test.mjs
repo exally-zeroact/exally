@@ -208,7 +208,7 @@ if (SELF) {
     /* ★2026-08-31：中身の 正本が 画面から lib/ctx-menu.js へ 移った★
        ★壊す 先も 一緒に 移す★（古いままだと ★素通り★＝見張りが 眠る） */
     ['lib/ctx-menu.js', '右クリックの 昇順を消す',
-      (s) => s.replace("名: '昇順で 並べ替え', 画面: 'sortRange'", "名: '昇順で 並べ替え', 画面: 'ctxCopy'")],
+      (s) => s.split("画面: 'sortRange'").join("画面: 'ctxCopy'")],
     ['book.html', '★式を移った先の行に読み替えない★（相対参照が壊れる）', (s) => s.replace('next.f = shiftFormula(src.f, ずれ, 0);', 'next.f = src.f;')],
     ['book.html', '見出しを いつも動かす', (s) => s.replace('var 先頭 = rng.r1 + (見出し ? 1 : 0);', 'var 先頭 = rng.r1;')],
     ['book.html', '表を広げず 1セルだけ並べ替える', (s) => s.replace('rng = GridSort.region(中身がある, selR1, selC1, ROWS-1, COLS-1);', 'rng = { r1:selR1, c1:selC1, r2:selR1, c2:selC1 };')],
