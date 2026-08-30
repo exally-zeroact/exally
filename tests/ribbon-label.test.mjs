@@ -20,7 +20,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { JSDOM } from 'jsdom';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 let ok = 0, ng = 0;
@@ -96,6 +97,42 @@ const ribbonSrc = fs.readFileSync(path.join(ROOT, 'lib/ribbon.js'), 'utf8');
 言う(/title="'\s*\+\s*esc\(元\)/.test(ribbonSrc),
   '★元の 名前は title に 残している（短くした札で 上書きしていない）★',
   '当てると 出る 字まで 短くすると 探せなくなる');
+
+/* ── ★実際に 描いて title を 見る★（監査役の 宿題・2026-08-30）──
+ *  ★札を 短く したので、★実Excelの 名前は title に 必ず 残っている★事を
+ *  ★ソースを 読むのでは なく 描いて 確かめる★。
+ *  （1個でも 出なければ それは ★探せない 札★） */
+{
+  const dom = new JSDOM('<div id="rb"></div>');
+  global.self = dom.window; global.window = dom.window; global.document = dom.window.document;
+  const Spec = (await import(pathToFileURL(path.join(ROOT, 'lib/ribbon-spec.js')).href)).default;
+  dom.window.RibbonActions = new Proxy({}, { get: () => function () {} });
+  const Ribbon = (await import(pathToFileURL(path.join(ROOT, 'lib/ribbon.js')).href)).default;
+  const el = dom.window.document.getElementById('rb');
+  const タブ = Spec.ツリー().map((t) => t.name);
+  let 見た = 0, 空 = 0;
+  const 違う = [];
+  for (const n of タブ) {
+    Ribbon.状態.tab = n;
+    Ribbon.描く(el, Spec);
+    for (const g of el.querySelectorAll('.rb-group')) {
+      /* ★並び順では 突き合わせない★＝JSDOM では 引き取り枠（サイズの入力）が
+         「元の物が 無い」ので 消える＝★番号が 1つ ずれる★（2026-08-30 実際に 踏んだ）。
+         ⇒ ★「この組の 正本の 名前の どれかに 当たるか」で 見る★。 */
+      const 期待 = new Set(一覧.filter((v) => v.t === n && v.g === g.dataset.group)
+        .map((v) => ラベル._尻を落とす(v.p)));
+      for (const b of g.querySelectorAll('.rb-item, [data-take]')) {
+        const ti = (b.getAttribute('title') || '').trim();
+        見た++;
+        if (!ti) { 空++; continue; }
+        if (!期待.has(ti)) 違う.push(n + '|' + g.dataset.group + '：title「' + ti + '」が 正本に 無い');
+      }
+    }
+  }
+  言う(見た >= 200, '★描いて title を 見た（' + 見た + '個）★');
+  言う(空 === 0, '★title が 空の ボタン = 0個★', String(空));
+  言う(違う.length === 0, '★title は 実Excelの 名前の まま = 違い 0個★', 違う.slice(0, 5).join(' / '));
+}
 
 /* ── ④ 短い札の 表そのものに 重なりが 無いか ──── */
 const 表 = ラベル._短い;
