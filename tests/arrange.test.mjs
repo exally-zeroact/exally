@@ -198,7 +198,7 @@ console.log('\n[⑤ リボンから 押せる]');
 console.log('\narrange: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const 中身 = GP.buildHtml({ data: { '0,0': { v: 'あ', d: 'あ' } }, sheetName: 'S', 印刷倍率: 50 });
   if (!/zoom: 0\.5/.test(中身 || '')) { 素通り++; console.log('  ★素通り★ 倍率が 紙に 効いていない'); }

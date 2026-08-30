@@ -137,7 +137,7 @@ console.log('\n[⑤ リボンから 押せる]');
 console.log('\ndata-tab: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 例に 合わない 決まりを 返していないか */
   const r = F.覚える([{ 元: ['a b'], 答え: 'a' }, { 元: ['x y'], 答え: 'y' }]);

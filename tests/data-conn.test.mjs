@@ -176,7 +176,7 @@ console.log('\n[⑦ リボンから 押せる]');
 console.log('\ndata-conn: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const 元 = [['名前'], ['あ'], ['い'], ['あ'], ['う']];
   if (A.絞る(元, null, true).length !== 4) { 素通り++; console.log('  ★素通り★ 条件なし＋重複除く が 4行で ない'); }

@@ -302,7 +302,7 @@ function testWiring(pages, opens) {
   ok(fs.existsSync(path.join(ROOT, 'lib', 'table-refs.js')), 'lib/table-refs.js が実在する');
 }
 
-/* ── わざと壊して赤になるか ─────────────────────────────────── */
+/* ── この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★） ─────────────────────────────────── */
 async function selfTest() {
   console.log('\n★--self-test★ わざと壊して、赤になる通り数を数える');
   const ways = [];

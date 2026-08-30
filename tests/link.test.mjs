@@ -139,7 +139,7 @@ console.log('\n[⑥ ★押したら 飛ぶ（実Excel と同じ）★]');
 console.log('\nlink: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const 確かめる = new Function(抜く('リンクの先を確かめる') + '\nreturn リンクの先を確かめる;')();
   /* 壊し① 前に 空白を 付けて すり抜ける */

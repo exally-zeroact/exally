@@ -192,7 +192,7 @@ console.log('\n[⑩ リボンから 押せる]');
 console.log('\nsparkline: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 空を 0 として 描いたら（実測は「描かない」）気づけるか */
   const c = 偽ctx();

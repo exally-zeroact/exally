@@ -174,7 +174,7 @@ console.log('\n[⑤ リボンから 押せる]');
 console.log('\nmodel-web-data: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const c = M3.立方体();
   let はみ出し = false;

@@ -132,7 +132,8 @@ T('1. ★給与タイルは同一オリジンの /kyuyo/ へ繋がる(別サイ�
 T('1. ★削除した旧ページ(請求書/見積/旧トップ/テンプレ)へのリンクがハブに無い', () => {
   const html = doc.getElementById('scr-hub').innerHTML;
   ['seikyusyo.html', 'mitsumoriyo.html', 'home.html', 'template.html', 'kyuuryoumeisai.html'].forEach(f => {
-    ok(!new RegExp(f.replace('.', '\.')).test(html), 'ハブに ' + f + ' へのリンクが残っている');
+    ok(!new RegExp(f.replace(/\./g, '\\.')  /* ★'\.' は 素の '.' に なる★＝逃がせていなかった
+       （bookXhtml にも 当たっていた／2026-08-30 監査役） */).test(html), 'ハブに ' + f + ' へのリンクが残っている');
   });
   ok(!doc.getElementById('tile-seikyu'), '請求書タイルが残っている');
   ok(!doc.getElementById('tile-mitsumori'), '見積タイルが残っている');

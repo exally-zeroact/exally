@@ -199,7 +199,7 @@ console.log('\n[⑦ ページ レイアウト（余白・用紙・印刷範囲�
 console.log('\nview-review-tab: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① ズームの 下が 25 に 戻っていないか（実測は 10） */
   if (/Math\.max\(0\.25, Math\.min\(4, 倍\)\)/.test(book)) {

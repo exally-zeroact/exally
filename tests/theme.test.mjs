@@ -158,7 +158,7 @@ console.log('\n[⑥ リボンから 押せる]');
 console.log('\ntheme: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (T.濃淡('#156082', 0.4) !== '#44B3E1') { 素通り++; console.log('  ★素通り★ 濃淡が 実測と 違う'); }
   else console.log('  ok   濃淡が 実測と 同じ');

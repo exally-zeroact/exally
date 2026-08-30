@@ -92,7 +92,7 @@ for (const [名, 行き先] of [['見出しを表示', '見出しを出すか'],
 console.log('\nview-toggle: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 元の数を 残さない（戻せなくなる） */
   if (!/var HDR_W0 = HDR_W/.test(book)) { 素通り++; console.log('  ★素通り★ 元の数を 残していない'); }

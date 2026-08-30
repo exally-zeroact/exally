@@ -86,7 +86,7 @@ const ACT = require_(path.join(ROOT, 'lib/ribbon-actions.js'));
 console.log('\nsort2: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 2つ目の鍵を 見ない（1つ目だけ） */
   const 名 = [c('ういろう'), c('あんこ'), c('かすてら'), c('ようかん')];

@@ -253,7 +253,7 @@ console.log('\n[⑥ リボンから 押せる]');
 console.log('\nshape-map-time: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (S.形を決める(多角(四角点)).形 !== '四角') { 素通り++; console.log('  ★素通り★ 四角を 当てられない'); }
   else console.log('  ok   四角を 当てる');

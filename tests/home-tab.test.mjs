@@ -115,7 +115,7 @@ console.log('\n[⑤ リボンから 押せる]');
 console.log('\nhome-tab: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 向きの 数が 実測と 違っていないか */
   const 並び = book.slice(book.indexOf('var 向きの並び = ['), book.indexOf('function 文字の向きの窓を開く'));

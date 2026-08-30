@@ -159,7 +159,7 @@ console.log('\n[⑦ リボンから 押せる]');
 console.log('\ninsert-diagram: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (D.図解を作る('process').節.length !== 5) { 素通り++; console.log('  ★素通り★ 節が 5個で ない'); }
   else console.log('  ok   節は 5個（実Excel と 同じ）');

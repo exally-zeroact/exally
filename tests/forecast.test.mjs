@@ -110,7 +110,7 @@ console.log('\n[⑥ リボンから 押せる]');
 console.log('\nforecast: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const f = new Function('Pivot', 抜く('直線を当てる') + '\nreturn 直線を当てる;')(Pivot);
   /* 壊し① 平均で ごまかしていないか（傾きが 0 に なる） */

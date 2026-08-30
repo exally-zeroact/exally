@@ -151,7 +151,7 @@ console.log('\n[⑦ リボンから 押せる]');
 console.log('\nsymbol-form: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 片割れ（サロゲート）を 通したら 字が 壊れる */
   if (S.コードから字('U+D800') !== null) { 素通り++; console.log('  ★素通り★ 片割れを 通した'); }

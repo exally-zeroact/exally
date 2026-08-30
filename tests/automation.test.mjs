@@ -129,7 +129,7 @@ console.log('\n[⑥ リボンから 押せる]');
 console.log('\nautomation: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const f = new Function('sheets', 'activeSheet', 'hideCtxMenu', 'notify', 'render', 'updateBar',
     抜く('リンクを全部消す') + '\nreturn リンクを全部消す;');

@@ -175,7 +175,7 @@ console.log('\n[⑦ リボンから 押せる]');
 console.log('\nreview2: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (R.スペルを見る([{ 値: 'recieve', 場所: 'A1' }]).length === 0) {
     素通り++; console.log('  ★素通り★ recieve を 見逃した');

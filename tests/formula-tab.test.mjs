@@ -190,7 +190,7 @@ console.log('\n[⑦ ワークシート分析（トレース・数式の検証・
 console.log('\nformula-tab: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 見出しを 中に 入れてしまったら 気づけるか */
   const f = new Function('sheets', 'activeSheet', 'selR1', 'selR2', 'selC1', 'selC2', 'cellAddr',

@@ -164,7 +164,7 @@ for (const [名, 行き先] of [['小数を増やす', '小数を増やす'], ['
 console.log('\ndecimal-painter: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 上限を 6桁に 戻す（勝手な決め） */
   if (/これ以上は 増やせません（6桁まで）/.test(book)) { 素通り++; console.log('  ★素通り★ 上限が 6桁に 戻っている'); }

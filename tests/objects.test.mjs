@@ -171,7 +171,7 @@ console.log('\n[⑧ リボンから 押せる]');
 console.log('\nobjects: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (O.色.塗り === '#156082') { 素通り++; console.log('  ★素通り★ Excelの 色を 写している'); }
   else console.log('  ok   Excelの 色を 写していない');

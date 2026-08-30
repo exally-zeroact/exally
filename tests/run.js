@@ -48,6 +48,7 @@ const FILES = [
   ['arrange.test.mjs', '--self-test'],
   ['view-window.test.mjs', '--self-test'],
   ['no-missing-call.test.mjs', '--self-test'],
+  'name-vs-body.test.mjs',                   /* ★「わざと壊して赤になるか」と名乗るのに 何も壊していない試験を 探す（08-30 監査役）★ */
   ['theme.test.mjs', '--self-test'],
   ['boolean.test.mjs', '--self-test'],
   ['insert-diagram.test.mjs', '--self-test'],

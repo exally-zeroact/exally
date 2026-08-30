@@ -209,7 +209,7 @@ console.log('\n[⑫ ★見出しの ▼（自動フィルタ）★ 実測 ShowAu
 console.log('\ntable: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 集計を 9 に したら（実測は 109）気づけるか */
   if (T.集計の式('B2:B4').indexOf('SUBTOTAL(9,') >= 0) {

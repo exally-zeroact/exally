@@ -115,7 +115,7 @@ console.log('\n[⑤ リボンから 押せる]');
 console.log('\ndata-tab2: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   if (!/\(箱\[鍵\[i\]\] \|\| 1\) > 段/.test(book)) { 素通り++; console.log('  ★素通り★ 段で 隠す所が 無い'); }
   else console.log('  ok   段で 隠している');

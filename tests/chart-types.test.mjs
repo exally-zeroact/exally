@@ -317,7 +317,7 @@ console.log('\n[⑪ ★違う所は 黙らない（画面に 断りを 出す）
 console.log('\nchart-types: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 「系列2本以上なら 出す」だけに 戻したら 実測と 食い違う */
   const 一本 = { 系列: [{ 名: 'A', 値: [1] }] };

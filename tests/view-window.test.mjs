@@ -275,7 +275,7 @@ console.log('\n[⑨ リボンから 押せる]');
 console.log('\nview-window: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   const n = VM.紙の中身({});
   const cb = VM.切れ目(Array(20).fill(60), n.幅, []);

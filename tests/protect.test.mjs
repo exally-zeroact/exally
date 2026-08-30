@@ -113,7 +113,7 @@ for (const [名, 行き先] of [['シートの保護', 'シートの保護を切
 console.log('\nprotect: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {
-  console.log('\n★--self-test＝わざと 壊して 赤に なるか★');
+  console.log('\n★--self-test＝この 見張りが 見ている物を 直に 確かめる（★壊して 赤を 見るのは tools/break-check.mjs★）★');
   let 素通り = 0;
   /* 壊し① 既定を「ロックされていない」に する（実Excelと 違う） */
   const t = 台({}, true);
