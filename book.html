@@ -1304,81 +1304,83 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=3a488a02"></script>
+<script src="hyperformula.full.min.js?v=412373e1"></script>
 
-<script src="exally-formula.js?v=3a488a02"></script>
+<script src="exally-formula.js?v=412373e1"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=3a488a02"></script>
+<script src="js/file-out.js?v=412373e1"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=3a488a02"></script>
-<script src="lib/grid-xlsx.js?v=3a488a02"></script>
+<script src="lib/typed-value.js?v=412373e1"></script>
+<script src="lib/grid-xlsx.js?v=412373e1"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=3a488a02"></script>
-<script src="lib/autosum.js?v=3a488a02"></script>
-<script src="lib/grid-sort.js?v=3a488a02"></script>
-<script src="lib/grid-filter.js?v=3a488a02"></script>
-<script src="lib/grid-find.js?v=3a488a02"></script>
-<script src="lib/grid-print.js?v=3a488a02"></script>
-<script src="lib/ai-reason.js?v=3a488a02"></script>
-<script src="lib/menu-place.js?v=3a488a02"></script>
-<script src="lib/grid-stats.js?v=3a488a02"></script>
-<script src="lib/grid-valid.js?v=3a488a02"></script>
-<script src="lib/cond-format.js?v=3a488a02"></script>
-<script src="lib/ref-graph.js?v=3a488a02"></script>
-<script src="lib/shindan.js?v=3a488a02"></script>
+  <script src="lib/grid-refedit.js?v=412373e1"></script>
+<script src="lib/autosum.js?v=412373e1"></script>
+<script src="lib/grid-sort.js?v=412373e1"></script>
+<script src="lib/grid-filter.js?v=412373e1"></script>
+<script src="lib/grid-find.js?v=412373e1"></script>
+<script src="lib/grid-print.js?v=412373e1"></script>
+<script src="lib/ai-reason.js?v=412373e1"></script>
+<script src="lib/menu-place.js?v=412373e1"></script>
+<script src="lib/grid-stats.js?v=412373e1"></script>
+<script src="lib/grid-valid.js?v=412373e1"></script>
+<script src="lib/cond-format.js?v=412373e1"></script>
+<script src="lib/ref-graph.js?v=412373e1"></script>
+<script src="lib/shindan.js?v=412373e1"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=3a488a02"></script>
-<script src="lib/vba-mikata.js?v=3a488a02"></script>
-<script src="lib/vba-tejun.js?v=3a488a02"></script>
-<script src="lib/rireki.js?v=3a488a02"></script>
-<script src="lib/chizu.js?v=3a488a02"></script>
-<script src="lib/horu.js?v=3a488a02"></script>
-<script src="lib/excel-version.js?v=3a488a02"></script>
-<script src="lib/teian.js?v=3a488a02"></script>
-<script src="lib/kikan.js?v=3a488a02"></script>
-<script src="lib/recipe.js?v=3a488a02"></script>
-<script src="lib/kirikae.js?v=3a488a02"></script>
-<script src="js/recipe-store.js?v=3a488a02"></script>
-<script src="js/rireki-store.js?v=3a488a02"></script>
-<script src="lib/excel-version.js?v=3a488a02"></script>
+<script src="lib/vba.js?v=412373e1"></script>
+<script src="lib/vba-mikata.js?v=412373e1"></script>
+<script src="lib/vba-tejun.js?v=412373e1"></script>
+<script src="lib/rireki.js?v=412373e1"></script>
+<script src="lib/chizu.js?v=412373e1"></script>
+<script src="lib/horu.js?v=412373e1"></script>
+<script src="lib/excel-version.js?v=412373e1"></script>
+<script src="lib/teian.js?v=412373e1"></script>
+<script src="lib/kikan.js?v=412373e1"></script>
+<script src="lib/recipe.js?v=412373e1"></script>
+<script src="lib/kirikae.js?v=412373e1"></script>
+<script src="js/recipe-store.js?v=412373e1"></script>
+<script src="js/rireki-store.js?v=412373e1"></script>
+<script src="lib/excel-version.js?v=412373e1"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=3a488a02">
-<script src="lib/named-ranges.js?v=3a488a02"></script>
-<script src="lib/cell-styles.js?v=3a488a02"></script>
-<script src="lib/chart.js?v=3a488a02"></script>
-<script src="lib/sparkline.js?v=3a488a02"></script>
-<script src="lib/table.js?v=3a488a02"></script>
-<script src="lib/flash-fill.js?v=3a488a02"></script>
-<script src="lib/pivot.js?v=3a488a02"></script>
-<script src="lib/csv-in.js?v=3a488a02"></script>
-<script src="lib/objects.js?v=3a488a02"></script>
-<script src="lib/ink.js?v=3a488a02"></script>
-<script src="lib/view-mode.js?v=3a488a02"></script>
-<script src="lib/sheet-view.js?v=3a488a02"></script>
-<script src="lib/theme.js?v=3a488a02"></script>
-<script src="lib/diagram.js?v=3a488a02"></script>
-<script src="lib/adv-filter.js?v=3a488a02"></script>
-<script src="lib/connections.js?v=3a488a02"></script>
-<script src="lib/review.js?v=3a488a02"></script>
-<script src="lib/xml-map.js?v=3a488a02"></script>
-<script src="lib/ink-shape.js?v=3a488a02"></script>
-<script src="lib/jp-map.js?v=3a488a02"></script>
-<script src="lib/timeline.js?v=3a488a02"></script>
-<script src="lib/symbols.js?v=3a488a02"></script>
-<script src="lib/ribbon-spec.js?v=3a488a02"></script>
-<script src="lib/ribbon-actions.js?v=3a488a02"></script>
-<script src="lib/ribbon.js?v=3a488a02"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=412373e1">
+<script src="lib/named-ranges.js?v=412373e1"></script>
+<script src="lib/cell-styles.js?v=412373e1"></script>
+<script src="lib/chart.js?v=412373e1"></script>
+<script src="lib/sparkline.js?v=412373e1"></script>
+<script src="lib/table.js?v=412373e1"></script>
+<script src="lib/flash-fill.js?v=412373e1"></script>
+<script src="lib/pivot.js?v=412373e1"></script>
+<script src="lib/csv-in.js?v=412373e1"></script>
+<script src="lib/objects.js?v=412373e1"></script>
+<script src="lib/ink.js?v=412373e1"></script>
+<script src="lib/view-mode.js?v=412373e1"></script>
+<script src="lib/sheet-view.js?v=412373e1"></script>
+<script src="lib/theme.js?v=412373e1"></script>
+<script src="lib/diagram.js?v=412373e1"></script>
+<script src="lib/adv-filter.js?v=412373e1"></script>
+<script src="lib/connections.js?v=412373e1"></script>
+<script src="lib/review.js?v=412373e1"></script>
+<script src="lib/xml-map.js?v=412373e1"></script>
+<script src="lib/ink-shape.js?v=412373e1"></script>
+<script src="lib/jp-map.js?v=412373e1"></script>
+<script src="lib/timeline.js?v=412373e1"></script>
+<script src="lib/model3d.js?v=412373e1"></script>
+<script src="lib/data-model.js?v=412373e1"></script>
+<script src="lib/symbols.js?v=412373e1"></script>
+<script src="lib/ribbon-spec.js?v=412373e1"></script>
+<script src="lib/ribbon-actions.js?v=412373e1"></script>
+<script src="lib/ribbon.js?v=412373e1"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=3a488a02"></script>
-<script src="js/exally-login.js?v=3a488a02"></script>
-<script src="js/auth.js?v=3a488a02"></script>
+<script src="js/supa-config.js?v=412373e1"></script>
+<script src="js/exally-login.js?v=412373e1"></script>
+<script src="js/auth.js?v=412373e1"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3050,6 +3052,354 @@ function 分割の線を描く(){
   return 出;
 }
 
+/* ═══ ★3Dモデル／Webから／データモデル／データ分析★ ═══ 2026-08-30
+ *
+ *  ★実Excel で 測れた 事★
+ *    データ モデル … `Workbook.Model` は 在る／★`ModelTables.Count` は はじめ 0★
+ *      （表を 作っただけでは モデルに 入らない）／`ModelRelationships.Count` も ★0★
+ *      ★`Model.AddConnection` は COM から 呼べなかった★
+ *    表 … 名前を 付けられる／`ListColumns` で 列の 名が 取れる／
+ *      ★既定の 名前は「テーブル3」★（日本語＋番号）
+ *    3D モデル … ★形（Shapes）の 1つ★／★中の 三角形の 数は 読めなかった★
+ *    データ分析 … ★Microsoft の クラウドで 動く（機械からは 呼べない）★
+ *
+ *  ★出来ない事は 出来ないと 書く★
+ *    ・3D は ★.obj（字だけ）だけ★ 読む。★.glb / .fbx は 読めない★
+ *    ・Web からは ★向こうの ページが 許した 時だけ★ 読める（ブラウザの 決まり）
+ *      ⇒ 読めなかったら ★そう 言って 字を 貼る 道も 出す★
+ *    ・データ分析は ★うちの AI に 聞く★
+ */
+var 三次元の決め = { 形: null, 名: '', 横: 0.6, 縦: 0.3 };
+
+/* ── 3D モデル ── */
+function 三次元を開く(){
+  hideCtxMenu();
+  var 入 = document.getElementById('objFileInput');
+  if (!入) { notify('★入り口が 見つかりません★'); return 0; }
+  入.value = '';
+  入.click();
+  return 1;
+}
+function 三次元を読む(ファイル){
+  if (!ファイル) return 0;
+  var 名 = String(ファイル.name || '');
+  if (!/\.obj$/i.test(名)) {
+    /* ★出来ない事は 出来ないと 言う★ */
+    notify('★.obj の ファイルだけ 読めます★（' + 名 + ' は 中身の 決まりが 大きくて 読めません）');
+    return 0;
+  }
+  var 読 = new FileReader();
+  読.onload = function () {
+    var 形 = Model3D.objを読む(String(読.result || ''));
+    if (!形) { notify('★点が 1つも 見つかりませんでした★'); return; }
+    三次元の決め.形 = 形;
+    三次元の決め.名 = 名;
+    三次元を置く();
+  };
+  読.readAsText(ファイル, 'utf-8');
+  return 1;
+}
+function 三次元を置く(){
+  if (!三次元の決め.形) {
+    /* ファイルが 無くても 試せる ように 見本を 出す */
+    三次元の決め.形 = Model3D.立方体();
+    三次元の決め.名 = '見本の 立方体';
+  }
+  var 箱 = 物の箱();
+  var o = { 種類: '3D', 形: 三次元の決め.形, 元の名: 三次元の決め.名,
+    横: 三次元の決め.横, 縦: 三次元の決め.縦,
+    w: 220, h: 180, x: 画面から物のX(HDR_W + 40), y: 画面から物のY(HDR_H + 40),
+    z: 箱.length + 1 };
+  o.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), '3D');
+  箱.push(o);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = o; えらんだ物たち = [o];
+  render();
+  notify('3D を 置きました（' + 三次元の決め.名 + '／点 ' + o.形.点.length
+    + '・面 ' + o.形.面.length + '）★線だけで 出します★');
+  return o.形.点.length;
+}
+function 三次元を回す(横, 縦){
+  var o = 選んだ物;
+  if (!o || o.種類 !== '3D') { notify('★3D を 選んでください★'); return 0; }
+  o.横 = (o.横 || 0) + 横;
+  o.縦 = (o.縦 || 0) + 縦;
+  render();
+  return 1;
+}
+function 三次元を描く(ctx2, o, X, Y){
+  var 点 = Model3D.画面の点(o.形, o.横 || 0, o.縦 || 0, o.w, o.h);
+  var 辺 = Model3D.辺たち(o.形);
+  ctx2.save();
+  ctx2.beginPath(); ctx2.rect(X, Y, o.w, o.h); ctx2.clip();
+  ctx2.strokeStyle = SheetObjects.色.線;
+  ctx2.lineWidth = 1;
+  ctx2.beginPath();
+  for (var i = 0; i < 辺.length; i++) {
+    var a = 点[辺[i][0]], b = 点[辺[i][1]];
+    if (!a || !b) continue;
+    ctx2.moveTo(X + a.x, Y + a.y);
+    ctx2.lineTo(X + b.x, Y + b.y);
+  }
+  ctx2.stroke();
+  ctx2.restore();
+  return true;
+}
+function 三次元の窓を開く(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = '3D モデル';
+  窓の副題(三次元の決め.形
+    ? ('「' + 三次元の決め.名 + '」点 ' + 三次元の決め.形.点.length + '・面 ' + 三次元の決め.形.面.length)
+    : 'まだ 読んでいません');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<button type="button" onclick="三次元を開く();関数の窓を閉じる()" style="min-height:44px;'
+    + 'border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;'
+    + 'font-family:inherit;cursor:pointer;">.obj の ファイルを 選ぶ</button>'
+    + '<button type="button" onclick="三次元を置く();関数の窓を閉じる()" style="min-height:44px;'
+    + 'border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;'
+    + 'font-family:inherit;cursor:pointer;">見本の 立方体を 置く</button>'
+    + '<div style="display:flex;gap:6px;">'
+    + '<button type="button" onclick="三次元を回す(-0.3,0)" style="flex:1;min-height:40px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">← 回す</button>'
+    + '<button type="button" onclick="三次元を回す(0.3,0)" style="flex:1;min-height:40px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">回す →</button>'
+    + '<button type="button" onclick="三次元を回す(0,-0.3)" style="flex:1;min-height:40px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">↑ 回す</button>'
+    + '<button type="button" onclick="三次元を回す(0,0.3)" style="flex:1;min-height:40px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">回す ↓</button></div>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★読めるのは .obj（字だけの ファイル）だけ★です。'
+    + '.glb や .fbx は 中身の 決まりが 大きくて 読めません。<br>'
+    + '★線だけで 出します★（色・影・アニメは ありません）。'
+    + '★どんな 向きに 回しても 箱から はみ出しません★。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+
+/* ── Web から ── */
+function Webから読む(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'Web から';
+  窓の副題('ページの 表を 読み込みます');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<input id="webUrl" type="text" placeholder="https://…"'
+    + ' style="min-height:44px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+    + 'border-radius:10px;padding:8px 10px;font-family:inherit;">'
+    + '<button type="button" onclick="Webを取りに行く()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">読みに 行く</button>'
+    + '<div style="font-size:13px;margin-top:6px;">読めなかった 時は ここに 貼っても 入ります</div>'
+    + '<textarea id="webHtml" rows="4" placeholder="ページの HTML を 貼る"'
+    + ' style="font-size:14px;color:#333333;border:1.5px solid #D4EDE1;border-radius:10px;'
+    + 'padding:8px 10px;font-family:inherit;"></textarea>'
+    + '<button type="button" onclick="Webの字から入れる()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">貼った 字から 入れる</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★ブラウザは 向こうの ページが 許した 時だけ 読めます★（安全の ための 決まり）。'
+    + '読めなかったら ★そう お知らせします★。その 時は 字を 貼ってください。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+function _表をHTMLから(字){
+  var 器 = document.createElement('div');
+  器.innerHTML = String(字 || '');
+  var 表たち = 器.getElementsByTagName('table');
+  if (!表たち.length) return null;
+  var 一番 = null, 一番の数 = 0;
+  for (var i = 0; i < 表たち.length; i++) {
+    var n = 表たち[i].getElementsByTagName('tr').length;
+    if (n > 一番の数) { 一番の数 = n; 一番 = 表たち[i]; }
+  }
+  if (!一番) return null;
+  var 出 = [];
+  var 行たち = 一番.getElementsByTagName('tr');
+  for (var r = 0; r < 行たち.length; r++) {
+    var 行 = [];
+    var セル = 行たち[r].children;
+    for (var c = 0; c < セル.length; c++) 行.push(String(セル[c].textContent || '').trim());
+    if (行.length) 出.push(行);
+  }
+  return 出.length ? 出 : null;
+}
+function Webの字から入れる(){
+  var e = document.getElementById('webHtml');
+  var 表 = e ? _表をHTMLから(e.value) : null;
+  if (!表) { notify('★表（table）が 見つかりません★'); return 0; }
+  return _表を入れる(表, '貼った 字');
+}
+function _表を入れる(表, どこから){
+  for (var r = 0; r < 表.length; r++) {
+    for (var c = 0; c < 表[r].length; c++) setCell(selR1 + r, selC1 + c, 表[r][c]);
+  }
+  render();
+  /* ★typeof で 守らない★＝つなぎたち は この ファイルの 中に 在る。
+     守ると 無くなった 時に ★黙って 素通り★する（見張りの 決まりと 同じ）。 */
+  Connections.足す(つなぎたち, 'web', どこから, どこから, 表);
+  接続の帯を出す();
+  関数の窓を閉じる();
+  notify('★' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列★ 入れました（' + どこから + '）');
+  return 表.length;
+}
+function Webを取りに行く(){
+  var e = document.getElementById('webUrl');
+  var url = e ? String(e.value || '').trim() : '';
+  if (!/^https?:\/\//.test(url)) { notify('★https:// から 始まる 所を 書いてください★'); return 0; }
+  notify('読みに 行っています…');
+  fetch(url).then(function (r) {
+    if (!r.ok) throw new Error('返事が ' + r.status);
+    return r.text();
+  }).then(function (t) {
+    var 表 = _表をHTMLから(t);
+    if (!表) { notify('★その ページに 表（table）が ありません★'); return; }
+    _表を入れる(表, url);
+  }).catch(function (err) {
+    /* ★出来なかった 事を 隠さない★ */
+    notify('★読めませんでした★（' + String(err && err.message ? err.message : err) + '）'
+      + '／向こうの ページが 許していない 時は 字を 貼ってください');
+  });
+  return 1;
+}
+
+/* ── データ モデル ── */
+var つながりたち = [];
+
+function _この画面の表たち(){
+  var 出 = [];
+  var 表たち = sheets[activeSheet].tables || [];
+  for (var i = 0; i < 表たち.length; i++) {
+    var t = 表たち[i];
+    var 行 = [];
+    for (var r = t.r1; r <= t.r2; r++) {
+      var 一 = [];
+      for (var c = t.c1; c <= t.c2; c++) {
+        var x = sheets[activeSheet].data[r + ',' + c];
+        一.push(x ? ((x.d !== undefined && x.d !== null && x.d !== '') ? x.d : x.v) : '');
+      }
+      行.push(一);
+    }
+    出.push({ 名: t.名 || t.name || ('テーブル' + (i + 1)), 行たち: 行 });
+  }
+  return 出;
+}
+function データモデルを開く(){
+  hideCtxMenu();
+  var 表 = _この画面の表たち();
+  document.getElementById('funcTitle').textContent = 'データ モデル';
+  窓の副題('表どうしを つなげます（この シートの 表 ' + 表.length + '個）');
+  var h = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  if (表.length < 2) {
+    h += '<div style="color:#7A9A87;">'
+      + '★つなげるには 表が 2つ 以上 要ります★（「挿入→テーブル」で 作れます）。</div>';
+  } else {
+    var 選 = function (id, 名) {
+      var o = '<select id="' + id + '" style="min-height:44px;font-size:15px;color:#333333;'
+        + 'border:1.5px solid #D4EDE1;border-radius:10px;padding:6px 8px;font-family:inherit;">';
+      for (var i = 0; i < 表.length; i++) {
+        var 見出し = 表[i].行たち[0] || [];
+        for (var c = 0; c < 見出し.length; c++) {
+          o += '<option value="' + _esc(表[i].名) + '|' + _esc(String(見出し[c])) + '">'
+            + _esc(表[i].名) + ' . ' + _esc(String(見出し[c])) + '</option>';
+        }
+      }
+      return '<div style="font-size:13px;">' + 名 + '</div>' + o + '</select>';
+    };
+    h += 選('dmLeft', 'つなぐ 側（たくさん）') + 選('dmRight', 'つながれる 側（1つずつ）')
+      + '<button type="button" onclick="つながりを足す()" style="min-height:44px;border:1px solid #C8ECD8;'
+      + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+      + 'cursor:pointer;">つなげる</button>';
+  }
+  if (つながりたち.length) {
+    h += '<div style="font-size:13px;margin-top:6px;">今の つながり</div>';
+    for (var j = 0; j < つながりたち.length; j++) {
+      var v = つながりたち[j];
+      h += '<div style="display:flex;gap:6px;align-items:center;border:1px solid #C8ECD8;'
+        + 'border-radius:8px;padding:6px 8px;">'
+        + '<span style="flex:1 1 auto;font-size:12px;">' + _esc(v.左表) + '.' + _esc(v.左列)
+        + ' → ' + _esc(v.右表) + '.' + _esc(v.右列) + '</span>'
+        + '<button type="button" data-i="' + j + '" onclick="つなげて出す(Number(this.getAttribute(\'data-i\')))"'
+        + ' style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;'
+        + 'color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">出す</button>'
+        + '<button type="button" data-i="' + j + '" onclick="つながりを消す(Number(this.getAttribute(\'data-i\')))"'
+        + ' style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;'
+        + 'color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">消す</button></div>';
+    }
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★つながれる 側は 1つずつ（同じ 値が 2回 出ない）で ないと いけません★'
+    + '（実Excel も 同じ 決まりです）。<br>'
+    + '★実測★＝実Excel は 表を 作っただけでは モデルに 入りません（ModelTables は 0 でした）。'
+    + '</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 表.length;
+}
+function つながりを足す(){
+  var l = document.getElementById('dmLeft'), r = document.getElementById('dmRight');
+  if (!l || !r) return 0;
+  var lp = String(l.value).split('|'), rp = String(r.value).split('|');
+  var 表 = _この画面の表たち();
+  var 左 = null, 右 = null;
+  for (var i = 0; i < 表.length; i++) {
+    if (表[i].名 === lp[0]) 左 = 表[i];
+    if (表[i].名 === rp[0]) 右 = 表[i];
+  }
+  if (!左 || !右) { notify('★表が 見つかりません★'); return 0; }
+  if (左 === 右) { notify('★同じ 表どうしは つなげません★'); return 0; }
+  var 見 = DataModel.つなげるか(左, lp[1], 右, rp[1]);
+  if (!見.出来る) { notify(見.訳); return 0; }
+  DataModel.つなぎを足す(つながりたち, lp[0], lp[1], rp[0], rp[1]);
+  データモデルを開く();
+  notify('つなげました（' + 見.訳 + '）');
+  return つながりたち.length;
+}
+function つながりを消す(i){
+  DataModel.つなぎを消す(つながりたち, i);
+  データモデルを開く();
+  notify('つながりを 消しました');
+  return つながりたち.length;
+}
+function つなげて出す(i){
+  var v = つながりたち[i];
+  if (!v) { notify('★見つかりません★'); return 0; }
+  var 表 = _この画面の表たち();
+  var 左 = null, 右 = null;
+  for (var j = 0; j < 表.length; j++) {
+    if (表[j].名 === v.左表) 左 = 表[j];
+    if (表[j].名 === v.右表) 右 = 表[j];
+  }
+  if (!左 || !右) { notify('★表が 見つかりません★'); return 0; }
+  var 出 = DataModel.つなげる(左, v.左列, 右, v.右列);
+  if (!出) { notify('★つなげられませんでした★'); return 0; }
+  var 名 = 'つないだ表';
+  var 新 = { name: 名, data: {}, colW: {}, rowH: {}, hiddenRows: {}, hiddenCols: {} };
+  sheets.push(新);
+  var 番 = sheets.length - 1;
+  switchSheet(番);
+  for (var r = 0; r < 出.length; r++) {
+    for (var c = 0; c < 出[r].length; c++) setCell(r, c, 出[r][c]);
+  }
+  render();
+  関数の窓を閉じる();
+  notify('★' + (出.length - 1) + '行★ を 新しい シートに 出しました');
+  return 出.length;
+}
+
+/* ── データ分析（★うちの AI に 聞く★）── */
+function データ分析(){
+  hideCtxMenu();
+  var rng = _表の範囲();
+  var 中身 = _範囲を配列にする(rng);
+  if (中身.length < 2) { notify('★表を 選んでください★'); return 0; }
+  var 見出し = (中身[0] || []).map(function (v) { return String(v); }).join('・');
+  var お願い = '次の 表を 見て、気づいた 事を 3つ 教えてください。'
+    + '（' + cellAddr(rng.r1, rng.c1) + ':' + cellAddr(rng.r2, rng.c2)
+    + '／' + (中身.length - 1) + '行・列は ' + 見出し + '）'
+    + '★合計や 割り算の 数は うちが 計算した 物を 使ってください★';
+  _AIに聞く(お願い, 'データ分析',
+    '★実Excel の データ分析は Microsoft の クラウドで 動きます★。'
+    + 'うちは ★AI に 聞きます★（お金の 数は うちの 計算の 値を 使います）。');
+  return 1;
+}
+
 /* ═══ ★インクを図形に／マップ／タイムライン★ ═══════════ 2026-08-30
  *
  *  ★実Excel で 測れた 事★
@@ -4355,6 +4705,7 @@ function 選んだ印を描く(x, y, w, h){
   return 1;
 }
 function 挿入した物を描く(ctx2, o, X, Y){
+  if (o.種類 === '3D') return 三次元を描く(ctx2, o, X, Y);
   if (o.種類 === 'コントロール') return コントロールを描く(ctx2, o, X, Y);
   if (o.種類 === '図解') { 図解を描く(ctx2, o, X, Y); return true; }
   if (o.種類 === 'アイコン') { アイコンを描く(ctx2, o.絵, X, Y, o.w, o.h); return true; }
@@ -6465,6 +6816,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="画像を読む(this)">
     <input type="file" id="bgFileInput" accept="image/*" style="display:none" onchange="背景を読み込む(this.files &amp;&amp; this.files[0])">
     <input type="file" id="xmlFileInput" accept=".xml,text/xml,application/xml" style="display:none" onchange="XMLを読む(this.files &amp;&amp; this.files[0])">
+    <input type="file" id="objFileInput" accept=".obj,.glb,.fbx" style="display:none" onchange="三次元を読む(this.files &amp;&amp; this.files[0])">
     <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
     <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">💾</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelに</span>書き出す</span></button>
