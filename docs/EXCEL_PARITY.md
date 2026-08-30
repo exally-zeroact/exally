@@ -1894,3 +1894,203 @@ Excel は ★物を 選んだ時だけ 出るタブ（コンテキストタブ�
 - ★ファイルの 中の 構造（xlsx/xlsb の 部品）★＝画面とは 別の 軸
 
 ★この節を 消さない事★。
+
+---
+
+# ★★Excel の「細胞」— オブジェクトモデル 全展開★★ 2026-08-30
+
+★司さんの 方針★
+> 「今の 原点にして 頂点の Excel を 本気で ★細胞分解レベルまで★ 網羅して 把握して
+> 　全てを 理解した上で Exally に 持ち込み パクり かつ 応用するのが Excelの最上級」
+
+★リボン（画面）は Excel の ★表面★でしか ありません★。
+★本体は オブジェクトモデル（Excel が 持っている 物と 出来る事 そのもの）★です。
+
+## ★取り方（★Excel を 起動せず・読むだけ★）★
+
+```
+ 出どころ … C:\Program Files\Microsoft Office\Root\Office16\EXCEL.EXE
+            ★の 中に 埋まっている 型ライブラリ★
+ 取り方   … LoadTypeLibEx → ITypeLib / ITypeInfo を 全部 歩く
+ 生データ … docs/excel-objectmodel-2026-08-30.tsv（★24,820行★）
+```
+
+★1回 外した（記録）★
+最初は PIA（Microsoft.Office.Interop.Excel）を 使ったが ★15.0（Office 2013）の 古い物★だった。
+★実機は 16.0★なので ★EXCEL.EXE の 中の 本物★を 読み直した。
+（「相手と 同じ 定数で 測り直す」）
+
+## ★★実測 — Excel 16.0 の 全体★★
+
+| 何 | 数 |
+|---|---:|
+| 型（オブジェクト・定数の 束） | **1,036** |
+| 　うち オブジェクト（Dispatch） | 388 |
+| 　うち インターフェース | 358 |
+| 　うち 定数の 束（Enum） | 282 |
+| ★部品（全部）★ | ★**24,820**★ |
+| 　読める値（PropertyGet） | 10,388 |
+| 　書ける値（PropertyPut / PutRef） | 4,664 |
+| 　命令（Method） | 7,440 |
+| 　定数（Enum の 値） | 2,328 |
+| ★「出来る事」（定数を 除き 型.部品で 重複を 除く）★ | ★**17,828**★ |
+| ★同じく I付きの 影を 除くと★ | ★**11,007**★ |
+
+## ★大きい 型（＝Excel の 太い 幹）★
+
+| 型 | 部品 | 何者か |
+|---|---:|---|
+| `_Application` | **474** | Excel そのもの（設定・計算・画面・イベント） |
+| `WorksheetFunction` | **427** | ★VBA から 呼べる 関数 424個★ |
+| `_Workbook` | **287** | ブック（保存・共有・保護・接続） |
+| `Range` | **260** | ★セル（命令110・読む112・書く38）★ |
+| `PivotTable` | **226** | ピボット |
+| `_Chart` | **215** | グラフ |
+| `_Worksheet` | **158** | シート |
+| `Window` | 114 | 窓（分割・固定・表示） |
+| `Shape` | 116 | 図形 |
+| `Axis` | 94 | グラフの 軸 |
+| `PageSetup` | 93 | 印刷の 設定 |
+| `DataLabel` | 83 | データラベル |
+| `ListObject` | 66 | テーブル |
+
+★主な 32型 だけで 3,181部品★。
+
+## ★★この 数が 意味する事★★
+
+★今まで 私が 数えていた「297」は ★リボンの ボタンの 数★でした★。
+★Excel の 出来る事は ★17,828★（I付きの 影を 除いても 11,007）★。
+
+⇒ ★★リボンは 入口であって Excel 本体では ない★★
+⇒ ★★「Excel の 最上級」を 名乗るなら 数えるべきは こちら★★
+
+★分母を どう 決めるかは 決め事★なので ★私は まだ 変えていません★。
+★この節を 消さない事★。
+
+## ★関数の 穴 — 実測 73個★（2026-08-30・型ライブラリと HyperFormula を 突き合わせ）
+
+| | 数 |
+|---|---:|
+| Excel の `WorksheetFunction`（VBAから 呼べる 関数） | **417** |
+| うち（HyperFormula 3.4.0・内部演算子を 除く） | **442** |
+| ★Excelに 在って うちに 無い★ | ★**73**★ |
+
+★数が 多い方が 勝ちでは ない★＝HyperFormula には Excel に 無い物（HSTACK等）も 在る。
+★見るべきは「Excelに 在って うちに 無い 73個」★。
+
+### ★中身で 分けた（★ここが 作る 順番の 材料★）★
+
+**① ★事務で 効く★（すぐ 効く・少ない）— 3個**
+`AVERAGEIFS`（★条件つき平均・よく 使う★） `CONVERT`（単位の 換算） `FREQUENCY`（度数分布）
+
+**② ★日本語で 効く★ — 1個**
+`PHONETIC`（★ふりがなを 取り出す★・うちは ふりがなを 持っているので 出来る）
+
+**③ 財務（債券・減価償却）— 25個**
+`ACCRINT` `ACCRINTM` `AMORDEGRC` `AMORLINC` `COUPDAYBS` `COUPDAYS` `COUPDAYSNC`
+`COUPNCD` `COUPNUM` `COUPPCD` `DISC` `DURATION` `INTRATE` `MDURATION`
+`ODDFPRICE` `ODDFYIELD` `ODDLPRICE` `ODDLYIELD` `PRICE` `PRICEDISC` `PRICEMAT`
+`RECEIVED` `VDB` `YIELDDISC` `YIELDMAT`
+
+**④ 統計・回帰・行列 — 15個**
+`LINEST` `LOGEST` `TREND` `GROWTH` `MINVERSE` `MUNIT` `MODE.MULT`
+`PERCENTRANK.EXC` `PERCENTRANK.INC` `PROB` `ERF.PRECISE` `ERFC.PRECISE`
+`FORECAST.ETS` `FORECAST.ETS.CONFINT` `FORECAST.ETS.SEASONALITY` `FORECAST.ETS.STAT`
+
+**⑤ 新しい 配列の 関数 — 4個**
+`SORTBY` `RANDARRAY` `SINGLE`(＠) `ARRAYTOTEXT`
+
+**⑥ バイト数で 数える 文字関数 — 3個**
+`FINDB` `SEARCHB` `REPLACEB`（★うちは LEFTB/LENB は 在る★ので 同じ 作りで 足せる）
+
+**⑦ 外の 物が 要る — 6個**
+`WEBSERVICE` `FILTERXML` `RTD` `STOCKHISTORY` `FIELDVALUE`（＋`CUBE`系は 元から 無し）
+
+**⑧ ★タイ語 専用★ — 12個**（日本の 事務では 使わない）
+`BAHTTEXT` `ROUNDBAHTDOWN` `ROUNDBAHTUP` `ISTHAIDIGIT` `THAIDAYOFWEEK`
+`THAIDIGIT` `THAIMONTHOFYEAR` `THAINUMSOUND` `THAINUMSTRING` `THAISTRINGLENGTH` `THAIYEAR`
+＋`USDOLLAR`（`DOLLAR` の 別名）
+
+**⑨ Excel の 中の ゴミ — 3個**
+`.WSFUNCTION` `DUMMY19` `DUMMY21`（★Excel の 型ライブラリに 入っている 空の 枠★）
+
+### ★★つまり 本当に 作る 相手は 73個では ない★★
+
+```
+ 73個
+  − タイ語 12 − ゴミ 3 − 外が 要る 6 = ★52個★
+ ⇒ ★52個は うちだけで 作れます★
+ ⇒ ★そのうち すぐ 効くのは ①②③④の 順★
+```
+
+★AVERAGEIFS が 無いのは 大きい★（AVERAGEIF と SUMIFS は 在るのに）。
+
+### ★注意（軸が 2つ ある）★
+
+- `WorksheetFunction`（VBAから）＝**417**
+- ★シートに 書ける 関数★（`IF` `TODAY` `ROW` 等 VBAには 無い 物を 含む）＝
+  ★2026-08-29 に 別途 測って **507個**★（別の 軸）
+★両方 本当の 数★。★混ぜて 語らない事★。
+
+## ★ファイルの 中の 構造 — Excel 34部品 vs うち 10部品★（2026-08-30 実測）
+
+★画面とは 別の 軸★。★お客さんの ファイルを 壊さず 往復できるか★は ここで 決まる。
+
+### 測り方（★新規ブックだけ・司さんの実物は 触らない★）
+
+実Excel で ★盛れるだけ 盛った★ブックを 作って 保存し、zip の 中を 覗いた。
+盛った物 … 表(ListObject)／グラフ2種／図形／ピボット／コメント／リンク／
+名前／数値の書式／罫線／塗り／データバー／入力規則／印刷の設定／グラフシート
+
+### ★★実Excel が 書く 部品★★
+
+| 形式 | 部品 |
+|---|---:|
+| `.xlsx` | ★**34個**★ |
+| `.xlsb` | ★**36個**★（`binaryIndex1/2.bin` が 増える） |
+
+主な 中身:
+```
+ [Content_Types].xml  _rels/.rels  docProps/app.xml  docProps/core.xml
+ xl/workbook.xml  xl/_rels/workbook.xml.rels  xl/styles.xml  xl/theme/theme1.xml
+ xl/sharedStrings.xml  xl/calcChain.xml
+ xl/worksheets/sheet1.xml  sheet2.xml（＋_rels）
+ ★xl/tables/table1.xml★         … テーブル
+ ★xl/pivotTables/pivotTable1.xml★／★xl/pivotCache/*★ … ピボット
+ ★xl/charts/chart1.xml chart2.xml／colors1.xml／style1.xml★ … グラフ
+ ★xl/chartsheets/sheet1.xml★    … グラフシート
+ ★xl/drawings/drawing1.xml drawing2.xml★ … 図形とグラフの 置き場
+ ★xl/drawings/vmlDrawing1.vml★  … ★コメントの 吹き出し（古い形）★
+ ★xl/comments1.xml★             … コメント
+ ★xl/printerSettings/printerSettings1.bin★ … 印刷の 設定（バイナリ）
+```
+
+### ★★うち（Exally）が 書く 部品＝10個★★
+
+```
+ [Content_Types].xml  _rels/.rels  docProps/app.xml  docProps/core.xml
+ xl/workbook.xml  xl/_rels/workbook.xml.rels
+ xl/styles.xml  xl/theme/theme1.xml
+ xl/metadata.xml  xl/worksheets/sheet1.xml
+```
+
+### ★★差＝24部品★★
+
+| 出せていない 部品 | 何が 落ちるか |
+|---|---|
+| `xl/sharedStrings.xml` | 字を セルに 直書き（★動くが Excel の 作り方とは 違う★） |
+| `xl/calcChain.xml` | 計算の 順番（Excel が 作り直すので 実害は 小さい） |
+| ★`xl/tables/*`★ | ★テーブル（表）が 消える★ |
+| ★`xl/pivotTables/*` `xl/pivotCache/*`★ | ★ピボットが 消える★ |
+| ★`xl/charts/*` `xl/drawings/*`★ | ★グラフ・図形が 消える★ |
+| ★`xl/chartsheets/*`★ | グラフシートが 消える |
+| ★`xl/comments1.xml` `vmlDrawing1.vml`★ | ★コメント（メモ）が 消える★ |
+| `xl/printerSettings/*.bin` | 印刷の 細かい 設定が 消える |
+| （シート2枚目以降） | ★複数シートの 保存を この場で 確かめていない★ |
+
+⇒ ★★「読める」と「往復できる」は 別★★
+⇒ ★お客さんの ファイルを 開いて 保存し直すと ★上の 物が 落ちる★★
+
+★これは 画面の 数（297）には 1つも 出ません★。
+
+★分母を どう するかは 決め事★。★私は まだ 変えていません★。★この節を 消さない事★。
