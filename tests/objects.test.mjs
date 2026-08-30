@@ -143,7 +143,9 @@ ok('★一覧は 上に 在る 物が 先★', /上に 在る 物が 先/.test(b
 ok('★物は シートの 座標で 持つ★', /物は「シートの 座標」で 持つ/.test(book));
 ok('  画面に 直す 道が 在る', /function 物の画面X\(o\)/.test(book) && /function 物の画面Y\(o\)/.test(book));
 ok('  画面から 直す 道も 在る', /function 画面から物のX\(px\)/.test(book));
-ok('★描く時に 画面の 座標へ 直している★', /x: 物の画面X\(o\), y: 物の画面Y\(o\)/.test(book));
+/* 08-30：写す 時に 持ち物を 数え上げると 新しい 持ち物（中身・回転）が 黙って 落ちたので
+   丸ごと 写して x/y だけ 差し替える 形に 変えた（tests/arrange.test.mjs に 見張り） */
+ok('★描く時に 画面の 座標へ 直している★', /写し\.x = 物の画面X\(o\); 写し\.y = 物の画面Y\(o\);/.test(book));
 ok('★押した所も 直してから 見る★', /どれを押したか\(箱, 画面から物のX\(px\), 画面から物のY\(py\)\)/.test(book));
 ok('★動かす時も 直している★', /_sx = 画面から物のX\(p\.x\), _sy = 画面から物のY\(p\.y\)/.test(book));
 ok('★alert / prompt / confirm を 使っていない★', !/\balert\(|\bprompt\(|\bconfirm\(/.test(book));

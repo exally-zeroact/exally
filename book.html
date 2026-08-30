@@ -1304,70 +1304,70 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=d16d8e93"></script>
+<script src="hyperformula.full.min.js?v=38108cc7"></script>
 
-<script src="exally-formula.js?v=d16d8e93"></script>
+<script src="exally-formula.js?v=38108cc7"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=d16d8e93"></script>
+<script src="js/file-out.js?v=38108cc7"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=d16d8e93"></script>
-<script src="lib/grid-xlsx.js?v=d16d8e93"></script>
+<script src="lib/typed-value.js?v=38108cc7"></script>
+<script src="lib/grid-xlsx.js?v=38108cc7"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=d16d8e93"></script>
-<script src="lib/autosum.js?v=d16d8e93"></script>
-<script src="lib/grid-sort.js?v=d16d8e93"></script>
-<script src="lib/grid-filter.js?v=d16d8e93"></script>
-<script src="lib/grid-find.js?v=d16d8e93"></script>
-<script src="lib/grid-print.js?v=d16d8e93"></script>
-<script src="lib/ai-reason.js?v=d16d8e93"></script>
-<script src="lib/menu-place.js?v=d16d8e93"></script>
-<script src="lib/grid-stats.js?v=d16d8e93"></script>
-<script src="lib/grid-valid.js?v=d16d8e93"></script>
-<script src="lib/cond-format.js?v=d16d8e93"></script>
-<script src="lib/ref-graph.js?v=d16d8e93"></script>
-<script src="lib/shindan.js?v=d16d8e93"></script>
+  <script src="lib/grid-refedit.js?v=38108cc7"></script>
+<script src="lib/autosum.js?v=38108cc7"></script>
+<script src="lib/grid-sort.js?v=38108cc7"></script>
+<script src="lib/grid-filter.js?v=38108cc7"></script>
+<script src="lib/grid-find.js?v=38108cc7"></script>
+<script src="lib/grid-print.js?v=38108cc7"></script>
+<script src="lib/ai-reason.js?v=38108cc7"></script>
+<script src="lib/menu-place.js?v=38108cc7"></script>
+<script src="lib/grid-stats.js?v=38108cc7"></script>
+<script src="lib/grid-valid.js?v=38108cc7"></script>
+<script src="lib/cond-format.js?v=38108cc7"></script>
+<script src="lib/ref-graph.js?v=38108cc7"></script>
+<script src="lib/shindan.js?v=38108cc7"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=d16d8e93"></script>
-<script src="lib/vba-mikata.js?v=d16d8e93"></script>
-<script src="lib/vba-tejun.js?v=d16d8e93"></script>
-<script src="lib/rireki.js?v=d16d8e93"></script>
-<script src="lib/chizu.js?v=d16d8e93"></script>
-<script src="lib/horu.js?v=d16d8e93"></script>
-<script src="lib/excel-version.js?v=d16d8e93"></script>
-<script src="lib/teian.js?v=d16d8e93"></script>
-<script src="lib/kikan.js?v=d16d8e93"></script>
-<script src="lib/recipe.js?v=d16d8e93"></script>
-<script src="lib/kirikae.js?v=d16d8e93"></script>
-<script src="js/recipe-store.js?v=d16d8e93"></script>
-<script src="js/rireki-store.js?v=d16d8e93"></script>
-<script src="lib/excel-version.js?v=d16d8e93"></script>
+<script src="lib/vba.js?v=38108cc7"></script>
+<script src="lib/vba-mikata.js?v=38108cc7"></script>
+<script src="lib/vba-tejun.js?v=38108cc7"></script>
+<script src="lib/rireki.js?v=38108cc7"></script>
+<script src="lib/chizu.js?v=38108cc7"></script>
+<script src="lib/horu.js?v=38108cc7"></script>
+<script src="lib/excel-version.js?v=38108cc7"></script>
+<script src="lib/teian.js?v=38108cc7"></script>
+<script src="lib/kikan.js?v=38108cc7"></script>
+<script src="lib/recipe.js?v=38108cc7"></script>
+<script src="lib/kirikae.js?v=38108cc7"></script>
+<script src="js/recipe-store.js?v=38108cc7"></script>
+<script src="js/rireki-store.js?v=38108cc7"></script>
+<script src="lib/excel-version.js?v=38108cc7"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=d16d8e93">
-<script src="lib/named-ranges.js?v=d16d8e93"></script>
-<script src="lib/cell-styles.js?v=d16d8e93"></script>
-<script src="lib/chart.js?v=d16d8e93"></script>
-<script src="lib/sparkline.js?v=d16d8e93"></script>
-<script src="lib/table.js?v=d16d8e93"></script>
-<script src="lib/flash-fill.js?v=d16d8e93"></script>
-<script src="lib/pivot.js?v=d16d8e93"></script>
-<script src="lib/csv-in.js?v=d16d8e93"></script>
-<script src="lib/objects.js?v=d16d8e93"></script>
-<script src="lib/ink.js?v=d16d8e93"></script>
-<script src="lib/symbols.js?v=d16d8e93"></script>
-<script src="lib/ribbon-spec.js?v=d16d8e93"></script>
-<script src="lib/ribbon-actions.js?v=d16d8e93"></script>
-<script src="lib/ribbon.js?v=d16d8e93"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=38108cc7">
+<script src="lib/named-ranges.js?v=38108cc7"></script>
+<script src="lib/cell-styles.js?v=38108cc7"></script>
+<script src="lib/chart.js?v=38108cc7"></script>
+<script src="lib/sparkline.js?v=38108cc7"></script>
+<script src="lib/table.js?v=38108cc7"></script>
+<script src="lib/flash-fill.js?v=38108cc7"></script>
+<script src="lib/pivot.js?v=38108cc7"></script>
+<script src="lib/csv-in.js?v=38108cc7"></script>
+<script src="lib/objects.js?v=38108cc7"></script>
+<script src="lib/ink.js?v=38108cc7"></script>
+<script src="lib/symbols.js?v=38108cc7"></script>
+<script src="lib/ribbon-spec.js?v=38108cc7"></script>
+<script src="lib/ribbon-actions.js?v=38108cc7"></script>
+<script src="lib/ribbon.js?v=38108cc7"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=d16d8e93"></script>
-<script src="js/exally-login.js?v=d16d8e93"></script>
-<script src="js/auth.js?v=d16d8e93"></script>
+<script src="js/supa-config.js?v=38108cc7"></script>
+<script src="js/exally-login.js?v=38108cc7"></script>
+<script src="js/auth.js?v=38108cc7"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -1702,6 +1702,7 @@ function printSheet(){
     data: sh.data, range: 範囲, sheetName: sh.name,
     向き: ページ設定.向き, 枠線: ページ設定.枠線, 行列番号: ページ設定.行列番号,
     余白: ページ設定.余白, 用紙: ページ設定.用紙,
+    印刷倍率: ページ設定.ページに合わせる ? null : ページ設定.印刷倍率,
     fileName: (typeof BookOpen!=='undefined' && BookOpen.isOpened && BookOpen.isOpened())
       ? (BookOpen.current && BookOpen.current().name) || '' : '',
   });
@@ -4340,6 +4341,44 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
 </div>
 <!-- ★描画（手書き）★ 2026-08-30
      ペンの 色と 太さは 実Excelの 項目名の とおり（黒0.35mm／赤0.35mm／灰0.5mm／黄6mm／濃青1mm／緑1mm） -->
+<!-- ★拡大縮小印刷（ページ レイアウト）★ 2026-08-30
+     実Excel実測＝既定 Zoom=100・横1・縦1／Zoom=False で「ページに 合わせる」／Zoom は 10〜400 -->
+<div id="fitOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:420px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
+      <div style="font-size:16px;font-weight:700;color:#2E7D54;">拡大縮小印刷</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">紙に 入る 大きさを 決めます</div>
+    </div>
+    <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="radio" name="fitMode" value="zoom" onchange="拡大縮小の見せ方()" style="width:18px;height:18px;">
+        <span>倍率で 決める</span>
+        <input id="fitZoom" type="number" min="10" max="400" step="5" style="width:80px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>％</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="radio" name="fitMode" value="fit" onchange="拡大縮小の見せ方()" style="width:18px;height:18px;">
+        <span>ページに 合わせる</span>
+      </label>
+      <div id="fitPages" style="display:flex;align-items:center;gap:8px;margin-left:26px;">
+        <span>横</span>
+        <input id="fitWide" type="number" min="1" max="20" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>ページ ／ 縦</span>
+        <input id="fitTall" type="number" min="1" max="20" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;">
+        <span>ページ</span>
+      </div>
+      <div id="fitWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
+      <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
+        ★実Excelと 同じで 10％〜400％まで★（既定は 100％・横1・縦1）。<br>
+        ★ページに 合わせる★を 選ぶと 倍率は 使いません（実Excel も 同じ）。
+      </div>
+    </div>
+    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="拡大縮小を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
+      <button onclick="拡大縮小を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    </div>
+  </div>
+</div>
 <div id="inkBar" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:56px;z-index:9400;background:#ffffff;border:1px solid #C8ECD8;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);padding:8px 10px;max-width:94vw;overflow:auto;">
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
     <span id="inkNow" style="font-size:12px;color:#2E7D54;font-weight:700;min-width:6em;">ペン（黒）</span>
@@ -4696,7 +4735,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
       <div style="font-size:16px;font-weight:700;color:#2E7D54;" id="funcTitle">関数</div>
-      <div style="font-size:12px;color:#333333;margin-top:4px;">押すと <span id="funcWhere">A1</span> に 「=関数名(」まで 入ります</div>
+      <div id="funcSub" style="font-size:12px;color:#333333;margin-top:4px;">押すと <span id="funcWhere">A1</span> に 「=関数名(」まで 入ります</div>
     </div>
     <div id="funcBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;min-height:100px;"></div>
     <div style="padding:8px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -6828,7 +6867,10 @@ function onMD(e){
      押したら 選ぶ＋動かす（つまみで 大きさも 変える） */
   var _o = 物を押したか(p.x, p.y);
   if(_o){
+    /* ★Ctrl を 押しながらなら 選んだ物に 足す★（そろえる・まとめる の ため） */
+    if(e.ctrlKey || e.metaKey){ 物を選び足す(_o); render(); return; }
     選んだ物 = _o;
+    えらんだ物たち = [_o];
     var _sx = 画面から物のX(p.x), _sy = 画面から物のY(p.y);
     var _つまみ = (_sx >= _o.x + _o.w - 8 && _sy >= _o.y + _o.h - 8);
     touchState = { type: _つまみ ? 'objsize' : 'objmove', 物: _o,
@@ -6836,7 +6878,7 @@ function onMD(e){
     render();
     return;
   }
-  if(選んだ物){ 選んだ物 = null; render(); }
+  if(選んだ物 || えらんだ物たち.length){ 選んだ物 = null; えらんだ物たち = []; render(); }
 
   var c=xToC(p.x),r=yToR(p.y);
 
@@ -9059,6 +9101,265 @@ function ウォッチを描く(){
   return ウォッチの箱.length;
 }
 
+/* ★配置（整列・グループ化・回転）★ 2026-08-30
+ *   ★真値（実Excel 16.0 で 実測）★ … tools/measure-align.ps1
+ *     A(左10 上10 60x40)・B(左100 上80 80x20) を そろえると
+ *       0 → 両方 左=10        ＝★左そろえ★（囲みの 左）
+ *       1 → A左65 / B左55     ＝★左右の 中央★（囲みの 真ん中 95）
+ *       2 → A左120 / B左100   ＝★右そろえ★（囲みの 右 180）
+ *       3 → 両方 上=10        ＝★上そろえ★
+ *       4 → A上35 / B上45     ＝★上下の 中央★（囲みの 真ん中 55）
+ *       5 → A上60 / B上80     ＝★下そろえ★（囲みの 下 100）
+ *       6 → ★出来ない★
+ *     グループ化 … 名前 'Group 3'・中の数 2／解除で 元の 2つに 戻る
+ *     回転 … 90 を 入れて 90度／さらに 90 足して 180度
+ *   ⇒ うちも 同じ（★囲み（みんなを 囲む 四角）に そろえる★）。 */
+var えらんだ物たち = [];
+function 物を選び足す(o){
+  if (!o) return えらんだ物たち.length;
+  var i = えらんだ物たち.indexOf(o);
+  if (i >= 0) えらんだ物たち.splice(i, 1); else えらんだ物たち.push(o);
+  選んだ物 = えらんだ物たち.length ? えらんだ物たち[えらんだ物たち.length - 1] : null;
+  return えらんだ物たち.length;
+}
+function 今の物たち(){
+  if (えらんだ物たち.length) return えらんだ物たち.slice();
+  return 選んだ物 ? [選んだ物] : [];
+}
+function 囲みを取る(物たち){
+  var 左 = null, 右 = null, 上 = null, 下 = null;
+  for (var i = 0; i < 物たち.length; i++) {
+    var o = 物たち[i];
+    if (左 === null || o.x < 左) 左 = o.x;
+    if (上 === null || o.y < 上) 上 = o.y;
+    if (右 === null || o.x + o.w > 右) 右 = o.x + o.w;
+    if (下 === null || o.y + o.h > 下) 下 = o.y + o.h;
+  }
+  return { 左: 左, 右: 右, 上: 上, 下: 下 };
+}
+var そろえ方 = [
+  { 番: 0, 名: '左ぞろえ' }, { 番: 1, 名: '左右の 中央' }, { 番: 2, 名: '右ぞろえ' },
+  { 番: 3, 名: '上ぞろえ' }, { 番: 4, 名: '上下の 中央' }, { 番: 5, 名: '下ぞろえ' },
+];
+function 物をそろえる(番){
+  var 物たち = 今の物たち();
+  if (物たち.length < 2) { notify('★2つ以上 選んでください★（Ctrl を 押しながら 押すと 足せます）'); return 0; }
+  var w = 囲みを取る(物たち);
+  for (var i = 0; i < 物たち.length; i++) {
+    var o = 物たち[i];
+    if (番 === 0) o.x = w.左;
+    else if (番 === 1) o.x = (w.左 + w.右) / 2 - o.w / 2;
+    else if (番 === 2) o.x = w.右 - o.w;
+    else if (番 === 3) o.y = w.上;
+    else if (番 === 4) o.y = (w.上 + w.下) / 2 - o.h / 2;
+    else if (番 === 5) o.y = w.下 - o.h;
+  }
+  render();
+  notify(物たち.length + '個を そろえました（' + (そろえ方[番] || {}).名 + '）');
+  return 物たち.length;
+}
+/* ★この 窓は いろいろな 用に 使い回す★＝副題が 前の 用の まま 残ると
+ *   「押すと A1 に 「=関数名(」まで 入ります」が ★関係の 無い 窓にも 出る★。
+ *   ⇒ ★開く 側が 必ず 副題を 決める★。決めない 窓は 見張りで 赤に する。 */
+function 窓の副題(字){
+  var e = document.getElementById('funcSub');
+  if (e) e.textContent = String(字);
+  return 字;
+}
+function 配置の窓を開く(){
+  hideCtxMenu();
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  for (var i = 0; i < そろえ方.length; i++) {
+    h += '<button type="button" class="align-b" onclick="物をそろえる(' + そろえ方[i].番 + ');関数の窓を閉じる()"'
+      + ' style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+      + 'border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + そろえ方[i].名 + '<span style="color:#7A9A87;font-size:11px;">（実Excelの 番号 '
+      + そろえ方[i].番 + '）</span></button>';
+  }
+  h += '</div><div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">'
+    + '★2つ以上 選んでから 押してください★（Ctrl を 押しながら 押すと 足せます）。<br>'
+    + 'そろえる 先は ★みんなを 囲む 四角★です（実Excelと 同じ）。</div>';
+  document.getElementById('funcTitle').textContent = '配置（そろえる）';
+  窓の副題('選んでいる ' + 今の物たち().length + '個を そろえます');
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return そろえ方.length;
+}
+/* ★グループ化★＝1つに まとめる（中の 物は 覚えておいて 解除で 戻す） */
+function グループにする(){
+  hideCtxMenu();
+  var 物たち = 今の物たち();
+  if (物たち.length < 2) { notify('★2つ以上 選んでください★'); return 0; }
+  var 箱 = 物の箱();
+  var w = 囲みを取る(物たち);
+  var 中身 = [];
+  for (var i = 0; i < 物たち.length; i++) {
+    var o = 物たち[i];
+    中身.push({ 物: o, ずれX: o.x - w.左, ずれY: o.y - w.上 });
+    var j = 箱.indexOf(o);
+    if (j >= 0) 箱.splice(j, 1);
+  }
+  var g = { 種類: 'グループ', 名: SheetObjects.名前を決める(箱.map(function (x) { return x.名; }), 'グループ'),
+    x: w.左, y: w.上, w: w.右 - w.左, h: w.下 - w.上, z: 箱.length + 1, 中身: 中身 };
+  箱.push(g);
+  SheetObjects.順をそろえる(箱);
+  えらんだ物たち = [g];
+  選んだ物 = g;
+  render();
+  notify(中身.length + '個を 1つに まとめました（' + g.名 + '）');
+  return 中身.length;
+}
+function グループを解く(){
+  hideCtxMenu();
+  var g = 選んだ物;
+  if (!g || g.種類 !== 'グループ') { notify('★まとめた 物を 選んでください★'); return 0; }
+  var 箱 = 物の箱();
+  var i = 箱.indexOf(g);
+  if (i >= 0) 箱.splice(i, 1);
+  var 出した = [];
+  for (var j = 0; j < g.中身.length; j++) {
+    var o = g.中身[j].物;
+    o.x = g.x + g.中身[j].ずれX;
+    o.y = g.y + g.中身[j].ずれY;
+    箱.push(o);
+    出した.push(o);
+  }
+  SheetObjects.順をそろえる(箱);
+  /* ★実Excel＝解いた後も 中の 物が 選ばれたまま★（続けて そろえられる） */
+  えらんだ物たち = 出した;
+  選んだ物 = 出した[0] || null;
+  render();
+  notify(g.中身.length + '個に 戻しました');
+  return g.中身.length;
+}
+function グループの窓を開く(){
+  hideCtxMenu();
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">'
+    + '<button type="button" onclick="グループにする();関数の窓を閉じる()" style="min-height:44px;padding:0 12px;'
+    + 'border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;'
+    + 'font-family:inherit;cursor:pointer;text-align:left;">1つに まとめる（グループ化）</button>'
+    + '<button type="button" onclick="グループを解く();関数の窓を閉じる()" style="min-height:44px;padding:0 12px;'
+    + 'border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:13px;'
+    + 'font-family:inherit;cursor:pointer;text-align:left;">まとめを 解く（グループ解除）</button></div>';
+  document.getElementById('funcTitle').textContent = 'グループ化';
+  窓の副題('選んでいる ' + 今の物たち().length + '個を 1つに まとめます');
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+/* ★回転★（実測＝90 を 足していく） */
+function 物を回す(度){
+  hideCtxMenu();
+  var 物たち = 今の物たち();
+  if (!物たち.length) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  for (var i = 0; i < 物たち.length; i++) {
+    物たち[i].回転 = (((物たち[i].回転 || 0) + 度) % 360 + 360) % 360;
+  }
+  render();
+  notify(物たち.length + '個を ' + 度 + '度 回しました（今 ' + (物たち[0].回転 || 0) + '度）');
+  return 物たち[0].回転 || 0;
+}
+function 回転の窓を開く(){
+  hideCtxMenu();
+  var 出 = [['右へ 90度', 90], ['左へ 90度', -90], ['180度', 180], ['元に 戻す', 0]];
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  for (var i = 0; i < 出.length; i++) {
+    h += '<button type="button" onclick="' + (出[i][1] === 0 ? '物の回転を戻す()' : ('物を回す(' + 出[i][1] + ')'))
+      + ';関数の窓を閉じる()" style="min-height:44px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;'
+      + 'color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;">'
+      + 出[i][0] + '</button>';
+  }
+  h += '</div>';
+  document.getElementById('funcTitle').textContent = '回転';
+  窓の副題('選んでいる ' + 今の物たち().length + '個を 回します');
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 出.length;
+}
+function 物の回転を戻す(){
+  var 物たち = 今の物たち();
+  for (var i = 0; i < 物たち.length; i++) 物たち[i].回転 = 0;
+  render();
+  notify('回転を 戻しました');
+  return 0;
+}
+
+/* ★拡大縮小印刷（ページ レイアウト）★ 2026-08-30
+ *   ★真値（実Excel 16.0 で 実測）★ … tools/measure-fit.ps1
+ *     既定 … Zoom=100・横1・縦1／Zoom=False に すると ★ページに 合わせる★
+ *     Zoom は ★10〜400★（401 も 9 も 入らない）
+ *   ⇒ うちも 同じ。紙に 出す 時に ★本当に 効かせる★（transform で 縮める）。 */
+function 拡大縮小の初期化(){
+  ページ設定の初期化();
+  if (ページ設定.印刷倍率 === undefined) ページ設定.印刷倍率 = 100;   /* 実測 */
+  if (ページ設定.ページに合わせる === undefined) ページ設定.ページに合わせる = false;
+  if (ページ設定.横ページ === undefined) ページ設定.横ページ = 1;      /* 実測 */
+  if (ページ設定.縦ページ === undefined) ページ設定.縦ページ = 1;      /* 実測 */
+  return ページ設定;
+}
+function 拡大縮小を開く(){
+  hideCtxMenu();
+  拡大縮小の初期化();
+  var ov = document.getElementById('fitOverlay');
+  if (!ov) return 0;
+  var 箱 = document.querySelectorAll('input[name="fitMode"]');
+  for (var i = 0; i < 箱.length; i++) {
+    箱[i].checked = (箱[i].value === (ページ設定.ページに合わせる ? 'fit' : 'zoom'));
+  }
+  document.getElementById('fitZoom').value = ページ設定.印刷倍率;
+  document.getElementById('fitWide').value = ページ設定.横ページ;
+  document.getElementById('fitTall').value = ページ設定.縦ページ;
+  document.getElementById('fitWhy').textContent = '';
+  拡大縮小の見せ方();
+  ov.style.display = 'flex';
+  return 1;
+}
+function 拡大縮小を閉じる(){
+  var ov = document.getElementById('fitOverlay');
+  if (ov) ov.style.display = 'none';
+}
+function 拡大縮小の見せ方(){
+  var 合わせる = false;
+  var 箱 = document.querySelectorAll('input[name="fitMode"]');
+  for (var i = 0; i < 箱.length; i++) if (箱[i].checked && 箱[i].value === 'fit') 合わせる = true;
+  document.getElementById('fitZoom').disabled = 合わせる;
+  document.getElementById('fitPages').style.opacity = 合わせる ? '1' : '0.45';
+  document.getElementById('fitWide').disabled = !合わせる;
+  document.getElementById('fitTall').disabled = !合わせる;
+  return 合わせる;
+}
+function 拡大縮小を決める(){
+  var 欄 = document.getElementById('fitWhy');
+  var 合わせる = 拡大縮小の見せ方();
+  var z = Number(document.getElementById('fitZoom').value);
+  var w = Number(document.getElementById('fitWide').value);
+  var t = Number(document.getElementById('fitTall').value);
+  if (!合わせる && (!isFinite(z) || z < 10 || z > 400)) {
+    欄.textContent = '★倍率は 10％から 400％までです★（実Excelと 同じ）'; return 0;
+  }
+  if (合わせる && (!isFinite(w) || w < 1 || !isFinite(t) || t < 1)) {
+    欄.textContent = '★ページの 数は 1以上で 入れてください★'; return 0;
+  }
+  拡大縮小の初期化();
+  ページ設定.ページに合わせる = 合わせる;
+  if (!合わせる) ページ設定.印刷倍率 = Math.round(z);
+  else { ページ設定.横ページ = Math.round(w); ページ設定.縦ページ = Math.round(t); }
+  拡大縮小を閉じる();
+  notify(合わせる ? ('紙 横' + ページ設定.横ページ + '・縦' + ページ設定.縦ページ + 'に 合わせます')
+    : (ページ設定.印刷倍率 + '％で 刷ります'));
+  return 1;
+}
+function 印刷倍率を足す(足す){
+  拡大縮小の初期化();
+  ページ設定.ページに合わせる = false;
+  var z = ページ設定.印刷倍率 + 足す;
+  if (z < 10) z = 10;
+  if (z > 400) z = 400;
+  ページ設定.印刷倍率 = z;
+  notify('刷る 倍率 … ' + z + '％');
+  return z;
+}
+
 /* ★描画（手書き）★ 2026-08-30
  *   ★真値★＝実Excelの リボンの 項目名に ペンの 色と 太さが そのまま 書いてある
  *     （ペン: 黒、0.35 mm／赤 0.35mm／鉛筆 灰 0.5mm／蛍光 黄 6mm／万年筆 濃青 1mm／ブラシ 緑 1mm）
@@ -9271,7 +9572,7 @@ function インクを再生(){
 }
 function インクのヘルプ(){
   document.getElementById('funcTitle').textContent = 'インクの ヘルプ';
-  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  窓の副題('描画タブの 道具の 使い方');
   var h = '<div style="line-height:1.9;">'
     + '<div>★ペン★ … 押したまま 動かすと 線が 引けます。</div>'
     + '<div>★消しゴム★ … 線の 上を なぞると その 線が 消えます。</div>'
@@ -9392,11 +9693,15 @@ function 物を描く(){
   var 出た = 0;
   for (var i = 0; i < 並び.length; i++) {
     var o = 並び[i];
-    /* ★シートの 座標 → 画面の 座標★（スクロールと 一緒に 動く） */
-    var 写し = { 種類: o.種類, x: 物の画面X(o), y: 物の画面Y(o), w: o.w, h: o.h,
-      字: o.字, 塗り: o.塗り, 線: o.線, 画像: o.画像 };
+    /* ★シートの 座標 → 画面の 座標★（スクロールと 一緒に 動く）
+     * ★写す 時は 列を 数え上げない★＝新しい 持ち物（中身・回転…）を 落とすと
+     *   画面から ★黙って 消える★。そのまま 写して x/y だけ 差し替える。 */
+    var 写し = {};
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 写し[k] = o[k];
+    写し.x = 物の画面X(o); 写し.y = 物の画面Y(o);
     if (写し.x + 写し.w < HDR_W || 写し.y + 写し.h < HDR_H) continue;   /* 見出しの 下に 隠れる分 */
-    if (SheetObjects.描く(ctx, 写し, o === 選んだ物)) 出た++;
+    var えらんでいる = (o === 選んだ物) || (えらんだ物たち.indexOf(o) >= 0);
+    if (SheetObjects.描く(ctx, 写し, えらんでいる)) 出た++;
   }
   return 出た;
 }
@@ -9561,7 +9866,7 @@ function データの取得を開く(){
     + '★ここに 並んでいるのは 今 出来る 読み口だけ★です。<br>'
     + '実Excelの「Web から」「画像から」「既存の接続」は ★まだ 出来ないので 並べていません★。</div>';
   document.getElementById('funcTitle').textContent = 'データの 取得';
-  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  窓の副題('どこから 読み込むかを 選びます');
   document.getElementById('funcBody').innerHTML = h;
   document.getElementById('funcOverlay').style.display = 'flex';
   return 出.length;
@@ -10039,7 +10344,7 @@ function アウトラインの窓を開く(){
   }
   h += '</div>';
   document.getElementById('funcTitle').textContent = 'アウトライン';
-  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  窓の副題('行や 列を たたんで 見せます');
   document.getElementById('funcBody').innerHTML = h;
   document.getElementById('funcOverlay').style.display = 'flex';
   return 出.length;
@@ -11018,6 +11323,9 @@ function 関数の窓を開く(どれ){
     題 = '財務';
   }
   document.getElementById('funcTitle').textContent = 題;
+  窓の副題('');
+  document.getElementById('funcSub').innerHTML =
+    '押すと <span id="funcWhere"></span> に 「=関数名(」まで 入ります';
   document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
   var h = '';
   if (!名たち.length) {
@@ -11188,7 +11496,7 @@ function 数式で使用の窓を開く(){
   var 一覧 = 名前の箱.全部();
   var ov = document.getElementById('funcOverlay');
   document.getElementById('funcTitle').textContent = '数式で 使用';
-  document.getElementById('funcWhere').textContent = cellAddr(selR1, selC1);
+  窓の副題('押すと ' + cellAddr(selR1, selC1) + ' の 式に その 名前が 入ります');
   var h = '';
   if (!一覧.length) {
     h = '<div style="color:#7A9A87;">まだ 名前が 1つも ありません（数式→名前の定義 で 作れます）</div>';
