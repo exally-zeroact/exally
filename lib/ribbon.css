@@ -173,12 +173,23 @@
   color: #2E7D54;
   font-weight: 700;
 }
+/* ★札は 2段まで 許す★（2026-08-30）
+   実Excel も 札を 2段で 出している。
+   ★実測★＝62pxの箱に 全角8字（アクセシビリティ）が 2段で 収まり、
+   ★帯の 高さは 112px のまま★（部品だけ 41→45px）。
+   ★語の 途中で 割らない★＝break-word と line-break:strict。 */
 .rb-lbl {
   max-width: 62px;
   text-align: center;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.15;
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-break: strict;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* ★まだ 作っていない箱★＝押せる物を 1つも 出さない（偽のボタンを 見せない） */
