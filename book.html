@@ -1304,77 +1304,78 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=18aa6431"></script>
+<script src="hyperformula.full.min.js?v=f16d6960"></script>
 
-<script src="exally-formula.js?v=18aa6431"></script>
+<script src="exally-formula.js?v=f16d6960"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=18aa6431"></script>
+<script src="js/file-out.js?v=f16d6960"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=18aa6431"></script>
-<script src="lib/grid-xlsx.js?v=18aa6431"></script>
+<script src="lib/typed-value.js?v=f16d6960"></script>
+<script src="lib/grid-xlsx.js?v=f16d6960"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=18aa6431"></script>
-<script src="lib/autosum.js?v=18aa6431"></script>
-<script src="lib/grid-sort.js?v=18aa6431"></script>
-<script src="lib/grid-filter.js?v=18aa6431"></script>
-<script src="lib/grid-find.js?v=18aa6431"></script>
-<script src="lib/grid-print.js?v=18aa6431"></script>
-<script src="lib/ai-reason.js?v=18aa6431"></script>
-<script src="lib/menu-place.js?v=18aa6431"></script>
-<script src="lib/grid-stats.js?v=18aa6431"></script>
-<script src="lib/grid-valid.js?v=18aa6431"></script>
-<script src="lib/cond-format.js?v=18aa6431"></script>
-<script src="lib/ref-graph.js?v=18aa6431"></script>
-<script src="lib/shindan.js?v=18aa6431"></script>
+  <script src="lib/grid-refedit.js?v=f16d6960"></script>
+<script src="lib/autosum.js?v=f16d6960"></script>
+<script src="lib/grid-sort.js?v=f16d6960"></script>
+<script src="lib/grid-filter.js?v=f16d6960"></script>
+<script src="lib/grid-find.js?v=f16d6960"></script>
+<script src="lib/grid-print.js?v=f16d6960"></script>
+<script src="lib/ai-reason.js?v=f16d6960"></script>
+<script src="lib/menu-place.js?v=f16d6960"></script>
+<script src="lib/grid-stats.js?v=f16d6960"></script>
+<script src="lib/grid-valid.js?v=f16d6960"></script>
+<script src="lib/cond-format.js?v=f16d6960"></script>
+<script src="lib/ref-graph.js?v=f16d6960"></script>
+<script src="lib/shindan.js?v=f16d6960"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=18aa6431"></script>
-<script src="lib/vba-mikata.js?v=18aa6431"></script>
-<script src="lib/vba-tejun.js?v=18aa6431"></script>
-<script src="lib/rireki.js?v=18aa6431"></script>
-<script src="lib/chizu.js?v=18aa6431"></script>
-<script src="lib/horu.js?v=18aa6431"></script>
-<script src="lib/excel-version.js?v=18aa6431"></script>
-<script src="lib/teian.js?v=18aa6431"></script>
-<script src="lib/kikan.js?v=18aa6431"></script>
-<script src="lib/recipe.js?v=18aa6431"></script>
-<script src="lib/kirikae.js?v=18aa6431"></script>
-<script src="js/recipe-store.js?v=18aa6431"></script>
-<script src="js/rireki-store.js?v=18aa6431"></script>
-<script src="lib/excel-version.js?v=18aa6431"></script>
+<script src="lib/vba.js?v=f16d6960"></script>
+<script src="lib/vba-mikata.js?v=f16d6960"></script>
+<script src="lib/vba-tejun.js?v=f16d6960"></script>
+<script src="lib/rireki.js?v=f16d6960"></script>
+<script src="lib/chizu.js?v=f16d6960"></script>
+<script src="lib/horu.js?v=f16d6960"></script>
+<script src="lib/excel-version.js?v=f16d6960"></script>
+<script src="lib/teian.js?v=f16d6960"></script>
+<script src="lib/kikan.js?v=f16d6960"></script>
+<script src="lib/recipe.js?v=f16d6960"></script>
+<script src="lib/kirikae.js?v=f16d6960"></script>
+<script src="js/recipe-store.js?v=f16d6960"></script>
+<script src="js/rireki-store.js?v=f16d6960"></script>
+<script src="lib/excel-version.js?v=f16d6960"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=18aa6431">
-<script src="lib/named-ranges.js?v=18aa6431"></script>
-<script src="lib/cell-styles.js?v=18aa6431"></script>
-<script src="lib/chart.js?v=18aa6431"></script>
-<script src="lib/sparkline.js?v=18aa6431"></script>
-<script src="lib/table.js?v=18aa6431"></script>
-<script src="lib/flash-fill.js?v=18aa6431"></script>
-<script src="lib/pivot.js?v=18aa6431"></script>
-<script src="lib/csv-in.js?v=18aa6431"></script>
-<script src="lib/objects.js?v=18aa6431"></script>
-<script src="lib/ink.js?v=18aa6431"></script>
-<script src="lib/view-mode.js?v=18aa6431"></script>
-<script src="lib/sheet-view.js?v=18aa6431"></script>
-<script src="lib/theme.js?v=18aa6431"></script>
-<script src="lib/diagram.js?v=18aa6431"></script>
-<script src="lib/adv-filter.js?v=18aa6431"></script>
-<script src="lib/connections.js?v=18aa6431"></script>
-<script src="lib/review.js?v=18aa6431"></script>
-<script src="lib/symbols.js?v=18aa6431"></script>
-<script src="lib/ribbon-spec.js?v=18aa6431"></script>
-<script src="lib/ribbon-actions.js?v=18aa6431"></script>
-<script src="lib/ribbon.js?v=18aa6431"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=f16d6960">
+<script src="lib/named-ranges.js?v=f16d6960"></script>
+<script src="lib/cell-styles.js?v=f16d6960"></script>
+<script src="lib/chart.js?v=f16d6960"></script>
+<script src="lib/sparkline.js?v=f16d6960"></script>
+<script src="lib/table.js?v=f16d6960"></script>
+<script src="lib/flash-fill.js?v=f16d6960"></script>
+<script src="lib/pivot.js?v=f16d6960"></script>
+<script src="lib/csv-in.js?v=f16d6960"></script>
+<script src="lib/objects.js?v=f16d6960"></script>
+<script src="lib/ink.js?v=f16d6960"></script>
+<script src="lib/view-mode.js?v=f16d6960"></script>
+<script src="lib/sheet-view.js?v=f16d6960"></script>
+<script src="lib/theme.js?v=f16d6960"></script>
+<script src="lib/diagram.js?v=f16d6960"></script>
+<script src="lib/adv-filter.js?v=f16d6960"></script>
+<script src="lib/connections.js?v=f16d6960"></script>
+<script src="lib/review.js?v=f16d6960"></script>
+<script src="lib/xml-map.js?v=f16d6960"></script>
+<script src="lib/symbols.js?v=f16d6960"></script>
+<script src="lib/ribbon-spec.js?v=f16d6960"></script>
+<script src="lib/ribbon-actions.js?v=f16d6960"></script>
+<script src="lib/ribbon.js?v=f16d6960"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=18aa6431"></script>
-<script src="js/exally-login.js?v=18aa6431"></script>
-<script src="js/auth.js?v=18aa6431"></script>
+<script src="js/supa-config.js?v=f16d6960"></script>
+<script src="js/exally-login.js?v=f16d6960"></script>
+<script src="js/auth.js?v=f16d6960"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -3046,6 +3047,335 @@ function 分割の線を描く(){
   return 出;
 }
 
+/* ═══ ★開発タブ★ XML の 対応付け・読み書き／コントロール ═══ 2026-08-30
+ *
+ *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-xml.ps1 / tools/measure-xml2.ps1
+ *    対応付けの 名前 … ★`people_対応付け`（ルート ＋ `_対応付け`）★
+ *    ★`IsExportable` は 結ぶ前 False・セルに 結んだ後 True★
+ *    ★結ぶ前に 読み込むと 断られる★
+ *      「Range.XPath.SetValue を使用して XML 要素をシートに対応付けてください。」
+ *    結んでから `Import` → ★戻り 0（成功）★／入るのは ★A1='ta' B1='20' の 1行だけ★
+ *      （何行も 入れるには 実Excel は ★表（ListObject）が 要る★）
+ *    出した XML … ★`standalone="yes"`★ と ★`xmlns:xsi=…XMLSchema-instance`★ が 付く
+ *    結んでいない セルを 直しても ★出る 中身は 変わらない★
+ *    決めの 既定 … AdjustColumnWidth=True／★AppendOnImport=False★／
+ *      PreserveColumnFilter=True／PreserveNumberFormatting=True／
+ *      SaveDataSourceDefinition=True／★ShowImportExportValidationErrors=False★
+ *    ボタン … `Button 1`／★90 × 24★／字 `ボタン 1`／つないだ マクロは ★空★
+ *    ドロップダウン … `Drop Down 2`／中の 数 2／★えらんでいる 番号は はじめ 0★
+ *
+ *  ★違う所（わざと）★
+ *    実Excel は くり返す 物を 何行も 入れるのに ★表が 要る★。
+ *    ★うちは 結んだ 道が くり返す 物なら そのまま 何行も 入れる★（人の 手間を 減らす）。
+ */
+var XMLの決め = { 木: null, 名: '', 結び: [], 元の字: '' };
+
+function XMLの窓を開く(){
+  hideCtxMenu();
+  var 入 = document.getElementById('xmlFileInput');
+  if (!入) { notify('★入り口が 見つかりません★'); return 0; }
+  入.value = '';
+  入.click();
+  return 1;
+}
+function XMLを読む(ファイル){
+  if (!ファイル) return 0;
+  var 読 = new FileReader();
+  読.onload = function () {
+    var 字 = String(読.result || '');
+    var 木 = XmlMap.木にする(字);
+    if (!木) { notify('★XML として 読めませんでした★'); return; }
+    XMLの決め.木 = 木;
+    XMLの決め.名 = XmlMap.名前を決める(木.名);
+    XMLの決め.結び = [];
+    XMLの決め.元の字 = 字;
+    XMLの道を出す();
+    notify('「' + ファイル.name + '」を 読みました（対応付け「' + XMLの決め.名 + '」）');
+  };
+  読.readAsText(ファイル, 'utf-8');
+  return 1;
+}
+function XMLの道を出す(){
+  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  var 道たち = XmlMap.道を集める(XMLの決め.木).filter(function (v) { return v.葉; });
+  document.getElementById('funcTitle').textContent = 'XML の ソース';
+  窓の副題('「' + XMLの決め.名 + '」の 中の 道（' + 道たち.length + '本）');
+  var h = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  for (var i = 0; i < 道たち.length; i++) {
+    var v = 道たち[i];
+    var 結んだ = XMLの結びを探す(v.道);
+    h += '<div style="display:flex;gap:6px;align-items:center;">'
+      + '<span style="flex:1 1 auto;font-size:12px;min-width:0;word-break:break-all;">'
+      + _esc(v.道) + (v.くり返す ? '　<b style="color:#2E7D54;">くり返す</b>' : '')
+      + (結んだ ? ('　<b>→ ' + cellAddr(結んだ.r, 結んだ.c) + '</b>') : '') + '</span>'
+      + '<button type="button" data-x="' + _esc(v.道) + '" onclick="XMLを結ぶ(this.getAttribute(\'data-x\'))"'
+      + ' style="flex:0 0 auto;min-height:38px;padding:0 12px;border:1px solid #C8ECD8;'
+      + 'background:#ffffff;color:#333333;border-radius:8px;font-size:13px;font-family:inherit;'
+      + 'cursor:pointer;">今の セルに 結ぶ</button></div>';
+  }
+  h += '<div style="display:flex;gap:6px;margin-top:8px;">'
+    + '<button type="button" onclick="XMLを読み込む()" style="flex:1;min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">インポート（入れる）</button>'
+    + '<button type="button" onclick="XMLを書き出す()" style="flex:1;min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">エクスポート（出す）</button></div>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★実Excel も 先に セルへ 結ばないと 読み込めません★'
+    + '（実測＝「Range.XPath.SetValue を使用して…」と 断られました）。<br>'
+    + '★実Excel は くり返す 物を 何行も 入れるのに 表が 要ります★。'
+    + 'うちは ★そのまま 何行も 入れます★。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 道たち.length;
+}
+function XMLの結びを探す(道){
+  for (var i = 0; i < XMLの決め.結び.length; i++) {
+    if (XMLの決め.結び[i].道 === 道) return XMLの決め.結び[i];
+  }
+  return null;
+}
+function XMLを結ぶ(道){
+  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  var 前 = XMLの結びを探す(道);
+  if (前) { 前.r = selR1; 前.c = selC1; }
+  else XMLの決め.結び.push({ 道: 道, r: selR1, c: selC1 });
+  XMLの道を出す();
+  notify(道 + ' を ' + cellAddr(selR1, selC1) + ' に 結びました');
+  return XMLの決め.結び.length;
+}
+function XMLを読み込む(){
+  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.結び.length) {
+    /* ★実Excel と 同じ 断り方★ */
+    notify('★対応付けられている 要素が ありません★＝先に「今の セルに 結ぶ」を 押してください');
+    return 0;
+  }
+  var 入 = XmlMap.読み込む(XMLの決め.木, XMLの決め.結び);
+  for (var i = 0; i < 入.length; i++) setCell(入[i].r, 入[i].c, 入[i].値);
+  render();
+  関数の窓を閉じる();
+  notify('★' + 入.length + '個★ 入れました（' + XMLの決め.結び.length + '本の 道）');
+  return 入.length;
+}
+function XMLを書き出す(){
+  if (!XmlMap.出せるか(XMLの決め.結び)) {
+    /* ★実Excel と 同じ＝結ぶ前は 出せない（IsExportable=False）★ */
+    notify('★対応付けが 出せません★（実Excel も IsExportable が False の 時は 断ります）');
+    return 0;
+  }
+  var d = sheets[activeSheet].data;
+  var 字 = XmlMap.書き出す(XMLの決め.木, XMLの決め.結び, function (r, c) {
+    var x = d[r + ',' + c];
+    if (!x) return '';
+    return (x.d !== undefined && x.d !== null && x.d !== '') ? x.d : (x.v === undefined ? '' : x.v);
+  });
+  if (!字) { notify('★出す 中身が ありません★'); return 0; }
+  FileOut.deliver(字, (XMLの決め.木 ? XMLの決め.木.名 : 'data') + '.xml', { type: 'application/xml' });
+  関数の窓を閉じる();
+  notify('XML を 書き出しました（' + 字.length + '文字）');
+  return 字.length;
+}
+function XMLの決めを見る(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = '対応付けの プロパティ';
+  窓の副題(XMLの決め.名 ? ('「' + XMLの決め.名 + '」の 決め') : 'まだ XML を 読んでいません');
+  var k = XmlMap.既定の決め;
+  var 行 = [
+    ['列の 幅を 合わせる', k.列の幅を合わせる, 'AdjustColumnWidth'],
+    ['読み込みで 下に 足す', k.読み込みで足す, 'AppendOnImport'],
+    ['絞り込みを 残す', k.絞り込みを残す, 'PreserveColumnFilter'],
+    ['書式を 残す', k.書式を残す, 'PreserveNumberFormatting'],
+    ['元の 場所を 覚える', k.元の場所を覚える, 'SaveDataSourceDefinition'],
+    ['検査の 間違いを 見せる', k.検査の間違いを見せる, 'ShowImportExportValidationErrors'],
+  ];
+  var h = '<div style="font-size:13px;line-height:1.9;">';
+  for (var i = 0; i < 行.length; i++) {
+    h += '<div style="display:flex;justify-content:space-between;border-bottom:1px solid #D4EDE1;padding:4px 0;">'
+      + '<span>' + 行[i][0] + '<span style="color:#7A9A87;font-size:11px;">（' + 行[i][2] + '）</span></span>'
+      + '<b>' + (行[i][1] ? 'する' : '★しない★') + '</b></div>';
+  }
+  h += '<div style="padding:6px 0;">結んだ 道 … <b>' + XMLの決め.結び.length + '本</b><br>'
+    + '出せるか（IsExportable） … <b>' + (XmlMap.出せるか(XMLの決め.結び) ? 'True' : '★False★') + '</b></div>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;">'
+    + '★上の 6つは 実Excel の 既定を そのまま 測った 値★です。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return XMLの決め.結び.length;
+}
+function XMLを更新(){
+  hideCtxMenu();
+  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.結び.length) {
+    notify('★対応付けられている 要素が ありません★（実Excel も 同じ 断り方でした）');
+    return 0;
+  }
+  var 入 = XmlMap.読み込む(XMLの決め.木, XMLの決め.結び);
+  for (var i = 0; i < 入.length; i++) setCell(入[i].r, 入[i].c, 入[i].値);
+  render();
+  notify('読み直しました（' + 入.length + '個）');
+  return 入.length;
+}
+function XML拡張パック(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'XML 拡張パック';
+  窓の副題('古い 仕組みです');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="font-size:13px;line-height:1.9;">'
+    + '★XML 拡張パック（スマート ドキュメント）は 古い 仕組み★で、'
+    + '今の Excel でも ほとんど 使われていません。<br>'
+    + 'うちでは ★作りません★。同じ 事は「XML の ソース」で 道を 結べば 出来ます。'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:8px;">'
+    + '★出来ない事を 出来るように 見せない★ため、ここは 正直に お知らせだけ 出します。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 0;
+}
+
+/* ── コントロール（開発→コントロール）── */
+function コントロールを挿入(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'コントロールの 挿入';
+  窓の副題('シートに 置く 部品（実測＝ボタンは 90×24）');
+  var b = function (名, 種) {
+    return '<button type="button" data-t="' + 種 + '" onclick="コントロールを置く(this.getAttribute(\'data-t\'))"'
+      + ' style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;'
+      + 'color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;'
+      + 'text-align:left;">' + 名 + '</button>';
+  };
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + b('ボタン（レシピを 動かす）', 'button')
+    + b('ドロップダウン（選ぶ）', 'dropdown')
+    + b('チェック ボックス（セルの TRUE/FALSE）', 'check')
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★実測★＝ボタンは 名前 `Button 1`・大きさ ★90 × 24★・字 `ボタン 1`・'
+    + 'つないだ マクロは ★空★。ドロップダウンの えらんでいる 番号は ★はじめ 0★。<br>'
+    + '★うちは VBA を 動かしません★ので、ボタンには ★言葉の お願い★を つなぎます。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 3;
+}
+function コントロールを置く(種){
+  if (種 === 'check') { 関数の窓を閉じる(); return チェックボックスを入れる(); }
+  var 箱 = 物の箱();
+  var o = { 種類: 'コントロール', 部品: 種,
+    w: 90, h: 24,                                  /* ★実測 90 × 24★ */
+    x: 画面から物のX(HDR_W + 40), y: 画面から物のY(HDR_H + 40), z: 箱.length + 1,
+    字: 種 === 'button' ? 'ボタン 1' : '',          /* ★実測の 字★ */
+    レシピ: '', 中身: 種 === 'dropdown' ? ['あ', 'い'] : [], 選び: 0 };
+  o.名 = SheetObjects.名前を決める(箱.map(function (x) { return x.名; }),
+    種 === 'button' ? 'ボタン' : 'ドロップダウン');
+  箱.push(o);
+  SheetObjects.順をそろえる(箱);
+  選んだ物 = o; えらんだ物たち = [o];
+  render();
+  関数の窓を閉じる();
+  notify(o.名 + ' を 置きました（' + o.w + ' × ' + o.h + '）');
+  return 1;
+}
+function コントロールのプロパティ(){
+  hideCtxMenu();
+  var o = 選んだ物;
+  if (!o || o.種類 !== 'コントロール') { notify('★コントロールを 選んでください★'); return 0; }
+  document.getElementById('funcTitle').textContent = 'コントロールの プロパティ';
+  窓の副題('「' + o.名 + '」の 決め');
+  var h = '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<div style="font-size:13px;">画面に 出す 字</div>'
+    + '<input id="ctlText" type="text" value="' + _esc(o.字 || '') + '"'
+    + ' style="min-height:44px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+    + 'border-radius:10px;padding:8px 10px;font-family:inherit;">';
+  if (o.部品 === 'button') {
+    h += '<div style="font-size:13px;">押した時に する 事（言葉で）</div>'
+      + '<input id="ctlRecipe" type="text" value="' + _esc(o.レシピ || '') + '"'
+      + ' placeholder="例: 売上の 合計を 出して（空なら 何も しない）"'
+      + ' style="min-height:44px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+      + 'border-radius:10px;padding:8px 10px;font-family:inherit;">';
+  } else {
+    h += '<div style="font-size:13px;">中身（1行に 1つ）</div>'
+      + '<textarea id="ctlItems" rows="5" style="font-size:16px;color:#333333;'
+      + 'border:1.5px solid #D4EDE1;border-radius:10px;padding:8px 10px;font-family:inherit;">'
+      + _esc((o.中身 || []).join('\n')) + '</textarea>';
+  }
+  h += '<button type="button" onclick="コントロールの決めを決める()" style="min-height:44px;'
+    + 'border:1px solid #C8ECD8;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;'
+    + 'font-family:inherit;cursor:pointer;">決める</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★実測★＝実Excel の ボタンも つないだ マクロは ★はじめ 空★でした。<br>'
+    + '★うちは VBA を 動かしません★ので、ボタンには ★言葉の お願い★を つなぎ、'
+    + '押すと ★AI に 送ります★（送り口は AI の 1つだけ）。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+function コントロールの決めを決める(){
+  var o = 選んだ物;
+  if (!o) return 0;
+  var t = document.getElementById('ctlText');
+  if (t) o.字 = String(t.value || '');
+  var r = document.getElementById('ctlRecipe');
+  if (r) o.レシピ = String(r.value || '').trim();
+  var it = document.getElementById('ctlItems');
+  if (it) {
+    o.中身 = String(it.value || '').split('\n').map(function (v) { return v.trim(); })
+      .filter(function (v) { return v; });
+    if (o.選び >= o.中身.length) o.選び = 0;
+  }
+  render();
+  関数の窓を閉じる();
+  notify('「' + o.名 + '」の 決めを 変えました');
+  return 1;
+}
+function コントロールを押す(o){
+  if (!o || o.種類 !== 'コントロール') return 0;
+  if (o.部品 === 'button') {
+    /* ★うちは VBA を 動かさない★＝ボタンには ★言葉の お願い★を つなぐ。
+       送り先は ★AI の 入り口 1つだけ★（同じ事を する 道を 2つ 作らない）。
+       ★typeof で 守らない★＝無い 物を 呼ぶ 守りは 嘘の 安全網（見張りが 赤に する）。 */
+    if (!o.レシピ) { notify('★この ボタンには まだ 何も ついていません★（プロパティで 決めます）'); return 0; }
+    notify('「' + o.レシピ + '」を AI に 送ります');
+    return AIへ送る(o.レシピ);
+  }
+  if (o.部品 === 'dropdown') {
+    if (!o.中身.length) { notify('★中身が ありません★'); return 0; }
+    o.選び = (o.選び + 1) % o.中身.length;
+    render();
+    notify('「' + o.中身[o.選び] + '」を 選びました');
+    return o.選び + 1;
+  }
+  return 0;
+}
+function コントロールを描く(ctx2, o, X, Y){
+  ctx2.save();
+  ctx2.lineWidth = 1;
+  ctx2.strokeStyle = SheetObjects.色.線;
+  ctx2.fillStyle = '#F3F8F5';
+  ctx2.fillRect(X, Y, o.w, o.h);
+  ctx2.strokeRect(X, Y, o.w, o.h);
+  ctx2.fillStyle = SheetObjects.色.字;
+  ctx2.font = '12px "Noto Sans JP",sans-serif';
+  ctx2.textBaseline = 'middle';
+  if (o.部品 === 'dropdown') {
+    ctx2.textAlign = 'left';
+    var 字 = (o.中身 && o.中身.length) ? o.中身[o.選び || 0] : '';
+    ctx2.save();
+    ctx2.beginPath(); ctx2.rect(X, Y, o.w - 18, o.h); ctx2.clip();
+    ctx2.fillText(String(字), X + 6, Y + o.h / 2);
+    ctx2.restore();
+    ctx2.beginPath();
+    ctx2.moveTo(X + o.w - 14, Y + o.h / 2 - 3);
+    ctx2.lineTo(X + o.w - 6, Y + o.h / 2 - 3);
+    ctx2.lineTo(X + o.w - 10, Y + o.h / 2 + 3);
+    ctx2.closePath(); ctx2.fill();
+  } else {
+    ctx2.textAlign = 'center';
+    ctx2.save();
+    ctx2.beginPath(); ctx2.rect(X, Y, o.w, o.h); ctx2.clip();
+    ctx2.fillText(String(o.字 || ''), X + o.w / 2, Y + o.h / 2);
+    ctx2.restore();
+  }
+  ctx2.restore();
+  return true;
+}
+
 /* ═══ ★校閲タブ★ 文章校正・見やすさ・翻訳・変更内容・共有・インク ═══ 2026-08-30
  *
  *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-review2.ps1
@@ -3760,6 +4090,7 @@ function 選んだ印を描く(x, y, w, h){
   return 1;
 }
 function 挿入した物を描く(ctx2, o, X, Y){
+  if (o.種類 === 'コントロール') return コントロールを描く(ctx2, o, X, Y);
   if (o.種類 === '図解') { 図解を描く(ctx2, o, X, Y); return true; }
   if (o.種類 === 'アイコン') { アイコンを描く(ctx2, o.絵, X, Y, o.w, o.h); return true; }
   if (o.種類 === '数式') { 数式を描く(ctx2, o.式, X, Y, o.w, o.h); return true; }
@@ -5868,6 +6199,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <!-- ★画像の 入り口★ 2026-08-30 -->
     <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="画像を読む(this)">
     <input type="file" id="bgFileInput" accept="image/*" style="display:none" onchange="背景を読み込む(this.files &amp;&amp; this.files[0])">
+    <input type="file" id="xmlFileInput" accept=".xml,text/xml,application/xml" style="display:none" onchange="XMLを読む(this.files &amp;&amp; this.files[0])">
     <button id="openBookBtn" onclick="document.getElementById('bookFileInput').click()" style="background:#F0FAF4;border:1px solid #C8ECD8;color:#3D9E72;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルを読み込む（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">📂</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelを</span>読み込む</span></button>
     <span id="openedFileLabel" style="font-size:11px;color:#3D9E72;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
     <button id="saveBookBtn" onclick="saveXlsx()" style="background:#52B788;border:1px solid #52B788;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;" title="Excelファイルとして書き出す（.xlsx / .xlsm / .xlsb）"><span class="hdr-ic">💾</span> <span class="hdr-lb"><span class="hdr-lb-long">Excelに</span>書き出す</span></button>
@@ -8892,6 +9224,8 @@ function onMD(e){
   if(_o){
     /* ★Ctrl を 押しながらなら 選んだ物に 足す★（そろえる・まとめる の ため） */
     if(e.ctrlKey || e.metaKey){ 物を選び足す(_o); render(); return; }
+      /* ★コントロールは 押せる★（ボタン＝レシピ／ドロップダウン＝次の 中身） */
+      if (_o.種類 === 'コントロール') { 選んだ物 = _o; えらんだ物たち = [_o]; コントロールを押す(_o); return; }
     選んだ物 = _o;
     えらんだ物たち = [_o];
     var _sx = 画面から物のX(p.x), _sy = 画面から物のY(p.y);
