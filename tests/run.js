@@ -45,7 +45,11 @@ const FILES = [
   ['csv-in.test.mjs', '--self-test'],        /* ★CSV読み込み＝実測どおり（"…"の中のカンマ・""・中の改行）／化けたらShift_JIS★ */
   ['objects.test.mjs', '--self-test'],       /* ★浮かぶ物（画像・図形・テキスト）＝形の番号と重なりは実測・色は写さない★ */
   ['ink.test.mjs', '--self-test'],           /* ★描画（手書き）＝ペンの色と太さは 正本の 項目名どおり／線もシートの座標★ */
-  ['arrange.test.mjs', '--self-test'],       /* ★配置・回転・まとめる＋拡大縮小印刷＝そろえた後の 数は 実測どおり／倍率は 紙に 本当に 効く★ */
+  ['arrange.test.mjs', '--self-test'],
+  ['view-window.test.mjs', '--self-test'],
+  ['no-missing-call.test.mjs', '--self-test'],
+  ['theme.test.mjs', '--self-test'],
+  ['boolean.test.mjs', '--self-test'],       /* ★TRUE/FALSEは大文字で出す／SUMは足さない・＋は数になる（実Excel実測）★ */         /* ★テーマ＝12の役割・濃淡は実Excelと15/15一致（0〜240で切り捨て）／色は写さない★ */ /* ★呼んでいるのに 無い 働きを 機械で 探す（08-30 colName 事故）★ */ /* ★表示タブ＝表示の番号1/2/3・分割はPanes4・窓の名前は空白2つ／紙の切れ目は列8で実Excelと同じ★ */       /* ★配置・回転・まとめる＋拡大縮小印刷＝そろえた後の 数は 実測どおり／倍率は 紙に 本当に 効く★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

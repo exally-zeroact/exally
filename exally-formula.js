@@ -59,6 +59,10 @@ function _hfGetDisplay(sheet, r, c, 式のセルか) {
     var val = _hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
     if(val===null||val===undefined) return 式のセルか ? '0' : '';
     if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
+    /* ★はい/いいえは 大文字★（実Excel 実測 2026-08-30＝Range.Text が "TRUE"/"FALSE"）。
+       String(true) は "true" に なるので ★ここで 直す★。
+       ★出口は この 1か所★＝画面も 紙も 書き出しも 同じ 字に なる。 */
+    if(typeof val==='boolean') return val ? 'TRUE' : 'FALSE';
     return String(val);
   } catch(e) { return '#ERR'; }
 }
