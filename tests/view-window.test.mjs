@@ -219,8 +219,9 @@ console.log('\n[⑧-2 ★下の 帯が シートのタブに 隠れていない�
       String(中.indexOf("display = 'flex'")) + ' < ' + String(中.indexOf('帯を下の上に置く(帯);')));
   }
   ok('★積む 部品が 在る★', !!抜く('帯たちを並べる'));
-  ok('★下から paperBar → viewBar → winBar の 順★',
-    /\['paperBar', 'viewBar', 'winBar'\]/.test(抜く('帯たちを並べる') || ''));
+  /* 08-30：データタブの connBar を 足したので 4本 */
+  ok('★下から paperBar → viewBar → winBar → connBar の 順★',
+    /\['paperBar', 'viewBar', 'winBar', 'connBar'\]/.test(抜く('帯たちを並べる') || ''));
   ok('★出ていない 帯は 積まない★',
     /getComputedStyle\(e\)\.display === 'none'\) continue;/.test(抜く('帯たちを並べる') || ''));
   ok('★AIの 札に かぶらないよう 右を 空ける★',
@@ -231,9 +232,13 @@ console.log('\n[⑧-2 ★下の 帯が シートのタブに 隠れていない�
     /getElementById\('ai-float-btn'\)/.test(抜く('AIの札の幅') || ''));
   ok('★下に 居ない 時は 押さない★',
     /r\.bottom < innerHeight - 160\) return 0;/.test(抜く('AIの札の幅') || ''));
-  ok('★消した 時も 並べ直す★',
-    (book.match(/帯\.style\.display = 'none'; 帯たちを並べる\(\); return 0;/g) || []).length === 3,
-    String((book.match(/帯\.style\.display = 'none'; 帯たちを並べる\(\); return 0;/g) || []).length));
+  /* ★帯を 1本 足したら ここも 増える★＝消す 所で 並べ直さないと 下に 穴が あく */
+  {
+    const 並 = (抜く('帯たちを並べる') || '').match(/'[a-zA-Z]+Bar'/g) || [];
+    const 消 = (book.match(/帯\.style\.display = 'none'; 帯たちを並べる\(\); return 0;/g) || []).length;
+    ok('★帯の 本数と「消した時に 並べ直す」所の 数が 合っている★',
+      並.length === 消 && 並.length >= 3, '帯 ' + 並.length + '本 / 消す所 ' + 消 + 'か所');
+  }
 }
 
 console.log('\n[⑨ リボンから 押せる]');

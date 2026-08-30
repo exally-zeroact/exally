@@ -1304,74 +1304,76 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=25194926"></script>
+<script src="hyperformula.full.min.js?v=47119d63"></script>
 
-<script src="exally-formula.js?v=25194926"></script>
+<script src="exally-formula.js?v=47119d63"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=25194926"></script>
+<script src="js/file-out.js?v=47119d63"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=25194926"></script>
-<script src="lib/grid-xlsx.js?v=25194926"></script>
+<script src="lib/typed-value.js?v=47119d63"></script>
+<script src="lib/grid-xlsx.js?v=47119d63"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=25194926"></script>
-<script src="lib/autosum.js?v=25194926"></script>
-<script src="lib/grid-sort.js?v=25194926"></script>
-<script src="lib/grid-filter.js?v=25194926"></script>
-<script src="lib/grid-find.js?v=25194926"></script>
-<script src="lib/grid-print.js?v=25194926"></script>
-<script src="lib/ai-reason.js?v=25194926"></script>
-<script src="lib/menu-place.js?v=25194926"></script>
-<script src="lib/grid-stats.js?v=25194926"></script>
-<script src="lib/grid-valid.js?v=25194926"></script>
-<script src="lib/cond-format.js?v=25194926"></script>
-<script src="lib/ref-graph.js?v=25194926"></script>
-<script src="lib/shindan.js?v=25194926"></script>
+  <script src="lib/grid-refedit.js?v=47119d63"></script>
+<script src="lib/autosum.js?v=47119d63"></script>
+<script src="lib/grid-sort.js?v=47119d63"></script>
+<script src="lib/grid-filter.js?v=47119d63"></script>
+<script src="lib/grid-find.js?v=47119d63"></script>
+<script src="lib/grid-print.js?v=47119d63"></script>
+<script src="lib/ai-reason.js?v=47119d63"></script>
+<script src="lib/menu-place.js?v=47119d63"></script>
+<script src="lib/grid-stats.js?v=47119d63"></script>
+<script src="lib/grid-valid.js?v=47119d63"></script>
+<script src="lib/cond-format.js?v=47119d63"></script>
+<script src="lib/ref-graph.js?v=47119d63"></script>
+<script src="lib/shindan.js?v=47119d63"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=25194926"></script>
-<script src="lib/vba-mikata.js?v=25194926"></script>
-<script src="lib/vba-tejun.js?v=25194926"></script>
-<script src="lib/rireki.js?v=25194926"></script>
-<script src="lib/chizu.js?v=25194926"></script>
-<script src="lib/horu.js?v=25194926"></script>
-<script src="lib/excel-version.js?v=25194926"></script>
-<script src="lib/teian.js?v=25194926"></script>
-<script src="lib/kikan.js?v=25194926"></script>
-<script src="lib/recipe.js?v=25194926"></script>
-<script src="lib/kirikae.js?v=25194926"></script>
-<script src="js/recipe-store.js?v=25194926"></script>
-<script src="js/rireki-store.js?v=25194926"></script>
-<script src="lib/excel-version.js?v=25194926"></script>
+<script src="lib/vba.js?v=47119d63"></script>
+<script src="lib/vba-mikata.js?v=47119d63"></script>
+<script src="lib/vba-tejun.js?v=47119d63"></script>
+<script src="lib/rireki.js?v=47119d63"></script>
+<script src="lib/chizu.js?v=47119d63"></script>
+<script src="lib/horu.js?v=47119d63"></script>
+<script src="lib/excel-version.js?v=47119d63"></script>
+<script src="lib/teian.js?v=47119d63"></script>
+<script src="lib/kikan.js?v=47119d63"></script>
+<script src="lib/recipe.js?v=47119d63"></script>
+<script src="lib/kirikae.js?v=47119d63"></script>
+<script src="js/recipe-store.js?v=47119d63"></script>
+<script src="js/rireki-store.js?v=47119d63"></script>
+<script src="lib/excel-version.js?v=47119d63"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=25194926">
-<script src="lib/named-ranges.js?v=25194926"></script>
-<script src="lib/cell-styles.js?v=25194926"></script>
-<script src="lib/chart.js?v=25194926"></script>
-<script src="lib/sparkline.js?v=25194926"></script>
-<script src="lib/table.js?v=25194926"></script>
-<script src="lib/flash-fill.js?v=25194926"></script>
-<script src="lib/pivot.js?v=25194926"></script>
-<script src="lib/csv-in.js?v=25194926"></script>
-<script src="lib/objects.js?v=25194926"></script>
-<script src="lib/ink.js?v=25194926"></script>
-<script src="lib/view-mode.js?v=25194926"></script>
-<script src="lib/sheet-view.js?v=25194926"></script>
-<script src="lib/theme.js?v=25194926"></script>
-<script src="lib/diagram.js?v=25194926"></script>
-<script src="lib/symbols.js?v=25194926"></script>
-<script src="lib/ribbon-spec.js?v=25194926"></script>
-<script src="lib/ribbon-actions.js?v=25194926"></script>
-<script src="lib/ribbon.js?v=25194926"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=47119d63">
+<script src="lib/named-ranges.js?v=47119d63"></script>
+<script src="lib/cell-styles.js?v=47119d63"></script>
+<script src="lib/chart.js?v=47119d63"></script>
+<script src="lib/sparkline.js?v=47119d63"></script>
+<script src="lib/table.js?v=47119d63"></script>
+<script src="lib/flash-fill.js?v=47119d63"></script>
+<script src="lib/pivot.js?v=47119d63"></script>
+<script src="lib/csv-in.js?v=47119d63"></script>
+<script src="lib/objects.js?v=47119d63"></script>
+<script src="lib/ink.js?v=47119d63"></script>
+<script src="lib/view-mode.js?v=47119d63"></script>
+<script src="lib/sheet-view.js?v=47119d63"></script>
+<script src="lib/theme.js?v=47119d63"></script>
+<script src="lib/diagram.js?v=47119d63"></script>
+<script src="lib/adv-filter.js?v=47119d63"></script>
+<script src="lib/connections.js?v=47119d63"></script>
+<script src="lib/symbols.js?v=47119d63"></script>
+<script src="lib/ribbon-spec.js?v=47119d63"></script>
+<script src="lib/ribbon-actions.js?v=47119d63"></script>
+<script src="lib/ribbon.js?v=47119d63"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=25194926"></script>
-<script src="js/exally-login.js?v=25194926"></script>
-<script src="js/auth.js?v=25194926"></script>
+<script src="js/supa-config.js?v=47119d63"></script>
+<script src="js/exally-login.js?v=47119d63"></script>
+<script src="js/auth.js?v=47119d63"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2904,7 +2906,7 @@ function AIの札の幅(){
 function 帯たちを並べる(){
   var 下 = document.querySelector('.bottom-stack');
   var 積 = 下 ? Math.round(下.getBoundingClientRect().height) : 0;
-  var 順 = ['paperBar', 'viewBar', 'winBar'];   /* 下から この 順で 積む */
+  var 順 = ['paperBar', 'viewBar', 'winBar', 'connBar'];   /* 下から この 順で 積む */
   var 出た = 0;
   for (var i = 0; i < 順.length; i++) {
     var e = document.getElementById(順[i]);
@@ -3041,6 +3043,262 @@ function 分割の線を描く(){
   }
   ctx.restore();
   return 出;
+}
+
+/* ═══ ★データタブ★ 詳細設定・クエリと接続 ═══════════════ 2026-08-30
+ *
+ *  ★真値（実Excel 16.0 で 実測）★ … tools/measure-data3.ps1
+ *    詳細設定（A1:A5＝見出し「名前」／あ・い・あ・う）
+ *      条件あり(名前=あ)＋重複残す … ★3行★（見出し＋あ＋あ）
+ *      条件あり＋重複除く         … ★2行★
+ *      条件なし＋重複除く         … ★4行★（見出し＋あ・い・う）
+ *      条件なし＋重複残す         … ★5行★
+ *      ★見出しは いつも 付く★
+ *    つなぎ … Connections も Queries も はじめ ★0★／`RefreshAll` は 0でも 通る
+ *    外の ブック … 式を 書くと `LinkSources` が ★1件★（`C:\ない\ないブック.xlsx`）
+ *      その セルの 答えは ★`#REF!`★
+ *
+ *  ★出来ない事は 出来ないと 書く★
+ *    ブラウザは ★人が 選んだ ファイルしか 読めない★（場所を 覚えて 勝手に 開けない）
+ *    ⇒ 更新は ★もう一度 選んでもらう★。画面に そう 書く。
+ *    「画像から」「株式・通貨・地理」は ★まだ★（読み取りと 外の サービスが 要る）。
+ */
+var つなぎたち = [];          /* クエリと接続の 台帳 */
+
+/* ── 詳細設定（フィルター オプション）── */
+function 詳細設定を開く(){
+  hideCtxMenu();
+  var rng = _表の範囲();
+  document.getElementById('funcTitle').textContent = '詳細設定（フィルター）';
+  窓の副題('元の 表 ' + cellAddr(rng.r1, rng.c1) + ':' + cellAddr(rng.r2, rng.c2)
+    + '（1行目を 見出しに します）');
+  document.getElementById('funcBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<div style="font-size:13px;">条件の 表（見出しと 同じ 字を 1行目に）</div>'
+    + '<input id="advCrit" type="text" placeholder="例: C1:C2（空なら 条件なし）"'
+    + ' style="min-height:44px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+    + 'border-radius:10px;padding:8px 10px;font-family:inherit;">'
+    + '<div style="font-size:13px;">出す 所（左上の セル）</div>'
+    + '<input id="advTo" type="text" placeholder="例: E1"'
+    + ' style="min-height:44px;font-size:16px;color:#333333;border:1.5px solid #D4EDE1;'
+    + 'border-radius:10px;padding:8px 10px;font-family:inherit;">'
+    + '<label style="display:flex;align-items:center;gap:8px;font-size:14px;min-height:44px;">'
+    + '<input id="advUniq" type="checkbox" style="width:20px;height:20px;">重複する 行は 1つに する</label>'
+    + '<button type="button" onclick="詳細設定を実行()" style="min-height:44px;border:1px solid #C8ECD8;'
+    + 'background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-family:inherit;'
+    + 'cursor:pointer;">出す</button>'
+    + '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★条件の 書き方は 実Excel と 同じ★ … <b>&gt;100</b> / <b>&lt;=5</b> / <b>&lt;&gt;あ</b> / <b>あ*</b><br>'
+    + '★同じ 行に 並べた 条件は「かつ」／行を 変えた 条件は「または」★<br>'
+    + '★見出しは いつも 付きます★（実Excel も 同じ＝実物で 4通り 測りました）。</div></div>';
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 1;
+}
+function _範囲を配列にする(rng){
+  var 出 = [];
+  var data = sheets[activeSheet].data;
+  for (var r = rng.r1; r <= rng.r2; r++) {
+    var 行 = [];
+    for (var c = rng.c1; c <= rng.c2; c++) {
+      var x = data[r + ',' + c];
+      行.push(x ? (x.d !== undefined && x.d !== null ? x.d : x.v) : '');
+    }
+    出.push(行);
+  }
+  return 出;
+}
+function _字を範囲に(字){
+  var m = /^\s*([A-Za-z]+)(\d+)\s*:\s*([A-Za-z]+)(\d+)\s*$/.exec(String(字 || ''));
+  if (m) {
+    return { r1: parseInt(m[2], 10) - 1, c1: letterToCol(m[1]),
+             r2: parseInt(m[4], 10) - 1, c2: letterToCol(m[3]) };
+  }
+  var m2 = /^\s*([A-Za-z]+)(\d+)\s*$/.exec(String(字 || ''));
+  if (m2) {
+    var r = parseInt(m2[2], 10) - 1, c = letterToCol(m2[1]);
+    return { r1: r, c1: c, r2: r, c2: c };
+  }
+  return null;
+}
+function 詳細設定を実行(){
+  var 条字 = document.getElementById('advCrit');
+  var 先字 = document.getElementById('advTo');
+  var 重複 = document.getElementById('advUniq');
+  if (!先字) return 0;
+  var 先 = _字を範囲に(先字.value);
+  if (!先) { notify('★出す 所を A1 の ように 書いてください★'); return 0; }
+  var 元 = _範囲を配列にする(_表の範囲());
+  if (元.length < 2) { notify('★元の 表が 見出しだけです★'); return 0; }
+  var 条 = null;
+  if (String(条字.value || '').trim()) {
+    var 条範 = _字を範囲に(条字.value);
+    if (!条範) { notify('★条件の 表を C1:C2 の ように 書いてください★'); return 0; }
+    条 = _範囲を配列にする(条範);
+  }
+  var 出 = AdvFilter.絞る(元, 条, !!(重複 && 重複.checked));
+  for (var r = 0; r < 出.length; r++) {
+    for (var c = 0; c < 出[r].length; c++) {
+      setCell(先.r1 + r, 先.c1 + c, 出[r][c]);
+    }
+  }
+  render();
+  関数の窓を閉じる();
+  notify('★' + 出.length + '行★ 出しました（見出し ＋ ' + (出.length - 1) + '行）');
+  return 出.length;
+}
+
+/* ── クエリと接続 ── */
+function 表から接続を作る(){
+  hideCtxMenu();
+  var rng = _表の範囲();
+  var 中身 = _範囲を配列にする(rng);
+  if (中身.length < 2) { notify('★表を 選んでください★'); return 0; }
+  var v = Connections.足す(つなぎたち, 'range',
+    sheets[activeSheet].name + ' の 表',
+    sheets[activeSheet].name + '!' + cellAddr(rng.r1, rng.c1) + ':' + cellAddr(rng.r2, rng.c2),
+    中身);
+  v.置き場 = { シート: sheets[activeSheet].name, r: rng.r1, c: rng.c1, r2: rng.r2, c2: rng.c2 };
+  接続の帯を出す();
+  notify('つなぎ「' + v.名 + '」を 作りました（' + v.行数 + '行 × ' + v.列数 + '列）');
+  return つなぎたち.length;
+}
+function 接続の窓を開く(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = 'クエリと接続';
+  窓の副題('どこから 持ってきたか（' + つなぎたち.length + '件）');
+  var h = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  if (!つなぎたち.length) {
+    h += '<div style="color:#7A9A87;">まだ 1件も ありません。'
+      + '「テーブルまたは範囲から」や「CSVを 読み込む」で 増えます。</div>';
+  } else {
+    for (var i = 0; i < つなぎたち.length; i++) {
+      var v = つなぎたち[i];
+      h += '<div style="border:1px solid #C8ECD8;border-radius:10px;padding:8px 10px;">'
+        + '<div style="font-size:14px;font-weight:700;color:#2E7D54;">' + _esc(v.名) + '</div>'
+        + '<div style="font-size:12px;color:#7A9A87;line-height:1.7;">'
+        + _esc(v.元) + '<br>' + v.行数 + '行 × ' + v.列数 + '列　更新 ' + v.更新回数 + '回<br>'
+        + _esc(Connections.更新の説明(v.種)) + '</div>'
+        + '<div style="display:flex;gap:6px;margin-top:6px;">'
+        + '<button type="button" data-n="' + _esc(v.名) + '" onclick="接続を更新(this.getAttribute(\'data-n\'))"'
+        + ' style="flex:1;min-height:38px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;'
+        + 'border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">更新</button>'
+        + '<button type="button" data-n="' + _esc(v.名) + '" onclick="接続を消す(this.getAttribute(\'data-n\'))"'
+        + ' style="flex:0 0 auto;min-height:38px;padding:0 12px;border:1px solid #C8ECD8;background:#ffffff;'
+        + 'color:#333333;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;">消す</button>'
+        + '</div></div>';
+    }
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:4px;">'
+    + '★ブラウザは 前に 選んだ ファイルを 勝手に 開けません★。'
+    + 'ファイルから 来た つなぎの 更新は ★もう一度 選んでもらいます★。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return つなぎたち.length;
+}
+function 接続を更新(名){
+  var v = Connections.探す(つなぎたち, 名);
+  if (!v) { notify('★見つかりません★'); return 0; }
+  if (v.種 === 'range' && v.置き場) {
+    var 中身 = _範囲を配列にする({ r1: v.置き場.r, c1: v.置き場.c, r2: v.置き場.r2, c2: v.置き場.c2 });
+    v.行数 = 中身.length; v.列数 = 中身[0] ? 中身[0].length : 0;
+    v.更新回数++;
+    接続の窓を開く();
+    notify('「' + 名 + '」を 数え直しました（' + v.行数 + '行）');
+    return v.行数;
+  }
+  if (v.種 === 'csv') {
+    関数の窓を閉じる();
+    notify('★ブラウザは 前の ファイルを 開けません★＝もう一度 選んでください');
+    CSVの窓を開く();
+    return 0;
+  }
+  notify('★この つなぎは まだ 更新できません★（' + v.種 + '）');
+  return 0;
+}
+function 接続を消す(名){
+  var 消えた = Connections.消す(つなぎたち, 名);
+  接続の帯を出す();
+  接続の窓を開く();
+  notify(消えた ? ('「' + 名 + '」を 消しました') : '★見つかりません★');
+  return 消えた ? 1 : 0;
+}
+function すべて更新(){
+  hideCtxMenu();
+  if (!つなぎたち.length) {
+    /* ★実測＝つなぎが 0でも RefreshAll は 通る（何も 起きない）★ */
+    notify('つなぎは 1件も ありません（何も しませんでした）');
+    return 0;
+  }
+  var 数 = 0;
+  for (var i = 0; i < つなぎたち.length; i++) {
+    var v = つなぎたち[i];
+    if (v.種 !== 'range' || !v.置き場) continue;
+    var 中身 = _範囲を配列にする({ r1: v.置き場.r, c1: v.置き場.c, r2: v.置き場.r2, c2: v.置き場.c2 });
+    v.行数 = 中身.length; v.列数 = 中身[0] ? 中身[0].length : 0;
+    v.更新回数++; 数++;
+  }
+  var 残 = つなぎたち.length - 数;
+  接続の帯を出す();
+  notify(数 + '件を 数え直しました'
+    + (残 ? ('／★残り ' + 残 + '件は ファイルを もう一度 選んでください★') : ''));
+  return 数;
+}
+function 接続のプロパティ(){
+  hideCtxMenu();
+  document.getElementById('funcTitle').textContent = '接続の プロパティ';
+  窓の副題('つなぎの 細かい 中身（' + つなぎたち.length + '件）');
+  var h = '<div style="font-size:13px;line-height:1.9;">';
+  if (!つなぎたち.length) h += '<div style="color:#7A9A87;">まだ 1件も ありません。</div>';
+  for (var i = 0; i < つなぎたち.length; i++) {
+    var v = つなぎたち[i];
+    h += '<div style="border-bottom:1px solid #D4EDE1;padding:6px 0;">'
+      + '<b>' + _esc(v.名) + '</b><br>'
+      + '種類 … ' + _esc(v.種) + '<br>'
+      + '元 … ' + _esc(v.元) + '<br>'
+      + '大きさ … ' + v.行数 + '行 × ' + v.列数 + '列<br>'
+      + '更新した 回数 … ' + v.更新回数 + '<br>'
+      + '押すだけで 更新 … ' + (Connections.更新できるか(v.種) ? '★出来る★' : '★出来ない★')
+      + '</div>';
+  }
+  h += '</div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return つなぎたち.length;
+}
+function ブックのリンクを見る(){
+  hideCtxMenu();
+  var 式たち = [];
+  for (var i = 0; i < sheets.length; i++) {
+    var d = sheets[i].data;
+    for (var k in d) {
+      if (Object.prototype.hasOwnProperty.call(d, k) && d[k] && d[k].f) 式たち.push(d[k].f);
+    }
+  }
+  var 外 = Connections.外のブックを探す(式たち);
+  document.getElementById('funcTitle').textContent = 'ブックのリンク';
+  窓の副題('外の ブックを 指している 式（' + 外.length + '件）');
+  var h = '<div style="font-size:13px;line-height:1.9;">';
+  if (!外.length) {
+    h += '<div style="color:#7A9A87;">外の ブックを 指す 式は ありません。</div>';
+  } else {
+    for (var j = 0; j < 外.length; j++) h += '<div>・' + _esc(外[j]) + '</div>';
+  }
+  h += '<div style="color:#7A9A87;font-size:12px;line-height:1.7;margin-top:8px;">'
+    + '★実Excel も 外の ブックが 無いと そのセルは <b>#REF!</b> に なります★（実測）。<br>'
+    + 'うちは 外の ブックを 開けないので ★指している 事だけ★ お知らせします。</div></div>';
+  document.getElementById('funcBody').innerHTML = h;
+  document.getElementById('funcOverlay').style.display = 'flex';
+  return 外.length;
+}
+function 接続の帯を出す(){
+  var 帯 = document.getElementById('connBar');
+  if (!帯) return 0;
+  if (!つなぎたち.length) { 帯.style.display = 'none'; 帯たちを並べる(); return 0; }
+  document.getElementById('connBarText').textContent =
+    'つなぎ ' + つなぎたち.length + '件（' + つなぎたち.map(function (v) { return v.名; }).join('・') + '）';
+  帯.style.display = 'flex';
+  帯を下の上に置く(帯);
+  return つなぎたち.length;
 }
 
 /* ═══ ★挿入タブ★ 図解（SmartArt）・アイコン・数式・チェックボックス ═══ 2026-08-30
@@ -5836,6 +6094,14 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <button onclick="拡大縮小を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
     </div>
   </div>
+</div>
+<div id="connBar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:57;
+  align-items:center;gap:10px;padding:8px 14px;background:#F3EEFB;border-top:1px solid #D9CDEF;
+  font-size:12px;color:#333333;">
+  <span id="connBarText" style="flex:1 1 auto;min-width:0;">—</span>
+  <button type="button" onclick="すべて更新()" style="flex:0 0 auto;min-height:32px;padding:0 12px;
+    border:1px solid #D9CDEF;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;
+    font-family:inherit;cursor:pointer;">すべて更新</button>
 </div>
 <div id="viewBar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:59;
   align-items:center;gap:10px;padding:8px 14px;background:#FFF6E5;border-top:1px solid #F0DCB4;
