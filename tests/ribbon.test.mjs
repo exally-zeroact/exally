@@ -204,6 +204,38 @@ ok('★起動時に 描いている★', /Ribbon\.描く/.test(book));
 
 /* ── 数を 出す ─────────────────────────────── */
 const n = SPEC.数える();
+/* ═══ ★画面の 中で 「触ってから でないと 動かない」物を 探す★ 2026-08-30 ═══
+ *  ★実ブラウザで 見つけた 事故★
+ *    `onfocus` で 入れた 変数を `onblur` が そのまま 使っていた。
+ *    リボンの「字を大きく」は ★触らずに blur を 呼ぶ★ので
+ *    `window._fsCell[0]` が ★undefined[0]★ に なり ★落ちた★。
+ *  ⇒ ★onblur / onchange の 中で 使う window の 覚え書きは
+ *     「入っていなければ 今の 選び」に 落とす★ こと。
+ */
+{
+  const 行 = book.split(String.fromCharCode(10));
+  const あぶない = [];
+  for (let i = 0; i < 行.length; i++) {
+    const l = 行[i];
+    if (!/onblur=|onchange=/.test(l)) continue;
+    /* window.〈名〉[0] の ように 添え字を そのまま 取っている物 */
+    const m = l.match(/window\.(_[A-Za-z0-9_]+)\[/g);
+    if (!m) continue;
+    for (const g of m) {
+      const 名 = g.replace('window.', '').replace('[', '');
+      /* 同じ 行で 「無ければ こうする」を 書いているか
+         ★正規表現に すると 逃がしの `\\.` が 素の 字に なり、
+         `|` だけの 空の 選択肢が 出来て ★何でも 通して しまう★。
+         （08-30 実測＝これで 見張りが 1件も 拾えていなかった）
+         ⇒ ★字を そのまま 探す★。 */
+      const 逃 = l.replace(/\s+/g, '');
+      if (逃.indexOf('window.' + 名 + '||') >= 0) continue;
+      あぶない.push((i + 1) + ': ' + 名 + ' … ' + l.trim().slice(0, 70));
+    }
+  }
+  ok('★触ってから でないと 動かない 覚え書きが 0個★', あぶない.length === 0, あぶない.join(' / '));
+}
+
 console.log('\n  ── 今の数 ──');
 console.log('  Excelの部品 … ' + n.全 + '個 ／ ★うちに 在る … ' + n.有 + '個★ ／ まだ … ' + n.無 + '個');
 

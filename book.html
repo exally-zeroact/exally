@@ -8380,9 +8380,12 @@ window.addEventListener('load',updateBookVerBadge);
   <button class="fmt-btn fmt-btn-s" id="fmt-strike"    onclick="toggleFormat('strike')"    title="取り消し線">S</button>
   <div class="fmt-sep"></div>
   <!-- フォントサイズ -->
+  <!-- ★_fsCell は onfocus で しか 入らない★＝リボンの「字を大きく」は 触らずに
+       blur を 呼ぶので ★undefined[0] で 落ちていた★（2026-08-30 実ブラウザで 見つけた）。
+       ⇒ ★入っていなければ 今 選んでいる セル★を 使う。 -->
   <input id="fmt-font-size" type="number" value="12" min="6" max="72" title="フォントサイズ"
     onfocus="window._fsCell=[selR1,selC1]; this.select()"
-    onblur="(function(el){var r=window._fsCell[0],cc=window._fsCell[1],sz=parseInt(el.value)||12;if(!window._toolbarUpdating){var k=r+','+cc;if(!sheets[activeSheet].data[k])sheets[activeSheet].data[k]={v:'',f:'',d:''};sheets[activeSheet].data[k].fontSize=sz;render();updateBar();}})(this)"
+    onblur="(function(el){var _fc=window._fsCell||[selR1,selC1];var r=_fc[0],cc=_fc[1],sz=parseInt(el.value)||12;if(!window._toolbarUpdating){var k=r+','+cc;if(!sheets[activeSheet].data[k])sheets[activeSheet].data[k]={v:'',f:'',d:''};sheets[activeSheet].data[k].fontSize=sz;render();updateBar();}})(this)"
     ontouchend="event.stopPropagation()">
   <div class="fmt-sep"></div>
   <!-- 文字色（パレット選択ポップオーバー） -->
@@ -15307,7 +15310,14 @@ function openColorPalette(evt, target){
   var pal=document.getElementById('colorPalette');
   if(!pal) return;
   _paletteTarget = target || 'color';
-  var rect=evt.currentTarget.getBoundingClientRect();
+  /* ★リボンから 押すと 出来事（event）が 無い★＝そのまま だと
+     `evt.currentTarget` で 落ちる（08-30 実測＝塗りつぶしの色・フォントの色）。
+     ⇒ ★出来事が 無い時は 画面の 色の 印を 目印に する★。 */
+  var _もと = (evt && evt.currentTarget) ? evt.currentTarget
+    : (document.getElementById(_paletteTarget === 'bgColor' ? 'fmt-bg-icon' : 'fmt-color-icon')
+       || document.getElementById('fmt-font-size'));
+  if(!_もと){ notify('★色を 出す 所が 見つかりません★'); return; }
+  var rect=_もと.getBoundingClientRect();
   pal.style.left=Math.max(8, rect.left)+'px';
   pal.style.top=(rect.bottom+4)+'px';
   pal.style.display='block';
@@ -16533,8 +16543,14 @@ function openRireki(どこから){
   if(!ov) return;
   ov.style.display = 'flex';
   _rirekiShurui = '';
-  /* ★開いた時は いつも「今のファイル」から★（前に「ぜんぶ」を押していても 持ち越さない） */
-  _rirekiFile = ((BookOpen.current() || {}).name) || '';
+  /* ★開いた時は いつも「今のファイル」から★（前に「ぜんぶ」を押していても 持ち越さない）
+     ★BookOpen は 後から 読み込む★ので まだ 来ていない 事が 在る
+     （08-30 実測＝リボンの「履歴」を 押すと `BookOpen is not defined` で 落ちた）。
+     ⇒ ★黙って 素通りしない★＝まだ 来ていない 時は
+       「ぜんぶ」で 出して ★そう 画面に 書く★（OPTIONAL_FNS に 理由つきで 載せた）。 */
+  var _bo = (typeof BookOpen !== 'undefined') ? BookOpen : null;
+  _rirekiFile = _bo ? (((_bo.current() || {}).name) || '') : '';
+  window._rirekiまだ = !_bo;
   履歴を読み直す(どこから);
 }
 function closeRireki(){ var ov = document.getElementById('rkOverlay'); if(ov) ov.style.display='none'; }
@@ -16562,7 +16578,9 @@ function 履歴を描く(行たち, opt){
     /* ★どのファイルの分を 出しているかを 必ず言う★（黙って混ぜない・黙って絞らない） */
     note.textContent = (_rirekiFile ? ('「' + _rirekiFile + '」の分 ') : '')
       + r.件数 + '件'
-      + (opt.倉庫 === false ? '（この画面の中だけです。ログインすると 残ります）' : '');
+      + (opt.倉庫 === false ? '（この画面の中だけです。ログインすると 残ります）' : '')
+      /* ★どのファイルか まだ 分からない時は そう 言う★（黙って「ぜんぶ」に しない） */
+      + (window._rirekiまだ ? '　★ファイルの 名前が まだ 分からないので ぜんぶ 出しています★' : '');
   }
   /* ★ブックを開いている時は その ファイルの分だけ★（司さん 2026-08-26
        「このタブに全部だしてどうするんど。ブック開いてからの画面なら そのファイルに限る方が
@@ -17841,7 +17859,8 @@ var REQUIRED_FNS = [
 /* ★本当に任意＝外部ライブラリの版で有無が変わる物だけ。理由を書く★ */
 var OPTIONAL_FNS = {
   'HyperFormula.getRegisteredFunctionNames': '版によって無い。関数一覧を出せないだけで、計算は動く',
-  'hf.isCellPartOfArray': '版によって無い。配列の式かどうかの判定が落ちるだけ（警告が出ないだけ）'
+  'hf.isCellPartOfArray': '版によって無い。配列の式かどうかの判定が落ちるだけ（警告が出ないだけ）',
+  'BookOpen.current': '★後から 読み込む（_loadScript）★ので 開いた直後は 未着。無い時は 履歴を「ぜんぶ」で出し、画面にそう書く'
 };
 /* ★グローバルではなく「引数」として渡ってくる物★（呼ぶ側が渡さない事がある） */
 var PARAM_FNS = {
