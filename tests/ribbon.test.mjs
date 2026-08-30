@@ -51,7 +51,8 @@ for (let i = 0; i < Math.min(SPEC.ITEMS.length, 正本.length); i++) {
 }
 ok('★並び順まで 同じ★', ずれ < 0, ずれ < 0 ? '' : (ずれ + 1) + '番目が 違う');
 const tabs = SPEC.ツリー();
-ok('タブ 12個', tabs.length === 12, String(tabs.length));
+/* ★Sheet1 を 正本から 落とした★（2026-08-30 測り直し＝下の シート見出しの 写り込み） */
+ok('タブ 11個（Sheet1は 幻）', tabs.length === 11, String(tabs.length));
 ok('グループ 67個', tabs.reduce((a, t) => a + t.groups.length, 0) === 67,
   String(tabs.reduce((a, t) => a + t.groups.length, 0)));
 
@@ -97,7 +98,9 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
   'XMLの窓を開く','XMLの決めを見る','XML拡張パック','XMLを更新','XMLを書き出す',
   'コントロールを挿入','コントロールのプロパティ',
   'インクを図形に','インクを数式に','アクションペン','マップを作る','タイムラインを作る',
-  '三次元の窓を開く','Webから読む','データモデルを開く','データ分析'];
+  '三次元の窓を開く','Webから読む','データモデルを開く','データ分析',
+  /* ★表示｜表示★（2026-08-30 実Excelを 測り直して 見つけた 組） */
+  'ルーラーを出すか','ナビゲーションを開く','セルにフォーカスを切り替える'];
   for (const n of 拾う名) にせ画面[n] = (function (nm) {
     return function () { 記録.push({ fn: nm, args: Array.prototype.slice.call(arguments) }); };
   }(n));
@@ -164,13 +167,20 @@ ok('★うちの緑を 使っている★', /#3D9E72|#2E7D54|#C8ECD8|#F0FAF4/i.t
 
 /* ── ⑤ 対象外は 理由つき ───────────────────── */
 console.log('\n[⑤ 対象外は 理由が 書いてある物だけ]');
+/* ★対象外の 正本は lib/ribbon-scope.js に 移した★（2026-08-30）
+   前は scripts/ribbon-bind.mjs の 中だけに 在り、★画面からは 見えなかった★。
+   そのせいで ★作らないと 決めた物にも「これから」と 出ていた★（監査役が 絵で 見つけた）。 */
 const bind = fs.readFileSync(path.join(ROOT, 'scripts/ribbon-bind.mjs'), 'utf8');
-const 対象外の数 = (bind.match(/^\s*'[^']+\|[^']+\|[^']+':\s*'[^']+',/gm) || []).length;
-ok('★対象外に 理由が 書いてある★', 対象外の数 >= 1, String(対象外の数));
+const scope = fs.readFileSync(path.join(ROOT, 'lib/ribbon-scope.js'), 'utf8');
+const 対象外の数 = (scope.match(/'[^']+\|[^']+\|[^']+':/g) || []).length;
+ok('★対象外に 理由が 書いてある★', 対象外の数 >= 10, String(対象外の数));
 /* ★\b は 日本語の 後ろでは 効かない★（単語の切れ目の 決まりが [A-Za-z0-9_] 前提）。
    実測 2026-08-29＝/export const 対象外\b/ は 在るのに 当たらなかった。 */
-ok('★対象外の一覧が repo に 在る（口約束に しない）', /export const 対象外\s*=/.test(bind));
-ok('★対象外のタブの一覧も 在る', /export const 対象外タブ\s*=/.test(bind));
+ok('★対象外の一覧が repo に 在る（口約束に しない）', /var 対象外\s*=/.test(scope));
+ok('★対象外のタブの一覧も 在る', /var 対象外タブ\s*=/.test(scope));
+ok('★「出さない」の一覧も 在る（押す物では ない 組）', /var 出さない\s*=/.test(scope));
+ok('★bind は その1本を 見ている（二重に 持たない）★',
+  /ribbon-scope\.js/.test(bind));
 
 /* ── ⑥⑦ 実際に 描く ───────────────────────── */
 console.log('\n[⑥ 実際に 描いて 数える]');
@@ -179,7 +189,13 @@ const el = dom.window.document.getElementById('ribbon');
 const r = RB.描く(el, SPEC);
 ok('★描けた★', !!r && r.tab === 'ホーム', JSON.stringify(r));
 const 描いたタブ = el.querySelectorAll('.rb-tab').length;
-ok('タブを 12個 描いた', 描いたタブ === 12, String(描いたタブ));
+/* ★Sheet1 は 描かない★（2026-08-30 実Excelを 測り直して 確かめた）
+   Sheet1 を 選んだ時に UIAが 返したのは
+   「シートの追加／標準／改ページ プレビュー／右スクロール」＝
+   ★下の シート見出しと 状態バー★であって リボンの タブでは ない。
+   ★空の タブを 見せない★ので 11個が 正しい。
+   理由は lib/ribbon-scope.js の 出さない[] に 書いてある。 */
+ok('タブを 11個 描いた（Sheet1は 幻なので 出さない）', 描いたタブ === 11, String(描いたタブ));
 const 描いた群 = el.querySelectorAll('.rb-group').length;
 ok('★ホームの グループを 9個 描いた★', 描いた群 === 9, String(描いた群));
 const ボタン = [...el.querySelectorAll('.rb-item')];

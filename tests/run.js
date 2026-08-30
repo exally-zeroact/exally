@@ -13,6 +13,9 @@ const FILES = [
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
   ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで かたまりが丸ごと動かない★
   ['ribbon.test.mjs', '--self-test'],        // ★リボン＝Excelと同じ配置／押して 届くかまで 見る★
+  ['ribbon-label.test.mjs', '--self-test'], // ★札が 箱に 収まり 同じに 見えない（08-30 監査役の 差し戻し）★
+  ['ribbon-scope.test.mjs', '--self-test'], // ★空の箱を (a)これから/(b)付けません/(c)出さない に 分ける★
+  ['view-extras.test.mjs', '--self-test'],  // ★表示｜表示＝測り直しで 見つけた 組★
   ['valign.test.mjs', '--self-test'],        // ★上下揃え＝実Excelの既定は中央（実測）★
   ['clear.test.mjs', '--self-test'],         // ★クリア3通り＝中身だけ/書式だけ/すべて（実測）★
   ['ribbon-features.test.mjs', '--self-test'],  // ★数式の表示／再計算／ズーム／重複の削除★

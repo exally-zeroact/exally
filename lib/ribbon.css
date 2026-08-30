@@ -192,11 +192,89 @@
   color: #A9C4B4;
   font-style: normal;
 }
-.rb-group[data-empty="1"] { opacity: .72; }
+.rb-group[data-empty="yet"] { opacity: .72; }
+
+/* ★付けないと 決めた箱★（2026-08-30 監査役の 決め）
+   「これから」と 書くと ★守れない 約束★に なるので
+   ★「付けません」と はっきり 書き、理由を 1行 添える★。 */
+.rb-no {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  min-height: 44px;
+  padding: 0 6px;
+  font-size: 10px;
+  color: #9AA4A0;
+  font-style: normal;
+  text-align: center;
+}
+.rb-no .rb-why {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  font-style: normal;
+  color: #B4BDB9;
+  line-height: 1.25;
+  /* ★注意書きを 潰さない★＝flexの 中でも 折り返す。
+     ただし anywhere は ★「う／ちに」のように 語の途中で 割る★ので 使わない。 */
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-break: strict;
+  word-break: normal;
+  max-width: 112px;
+}
+.rb-group[data-empty="no"] { opacity: .9; }
 
 /* ── 狭い画面 ─────────────────────────────── */
 @media (max-width: 560px) {
   .rb-item { min-width: 44px; min-height: 44px; }
-  .rb-lbl { max-width: 48px; }
+  /* ★前は 48px だった★＝全角6字の 札が ★スマホだけ 16個 切れていた★
+     （2026-08-30 実測。デスクトップは 0個なのに スマホだけ 切れていた）
+     ★字を 少し 小さく して 幅を 広げる★＝押す所（44px）は 変えない。 */
+  .rb-lbl { max-width: 66px; font-size: 9px; }
   .rb-gname { font-size: 9px; }
 }
+
+/* ★ルーラー（表示｜表示）★ 2026-08-30
+   紙の 尺（cm）。★実Excelを 測り直して 見つけた 組★の 1つ。 */
+#ruler-bar {
+  position: relative;
+  height: 18px;
+  background: #F7FBF9;
+  border-bottom: 1px solid #D4EDE1;
+  overflow: hidden;
+  font-size: 9px;
+  color: #6B7B74;
+}
+#ruler-bar .rl-t {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 5px;
+  background: #C8ECD8;
+}
+#ruler-bar .rl-t.rl-big { height: 10px; background: #9ED3B8; }
+#ruler-bar .rl-t b { position: absolute; left: 3px; top: 7px; font-weight: 400; }
+
+/* ★ナビゲーション（表示｜表示）★ */
+.nv-wrap .nv-h {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #2E7D54;
+  border-bottom: 1px solid #D4EDE1;
+  padding-bottom: 3px;
+}
+.nv-wrap .nv-r {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 32px;
+  align-items: center;
+  font-size: 14px;
+  color: #333333;
+}
+.nv-wrap .nv-m { color: #6B7B74; font-size: 12px; }
+/* ★注意書きを 潰さない★＝flex の 中でも 折り返す */
+.nv-wrap .nv-e { font-size: 12px; color: #9AA4A0; white-space: normal; overflow-wrap: anywhere; }
