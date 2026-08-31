@@ -928,6 +928,45 @@ gap:8px;
 .ctx-item:hover { background:#F0FAF4; }
 .ctx-divider { height:1px; background:#E8EFE8; margin:4px 0; }
 
+/* ===== ★ページ設定＝実Excel と 同じ 4タブ★ 2026-08-31 =====
+   ★司さん「Excelと 同じように 見せろ」★
+   Excel の この 窓は ★字が 小さく・行が 詰まっている★。
+   ★説明文を 足さない★（足すと 縦に 伸びて Excel と 別物に なる）。 */
+.pg-tab {
+  border:0; background:transparent; cursor:pointer;
+  padding:6px 12px; font:13px/1.4 inherit; color:#5B7A6A;
+  border-radius:6px 6px 0 0; margin-bottom:-1px;
+}
+.pg-tab:hover { background:#F0FAF4; }
+.pg-tab.on {
+  background:#ffffff; color:#2E7D54; font-weight:700;
+  border:1px solid #D4EDE1; border-bottom-color:#ffffff;
+}
+.pg-grp {
+  font-weight:700; color:#2E7D54; font-size:12px;
+  margin:10px 0 4px; padding-bottom:2px; border-bottom:1px solid #EAF6F0;
+}
+.pg-grp:first-child { margin-top:0; }
+.pg-row {
+  display:flex; align-items:center; gap:6px;
+  min-height:30px; margin:2px 0; cursor:pointer;
+}
+.pg-row input[type=checkbox], .pg-row input[type=radio] { width:15px; height:15px; margin:0; }
+.pg-lbl { min-width:4.5em; color:#5B7A6A; }
+.pg-btn {
+  border:1px solid #C8ECD8; background:#ffffff; color:#333333;
+  border-radius:6px; padding:5px 12px; font:13px inherit; cursor:pointer;
+}
+.pg-btn:hover { background:#F0FAF4; }
+.pg-ok { border:0; background:#3D9E72; color:#ffffff; font-weight:700; }
+/* ★刷った時の 見え方★（Excel も 上と下に 下絵を 出す） */
+.pg-prev {
+  display:flex; gap:8px; background:#F5FBF8; border:1px solid #D4EDE1;
+  border-radius:6px; padding:6px 8px; font-size:11px; color:#333333; min-height:22px;
+}
+.pg-prev > div { flex:1; white-space:pre; overflow:hidden; }
+.pg-hint { font-size:11px; color:#7A9A87; margin:2px 0 6px; line-height:1.6; }
+
 /* ===== ★組（ドロップダウン）★ 2026-08-31 =====
    ★なぜ 入れたか★：平らに 37個 並べたら 高さ 1,193px に なり
    画面（884px）に 入らず スクロールに なった（実測）。
@@ -1332,93 +1371,93 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=3c503e6e"></script>
-<script src="lib/formula-extra.js?v=3c503e6e"></script>
-<script src="lib/formula-extra-plug.js?v=3c503e6e"></script>
+<script src="hyperformula.full.min.js?v=db8f2822"></script>
+<script src="lib/formula-extra.js?v=db8f2822"></script>
+<script src="lib/formula-extra-plug.js?v=db8f2822"></script>
 
-<script src="exally-formula.js?v=3c503e6e"></script>
+<script src="exally-formula.js?v=db8f2822"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=3c503e6e"></script>
+<script src="js/file-out.js?v=db8f2822"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=3c503e6e"></script>
-<script src="lib/grid-xlsx.js?v=3c503e6e"></script>
+<script src="lib/typed-value.js?v=db8f2822"></script>
+<script src="lib/grid-xlsx.js?v=db8f2822"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=3c503e6e"></script>
-<script src="lib/autosum.js?v=3c503e6e"></script>
-<script src="lib/grid-sort.js?v=3c503e6e"></script>
-<script src="lib/grid-filter.js?v=3c503e6e"></script>
-<script src="lib/grid-find.js?v=3c503e6e"></script>
-<script src="lib/grid-print.js?v=3c503e6e"></script>
-<script src="lib/ai-reason.js?v=3c503e6e"></script>
-<script src="lib/menu-place.js?v=3c503e6e"></script>
-<script src="lib/grid-stats.js?v=3c503e6e"></script>
-<script src="lib/grid-valid.js?v=3c503e6e"></script>
-<script src="lib/cond-format.js?v=3c503e6e"></script>
-<script src="lib/ref-graph.js?v=3c503e6e"></script>
-<script src="lib/shindan.js?v=3c503e6e"></script>
+  <script src="lib/grid-refedit.js?v=db8f2822"></script>
+<script src="lib/autosum.js?v=db8f2822"></script>
+<script src="lib/grid-sort.js?v=db8f2822"></script>
+<script src="lib/grid-filter.js?v=db8f2822"></script>
+<script src="lib/grid-find.js?v=db8f2822"></script>
+<script src="lib/grid-print.js?v=db8f2822"></script>
+<script src="lib/ai-reason.js?v=db8f2822"></script>
+<script src="lib/menu-place.js?v=db8f2822"></script>
+<script src="lib/grid-stats.js?v=db8f2822"></script>
+<script src="lib/grid-valid.js?v=db8f2822"></script>
+<script src="lib/cond-format.js?v=db8f2822"></script>
+<script src="lib/ref-graph.js?v=db8f2822"></script>
+<script src="lib/shindan.js?v=db8f2822"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=3c503e6e"></script>
-<script src="lib/vba-mikata.js?v=3c503e6e"></script>
-<script src="lib/vba-tejun.js?v=3c503e6e"></script>
-<script src="lib/rireki.js?v=3c503e6e"></script>
-<script src="lib/chizu.js?v=3c503e6e"></script>
-<script src="lib/horu.js?v=3c503e6e"></script>
-<script src="lib/excel-version.js?v=3c503e6e"></script>
-<script src="lib/teian.js?v=3c503e6e"></script>
-<script src="lib/kikan.js?v=3c503e6e"></script>
-<script src="lib/recipe.js?v=3c503e6e"></script>
-<script src="lib/kirikae.js?v=3c503e6e"></script>
-<script src="js/recipe-store.js?v=3c503e6e"></script>
-<script src="js/rireki-store.js?v=3c503e6e"></script>
-<script src="lib/excel-version.js?v=3c503e6e"></script>
+<script src="lib/vba.js?v=db8f2822"></script>
+<script src="lib/vba-mikata.js?v=db8f2822"></script>
+<script src="lib/vba-tejun.js?v=db8f2822"></script>
+<script src="lib/rireki.js?v=db8f2822"></script>
+<script src="lib/chizu.js?v=db8f2822"></script>
+<script src="lib/horu.js?v=db8f2822"></script>
+<script src="lib/excel-version.js?v=db8f2822"></script>
+<script src="lib/teian.js?v=db8f2822"></script>
+<script src="lib/kikan.js?v=db8f2822"></script>
+<script src="lib/recipe.js?v=db8f2822"></script>
+<script src="lib/kirikae.js?v=db8f2822"></script>
+<script src="js/recipe-store.js?v=db8f2822"></script>
+<script src="js/rireki-store.js?v=db8f2822"></script>
+<script src="lib/excel-version.js?v=db8f2822"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=3c503e6e">
-<script src="lib/named-ranges.js?v=3c503e6e"></script>
-<script src="lib/cell-styles.js?v=3c503e6e"></script>
-<script src="lib/chart.js?v=3c503e6e"></script>
-<script src="lib/sparkline.js?v=3c503e6e"></script>
-<script src="lib/table.js?v=3c503e6e"></script>
-<script src="lib/flash-fill.js?v=3c503e6e"></script>
-<script src="lib/pivot.js?v=3c503e6e"></script>
-<script src="lib/csv-in.js?v=3c503e6e"></script>
-<script src="lib/objects.js?v=3c503e6e"></script>
-<script src="lib/ink.js?v=3c503e6e"></script>
-<script src="lib/view-mode.js?v=3c503e6e"></script>
-<script src="lib/sheet-view.js?v=3c503e6e"></script>
-<script src="lib/theme.js?v=3c503e6e"></script>
-<script src="lib/diagram.js?v=3c503e6e"></script>
-<script src="lib/adv-filter.js?v=3c503e6e"></script>
-<script src="lib/connections.js?v=3c503e6e"></script>
-<script src="lib/review.js?v=3c503e6e"></script>
-<script src="lib/xml-map.js?v=3c503e6e"></script>
-<script src="lib/ink-shape.js?v=3c503e6e"></script>
-<script src="lib/jp-map.js?v=3c503e6e"></script>
-<script src="lib/timeline.js?v=3c503e6e"></script>
-<script src="lib/model3d.js?v=3c503e6e"></script>
-<script src="lib/data-model.js?v=3c503e6e"></script>
-<script src="lib/symbols.js?v=3c503e6e"></script>
-<script src="lib/view-extras.js?v=3c503e6e"></script>
-<script src="lib/ribbon-spec.js?v=3c503e6e"></script>
-<script src="lib/ribbon-label.js?v=3c503e6e"></script>
-<script src="lib/ribbon-scope.js?v=3c503e6e"></script>
-<script src="lib/ribbon-actions.js?v=3c503e6e"></script>
-<script src="lib/ribbon-keys.js?v=3c503e6e"></script>
-<script src="lib/ribbon-keytips.js?v=3c503e6e"></script>
-<script src="lib/ribbon-launcher.js?v=3c503e6e"></script>
-<script src="lib/ctx-menu.js?v=3c503e6e"></script>
-<script src="lib/header-footer.js?v=3c503e6e"></script>
-<script src="lib/ribbon.js?v=3c503e6e"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=db8f2822">
+<script src="lib/named-ranges.js?v=db8f2822"></script>
+<script src="lib/cell-styles.js?v=db8f2822"></script>
+<script src="lib/chart.js?v=db8f2822"></script>
+<script src="lib/sparkline.js?v=db8f2822"></script>
+<script src="lib/table.js?v=db8f2822"></script>
+<script src="lib/flash-fill.js?v=db8f2822"></script>
+<script src="lib/pivot.js?v=db8f2822"></script>
+<script src="lib/csv-in.js?v=db8f2822"></script>
+<script src="lib/objects.js?v=db8f2822"></script>
+<script src="lib/ink.js?v=db8f2822"></script>
+<script src="lib/view-mode.js?v=db8f2822"></script>
+<script src="lib/sheet-view.js?v=db8f2822"></script>
+<script src="lib/theme.js?v=db8f2822"></script>
+<script src="lib/diagram.js?v=db8f2822"></script>
+<script src="lib/adv-filter.js?v=db8f2822"></script>
+<script src="lib/connections.js?v=db8f2822"></script>
+<script src="lib/review.js?v=db8f2822"></script>
+<script src="lib/xml-map.js?v=db8f2822"></script>
+<script src="lib/ink-shape.js?v=db8f2822"></script>
+<script src="lib/jp-map.js?v=db8f2822"></script>
+<script src="lib/timeline.js?v=db8f2822"></script>
+<script src="lib/model3d.js?v=db8f2822"></script>
+<script src="lib/data-model.js?v=db8f2822"></script>
+<script src="lib/symbols.js?v=db8f2822"></script>
+<script src="lib/view-extras.js?v=db8f2822"></script>
+<script src="lib/ribbon-spec.js?v=db8f2822"></script>
+<script src="lib/ribbon-label.js?v=db8f2822"></script>
+<script src="lib/ribbon-scope.js?v=db8f2822"></script>
+<script src="lib/ribbon-actions.js?v=db8f2822"></script>
+<script src="lib/ribbon-keys.js?v=db8f2822"></script>
+<script src="lib/ribbon-keytips.js?v=db8f2822"></script>
+<script src="lib/ribbon-launcher.js?v=db8f2822"></script>
+<script src="lib/ctx-menu.js?v=db8f2822"></script>
+<script src="lib/header-footer.js?v=db8f2822"></script>
+<script src="lib/ribbon.js?v=db8f2822"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa-config.js?v=3c503e6e"></script>
-<script src="js/exally-login.js?v=3c503e6e"></script>
-<script src="js/auth.js?v=3c503e6e"></script>
+<script src="js/supa-config.js?v=db8f2822"></script>
+<script src="js/exally-login.js?v=db8f2822"></script>
+<script src="js/auth.js?v=db8f2822"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -8008,85 +8047,107 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
   </div>
 </div>
 
+<!-- ★★ページ設定＝実Excel と 同じ 4つの タブ★★ 2026-08-31
+     ★司さん「おれは 最初から Excelと 同じように 見せろって 言わんかったか？」★
+     前は ★私が 勝手に 作った 1枚の 長い 一覧★だった（説明文つき）。
+     実Excel の ページ設定は ★ページ／余白／ヘッダー・フッター／シート の 4タブ★。
+     ★中身も 実測した PageSetup の 47項目から 取った★
+       （docs/excel-objectmodel-2026-08-30.tsv の PageSetup）
+     ★窓は 開かせていない★＝COM で 性質を 読んだだけ（窓を 開くと 9分 止まる）。 -->
 <div id="pageOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;">
-    <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
-      <div style="font-size:16px;font-weight:700;color:#2E7D54;">ページ設定</div>
-      <div style="font-size:12px;color:#333333;margin-top:4px;">紙に 刷る時の 決まり</div>
+  <div style="background:#ffffff;border-radius:12px;width:100%;max-width:520px;overflow:hidden;display:flex;flex-direction:column;max-height:92vh;">
+    <div style="padding:12px 16px 0;">
+      <div style="font-size:15px;font-weight:700;color:#2E7D54;">ページ設定</div>
     </div>
-    <div style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;overflow:auto;">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <span style="min-width:5em;">用紙の 向き</span>
-        <select id="pageOrient" style="flex:1;min-width:150px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-          <option value="portrait">縦</option>
-          <option value="landscape">横</option>
-        </select>
-      </div>
-      <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
-        <input id="pageGrid" type="checkbox" style="width:20px;height:20px;">
-        <span>枠線を 刷る</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
-        <input id="pageHead" type="checkbox" style="width:20px;height:20px;">
-        <span>行と列の 見出し（1,2,3 / A,B,C）を 刷る</span>
-      </label>
-      <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
-        用紙は A4・余白は 上下 19.1mm／左右 17.8mm（★実Excelの 既定を 測った値★）。<br>
-        枠線も 見出しも ★実Excelの 既定は 刷らない★です。
-      </div>
-
-      <!-- ★ヘッダーと フッター★（2026-08-31 司さんの 指示）
-           「ごちゃごちゃに ならないよう ★ドロップダウンでも いいから 綺麗に★」
-           ⇒ ★選ぶだけ★で 済むように し、細かく 直したい 人だけ ★自分で 書く★を 開く。
-           印（&P など）の 意味は ★実 Excel に PDF を 刷らせて 測った★。
-           中身の 正本：lib/header-footer.js -->
-      <div style="border-top:1px solid #D4EDE1;margin-top:12px;padding-top:12px;">
-        <div style="font-weight:700;color:#2E7D54;margin-bottom:6px;">紙の 上と 下に 入れる 字</div>
-
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-          <span style="min-width:5em;">上（ヘッダー）</span>
-          <select id="hfHead" style="flex:1;min-width:180px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-          <span style="min-width:5em;">下（フッター）</span>
-          <select id="hfFoot" style="flex:1;min-width:180px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;"></select>
-        </div>
-
-        <label style="display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;">
-          <input id="hfSelf" type="checkbox" style="width:20px;height:20px;" onchange="ヘッダーの自分で書くを切り替える()">
-          <span>自分で 書く（左・中央・右を 別々に）</span>
-        </label>
-
-        <div id="hfCustom" style="display:none;">
-          <div style="font-size:12px;color:#7A9A87;margin:4px 0 8px;line-height:1.7;">
-            ★印★… <span id="hfCodes"></span><br>
-            （印の 意味は ★実 Excel に 刷らせて 測った 物★）
-          </div>
-          <div style="font-weight:700;margin:6px 0 4px;">上（ヘッダー）</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <input id="hfHL" placeholder="左" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-            <input id="hfHC" placeholder="中央" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-            <input id="hfHR" placeholder="右" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-          </div>
-          <div style="font-weight:700;margin:10px 0 4px;">下（フッター）</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <input id="hfFL" placeholder="左" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-            <input id="hfFC" placeholder="中央" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-            <input id="hfFR" placeholder="右" style="flex:1;min-width:110px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">
-          </div>
-        </div>
-
-        <div style="margin-top:10px;background:#F5FBF8;border:1px solid #D4EDE1;border-radius:8px;padding:8px 10px;font-size:12px;color:#333333;line-height:1.8;">
-          <div style="color:#7A9A87;">刷ると こう なります（1ページ目）</div>
-          <div id="hfPreviewH" style="display:flex;gap:8px;"></div>
-          <div style="color:#C8ECD8;">————— 表 —————</div>
-          <div id="hfPreviewF" style="display:flex;gap:8px;"></div>
-        </div>
-      </div>
+    <!-- ★タブ★（実Excel と 同じ 4つ・同じ 順） -->
+    <div id="pgTabs" style="display:flex;gap:2px;padding:8px 16px 0;border-bottom:1px solid #D4EDE1;">
+      <button type="button" class="pg-tab on" data-pg="page">ページ</button>
+      <button type="button" class="pg-tab" data-pg="margin">余白</button>
+      <button type="button" class="pg-tab" data-pg="hf">ヘッダー/フッター</button>
+      <button type="button" class="pg-tab" data-pg="sheet">シート</button>
     </div>
-    <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
-      <button onclick="ページ設定を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
-      <button onclick="ページ設定を決める()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">決める</button>
+    <div style="padding:14px 16px;font-size:13px;color:#333333;overflow:auto;">
+
+      <!-- ══ ページ ══ -->
+      <div class="pg-pane" data-pg="page">
+        <div class="pg-grp">印刷の向き</div>
+        <label class="pg-row"><input type="radio" name="pgOrient" id="pgOrientP" value="portrait"><span>縦</span></label>
+        <label class="pg-row"><input type="radio" name="pgOrient" id="pgOrientL" value="landscape"><span>横</span></label>
+        <div class="pg-grp">拡大縮小印刷</div>
+        <label class="pg-row"><input type="radio" name="pgScale" id="pgScaleZoom" value="zoom">
+          <span>拡大/縮小</span><input id="pgZoom" type="number" min="10" max="400" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"><span>%</span></label>
+        <label class="pg-row"><input type="radio" name="pgScale" id="pgScaleFit" value="fit">
+          <span>次のページ数に合わせて印刷</span>
+          <input id="pgFitW" type="number" min="1" max="99" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"><span>×</span>
+          <input id="pgFitH" type="number" min="1" max="99" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"><span>ページ</span></label>
+        <div class="pg-grp">用紙サイズ</div>
+        <div class="pg-row"><select id="pgPaper" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+          <option value="A4">A4</option><option value="A3">A3</option><option value="A5">A5</option>
+          <option value="B5">B5</option><option value="Letter">Letter</option></select></div>
+        <div class="pg-grp">先頭ページ番号</div>
+        <div class="pg-row"><input id="pgFirstPage" type="number" min="1" max="9999" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+      </div>
+
+      <!-- ══ 余白 ══ -->
+      <div class="pg-pane" data-pg="margin" hidden>
+        <div class="pg-grp">余白（cm）</div>
+        <div class="pg-row"><span class="pg-lbl">上</span><input id="pgMT" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+          <span class="pg-lbl">下</span><input id="pgMB" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-row"><span class="pg-lbl">左</span><input id="pgML" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+          <span class="pg-lbl">右</span><input id="pgMR" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-row"><span class="pg-lbl">ヘッダー</span><input id="pgMH" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+          <span class="pg-lbl">フッター</span><input id="pgMF" type="number" step="0.1" min="0" style="width:76px;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-grp">ページ中央</div>
+        <label class="pg-row"><input id="pgCenterH" type="checkbox"><span>水平</span></label>
+        <label class="pg-row"><input id="pgCenterV" type="checkbox"><span>垂直</span></label>
+      </div>
+
+      <!-- ══ ヘッダー/フッター ══（★実Excel と 同じ 形★） -->
+      <div class="pg-pane" data-pg="hf" hidden>
+        <div class="pg-prev" id="hfPreviewH"></div>
+        <div class="pg-grp">ヘッダー</div>
+        <div class="pg-row"><select id="hfHead" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></select></div>
+        <div class="pg-row"><button type="button" class="pg-btn" onclick="ヘッダーの編集('ヘッダー')">ヘッダーの編集...</button></div>
+        <div class="pg-grp">フッター</div>
+        <div class="pg-row"><select id="hfFoot" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></select></div>
+        <div class="pg-row"><button type="button" class="pg-btn" onclick="ヘッダーの編集('フッター')">フッターの編集...</button></div>
+        <div class="pg-prev" id="hfPreviewF"></div>
+        <div id="hfCustom" hidden>
+          <div class="pg-grp">自分で書く（左・中央・右）</div>
+          <div class="pg-hint">★印★ <span id="hfCodes"></span></div>
+          <div class="pg-row"><span class="pg-lbl">ヘッダー</span>
+            <input id="hfHL" placeholder="左" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+            <input id="hfHC" placeholder="中央" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+            <input id="hfHR" placeholder="右" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+          <div class="pg-row"><span class="pg-lbl">フッター</span>
+            <input id="hfFL" placeholder="左" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+            <input id="hfFC" placeholder="中央" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
+            <input id="hfFR" placeholder="右" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        </div>
+        <label class="pg-row"><input id="hfSelf" type="checkbox" onchange="ヘッダーの自分で書くを切り替える()"><span>自分で書く</span></label>
+      </div>
+
+      <!-- ══ シート ══ -->
+      <div class="pg-pane" data-pg="sheet" hidden>
+        <div class="pg-grp">印刷範囲</div>
+        <div class="pg-row"><input id="pgPrintArea" placeholder="A1:D20" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-grp">印刷タイトル</div>
+        <div class="pg-row"><span class="pg-lbl">行</span><input id="pgTitleRows" placeholder="1:1" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-row"><span class="pg-lbl">列</span><input id="pgTitleCols" placeholder="A:A" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;"></div>
+        <div class="pg-grp">印刷</div>
+        <label class="pg-row"><input id="pageGrid" type="checkbox"><span>枠線</span></label>
+        <label class="pg-row"><input id="pageHead" type="checkbox"><span>行列番号</span></label>
+        <label class="pg-row"><input id="pgBW" type="checkbox"><span>白黒印刷</span></label>
+        <label class="pg-row"><input id="pgDraft" type="checkbox"><span>簡易印刷</span></label>
+        <div class="pg-grp">ページの方向</div>
+        <label class="pg-row"><input type="radio" name="pgOrder" id="pgOrderDown" value="down"><span>左から右へ、上から下へ</span></label>
+        <label class="pg-row"><input type="radio" name="pgOrder" id="pgOrderOver" value="over"><span>上から下へ、左から右へ</span></label>
+      </div>
+
+    </div>
+    <div style="padding:10px 16px 14px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
+      <button onclick="ページ設定を閉じる()" class="pg-btn">キャンセル</button>
+      <button onclick="ページ設定を決める()" class="pg-btn pg-ok">OK</button>
     </div>
   </div>
 </div>
@@ -11196,26 +11257,137 @@ function ページ設定を開く(){
   hideCtxMenu();
   var ov = document.getElementById('pageOverlay');
   if (!ov) return;
-  document.getElementById('pageOrient').value = ページ設定.向き;
+  ページ設定の初期化();
+  ページ設定のタブを繋ぐ();
+
+  /* ── ページ ── */
+  var 縦 = ページ設定.向き !== 'landscape';
+  document.getElementById('pgOrientP').checked = 縦;
+  document.getElementById('pgOrientL').checked = !縦;
+  var 合わせる = !!ページ設定.ページに合わせる;
+  document.getElementById('pgScaleZoom').checked = !合わせる;
+  document.getElementById('pgScaleFit').checked = 合わせる;
+  document.getElementById('pgZoom').value = ページ設定.印刷倍率;
+  document.getElementById('pgFitW').value = ページ設定.横ページ数 || 1;
+  document.getElementById('pgFitH').value = ページ設定.縦ページ数 || 1;
+  document.getElementById('pgPaper').value = ページ設定.用紙 || 'A4';
+  document.getElementById('pgFirstPage').value = ページ設定.先頭ページ番号 || 1;
+
+  /* ── 余白 ── */
+  var 余 = ページ設定.余白 || {};
+  document.getElementById('pgMT').value = 余.上;
+  document.getElementById('pgMB').value = 余.下;
+  document.getElementById('pgML').value = 余.左;
+  document.getElementById('pgMR').value = 余.右;
+  document.getElementById('pgMH').value = ページ設定.ヘッダー余白;
+  document.getElementById('pgMF').value = ページ設定.フッター余白;
+  document.getElementById('pgCenterH').checked = !!ページ設定.水平中央;
+  document.getElementById('pgCenterV').checked = !!ページ設定.垂直中央;
+
+  /* ── ヘッダー/フッター ── */
+  ヘッダーの窓を詰める();
+
+  /* ── シート ── */
+  document.getElementById('pgPrintArea').value = ページ設定.印刷範囲 || '';
+  document.getElementById('pgTitleRows').value = ページ設定.タイトル行 || '';
+  document.getElementById('pgTitleCols').value = ページ設定.タイトル列 || '';
   document.getElementById('pageGrid').checked = !!ページ設定.枠線;
   document.getElementById('pageHead').checked = !!ページ設定.行列番号;
-  ヘッダーの窓を詰める();
+  document.getElementById('pgBW').checked = !!ページ設定.白黒;
+  document.getElementById('pgDraft').checked = !!ページ設定.簡易;
+  var 下へ = (ページ設定.ページの方向 || 'down') === 'down';
+  document.getElementById('pgOrderDown').checked = 下へ;
+  document.getElementById('pgOrderOver').checked = !下へ;
+
   ov.style.display = 'flex';
 }
+
+/** ★タブの 押し込み★（Excel と 同じ 4つ） */
+function ページ設定のタブを繋ぐ(){
+  var 帯 = document.getElementById('pgTabs');
+  if (!帯 || 帯.getAttribute('data-done')) return;
+  帯.setAttribute('data-done', '1');
+  var bs = 帯.querySelectorAll('.pg-tab');
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].addEventListener('click', (function (名) {
+      return function () { ページ設定のタブを選ぶ(名); };
+    }(bs[i].getAttribute('data-pg'))));
+  }
+}
+function ページ設定のタブを選ぶ(名){
+  var bs = document.querySelectorAll('#pgTabs .pg-tab');
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].classList.toggle('on', bs[i].getAttribute('data-pg') === 名);
+  }
+  var ps = document.querySelectorAll('#pageOverlay .pg-pane');
+  for (var j = 0; j < ps.length; j++) {
+    ps[j].hidden = (ps[j].getAttribute('data-pg') !== 名);
+  }
+}
+
 function ページ設定を閉じる(){
   var ov = document.getElementById('pageOverlay');
   if (ov) ov.style.display = 'none';
 }
+
+/** ★数を 読む★（空や 変な字は 元のまま） */
+function _pg数(id, 元, 小, 大){
+  var v = Number((document.getElementById(id) || {}).value);
+  if (!isFinite(v)) return 元;
+  if (小 !== undefined && v < 小) v = 小;
+  if (大 !== undefined && v > 大) v = 大;
+  return v;
+}
+
 function ページ設定を決める(){
-  ページ設定.向き 　= document.getElementById('pageOrient').value === 'landscape' ? 'landscape' : 'portrait';
+  /* ── ページ ── */
+  ページ設定.向き 　= document.getElementById('pgOrientL').checked ? 'landscape' : 'portrait';
+  ページ設定.ページに合わせる = document.getElementById('pgScaleFit').checked;
+  ページ設定.印刷倍率 = _pg数('pgZoom', ページ設定.印刷倍率, 10, 400);
+  ページ設定.横ページ数 = _pg数('pgFitW', ページ設定.横ページ数 || 1, 1, 99);
+  ページ設定.縦ページ数 = _pg数('pgFitH', ページ設定.縦ページ数 || 1, 1, 99);
+  ページ設定.用紙 = document.getElementById('pgPaper').value || 'A4';
+  ページ設定.先頭ページ番号 = _pg数('pgFirstPage', 1, 1, 9999);
+
+  /* ── 余白 ── */
+  var 余 = ページ設定.余白 || {};
+  ページ設定.余白 = {
+    上: _pg数('pgMT', 余.上, 0), 下: _pg数('pgMB', 余.下, 0),
+    左: _pg数('pgML', 余.左, 0), 右: _pg数('pgMR', 余.右, 0)
+  };
+  ページ設定.ヘッダー余白 = _pg数('pgMH', ページ設定.ヘッダー余白, 0);
+  ページ設定.フッター余白 = _pg数('pgMF', ページ設定.フッター余白, 0);
+  ページ設定.水平中央 = !!document.getElementById('pgCenterH').checked;
+  ページ設定.垂直中央 = !!document.getElementById('pgCenterV').checked;
+
+  /* ── ヘッダー/フッター ── */
+  ヘッダーを取り込む();
+
+  /* ── シート ── */
+  ページ設定.印刷範囲 = (document.getElementById('pgPrintArea').value || '').trim();
+  ページ設定.タイトル行 = (document.getElementById('pgTitleRows').value || '').trim();
+  ページ設定.タイトル列 = (document.getElementById('pgTitleCols').value || '').trim();
   ページ設定.枠線 　= !!document.getElementById('pageGrid').checked;
   ページ設定.行列番号 = !!document.getElementById('pageHead').checked;
-  ヘッダーを取り込む();
+  ページ設定.白黒 = !!document.getElementById('pgBW').checked;
+  ページ設定.簡易 = !!document.getElementById('pgDraft').checked;
+  ページ設定.ページの方向 = document.getElementById('pgOrderOver').checked ? 'over' : 'down';
+
   ページ設定を閉じる();
   notify('ページの 設定を 変えました（' + (ページ設定.向き === 'landscape' ? '横' : '縦')
-    + '／枠線 ' + (ページ設定.枠線 ? '刷る' : '刷らない')
-    + '／見出し ' + (ページ設定.行列番号 ? '刷る' : '刷らない') + '）');
+    + '／' + (ページ設定.用紙 || 'A4')
+    + '／枠線 ' + (ページ設定.枠線 ? '刷る' : '刷らない') + '）');
 }
+
+/** ★ヘッダーの編集…★（Excel と 同じ 名前の ボタン）
+ *  ＝「自分で 書く」を 開いて そこへ 送る */
+function ヘッダーの編集(どちら){
+  var sw = document.getElementById('hfSelf');
+  if (sw && !sw.checked) { sw.checked = true; ヘッダーの自分で書くを切り替える(); }
+  var 先 = document.getElementById(どちら === 'フッター' ? 'hfFL' : 'hfHL');
+  if (先) { 先.scrollIntoView({ block: 'nearest' }); 先.focus(); }
+}
+
 /* ══ ★紙の 上と 下に 入れる 字（ヘッダー／フッター）★ 2026-08-31 ══
  *
  *  司さんの 指示：「★ごちゃごちゃに ならないよう
@@ -14217,6 +14389,20 @@ function ページ設定の初期化(){
   if (ページ設定.印刷範囲 === undefined) ページ設定.印刷範囲 = '';
   if (ページ設定.枠線を表示 === undefined) ページ設定.枠線を表示 = true;    /* 実測 True */
   if (ページ設定.見出しを表示 === undefined) ページ設定.見出しを表示 = true; /* 実測 True */
+  /* ★実Excel の PageSetup を COM で 読んだ 既定★（2026-08-31）
+     ★窓は 開かせていない★（開くと 9分 止まる）。 */
+  if (ページ設定.ヘッダー余白 === undefined) ページ設定.ヘッダー余白 = 0.76;  /* 21.6pt = 0.3in */
+  if (ページ設定.フッター余白 === undefined) ページ設定.フッター余白 = 0.76;
+  if (ページ設定.水平中央 === undefined) ページ設定.水平中央 = false;   /* 実測 False */
+  if (ページ設定.垂直中央 === undefined) ページ設定.垂直中央 = false;   /* 実測 False */
+  if (ページ設定.先頭ページ番号 === undefined) ページ設定.先頭ページ番号 = 1;
+  if (ページ設定.横ページ数 === undefined) ページ設定.横ページ数 = 1;
+  if (ページ設定.縦ページ数 === undefined) ページ設定.縦ページ数 = 1;
+  if (ページ設定.白黒 === undefined) ページ設定.白黒 = false;         /* 実測 False */
+  if (ページ設定.簡易 === undefined) ページ設定.簡易 = false;         /* 実測 False */
+  if (ページ設定.ページの方向 === undefined) ページ設定.ページの方向 = 'down'; /* 実測：下へ→右 */
+  if (ページ設定.タイトル行 === undefined) ページ設定.タイトル行 = '';
+  if (ページ設定.タイトル列 === undefined) ページ設定.タイトル列 = '';
   return ページ設定;
 }
 function ページの詳しい設定を開く(どこ){

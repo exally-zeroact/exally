@@ -216,80 +216,85 @@ const どこに居る = (act) => {
   }
   return -1;
 };
-/* ★2026-08-31 に 元の 並びへ 戻したので 9番目までに なった★
-   （前は 8番目まで。組を やめて 平らに 戻した分 1つ ずれた。
-     ★大事な5つが 上に 固まっている★のは 変わらない） */
-T('★並べ替え・絞り込み・固定・印刷・入力の決まりが 上から9番目までに在る★', () => {
-  for (const act of ['sortRange', 'filterByValue', 'freezePanes', 'printSheet', 'openValid']) {
-    const i = どこに居る(act);
-    ok(i >= 0, '★' + act + ' がメニューに無い★');
-    ok(i < 9, '★' + act + ' が ' + (i + 1) + '番目まで沈んだ（上に物を足しすぎ）★');
-  }
-});
-T('★作った7つは 全部 メニューに在る（1つでも欠けたら 客の手に届かない）★', () => {
-  for (const act of ['sortRange', 'filterByValue', 'freezePanes', 'printSheet', 'openValid',
-    'openCondFormat', 'showBadCells']) {
-    ok(どこに居る(act) >= 0, '★' + act + ' が無い★');
-  }
-});
-/* ★★2026-08-31 差し戻し（司さん「複雑にするなって言うてなかったか？」）★★
- *  私は 37個 全部を 組（▸）に まとめ、★前から 在った 25個の うち 17個を
- *  1押し → 2段★に 落とした（昇順・絞り込み・固定・印刷・行の挿入 …）。
- *  ★司さんが 言ったのは「ヘッダーフッターを ドロップダウンで」だけ★。
- *  ⇒ ★前からの 物は ずっと 1押し★を ここで 見張る。 */
-T('★★前から 在った 物が 2段に 落ちていない（1押しのまま）★★', () => {
-  const m = doc.getElementById('ctx-menu');
-  const 落ちた = [];
-  for (const g of [...m.querySelectorAll('.ctx-sub')]) {
-    for (const c of [...g.querySelectorAll('.ctx-sub-box .ctx-item')]) {
-      const act = c.getAttribute('data-ctx') || '';
-      if (前からの物.indexOf(act) >= 0) {
-        落ちた.push(g.childNodes[0].textContent.trim() + ' ▸ ' + c.textContent.trim());
-      }
-    }
-  }
-  eq(落ちた.length, 0, '★2段に 落ちた 前からの物★\n       ' + 落ちた.join('\n       '));
-});
-T('★前から 在った 物は 全部 上の段に 在る（24個）★', () => {
-  const 段 = 上の段().map((e) => e.getAttribute('data-ctx') || '');
-  const 無い = 前からの物.filter((a) => 段.indexOf(a) < 0);
-  eq(無い.length, 0, '★上の段から 消えた★：' + 無い.join(' / '));
-});
-/* ★★高さでは なく「大事な物が 送らずに 見えるか」で 見る★★
-   2026-08-21 の 事故は ★大事な5つが 真ん中に 埋もれて 届かなかった★事。
-   ⇒ ★画面の 高さを 変えて 総当たりで 測る★。
-   実測（2026-08-31 実ブラウザ）：大事な5つの 下端は 246px。
-   画面 400px でも 見える高さ 384px なので ★送らずに 見える★。 */
-T('★★どの 画面の 高さでも 大事な5つは 送らずに 見える★★', () => {
-  const m = doc.getElementById('ctx-menu');
-  const 大事 = ['sortRange', 'filterByValue', 'freezePanes', 'printSheet', 'openValid'];
-  /* 大事な5つの 下端（上からの px）を 並びから 数える
-     （jsdom に 高さは 無いので ★何行目か★× 1行の高さで 数える） */
-  const 行の高さ = 33;        /* 実測：padding 8+8 ∕ 字 13px ∕ 行間 → 約 33px */
+/* ★★2026-08-31：見張りを ★Excel と 同じか★ で 見る 形に 直した★★
+ *
+ *  司さん「おれは 最初から ★Excelと 同じように 見せろ★って 言わんかったか？」
+ *
+ *  ★私の 間違い（3回）★
+ *    ① 37個 全部を 組（▸）に まとめ、前からの 17個を 2段に 落とした
+ *    ② 差し戻す時に ★うちの 並び★（2026-08-21 の 事故直し）で 平らに 並べた
+ *    ③ 見張りまで ★うちの 決め事★（大事な5つを 上から9番目まで）を 見ていた
+ *
+ *  ⇒ ★★見るのは「実Excel の 並びと 同じか」★★
+ *    2026-08-21 の 事故（大事な物が 届かない）は
+ *    ★MenuPlace の 総当たり★（この 上の ①②）が すでに 見ている。
+ *    ★並びまで うちの 都合で 決めない★。
+ */
+
+/* ★実Excel の セルメニューの 並び★（docs/excel-commandbars-2026-08-30.tsv の Cell・実測） */
+const Excelの並び = [
+  'ctxCut',        /* 切り取り(T) */
+  'ctxCopy',       /* コピー(C) */
+  'ctxPaste',      /* 貼り付け(P) */
+  'ctxPasteValue', /* 形式を選択して貼り付け(S)... */
+  'セルを挿入',     /* セルの挿入(E)... */
+  'セルを削除',     /* 削除(D)... */
+  'ctxDelete',     /* 数式と値のクリア(N) */
+  'フィルター',     /* フィルター(E)   ★Excel も ▸★ */
+  '並べ替え',       /* 並べ替え(O)     ★Excel も ▸★ */
+  '新しいコメント',      /* コメントの挿入(M) */
+  'コメントを消す',      /* コメントの削除(M) */
+  'コメントの表示',      /* コメントの表示/非表示(O) */
+  'ctxFormat',     /* セルの書式設定(F)... */
+  'リンク',              /* ハイパーリンク(H)... */
+  'ハイパーリンクを削除',
+];
+
+T('★★実Excel の 並び そのままに 出ている★★', () => {
   const 段 = 上の段();
-  let 一番下 = -1;
-  for (const a of 大事) {
-    const i = どこに居る(a);
-    ok(i >= 0, '★' + a + ' が メニューに 無い★');
-    if (i > 一番下) 一番下 = i;
+  /* 上の段の 名前か 働きで 引く */
+  /* ★組の 見出しは data-ctx を 持たない★（押しても 何も 起きない 行だから）
+     ⇒ 字で 引く。★絵文字は 落とす★（字だけで 見る） */
+  const 印 = 段.map((e) => {
+    const a = e.getAttribute('data-ctx');
+    if (a) return a;
+    return e.childNodes[0].textContent.trim().replace(/^\S+\s*/, '');
+  });
+  let 前 = -1;
+  for (const 物 of Excelの並び) {
+    const i = 印.indexOf(物);
+    ok(i >= 0, '★' + 物 + ' がメニューに無い★：' + 印.join(' / '));
+    ok(i > 前, '★' + 物 + ' が Excel の 順より 前に 出ている（' + i + ' ≦ ' + 前 + '）★');
+    前 = i;
   }
-  const 下端px = (一番下 + 1) * 行の高さ;
-  /* ★一番 狭い 画面（400px）で 測る★ */
-  const p = win.MenuPlace.place({ x: 8, y: 8, w: 330, h: 925, winW: 1440, winH: 400, 余白: 8 });
-  ok(下端px <= p.見える高さ,
-    '★大事な5つの 下端 ' + 下端px + 'px が 見える高さ ' + p.見える高さ + 'px を 超えた★'
-    + '（＝送らないと 届かない。上に 物を 足しすぎ）');
-  void 段;
 });
 
-T('★組（▸）は 一番 下に まとまっている（前からの物を 押しのけない）★', () => {
+T('★Excel が ▸ に している 2つ（フィルター／並べ替え）だけ 組★', () => {
+  const 組 = [...doc.querySelectorAll('#ctx-menu .ctx-sub')]
+    .map((e) => e.childNodes[0].textContent.trim());
+  eq(組.length, 2, '★組の 数★：' + 組.join(' / '));
+  ok(組.indexOf('🔽 フィルター') >= 0 || 組.some((x) => x.indexOf('フィルター') >= 0), 'フィルターが 組でない');
+  ok(組.some((x) => x.indexOf('並べ替え') >= 0), '並べ替えが 組でない');
+});
+
+T('★うちにしか 無い 物は 一番 下（Excel の 並びを 崩さない）★', () => {
   const 段 = 上の段();
-  let 最後の平ら = -1, 最初の組 = 段.length;
-  段.forEach((e, i) => {
-    if (e.classList.contains('ctx-sub')) { if (i < 最初の組) 最初の組 = i; }
-    else 最後の平ら = i;
-  });
-  ok(最初の組 > 最後の平ら, '★組が 平らな 物より 上に 居る（' + 最初の組 + ' ≦ ' + 最後の平ら + '）★');
+  const 印 = 段.map((e) => e.getAttribute('data-ctx') || '');
+  const うちだけ = ['freezePanes', 'printSheet', 'openCondFormat', 'openValid', 'explainCell'];
+  const Excel最後 = 印.indexOf('ハイパーリンクを削除') >= 0
+    ? 印.indexOf('ハイパーリンクを削除') : 印.indexOf('ctxFormat');
+  for (const a of うちだけ) {
+    const i = 印.indexOf(a);
+    ok(i >= 0, '★' + a + ' が無い★');
+    ok(i > Excel最後, '★' + a + ' が Excel の 物より 上に 居る★');
+  }
+});
+
+T('★名前は Excel の 字（長い 説明を 付けない）★', () => {
+  const 長い = 上の段()
+    .map((e) => e.childNodes[0].textContent.trim())
+    .filter((t) => t.replace(/^\S+\s*/, '').length > 12);
+  eq(長い.length, 0, '★長すぎる 名前★：' + 長い.join(' / '));
 });
 
 /* ── ⑤ 前からある物を 押し直す ── */
@@ -361,33 +366,37 @@ if (SELF) {
       (s) => s.replace("  m.style.maxHeight = 置く.maxHeight ? (置く.maxHeight+'px') : '';", '')],
     /* ★2026-08-31 に 印を 直した★＝中身の 正本が 画面から lib/ctx-menu.js へ 移った。
        ★壊す 先も 一緒に 移す★（印が 古いままだと ★素通り★＝見張りが 眠る）。 */
-    /* ★2026-08-31：組を やめて 平らに 戻したので 壊す 印も 合わせる★ */
-    ['lib/ctx-menu.js', '★大事な物の上に 物を足す（並べ替えが 沈む）★',
-      (s) => s.replace("    { 印: '⬆️', 名: '昇順で並べ替え'",
-        Array.from({ length: 12 },
-          (_, i) => "    { 印: '+', 名: 'ふえた" + i + "', 画面: 'ctxCopy' },").join(String.fromCharCode(10))
-        + String.fromCharCode(10) + "    { 印: '⬆️', 名: '昇順で並べ替え'")],
-    /* ★2つ 在るので 両方 消す★（片方だけだと まだ 見つかって 素通りする） */
-    ['lib/ctx-menu.js', '★並べ替えを メニューから外す（客の手に届かない）★',
-      (s) => s.split("画面: 'sortRange'").join("画面: 'ctxCopy'")],
-    ['lib/ctx-menu.js', '★印刷を メニューから外す★',
-      (s) => s.replace("画面: 'printSheet'", "画面: 'ctxCopy'")],
-    /* ★★司さんの 差し戻し（2026-08-31）を 見張る★★
-       前から 在った 物を 組（▸）の 中に 落としたら 赤に なるか */
-    ['lib/ctx-menu.js', '★前からの物（昇順）を 組の 中に 落とす★',
+    /* ★★2026-08-31：★Excel の 並びを 崩したら 赤★ に 直した★★
+       前は ★うちの 決め事★（大事な5つを 上に）を 壊していた。
+       今 見るのは ★実Excel と 同じ 並びか★。 */
+    ['lib/ctx-menu.js', '★Excel の 順を 入れ替える（コピーを 一番 下へ）★',
       (s) => s.replace(
-        "    { 印: '⬆️', 名: '昇順で並べ替え', 画面: 'sortRange', 引数: 'asc',  Excel: '昇順(S)' },",
-        "    { 印: '↕️', 名: '並べ替え', 子: [" +
-        "{ 印: '⬆️', 名: '昇順で並べ替え', 画面: 'sortRange', 引数: 'asc' }] },")],
+        "    { 印: '📋', 名: 'コピー',   画面: 'ctxCopy',  鍵: 'Ctrl+C', Excel: 'コピー(C)' },",
+        "")
+        .replace("    { 印: '🤖', 名: 'AIに解説させる'",
+          "    { 印: '📋', 名: 'コピー', 画面: 'ctxCopy', 鍵: 'Ctrl+C', Excel: 'コピー(C)' },"
+          + String.fromCharCode(10) + "    { 印: '🤖', 名: 'AIに解説させる'")],
+    ['lib/ctx-menu.js', '★Excel が 平らに している 物を 組（▸）に 落とす★',
+      (s) => s.replace(
+        "    { 印: '🎨', 名: 'セルの書式設定', 画面: 'ctxFormat', Excel: 'セルの書式設定(F)...' },",
+        "    { 印: '🎨', 名: '書式', 子: ["
+        + "{ 印: '🎨', 名: 'セルの書式設定', 画面: 'ctxFormat' }] },")],
+    ['lib/ctx-menu.js', '★Excel の 物を メニューから 外す（切り取り）★',
+      (s) => s.replace("画面: 'ctxCut'", "画面: 'ctxCopy'")],
+    ['lib/ctx-menu.js', '★名前に 長い 説明を 足す（Excel と 別物に なる）★',
+      (s) => s.replace("名: 'セルの書式設定'",
+        "名: 'セルの書式設定（字の 色や 大きさ・罫線・塗りを まとめて 決める）'")],
+    ['lib/ctx-menu.js', '★うちだけの 物を Excel の 物より 上に 出す★',
+      (s) => s.replace("    { 印: '✂️', 名: '切り取り'",
+        "    { 印: '🤖', 名: 'AIに解説させる', 画面: 'explainCell' },"
+        + String.fromCharCode(10) + "    { 印: '✂️', 名: '切り取り'")],
+
     ['lib/ctx-menu.js', '★元の 画面が 探している id を 消す（開いた途端に 落ちる）★',
-      (s) => s.replace("id: 'ctx-unhide-row', ", '')],
-    ['lib/ctx-menu.js', '★実Excel の 中身を 落とす（コメントの組を 丸ごと 消す）★',
-      (s) => {
-        const i = s.indexOf("{ 印: '💬', 名: 'コメント'");
-        if (i < 0) return s;
-        const j = s.indexOf("{ 印: '🔗', 名: 'リンク'", i);
-        return j < 0 ? s : s.slice(0, i) + s.slice(j);
-      }],
+      (s) => s.replace("id: 'ctx-unhide-row',", '')],
+    ['lib/ctx-menu.js', '★実Excel の 中身を 落とす（コメント 3つを 消す）★',
+      (s) => s.split("リボン: '新しいコメント'").join("リボン: '在るわけない'")
+        .split("リボン: 'コメントを消す'").join("リボン: '在るわけない'")
+        .split("リボン: 'コメントの表示'").join("リボン: '在るわけない'")],
     ['book.html', '★中身を 画面に 直に 書き戻す（部品を 使わない）★',
       (s) => s.replace('window.CtxMenu.出す(', 'window.__無い.出す(')],
   ];
