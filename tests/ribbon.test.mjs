@@ -202,7 +202,16 @@ const ボタン = [...el.querySelectorAll('.rb-item')];
 ok('★押せるボタンを 1つ以上 描いた★', ボタン.length >= 10, ボタン.length + '個');
 
 console.log('\n[② 出来ていない物の ボタンを 出していない]');
-const 結び済み名 = new Set(SPEC.ITEMS.filter((x) => x.t === 'ホーム' && x.a && !x.a.取り込む).map((x) => RB._名を短く(x.p)));
+/* ★その組の ↘ そのものは 組の 中に 出さない★ 2026-09-03
+   ＝実Excel では ★組の 下端の Button（上=321）＝右下に ↘ として 1つ 描く物★。
+   中にも 出すと ★同じ字が 2つ 並ぶ★（ページ レイアウトで「ページ設定」が 3つに 見えた）。
+   ★線は 緩めていません★＝右下に 出ている事は ★下の ⑧で 別に 数える★。
+   正本：lib/ribbon-launcher.js の 実の起動ツール（実測 8個） */
+const LAUNCH = require_(path.join(ROOT, 'lib/ribbon-launcher.js'));
+const 結び済み名 = new Set(SPEC.ITEMS
+  .filter((x) => x.t === 'ホーム' && x.a && !x.a.取り込む)
+  .filter((x) => !LAUNCH.起動の品か(x.t, x.g, x.p))
+  .map((x) => RB._名を短く(x.p)));
 const 出た名 = ボタン.map((b) => b.getAttribute('title'));
 const 余計 = 出た名.filter((n) => !結び済み名.has(n));
 ok('★結んでいない物が 画面に 出ていない★', 余計.length === 0, 余計.join(', '));

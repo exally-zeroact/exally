@@ -336,5 +336,12 @@
 }
 .rb-launch:hover { color: var(--c-accent, #3D9E72); background: #EAF6F0; }
 .rb-launch:focus-visible { outline: 2px solid var(--c-accent, #3D9E72); outline-offset: 1px; }
+/* ★★3種類を 分ける（2026-09-03）★★
+   前は ★↘ という 1つの箱に 3種類を 混ぜていた★。実Excel では 別の物：
+     ↘ 起動ツール（組の 下端の Button・★実測 8個★）
+     ▾ その他のオプション（組の 中の メニュー・15個）
+     ▼ コンボの 開く（入力欄の 右・1個）
+   ★どれも 実Excel の 画面に 在る＝消さない。印だけ 分ける★ */
+.rb-launch-more, .rb-launch-combo { font-size: 10px; }
 /* ★狭い画面では 出さない★＝組の 名前と ぶつかる（実測で 決める） */
 @media (max-width: 560px) { .rb-launch { display: none; } }
