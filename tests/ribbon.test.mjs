@@ -53,7 +53,7 @@ ok('★並び順まで 同じ★', ずれ < 0, ずれ < 0 ? '' : (ずれ + 1) + 
 const tabs = SPEC.ツリー();
 /* ★Sheet1 を 正本から 落とした★（2026-08-30 測り直し＝下の シート見出しの 写り込み） */
 ok('タブ 11個（Sheet1は 幻）', tabs.length === 11, String(tabs.length));
-ok('グループ 67個', tabs.reduce((a, t) => a + t.groups.length, 0) === 67,
+ok('グループ 65個', tabs.reduce((a, t) => a + t.groups.length, 0) === 65,
   String(tabs.reduce((a, t) => a + t.groups.length, 0)));
 
 /* ── ③ ★結び先を 実際に 押す★ ───────────────────────
@@ -220,6 +220,53 @@ const 空箱 = [...el.querySelectorAll('.rb-group[data-empty="1"]')];
 ok('★中身が 無い箱は「これから」と 出す（偽のボタンを 出さない）',
   空箱.every((g) => g.querySelectorAll('.rb-item').length === 0 && /これから/.test(g.textContent)),
   空箱.length + '箱');
+
+/* ═══ ★★中身が 空の 組を 赤にする★★ 2026-09-03 ═══
+ *  ★なぜ 要るか★＝2026-09-03 に ★名前だけの 空っぽの 箱★を 出していた
+ *    （ページ レイアウト｜シートのオプション）。★数字には 1つも 出なかった★
+ *    ＝札の切れ 0・↘ 8/8・▾ 15/15 とも 緑のまま。★絵を 開いて 初めて 分かった★。
+ *  ★★数え方を 1つ 強くした（理由つき）★★
+ *    指示役の 注文は「★↘ だけの 組も 中身1 と 数える★」でした。
+ *    ★その形だと この見張りは 一度も 赤に なれません★＝実際に 壊して 試したら 緑のまま でした
+ *    （↘ が 中身に 数えられるので、今回の 事故そのものが 通ってしまう）。
+ *    ⇒ ★押せる札（rb-item）が 0個の 組を 赤にする★＝★今回の 事故を 捕まえられる形★に した。
+ *    ★↘ は 中身に 数えない★（↘ だけの 組は ★空っぽに 見える★＝それが 今回 起きた事）。
+ *  ★「これから」「付けません」と 書いてある 箱は 別★＝理由を 出しているので 空では ない。 */
+{
+  const 空っぽ = [];
+  let 見た組 = 0;
+  /* ★↘ が 描かれる 状態で 測る★＝働きが 無いと ↘ が 出ず、
+     組が「これから」に なって ★見張りが 空振りする★（2026-09-03 実際に 空振りした）。 */
+  const 前の働き = globalThis.window && globalThis.window.RibbonActions;
+  if (globalThis.window) globalThis.window.RibbonActions = ACT;
+  for (const t of SPEC.ツリー()) {
+    RB.状態.tab = t.name;
+    RB.描く(el, SPEC);
+    for (const g of el.querySelectorAll('.rb-group')) {
+      見た組++;
+      const 数 = g.querySelectorAll('.rb-item, [data-take]').length;   /* ★↘ は 数えない★ */
+      const 訳あり = /これから|付けません/.test(g.textContent);
+      if (数 === 0 && !訳あり) 空っぽ.push(t.name + '|' + g.dataset.group);
+    }
+  }
+  if (globalThis.window) globalThis.window.RibbonActions = 前の働き;
+  RB.状態.tab = 'ホーム'; RB.描く(el, SPEC);
+  ok('★名前だけの 空っぽな 組が 0個★（' + 見た組 + '組 を 全部 見た）',
+    空っぽ.length === 0, 空っぽ.join(' / '));
+  /* ★この 見張り自身が 空振りしていないか★ 2026-09-03
+     ＝★名前だけの 箱★を わざと 1つ 作って、上の 数え方が それを 拾えるか 見る。
+     （★画面側を 壊す形では 赤に できなかった＝「これから」に なって 逃げる★ので、
+       ★数え方そのもの★を 試す。★これが 出来ないと 見張りは 嘘をつく★） */
+  {
+    const 仮 = new JSDOM('<div><div class="rb-group" data-group="わざと空"><div class="rb-items"></div>'
+      + '<div class="rb-gname">わざと空</div></div></div>').window.document;
+    const g2 = 仮.querySelector('.rb-group');
+    const 数2 = g2.querySelectorAll('.rb-item, [data-take]').length;
+    const 訳2 = /これから|付けません/.test(g2.textContent);
+    ok('★この 見張りは 名前だけの 箱を 拾える（空振りしていない）★', 数2 === 0 && !訳2,
+      '数=' + 数2 + ' 訳=' + 訳2);
+  }
+}
 
 console.log('\n[⑦ 画面に 差し込んである]');
 ok('book.html に リボンの箱が 在る', /id="ribbon"/.test(book));

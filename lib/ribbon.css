@@ -343,5 +343,11 @@
      ▼ コンボの 開く（入力欄の 右・1個）
    ★どれも 実Excel の 画面に 在る＝消さない。印だけ 分ける★ */
 .rb-launch-more, .rb-launch-combo { font-size: 10px; }
+/* ★親の字（1つの 箱の 中の 列）★ 2026-09-03
+   実Excel の ページ レイアウト｜シートのオプション と 同じ形＝
+   ★枠線[表示][印刷]／見出し[表示][印刷]★ を ★親の字の 下に 2列★で 並べる。
+   ★親の字が 無いと「表示」「印刷」が 2つずつ 並んで 見分けが つかない★（絵で 見つけた）。 */
+.rb-sub { display: inline-flex; flex-direction: column; align-items: flex-start; margin: 0 6px 0 0; }
+.rb-subname { font-size: 10px; color: #6B8C7D; line-height: 13px; padding: 0 2px; white-space: nowrap; }
 /* ★狭い画面では 出さない★＝組の 名前と ぶつかる（実測で 決める） */
 @media (max-width: 560px) { .rb-launch { display: none; } }
