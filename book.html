@@ -2193,7 +2193,11 @@ function colorizeFormulaBlock(f){
   f=f.replace(/VLOOKUP\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+),\s*(FALSE|TRUE)\s*\)/gi,function(m,a1,a2,a3,a4){return 'VLOOKUP(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>, <span class="arg-green">'+a4.trim()+'</span>)';});
   f=f.replace(/SUMIF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'SUMIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
   f=f.replace(/COUNTIF\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'COUNTIF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
-  f=f.replace(/(?<![A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2,a3){return 'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
+  /* ★後読み (?<![A-Z]) を やめた（2026-08-29）★
+     旧iOS Safari(<16.4) は 後読みを ★読んだ瞬間に 構文エラー★＝この かたまり（scriptタグ1つぶん） 丸ごと（2,183行・関数108個）が 動かない。
+     ★前を 1文字 食べて、置き換える時に 戻す★（SUMIF/COUNTIF の IF を 拾わない為の物）。
+     ★先頭(^) も 拾う★＝「IF(」が 文字列の 先頭に 来た時に 落とさない。 */
+  f=f.replace(/(^|[^A-Z])IF\s*\(([^,()]+),\s*([^,()]+),\s*([^,()]+)\)/gi,function(m,p,a1,a2,a3){return p+'IF(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>, <span class="arg-purple">'+a3.trim()+'</span>)';});
   f=f.replace(/ROUND\s*\(([^,()]+),\s*([^,()]+)\)/gi,function(m,a1,a2){return 'ROUND(<span class="arg-blue">'+a1.trim()+'</span>, <span class="arg-orange">'+a2.trim()+'</span>)';});
   return f;
 }
@@ -3058,11 +3062,19 @@ function getRefInput(){
   }
   return null;
 }
+/* ★後読み (?<![A-Za-z]) を やめた（2026-08-29）★
+   旧iOS Safari(<16.4) は 後読みを ★読んだ瞬間に 構文エラー★＝この かたまり（scriptタグ1つぶん） 丸ごとが 動かない。
+   ★前を 1文字 食べて、欲しい所だけ 2つ目の かっこで 取る★。
+   `match` は 食べた1文字ごと 返してくるので ★exec で 回して 2つ目だけ 集める★。
+   ★先頭(^) も 拾う★＝「=A1」の A1 は 直前が `=` なので 元から 拾えるが、
+   食べる形に すると 先頭の 1文字が 無い場合に 落ちるため 必ず 入れる。 */
 function extractRefs(formula){
   if(!formula||formula[0]!=='=') return [];
-  var pattern=/(?<![A-Za-z])\$?[A-Za-z]{1,3}\$?[0-9]{1,7}(?![0-9A-Za-z])/g;
-  var matches=formula.match(pattern);
-  if(!matches) return [];
+  var pattern=/(^|[^A-Za-z])(\$?[A-Za-z]{1,3}\$?[0-9]{1,7})(?![0-9A-Za-z])/g;
+  var matches=[], m;
+  pattern.lastIndex=0;
+  while((m=pattern.exec(formula))!==null) matches.push(m[2]);
+  if(!matches.length) return [];
   return matches.filter(function(v,i,a){return a.indexOf(v)===i;})
     .map(function(a){return a.replace(/\$/g,'');});
 }
@@ -4693,10 +4705,18 @@ var editingCell=null;
 var refMode=false; // セル参照入力モード
 var REF_COLORS=['#1E88E5','#E53935','#8E24AA','#00897B','#F4511E'];
 var _currentRefs=[];
+/* ★後読み をやめた（2026-08-29）★＝3061行の同名の関数と 同じ直し方。
+   旧iOS Safari(<16.4) は 後読みを ★読んだ瞬間に 構文エラー★＝この かたまり（scriptタグ1つぶん）
+   （4,915行・関数181個）が 丸ごと 動かない。
+   ★前を1文字 食べて、2つ目の かっこだけ 取る★（match だと 食べた1文字ごと 返るので exec で 回す）。
+   ★司さんの実物 19,321本の式で 前の書き方と 突き合わせ＝答えが違った式 0本★ */
 function extractRefs(formula){
   if(!formula||formula[0]!=='=') return [];
-  var matches=formula.match(/(?<![A-Za-z])\$?[A-Za-z]{1,3}\$?[0-9]{1,7}(?![0-9A-Za-z])/g);
-  if(!matches) return [];
+  var pattern=/(^|[^A-Za-z])(\$?[A-Za-z]{1,3}\$?[0-9]{1,7})(?![0-9A-Za-z])/g;
+  var matches=[], m;
+  pattern.lastIndex=0;
+  while((m=pattern.exec(formula))!==null) matches.push(m[2]);
+  if(!matches.length) return [];
   return matches.filter(function(v,i,a){return a.indexOf(v)===i;})
     .map(function(a){return a.replace(/\$/g,'');});
 }
@@ -4707,8 +4727,12 @@ function buildDisplayHtml(formula){
   var html=esc(formula);
   refs.forEach(function(addr,i){
     var c=REF_COLORS[i%REF_COLORS.length];
-    html=html.replace(new RegExp('(?<![A-Za-z])'+addr+'(?![0-9A-Za-z])','g'),
-      '<span style="color:'+c+';font-weight:700">'+addr+'</span>');
+    /* ★後読み をやめた（2026-08-29）★
+       これは new RegExp なので 落ちるのは 呼ばれた時だけだが、
+       ★同じ穴を 1つでも 残すと 見張りの名簿が 意味を 失う★ので 一緒に 直す。
+       ★前を1文字 食べて、置き換える時に $1 で 戻す★。 */
+    html=html.replace(new RegExp('(^|[^A-Za-z])'+addr+'(?![0-9A-Za-z])','g'),
+      '$1<span style="color:'+c+';font-weight:700">'+addr+'</span>');
   });
   return html;
 }

@@ -8,6 +8,7 @@ const path = require('path');
 
 const FILES = [
   'stamp.test.mjs',         // キャッシュバスター(?v=)の道具そのもの
+  ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで <script> の塊が丸ごと動かない★
   ['sql-guard.test.mjs', '--self-test'],  // ★倉庫にSQLを当てる門番（本番の実データが同居している）★
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
