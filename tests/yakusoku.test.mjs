@@ -32,7 +32,7 @@ let JSDOM;
 try { ({ JSDOM } = await import('jsdom')); }
 catch { console.log('★jsdomが入っていません。この検証は飛ばせません（SKIPを緑と呼ばない）'); process.exit(1); }
 
-let pass = 0, fail = 0;
+let pass = 0, fail = 0, 未測定 = 0;
 const T = (n, fn) => {
   try { fn(); pass++; console.log('  ok   ' + n); }
   catch (e) { fail++; console.log('  NG   ' + n + '\n       ' + (e && e.message)); }
@@ -98,6 +98,14 @@ let 約束の形の数 = 0, 未点検 = 0;
 T('★印なし＝未点検が ' + 未点検 + '個（' + 未点検の上限 + '以下）★', () => {
   言う(未点検 <= 未点検の上限,
     '未点検が 増えた（' + 未点検 + ' > ' + 未点検の上限 + '）＝★見張っていない 約束を 増やした★');
+});
+/* ★上限の ラチェット★（2026-09-03・指示役）
+   ★増えたら 赤★だけだと ★減らしても 締まらない★＝また 増やせる。
+   ⇒★減ったら 上限も 一緒に 下げる★／★下げ忘れたら 赤★＝★戻れない★ */
+T('★減った分だけ 上限も 下げてある（戻れない）★', () => {
+  言う(未点検 >= 未点検の上限,
+    '★上限を ' + 未点検 + ' に 下げて ください★（今 ' + 未点検の上限 + '／実物 ' + 未点検 + '）'
+    + '＝★下げないと また 増やせる★');
 });
 console.log('       （約束の 形の 文 ' + 約束の形の数 + '／印を 付けた ' + 印セット.length
   + '／未点検 ' + 未点検 + '。★形の 数は 字で 拾った 数＝分母では ない★）');
@@ -172,9 +180,15 @@ for (const v of 台帳.台帳) {
   const まだ = 台帳.台帳.filter((v) => v.見方 === '中の数' && !中の数の試し[v.名]).map((v) => v.名);
   console.log('');
   console.log('  ★機械が 毎回は 見ていない 物（隠さず 出す）★');
-  console.log('    週1の 実ブラウザの 回で 見る（canvas の 点）… ' + (描いた物.join('・') || 'なし'));
-  console.log('    人が 見る しかない ……………………………… ' + (人.join('・') || 'なし'));
-  console.log('    まだ 押していない（中の数だが 試しが 無い）… ' + (まだ.join('・') || 'なし'));
+  /* ★未測定は 緑の 数に 入れない★（2026-09-03・指示役）
+     ＝★見張りが 見ていない 物を 緑に 見せない★
+     ★週1の 回で 埋まったら その 行を「見ている」に 変える★ */
+  for (const v of 台帳.台帳) {
+    if (v.見方 === '描いた物') { 未測定++; console.log('    ★未測定★ ' + v.名 + ' … ' + v.何を見る + '（★週1の 実ブラウザの 回で 埋める★／今＝' + v.今 + '）'); }
+    else if (v.見方 === '人') { 未測定++; console.log('    ★未測定★ ' + v.名 + ' … ' + v.何を見る + '（★人が 見る しかない★／今＝' + v.今 + '）'); }
+  }
+  for (const n of まだ) { 未測定++; console.log('    ★未測定★ ' + n + ' … 中の数だが ★試しが まだ 無い★'); }
+  console.log('    （週1で 見る ' + 描いた物.length + '／人 ' + 人.length + '／試しが 無い ' + まだ.length + '）');
   T('★「まだ 押していない」が 2個 以下（増やしていない）★', () => {
     言う(まだ.length <= 2, 'まだ 押していない 物が 増えた（' + まだ.join('・') + '）');
   });
@@ -194,6 +208,9 @@ if (process.argv.includes('--self-test')) {
       (s) => s.replace('  else e.removeAttribute(\'data-yakusoku\');', '  else { /* 外さない */ }')],
     ['★関数を 入れても セルに 入らない（約束が 嘘に なる）★',
       (s) => s.replace("  setCell(selR1, selC1, '=' + 名 + '(');", '  /* 入れない */')],
+    /* ★上限の ラチェット★＝★印を 付けて 未点検が 減ったのに 上限を 下げない★ と 赤 */
+    ['★印を 1つ 増やして 上限を 下げない（戻れる 形に する）★',
+      (s) => s.replace("（★式でした＝答えが変わります★）", "（★式でした＝答えが変わります★）<!-- data-yakusoku=\"tsuika-test\" -->")],
   ];
   const 元 = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
   const tmp = path.join(ROOT, 'tests', '_yakusoku_broken.html');
@@ -216,5 +233,6 @@ if (process.argv.includes('--self-test')) {
 }
 
 console.log('');
-console.log('yakusoku: ' + pass + ' 緑 / ' + fail + ' 赤');
+console.log('yakusoku: ' + pass + ' 緑 / ' + fail + ' 赤 / ★未測定 ' + 未測定 + '件★'
+  + '（★未測定は 緑に 数えていません★）');
 process.exit(fail ? 1 : 0);
