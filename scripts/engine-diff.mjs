@@ -115,7 +115,13 @@ function 計算する(道具, sheets) {
       let v;
       try { v = hf.getCellValue({ sheet: sid, row: r, col: c }); }
       catch (e) { v = '★読めない★'; }
-      出[s.name + '!' + k] = (v && typeof v === 'object' && v.value !== undefined) ? v.value : v;
+      let 答 = (v && typeof v === 'object' && v.value !== undefined) ? v.value : v;
+      /* ★画面に出る形に そろえる★＝ここは ★全部 式のセル★（式の場所 しか 見ていない）。
+         本番の _hfGetDisplay は 式のセルが 空セルを指したら ★0★ を出す（Excelと同じ・2026-08-29）。
+         生の null のまま 比べると ★画面では 合っている物を「合わない」と 数える★
+         ＝プラグイン積み忘れ（穴4）と 同じ型の 間違い。 */
+      if (答 === null || 答 === undefined) 答 = 0;
+      出[s.name + '!' + k] = 答;
     }
   }
   const 版 = HyperFormula.version;
@@ -329,7 +335,7 @@ console.log('  今の道具 … 合う ' + b.合.toLocaleString() + ' ／ 違う
   console.log('   その他 … ' + その他.toLocaleString() + '本');
   /* ★中身を 見ないと 直せない★＝エラーと 字の差を 少しだけ 出す */
   if (process.argv.includes('--中身')) {
-    let e1 = 0, e2 = 0;
+    let e1 = 0, e2 = 0, e3 = 0;
     for (const k of Object.keys(Excelの答え)) {
       const e = Excelの答え[k], v = 今.答え[k];
       if (v === undefined) continue;
@@ -344,6 +350,12 @@ console.log('  今の道具 … 合う ' + b.合.toLocaleString() + ' ／ 違う
         console.log('   ［エラー］' + k + ' ／ Excel=' + JSON.stringify(e) + ' ／ うち=' + v);
         console.log('        元の式 … ' + String(g.元).slice(0, 160));
         if (g.直) console.log('        直した後 … ' + String(g.直).slice(0, 160));
+      } else if (数か && e3 < 10) {
+        e3++;
+        const g3 = 生の式[k] || {};
+        console.log('   ［数が違う］' + k + ' ／ Excel=' + e + ' ／ うち=' + v + ' ／ 差=' + (v - e));
+        console.log('        元の式 … ' + String(g3.元).slice(0, 150));
+        if (g3.直) console.log('        直した後 … ' + String(g3.直).slice(0, 150));
       } else if ((typeof e === 'string' || typeof v === 'string') && !/^#/.test(String(v)) && e2 < 6) {
         e2++; console.log('   ［字］' + k + ' ' + f.slice(0, 70) + ' ／ Excel=' + JSON.stringify(e) + ' ／ うち=' + JSON.stringify(v));
       }

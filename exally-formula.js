@@ -39,10 +39,25 @@ function addSheetToEngine(name) {
 // ================================================================
 // 内部ヘルパー
 // ================================================================
-function _hfGetDisplay(sheet, r, c) {
+/* ★式のセルが「空のセル」を指した時、Excelは 0 を返す★（2026-08-29 実Excel 16.0 で実測）
+ *
+ *   =C2（C2は空）         → ★0★（数）  画面に「0」
+ *   =INDEX(C1:C5,2)（空）  → ★0★（数）  画面に「0」
+ *   =IF(C2="","",1)       → ""（字）    画面は 空
+ *   =C2&""                → ""（字）    画面は 空
+ *   ⇒ ★決まり＝「数の場所なら 0・字の場所なら 空」★
+ *
+ *   HyperFormula は 前者で ★null★ を返す（後者は "" を返すので ★区別が つく★）。
+ *   ここで null を '' にしていたため、★司さんの実物 19,323本のうち 2,918本が
+ *   「Excelは 0・うちは 空」★ で 食い違っていた（Excelとの一致 84.6%）。
+ *
+ *   ★式のセルだけ★ 0 にする。ただの空セルまで 0 にすると 表が 0 だらけになる。
+ *   ⇒ 呼び手が 式かどうかを 渡す（★既定は false＝前と同じ動き★）。
+ */
+function _hfGetDisplay(sheet, r, c, 式のセルか) {
   try {
     var val = _hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
-    if(val===null||val===undefined) return '';
+    if(val===null||val===undefined) return 式のセルか ? '0' : '';
     if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
     return String(val);
   } catch(e) { return '#ERR'; }
@@ -868,8 +883,73 @@ function _rewriteIntMod(f) {
   return f;
 }
 
+/* ★範囲を「:」で つないだ物を 1つの四角に まとめる★（2026-08-29）
+ *
+ *  Excel の「:」は ★範囲演算子★＝2つの範囲を「囲む四角」に する。
+ *  司さんの実物に こう書いてある（★実Excel(COM)で 原本の複製を 読んだ 真値★）:
+ *      =SUM(ROUNDDOWN(FILTER(R8.1[白石正人]:R8.1[長野孝]: … :R8.1[向垣内], … )))
+ *  表の名前を A1 に 直すと `'歩合'!V2:V32:'歩合'!X2:X32: … :'歩合'!AJ2:AJ32` になる。
+ *
+ *  ★HyperFormula は この形を 読めない★（実測 2026-08-29）:
+ *      =SUM(A1:A3:C1:C3)              → Parsing error（RParen を待っていたら ':' が来た）
+ *      =SUM('歩合'!A1:A3:'歩合'!C1:C3) → #ERROR!
+ *      =SUM('歩合'!A1:C3)              → ★45（通る）★
+ *  ⇒ ★囲む四角に まとめてから 渡す★。
+ *
+ *  これを入れる前は 司さんの実物で ★52本が #ERROR!★ だった
+ *  （実Excel の答えは 177,523 / 211,558 / 279,558 / 668,639 ＝★金額★）。
+ *
+ *  ★同じシートの物だけ まとめる★（別シートを跨ぐ「:」は Excel でも 意味が違う）。
+ *  ★読めない形は 触らない★（部品が 奇数個・番地の形が 違う 等）。
+ */
+function _mergeRangeChains(f) {
+  var シート = "(?:'[^']+'|[A-Za-z_\\u3040-\\u30ff\\u4e00-\\u9fff][\\w\\u3040-\\u30ff\\u4e00-\\u9fff.]*)!";
+  var 番地 = '\\$?[A-Za-z]{1,3}\\$?[0-9]{1,7}';
+  var 一つ = '(?:' + シート + ')?' + 番地 + ':' + 番地;
+  var 鎖 = new RegExp('(' + 一つ + ')(?::(' + 一つ + ')){1,}', 'g');
+  return String(f).replace(鎖, function (whole) {
+    var 部品 = whole.split(':');
+    if (部品.length % 2 !== 0) return whole;        // 2つで1組。奇数なら 触らない
+    var 名 = null, r1 = Infinity, r2 = -Infinity, c1 = Infinity, c2 = -Infinity;
+    for (var i = 0; i < 部品.length; i++) {
+      var m = 部品[i].match(/^(?:(.+)!)?\$?([A-Za-z]{1,3})\$?([0-9]{1,7})$/);
+      if (!m) return whole;
+      var このシート = m[1] || '';
+      if (i === 0) 名 = このシート;
+      else if (このシート && このシート !== 名) return whole;   // ★別シートは まとめない★
+      var col = 0, L = m[2].toUpperCase();
+      for (var k = 0; k < L.length; k++) col = col * 26 + (L.charCodeAt(k) - 64);
+      var row = parseInt(m[3], 10);
+      if (col < c1) c1 = col;
+      if (col > c2) c2 = col;
+      if (row < r1) r1 = row;
+      if (row > r2) r2 = row;
+    }
+    function 列名(n) { var s = ''; while (n > 0) { var t = (n - 1) % 26; s = String.fromCharCode(65 + t) + s; n = (n - t - 1) / 26; } return s; }
+    return (名 ? 名 + '!' : '') + 列名(c1) + r1 + ':' + 列名(c2) + r2;
+  });
+}
+
+/* ★Excelが 新しい関数に 付ける 内部の印を 外す★（2026-08-29）
+ *   Excel は 新しい関数を ファイルの中で `_xlfn.` `_xlws.` `_xludf.` `_xlpm.` 付きで 持つ。
+ *   ★.xlsb を 読むと 裸の `_xlws.FILTER(` が そのまま 来る★（実測）。
+ *   HyperFormula は これを 読めない ⇒ `Parsing error`。
+ *   ★長い方から 順に★（先に短い方を外すと `_xlfn.` だけ 消えて `_xlws.` が 残る）。
+ *   ★同じ一覧を lib/xlsx-io.js の stripXlfn も 持つ★（あちらは 式バーの表示用）。
+ *     tests/xlfn-strip.test.mjs が ★両方が 同じ物を 外すか★ を 突き合わせる。 */
+function _stripXlPrefix(f) {
+  return String(f)
+    .replace(/_xlfn\._xlws\./g, '')
+    .replace(/_xlfn\./g, '')
+    .replace(/_xlws\./g, '')
+    .replace(/_xludf\./g, '')
+    .replace(/_xlpm\./g, '');
+}
+
 function convertFormula(f) {
   if(!f||f[0]!=='=') return f;
+  if(f.indexOf('_xl') >= 0) f = _stripXlPrefix(f);
+  if(f.indexOf(':') >= 0) f = _mergeRangeChains(f);
   if(/VALUE\s*\(/i.test(f))     f = _rewriteValueCalls(f);
   if(/\b(INT|MOD)\s*\(/i.test(f)) f = _rewriteIntMod(f);
   // LET展開
@@ -1113,6 +1193,8 @@ if (typeof module !== 'undefined' && module.exports) {
     _jsMapCompute: _jsMapCompute, _jsMakearrayCompute: _jsMakearrayCompute,
     // ルーター
     convertFormula: convertFormula,
+    /* ★見張りが 中を1つずつ 試せるように 出す★（入口だけ見て 緑にしない） */
+    _stripXlPrefix: _stripXlPrefix, _mergeRangeChains: _mergeRangeChains,
     _jsComputeFormula: _jsComputeFormula
   };
 }
@@ -1216,6 +1298,15 @@ function registerExallyFunctions(HFns) {
     } catch(e){}
     return 1;
   }
+  /* ★幅も 読む★（FILTER は 形を保つので 幅の申告が 要る）。読めない時は 1（＝スカラー扱い） */
+  function rangeWidth(argAst){
+    try {
+      if(argAst && argAst.type === 'CELL_RANGE' && argAst.start && argAst.end){
+        return Math.abs(argAst.end.col - argAst.start.col) + 1;
+      }
+    } catch(e){}
+    return 1;
+  }
   function sizeFromFirstArg(ast){
     if(!ArraySize) return null;
     var args = (ast && ast.args) || [];
@@ -1246,29 +1337,100 @@ function registerExallyFunctions(HFns) {
   //  ★配列を返す関数の「出力の大きさ」。SORT/UNIQUE/FILTER はいずれも
   //    第1引数の範囲と同じ高さの縦1列を返すので、1つの実装で足りる。
   ExallyPlugin.prototype.exArraySize = function(ast){ return sizeFromFirstArg(ast) || new ArraySize(1,1); };
+  /* ★FILTER は 形を保つ★＝出す大きさも 入力の 高さ×幅 で 申告する。
+     幅1 と 申告したままだと、2列以上を 返しても ★1列しか 展開されない★（2026-08-29）。 */
+  ExallyPlugin.prototype.exFilterArraySize = function(ast){
+    if(!ArraySize) return null;
+    var a = (ast && ast.args) || [];
+    return new ArraySize(rangeWidth(a[0]), rangeHeight(a[0]));
+  };
 
+  /* ★SORT / UNIQUE も 形を保つ★（2026-08-29 実Excel 16.0 で 測り直した）
+   *   A1:B4 = [[300,1],[100,2],[200,3],[100,2]] の 真値:
+   *     =COLUMNS(SORT(A1:B4))            → ★2★   （★行ごと★ 並べ替え・列は そのまま）
+   *     =ROWS(SORT(A1:B4))               → ★4★
+   *     =INDEX(SORT(A1:B4),1,1)          → ★100★
+   *     =INDEX(SORT(A1:B4,2),1,1)        → ★300★（2列目で 並べ替え）
+   *     =INDEX(SORT(A1:B4,2,-1),1,1)     → ★200★（降順）
+   *     =INDEX(SORT(A1:B4,1,1,TRUE),1,1) → ★1★  （by_col＝★列ごと★ 並べ替え）
+   *     =ROWS(UNIQUE(A1:B4))             → ★3★  （★行の重複★を 消す）
+   *     =COLUMNS(UNIQUE(A1:B4,TRUE))     → ★2★
+   *     =ROWS(UNIQUE(A1:B4,FALSE,TRUE))  → ★2★  （1度だけ出る行）
+   *   ★直す前は FILTER と 同じ作り★＝平らにして 縦1列で 返していたので
+   *   2列以上で 中身も 形も 壊れていた（実測 10項目中 6件が 実Excelと 違った）。
+   *
+   *   ★1列の時は 今までどおり★（空を落として 縦1列）。
+   *   ＝実Excel は 空を 残して 後ろに 置く（`=ROWS(SORT(D1:D4))` → 4）が、
+   *     ★ここは 突き合わせ台 tests/xlsx-harness の 見本値が 決めている所★なので
+   *     ★測っただけで 今回は 変えていない★（変えるなら 見本値ごと 取り直す）。 */
+  function 並び比べ(a, b, dir){
+    var A = (a===null||a===undefined||a==='');
+    var B = (b===null||b===undefined||b==='');
+    if(A && B) return 0;
+    if(A) return 1;            // ★空は いつも 後ろ★（実Excelで実測）
+    if(B) return -1;
+    if(typeof a==='number' && typeof b==='number') return (a-b)*dir;
+    return String(a).localeCompare(String(b))*dir;
+  }
+  function 転置(m){
+    var out=[], 幅=(m[0]?m[0].length:0);
+    for(var c=0;c<幅;c++){ var 行=[]; for(var r=0;r<m.length;r++) 行.push(m[r][c]); out.push(行); }
+    return out;
+  }
   ExallyPlugin.prototype.exSort = function(ast, state){
-    return this.runFunction(ast.args, state, this.metadata('EX.SORT'), function(range, idx, order){
-      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
-      var e = firstErr(arr); if(e) return e;
+    return this.runFunction(ast.args, state, this.metadata('EX.SORT'), function(range, idx, order, byCol){
+      var e = firstErr(flat(range)); if(e) return e;
+      var M = rect(range);
+      var 幅 = M[0] ? M[0].length : 0;
+      if(幅 <= 1){
+        var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+        var d1 = (toNum(order)===-1) ? -1 : 1;
+        arr.sort(function(a,b){ return 並び比べ(a,b,d1); });
+        return col(arr);
+      }
+      var 列で = (byCol===true || toNum(byCol)===1);
+      var 表 = 列で ? 転置(M) : M;
+      var k = Math.max(1, Math.round(toNum(idx)||1)) - 1;
       var dir = (toNum(order)===-1) ? -1 : 1;
-      arr.sort(function(a,b){
-        if(typeof a==='number' && typeof b==='number') return (a-b)*dir;
-        return String(a).localeCompare(String(b))*dir;
-      });
-      return col(arr);
+      表 = 表.slice().sort(function(x, y){ return 並び比べ(x[k], y[k], dir); });
+      return rectOut(列で ? 転置(表) : 表);
     });
   };
   ExallyPlugin.prototype.exUnique = function(ast, state){
-    return this.runFunction(ast.args, state, this.metadata('EX.UNIQUE'), function(range){
-      var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
-      var e = firstErr(arr); if(e) return e;
-      var seen = [], out = [];
-      for(var i=0;i<arr.length;i++){
-        var key = (typeof arr[i]) + ' ' + String(arr[i]);
-        if(seen.indexOf(key)<0){ seen.push(key); out.push(arr[i]); }
+    return this.runFunction(ast.args, state, this.metadata('EX.UNIQUE'), function(range, byCol, once){
+      var e = firstErr(flat(range)); if(e) return e;
+      var M = rect(range);
+      var 幅 = M[0] ? M[0].length : 0;
+      if(幅 <= 1 && !(byCol===true || toNum(byCol)===1)){
+        /* ★1列は 今までどおり★（見本値が 決めている） */
+        var arr = flat(range).filter(function(v){ return v!==null && v!==undefined && v!==''; });
+        var seen = [], out = [];
+        for(var i=0;i<arr.length;i++){
+          var key = (typeof arr[i]) + ' ' + String(arr[i]);
+          if(seen.indexOf(key)<0){ seen.push(key); out.push(arr[i]); }
+        }
+        if(once===true || toNum(once)===1){
+          var 数={};
+          for(var j=0;j<arr.length;j++){ var k2=(typeof arr[j])+' '+String(arr[j]); 数[k2]=(数[k2]||0)+1; }
+          out = out.filter(function(v){ return 数[(typeof v)+' '+String(v)]===1; });
+        }
+        return col(out);
       }
-      return col(out);
+      var 列で = (byCol===true || toNum(byCol)===1);
+      var 一度だけ = (once===true || toNum(once)===1);
+      var 表 = 列で ? 転置(M) : M;
+      var 鍵 = 表.map(function(行){ return 行.map(function(v){ return (typeof v)+' '+String(v); }).join(''); });
+      var 数え = {};
+      for(var m=0;m<鍵.length;m++) 数え[鍵[m]] = (数え[鍵[m]]||0) + 1;
+      var 見た = {}, 残り = [];
+      for(var n=0;n<表.length;n++){
+        if(見た[鍵[n]]) continue;
+        見た[鍵[n]] = true;
+        if(一度だけ && 数え[鍵[n]] !== 1) continue;
+        残り.push(表[n]);
+      }
+      if(!残り.length) return 0;
+      return rectOut(列で ? 転置(残り) : 残り);
     });
   };
   ExallyPlugin.prototype.exText = function(ast, state){
@@ -1334,20 +1496,60 @@ function registerExallyFunctions(HFns) {
       return flat(ifnf)[0];
     });
   };
+  /* ★FILTER は「行を残す／列を残す」＝形を保つ★（2026-08-29 実Excel 16.0 で 測り直した）
+   *
+   *   =SUM(FILTER(A1:B4,{1;0;0;1}))     → ★505★（縦の条件＝★行★を選ぶ・2列とも 残る）
+   *   =COLUMNS(FILTER(A1:B4,{1;0;0;1})) → ★2★
+   *   =SUM(FILTER(A1:B4,{1,0}))         → ★1000★（横の条件＝★列★を選ぶ）
+   *   =SUM(FILTER(A1:A4,{2;0;0;0}))     → ★100★（0以外の数は 真）
+   *   =SUM(FILTER(A1:A4,{-1;0;0;0}))    → ★100★（負の数も 真）
+   *   =FILTER(A1:A4,{0;0;0;0},"なし")    → ★なし★
+   *
+   *   ★直す前は 平らにして 1つずつ 拾い、縦1列で 返していた★＝
+   *   2列以上だと ★中身も 形も 壊れる★（実測 =FILTER(A1:B4,{1;0;0;1}) が [[100],[2]]・COLUMNS=1）。
+   *   これで 司さんの実物の 月別合計が ★177,523 などの金額 → 0★ に なっていた。 */
+  function rect(v){
+    if(v && typeof v==='object' && v.data) return v.data.map(function(row){ return row.map(unwrap); });
+    return [[unwrap(v)]];
+  }
+  function 真か(c){
+    if(c===true) return true;
+    if(typeof c==='number') return c !== 0;              // ★0以外は 真（負も 真）★実Excelで実測
+    if(typeof c==='string') return c.toUpperCase()==='TRUE';
+    return false;
+  }
+  function rectOut(rows2d){
+    if(!rows2d.length || !rows2d[0].length) return 0;    // col() と同じ理由（空は スカラー）
+    return SRV.onlyValues(rows2d);
+  }
   ExallyPlugin.prototype.exFilter = function(ast, state){
     return this.runFunction(ast.args, state, this.metadata('EX.FILTER'), function(range, cond, ifEmpty){
-      var A = flat(range), C = flat(cond);
-      var e = firstErr(A) || firstErr(C); if(e) return e;
+      var A = rect(range), C = rect(cond);
+      var e = firstErr(flat(range)) || firstErr(flat(cond)); if(e) return e;
+      var 高 = A.length, 幅 = A[0] ? A[0].length : 0;
+      var C高 = C.length, C幅 = C[0] ? C[0].length : 0;
       var out = [];
-      for(var i=0;i<A.length;i++){
-        var c = C[i];
-        if(c===true || c===1 || (typeof c==='string' && c.toUpperCase()==='TRUE')) out.push(A[i]);
+      /* ★縦の条件（1列）＝行を選ぶ★ ／ ★横の条件（1行）＝列を選ぶ★
+         どちらとも 決められない形は ★触らずに #VALUE!★（黙って違う数字を出さない） */
+      if(C幅 === 1 && C高 === 高){
+        for(var r=0;r<高;r++) if(真か(C[r][0])) out.push(A[r].slice());
+      } else if(C高 === 1 && C幅 === 幅){
+        var 残す = [];
+        for(var c2=0;c2<幅;c2++) if(真か(C[0][c2])) 残す.push(c2);
+        for(var r2=0;r2<高;r2++){
+          var 行 = [];
+          for(var k2=0;k2<残す.length;k2++) 行.push(A[r2][残す[k2]]);
+          out.push(行);
+        }
+        if(!残す.length) out = [];
+      } else {
+        return err(ErrorType.VALUE);
       }
-      if(!out.length){
+      if(!out.length || !out[0] || !out[0].length){
         if(ifEmpty===undefined || ifEmpty===null) return err(ErrorType.NA);
         return col(flat(ifEmpty));
       }
-      return col(out);
+      return rectOut(out);
     });
   };
   ExallyPlugin.prototype.exMatch = function(ast, state){
@@ -1712,15 +1914,15 @@ function registerExallyFunctions(HFns) {
   var OPT = { argumentType: T.ANY, optionalArg: true };
   ExallyPlugin.implementedFunctions = {
     //  ★arraySizeMethod = 出力の大きさの申告(R19)。これが無いと素の =SORT(A1:A10) が #VALUE! になる。
-    'EX.SORT':       { method: 'exSort',       parameters: [ANY, OPT, OPT, OPT], arrayFunction: true, arraySizeMethod: 'exArraySize' },
-    'EX.UNIQUE':     { method: 'exUnique',     parameters: [ANY, OPT, OPT],      arrayFunction: true, arraySizeMethod: 'exArraySize' },
+    'EX.SORT':       { method: 'exSort',       parameters: [ANY, OPT, OPT, OPT], arrayFunction: true, arraySizeMethod: 'exFilterArraySize' },
+    'EX.UNIQUE':     { method: 'exUnique',     parameters: [ANY, OPT, OPT],      arrayFunction: true, arraySizeMethod: 'exFilterArraySize' },
     'EX.TEXT':       { method: 'exText',       parameters: [ANY, ANY] },
     'EX.TEXTJOIN':   { method: 'exTextjoin',   parameters: [ANY, ANY, ANY], repeatLastArgs: 1 },
     'EX.INT':        { method: 'exInt',        parameters: [ANY] },
     'EX.MOD':        { method: 'exMod',        parameters: [ANY, ANY] },
     'EX.VALUE':      { method: 'exValue',      parameters: [ANY] },
     'EX.XLOOKUP':    { method: 'exXlookup',    parameters: [ANY, ANY, ANY, OPT, OPT, OPT] },
-    'EX.FILTER':     { method: 'exFilter',     parameters: [ANY, ANY, OPT],      arrayFunction: true, arraySizeMethod: 'exArraySize' },
+    'EX.FILTER':     { method: 'exFilter',     parameters: [ANY, ANY, OPT],      arrayFunction: true, arraySizeMethod: 'exFilterArraySize' },
     'EX.MATCH':      { method: 'exMatch',      parameters: [ANY, ANY, OPT] },
     'EX.SUMPRODUCT': { method: 'exSumproduct', parameters: [ANY], repeatLastArgs: 1 },
     // ★第3波P1(2026-08-01)

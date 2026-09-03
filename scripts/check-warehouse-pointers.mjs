@@ -498,7 +498,14 @@ if (argv.includes('--self-test')) {
   process.exit(f ? 1 : 0);
 }
 
-/* ══════════ 実行 ══════════ */
+/* ══════════ 実行 ══════════
+   ★import された時は 走らせない★（2026-08-29）
+     PROD_REF / TEST_REF を 借りたい道具が 出てきた。見分けを 付けないと
+     ★import しただけで 外へ GET を 何十本も 出し、最後の process.exit で
+      借りた側が その場で 死ぬ★（実測＝apply-supabase-sql.mjs が 何も言わずに 終わっていた）。
+     ＝ tests/run.js で 踏んだ物と 同じ型（あちらは require.main）。 */
+const 走らせ役 = /check-warehouse-pointers\.mjs$/.test(String(process.argv[1] || '').split('\\').join('/'));
+if (走らせ役) {
 console.log('\n[warehouse-pointers] 倉庫の向き先 6か所 × 全アプリ（★読むだけ★）');
 console.log(`  本番 = ${PROD_REF} / テスト = ${TEST_REF} / 引っ越しの日 = ${MIGRATION_DAY}\n`);
 
@@ -531,3 +538,4 @@ console.log(`  —  対象外 : ${all.filter((r) => r.mark === '—').length}`);
 if (JSON_OUT) console.log('\n' + JSON.stringify(rows, null, 2));
 console.log(red ? '\n★🔴があります。向き先が違う所を直すこと★' : '\n🔴は0件（🟡の本数は上を見ること）');
 process.exit(red ? 3 : 0);
+}
