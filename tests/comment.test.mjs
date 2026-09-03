@@ -42,7 +42,12 @@ ok('★alert / prompt / confirm を 使っていない★', !/\balert\(|\bprompt
 
 console.log('\n[② ★赤い印を 描く（実Excelと 同じ 見せ方）★]');
 ok('印を 描く所が 在る', /sheets\[activeSheet\]\.comments/.test(book) && /#E53935/.test(book));
-ok('★右上に 描く★（moveTo(x+w-6,y)）', /moveTo\(x\+w-6,y\)/.test(book));
+/* ★2026-09-03 に 直した★＝★空白 1つで 死ぬ 形だった★
+   `moveTo(x+w-6, y)` と 書き直した だけで ★見つからない＝赤★に なった（実際に なった）。
+   ★字の 並びで 探す 見張りは 書き直しで 死ぬ★（今日 何度も 出た 型）
+   ⇒★空白は 幾つ 在っても よい形★に する。 */
+ok('★右上に 描く★（moveTo(x+w-6, y)）',
+  /moveTo\(\s*x\s*\+\s*w\s*-\s*6\s*,\s*y\s*\)/.test(book));
 
 console.log('\n[③ 実際に 走らせる]');
 function 台(選 = [0, 0]) {

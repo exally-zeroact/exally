@@ -66,7 +66,16 @@ function listTestFiles() {
   return out.sort();
 }
 
-const ci = fs.readFileSync(path.join(ROOT, '.github/workflows/ci.yml'), 'utf8');
+/* ★2026-09-03 に 直した★＝★ci.yml しか 見ていなかった★。
+   ★週1の 回（.github/workflows/webkit.yml）で 走る 試験を「宙に浮いている」と 誤って 赤に した★
+   （実測＝comment-mark-webkit.mjs／karimono.test.mjs の 2本）。
+   ⇒★.github/workflows の yml を 全部 見る★（★どの 回で 走っても「走っている」★）
+   ⇒★見た yml の 本数も 出す★＝★0本 見て 0件★を 見破れるように（今日の 決まり） */
+const wfDir = path.join(ROOT, '.github/workflows');
+const wfFiles = fs.existsSync(wfDir)
+  ? fs.readdirSync(wfDir).filter((f) => /\.ya?ml$/.test(f)).sort()
+  : [];
+const ci = wfFiles.map((f) => fs.readFileSync(path.join(wfDir, f), 'utf8')).join(String.fromCharCode(10));
 const ciRuns = new Set((ci.match(/node\s+([A-Za-z0-9/._-]+)/g) || []).map(s => s.replace(/^node\s+/, '')));
 
 function runnerList(runnerRel) {
@@ -81,6 +90,8 @@ function runnerList(runnerRel) {
 const viaRunner = new Set([...runnerList('tests/run.js'), ...runnerList('kyuyo/tests/run.js')]);
 
 console.log('\n[ci-coverage] CIから黙って外れているテストが無いか');
+/* ★見た 本数も 出す★＝★0本 見て 0件★を 見破る為（2026-09-03 の 決まり） */
+console.log('  （見た ワークフロー ' + wfFiles.length + '本＝' + wfFiles.join('・') + '）');
 
 const files = listTestFiles();
 const covered = [], excluded = [], orphan = [];
@@ -107,6 +118,12 @@ T('★除外は1本だけ（増えていたら、ここが赤になって気づ�
 });
 T('検査が空振りしていない（テストファイルを実際に数えている）', function () {
   if (covered.length < 50) throw new Error('CIが回しているテストが少なすぎます: ' + covered.length);
+});
+/* ★0本 見て 0件★を 見破る（2026-09-03 の 決まり）
+   ＝★ワークフローを 1本も 読めていないのに「全部 走っている」と 言わない★ */
+T('★ワークフローを 実際に 読んでいる（今 ' + wfFiles.length + '本）★', function () {
+  if (wfFiles.length < 2) throw new Error('ワークフローを ' + wfFiles.length + '本しか 読めていません＝★探し方が 悪い★');
+  if (!/webkit\.yml/.test(wfFiles.join(' '))) throw new Error('週1の 回（webkit.yml）を 読めていません');
 });
 
 console.log(`\n── 実測 ──`);
