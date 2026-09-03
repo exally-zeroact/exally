@@ -1,6 +1,6 @@
 # 版対応 検証ハーネス レポート
 
-- 生成日: 2026-08-29
+- 生成日: 2026-08-31
 - 真値: **O365HomePremRetail 16.0.20228.20158** (x64 / Current Channel)
 - ロケール: UI=1041 / 国=81 / 小数点='.' 桁区切り=',' / 日付システム=1900
 - 計算経路: **book.html の setCellFormula(本番と同じ)**。生の HyperFormula ではない。
@@ -35,7 +35,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 
 | ケース | 式 | 見方 | 期待 | 実際 | 判定 |
 |---|---|---|---|---|---|
-| TODAY_serial | `=TODAY()*1` | 実行時点の日付シリアルと一致するか | 46263 | 46263 | OK |
+| TODAY_serial | `=TODAY()*1` | 実行時点の日付シリアルと一致するか | 46265 | 46265 | OK |
 | NOW_int_is_today | `=INT(NOW())-TODAY()` | NOWの整数部がTODAYと一致するか | 0 | 0 | OK |
 
 ## 不一致（新規）＝赤
@@ -71,7 +71,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 ## 経路の固定（将来 生HF に落ちたら気付くための錠）
 
 - 独自層(_jsComputeFormula)が答えたケース: **0件**
-- 生HFと本番経路で答えが違うケース: **211件** … この差が消えたら「素通りに落ちた」ということ
+- 生HFと本番経路で答えが違うケース: **203件** … この差が消えたら「素通りに落ちた」ということ
 - 独自層の入口: {"jsSetCount":1,"entryPoints":1,"pluginRegistered":true,"pluginCount":43}（1つだけであること）
 
 ## 全ケース
@@ -173,15 +173,15 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | IFNA | IFNA_na | `=IFNA(NA(),"なし")` | なし | なし | 未検証 | なし | 一致 |  |
 | IFNA | IFNA_div0_passes | `=IFERROR(IFNA(1/0,"なし"),"div0が素通り")` | div0が素通り | div0が素通り | 未検証 | div0が素通り | 一致 |  |
 | IFNA | IFNA_ok | `=IFNA(A1,"なし")` | 1000 | 1000 | 未検証 | 1000 | 一致 |  |
-| AND | AND_all_true | `=AND(A1>0,A2>0)` | true | TRUE | 未検証 | TRUE | 一致 |  |
-| AND | AND_one_false | `=AND(A1>0,A3>0)` | false | FALSE | 未検証 | FALSE | 一致 |  |
-| AND | AND_cellbool | `=AND(H1,H1)` | true | TRUE | 未検証 | TRUE | 一致 |  |
-| OR | OR_one_true | `=OR(A3>0,A1>0)` | true | TRUE | 未検証 | TRUE | 一致 |  |
-| OR | OR_all_false | `=OR(A3>0,A8>0)` | false | FALSE | 未検証 | FALSE | 一致 |  |
-| OR | OR_cellbool | `=OR(H2,H1)` | true | TRUE | 未検証 | TRUE | 一致 |  |
-| NOT | NOT_true | `=NOT(TRUE)` | false | FALSE | 未検証 | #NAME? | 一致 |  |
-| NOT | NOT_cell | `=NOT(H2)` | true | TRUE | 未検証 | TRUE | 一致 |  |
-| NOT | NOT_expr | `=NOT(A1>A2)` | true | TRUE | 未検証 | TRUE | 一致 |  |
+| AND | AND_all_true | `=AND(A1>0,A2>0)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
+| AND | AND_one_false | `=AND(A1>0,A3>0)` | FALSE | FALSE | 未検証 | FALSE | 一致 |  |
+| AND | AND_cellbool | `=AND(H1,H1)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
+| OR | OR_one_true | `=OR(A3>0,A1>0)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
+| OR | OR_all_false | `=OR(A3>0,A8>0)` | FALSE | FALSE | 未検証 | FALSE | 一致 |  |
+| OR | OR_cellbool | `=OR(H2,H1)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
+| NOT | NOT_true | `=NOT(TRUE)` | FALSE | FALSE | 未検証 | #NAME? | 一致 |  |
+| NOT | NOT_cell | `=NOT(H2)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
+| NOT | NOT_expr | `=NOT(A1>A2)` | TRUE | TRUE | 未検証 | TRUE | 一致 |  |
 | AND | LOGIC_combo | `=IF(AND(OR(A1>0,NOT(TRUE)),A3<0),"y","n")` | y | y | 未検証 | #NAME? | 一致 |  |
 | NOT | LOGIC_bool_to_num | `=(A1>0)*1+(A3>0)*1` | 1 | 1 | 未検証 | 1 | 一致 |  |
 | VLOOKUP | VLOOKUP_exact | `=VLOOKUP(20,C1:E6,3,FALSE)` | 400 | 400 | 未検証 | #NAME? | 一致 |  |

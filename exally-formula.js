@@ -59,6 +59,10 @@ function _hfGetDisplay(sheet, r, c, 式のセルか) {
     var val = _hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
     if(val===null||val===undefined) return 式のセルか ? '0' : '';
     if(typeof val==='object'&&val.type) return HF_ERR[val.type]||('#'+val.type);
+    /* ★はい/いいえは 大文字★（実Excel 実測 2026-08-30＝Range.Text が "TRUE"/"FALSE"）。
+       String(true) は "true" に なるので ★ここで 直す★。
+       ★出口は この 1か所★＝画面も 紙も 書き出しも 同じ 字に なる。 */
+    if(typeof val==='boolean') return val ? 'TRUE' : 'FALSE';
     return String(val);
   } catch(e) { return '#ERR'; }
 }
@@ -946,8 +950,15 @@ function _stripXlPrefix(f) {
     .replace(/_xlpm\./g, '');
 }
 
-function convertFormula(f) {
+function convertFormula(f, シート) {
   if(!f||f[0]!=='=') return f;
+  /* ★名前の定義を 実際の範囲に 開く★（2026-08-29）
+     HyperFormula は ★日本語の名前を 受け付けない★（実測：売上／うりあげ／売上_2026 とも invalid）。
+     司さんの実物は 日本語の名前で 書かれているので ★エンジンに 入る前に 開く★。
+     開き方は lib/named-ranges.js（字の中は 触らない／長い名前から 先に 開く）。 */
+  if(typeof window !== 'undefined' && window.名前の箱 && typeof window.名前の箱.開く === 'function'){
+    f = window.名前の箱.開く(f, シート);
+  }
   if(f.indexOf('_xl') >= 0) f = _stripXlPrefix(f);
   if(f.indexOf(':') >= 0) f = _mergeRangeChains(f);
   if(/VALUE\s*\(/i.test(f))     f = _rewriteValueCalls(f);

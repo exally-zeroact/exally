@@ -8,10 +8,66 @@ const path = require('path');
 
 const FILES = [
   'stamp.test.mjs',         // キャッシュバスター(?v=)の道具そのもの
-  ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで <script> の塊が丸ごと動かない★
   ['sql-guard.test.mjs', '--self-test'],  // ★倉庫にSQLを当てる門番（本番の実データが同居している）★
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
+  ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで かたまりが丸ごと動かない★
+  ['ribbon.test.mjs', '--self-test'],        // ★リボン＝Excelと同じ配置／押して 届くかまで 見る★
+  ['ribbon-label.test.mjs', '--self-test'], // ★札が 箱に 収まり 同じに 見えない（08-30 監査役の 差し戻し）★
+  ['ribbon-scope.test.mjs', '--self-test'], // ★空の箱を (a)これから/(b)付けません/(c)出さない に 分ける★
+  ['view-extras.test.mjs', '--self-test'],  // ★表示｜表示＝測り直しで 見つけた 組★
+  ['type-to-edit.test.mjs', '--self-test'],  // ★セルを 選んで いきなり 打つ（08-30 いうえおあ）★
+  ['unused-param.test.mjs', '--self-test'], // ★持っているのに 渡していない 口が 増えていないか★
+  ['ribbon-keytips.test.mjs', '--self-test'], // ★Alt の キーが 実 Excel と 同じ順で 効くか★
+  ['ctx-menu-items.test.mjs', '--self-test'], // ★右クリックの 中身が 実 Excel に 追いついているか★
+  ['header-footer.test.mjs', '--self-test'], // ★紙の 上と 下に 入れる 字（印は 実 Excel に 刷らせて 測った）★
+  ['ribbon-launcher.test.mjs', '--self-test'], // ★組の 右下の ↘（開く先の 窓は 既に 在る）★
+  ['ribbon-context.test.mjs', '--self-test'], // ★コンテキストタブ 8タブ／235部品の 正本★
+  ['formula-extra.test.mjs', '--self-test'], // ★足りない 関数 12個（答えは 実 Excel の 実測）★
+  ['valign.test.mjs', '--self-test'],        // ★上下揃え＝実Excelの既定は中央（実測）★
+  ['clear.test.mjs', '--self-test'],         // ★クリア3通り＝中身だけ/書式だけ/すべて（実測）★
+  ['ribbon-features.test.mjs', '--self-test'],  // ★数式の表示／再計算／ズーム／重複の削除★
+  ['named-ranges.test.mjs', '--self-test'],  // ★名前の定義＝日本語の名前をエンジンに渡す前に開く★
+  ['split-columns.test.mjs', '--self-test'], // ★区切り位置＝実Excelの TextToColumns どおり★
+  ['chart.test.mjs', '--self-test'],         // ★グラフ＝実Excelの既定（360x216・凡例は2本以上）★
+  ['comment.test.mjs', '--self-test'],       // ★コメント＝実Excelどおり（作者つき・赤い印だけ）★
+  ['page-setup.test.mjs', '--self-test'],    // ★ページ設定＝実Excelの既定（A4縦・枠線も見出しも刷らない）★
+  ['protect.test.mjs', '--self-test'],       // ★シートの保護＝実Excelどおり（既定は全セルロック・保護して初めて効く）★
+  ['decimal-painter.test.mjs', '--self-test'], // ★小数の増減（上限30桁は実測）／書式のコピー（中身は写さない）★
+  ['shift-cells.test.mjs', '--self-test'],   // ★セルの挿入/削除＝実Excelどおり（選んだ列だけ動く）★
+  ['cell-styles.test.mjs', '--self-test'],   // ★セルのスタイル＝実Excelから読んだ真値（BGR→RGB）★
+  ['sort2.test.mjs', '--self-test'],         // ★並べ替え2つの鍵＝実Excelの並びと一致★
+  ['view-toggle.test.mjs', '--self-test'],
+  ['link.test.mjs', '--self-test'],
+  ['select-all-statusbar.test.mjs', '--self-test'], // ★Ctrl+A（すべて選ぶ）で 帯が落ちない（170億マスを 積もうとして 死んでいた）★         // ★リンク＝実Excelどおり（#467886の下線）／javascript:とdata:は弾く★   // ★表示の切り替え＝実Excelの既定（見出しも枠線も出す）★
+  ['chart-types.test.mjs', '--self-test'],   /* ★グラフの種類（凡例の出る/出ない・軸の数・四分位は実測）★ */
+  ['sparkline.test.mjs', '--self-test'],     /* ★スパークライン＝実測（飾りなし・勝敗だけマイナス別・縦軸は1本ごと・空は隙間）★ */
+  ['formula-bar-type.test.mjs', '--self-test'], /* ★数を入れると 数式バーが落ちて セル選択そのものが 出来なくなっていた★ */
+  ['table.test.mjs', '--self-test'],         /* ★テーブル(Ctrl+T)＝実測／行列を足しても 付箋・リンク・表が 置いていかれない★ */
+  ['symbol-form.test.mjs', '--self-test'],   /* ★記号と特殊文字（並びは未測定＝理由つき）／フォーム（実測＝まわりの塊）★ */
+  ['formula-tab.test.mjs', '--self-test'],   /* ★数式タブ＝計算方法(実測 既定は自動)／選択範囲から名前(見出しは入らない)／無い関数を出さない★ */
+  ['view-review-tab.test.mjs', '--self-test'], /* ★ズーム(実測10〜400)／ブックの保護(守るとシートが足せない)／許可範囲／ブックの数★ */
+  ['data-tab.test.mjs', '--self-test'],      /* ★フラッシュフィル(1つの見本で覚える)／再適用／ゴールシーク(実測100回・0.001)★ */
+  ['home-tab.test.mjs', '--self-test'],      /* ★ホーム＝フォント(在るか測る)／文字の向き(実測の数)／クリップボード24個★ */
+  ['pivot.test.mjs', '--self-test'],         /* ★ピボット＝実測の形と 数（列なしは2列だけ）／読みで並べない事も 書く★ */
+  ['data-tab2.test.mjs', '--self-test'],     /* ★統合／アウトライン(実測 段2・1段で隠れる)／スライサー(見た目は未測定)★ */
+  ['forecast.test.mjs', '--self-test'],      /* ★予測シート＝実測(傾き20・切片80・7つ目220)と 同じ／点検／メモ★ */
+  ['automation.test.mjs', '--self-test'],    /* ★自動化＝Officeスクリプトの見本と同じ中身を うちの道具で（10項目）★ */
+  ['csv-in.test.mjs', '--self-test'],        /* ★CSV読み込み＝実測どおり（"…"の中のカンマ・""・中の改行）／化けたらShift_JIS★ */
+  ['objects.test.mjs', '--self-test'],       /* ★浮かぶ物（画像・図形・テキスト）＝形の番号と重なりは実測・色は写さない★ */
+  ['ink.test.mjs', '--self-test'],           /* ★描画（手書き）＝ペンの色と太さは 正本の 項目名どおり／線もシートの座標★ */
+  ['arrange.test.mjs', '--self-test'],
+  ['view-window.test.mjs', '--self-test'],
+  ['no-missing-call.test.mjs', '--self-test'],
+  'name-vs-body.test.mjs',                   /* ★「わざと壊して赤になるか」と名乗るのに 何も壊していない試験を 探す（08-30 監査役）★ */
+  ['theme.test.mjs', '--self-test'],
+  ['boolean.test.mjs', '--self-test'],
+  ['insert-diagram.test.mjs', '--self-test'],
+  ['data-conn.test.mjs', '--self-test'],
+  ['review2.test.mjs', '--self-test'],
+  ['xml-dev.test.mjs', '--self-test'],
+  ['shape-map-time.test.mjs', '--self-test'],
+  ['model-web-data.test.mjs', '--self-test'], /* ★3Dは対角線で合わせて どの向きでも はみ出さない／つなぐ相手は1つずつ★ */ /* ★手書き→図形12/12／升目の日本地図47／日付の通し番号は実測と7/7★ */       /* ★XML＝結ぶ前は読めない・出せない（実測）／2つの読み取りで答えを合わせる★ */       /* ★校閲＝実Excelが測った6語と同じ答え／日本語は通す／見やすさは4.5:1★ */     /* ★詳細設定＝実測4通りの行数／つなぎ台帳＝出来ない更新は そう言う★ */ /* ★図解＝型159・節5は実測／字は形の後に出す（重なる丸で隠れた）／アイコンと数式はうちで描く★ */       /* ★TRUE/FALSEは大文字で出す／SUMは足さない・＋は数になる（実Excel実測）★ */         /* ★テーマ＝12の役割・濃淡は実Excelと15/15一致（0〜240で切り捨て）／色は写さない★ */ /* ★呼んでいるのに 無い 働きを 機械で 探す（08-30 colName 事故）★ */ /* ★表示タブ＝表示の番号1/2/3・分割はPanes4・窓の名前は空白2つ／紙の切れ目は列8で実Excelと同じ★ */       /* ★配置・回転・まとめる＋拡大縮小印刷＝そろえた後の 数は 実測どおり／倍率は 紙に 本当に 効く★ */
   'suite-data.test.js',     // E0 共有データ層の契約
   'aggregate.test.js',      // E1 事業別集計(純関数)
   'ledger-source.test.js',  // E2 台帳→期間の実績値(ctx)

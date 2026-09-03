@@ -276,7 +276,10 @@ if (process.argv.includes('--見本')) {
       const [R2, C2] = rc2.split(',').map(Number);
       const f2 = String((((sheets.find((x) => x.name === sh2) || {}).grid || [])[R2] || [])[C2] || '');
       const 関数あり = /[A-Z][A-Z0-9._]*\s*\(/.test(f2);
-      if (絞り === 'なし' ? 関数あり : !new RegExp('\b' + 絞り + '\s*\(').test(f2)) continue;
+      /* ★逃がしは 2つ 書く★＝1つだと `\b` が ★U+0008（バックスペースの 字）★に なり、
+         `\(` も 素の `(` に なって ★new RegExp した その場で 落ちる★
+         （2026-08-30 監査役が 見つけた＝この道は 1度も 通っていなかった）。 */
+      if (絞り === 'なし' ? 関数あり : !new RegExp('\\b' + 絞り + '\\s*\\(').test(f2)) continue;
     }
     n++;
     const [sh, rc] = k.split('!');
