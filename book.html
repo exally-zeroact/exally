@@ -8086,10 +8086,14 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <div id="shiftTitle" style="font-size:16px;font-weight:700;color:#2E7D54;">挿入</div>
       <div style="font-size:12px;color:#333333;margin-top:4px;">場所 … <span id="shiftWhere">A1</span></div>
     </div>
-    <div id="shiftBody" style="padding:14px 18px;font-size:13px;color:#333333;line-height:1.9;"></div>
+    <div style="padding:12px 18px 0;font-size:13px;color:#333333;" id="shiftLead">挿入</div>
+    <div id="shiftBody" style="padding:6px 18px 14px;font-size:13px;color:#333333;line-height:1.9;"></div>
+    <!-- ★2026-09-04 に 実Excel の 窓を 撮って 合わせた★（司さん「Excelと 同じ」）
+         ★実物は ★OK が 左・キャンセルが 右★／字は「キャンセル」★（うちの 他の 窓は「やめる」）
+         絵 … shot/excel_dialog_sonyu.png ／ excel_dialog_sakujo.png -->
     <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;">
-      <button onclick="詰める向きの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;">やめる</button>
       <button id="shiftOk" onclick="詰める向きを決める()" style="min-height:44px;padding:0 18px;border:none;background:#2E7D54;color:#ffffff;border-radius:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">OK</button>
+      <button id="shiftCancel" onclick="詰める向きの窓を閉じる()" style="min-height:44px;padding:0 16px;border:1px solid #C8ECD8;background:#ffffff;color:#2E7D54;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;">キャンセル</button>
     </div>
   </div>
 </div>
@@ -11827,9 +11831,13 @@ var SHIFT_SENTAKU = {
     { 値: 'col',   字: '列全体',          呼ぶ: function(){ return ctxDeleteCol(); } }
   ]
 };
-/* ★はじめから 選ばれている 物★＝★直す前と 同じ 動き★
-   （挿入＝下へ／削除＝上へ）⇒★OK を 1回 押せば 前と 同じ★＝★手数を 増やしすぎない★ */
-var SHIFT_HAJIME = { 挿入: 'down', 削除: 'up' };
+/* ★はじめから 選ばれている 物★＝★実Excel と 同じ★（2026-09-04 に 実物を 撮って 合わせた）
+   ★実Excel★ … 挿入＝★右方向にシフト(I)★／削除＝★左方向にシフト(L)★
+     絵 … shot/excel_dialog_sonyu.png ／ shot/excel_dialog_sakujo.png
+   ★前は 挿入＝下／削除＝上 に していました★（＝直す前の うちの 動きに 合わせていた）
+   ⇒★司さんの 決めは「Excelと 同じ」＝実物に 合わせる★
+   ⇒★OK を 1回 押した時の 動きが 前と 変わります★（★隠さず 紙に 書く★） */
+var SHIFT_HAJIME = { 挿入: 'right', 削除: 'left' };
 
 function 詰める向きの窓を開く(どっち){
   hideCtxMenu();
@@ -11839,6 +11847,9 @@ function 詰める向きの窓を開く(どっち){
   if (!一覧) return 0;
   window._詰める向き = どっち;
   document.getElementById('shiftTitle').textContent = どっち;
+  /* ★実物は 題の 下に もう一度 「挿入」「削除」と 出る★（2026-09-04 実測）＝同じに する */
+  var 小 = document.getElementById('shiftLead');
+  if (小) 小.textContent = どっち;
   document.getElementById('shiftWhere').textContent =
     (selR1 === selR2 && selC1 === selC2) ? cellAddr(selR1, selC1)
       : (cellAddr(selR1, selC1) + '〜' + cellAddr(selR2, selC2));
