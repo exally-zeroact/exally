@@ -53,7 +53,7 @@ ok('★並び順まで 同じ★', ずれ < 0, ずれ < 0 ? '' : (ずれ + 1) + 
 const tabs = SPEC.ツリー();
 /* ★Sheet1 を 正本から 落とした★（2026-08-30 測り直し＝下の シート見出しの 写り込み） */
 ok('タブ 11個（Sheet1は 幻）', tabs.length === 11, String(tabs.length));
-ok('グループ 67個', tabs.reduce((a, t) => a + t.groups.length, 0) === 67,
+ok('グループ 65個', tabs.reduce((a, t) => a + t.groups.length, 0) === 65,
   String(tabs.reduce((a, t) => a + t.groups.length, 0)));
 
 /* ── ③ ★結び先を 実際に 押す★ ───────────────────────
@@ -100,7 +100,9 @@ ok('★働きが 無い結びが 0件★', 名無し.length === 0, 名無し.map
   'インクを図形に','インクを数式に','アクションペン','マップを作る','タイムラインを作る',
   '三次元の窓を開く','Webから読む','データモデルを開く','データ分析',
   /* ★表示｜表示★（2026-08-30 実Excelを 測り直して 見つけた 組） */
-  'ルーラーを出すか','ナビゲーションを開く','セルにフォーカスを切り替える'];
+  'ルーラーを出すか','ナビゲーションを開く','セルにフォーカスを切り替える',
+  /* ★[開発]→[Visual Basic]＝マクロの 字を そのまま 見る（読むだけ・動かさない）★ 2026-09-03 */
+  'VBAの字を見る'];
   for (const n of 拾う名) にせ画面[n] = (function (nm) {
     return function () { 記録.push({ fn: nm, args: Array.prototype.slice.call(arguments) }); };
   }(n));
@@ -202,7 +204,16 @@ const ボタン = [...el.querySelectorAll('.rb-item')];
 ok('★押せるボタンを 1つ以上 描いた★', ボタン.length >= 10, ボタン.length + '個');
 
 console.log('\n[② 出来ていない物の ボタンを 出していない]');
-const 結び済み名 = new Set(SPEC.ITEMS.filter((x) => x.t === 'ホーム' && x.a && !x.a.取り込む).map((x) => RB._名を短く(x.p)));
+/* ★その組の ↘ そのものは 組の 中に 出さない★ 2026-09-03
+   ＝実Excel では ★組の 下端の Button（上=321）＝右下に ↘ として 1つ 描く物★。
+   中にも 出すと ★同じ字が 2つ 並ぶ★（ページ レイアウトで「ページ設定」が 3つに 見えた）。
+   ★線は 緩めていません★＝右下に 出ている事は ★下の ⑧で 別に 数える★。
+   正本：lib/ribbon-launcher.js の 実の起動ツール（実測 8個） */
+const LAUNCH = require_(path.join(ROOT, 'lib/ribbon-launcher.js'));
+const 結び済み名 = new Set(SPEC.ITEMS
+  .filter((x) => x.t === 'ホーム' && x.a && !x.a.取り込む)
+  .filter((x) => !LAUNCH.起動の品か(x.t, x.g, x.p))
+  .map((x) => RB._名を短く(x.p)));
 const 出た名 = ボタン.map((b) => b.getAttribute('title'));
 const 余計 = 出た名.filter((n) => !結び済み名.has(n));
 ok('★結んでいない物が 画面に 出ていない★', 余計.length === 0, 余計.join(', '));
@@ -211,6 +222,99 @@ const 空箱 = [...el.querySelectorAll('.rb-group[data-empty="1"]')];
 ok('★中身が 無い箱は「これから」と 出す（偽のボタンを 出さない）',
   空箱.every((g) => g.querySelectorAll('.rb-item').length === 0 && /これから/.test(g.textContent)),
   空箱.length + '箱');
+
+/* ═══ ★★中身が 空の 組を 赤にする★★ 2026-09-03 ═══
+ *  ★なぜ 要るか★＝2026-09-03 に ★名前だけの 空っぽの 箱★を 出していた
+ *    （ページ レイアウト｜シートのオプション）。★数字には 1つも 出なかった★
+ *    ＝札の切れ 0・↘ 8/8・▾ 15/15 とも 緑のまま。★絵を 開いて 初めて 分かった★。
+ *  ★★数え方を 1つ 強くした（理由つき）★★
+ *    指示役の 注文は「★↘ だけの 組も 中身1 と 数える★」でした。
+ *    ★その形だと この見張りは 一度も 赤に なれません★＝実際に 壊して 試したら 緑のまま でした
+ *    （↘ が 中身に 数えられるので、今回の 事故そのものが 通ってしまう）。
+ *    ⇒ ★押せる札（rb-item）が 0個の 組を 赤にする★＝★今回の 事故を 捕まえられる形★に した。
+ *    ★↘ は 中身に 数えない★（↘ だけの 組は ★空っぽに 見える★＝それが 今回 起きた事）。
+ *  ★「これから」「付けません」と 書いてある 箱は 別★＝理由を 出しているので 空では ない。
+ *
+ *  ★★正直に 書いておく（この見張りの 限界）★★
+ *    ここは JSDOM です。★JSDOM では ↘ の 表（RibbonLauncher）が 画面に 積まれない★ので、
+ *    ↘ だけの 組は 「これから」に なって ★この見張りを すり抜けます★。
+ *    ⇒ 2026-09-03 に ★本物の 抜け（結び目が 4つ 消えた）を 通してしまった★。
+ *    ⇒ ★本当に 効いたのは 下の「結び目が 減っていない」★と ★実ブラウザで 数える事★。
+ *    ⇒ ★この 見張りだけを 頼りに しない事★。 */
+{
+  const 空っぽ = [];
+  let 見た組 = 0;
+  /* ★↘ が 描かれる 状態で 測る★＝働きが 無いと ↘ が 出ず、
+     組が「これから」に なって ★見張りが 空振りする★（2026-09-03 実際に 空振りした）。 */
+  const 前の働き = globalThis.window && globalThis.window.RibbonActions;
+  if (globalThis.window) globalThis.window.RibbonActions = ACT;
+  /* ★↘ の 表も 積む★＝積まないと ↘ が 出ず、組が「これから」に なって ★この見張りが 空振りする★
+     （2026-09-03 実際に 空振りした＝本物の 抜け（結び目が 4つ 消えた）を 通してしまった） */
+  const 前の起動 = globalThis.window && globalThis.window.RibbonLauncher;
+  if (globalThis.window) globalThis.window.RibbonLauncher = LAUNCH;
+  for (const t of SPEC.ツリー()) {
+    RB.状態.tab = t.name;
+    RB.描く(el, SPEC);
+    for (const g of el.querySelectorAll('.rb-group')) {
+      見た組++;
+      const 数 = g.querySelectorAll('.rb-item, [data-take]').length;   /* ★↘ は 数えない★ */
+      const 訳あり = /これから|付けません/.test(g.textContent);
+      if (数 === 0 && !訳あり) 空っぽ.push(t.name + '|' + g.dataset.group);
+    }
+  }
+  if (globalThis.window) globalThis.window.RibbonActions = 前の働き;
+  if (globalThis.window) globalThis.window.RibbonLauncher = 前の起動;
+  RB.状態.tab = 'ホーム'; RB.描く(el, SPEC);
+  ok('★名前だけの 空っぽな 組が 0個★（' + 見た組 + '組 を 全部 見た）',
+    空っぽ.length === 0, 空っぽ.join(' / '));
+  /* ★この 見張り自身が 空振りしていないか★ 2026-09-03
+     ＝★名前だけの 箱★を わざと 1つ 作って、上の 数え方が それを 拾えるか 見る。
+     （★画面側を 壊す形では 赤に できなかった＝「これから」に なって 逃げる★ので、
+       ★数え方そのもの★を 試す。★これが 出来ないと 見張りは 嘘をつく★） */
+  {
+    const 仮 = new JSDOM('<div><div class="rb-group" data-group="わざと空"><div class="rb-items"></div>'
+      + '<div class="rb-gname">わざと空</div></div></div>').window.document;
+    const g2 = 仮.querySelector('.rb-group');
+    const 数2 = g2.querySelectorAll('.rb-item, [data-take]').length;
+    const 訳2 = /これから|付けません/.test(g2.textContent);
+    ok('★この 見張りは 名前だけの 箱を 拾える（空振りしていない）★', 数2 === 0 && !訳2,
+      '数=' + 数2 + ' 訳=' + 訳2);
+  }
+  /* ═══ ★★結び目が 黙って 減っていないか★★ 2026-09-03 ═══
+   *  ★2026-09-03 に 実際に やらかした★＝正本を 作り直す 途中で
+   *  ★4つの 結び目（シートのオプションの 枠線/見出し）が `a: null` に 戻った★のに
+   *  ★どの 見張りも 赤に ならなかった★（「まだ」の 数が 57→61 に 増えただけ）。
+   *  ⇒ ★結んだ数の 下限を 決めて、下回ったら 赤★。
+   *  ★わざと 減らす時は この数字を 一緒に 直す★＝★黙って 減らせない★。 */
+  {
+    const 下限 = 253;
+    const 今 = SPEC.ITEMS.filter((x) => x.a).length;
+    ok('★結び目が 減っていない（' + 下限 + '個 以上）★', 今 >= 下限,
+      '今 ' + 今 + '個（下限 ' + 下限 + '）★減らすなら この数字も 一緒に 直す★');
+  }
+  /* ═══ ★★同じ組の 中に「同じ働き」の 札が 2つ 出ていないか★★ 2026-09-03 ═══
+   *  ★今日 3回とも「同じ字が 並ぶ」で 差し戻された★
+   *  （表示×4／印刷×3／ページ設定×3 → 名前の定義×2）。★人の目で 探すのを やめて 機械に 移す★。
+   *  ★字だけで 見ると 足りない★＝「オート SUM」と「合計」は ★字は 違うが 働きは 同じ★だった。
+   *  ⇒ ★働き（act）で 数える★。★同じ組に 同じ働きが 2つ 在れば 赤★。
+   *  ★働きが 違うなら 2つ 在ってよい★＝実Excel の 分かれボタンの 既定動作を
+   *    ★1押しで 出せる★形（罫線／下罫線 など）。★消すと 1押しが 2段に 落ちる★。 */
+  {
+    const 束 = {};
+    for (const x of SPEC.ITEMS) {
+      if (!x.a || !x.a.act) continue;
+      /* ★その組の ↘ そのものは 組の 中に 描かない★＝画面に 2つ 並ばない。
+         （↘ が 同じ 窓を 開くのは 当たり前＝ホーム｜数値の「セルの書式設定」） */
+      if (LAUNCH.起動の品か(x.t, x.g, x.p)) continue;
+      const k = x.t + '|' + x.g + '|' + x.a.act;
+      (束[k] = 束[k] || []).push(x.p);
+    }
+    const 二重 = Object.keys(束).filter((k) => 束[k].length > 1)
+      .map((k) => k + '（' + 束[k].join(' / ') + '）');
+    ok('★同じ組に 同じ働きの 札が 2つ 無い★（' + Object.keys(束).length + '通り を 見た）',
+      二重.length === 0, 二重.slice(0, 6).join('\n       '));
+  }
+}
 
 console.log('\n[⑦ 画面に 差し込んである]');
 ok('book.html に リボンの箱が 在る', /id="ribbon"/.test(book));
