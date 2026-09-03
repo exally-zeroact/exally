@@ -69,51 +69,67 @@ await page.evaluate(() => {
   window.dispatchEvent(new Event('resize'));
 });
 
-/** A1 の 中の ★赤い 点★ を 数える（★描き終わるのを 待ってから★ 読む） */
+/** A1 の 中の ★赤い 点★ を 数える
+ *  ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測）
+ *  ★「白でない 点が 在る」では 待った 事に ならない★（見出しは いつも 白では ない）
+ *    ⇒★2026-09-03 実測＝1回で 抜けて 0点に なった★
+ *  ⇒★赤が 出るまで 待つ★（出なければ 上限まで 待って 0点＝★本当に 出ていない★）
+ *    ★これは 甘くしていません★＝★出ない 物は 何回 待っても 0点★
+ *  ★待った 回数も 返す★＝★0回＝速かった のでは なく 1回目で 出た／上限＝待ち切れなかった★
+ */
 const 赤を数える = (結合にする) => page.evaluate(async (結合) => {
+  const 上限 = 100;
   const s = window.sheets[window.activeSheet];
   s.data = {}; s.comments = {};
   window.setCell(0, 0, 'あ');
   s.comments['0,0'] = { 文: 'ためし', 誰: 'わたし', いつ: '2026/9/3' };
   if (結合) s.data['0,0'].mergeEnd = { r: 0, c: 0 };
   window.sel(4, 4, 4, 4);            /* 選んだ 青を 混ぜない */
-  window.render();
-  /* ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測）
-     ★rAF 2回では 足りない ブラウザが 在る★（同 実測＝playwright 1.62.1 の WebKit で 0点）
-     ⇒★「表が 本当に 描かれた」を 見てから 読む★＝白でない 点が 出るまで 待つ（最長 5秒） */
-  const 描けた = async () => {
-    const cv0 = document.getElementById('grid-canvas');
-    const ctx0 = cv0.getContext('2d');
-    for (let n = 0; n < 100; n++) {
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      const d0 = ctx0.getImageData(0, 0, cv0.width, Math.min(cv0.height, 200)).data;
-      for (let i = 0; i < d0.length; i += 4) {
-        if (d0[i] !== 255 || d0[i + 1] !== 255 || d0[i + 2] !== 255) return n + 1;
-      }
-      window.render();
-    }
-    return 0;
-  };
-  const 待った = await 描けた();
-  /* ★箱を 切って 読まない★＝★全部 読んでから A1 の 中か 見る★
-     （2026-09-03 実測＝箱で 切ると 0点に なる事が 在った／全部 読むと 15点 出た）*/
   const cv = document.getElementById('grid-canvas');
   const ctx = cv.getContext('2d');
-  const 全 = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  const x = window.colX(0), y = window.rowY(0), w = window.cW(0), h = window.rH(0);
-  let 赤 = 0, A1の中 = 0;
-  for (let i = 0; i < 全.length; i += 4) {
-    if (!(全[i] > 180 && 全[i + 1] < 110 && 全[i + 2] < 110)) continue;
-    赤++;
-    const n = i / 4, px = n % cv.width, py = Math.floor(n / cv.width);
-    if (px >= x && px < x + w && py >= y && py < y + h) A1の中++;
+  const 読む = () => {
+    const 全 = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    const x = window.colX(0), y = window.rowY(0), w = window.cW(0), h = window.rH(0);
+    let 赤 = 0, A1の中 = 0;
+    for (let i = 0; i < 全.length; i += 4) {
+      if (!(全[i] > 180 && 全[i + 1] < 110 && 全[i + 2] < 110)) continue;
+      赤++;
+      const n = i / 4, px = n % cv.width, py = Math.floor(n / cv.width);
+      if (px >= x && px < x + w && py >= y && py < y + h) A1の中++;
+    }
+    return { 赤, A1の中,
+      A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
+  };
+  let 待った = 0, r = null;
+  for (let n = 1; n <= 上限; n++) {
+    window.render();
+    await new Promise((k) => requestAnimationFrame(() => requestAnimationFrame(k)));
+    待った = n;
+    r = 読む();
+    if (r.A1の中 > 0) break;
   }
-  return { 赤, A1の中, 待った,
-    A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
+  return { ...r, 待った, 上限 };
 }, 結合にする);
 
 /* ── ①物差しが 通るか（★先に これ★） ── */
+const 待ちの上限 = 100;
 const 結合 = await 赤を数える(true);
+/* ★待った 回数に 上と 下の 線★（2026-09-03・指示役）
+   ・★0回＝表その物が 描かれていない★（★「速かった」では ない★）
+   ・★上限に 届いた＝待ち切れなかった★（★待ち切れないまま 通さない★）
+   ⇒★どちらも「読めていない」＝この 試験は 何も 言わない（未測定）★
+   ⇒★週1の 回（MEASURE_REQUIRED=1）では 未測定＝赤★（_borrow-playwright.mjs が 決める）
+     ＝★この 試験は webkit.yml だけに 登録＝★緑で 素通りする 道は 無い★★ */
+if (結合.待った === 0) {
+  await browser.close(); 配信.閉じる();
+  unmeasured(TAG, '★表その物が 描かれていません★（白でない 点が 1つも 出なかった）'
+    + '＝★「速かった」では ない★', 'webkit');
+}
+if (結合.待った >= 待ちの上限) {
+  await browser.close(); 配信.閉じる();
+  unmeasured(TAG, '★待ち切れませんでした★（' + 待ちの上限 + '回 待っても 描き終わらない）'
+    + '＝★待ち切れないまま 通しません★', 'webkit');
+}
 if (結合.A1の中 === 0) {
   await browser.close();
   配信.閉じる();
