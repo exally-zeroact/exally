@@ -69,7 +69,23 @@ export const 名前の橋 = {
   セルの書式設定: 'セルの書式設定',
   ふりがなの表示: 'ふりがなの表示',
   名前の定義: '名前の定義',
-  ハイパーリンク: 'リンク'
+  ハイパーリンク: 'リンク',
+  ハイパーリンクを開く: 'ハイパーリンクを開く',
+  'ドロップダウンリストから選択': 'ドロップダウンリストから選択'
+};
+
+/* ★穴（画面が 中身を 差し込む 場所）も 1つ 数える★
+   `ctx-valid-list` … ★ドロップダウン リストから選択★（一覧の 決まりが 在る セルで 出る）
+     短い時＝一覧を そのまま 並べる ／ 長い時＝「ドロップダウン リストから選択」の 1行
+     （2026-09-03・切り取りが 転がさずに 見えるかで 切り替える） */
+export const 穴の橋 = { 'ctx-valid-list': 'ドロップダウンリストから選択' };
+
+/* ★作らない★＝★外の 会社の 物★（分母は 20 のまま・印を 付けるだけ）
+   ★分母を 動かすと また 数字が 揺れる★ので 動かさない（2026-09-03 の 決め） */
+export const 作らない = {
+  'この範囲にリンクする':
+    '★OneDrive に ブックを 上げて 共有リンクを 作る 物★（実物を 1回 押して 確かめた）。'
+    + 'うちは ブラウザの アプリで「ブックを 上げる」が 無い ⇒ Copilot／翻訳 と 同じ 扱い。'
 };
 
 /* ★④実Excel の ▸ の 中★（★2026-09-03 に 実物を 開いて 測りました★）
@@ -127,7 +143,11 @@ export function うち() {
   new Function('module', 'exports', src)(mod, mod.exports);
   const 出 = [];
   (function 歩く(a) {
-    for (const v of (a || [])) { if (v.名) 出.push(v); if (v.子) 歩く(v.子); }
+    for (const v of (a || [])) {
+      if (v.名) 出.push(v);
+      else if (v.穴 && 穴の橋[v.穴]) 出.push({ 名: 穴の橋[v.穴], 穴: v.穴 });
+      if (v.子) 歩く(v.子);
+    }
   })(mod.exports.表 || []);
   return 出;
 }
@@ -144,11 +164,13 @@ export function 数える() {
     if (条件つき未測定.indexOf(v.名) >= 0) { 未測定.push(v.名); continue; }
     独自.push(v.名);
   }
-  const 足りない = 実Excelの20
-    .filter((r) => !当たり.has(r.字))
+  const 残り = 実Excelの20.filter((r) => !当たり.has(r.字));
+  const 足りない = 残り.filter((r) => !作らない[r.字])
     .map((r) => r.字 + (r.印 ? '【' + r.印 + '】' : ''));
+  const 作らない分 = 残り.filter((r) => 作らない[r.字]).map((r) => r.字);
   const 子の分母 = Object.keys(実Excelの子).reduce((n, k) => n + 実Excelの子[k].length, 0);
-  return { 我, 当たり, 帯, 独自, 子, 未測定, 足りない, 分母: 実Excelの20.length, 子の分母 };
+  return { 我, 当たり, 帯, 独自, 子, 未測定, 足りない, 作らない分,
+    分母: 実Excelの20.length, 子の分母 };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -158,6 +180,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   console.log('★①実Excel の セルの 右クリックに 在る 物 ＝ ' + k.当たり.size + ' / ' + k.分母 + '★');
   for (const [ex, ours] of k.当たり) console.log('     ' + ex + ' ← ' + ours.join('・'));
   console.log('   ★足りない（' + k.足りない.length + '）★ … ' + k.足りない.join('・'));
+  console.log('   ★作らない（' + k.作らない分.length + '）★ … ' + k.作らない分.join('・')
+    + '（外の 会社の 物）');
   console.log('');
   console.log('★②行／列の 帯から 借りてきた 物 ＝ ' + k.帯.length + '個★（★消さない★・うちは 1枚に まとめている）');
   console.log('     ' + k.帯.join('・'));

@@ -135,6 +135,8 @@ const FILES = [
   ['grid-stats.test.mjs', '--self-test'],
   'ctx-menu.test.mjs',                    // ★右クリックが画面の中に収まる(743pxが619pxの画面で 上へ470px はみ出した事故)
   ['ctx-menu.test.mjs', '--self-test'],
+  'ctx-menu-a-ui.test.mjs',               // ★本物の画面で 右クリックを出す(灰・一覧が長い時の 切り替え)
+  ['ctx-menu-a-ui.test.mjs', '--self-test'],
   'cond-format.test.mjs',                 // ★条件付き書式の当たり判定(実Excelの真値と突き合わせ)
   ['cond-format.test.mjs', '--self-test'],
   'cond-format-ui.test.mjs',              // ★本物の画面で 実際に押す(部品が緑=画面で使える ではない)

@@ -360,8 +360,11 @@ if (SELF) {
       }],
     ['book.html', '★測る前に 高さの上限を外さない（中身の高さが取れない）★',
       (s) => s.replace("  m.style.maxHeight=''; m.style.left='0px'; m.style.top='0px';", "  m.style.left='0px'; m.style.top='0px';")],
+    /* ★2026-09-03 に 直した★＝`m.scrollTop = 0;` が ★2か所★に なった
+       （一覧が 長い時に 1行へ 切り替えた 後の 置き直し）。
+       ★1か所だけ 消しても もう1か所が 残って 素通りに なった★ ⇒ ★全部 消す★ */
     ['book.html', '★出すたびに 一番上へ戻さない（前の位置が残る）★',
-      (s) => s.replace('  m.scrollTop = 0;\n', '')],
+      (s) => s.split('m.scrollTop = 0;').join('/*消した*/')],
     ['book.html', '★上限を付けない（画面より高いまま出す）★',
       (s) => s.replace("  m.style.maxHeight = 置く.maxHeight ? (置く.maxHeight+'px') : '';", '')],
     /* ★2026-08-31 に 印を 直した★＝中身の 正本が 画面から lib/ctx-menu.js へ 移った。
