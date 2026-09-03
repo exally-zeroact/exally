@@ -29,7 +29,9 @@ function 立てる(root) {
     '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml' };
   const s = http.createServer((req, res) => {
     const 道 = decodeURIComponent(String(req.url).split('?')[0]);
-    const f = path.join(root, 道.replace(/^\/+/, ''));
+    let f = path.join(root, 道.replace(/^\/+/, ''));
+    /* ★わざと 壊した book.html を 食わせる 口★（--self-test で 使う） */
+    if (道 === '/book.html' && process.env.EXALLY_CM_BOOK) f = process.env.EXALLY_CM_BOOK;
     if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.statusCode = 404; return res.end('no'); }
     res.setHeader('content-type', 型[path.extname(f).toLowerCase()] || 'application/octet-stream');
     fs.createReadStream(f).pipe(res);
@@ -114,28 +116,41 @@ T('★コメントを 付けた ふつうの セルに 赤い印が 出る（今
   + '（印を 描く 数行が ★結合セルだけを 回す 輪★の 中に 在る＝book.html）');
 
 /* ── わざと 壊して 赤に なるか ── */
-if (SELF) {
+/* ★前の 自己確認は 取り下げました★（2026-09-03）
+   前 …「★描き終わるのを 待たずに 読むと 0点に なる★」を 見ていた。
+   ⇒ 直した後は ★待たなくても 10点 読めて しまう★＝★再現しない★。
+   ⇒★再現しない 物を 自己確認に しない★（★「たまに 赤」を 見張りに しない★）
+   今 …★直しを わざと 元に 戻して（drawText の 呼び出しを 消して）赤に なるか★を 見る。 */
+if (process.argv.includes('--self-test')) {
   console.log('');
   console.log('★わざと 壊して 赤に なるか★');
-  /* ★描き終わるのを 待たない★＝①の 物差しが 通らなく なる（＝未測定で 止まる）事を 見る */
-  const 待たずに = await page.evaluate(async () => {
-    const s = window.sheets[window.activeSheet];
-    s.data = {}; s.comments = {};
-    window.setCell(0, 0, 'あ');
-    s.comments['0,0'] = { 文: 'ためし', 誰: 'わたし', いつ: '2026/9/3' };
-    s.data['0,0'].mergeEnd = { r: 0, c: 0 };
-    window.sel(4, 4, 4, 4);
-    window.render();                    /* ★待たない★ */
-    const cv = document.getElementById('grid-canvas');
-    const ctx = cv.getContext('2d');
-    const 全 = ctx.getImageData(0, 0, cv.width, cv.height).data;
-    let 赤 = 0;
-    for (let i = 0; i < 全.length; i += 4) if (全[i] > 180 && 全[i + 1] < 110 && 全[i + 2] < 110) 赤++;
-    return 赤;
-  });
-  console.log((待たずに === 0 ? '  そうなった  ' : '  ★素通り★  ')
-    + '★描き終わるのを 待たずに 読むと 0点に なる（' + 待たずに + '点）★');
-  if (待たずに !== 0) fail++;
+  const fsx = await import('node:fs');
+  const 元 = fsx.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+  const 壊す = [
+    ['★drawText の 呼び出しを 消す（直す前に 戻す）★',
+      (t) => t.replace('  コメントの印を描く(r, c, x, y, w);' + String.fromCharCode(10), '')],
+    /* ★「色を 変える」は 自己確認に 使えません★（2026-09-03 実測）
+       ＝★物差し（結合セルで 赤が 読めるか）まで 通らなく なる★
+       ⇒ この 試験は ★正しく「未測定」と 言って 何も 言わずに 終わる★＝★赤に ならない★。
+       ★それで 正しい★（★読めない のに「守られていない」と 言わない★）ので、
+       ★自己確認には 使わない★。 */
+  ];
+  const tmp = path.join(ROOT, 'tests', '_cm_broken.html');
+  const { execFileSync } = await import('node:child_process');
+  for (const [名, f] of 壊す) {
+    const 壊れ = f(元);
+    if (壊れ === 元) { console.log('  ★素通り★  ' + 名 + '（印が 古い＝直せ）'); fail++; continue; }
+    fsx.writeFileSync(tmp, 壊れ);
+    let 赤 = false;
+    try {
+      execFileSync(process.execPath, [path.join(ROOT, 'tests', 'comment-mark-webkit.mjs')], {
+        env: { ...process.env, EXALLY_CM_BOOK: tmp }, stdio: 'pipe',
+      });
+    } catch (e) { 赤 = true; }
+    console.log((赤 ? '  赤くなった  ' : '  ★素通り★  ') + 名);
+    if (!赤) fail++;
+  }
+  try { fsx.unlinkSync(tmp); } catch (e) { /* 無くてよい */ }
 }
 
 await browser.close();
