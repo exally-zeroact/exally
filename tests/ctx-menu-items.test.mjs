@@ -91,15 +91,15 @@ const 下限 = 37;   /* ★2026-08-31 の 実測★（2026-08-21 は 25個） */
 言う(数.組 === 2,
   '★組（▸）は 2つだけ＝Excel が ▸ に している フィルターと 並べ替え★（今 ' + 数.組 + '組）',
   '★Excel が 平らに している 物を 組に しない★');
-言う(数.組の中 === 4,
-  '★組の 中は 4個（フィルター2＋並べ替え2）★（今 ' + 数.組の中 + '個）');
+言う(数.組の中 === 6,
+  '★組の 中は 6個（フィルター3＋並べ替え3）★（今 ' + 数.組の中 + '個）');
 /* ★Excel が 組に している 物 以外が 2段に 落ちていないか★ */
 {
   const 落ちた = [];
   for (const v of 中身.表) {
     if (!v.子) continue;
     for (const c of v.子) {
-      if (中身.Excelが組にしている物.indexOf(c.画面) < 0) 落ちた.push(v.名 + ' ▸ ' + c.名);
+      if (中身.Excelが組にしている物.indexOf(c.名) < 0) 落ちた.push(v.名 + ' ▸ ' + c.名);
     }
   }
   言う(落ちた.length === 0,
@@ -112,6 +112,20 @@ const 理由なし = Object.keys(中身.出さない).filter((k) => !String(中�
 言う(理由なし.length === 0, '★出さない 物には 理由が 書いてある★', 理由なし.join(' / '));
 言う(Object.keys(中身.出さない).length >= 10,
   '★出さない 物を 数えている（' + Object.keys(中身.出さない).length + '個）★');
+
+/* ── ★何個 / 何個★（★数を 手で 書かない＝道具で 数える★ 2026-09-03） ──
+   分母 … docs/excel-commandbars-2026-08-30.tsv の `Cell` バー 87 − 外の会社の物 20 ＝ ★67★
+   ★下限で 見る★＝「減っていない」を 見張る（増やすのは 自由・減らしたら 赤） */
+{
+  const 数 = await import(pathToFileURL(path.join(ROOT, 'scripts/count-ctx-menu.mjs')).href);
+  const 相 = 数.相手();
+  const 我名 = 数.うち().map((v) => 数.掃除(v.名));
+  const 当 = 相.分母.filter((n) => 我名.indexOf(n) >= 0);
+  言う(相.分母.length === 67,
+    '★分母は 67（Cell バー 87 − 外の会社の物 20）★（今 ' + 相.分母.length + '）');
+  言う(当.length >= 23,
+    '★★' + 当.length + ' / 67★★（★23 を 下回ったら 赤＝減らしていない★）');
+}
 
 /* ── 元の 実測 ── */
 言う(fs.existsSync(path.join(ROOT, 'docs/excel-commandbars-2026-08-30.tsv')),
