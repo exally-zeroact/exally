@@ -72,14 +72,45 @@ export const 名前の橋 = {
   ハイパーリンク: 'リンク'
 };
 
-/* ★④実Excel でも ▸ の 中／条件が 揃った時に 出る 物★＝★中身は まだ 測っていない★
-   （▸ は マウスを 乗せないと 開かない／コメントの削除は コメントが 在る セルでないと 出ない）
+/* ★④実Excel の ▸ の 中★（★2026-09-03 に 実物を 開いて 測りました★）
+     フィルター(E)▸ … 6個 ／ 並べ替え(O)▸ … 6個 ／ リンク(I)▸ … 2個
+     絵 … scratchpad/shot/excel_sub_filter.png ／ _sort.png ／ _link.png
    ⇒★「うち独自」に 混ぜると 独自の 数が 水増しに なる★ので 分ける */
-export const 実Excelの子か条件つき未測定 = [
-  '選択したセルの値でフィルター', 'フィルターのクリア', '再適用',   // フィルター ▸ の 中
-  '昇順', '降順', 'ユーザー設定の並べ替え',                        // 並べ替え ▸ の 中
-  'ハイパーリンクの削除',                                          // リンク ▸ の 中
-  'コメントの削除', 'コメントの表示/非表示'                        // コメントが 在る セルで 出る
+export const 実Excelの子 = {
+  'フィルター': [
+    { 字: 'フィルターのクリア', 印: '灰' },
+    { 字: '再適用', 印: '灰' },
+    { 字: '選択したセルの値でフィルター' },
+    { 字: '選択したセルの色でフィルター' },
+    { 字: '選択したセルのフォント色でフィルター' },
+    { 字: '選択したセルのアイコンでフィルター' }
+  ],
+  '並べ替え': [
+    { 字: '昇順' },
+    { 字: '降順' },
+    { 字: '選択したセルの色を上に表示' },
+    { 字: '選択したフォントの色を上に表示' },
+    { 字: '選択した書式設定のアイコンを上に配置' },
+    { 字: 'ユーザー設定の並べ替え', 印: '窓' }
+  ],
+  'リンク': [
+    { 字: '最近表示したアイテム', 印: '見出し（今は 空）' },
+    { 字: 'リンクを挿入', 印: '窓' }
+  ]
+};
+/* うちの 札 → ▸ の どの 行に 当たるか（★字が 違う物だけ 手で 結ぶ★） */
+export const 子の橋 = {
+  'フィルターのクリア': 'フィルターのクリア',
+  '再適用': '再適用',
+  '選択したセルの値でフィルター': '選択したセルの値でフィルター',
+  '昇順': '昇順',
+  '降順': '降順',
+  'ユーザー設定の並べ替え': 'ユーザー設定の並べ替え'
+};
+/* ★まだ 測っていない★＝条件が 揃った セルでないと 出ない */
+export const 条件つき未測定 = [
+  'ハイパーリンクの削除',        // リンクが 在る セルで 出るはず（リンク▸ には 無かった）
+  'コメントの削除', 'コメントの表示/非表示'   // コメントが 在る セルで 出る
 ];
 
 /* ★②行／列の 帯から 借りてきた 物★＝★実Excel では 別の メニューに 在る★＝★消さない★ */
@@ -104,18 +135,20 @@ export function うち() {
 export function 数える() {
   const 我 = うち();
   const 当たり = new Map();          // 実Excel の 字 → うちの 札
-  const 帯 = [], 独自 = [], 未測定 = [];
+  const 帯 = [], 独自 = [], 未測定 = [], 子 = [];
   for (const v of 我) {
     const 橋 = 名前の橋[v.名];
     if (橋) { if (!当たり.has(橋)) 当たり.set(橋, []); 当たり.get(橋).push(v.名); continue; }
     if (行や列の帯から.indexOf(v.名) >= 0) { 帯.push(v.名); continue; }
-    if (実Excelの子か条件つき未測定.indexOf(v.名) >= 0) { 未測定.push(v.名); continue; }
+    if (子の橋[v.名]) { 子.push(v.名); continue; }
+    if (条件つき未測定.indexOf(v.名) >= 0) { 未測定.push(v.名); continue; }
     独自.push(v.名);
   }
   const 足りない = 実Excelの20
     .filter((r) => !当たり.has(r.字))
     .map((r) => r.字 + (r.印 ? '【' + r.印 + '】' : ''));
-  return { 我, 当たり, 帯, 独自, 未測定, 足りない, 分母: 実Excelの20.length };
+  const 子の分母 = Object.keys(実Excelの子).reduce((n, k) => n + 実Excelの子[k].length, 0);
+  return { 我, 当たり, 帯, 独自, 子, 未測定, 足りない, 分母: 実Excelの20.length, 子の分母 };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -132,7 +165,16 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   console.log('★③うち独自の 物 ＝ ' + k.独自.length + '個★');
   console.log('     ' + k.独自.join('・'));
   console.log('');
-  console.log('★④実Excel でも ▸ の 中／条件つきで 出る 物 ＝ ' + k.未測定.length + '個★（★中身は 未測定★）');
+  console.log('★④実Excel の ▸ の 中 ＝ ' + k.子.length + ' / ' + k.子の分母 + '★（実物を 開いて 測った）');
+  console.log('     ' + k.子.join('・'));
+  for (const oya of Object.keys(実Excelの子)) {
+    const ある = 実Excelの子[oya].filter((r) => k.子.indexOf(r.字) >= 0).length;
+    console.log('       ' + oya + ' ▸ … ' + ある + ' / ' + 実Excelの子[oya].length
+      + '  （足りない: ' + 実Excelの子[oya].filter((r) => k.子.indexOf(r.字) < 0)
+        .map((r) => r.字 + (r.印 ? '【' + r.印 + '】' : '')).join('・') + '）');
+  }
+  console.log('');
+  console.log('★⑤条件が 揃った セルでないと 出ない ＝ ' + k.未測定.length + '個★（★まだ 測っていない★）');
   console.log('     ' + k.未測定.join('・'));
   console.log('');
   console.log('（うちの 札を 子まで 歩いた 数 ＝ ' + k.我.length + '）');
