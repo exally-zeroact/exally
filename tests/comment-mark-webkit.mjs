@@ -78,8 +78,23 @@ const 赤を数える = (結合にする) => page.evaluate(async (結合) => {
   if (結合) s.data['0,0'].mergeEnd = { r: 0, c: 0 };
   window.sel(4, 4, 4, 4);            /* 選んだ 青を 混ぜない */
   window.render();
-  /* ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測） */
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  /* ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測）
+     ★rAF 2回では 足りない ブラウザが 在る★（同 実測＝playwright 1.62.1 の WebKit で 0点）
+     ⇒★「表が 本当に 描かれた」を 見てから 読む★＝白でない 点が 出るまで 待つ（最長 5秒） */
+  const 描けた = async () => {
+    const cv0 = document.getElementById('grid-canvas');
+    const ctx0 = cv0.getContext('2d');
+    for (let n = 0; n < 100; n++) {
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const d0 = ctx0.getImageData(0, 0, cv0.width, Math.min(cv0.height, 200)).data;
+      for (let i = 0; i < d0.length; i += 4) {
+        if (d0[i] !== 255 || d0[i + 1] !== 255 || d0[i + 2] !== 255) return n + 1;
+      }
+      window.render();
+    }
+    return 0;
+  };
+  const 待った = await 描けた();
   /* ★箱を 切って 読まない★＝★全部 読んでから A1 の 中か 見る★
      （2026-09-03 実測＝箱で 切ると 0点に なる事が 在った／全部 読むと 15点 出た）*/
   const cv = document.getElementById('grid-canvas');
@@ -93,7 +108,8 @@ const 赤を数える = (結合にする) => page.evaluate(async (結合) => {
     const n = i / 4, px = n % cv.width, py = Math.floor(n / cv.width);
     if (px >= x && px < x + w && py >= y && py < y + h) A1の中++;
   }
-  return { 赤, A1の中, A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
+  return { 赤, A1の中, 待った,
+    A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
 }, 結合にする);
 
 /* ── ①物差しが 通るか（★先に これ★） ── */
@@ -103,10 +119,11 @@ if (結合.A1の中 === 0) {
   配信.閉じる();
   unmeasured(TAG,
     '★物差しが 通りません★＝印が 描かれる はずの 形（結合セル）でも 赤が 0点。'
+    + '（表が 描けるまで 待った 回数 ' + 結合.待った + '／0 なら ★表その物が 描かれていない★）'
     + '★読み方（場所・倍率・待ち方）が 悪い＝この 試験は 何も 言いません★', 'webkit');
 }
 T('★物差しが 通っている（印が 在る 形で A1 の 中に 赤 ' + 結合.A1の中 + '点／画面ぜんぶで '
-  + 結合.赤 + '点・A1＝' + 結合.A1 + '）★', 結合.A1の中 > 0);
+  + 結合.赤 + '点・A1＝' + 結合.A1 + '・待った ' + 結合.待った + '回）★', 結合.A1の中 > 0);
 
 /* ── ②約束は 守られているか ── */
 const ふつう = await 赤を数える(false);
