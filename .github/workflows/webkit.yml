@@ -67,6 +67,15 @@ jobs:
           node-version: '20'
       - name: Install test deps
         run: npm install --no-audit --no-fund
+      # ★★借り元と ここが 違う（理由）★★
+      #   借り元（rakually-test）は playwright を ★devDependency に 入れている★（2026-08-28 案A）。
+      #   ★Exally は 入れていません★＝★Vercel は 配信の たびに devDependencies を 全部 入れる★
+      #     （2026-08-29 実測＝$110.59/21日）⇒★重い 物を repo の 依存に 足さない★。
+      #   ⇒★この 回の 中だけ 借りる★（`--no-save`＝package.json を 汚さない）
+      #   ★これが 無いと `playwright(webkit) を 借りられる場所が 見つかりません＝赤★
+      #     （2026-09-03 実測＝PR#10 の 1回目）
+      - name: Install playwright (この 回の 中だけ・package.json は 汚さない)
+        run: npm i --no-save playwright
       # ★webkit だけ★ 入れる（chromium/firefox は 要らない＝そのぶん 速い）
       - name: Install WebKit
         run: npx playwright install --with-deps webkit
