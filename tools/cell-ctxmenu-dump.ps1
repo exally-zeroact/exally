@@ -36,7 +36,23 @@ public class Mouse {
   }
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int n);
+  [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, IntPtr pid);
+  [DllImport("user32.dll")] public static extern bool AttachThreadInput(uint a, uint b, bool f);
+  [DllImport("user32.dll")] public static extern bool BringWindowToTop(IntPtr h);
+  [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
   public static void Front(IntPtr h) { ShowWindow(h, 3); SetForegroundWindow(h); }
+  // ★Windows は 後ろの プロセスからの 前面化を 断る★
+  //   ⇒ 今 前面に 居る スレッドに 自分を くっつけてから 頼むと 通る
+  public static void ForceFront(IntPtr h) {
+    IntPtr fg = GetForegroundWindow();
+    uint me = GetCurrentThreadId();
+    uint other = (fg == IntPtr.Zero) ? me : GetWindowThreadProcessId(fg, IntPtr.Zero);
+    if (other != me) AttachThreadInput(me, other, true);
+    ShowWindow(h, 9); ShowWindow(h, 3);
+    BringWindowToTop(h); SetForegroundWindow(h);
+    if (other != me) AttachThreadInput(me, other, false);
+  }
   // ★キーボードでも 開ける★＝Shift+F10 / メニューキー（お客さんが 使う 道）
   public static void ShiftF10() {
     keybd_event(0x10,0,0,IntPtr.Zero);              // Shift ↓
@@ -83,8 +99,8 @@ try {
   # ★C5 を 選んで、その セルの 画面の 場所を 取る★
   # ★Excel を 前面に 出す★（前は 後ろの Chrome を 右クリックしていた＝2026-09-03 実測）
   try { $xl.WindowState = -4137 } catch {}          # xlMaximized
-  [Mouse]::Front([IntPtr]$xl.Hwnd)
-  Start-Sleep -Milliseconds 1200
+  [Mouse]::ForceFront([IntPtr]$xl.Hwnd)
+  Start-Sleep -Milliseconds 1500
 
   $sh = $wb.Worksheets.Item(1)
   $cell = $sh.Range("C5")
@@ -102,9 +118,21 @@ try {
   while ($w -ne $null -and $w.Current.ControlType -ne $CT::Window) {
     $w = [System.Windows.Automation.TreeWalker]::ControlViewWalker.GetParent($w)
   }
-  $mado = if ($w) { $w.Current.Name + " / " + $w.Current.ClassName } else { "不明" }
+  $mado = "不明"
+  for ($try = 1; $try -le 5; $try++) {
+    $under = $AE::FromPoint((New-Object System.Windows.Point([double]$ptX, [double]$ptY)))
+    $w = $under
+    while ($w -ne $null -and $w.Current.ControlType -ne $CT::Window) {
+      $w = [System.Windows.Automation.TreeWalker]::ControlViewWalker.GetParent($w)
+    }
+    $mado = if ($w) { $w.Current.Name + " / " + $w.Current.ClassName } else { "不明" }
+    if ($mado -match 'XLMAIN') { break }
+    $lines += "  ($try 回目) その 点は「$mado」だった ⇒ Excel を 前へ 出し直す"
+    [Mouse]::ForceFront([IntPtr]$xl.Hwnd)
+    Start-Sleep -Milliseconds 1200
+  }
   $lines += "その 点に 居る 窓: $mado"
-  if ($mado -notmatch 'Excel|XLMAIN') { throw "★Excel では ない 窓の 上でした（$mado）＝押しません★" }
+  if ($mado -notmatch 'XLMAIN') { throw "★Excel を 前面に 出せませんでした（$mado）＝押しません★" }
 
   # ★他の アプリの 開きっぱなしの メニューを 先に 閉じる★
   #   （2026-09-03 実測＝1回目に Chrome の メニューを 開いてしまい、

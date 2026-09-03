@@ -113,18 +113,25 @@ const 理由なし = Object.keys(中身.出さない).filter((k) => !String(中�
 言う(Object.keys(中身.出さない).length >= 10,
   '★出さない 物を 数えている（' + Object.keys(中身.出さない).length + '個）★');
 
-/* ── ★何個 / 何個★（★数を 手で 書かない＝道具で 数える★ 2026-09-03） ──
-   分母 … docs/excel-commandbars-2026-08-30.tsv の `Cell` バー 87 − 外の会社の物 20 ＝ ★67★
+/* ── ★何個 / 何個★（★数を 手で 書かない＝道具で 数える★ 2026-09-03 引き直し） ──
+   ★分母は 20★＝★実Excel を 本物の マウスで 右クリックして 目で 数えた 行★
+   （前の 67 は `CommandBars("Cell")` の 一覧＝★実際には 出ない物まで 入っていた★）
+   正本 … docs/EXCEL_CELL_CTXMENU_2026-09-03.md
    ★下限で 見る★＝「減っていない」を 見張る（増やすのは 自由・減らしたら 赤） */
 {
-  const 数 = await import(pathToFileURL(path.join(ROOT, 'scripts/count-ctx-menu.mjs')).href);
-  const 相 = 数.相手();
-  const 我名 = 数.うち().map((v) => 数.掃除(v.名));
-  const 当 = 相.分母.filter((n) => 我名.indexOf(n) >= 0);
-  言う(相.分母.length === 67,
-    '★分母は 67（Cell バー 87 − 外の会社の物 20）★（今 ' + 相.分母.length + '）');
-  言う(当.length >= 23,
-    '★★' + 当.length + ' / 67★★（★23 を 下回ったら 赤＝減らしていない★）');
+  const 道具 = await import(pathToFileURL(path.join(ROOT, 'scripts/count-ctx-menu.mjs')).href);
+  const k = 道具.数える();
+  言う(k.分母 === 20,
+    '★分母は 20（実Excel の セルの 右クリックの 行）★（今 ' + k.分母 + '）');
+  言う(k.当たり.size >= 13,
+    '★★①実Excel に 在る 物 ' + k.当たり.size + ' / 20★★（★13 を 下回ったら 赤★）');
+  言う(k.帯.length >= 13,
+    '★②行／列の 帯から 借りてきた 物 ' + k.帯.length + '個（★消していない★）★');
+  言う(k.未測定.length >= 9,
+    '★④実Excel でも ▸ の 中／条件つきの 物 ' + k.未測定.length + '個（★独自に 混ぜていない★）★');
+  /* ★足りない 7つは わざと 残している★＝★次の回の 相手★（消えたら 逆に おかしい） */
+  言う(k.足りない.length <= 7,
+    '★足りないのは ' + k.足りない.length + '個（7以下）★ … ' + k.足りない.join('・'));
 }
 
 /* ── 元の 実測 ── */

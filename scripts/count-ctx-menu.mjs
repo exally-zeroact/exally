@@ -1,7 +1,16 @@
-/* ★右クリック（セル）は 今 何個 / 相手は 何個★ — ★1本の 数字を 手で 書かない為の 道具★
- *   分母 … docs/excel-commandbars-2026-08-30.tsv の `Cell` バー
- *          （名前で 重複を 除く 87）− ★外の 会社の 物 20★ ＝ ★67★
- *   分子 … lib/ctx-menu.js の 表を ★子まで 歩いて★ 上の 67 と 名前で 突き合わせた 数
+/* ★右クリック（セル）を ★3つに 分けて★ 数える 道具★ — ★1本の 数字を 手で 書かない為★
+ *
+ *   ★2026-09-03 に 分母を 引き直しました★
+ *     前 … 67（`CommandBars("Cell")` の 一覧）⇒★実際には 出ない物まで 入っていた★
+ *     今 … ★20★（★実Excel を 本物の マウスで 右クリックして 目で 数えた★）
+ *     正本 … docs/EXCEL_CELL_CTXMENU_2026-09-03.md
+ *     絵 …… scratchpad/shot/excel_cell_ctxmenu_jitsubutsu.png
+ *     ★docs/excel-commandbars-2026-08-30.tsv は 消していません★（「在る物の 一覧」としては 正しい）
+ *
+ *   ①★実Excel の セルの 右クリックに 在る 物★ … ◯ / 20  ←★本命★
+ *   ②★行／列の 帯から 借りてきた 物★ ………… ◯個（★消さない★・うちは 1枚に まとめている）
+ *   ③★うち独自の 物★ ………………………………… ◯個
+ *
  *   使い方 … node scripts/count-ctx-menu.mjs
  */
 import fs from 'node:fs';
@@ -9,7 +18,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/* ★物差し★＝見えない字と アクセスキー（COM は `(&T)`・TSV は `(T)`）と 末尾の … を 落とす */
+/* ★物差し★＝見えない字・アクセスキー（COM は `(&T)`・TSV は `(T)`）・末尾の … ・空白 を 落とす */
 export const 掃除 = (s) => String(s || '')
   .replace(/[​‌‍﻿]/g, '')
   .replace(/\(&?[A-Za-z0-9]\)/g, '')
@@ -17,55 +26,114 @@ export const 掃除 = (s) => String(s || '')
   .replace(/\s+/g, '')
   .trim();
 
-/* ★外の 会社の 物（うちだけでは 作れない）＝20★ */
-export const 外の会社の物 = [
-  'Paste as Table with Copilot', 'Copilot', 'Copilot とチャットする',
-  'カスタマイズされたテーブルの作成', '推奨される Copilot プロンプト',
-  'Python 出力', 'Python オブジェクト', 'Excel の値',
-  'データの種類', 'データ型カードを表示', '設定の更新をしています', '更新', '変更', 'テキストに変換',
-  '翻訳', 'スマート検索',
-  'セル内の画像', 'セルの上に配置', '参照の作成',
-  'アプリのスキルを開く'
-].map(掃除);
+/* ★①実Excel の セルの 右クリック＝20行★（2026-09-03 実測・並び順のまま）
+   ★灰（今 押せない）も 分母に 入れる★＝お客さんの 目には 見えているから
+   ★「貼り付けのオプション:」は 1行と 数える★（中の アイコンは 2つ） */
+export const 実Excelの20 = [
+  { 字: '切り取り' },
+  { 字: 'コピー' },
+  { 字: '貼り付けのオプション', 印: 'アイコン2つの束' },
+  { 字: '形式を選択して貼り付け', 印: '窓' },
+  { 字: '挿入', 印: '窓＝向きを 聞く' },
+  { 字: '削除', 印: '窓＝向きを 聞く' },
+  { 字: '数式と値のクリア' },
+  { 字: 'クイック分析', 印: '灰' },
+  { 字: 'フィルター', 印: '▸' },
+  { 字: '並べ替え', 印: '▸' },
+  { 字: 'テーブルまたは範囲からデータを取得', 印: '窓' },
+  { 字: '新しいコメント' },
+  { 字: '新しいメモ' },
+  { 字: 'セルの書式設定', 印: '窓' },
+  { 字: 'ドロップダウンリストから選択' },
+  { 字: 'ふりがなの表示' },
+  { 字: '名前の定義', 印: '窓' },
+  { 字: 'リンク', 印: '▸' },
+  { 字: 'ハイパーリンクを開く', 印: '灰' },
+  { 字: 'この範囲にリンクする' }
+];
 
-export function 相手() {
-  const tsv = fs.readFileSync(path.join(ROOT, 'docs/excel-commandbars-2026-08-30.tsv'), 'utf8');
-  const 全 = new Map();
-  for (const l of tsv.split(/\r?\n/)) {
-    if (!l || l[0] === '#') continue;
-    const c = l.split('\t');
-    if (c[0] !== 'Cell') continue;
-    const n = 掃除(c[2]);
-    if (n && !全.has(n)) 全.set(n, c[2]);
-  }
-  const 残 = [...全.keys()].filter((n) => 外の会社の物.indexOf(n) < 0);
-  return { 全部: 全.size, 外: 全.size - 残.length, 分母: 残 };
-}
+/* ★うちの 札 → 実Excel の どの 行に 当たるか★（★字が 違う物だけ 手で 結ぶ★）
+   ★ここに 書いた分だけが「当たり」★＝あいまい一致で 水増ししない。
+   （2026-09-03 に あいまい一致で「形式を選択して貼り付け」が「貼り付け」に 誤って 当たった） */
+export const 名前の橋 = {
+  切り取り: '切り取り',
+  コピー: 'コピー',
+  貼り付け: '貼り付けのオプション',
+  値のみ貼り付け: '貼り付けのオプション',
+  セルの挿入: '挿入',
+  削除: '削除',
+  数式と値のクリア: '数式と値のクリア',
+  フィルター: 'フィルター',
+  並べ替え: '並べ替え',
+  コメントの挿入: '新しいコメント',
+  セルの書式設定: 'セルの書式設定',
+  ふりがなの表示: 'ふりがなの表示',
+  名前の定義: '名前の定義',
+  ハイパーリンク: 'リンク'
+};
+
+/* ★④実Excel でも ▸ の 中／条件が 揃った時に 出る 物★＝★中身は まだ 測っていない★
+   （▸ は マウスを 乗せないと 開かない／コメントの削除は コメントが 在る セルでないと 出ない）
+   ⇒★「うち独自」に 混ぜると 独自の 数が 水増しに なる★ので 分ける */
+export const 実Excelの子か条件つき未測定 = [
+  '選択したセルの値でフィルター', 'フィルターのクリア', '再適用',   // フィルター ▸ の 中
+  '昇順', '降順', 'ユーザー設定の並べ替え',                        // 並べ替え ▸ の 中
+  'ハイパーリンクの削除',                                          // リンク ▸ の 中
+  'コメントの削除', 'コメントの表示/非表示'                        // コメントが 在る セルで 出る
+];
+
+/* ★②行／列の 帯から 借りてきた 物★＝★実Excel では 別の メニューに 在る★＝★消さない★ */
+export const 行や列の帯から = [
+  '挿入', '列の挿入', '行の削除', '列の削除',
+  '行の高さ', '列の幅',
+  '非表示', '列の非表示', '再表示', '列の再表示',
+  '印刷範囲', '改ページ', 'ページ設定'
+];
 
 export function うち() {
   const src = fs.readFileSync(path.join(ROOT, 'lib/ctx-menu.js'), 'utf8');
   const mod = { exports: {} };
   new Function('module', 'exports', src)(mod, mod.exports);
-  const 表 = mod.exports.表 || [];
   const 出 = [];
   (function 歩く(a) {
-    for (const v of a) { if (v.名) 出.push(v); if (v.子) 歩く(v.子); }
-  })(表);
+    for (const v of (a || [])) { if (v.名) 出.push(v); if (v.子) 歩く(v.子); }
+  })(mod.exports.表 || []);
   return 出;
 }
 
-/* ★字を 出すのは 自分で 走らせた時だけ★（試験から 呼ぶ時は 黙る） */
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const 相 = 相手();
+export function 数える() {
   const 我 = うち();
-  const 我名 = 我.map((v) => 掃除(v.名));
-  const 当たり = 相.分母.filter((n) => 我名.indexOf(n) >= 0);
+  const 当たり = new Map();          // 実Excel の 字 → うちの 札
+  const 帯 = [], 独自 = [], 未測定 = [];
+  for (const v of 我) {
+    const 橋 = 名前の橋[v.名];
+    if (橋) { if (!当たり.has(橋)) 当たり.set(橋, []); 当たり.get(橋).push(v.名); continue; }
+    if (行や列の帯から.indexOf(v.名) >= 0) { 帯.push(v.名); continue; }
+    if (実Excelの子か条件つき未測定.indexOf(v.名) >= 0) { 未測定.push(v.名); continue; }
+    独自.push(v.名);
+  }
+  const 足りない = 実Excelの20
+    .filter((r) => !当たり.has(r.字))
+    .map((r) => r.字 + (r.印 ? '【' + r.印 + '】' : ''));
+  return { 我, 当たり, 帯, 独自, 未測定, 足りない, 分母: 実Excelの20.length };
+}
 
-  console.log('★相手★ Cell バー 名前で重複を除く ' + 相.全部
-    + ' − 外の会社の物 ' + 相.外 + ' ＝ ★分母 ' + 相.分母.length + '★');
-  console.log('★うち★ 表を 子まで 歩いた ' + 我.length + ' 個');
-  console.log('★★' + 当たり.length + ' / ' + 相.分母.length + '★★');
-  console.log('  当たり … ' + 当たり.join('・'));
-  console.log('  ★うちにしか 無い（Excel の Cell バーに 名前が 無い）★ … '
-    + 我名.filter((n) => 相.分母.indexOf(n) < 0).join('・'));
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const k = 数える();
+  console.log('★正本★ docs/EXCEL_CELL_CTXMENU_2026-09-03.md（実Excel を 本物の マウスで 開いて 数えた 20行）');
+  console.log('');
+  console.log('★①実Excel の セルの 右クリックに 在る 物 ＝ ' + k.当たり.size + ' / ' + k.分母 + '★');
+  for (const [ex, ours] of k.当たり) console.log('     ' + ex + ' ← ' + ours.join('・'));
+  console.log('   ★足りない（' + k.足りない.length + '）★ … ' + k.足りない.join('・'));
+  console.log('');
+  console.log('★②行／列の 帯から 借りてきた 物 ＝ ' + k.帯.length + '個★（★消さない★・うちは 1枚に まとめている）');
+  console.log('     ' + k.帯.join('・'));
+  console.log('');
+  console.log('★③うち独自の 物 ＝ ' + k.独自.length + '個★');
+  console.log('     ' + k.独自.join('・'));
+  console.log('');
+  console.log('★④実Excel でも ▸ の 中／条件つきで 出る 物 ＝ ' + k.未測定.length + '個★（★中身は 未測定★）');
+  console.log('     ' + k.未測定.join('・'));
+  console.log('');
+  console.log('（うちの 札を 子まで 歩いた 数 ＝ ' + k.我.length + '）');
 }
