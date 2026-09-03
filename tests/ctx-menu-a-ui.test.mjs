@@ -153,7 +153,9 @@ T('★一覧の 切り替えを「個数」で 決めていない★', () => {
 });
 
 /* ── わざと 壊して 赤に なるか ── */
-if (SELF) {
+/* ★`if (SELF) {` では tests/name-vs-body.test.mjs が 見つけられない★（2026-09-03 実測）
+   ＝あの 見張りは 決まった 書き方だけを 探す。★書き方を 合わせる★ */
+if (process.argv.includes('--self-test')) {
   console.log('');
   console.log('★わざと 壊して 赤に なるか★');
   const 壊す = [
