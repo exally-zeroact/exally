@@ -137,6 +137,84 @@ T('★切り替えは 出すたび 1回だけ（行ったり来たり しない�
   言う(win.__validListSwitch === null, '切り替えの 手が 残っている（何度も 走る）');
 });
 
+/* ── ★短い時は 一覧のまま／長い時は 1行★（★作り物の 高さを 与えて 見る★） ──
+   ★本物の 画面では ありません★＝jsdom は 高さを 持たないので ★こちらで 高さを 作る★。
+     ・.ctx-item は 1つ 34px（実ブラウザ実測 約34.5px）
+     ・#ctx-menu の 箱の 高さは この 試験が 決める
+   ⇒★「切り取りが 見えるか」で 切り替わっているか★を 数で 見張れる。
+   ★実ブラウザの 数（720で19個／560で14個）は 手で 測って 紙に 書いてある★
+     （docs/EXCEL_CELL_CTXMENU_2026-09-03.md）。
+   ★CI に 実ブラウザは 在りません★＝そこは ★未測定★と 紙に 書いた。 */
+const 高さを作る = (箱の高さ) => {
+  const H = 34;
+  const proto = win.HTMLElement.prototype;
+  Object.defineProperty(proto, 'offsetHeight', {
+    configurable: true,
+    get() { return this.classList && this.classList.contains('ctx-item') ? H : 0; },
+  });
+  Object.defineProperty(proto, 'offsetTop', {
+    configurable: true,
+    get() {
+      const m = doc.getElementById('ctx-menu');
+      if (!m || !m.contains(this)) return 0;
+      const 全 = [...m.querySelectorAll('.ctx-item, .ctx-divider')];
+      let y = 0;
+      for (const e of 全) {
+        if (e === this) return y;
+        if (e.style && e.style.display === 'none') continue;
+        y += e.classList.contains('ctx-item') ? H : 9;
+      }
+      return y;
+    },
+  });
+  Object.defineProperty(proto, 'clientHeight', {
+    configurable: true,
+    get() { return this.id === 'ctx-menu' ? 箱の高さ : 0; },
+  });
+};
+const 高さを戻す = () => {
+  const proto = win.HTMLElement.prototype;
+  for (const k of ['offsetHeight', 'offsetTop', 'clientHeight']) {
+    Object.defineProperty(proto, k, { configurable: true, get() { return 0; } });
+  }
+};
+
+for (const [箱, 一覧のまま, 一行に] of [[704, 19, 20], [400, 10, 11]]) {
+  T('★箱 ' + 箱 + 'px … ' + 一覧のまま + '個は 一覧のまま★', () => {
+    高さを作る(箱);
+    try {
+      決まりを置く(一覧のまま);
+      出す();
+      言う(win.__validListMode === '一覧',
+        '短いのに 1行に した（今 ' + win.__validListMode + '）');
+    } finally { 高さを戻す(); }
+  });
+  T('★箱 ' + 箱 + 'px … ' + 一行に + '個で 1行に なる★', () => {
+    高さを作る(箱);
+    try {
+      決まりを置く(一行に);
+      出す();
+      言う(win.__validListMode === '1行',
+        '長いのに 一覧のまま（今 ' + win.__validListMode + '）＝切り取りが 押せなく なる');
+    } finally { 高さを戻す(); }
+  });
+}
+
+T('★箱が 低いほど 早く 1行に なる（個数 固定では ない）★', () => {
+  const 境目 = (箱) => {
+    高さを作る(箱);
+    try {
+      for (let n = 1; n <= 40; n++) {
+        決まりを置く(n); 出す();
+        if (win.__validListMode !== '一覧') return n - 1;
+      }
+      return 40;
+    } finally { 高さを戻す(); }
+  };
+  const 高い = 境目(704), 低い = 境目(400);
+  言う(低い < 高い, '箱が 低いのに 境目が 同じ／広い（高い=' + 高い + ' 低い=' + 低い + '）');
+});
+
 /* ── ★個数で 決めていない事★（jsdom は 高さを 持たないので ★字で 見る★） ──
    ★窓の 高さで 境目が 動く★＝実ブラウザ実測 720で19個／560で14個。
    ⇒★`items.length <= 数` の 形で 決めたら 赤★（小さい 画面で また 壊れる） */
