@@ -74,8 +74,14 @@ jobs:
       #   ⇒★この 回の 中だけ 借りる★（`--no-save`＝package.json を 汚さない）
       #   ★これが 無いと `playwright(webkit) を 借りられる場所が 見つかりません＝赤★
       #     （2026-09-03 実測＝PR#10 の 1回目）
-      - name: Install playwright (この 回の 中だけ・package.json は 汚さない)
-        run: npm i --no-save playwright
+      #   ★版は x.y.z まで 書く★（2026-09-03・指示役）
+      #     ★版を 書かないと @latest と 同じ＝ある日 勝手に 中身が 入れ替わる／CIは 緑のまま★
+      #     （★CDN の 版を 固定した のと 同じ 病気★＝2026-09-02 に 全社 41か所で 出た）
+      #     ★playwright は 部品と ブラウザ本体の 版が 合わないと 黙って 転ぶ★
+      #   ★1.62.1 の 出どころ★＝借り元 rakually-test の node_modules に
+      #     ★実際に 入っている 版★（package.json は "^1.62.1"）＝★借り元に 合わせる★
+      - name: Install playwright 1.62.1 (この 回の 中だけ・package.json は 汚さない)
+        run: npm i --no-save playwright@1.62.1
       # ★webkit だけ★ 入れる（chromium/firefox は 要らない＝そのぶん 速い）
       - name: Install WebKit
         run: npx playwright install --with-deps webkit
