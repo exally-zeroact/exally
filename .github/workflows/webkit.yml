@@ -22,6 +22,21 @@ on:
   schedule:
     # ★週1（日曜 22:00 UTC＝月曜 07:00 JST）★ … 誰も 押さなくても 週に 1回は 必ず 測る
     - cron: '0 22 * * 0'
+  # ★★2026-09-03 に 足した（借り元には 無い・理由）★★
+  #   ★入れた後に 赤に なった★＝PR の CI では この 回が 走らず ★見えなかった★
+  #   （実測＝1d1e434 で main に 入った 直後に failure）
+  #   ⇒★PR でも 同じ 所を 触ったら 走らせる★＝★入れる前に 分かる★
+  pull_request:
+    paths:
+      - 'book.html'
+      - 'lib/**'
+      - 'js/**'
+      - 'css/**'
+      - 'tests/comment-mark-webkit.mjs'
+      - 'tests/karimono.test.mjs'
+      - 'lib/yakusoku-daicho.js'
+      - 'scripts/_borrow-playwright.mjs'
+      - '.github/workflows/webkit.yml'
   push:
     branches: [main]
     paths:
@@ -31,6 +46,7 @@ on:
       - 'js/**'
       - 'css/**'
       - 'tests/comment-mark-webkit.mjs'
+      - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
       - '.github/workflows/webkit.yml'
