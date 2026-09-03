@@ -69,44 +69,77 @@ await page.evaluate(() => {
   window.dispatchEvent(new Event('resize'));
 });
 
-/** A1 の 中の ★赤い 点★ を 数える（★描き終わるのを 待ってから★ 読む） */
+/** A1 の 中の ★赤い 点★ を 数える
+ *  ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測）
+ *  ★「白でない 点が 在る」では 待った 事に ならない★（見出しは いつも 白では ない）
+ *    ⇒★2026-09-03 実測＝1回で 抜けて 0点に なった★
+ *  ⇒★赤が 出るまで 待つ★（出なければ 上限まで 待って 0点＝★本当に 出ていない★）
+ *    ★これは 甘くしていません★＝★出ない 物は 何回 待っても 0点★
+ *  ★待った 回数も 返す★＝★1回＝1回目の 描画で もう 出た／上限＝待ち切れなかった★
+ *    （★0回は 起きません★＝輪は n=1 から 必ず 1回 回る）
+ */
 const 赤を数える = (結合にする) => page.evaluate(async (結合) => {
+  const 上限 = 100;
   const s = window.sheets[window.activeSheet];
   s.data = {}; s.comments = {};
   window.setCell(0, 0, 'あ');
   s.comments['0,0'] = { 文: 'ためし', 誰: 'わたし', いつ: '2026/9/3' };
   if (結合) s.data['0,0'].mergeEnd = { r: 0, c: 0 };
   window.sel(4, 4, 4, 4);            /* 選んだ 青を 混ぜない */
-  window.render();
-  /* ★描き終わるのを 待つ★＝これが 無いと 印が 在っても 0点に なる（2026-09-03 実測） */
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  /* ★箱を 切って 読まない★＝★全部 読んでから A1 の 中か 見る★
-     （2026-09-03 実測＝箱で 切ると 0点に なる事が 在った／全部 読むと 15点 出た）*/
   const cv = document.getElementById('grid-canvas');
   const ctx = cv.getContext('2d');
-  const 全 = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  const x = window.colX(0), y = window.rowY(0), w = window.cW(0), h = window.rH(0);
-  let 赤 = 0, A1の中 = 0;
-  for (let i = 0; i < 全.length; i += 4) {
-    if (!(全[i] > 180 && 全[i + 1] < 110 && 全[i + 2] < 110)) continue;
-    赤++;
-    const n = i / 4, px = n % cv.width, py = Math.floor(n / cv.width);
-    if (px >= x && px < x + w && py >= y && py < y + h) A1の中++;
+  const 読む = () => {
+    const 全 = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    const x = window.colX(0), y = window.rowY(0), w = window.cW(0), h = window.rH(0);
+    let 赤 = 0, A1の中 = 0;
+    for (let i = 0; i < 全.length; i += 4) {
+      if (!(全[i] > 180 && 全[i + 1] < 110 && 全[i + 2] < 110)) continue;
+      赤++;
+      const n = i / 4, px = n % cv.width, py = Math.floor(n / cv.width);
+      if (px >= x && px < x + w && py >= y && py < y + h) A1の中++;
+    }
+    return { 赤, A1の中,
+      A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
+  };
+  let 待った = 0, r = null;
+  for (let n = 1; n <= 上限; n++) {
+    window.render();
+    await new Promise((k) => requestAnimationFrame(() => requestAnimationFrame(k)));
+    待った = n;
+    r = 読む();
+    if (r.A1の中 > 0) break;
   }
-  return { 赤, A1の中, A1: Math.round(x) + ',' + Math.round(y) + ' ' + Math.round(w) + 'x' + Math.round(h) };
+  return { ...r, 待った, 上限 };
 }, 結合にする);
 
 /* ── ①物差しが 通るか（★先に これ★） ── */
+const 待ちの上限 = 100;
 const 結合 = await 赤を数える(true);
-if (結合.A1の中 === 0) {
-  await browser.close();
-  配信.閉じる();
+/* ★★線は 1本だけ＝上限（100回）★★（2026-09-03・指示役の 指摘で 直した）
+   ★前は 3本 書いていました★が ★2本は 一度も 通らない 枝★でした（指示役が 読んで 見つけた）
+     ・`待った === 0` … ★輪は n=1 から 必ず 1回は 回る★＝★待った は 1以上に しか ならない★
+     ・`A1の中 === 0`（上限に 届く 前）… ★早く 抜けるのは 赤が 出た時だけ★
+        ⇒ 出なければ 100回まで 回る ⇒★上限の 線で 捕まる★
+   ⇒★塞げてはいた★（★緑で 素通りする 道は 無い★）が ★紙には 3本 在ると 書いていた★
+     ＝★数え方を 変えた 日に、前に 引いた 線が 届かなくなる＝紙だけ 残る★
+   ⇒★嘘を 消す（線を 増やさない）★＝★1本に した★
+
+   ★下の 線（表が 描かれていない）は 上限の 線が 兼ねます★
+     ＝★1点も 描かれなければ 赤は 出ない＝100回 待って 未測定★
+
+   ★未測定＝週1の 回では 赤★（_borrow-playwright.mjs／webkit.yml の MEASURE_REQUIRED=1）
+   ★この 試験の 登録は webkit.yml だけ★（ci-coverage が 数えている）
+     ⇒★緑で 素通りする 道は 在りません★ */
+if (結合.待った >= 待ちの上限 || 結合.A1の中 === 0) {
+  await browser.close(); 配信.閉じる();
   unmeasured(TAG,
-    '★物差しが 通りません★＝印が 描かれる はずの 形（結合セル）でも 赤が 0点。'
-    + '★読み方（場所・倍率・待ち方）が 悪い＝この 試験は 何も 言いません★', 'webkit');
+    '★物差しが 通りません★＝印が 描かれる はずの 形（結合セル）でも 赤が 0点'
+    + '（' + 結合.待った + '回 待った／上限 ' + 待ちの上限 + '）。'
+    + '★読み方（場所・倍率・待ち方）が 悪い か、表その物が 描かれていない★'
+    + '＝★この 試験は 何も 言いません★', 'webkit');
 }
 T('★物差しが 通っている（印が 在る 形で A1 の 中に 赤 ' + 結合.A1の中 + '点／画面ぜんぶで '
-  + 結合.赤 + '点・A1＝' + 結合.A1 + '）★', 結合.A1の中 > 0);
+  + 結合.赤 + '点・A1＝' + 結合.A1 + '・待った ' + 結合.待った + '回）★', 結合.A1の中 > 0);
 
 /* ── ②約束は 守られているか ── */
 const ふつう = await 赤を数える(false);
@@ -129,22 +162,24 @@ if (process.argv.includes('--self-test')) {
   const 壊す = [
     ['★drawText の 呼び出しを 消す（直す前に 戻す）★',
       (t) => t.replace('  コメントの印を描く(r, c, x, y, w);' + String.fromCharCode(10), '')],
-    /* ★「色を 変える」は 自己確認に 使えません★（2026-09-03 実測）
-       ＝★物差し（結合セルで 赤が 読めるか）まで 通らなく なる★
-       ⇒ この 試験は ★正しく「未測定」と 言って 何も 言わずに 終わる★＝★赤に ならない★。
-       ★それで 正しい★（★読めない のに「守られていない」と 言わない★）ので、
-       ★自己確認には 使わない★。 */
+    /* ★★引いた 線を わざと 踏んで 赤に なるか★★（2026-09-03・指示役の 決まり）
+       ★色を 変える★と ★物差しが 通らなく なる★＝★未測定★に なる。
+       ★未測定は 週1の 回（MEASURE_REQUIRED=1）で 赤★ ⇒ ★その 形で 試す★
+       （★手元では 緑で 終わる★＝だから 子に MEASURE_REQUIRED=1 を 渡して 週1の 回を 真似る） */
+    ['★物差しを 潰す（赤の 色を 変える）→ 週1の 回なら 赤★',
+      (s) => s.replace("ctx.fillStyle = '#E53935';", "ctx.fillStyle = '#1E88E5';"),
+      { MEASURE_REQUIRED: '1' }],
   ];
   const tmp = path.join(ROOT, 'tests', '_cm_broken.html');
   const { execFileSync } = await import('node:child_process');
-  for (const [名, f] of 壊す) {
+  for (const [名, f, 足す] of 壊す) {
     const 壊れ = f(元);
     if (壊れ === 元) { console.log('  ★素通り★  ' + 名 + '（印が 古い＝直せ）'); fail++; continue; }
     fsx.writeFileSync(tmp, 壊れ);
     let 赤 = false;
     try {
       execFileSync(process.execPath, [path.join(ROOT, 'tests', 'comment-mark-webkit.mjs')], {
-        env: { ...process.env, EXALLY_CM_BOOK: tmp }, stdio: 'pipe',
+        env: { ...process.env, EXALLY_CM_BOOK: tmp, ...(足す || {}) }, stdio: 'pipe',
       });
     } catch (e) { 赤 = true; }
     console.log((赤 ? '  赤くなった  ' : '  ★素通り★  ') + 名);

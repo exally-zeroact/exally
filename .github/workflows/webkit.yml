@@ -22,6 +22,21 @@ on:
   schedule:
     # ★週1（日曜 22:00 UTC＝月曜 07:00 JST）★ … 誰も 押さなくても 週に 1回は 必ず 測る
     - cron: '0 22 * * 0'
+  # ★★2026-09-03 に 足した（借り元には 無い・理由）★★
+  #   ★入れた後に 赤に なった★＝PR の CI では この 回が 走らず ★見えなかった★
+  #   （実測＝1d1e434 で main に 入った 直後に failure）
+  #   ⇒★PR でも 同じ 所を 触ったら 走らせる★＝★入れる前に 分かる★
+  pull_request:
+    paths:
+      - 'book.html'
+      - 'lib/**'
+      - 'js/**'
+      - 'css/**'
+      - 'tests/comment-mark-webkit.mjs'
+      - 'tests/karimono.test.mjs'
+      - 'lib/yakusoku-daicho.js'
+      - 'scripts/_borrow-playwright.mjs'
+      - '.github/workflows/webkit.yml'
   push:
     branches: [main]
     paths:
@@ -31,6 +46,7 @@ on:
       - 'js/**'
       - 'css/**'
       - 'tests/comment-mark-webkit.mjs'
+      - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
       - '.github/workflows/webkit.yml'
@@ -51,6 +67,21 @@ jobs:
           node-version: '20'
       - name: Install test deps
         run: npm install --no-audit --no-fund
+      # ★★借り元と ここが 違う（理由）★★
+      #   借り元（rakually-test）は playwright を ★devDependency に 入れている★（2026-08-28 案A）。
+      #   ★Exally は 入れていません★＝★Vercel は 配信の たびに devDependencies を 全部 入れる★
+      #     （2026-08-29 実測＝$110.59/21日）⇒★重い 物を repo の 依存に 足さない★。
+      #   ⇒★この 回の 中だけ 借りる★（`--no-save`＝package.json を 汚さない）
+      #   ★これが 無いと `playwright(webkit) を 借りられる場所が 見つかりません＝赤★
+      #     （2026-09-03 実測＝PR#10 の 1回目）
+      #   ★版は x.y.z まで 書く★（2026-09-03・指示役）
+      #     ★版を 書かないと @latest と 同じ＝ある日 勝手に 中身が 入れ替わる／CIは 緑のまま★
+      #     （★CDN の 版を 固定した のと 同じ 病気★＝2026-09-02 に 全社 41か所で 出た）
+      #     ★playwright は 部品と ブラウザ本体の 版が 合わないと 黙って 転ぶ★
+      #   ★1.62.1 の 出どころ★＝借り元 rakually-test の node_modules に
+      #     ★実際に 入っている 版★（package.json は "^1.62.1"）＝★借り元に 合わせる★
+      - name: Install playwright 1.62.1 (この 回の 中だけ・package.json は 汚さない)
+        run: npm i --no-save playwright@1.62.1
       # ★webkit だけ★ 入れる（chromium/firefox は 要らない＝そのぶん 速い）
       - name: Install WebKit
         run: npx playwright install --with-deps webkit
