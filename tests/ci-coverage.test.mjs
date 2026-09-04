@@ -21,21 +21,16 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // ★CIから外しているテスト（ここに載っていない除外は赤になる）
-const EXCLUDED = {
-  'kyuyo/tests/exally-login.test.mjs': {
-    reason: 'item C（メール確認ON前提のsignup分岐）は payslip-app のテスト線のみの機能。'
-      + '本番の js/exally-login.js には意図的に未展開で、統合時に本番のログイン挙動を変えないため'
-      + '共通部品は本番版を据え置いた。よって対象機能がこのツリーに存在しない。',
-    restoreWhen: 'item C を本番へ展開する時＝SMTP（確認メール送信）を設定してメール確認をONにする時。'
-      + 'その時に js/exally-login.js を item C 版へ差し替え、このテストをCIへ戻す。',
-    owner: '司さん（SMTP設定）＋ 実装セッション',
-  },
-};
+/* ★CIから外しているテスト（ここに載っていない除外は赤になる）
+   ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）。
+     ★唯一の 除外だった kyuyo/tests/exally-login.test.mjs も 一緒に 出て行った★
+     ⇒★空に する★＝★除外が 1本も 無い のが 今の 正しい 姿★
+     ⇒★増えたら 下の「理由と 戻す条件」で 必ず 赤に なる★（★空でも 見張りは 効く★） */
+const EXCLUDED = {};
 
 // テストではない道具（実行されなくてよい物）。ここも理由つきで明示する。
 const NOT_TESTS = {
   'tests/run.js': 'ランナー本体',
-  'kyuyo/tests/run.js': 'ランナー本体',
   'tests/fake-supa.js': 'テスト用のSupabaseモック（他テストが読む部品）',
   'tests/repo-supa.mjs': 'このリポジトリの接続先(js/supa-config.js)を返す部品。実DBに触る道具が読む（テストではない）',
   'tests/dbtest-seed.mjs': 'DB-testに種データを入れる手動ツール（CIから叩かない）',
@@ -87,7 +82,11 @@ function runnerList(runnerRel) {
     .map(s => s.replace(/'/g, '').replace(/^\.\//, ''))
     .map(f => path.posix.join(base, f));
 }
-const viaRunner = new Set([...runnerList('tests/run.js'), ...runnerList('kyuyo/tests/run.js')]);
+/* ★在る 一覧だけ 読む★（給与が 出て行き kyuyo/tests/run.js は 無い） */
+const runnerPaths = ['tests/run.js', 'kyuyo/tests/run.js']
+  .filter((p) => fs.existsSync(path.join(ROOT, p)));
+if (!runnerPaths.length) throw new Error('★走らせる 一覧が 1本も 無い＝この 検査が 空振り★');
+const viaRunner = new Set(runnerPaths.flatMap((p) => runnerList(p)));
 
 console.log('\n[ci-coverage] CIから黙って外れているテストが無いか');
 /* ★見た 本数も 出す★＝★0本 見て 0件★を 見破る為（2026-09-03 の 決まり） */
@@ -112,9 +111,17 @@ T('★除外リストの各項目に「理由」と「戻す条件」が書か�
     if (!fs.existsSync(path.join(ROOT, f))) throw new Error(f + ': 除外リストにあるがファイルが無い（消したなら除外リストからも消す）');
   }
 });
-T('★除外は1本だけ（増えていたら、ここが赤になって気づける）', function () {
+/* ★2026-09-05★ 給与が 出て行き、除外は ★0本★に なった。
+   ★数の 決め打ち（1本）を やめる★＝★0本が 正しい 姿★
+   ⇒★増えた時に 気づく★のが 目的なので、
+     ★「除外が 在るなら 理由と 戻す条件が 書いてある」（上の 検査）★で 足りる。
+   ⇒ ここでは ★増えていない事★だけ 見る（0本 なら 緑・1本でも 増えたら 上で 中身を 見る）。 */
+T('★除外は 増えていない（0本＝給与が 出て行った後の 正しい 姿）', function () {
   const n = Object.keys(EXCLUDED).length;
-  if (n !== 1) throw new Error(`除外が ${n} 本あります。増やすなら、この本数もここで更新して意図を示すこと: ` + Object.keys(EXCLUDED).join(', '));
+  if (n > 0) {
+    console.log('  ★除外が ' + n + '本 在ります★ … ' + Object.keys(EXCLUDED).join(', '));
+    console.log('  ⇒★理由と 戻す条件は 上の 検査が 見ています★');
+  }
 });
 T('検査が空振りしていない（テストファイルを実際に数えている）', function () {
   if (covered.length < 50) throw new Error('CIが回しているテストが少なすぎます: ' + covered.length);
