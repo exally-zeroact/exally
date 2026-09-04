@@ -37,6 +37,7 @@ on:
       - 'tests/fixtures/hyou-no-soto-sample.xlsx'
       - 'tests/bahttext-webkit.mjs'
       - 'tests/fixtures/bahttext-sample.xlsx'
+      - 'tests/encodeurl-webkit.mjs'
       - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
@@ -106,3 +107,7 @@ jobs:
       #   ★実Excel が 出した 答え★を 1行ずつ 見比べる（部品だけ 緑では 足りない）
       - name: ★タイ語の 金額＝実Excel の ブックを 開いて 答えが 同じか（実ブラウザ）
         run: node tests/bahttext-webkit.mjs
+      # ★ENCODEURL が 外に 出ない事★＝★通信を 数えて 0本★（2026-09-04 指示役の 注文）
+      #   ★「思う」では なく 数える★／答えが 実Excel と 同じ事も 一緒に 見る
+      - name: ★URLの形＝外に出ない事を 通信0本で 示す（実ブラウザ）
+        run: node tests/encodeurl-webkit.mjs
