@@ -33,6 +33,8 @@ on:
       - 'js/**'
       - 'css/**'
       - 'tests/comment-mark-webkit.mjs'
+      - 'tests/hyou-no-soto-webkit.mjs'
+      - 'tests/fixtures/hyou-no-soto-sample.xlsx'
       - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
@@ -93,3 +95,7 @@ jobs:
         run: node tests/comment-mark-webkit.mjs
       - name: ★同 わざと 描き終わる前に 読むと 0点に なるか（物差しの 自己確認）
         run: node tests/comment-mark-webkit.mjs --self-test
+      # ★診断2本目★（2026-09-04）＝★実Excel に 作らせた 見本を 本物の ブラウザで 開いて 押す★
+      #   ★字合わせでは 分からない★＝知らせが 出るか／窓に ★直し方★が 出るか／その場所へ 飛ぶか
+      - name: ★ほかの表の その行＝見本を 開いて 直し方まで 出るか（本物のマウスで 押す）
+        run: node tests/hyou-no-soto-webkit.mjs

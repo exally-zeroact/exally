@@ -35,9 +35,11 @@ const T = (n, よい, 添え) => {
    行は 0 から 数える。実物 … Table23 行233〜265 ／ Table24 行267〜299（見出し1・合計1） */
 /* ★名前は 司さんの 実物と 同じ★＝★客が 数式バーで 見る 名前は R8.8 / R8.9★
    （SheetJS が 書く Table23 / Table24 は ★客の 画面には 出ない★＝それで 助言すると 探せない） */
+/* ★列の 一覧★＝32番目が 正岡ｈ・34番目が 向垣内ｈ（実物と 同じ 並び） */
+const 列たち = (function () { var a = []; for (var i = 0; i < 38; i++) a.push('列' + i); a[32] = '正岡ｈ'; a[34] = '向垣内ｈ'; a[5] = '売上'; return a; })();
 const 表 = [
-  { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 265, cl1: 0, cl2: 37, header: 1, totals: 1 },
-  { id: 24, name: 'R8.9', sheet: '計算', rw1: 267, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 },
+  { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 265, cl1: 0, cl2: 37, header: 1, totals: 1, cols: 列たち },
+  { id: 24, name: 'R8.9', sheet: '計算', rw1: 267, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1, cols: 列たち },
 ];
 const byId = { 23: 表[0], 24: 表[1] };
 /* 見出しの 字（列名を 出す為）。Table23 と Table24 の 33列目＝AG＝「正岡ｈ」 */
@@ -79,7 +81,7 @@ T('★知らない表を 指している時は 出さない（当て推量しな
 {
   /* ★ほかの表でも その行が 中に 在るなら 出さない★（Excel は 答えを 出せる） */
   const 重なり = [
-    { id: 23, sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 },
+    { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1, cols: 列たち },
     表[1],
   ];
   T('★ほかの表でも その行が 中身の 行の 中なら 出さない★',
@@ -100,14 +102,16 @@ T('★ほかの表でも その行が 中身の 中なら 出さない（列を�
   })());
 T('★別のシートの 表を 指していたら 出す（行が 合っていても 別の紙）★',
   (() => {
-    const 別 = [{ id: 23, name: 'R8.8', sheet: '売上表', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 }, 表[1]];
+    const 別 = [{ id: 23, name: 'R8.8', sheet: '売上表', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1, cols: 列たち }, 表[1]];
     const x = TR._断りを仕分ける('計算', 268, 31, [その行(23, 32)], { 23: 別[0], 24: 表[1] }, 別, wb);
     return !!x && x.指した表 === 'R8.8';
   })());
 
 /* ── ②-b ★.xlsx / .xlsm でも 同じ★（形式で 出たり 出なかったり させない）── */
 {
-  const f = '=IFERROR(MAX(R8.9[@売上]*R8.9[@時数], 1000*R8.8[@正岡ｈ]), 0)';
+  /* ★短い形（画面の 見え方）と 長い形（実Excel が 保存する 形）の 両方★ */
+  const f = '=IFERROR(MAX(R8.9[@売上]*2, 1000*R8.8[@正岡ｈ]), 0)';
+  const f長 = '=IFERROR(MAX(R8.9[[#This Row],[売上]]*2, 1000*R8.8[[#This Row],[正岡ｈ]]), 0)';
   const x = TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, f, 表, 表[1]);
   T('★.xlsx の 文字の 式でも 見つける★', !!x);
   T('★.xlsx でも 同じ 直し方（R8.8 → R8.9）★',
@@ -119,6 +123,11 @@ T('★別のシートの 表を 指していたら 出す（行が 合ってい�
     TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=R8.9[@正岡ｈ]', 表, 表[1]) === null);
   T('★.xlsx で 知らない名前は 出さない（当て推量しない）★',
     TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=しらない表[@正岡ｈ]', 表, 表[1]) === null);
+  const x長 = TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, f長, 表, 表[1]);
+  T('★★実Excel が 保存する 長い形でも 見つける（[[#This Row],[列名]]）★★', !!x長,
+    '★字で 探す 作りだと ここが 0件に なる（2026-09-04 実際に 踏んだ）★');
+  T('★長い形でも 同じ 直し方★',
+    x長 && x長.直し方.前 === 'R8.8' && x長.直し方.後 === 'R8.9' && x長.列名 === '正岡ｈ');
   T('★.xlsx で その行で ない（[列名]）物は 出さない★',
     TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=SUM(R8.8[正岡ｈ])', 表, 表[1]) === null);
   /* ★自己確認が 教えてくれた 抜け★（xlsb 側と 同じ 2つを xlsx 側にも） */
@@ -126,9 +135,47 @@ T('★別のシートの 表を 指していたら 出す（行が 合ってい�
     TR._断りを仕分ける文字('計算', { r: 299, c: 31 }, '=R8.9[@正岡ｈ]', 表, 表[1]) === null);
   T('★.xlsx で ほかの表でも その行が 中身の 中なら 出さない★',
     (() => {
-      const 長い = { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 10, header: 1, totals: 1 };
+      const 長い = { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 10, header: 1, totals: 1, cols: 列たち };
       return TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=R8.8[@正岡ｈ]', [表[1], 長い], 表[1]) === null;
     })());
+}
+
+/* ── ②-c ★★実Excel が 作った 見本の ブックで 実際に 押す★★ ──
+   ★作り物の 引数で 試すだけでは 足りない★（2026-09-04 実際に 踏んだ）：
+   実Excel が 保存する 形は ★R8.8[[#This Row],[正岡ｈ]]★ で、
+   ★[@正岡ｈ] の 短い形では ない★＝字で 探す 作りは ★1件も 見つけられなかった★。
+   ⇒ ★実Excel に 作らせた 見本を repo に 置いて 毎回 通す★
+      tools/make-mihon.ps1 で 作った（司さんの 実物は 1バイトも 触っていない）
+      中身 … 表2つ（R8.8＝A1:C5 ／ R8.9＝A8:C12）、R8.9 の C列が R8.8 の その行を 指す
+      ★Excel 自身も 答えを 出せず 値は 0★（エラーは 出ない＝客は 気づけない） */
+{
+  const fs = await import('node:fs');
+  const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
+  const ZipSurgeon = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
+  const TR2 = require_(path.join(ROOT, 'lib/table-refs.js'));
+  for (const [形, 名] of [['xlsx', 'hyou-no-soto-sample.xlsx'], ['xlsb', 'hyou-no-soto-sample.xlsb']]) {
+    const 道 = path.join(ROOT, 'tests/fixtures', 名);
+    if (!fs.existsSync(道)) { T('★見本が 在る（' + 名 + '）★', false, '★無い＝この 試験は 空振り★'); continue; }
+    const bytes = new Uint8Array(fs.readFileSync(道));
+    const wb = XLSX.read(bytes, { type: 'array', cellFormula: true });
+    const rr = await TR2.resolve(bytes, 形, wb, ZipSurgeon);
+    const 出 = (rr.断り || []).filter((x) => x.種類 === 'thisrow_other_table');
+    T('★' + 形 + ' の 見本で 見つける（4か所）★', 出.length === 4, '見つけた ' + 出.length + '件');
+    T('★' + 形 + ' の 直し方が 正しい（R8.8[@正岡ｈ] → R8.9[@正岡ｈ]）★',
+      出.length > 0 && 出[0].直し方.前 === 'R8.8' && 出[0].直し方.後 === 'R8.9' && 出[0].列名 === '正岡ｈ',
+      出.length ? (出[0].直し方.前 + '→' + 出[0].直し方.後 + ' [@' + 出[0].列名 + ']') : '(0件)');
+    T('★' + 形 + ' の 場所が 正しい（計算!C9 から）★',
+      出.length > 0 && 出[0].シート === '計算' && 出[0].セル === 'C9', 出.length ? 出[0].セル : '(0件)');
+    T('★' + 形 + ' Excel 自身も 0 を 返している（エラーが 出ない＝客は 気づけない）★',
+      (wb.Sheets['計算'].C9 || {}).v === 0, JSON.stringify((wb.Sheets['計算'].C9 || {}).v));
+    /* ★★答えを 実Excel に 合わせる★★（2026-09-04＝★絵を 開いて 見つけた★）
+       断ると 式ごと 読めず ★IFERROR まで 道連れで #ERROR★＝実Excel の 0 と 違う。
+       ⇒★Excel と 同じ エラーの 印を 置く★＝IFERROR が 拾って 0 に なる。 */
+    const 直し = rr.fixes['計算|8,2'] || '';
+    T('★' + 形 + ' その セルを 直している（断って 放り出していない）★', !!直し, '(直していない)');
+    T('★' + 形 + ' ★Excel と 同じく エラーの 印を 置く（IFERROR が 拾える）★★',
+      直し.indexOf('#VALUE!') >= 0 && 直し.indexOf('IFERROR') >= 0, 直し.slice(0, 120));
+  }
 }
 
 /* ── ③ 客に 見せる 言葉 ── */
@@ -216,6 +263,14 @@ if (process.argv.includes('--self-test')) {
   ];
   /* ★lib/horu.js と lib/chizu.js の 側も 壊して 見る★（渡す所が 抜けたら 気づけない） */
   const 別の壊し = [
+    /* ★★本当に 動いている 道を 壊す★★（2026-09-04）
+       ＝実Excel の 見本を 通す 道。上の 8通りは ★断った 時の 受け皿★を 壊している。 */
+    ['lib/table-refs.js', '★実物の 道＝控えるのを やめる（答えは 合うが 誰も 気づけない）★',
+      (t) => t.replace('    ctx.断り.push({', '    if (false) ctx.断り.push({')],
+    ['lib/table-refs.js', '★実物の 道＝その行が 中か 外かを 見なくする★',
+      (t) => t.replace('    return ctx.row >= (def.rw1 + def.header) && ctx.row <= (def.rw2 - def.totals);', '    return true;')],
+    ['lib/table-refs.js', '★実物の 道＝Excel と 同じ 答えに しない（#ERROR に 戻す）★',
+      (t) => t.replace("        out += formula.slice(prev, h.at) + '#VALUE!';", '        return null;')],
     ['lib/horu.js', '★掘れる回数を 5回の 決め打ちに 戻す★',
       (t) => t.replace('return Math.max(下限, Math.ceil(全部 / Math.max(1, 一度のセル)) + 2);', 'return 下限;')],
     ['lib/chizu.js', '★機械が 見つけた 2本目を 地図に 載せない★',
