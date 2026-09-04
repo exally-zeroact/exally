@@ -38,6 +38,8 @@ on:
       - 'tests/bahttext-webkit.mjs'
       - 'tests/fixtures/bahttext-sample.xlsx'
       - 'tests/encodeurl-webkit.mjs'
+      - 'tests/filterxml-webkit.mjs'
+      - 'tests/fixtures/filterxml-golden.json'
       - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
@@ -111,3 +113,8 @@ jobs:
       #   ★「思う」では なく 数える★／答えが 実Excel と 同じ事も 一緒に 見る
       - name: ★URLの形＝外に出ない事を 通信0本で 示す（実ブラウザ）
         run: node tests/encodeurl-webkit.mjs
+      # ★FILTERXML★ 2026-09-04＝★ここが 本当の 答え★
+      #   ★試験の台（jsdom）の XPath は 本物と 違う★（大文字小文字／local-name()）
+      #   ⇒ node では 3通り 未測定に なる ⇒★ここで 29通り 全部 見る★＋★通信 0本★
+      - name: ★XMLから取り出す＝実Excel 29通りと 同じか／通信0本（実ブラウザ）
+        run: node tests/filterxml-webkit.mjs
