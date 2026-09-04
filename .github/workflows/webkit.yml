@@ -35,6 +35,8 @@ on:
       - 'tests/comment-mark-webkit.mjs'
       - 'tests/hyou-no-soto-webkit.mjs'
       - 'tests/fixtures/hyou-no-soto-sample.xlsx'
+      - 'tests/bahttext-webkit.mjs'
+      - 'tests/fixtures/bahttext-sample.xlsx'
       - 'tests/karimono.test.mjs'
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
@@ -99,3 +101,8 @@ jobs:
       #   ★字合わせでは 分からない★＝知らせが 出るか／窓に ★直し方★が 出るか／その場所へ 飛ぶか
       - name: ★ほかの表の その行＝見本を 開いて 直し方まで 出るか（本物のマウスで 押す）
         run: node tests/hyou-no-soto-webkit.mjs
+      # ★BAHTTEXT（タイ語の 金額）★ 2026-09-04
+      #   ★実Excel が 作った ブック★を 本物の ブラウザで 開いて ★計算し直した 答え★と
+      #   ★実Excel が 出した 答え★を 1行ずつ 見比べる（部品だけ 緑では 足りない）
+      - name: ★タイ語の 金額＝実Excel の ブックを 開いて 答えが 同じか（実ブラウザ）
+        run: node tests/bahttext-webkit.mjs

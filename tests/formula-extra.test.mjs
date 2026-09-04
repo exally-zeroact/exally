@@ -134,6 +134,12 @@ const mm = F.最頻値たち([[1], [2], [2], [3], [3]]);
 /* ── ★足さない 物に 理由★ ── */
 const 数 = F.数える();
 言う(数.足す.length === 12, '★足すのは 12個★（今 ' + 数.足す.length + '個）');
+/* ★2026-09-04 に BAHTTEXT を 足した★＝★中身は lib/bahttext.js★（このファイルでは 計算しない）
+   ⇒★繋ぐ 数は 12 + 1 = 13★／★数を ただ 上げるのでは なく「どこに 在るか」まで 見る★ */
+言う(Object.keys(数.別のlibで足す).length === 1 && !!数.別のlibで足す.BAHTTEXT,
+  '★別の lib で 足した 物は BAHTTEXT の 1つ★');
+言う(/lib\/bahttext\.js/.test(数.別のlibで足す.BAHTTEXT), '★どこに 在るかが 書いてある★');
+言う(!数.足さない.BAHTTEXT, '★足さない 一覧から BAHTTEXT が 消えている（もう 足した）★');
 言う(数.足す.indexOf('YEN') < 0, '★YEN は 足していない（実Excel に 無い）★');
 言う(!!数.足さない.YEN && /存在しない/.test(数.足さない.YEN),
   '★YEN を 足さない 理由が 書いてある★', 数.足さない.YEN);
@@ -153,7 +159,10 @@ const plug素 = 注記を外す(plug);
 言う(!/YEN/.test(plug素.replace(/\s/g, '')) || !/'YEN'/.test(plug素),
   '★繋ぐ 側にも YEN が 残っていない★');
 const 実装 = (plug素.match(/'[A-Z.]+':\s*\{ method:/g) || []).length;
-言う(実装 === 12, '★繋ぐのも 12個★（今 ' + 実装 + '個）');
+const 繋ぐ筈 = 数.足す.length + Object.keys(数.別のlibで足す).length;
+言う(実装 === 繋ぐ筈, '★繋ぐ 数 ＝ このファイルの 12 ＋ 別の lib の '
+  + Object.keys(数.別のlibで足す).length + ' ＝ ' + 繋ぐ筈 + '個★（今 ' + 実装 + '個）');
+言う(/'BAHTTEXT':\s*\{ method: 'bahttext'/.test(plug素), '★BAHTTEXT を 繋いでいる★');
 const book = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
 言う(/formula-extra\.js/.test(book) && /formula-extra-plug\.js/.test(book),
   '★画面が 両方 読み込んでいる★');
@@ -188,9 +197,13 @@ if (process.argv.includes('--self-test')) {
   const 壊した = 元字.replace(/'TAKE':\s*\{ method:/, "'TAKE': { nope:");
   言う(壊した !== 元字, '★壊せた（TAKE を 別名に した）★');
   const 数え = (t) => (注記を外す(t).match(/'[A-Z.]+':\s*\{ method:/g) || []).length;
-  言う(数え(元字) === 12 && 数え(壊した) === 11,
-    '★1つ 消したら 12→11 に なる（数える所が 効いている）★',
+  /* ★2026-09-04 に 13個に なった★（BAHTTEXT を 足した＝中身は lib/bahttext.js）
+     ⇒★数を 決め打ちに しない★＝★1つ 消したら 1つ 減る事★を 見る（数える所が 効いている） */
+  言う(数え(壊した) === 数え(元字) - 1,
+    '★1つ 消したら 1つ 減る（数える所が 効いている）★',
     '本物 ' + 数え(元字) + ' / 壊した ' + 数え(壊した));
+  言う(数え(元字) === 数.足す.length + Object.keys(数.別のlibで足す).length,
+    '★繋いでいる 数が 台帳と 合う★（今 ' + 数え(元字) + '個）');
   const 表壊し = 元字.replace('class extends', 'class Nope');
   言う(!/class extends/.test(表壊し),
     '★extends を 外したら ③が 落ちる★');
