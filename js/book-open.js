@@ -69,10 +69,12 @@
          ★合わないセルは直さない（元のまま＝#ERROR のまま）★＝壊すより断る。 */
       var trFixes = {};
       var trStats = null;
+      /* ★断った 式のうち 客に 説明できる 物★（2026-09-04）＝★直さない・言うだけ★ */
+      var tr断り = [];
       var pre = Promise.resolve();
       if (kind !== 'xls' && root.TableRefs && root.ZipSurgeon) {
         pre = root.TableRefs.resolve(bytes, kind, wb, root.ZipSurgeon).then(function (r) {
-          if (r && r.ok) { trFixes = r.fixes || {}; trStats = r.stats || null; }
+          if (r && r.ok) { trFixes = r.fixes || {}; trStats = r.stats || null; tr断り = r.断り || []; }
           else if (r && root.console) root.console.warn('[Exally] 表の参照を直せませんでした: ' + r.why);
         }).catch(function (e) {
           if (root.console) root.console.warn('[Exally] 表の参照を直せませんでした', e);
@@ -93,12 +95,12 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り); });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り) {
       var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
@@ -126,7 +128,8 @@
         base: base,
         tableRefs: trStats,        // ★何本 直したか（見張りと報告が読む。画面には出さない）
       };
-      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null };
+      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null,
+        表の断り: tr断り || [] };
   }
 
   /* ★日本語の曜日（aaa / aaaa）を先に本物の文字へ置き換える★

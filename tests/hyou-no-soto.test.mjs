@@ -1,0 +1,206 @@
+/* hyou-no-soto.test.mjs — ★診断2本目「ほかの表の その行を 見ている」★ 2026-09-04
+ *
+ *  ★なぜ 作ったか（司さんの 実物で 実際に 出た）★
+ *    2026-09-03 に 8月の 行を コピーして 9月を 作った時、
+ *    ★AF・AH・AJ の 3列 × 31行 が 8月の 表(Table23) の [@列名] を 指したまま★ 残っていた。
+ *    ⇒ 「その行」は ★自分の表の 中でしか 決まらない★ので Excel も 答えを 出せない
+ *    ⇒ IFERROR に 包まれているので ★画面は 0★＝★エラーが 出ず 誰も 気づけない★
+ *    ⇒ ★数字を 入れても ずっと 0 のまま★
+ *
+ *  ★司さんの 指摘（2026-09-04）★
+ *    「分かったんなら ★理由と 修正方法まで★ 教えれないかんやろが
+ *      それが 出来ずに Exally内でも ユーザーに 聞くつもりか？」
+ *    ⇒ ★聞かない★。★見つけて・なぜかを 言って・直し方（前→後）まで 出す★。
+ *
+ *  ★ここでは 直さない★＝式を 書き換えるのは 客の 決め。★言うだけ★。
+ *
+ *  走らせ方: node tests/hyou-no-soto.test.mjs [--self-test]
+ */
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
+const TR = require_(path.join(ROOT, 'lib/table-refs.js'));
+const Shindan = require_(path.join(ROOT, 'lib/shindan.js'));
+
+let pass = 0, fail = 0;
+const T = (n, よい, 添え) => {
+  if (よい) { pass++; console.log('  ok   ' + n); }
+  else { fail++; console.log('  NG   ' + n + (添え ? '\n       ' + 添え : '')); }
+};
+
+/* ★実物と 同じ 形で 作る★（計算シート・8月=Table23・9月=Table24）
+   行は 0 から 数える。実物 … Table23 行233〜265 ／ Table24 行267〜299（見出し1・合計1） */
+/* ★名前は 司さんの 実物と 同じ★＝★客が 数式バーで 見る 名前は R8.8 / R8.9★
+   （SheetJS が 書く Table23 / Table24 は ★客の 画面には 出ない★＝それで 助言すると 探せない） */
+const 表 = [
+  { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 265, cl1: 0, cl2: 37, header: 1, totals: 1 },
+  { id: 24, name: 'R8.9', sheet: '計算', rw1: 267, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 },
+];
+const byId = { 23: 表[0], 24: 表[1] };
+/* 見出しの 字（列名を 出す為）。Table23 と Table24 の 33列目＝AG＝「正岡ｈ」 */
+const wb = { Sheets: { 計算: { AG234: { v: '正岡ｈ' }, AG268: { v: '正岡ｈ' } } } };
+const その行 = (id, col) => ({ id: id, code: 16, coltype: 1, colFirst: col, colLast: col });
+const 中身 = (id, col) => ({ id: id, code: 0, coltype: 1, colFirst: col, colLast: col });
+
+console.log('');
+console.log('[hyou-no-soto] ★ほかの表の「その行」を 見ている所★');
+
+/* ── ① 実物と 同じ形＝見つける ── */
+{
+  /* 計算!AF269（0から数えると 行268・列31）が Table23[@正岡ｈ] を 指す */
+  const x = TR._断りを仕分ける('計算', 268, 31, [その行(24, 12), その行(23, 32)], byId, 表, wb);
+  T('★ほかの表の その行を 指していたら 見つける★', !!x, '見つけていない');
+  T('★種類が thisrow_other_table★', x && x.種類 === 'thisrow_other_table');
+  T('★場所が セルの名前で 出る（AF269）★', x && x.セル === 'AF269', x && x.セル);
+  T('★客が 見る 名前で 出す（R8.8 → R8.9／Table23 では ない）★',
+    x && x.指した表 === 'R8.8' && x.自分の表 === 'R8.9',
+    x && (x.指した表 + ' / ' + x.自分の表));
+  T('★列名を 見出しから 取る（正岡ｈ）★', x && x.列名 === '正岡ｈ', x && String(x.列名));
+  T('★直し方が 前→後 で 出る★',
+    x && x.直し方 && x.直し方.前 === 'R8.8' && x.直し方.後 === 'R8.9');
+  T('★直し方の 字（列名は そのまま）★',
+    Shindan.直し方の字(x) === 'R8.8[@正岡ｈ]　→　R8.9[@正岡ｈ]',
+    Shindan.直し方の字(x));
+  T('★行と列を そのまま 出す（画面が その場所へ 飛べる）★', x && x.r === 268 && x.c === 31);
+}
+
+/* ── ② 出しては いけない物（★空振りで 客を 驚かせない★）── */
+T('★自分の表の その行は 出さない★',
+  TR._断りを仕分ける('計算', 268, 31, [その行(24, 32)], byId, 表, wb) === null);
+T('★その行では ない（[#Data]）物は 出さない★',
+  TR._断りを仕分ける('計算', 268, 31, [中身(23, 32)], byId, 表, wb) === null);
+T('★どの表にも 入っていない セルは 出さない（自分の表が 分からない）★',
+  TR._断りを仕分ける('計算', 500, 31, [その行(23, 32)], byId, 表, wb) === null);
+T('★知らない表を 指している時は 出さない（当て推量しない）★',
+  TR._断りを仕分ける('計算', 268, 31, [その行(99, 32)], byId, 表, wb) === null);
+{
+  /* ★ほかの表でも その行が 中に 在るなら 出さない★（Excel は 答えを 出せる） */
+  const 重なり = [
+    { id: 23, sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 },
+    表[1],
+  ];
+  T('★ほかの表でも その行が 中身の 行の 中なら 出さない★',
+    TR._断りを仕分ける('計算', 268, 31, [その行(23, 32)], { 23: 重なり[0], 24: 表[1] }, 重なり, wb) === null);
+}
+/* ★自己確認が 教えてくれた 抜け その1★
+   ★自分の表の その行でも、合計の行から 呼べば 中身の 行の 外★になる。
+   その時に 出してしまうと 直し方が「Table24→Table24」＝★意味の 無い 助言★に なる。 */
+T('★自分の表なら 合計の行から 呼んでも 出さない（前＝後の 助言を 出さない）★',
+  TR._断りを仕分ける('計算', 299, 31, [その行(24, 32)], byId, 表, wb) === null);
+/* ★自己確認が 教えてくれた 抜け その2★
+   ★ほかの表でも その行が 中身の 中に 在るなら Excel は 答えを 出せる＝出しては いけない★
+   （自分の表と 重ならない 形で 試す＝列を ずらす） */
+T('★ほかの表でも その行が 中身の 中なら 出さない（列をずらして 確かめる）★',
+  (() => {
+    const 長い = { id: 23, sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 10, header: 1, totals: 1 };
+    return TR._断りを仕分ける('計算', 268, 31, [その行(23, 5)], { 23: 長い, 24: 表[1] }, [表[1], 長い], wb) === null;
+  })());
+T('★別のシートの 表を 指していたら 出す（行が 合っていても 別の紙）★',
+  (() => {
+    const 別 = [{ id: 23, name: 'R8.8', sheet: '売上表', rw1: 233, rw2: 299, cl1: 0, cl2: 37, header: 1, totals: 1 }, 表[1]];
+    const x = TR._断りを仕分ける('計算', 268, 31, [その行(23, 32)], { 23: 別[0], 24: 表[1] }, 別, wb);
+    return !!x && x.指した表 === 'R8.8';
+  })());
+
+/* ── ②-b ★.xlsx / .xlsm でも 同じ★（形式で 出たり 出なかったり させない）── */
+{
+  const f = '=IFERROR(MAX(R8.9[@売上]*R8.9[@時数], 1000*R8.8[@正岡ｈ]), 0)';
+  const x = TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, f, 表, 表[1]);
+  T('★.xlsx の 文字の 式でも 見つける★', !!x);
+  T('★.xlsx でも 同じ 直し方（R8.8 → R8.9）★',
+    x && x.直し方.前 === 'R8.8' && x.直し方.後 === 'R8.9' && x.列名 === '正岡ｈ',
+    x && JSON.stringify(x.直し方) + ' ' + x.列名);
+  T('★.xlsx でも 種類と 場所は 同じ形★',
+    x && x.種類 === 'thisrow_other_table' && x.セル === 'AF269');
+  T('★.xlsx で 自分の表だけなら 出さない★',
+    TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=R8.9[@正岡ｈ]', 表, 表[1]) === null);
+  T('★.xlsx で 知らない名前は 出さない（当て推量しない）★',
+    TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=しらない表[@正岡ｈ]', 表, 表[1]) === null);
+  T('★.xlsx で その行で ない（[列名]）物は 出さない★',
+    TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=SUM(R8.8[正岡ｈ])', 表, 表[1]) === null);
+  /* ★自己確認が 教えてくれた 抜け★（xlsb 側と 同じ 2つを xlsx 側にも） */
+  T('★.xlsx で 自分の表なら 合計の行から 呼んでも 出さない★',
+    TR._断りを仕分ける文字('計算', { r: 299, c: 31 }, '=R8.9[@正岡ｈ]', 表, 表[1]) === null);
+  T('★.xlsx で ほかの表でも その行が 中身の 中なら 出さない★',
+    (() => {
+      const 長い = { id: 23, name: 'R8.8', sheet: '計算', rw1: 233, rw2: 299, cl1: 0, cl2: 10, header: 1, totals: 1 };
+      return TR._断りを仕分ける文字('計算', { r: 268, c: 31 }, '=R8.8[@正岡ｈ]', [表[1], 長い], 表[1]) === null;
+    })());
+}
+
+/* ── ③ 客に 見せる 言葉 ── */
+{
+  const w = Shindan.言葉('thisrow_other_table', 62);
+  T('★言葉が 在る★', !!w);
+  T('★何か所か を 言う★', w && w.本文.indexOf('62か所') >= 0);
+  T('★「0 のまま」と 言う（気づけない事を 言う）★', w && w.本文.indexOf('0 のまま') >= 0);
+  T('★直し方を 言う（聞かない）★', w && w.つぎ.indexOf('直し方は1つ') >= 0, w && w.つぎ);
+  T('★列名は そのまま と 言う★', w && w.つぎ.indexOf('列名はそのまま') >= 0);
+  T('★金額らしき数を 出さない★', w && (w.本文 + w.つぎ).match(/\d{6,}/) === null);
+}
+
+/* ── ④ 画面に つないである（台帳に 書いただけで 出ていない、を 防ぐ）── */
+{
+  const fs = await import('node:fs');
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+  T('★画面が 断りを 受け取っている★', html.indexOf('res.表の断り') > 0);
+  T('★画面が 種類で 選り分けている★', html.indexOf("'thisrow_other_table'") > 0);
+  T('★画面が 直し方の字を 出している★', html.indexOf('Shindan.直し方の字') > 0);
+  T('★ボタンの 数が 2本の 合計★', html.indexOf("'危ない所 ' + (n1 + n2) + 'か所'") > 0);
+  const open = fs.readFileSync(path.join(ROOT, 'js/book-open.js'), 'utf8');
+  T('★読み込みが 断りを 渡している★', open.indexOf('表の断り: tr断り') > 0);
+  T('★前のファイルの物を 残さない（毎回 入れ替える）★',
+    html.indexOf('_hyouNoSoto = (res.表の断り') > 0);
+}
+
+/* ── わざと 壊して 赤に なるか ── */
+/* ★「出さない」を もう一度 呼ぶだけでは 自己確認に ならない★（同じ物を 2回 見るだけ）
+   ⇒ ★本物の 部品を わざと 壊して、この 試験が 赤に なるか を 見る★ */
+if (process.argv.includes('--self-test')) {
+  console.log('');
+  console.log('★本物の 部品を わざと 壊して 赤に なるか★');
+  const fs = await import('node:fs');
+  const { execFileSync } = await import('node:child_process');
+  const 道 = path.join(ROOT, 'lib/table-refs.js');
+  const 元 = fs.readFileSync(道, 'utf8');
+  const 壊す = [
+    ['★自分の表かどうかを 見なくする★',
+      (t) => t.replace('      if (L.id === 自分.id) continue;', '      if (false) continue;')],
+    ['★その行（[@列名]）以外も 拾う★',
+      (t) => t.replace("      if (BAND_BY_CODE[L.code] !== 'thisRow') continue;", '      if (false) continue;')],
+    ['★中身の 行の 中か どうかを 見なくする★',
+      (t) => t.replace('      if (先.sheet === sn && 行 >= 中身の頭 && 行 <= 中身の尻) continue;', '      if (false) continue;')],
+    ['★直し方（後）を 取り違える★',
+      (t) => t.replace('後: 自分の名 },', '後: 先の名 },')],
+    ['★番号の 名前（Table23）で 助言してしまう★',
+      (t) => t.replace("var 先の名 = (先.name || ('Table' + L.id));", "var 先の名 = 'Table' + L.id;")],
+    ['★.xlsx の 側で 自分の表かどうかを 見なくする★',
+      (t) => t.replace('      if (名 === own.name) continue;', '      if (false) continue;')],
+    ['★.xlsx の 側で 中身の 行か どうかを 見なくする★',
+      (t) => t.replace('      if (先.sheet === sn && rc.r >= 中身の頭 && rc.r <= 中身の尻) continue;', '      if (false) continue;')],
+    ['★列名を 出さなくする★',
+      (t) => t.replace('列名 = String(hc.v);', '列名 = null;')],
+  ];
+  for (const [名, f] of 壊す) {
+    const 壊れ = f(元);
+    if (壊れ === 元) { console.log('  ★素通り★  ' + 名 + '（印が 古い＝直せ）'); fail++; continue; }
+    fs.writeFileSync(道, 壊れ);
+    let 赤 = false;
+    try { execFileSync(process.execPath, [path.join(ROOT, 'tests', 'hyou-no-soto.test.mjs')], { stdio: 'pipe' }); }
+    catch (e) { 赤 = true; }
+    fs.writeFileSync(道, 元);                 /* ★必ず 戻す★ */
+    console.log((赤 ? '  赤くなった  ' : '  ★素通り★  ') + 名);
+    if (!赤) fail++;
+  }
+  T('★本物は 壊していない（戻した）★', fs.readFileSync(道, 'utf8') === 元);
+  T('★言葉を 知らない 種類で 呼んだら null（黙って 何か 出さない）★',
+    Shindan.言葉('しらない種類', 1) === null);
+  T('★直し方の 字は 中身が 無ければ 空★', Shindan.直し方の字(null) === '');
+}
+
+console.log('');
+console.log('hyou-no-soto: ' + pass + ' 緑 / ' + fail + ' 赤');
+process.exit(fail ? 1 : 0);
