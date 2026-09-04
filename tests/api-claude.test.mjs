@@ -18,13 +18,18 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { 注記を外す } from '../scripts/lib/chuki.mjs';
+import { 倉庫の行を拾う, 読めなければ止まる } from '../scripts/lib/statutory-soko.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require_ = createRequire(import.meta.url);
 
 if (!process.env.ANTHROPIC_API_KEY) process.env.ANTHROPIC_API_KEY = 'test-dummy-key';
 const handler = require_(path.join(ROOT, 'api/claude.js'));
-const build = handler.__buildStatutoryPrompt;
+/* ★2026-09-05★ 法定の数値は ★倉庫(Supabase statutory)から 拾う★ ようにした（司さん）。
+   ⇒ この 検査も ★本物の 倉庫を 読んで★ 前置きを 組み立てる＝★客が 見る 数字と 同じ 所★。
+   ⇒ 読めなければ ★緑に しない★（終了の印 2＝検査が 走っていない／コードの赤ではない）。 */
+const 倉庫の行 = 読めなければ止まる(await 倉庫の行を拾う(), 'api-claude の 基準数値の検査');
+const build = (ym) => handler.__buildStatutoryPrompt(ym, 倉庫の行);
 
 let pass = 0, fail = 0;
 const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
@@ -70,6 +75,76 @@ T('★「今日」で組み立てても NaN / undefined が混ざらない', () 
 T('検査が空振りしていない（テスト用の窓が実際に生えている）', () => {
   if (typeof build !== 'function') throw new Error('__buildStatutoryPrompt が無い');
   if (typeof handler !== 'function') throw new Error('api/claude.js が関数を export していない（Vercelが呼べない）');
+});
+
+/* ── ★倉庫が 読めなかった 時に AI へ 何と 言うか★（甲・2026-09-05 指示役）──────
+ *  ★黙って 数字を 抜くのが 一番 危ない★＝AI は 自分の おぼえている 率を 書いてしまう。
+ *  ⇒ 数字の 代わりに ★「今 出せない・推測で 書くな」★ を 必ず 入れる。 */
+const 取れない = handler.__法定が取れない時;
+
+T('★倉庫が 読めない時＝数字を 1つも 出さない', () => {
+  const s = handler.__buildStatutoryPrompt('2026-08', null);
+  if (new RegExp('\\d+\\.\\d+\\s*[%％]').test(s)) throw new Error('率の 数字が 残っています:' + s);
+  for (const 悪い of ['4.925', '9.15', '0.50%', '10%（標準）']) {
+    if (s.indexOf(悪い) >= 0) throw new Error('数字が 出ています: ' + 悪い);
+  }
+});
+
+T('★倉庫が 読めない時＝AI に「数字を答えるな・推測で書くな」と 言う', () => {
+  const s = handler.__buildStatutoryPrompt('2026-08', null);
+  for (const 要る of ['取り出せませんでした', '数字を答えず', '推測した率を 答えに書かないこと']) {
+    if (s.indexOf(要る) < 0) throw new Error('言っていない: ' + 要る + '\n' + s);
+  }
+  if (s !== 取れない) throw new Error('★別の 文が 出ている★');
+});
+
+T('★半分だけ 取れた時も 出さない（欠けた表が 一番 危ない）', () => {
+  /* 消費税だけ 取れて 社保・雇用が 無い＝★消費税だけ 書いて しまわないか★ */
+  const 半分 = [{ kind: 'shouhizei', year: 2019, data: { hyojun: 0.1, keigen: 0.08 } }];
+  const s = handler.__buildStatutoryPrompt('2026-08', 半分);
+  if (s !== 取れない) throw new Error('★半分の 表を 出しています★:' + s);
+});
+
+T('★倉庫の 数字を 変えたら 前置きも 変わる（倉庫を 本当に 見ている）', () => {
+  /* ★これが 無いと「たまたま 同じ 数字」で 緑に なる★＝倉庫を 見ていない事に 気付けない */
+  const 偽 = [
+    { kind: 'shakaihoken', year: 2026, data: { kenko_total: { tokyo: 0.12 }, kosei_total: 0.2 } },
+    { kind: 'koyo', year: 2026, data: { ippan: 0.007 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.15, keigen: 0.09 } },
+  ];
+  const s = handler.__buildStatutoryPrompt('2026-08', 偽);
+  for (const 要る of ['6.000%', '10.00%', '0.70%', '15%（標準）/ 9%（軽減）']) {
+    if (s.indexOf(要る) < 0) throw new Error('倉庫の 値が 使われていない: ' + 要る + '\n' + s);
+  }
+});
+
+T('★消費税は「その kind の 一番 新しい 行」を 取る（2019 と 決め打ちしない）', () => {
+  /* ★倉庫に 新しい 施行年が 増えた時、古い 行を 読み続けると★
+     ★数字は 出るので 誰も 気づかない★＝2026-09-05 指示役の 指摘。 */
+  const 行 = [
+    { kind: 'shakaihoken', year: 2026, data: { kenko_total: { tokyo: 0.0985 }, kosei_total: 0.183 } },
+    { kind: 'koyo', year: 2026, data: { ippan: 0.005 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.10, keigen: 0.08 } },
+    { kind: 'shouhizei', year: 2027, data: { hyojun: 0.12, keigen: 0.09 } },
+  ];
+  const s = handler.__buildStatutoryPrompt('2026-08', 行);
+  if (s.indexOf('消費税: 12%（標準）/ 9%（軽減）') < 0) {
+    throw new Error('★新しい 行を 見ていない（古い 2019 を 読んでいる）★:' + s);
+  }
+});
+
+T('★社保・雇用は 逆に「先の年」を 使わない（対象月の 年度で 選ぶ）', () => {
+  const 行 = [
+    { kind: 'shakaihoken', year: 2025, data: { kenko_total: { tokyo: 0.0991 }, kosei_total: 0.183 } },
+    { kind: 'shakaihoken', year: 2030, data: { kenko_total: { tokyo: 0.5 }, kosei_total: 0.9 } },
+    { kind: 'koyo', year: 2025, data: { ippan: 0.0055 } },
+    { kind: 'koyo', year: 2030, data: { ippan: 0.9 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.10, keigen: 0.08 } },
+  ];
+  const s = handler.__buildStatutoryPrompt('2025-08', 行);
+  if (s.indexOf('4.955%') < 0 || s.indexOf('0.55%') < 0) {
+    throw new Error('★対象月の 年度を 使っていない★:' + s);
+  }
 });
 
 /* ── ★失敗した時に 何を返すか（2026-08-22）★ ──────────────────────────
@@ -508,8 +583,11 @@ if (process.argv.includes('--self-test')) {
       (t) => t.replace("        content: [{ type: 'text', text: 最後.content, cache_control: { type: 'ephemeral' } }],", "        content: [{ type: 'text', text: 最後.content, cache_control: { type: 'ephemeral', ttl: '1h' } }],"),
       async (h) => { const p = await 捕まえる2(h, [{ role: 'user', content: 'a' }]); const m = p.messages.find((x) => Array.isArray(x.content)); return !m.content[0].cache_control.ttl; }],
     ['★①に 今の日時を混ぜる（毎回 置き直し＝2倍を毎回 払う）★',
-      (t) => t.replace('  const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt();',
-        '  const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt() + new Date().toISOString();'),
+      /* ★2026-09-05★ 法定の数値を 倉庫から 拾うように したので 引数が 増えた。
+         ★書き換える 元の 字が ずれると『置換できず』＝赤に なる★（この 検査は それを 言った）。
+         ⇒★合図の 字を 短く して、また ずれにくく する★ */
+      (t) => t.replace('const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt(',
+        'const 共通 = new Date().toISOString() + SYSTEM_PROMPT_BASE + buildStatutoryPrompt('),
       /* ★2回 呼んで比べる形だと 同じミリ秒に入って 素通りする（実際に素通りした）★
          ⇒ ★日付の形が混ざっていないか★ を見る（いつ走らせても 同じ答えになる） */
       async (h) => { const a = await 捕まえる2(h); return !/\d{4}-\d{2}-\d{2}/.test(a.system[0].text); }],

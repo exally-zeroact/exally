@@ -24,27 +24,5 @@
       "source": "/exally-canvas-grid.html",
       "destination": "/book.html"
     }
-  ],
-  "redirects": [
-    {
-      "source": "/kyuyo",
-      "destination": "https://rakually.vercel.app/kyuyo/",
-      "permanent": false
-    },
-    {
-      "source": "/kyuyo/",
-      "destination": "https://rakually.vercel.app/kyuyo/",
-      "permanent": false
-    },
-    {
-      "source": "/kyuyo/meisai",
-      "destination": "https://rakually.vercel.app/kyuyo/meisai.html",
-      "permanent": false
-    },
-    {
-      "source": "/kyuyo/:path*",
-      "destination": "https://rakually.vercel.app/kyuyo/:path*",
-      "permanent": false
-    }
   ]
 }
