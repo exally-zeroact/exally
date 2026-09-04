@@ -156,6 +156,36 @@ T('★別のシートの 表を 指していたら 出す（行が 合ってい�
     html.indexOf('_hyouNoSoto = (res.表の断り') > 0);
 }
 
+/* ── ⑤ ★機械が 見つけた 物を AIへ 渡しているか★（2026-09-04 司さん「なんで できてないんど」）── */
+{
+  const fs = await import('node:fs');
+  const Chizu = require_(path.join(ROOT, 'lib/chizu.js'));
+  const Horu = require_(path.join(ROOT, 'lib/horu.js'));
+  const 断り = [{ 種類: 'thisrow_other_table', シート: '計算', r: 268, c: 31, セル: 'AF269',
+    指した表: 'R8.8', 自分の表: 'R8.9', 列名: '正岡ｈ', 直し方: { 前: 'R8.8', 後: 'R8.9' } }];
+  const m = Chizu.作る([{ name: '計算', data: { '0,0': { v: 1 } } }], null, null, { 表の断り: 断り });
+  T('★地図に 2本目が 載る（見つけたのに 渡さない、を 防ぐ）★',
+    m.字.indexOf('機械が見つけた 危ない所（AIは呼んでいない）その2') > 0
+    && m.字.indexOf('ほかの表の「その行」を見ている式') > 0, m.字.slice(-260));
+  T('★地図に 直し方が 載る（前→後）★', m.字.indexOf('R8.8[@正岡ｈ]→R8.9[@正岡ｈ]') > 0);
+  T('★地図に 何か所かが 載る★', m.字.indexOf('1か所') > 0);
+  T('★1つも 無い時は 地図に 出さない（0件で 騒がない）★',
+    Chizu.作る([{ name: '計算', data: { '0,0': { v: 1 } } }], null, null, {}).字.indexOf('その2') < 0);
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
+  T('★画面が 地図に 2本目を 渡している★', html.indexOf('表の断り: (typeof _hyouNoSoto') > 0);
+
+  /* ★掘れる回数＝ブックを 掘りきれる 回数★（★5回の 決め打ちに 戻らない為★） */
+  const 作る = (n) => { const d = {}; for (let i = 0; i < n; i++) d[i + ',0'] = { v: 1 }; return [{ name: 's', data: d }]; };
+  T('★小さいブックでも 5回は 掘れる★', Horu.掘れる回数を決める(作る(10)) === 5);
+  T('★実物なみ（21,204セル）なら 掘りきれる 回数まで 増える★',
+    Horu.掘れる回数を決める(作る(21204)) * 2000 >= 21204,
+    String(Horu.掘れる回数を決める(作る(21204))));
+  T('★大きいほど 多く 掘れる（決め打ちに なっていない）★',
+    Horu.掘れる回数を決める(作る(50000)) > Horu.掘れる回数を決める(作る(10000)));
+  T('★画面が その回数を 使っている（12回の 決め打ちで ない）★',
+    html.indexOf('Horu.掘れる回数を決める(sheets)') > 0 && html.indexOf('回 < 掘れる + 2') > 0);
+}
+
 /* ── わざと 壊して 赤に なるか ── */
 /* ★「出さない」を もう一度 呼ぶだけでは 自己確認に ならない★（同じ物を 2回 見るだけ）
    ⇒ ★本物の 部品を わざと 壊して、この 試験が 赤に なるか を 見る★ */
@@ -184,6 +214,15 @@ if (process.argv.includes('--self-test')) {
     ['★列名を 出さなくする★',
       (t) => t.replace('列名 = String(hc.v);', '列名 = null;')],
   ];
+  /* ★lib/horu.js と lib/chizu.js の 側も 壊して 見る★（渡す所が 抜けたら 気づけない） */
+  const 別の壊し = [
+    ['lib/horu.js', '★掘れる回数を 5回の 決め打ちに 戻す★',
+      (t) => t.replace('return Math.max(下限, Math.ceil(全部 / Math.max(1, 一度のセル)) + 2);', 'return 下限;')],
+    ['lib/chizu.js', '★機械が 見つけた 2本目を 地図に 載せない★',
+      (t) => t.replace("      行.push('## 機械が見つけた 危ない所（AIは呼んでいない）その2');", '')],
+    ['lib/chizu.js', '★地図に 直し方を 載せない★',
+      (t) => t.replace("      行.push('- 例: ' + 直し.join(' / ')", "      行.push('- 例: ' + ''")],
+  ];
   for (const [名, f] of 壊す) {
     const 壊れ = f(元);
     if (壊れ === 元) { console.log('  ★素通り★  ' + 名 + '（印が 古い＝直せ）'); fail++; continue; }
@@ -196,6 +235,20 @@ if (process.argv.includes('--self-test')) {
     if (!赤) fail++;
   }
   T('★本物は 壊していない（戻した）★', fs.readFileSync(道, 'utf8') === 元);
+  for (const [部品, 名, f] of 別の壊し) {
+    const み = path.join(ROOT, 部品);
+    const もと = fs.readFileSync(み, 'utf8');
+    const こわれ = f(もと);
+    if (こわれ === もと) { console.log('  ★素通り★  ' + 名 + '（印が 古い＝直せ）'); fail++; continue; }
+    fs.writeFileSync(み, こわれ);
+    let 赤 = false;
+    try { execFileSync(process.execPath, [path.join(ROOT, 'tests', 'hyou-no-soto.test.mjs')], { stdio: 'pipe' }); }
+    catch (e) { 赤 = true; }
+    fs.writeFileSync(み, もと);                 /* ★必ず 戻す★ */
+    console.log((赤 ? '  赤くなった  ' : '  ★素通り★  ') + 名 + '（' + 部品 + '）');
+    if (!赤) fail++;
+    if (fs.readFileSync(み, 'utf8') !== もと) { console.log('  ★戻せていない★ ' + 部品); fail++; }
+  }
   T('★言葉を 知らない 種類で 呼んだら null（黙って 何か 出さない）★',
     Shindan.言葉('しらない種類', 1) === null);
   T('★直し方の 字は 中身が 無ければ 空★', Shindan.直し方の字(null) === '');
