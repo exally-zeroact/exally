@@ -34,6 +34,9 @@ const libs = {
   N: require_(path.join(ROOT, 'lib/nenmatsu.js')),
   WM: require_(path.join(ROOT, 'lib/warimashi.js')),
   SHZ: require_(path.join(ROOT, 'lib/shouhizei-ritsu.js')),
+  /* ★労災保険率表★（2026-09-04 中央の 台帳へ 入れた）
+     ★労災を 持たない アプリでは 渡らない★＝statutory-rows.js が 行を 足さない */
+  RR: require_(path.join(ROOT, 'lib/rousai-ritsu.js')),
 };
 
 let pass = 0, fail = 0;
@@ -155,6 +158,18 @@ T('中央の行と lib の行が1対1（増えても減っても気づける）'
   if (missing.length || extra.length) {
     throw new Error('不整合: libにあって中央に無い=' + (missing.join(', ') || 'なし') + ' / 中央にあってlibに無い=' + (extra.join(', ') || 'なし'));
   }
+});
+
+T('★最賃の 行の 年は lib（NENDO_YEAR）から 来ている（打ち込みでない）', () => {
+  /* ★なぜ（2026-09-04 実測で 穴が 見つかった）★
+   *   ★lib の NENDO_YEAR だけ 2026 に 進めても この見張りは 緑のまま だった★。
+   *   行の年が statutory-rows.js に ★2025 と 打ち込んで あった★ため、
+   *   lib が 年度を 跨いでも 行の名前が 動かず、中央との 1対1 が 崩れなかった。
+   *   ⇒★偽の lib を 1つ 通して、行の年が ついて来るか★を 見る（中央は 触らない）。 */
+  const nise = Object.assign({}, libs, { SAI: Object.assign({}, libs.SAI, { NENDO_YEAR: 2099 }) });
+  const r = SR.buildStatutoryRows(nise).filter(x => x.kind === 'saitei_chingin');
+  if (r.length !== 1) throw new Error('最賃の行が ' + r.length + '件（1件のはず）');
+  if (r[0].year !== 2099) throw new Error('★lib を 2099 にしても 行は ' + r[0].year + ' のまま★＝年が 打ち込みで、lib の 年度替えを 中央との 1対1 で 拾えない');
 });
 
 T('検査が空振りしていない（行を実際に作れている）', () => {
