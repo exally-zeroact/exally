@@ -141,6 +141,8 @@ const FILES = [
   ['ctx-menu-a-ui.test.mjs', '--self-test'],
   'yakusoku.test.mjs',                    // ★画面に 書いてある「約束」を 押して 確かめる(字が緑でも 起きない事が在る)
   ['yakusoku.test.mjs', '--self-test'],
+  'shift-mado.test.mjs',                  // ★挿入/削除で どちらへ詰めるかを聞く窓(4つ・本当に その向きに 動くか)
+  ['shift-mado.test.mjs', '--self-test'],
   'cond-format.test.mjs',                 // ★条件付き書式の当たり判定(実Excelの真値と突き合わせ)
   ['cond-format.test.mjs', '--self-test'],
   'cond-format-ui.test.mjs',              // ★本物の画面で 実際に押す(部品が緑=画面で使える ではない)
