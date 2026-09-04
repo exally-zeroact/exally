@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/hub.css?v=d1d696a4">
+<link rel="stylesheet" href="css/hub.css?v=fae148a4">
 
 </head>
 <body>
@@ -29,12 +29,10 @@
   <section id="scr-hub" class="scr active">
     <p class="greet">こんにちは。今日やることは？</p>
     <div class="tiles">
-      <a class="tile" id="tile-payslip" href="kyuyo/">
-        <span class="tile-ic">💰</span>
-        <span class="tile-t">給与</span>
-        <span class="tile-d">明細の作成・配布</span>
-        <span class="tile-go">開く →</span>
-      </a>
+      <!-- ★給与(kyuyo/)は 2026-09-05 に Exally から 外した＝給与は Rakunally★
+           （司さん「何のための Rakunally なんど」）
+           ★入口を 消しただけでは なく 中身も 消した★（残すと 古い 画面が 同じ 倉庫に 書ける） -->
+
       <button class="tile" id="tile-ledger" type="button" data-go="scr-ledger">
         <span class="tile-ic">📒</span>
         <span class="tile-t">日次台帳</span>
@@ -297,16 +295,16 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
-<script src="js/supa-config.js?v=d1d696a4"></script>
-<script src="lib/access.js?v=d1d696a4"></script>
-<script src="lib/aggregate.js?v=d1d696a4"></script>
-<script src="lib/periods.js?v=d1d696a4"></script>
-<script src="lib/ledger-source.js?v=d1d696a4"></script>
-<script src="lib/cross-agg.js?v=d1d696a4"></script>
-<script src="js/suite-data.js?v=d1d696a4"></script>
-<script src="js/hub.js?v=d1d696a4"></script>
-<script src="js/ledger.js?v=d1d696a4"></script>
-<script src="js/exally-login.js?v=d1d696a4"></script>
-<script src="js/auth.js?v=d1d696a4"></script>
+<script src="js/supa-config.js?v=fae148a4"></script>
+<script src="lib/access.js?v=fae148a4"></script>
+<script src="lib/aggregate.js?v=fae148a4"></script>
+<script src="lib/periods.js?v=fae148a4"></script>
+<script src="lib/ledger-source.js?v=fae148a4"></script>
+<script src="lib/cross-agg.js?v=fae148a4"></script>
+<script src="js/suite-data.js?v=fae148a4"></script>
+<script src="js/hub.js?v=fae148a4"></script>
+<script src="js/ledger.js?v=fae148a4"></script>
+<script src="js/exally-login.js?v=fae148a4"></script>
+<script src="js/auth.js?v=fae148a4"></script>
 </body>
 </html>

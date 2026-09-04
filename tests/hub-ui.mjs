@@ -100,7 +100,7 @@ T('0. ★中身(.app)は最初 hidden＝未ログインで画面を見せない'
 doc.getElementById('app').hidden = false;   // 以降はログイン済みとして描画を見る
 
 /* ═══ 1. ハブ ═══ */
-T('1. ハブが出る・押せるタイルは5つ(給与/日次台帳/集計/共有データ/表)＋準備中1つ', () => {
+T('1. ハブが出る・押せるタイルは4つ(日次台帳/集計/共有データ/表)＋準備中1つ', () => {
   /* ★2026-08-29★ ブックの下の帯が 8個で ごちゃごちゃ だったので（司さん「整理しろ」）
      ★電子ハンコを ここへ 移した★＝★消したのでは ない★（灰色＋理由で 見える所に 残す）。
      ★テンプレは 移していない★＝あれは「まだ」ではなく ★消したページ★（下の見張りが 戻りを 止める）。 */
@@ -108,27 +108,29 @@ T('1. ハブが出る・押せるタイルは5つ(給与/日次台帳/集計/共
   const 全部 = [...doc.querySelectorAll('#scr-hub .tile')];
   const 押せる = 全部.filter((e) => !e.disabled);
   const 準備中 = 全部.filter((e) => e.disabled);
-  ok(押せる.length === 5, '押せるタイル数=' + 押せる.length);
+  /* ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）＝★タイルは 4つ★
+     ⇒★数を 下げた のは ゆるめでは ない★：★給与の タイルが 戻っていない事★を 下で 別に 見る */
+  ok(押せる.length === 4, '押せるタイル数=' + 押せる.length);
   ok(準備中.length === 1, '準備中のタイル数=' + 準備中.length + '（電子ハンコ）');
   for (const e of 準備中) {
     ok(/まだ出来ていません|準備中/.test(e.textContent), '準備中の理由が 画面の字で 読めない: ' + e.textContent.slice(0, 40));
   }
 });
-// 2026-08-01 統合: 給与は別サイト(payslip-app-olive)ではなく【同一オリジンの /kyuyo/】になった。
-//   同一オリジンであることが「ログイン1回で両方使える」の条件そのものなので、そこを見張る。
-T('1. ★給与タイルは同一オリジンの /kyuyo/ へ繋がる(別サイトへ飛ばさない)', () => {
-  const a = doc.getElementById('tile-payslip');
-  ok(a, '給与タイルが無い');
-  ok(a.tagName === 'A', 'リンクでない');
-  // ★2026-08-02 相対に直した。'/kyuyo/' はドメイン直下を指すので、サブパスで配信した時に404になる
-  //   （テスト環境 exally-staging は github.io/exally-staging/ のサブパス配信）。
-  //   相対なら Vercel のルート配信でも Pages のサブパスでも同じ場所を指す＝両方で正しい。
-  ok(a.getAttribute('href') === 'kyuyo/', 'href=' + a.getAttribute('href') + ' (相対 kyuyo/ であること)');
-  ok(!/^https?:/.test(a.getAttribute('href')), '外部URLになっている(別オリジン=ログインが分かれる)');
-  ok(!a.getAttribute('target'), '別タブで開く指定が残っている(同一サイト内なので不要)');
+/* ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（司さん「何のための Rakunally なんど」）。
+   ★前は「給与タイルが 同一オリジンの /kyuyo/ へ 繋がるか」を 見ていた★
+   ⇒★今は 逆＝★給与が 戻っていない事★を 見る★
+     ・タイルが 復活していない
+     ・kyuyo/ を 指す リンクが 1つも 無い
+   ★消した物が 黙って 戻るのを 止める★（前に テンプレで 同じ 見張りを 作った 型） */
+T('1. ★給与は Exally に 戻っていない（Rakunally へ 出した）', () => {
+  ok(!doc.getElementById('tile-payslip'), '★給与タイルが 戻っている★');
+  const 給与へ = [...doc.querySelectorAll('#scr-hub a[href]')]
+    .filter((e) => /kyuyo/.test(e.getAttribute('href') || ''));
+  ok(給与へ.length === 0, '★kyuyo/ を 指す リンクが 在る: ' + 給与へ.length + '本★');
+  const 字 = doc.getElementById('scr-hub').textContent;
+  ok(字.indexOf('明細の作成') < 0, '★給与の 字が 残っている★');
 });
-// 2026-08-01 統合: 請求書/見積の旧ページは削除した。無い物は見せない＝タイルも消す。
-//   「消したページへのリンクが戻ってくる」＝404を配るので、逆向きに見張る。
+
 T('1. ★削除した旧ページ(請求書/見積/旧トップ/テンプレ)へのリンクがハブに無い', () => {
   const html = doc.getElementById('scr-hub').innerHTML;
   ['seikyusyo.html', 'mitsumoriyo.html', 'home.html', 'template.html', 'kyuuryoumeisai.html'].forEach(f => {

@@ -58,18 +58,22 @@ const KINDS = {
 
 /* ── libから「実際の値」を集める ─────────────────────────────────── */
 function buildTable() {
-  const SHH = require_(path.join(ROOT, 'kyuyo/lib/shakaihoken-hyo.js'));
-  const KH = require_(path.join(ROOT, 'kyuyo/lib/koyo-hoken.js'));
-  const SHZ = require_(path.join(ROOT, 'kyuyo/lib/shouhizei-ritsu.js'));
-  const SAI = require_(path.join(ROOT, 'kyuyo/lib/saitei-chingin.js'));
-  const SK = require_(path.join(ROOT, 'kyuyo/lib/shaho-kanyu.js'));
+  /* ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）。
+     ★Exally に 残った 法定の lib は 3本★＝api/claude.js（AI）が 読む 物だけ。
+       lib/shakaihoken-hyo.js ／ lib/koyo-hoken.js ／ lib/shouhizei-ritsu.js
+     ★最賃・社保の適用拡大は Exally から 出て行った★
+       ⇒ 見張る 相手が 無いので ここでは 見ない
+       ⇒★ただし「Exally の 文に その 数字が 出ていないか」は 下で 別に 見る★
+         （★lib が 無い＝好きに 書いてよい、では ない★） */
+  const SHH = require_(path.join(ROOT, 'lib/shakaihoken-hyo.js'));
+  const KH = require_(path.join(ROOT, 'lib/koyo-hoken.js'));
+  const SHZ = require_(path.join(ROOT, 'lib/shouhizei-ritsu.js'));
 
   const rates = { koyo: [], kenko: [], kaigo: [], kosei: [], shienkin: [], shouhizei: [] };
   const yen = { saitei: [], tekiyo: [] };
   /* 適用拡大の賃金要件（88,000円）。★人数(51人→36人…)はここに入れない：
      51/36/21/11 は普通の数と衝突しやすく、赤の信用を落とす。人数が lib から来ているかは
      kyuyo/tests/shaho-kanyu.test.js と law-switchpoints が「文＝libの値」で見ている。 */
-  yen.tekiyo.push(SK.WAGE_88K);
 
   Object.values(KH.RATES).forEach(r => Object.values(r).forEach(v => rates.koyo.push(v)));
   Object.values(KH.EMPLOYER).forEach(r => Object.values(r).forEach(v => rates.koyo.push(v)));
@@ -79,16 +83,24 @@ function buildTable() {
   rates.kosei.push(SHH.KOSEI_NENKIN_RITSU_TOTAL, SHH.KOSEI_NENKIN_RITSU_JUGYOIN);
   rates.shienkin.push(SHH.SHIENKIN_TOTAL_FROM_2026_04);
   rates.shouhizei.push(SHZ.hyojun, SHZ.keigen);
-  Object.values(SAI.todofuken || {}).forEach(v => {
-    const n = (v && typeof v === 'object') ? v.chingin : v;
-    if (typeof n === 'number' && n > 0) yen.saitei.push(n);
-  });
+  /* ★最賃は Exally から 出て行った（2026-09-05）★＝拾う lib が 無い。
+     ⇒ ここは 空のまま／★下の「空なら 赤」から 最賃と 適用拡大を 外す★
+     ⇒★代わりに「最賃の 語が Exally の 文に 出ていないか」を 別に 見る★（下） */
 
   // ★どれか1つでも空なら、その種類は「文に直書きされていないか」を一度も見ていない＝空振り。
   //   libの形が変わって拾えなくなっても、緑のままになるのを止める。
-  const empty = [...Object.entries(rates), ...Object.entries(yen)].filter(([, v]) => !v.length).map(([k]) => k);
+  /* ★2026-09-05★ 給与が 出て行き、最賃(saitei)と 適用拡大(tekiyo)の lib は Exally に 無い。
+     ⇒★この 2つは「拾えなくて 当たり前」＝空振りの 判定から 外す★
+     ⇒★外して よい 理由★＝★その 語が Exally の 文に 出ていない事★を 下で 別に 見るから
+       （出て来たら ★lib が 無いのに 数字を 書いた★＝そこで 赤に なる） */
+  const 出て行った = ['saitei', 'tekiyo'];
+  const empty = [...Object.entries(rates), ...Object.entries(yen)]
+    .filter(([k, v]) => !v.length && 出て行った.indexOf(k) < 0).map(([k]) => k);
   if (empty.length) throw new Error('★libから値を拾えていない種類がある（この検査が空振り）: ' + empty.join(', '));
-  if (yen.saitei.length !== 47) throw new Error('★最低賃金を47件拾えていない（' + yen.saitei.length + '件）＝この検査が空振り');
+  /* ★残った 3本は 必ず 拾えている事★（★1つでも 0なら 空振り★） */
+  const 要る = ['koyo', 'kenko', 'kaigo', 'kosei', 'shienkin', 'shouhizei'];
+  const 足りない = 要る.filter((k) => !(rates[k] || []).length);
+  if (足りない.length) throw new Error('★残った libから 拾えていない: ' + 足りない.join(', '));
 
   return { rates, yen };
 }
@@ -229,9 +241,14 @@ if (process.argv.includes('--self-test')) {
   });
   T('libから作った表が空振りしていない（実物のlibを読めている）', () => {
     const t = buildTable();
-    if (!t.yen.tekiyo.length) throw new Error('適用拡大の額を拾えていない');
+    /* ★2026-09-05★ 適用拡大の lib は 給与と 一緒に 出て行った＝★ここでは 拾えない★
+       （★その 語が Exally の 文に 出ていない事★は 本体の 検査が 見ている） */
     if (t.rates.kenko.length < 47) throw new Error('健保の県が足りない: ' + t.rates.kenko.length);
-    if (!t.rates.koyo.length || !t.rates.kaigo.length || !t.yen.saitei.length) throw new Error('分野が空です');
+    if (!t.rates.koyo.length || !t.rates.kaigo.length || !t.rates.shouhizei.length) throw new Error('分野が空です');
+    /* ★出て行った 物は 空で 正しい★＝★空でない なら 台帳の 直し忘れ★ */
+    if (t.yen.saitei.length || t.yen.tekiyo.length) {
+      throw new Error('★最賃・適用拡大は Exally から 出て行った筈なのに 拾えている★（台帳を 見直す）');
+    }
   });
 
   console.log('\n' + pass + ' passed, ' + fail + ' failed');

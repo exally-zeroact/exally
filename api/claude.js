@@ -1,12 +1,15 @@
 const Anthropic = require('@anthropic-ai/sdk');
-// ★法定の数値は kyuyo/lib/ の本体を読む（写しを作らない）。
+// ★法定の数値は lib/ の本体を読む（写しを作らない）。
+// ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）。
+//   ★AIが 答えに 使う 3本だけ★ lib/ へ 移した＝★写しでは なく 本体を 移した★。
+//   （前は kyuyo/lib/ を 読んでいた＝そのまま 消すと 押した時に 500 で 落ちた）
 //   2026-08-02: リポジトリ直下に写しを置いていて、掃除でそれを消した時にここが
 //   MODULE_NOT_FOUND になり /api/claude が毎回500（＝チャットが全部落ちた）。
 //   本体を直接読めば、消しても場所が変わっても同じ所を指す。
 //   参照が生きているかは tests/refs-resolve.test.mjs がCIで見張っている。
-const SHAKAIHOKEN_HYO = require('../kyuyo/lib/shakaihoken-hyo.js');
-const KOYO_HOKEN      = require('../kyuyo/lib/koyo-hoken.js');
-const SHOUHIZEI_RITSU = require('../kyuyo/lib/shouhizei-ritsu.js');
+const SHAKAIHOKEN_HYO = require('../lib/shakaihoken-hyo.js');
+const KOYO_HOKEN      = require('../lib/koyo-hoken.js');
+const SHOUHIZEI_RITSU = require('../lib/shouhizei-ritsu.js');
 
 /* ★let にしてある理由★＝下の __setClient（テスト用の窓）から 偽のAIに差し替えて、
    ★失敗した時に本当に何を返すか★を機械で押すため。本番では 1ミリも挙動が変わらない。 */
@@ -105,7 +108,7 @@ Excelバージョン別（365/2024/2021/2019/2016/Mac/Online/なし）に合わ�
 - TSVの数式セルはExcelで動く形式（=SUM(B2:B10) など）で記載する
 - セル幅・書式は貼り付け後に手動調整が必要な旨を末尾に添える`;
 
-// ===== 税務・給与の基準数値（kyuyo/lib の本体から・年度は対象月で自己選択） =====
+// ===== 税務・給与の基準数値（lib/ の本体から・年度は対象月で自己選択） =====
 //  ・健保/介護は社保年度（3月起算）、雇用保険は労働保険年度（4月起算）で切り替わる。
 //  ・呼び出しの【たびに】組み立てる＝年度をまたいでも古い値を返さない
 //    （関数が温まったまま年度が変わる、を避ける）。

@@ -101,8 +101,12 @@ T('★★法定データ(金額に直結)は必ず1箇所しかない — 例外
   }
 });
 T('法定データの一覧が空振りしていない（実際にその名前のファイルがある）', () => {
+  /* ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）。
+     ★Exally に 残る 法定の lib は 3本★（AIが 読む 物）＝shakaihoken-hyo / koyo-hoken / shouhizei-ritsu
+     ★前は「5本以上 実在」の 決め打ち★ ⇒★数では なく「1本も 見つからない＝空振り」で 見る★
+     ★大事な 方（2箇所に 無い事）は 上の 検査が そのまま 見ている★ */
   const found = STATUTORY.filter(b => byName[b]);
-  if (found.length < 5) throw new Error('法定データの一覧が実物と合っていません（見つかった: ' + found.join(', ') + '）');
+  if (!found.length) throw new Error('法定データを 1本も 見つけられていない＝この 検査が 空振り');
 });
 
 T('例外表の各項目に理由が書いてあり、実在する', () => {
