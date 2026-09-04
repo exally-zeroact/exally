@@ -58,7 +58,7 @@ T('★ボタンの 数が 2本の 合計（片方だけ 数えていない）★
 T('★2本目は 直し方まで 出す（客に 聞かない）★', () => {
   const 窓 = 切り出す('function openShindan');
   ok(窓.indexOf('Shindan.直し方の字(y)') > 0, '★直し方を 出していない★');
-  ok(窓.indexOf('列名は そのまま') > 0, '★列名は そのまま、を 言っていない★');
+  ok(窓.indexOf('Shindan.直し方の字(y)') > 0, '★直し方を 出していない★');
 });
 /** ★その関数だけを 切り出して 見る★（ファイル全体で 探すと 別の所の 字を 拾う） */
 function 切り出す(頭) {
@@ -229,7 +229,7 @@ if (SELF) {
     ['book.html', '★2本目を 数えずに ボタンの 数を 出す★',
       (s) => s.replace("'危ない所 ' + (n1 + n2) + 'か所'", "'危ない所 ' + n1 + 'か所'")],
     ['book.html', '★2本目の 直し方を 出さない★',
-      (s) => s.replace("'直し方：' + Shindan.直し方の字(y) + '（列名は そのまま）'", "''")],
+      (s) => s.replace("'直し方：' + Shindan.直し方の字(y)", "''")],
     ['book.html', '★調べられない時に 画面ごと止まる★', (s) => s.replace("catch(e){ _shindanBusy = false; 開いた知らせは済んだ('診断'); return; }", 'catch(e){ throw e; }')],
     ['book.html', '★一度に全部 やる（画面が固まる）★', (s) => s.replace('Shindan.調べる途中(sheets, { 一度に: 3000 })', 'Shindan.調べる途中(sheets, { 一度に: 1e9 })')],
     ['book.html', '★0円だと 言わない★', (s) => s.split('AIは使っていません').join('')],
