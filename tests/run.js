@@ -105,6 +105,8 @@ const FILES = [
   'cross-sheet.test.mjs',                 // ★他のシートを参照している合計が黙って小さくならないか(527,000が186,000になった)
   'table-refs.test.mjs',                  // ★表の名前での参照(Table[列名])→A1範囲。実物の式11,669本が1本残らず#ERRORだった
   ['table-refs.test.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認(16通り)
+  'kobore.test.mjs',                      // ★足した関数が2つ以上返せるか＝本番に前から在った穴（エンジンに通して打つ）
+  ['kobore.test.mjs', '--self-test'],     // ★大きさの宣言を外して 赤になるか
   'bahttext.test.mjs',                    // ★BAHTTEXT＝タイ語の金額。答えは実Excelに116通り打たせた真値
   ['bahttext.test.mjs', '--self-test'],   // ★本物の部品を11通り壊して 赤になるか
   'hyou-no-soto.test.mjs',                // ★診断2本目「ほかの表の その行を見ている」＝実物で62か所（直し方まで出す）
