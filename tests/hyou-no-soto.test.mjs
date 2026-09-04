@@ -175,6 +175,72 @@ T('★別のシートの 表を 指していたら 出す（行が 合ってい�
     T('★' + 形 + ' その セルを 直している（断って 放り出していない）★', !!直し, '(直していない)');
     T('★' + 形 + ' ★Excel と 同じく エラーの 印を 置く（IFERROR が 拾える）★★',
       直し.indexOf('#VALUE!') >= 0 && 直し.indexOf('IFERROR') >= 0, 直し.slice(0, 120));
+    /* ★置き換えた 数 ＝ 診断に 出す 数★（1個でも 黙らせたら 赤） */
+    let 置換 = 0;
+    for (const k of Object.keys(rr.fixes || {})) {
+      if (String(rr.fixes[k]).indexOf('#VALUE!') < 0) continue;
+      const [sn, rc] = k.split('|'); const [r, c] = rc.split(',').map(Number);
+      const も = (wb.Sheets[sn] && wb.Sheets[sn][XLSX.utils.encode_cell({ r, c })] || {}).f || '';
+      if (('=' + も).indexOf('#VALUE!') >= 0) continue;
+      置換++;
+    }
+    T('★' + 形 + ' ★置き換えた 数 ＝ 診断に 出す 数（黙らせない）★★',
+      置換 === (rr.断り || []).length, '置き換え ' + 置換 + ' / 診断 ' + (rr.断り || []).length);
+  }
+}
+
+/* ── ②-d ★★答えを 変えた 所は 必ず 診断に 出す（黙って 0 に しない）★★ ──
+   ★指示役の 問い（2026-09-04）★
+     「Excel と 同じ エラーの 印を 置く を 入れた 事で、
+       今まで #ERROR だった 他の 式が 黙って 0 に 変わっていませんか」
+   ⇒★1つ 在った★＝★表の 外から 自分の表の「同じ行」を 見ている 式★
+     （直す 名前が 無いので 前は 診断に 出さなかった＝★黙って 0★）
+   ⇒★型を 分けて 必ず 出す ようにした★
+   ★見本★ tests/fixtures/hyou-no-soto-soto-sample.xlsx（tools/make-mihon-soto.ps1）
+     計算!B20 ＝ 表(R8.8 は A1:C5)の 外の 行から R8.8 の「同じ行」を 見る
+     ★Excel の 答えも 0★（エラーは 出ない） */
+{
+  const fs = await import('node:fs');
+  const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
+  const ZipSurgeon = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
+  const TR3 = require_(path.join(ROOT, 'lib/table-refs.js'));
+  const 道 = path.join(ROOT, 'tests/fixtures/hyou-no-soto-soto-sample.xlsx');
+  if (!fs.existsSync(道)) {
+    T('★見本が 在る（表の外から 見ている 物）★', false, '★無い＝この 試験は 空振り★');
+  } else {
+    const bytes = new Uint8Array(fs.readFileSync(道));
+    const wb = XLSX.read(bytes, { type: 'array', cellFormula: true });
+    const rr = await TR3.resolve(bytes, 'xlsx', wb, ZipSurgeon);
+    const 出 = rr.断り || [];
+    T('★★答えを 変えた 所が 診断に 出る（黙って 0 に しない）★★', 出.length === 1,
+      '見つけた ' + 出.length + '件');
+    T('★型が 分かれている（表の外から）★',
+      出.length > 0 && 出[0].種類 === 'thisrow_outside_table', 出.length ? 出[0].種類 : '(0件)');
+    T('★場所が 出る（計算!B20）★', 出.length > 0 && 出[0].セル === 'B20');
+    T('★直す 名前が 無い事を そのまま 出す（前＝後の 嘘を 言わない）★',
+      出.length > 0 && 出[0].直し方 === null);
+    T('★一覧の 字が 出る★',
+      出.length > 0 && Shindan.直し方の字(出[0]) === 'R8.8 の「同じ行」を 表の外から 見ている（正岡ｈ の 所）',
+      出.length ? Shindan.直し方の字(出[0]) : '(0件)');
+    T('★Excel と 同じ 答えに している（エラーの印を 置く）★',
+      String(rr.fixes['計算|19,1'] || '').indexOf('#VALUE!') >= 0, rr.fixes['計算|19,1']);
+    T('★Excel 自身も 0★', (wb.Sheets['計算'].B20 || {}).v === 0);
+    const w = Shindan.言葉('thisrow_outside_table', 1);
+    T('★この型の 言葉が 在る★', !!w && w.つぎ.indexOf('表の中へ 移す') >= 0, w && w.つぎ);
+    T('★この型の 言葉にも 中の言葉を 出さない★',
+      (w.題 + w.本文 + w.つぎ).indexOf('[@') < 0 && (w.題 + w.本文 + w.つぎ).indexOf('IFERROR') < 0
+      && (w.題 + w.本文 + w.つぎ).indexOf('★') < 0);
+    /* ★★どちらの 型も 数えて、置き換えた 数と 合うか★★（1個でも 黙っていたら 赤） */
+    let 置換 = 0;
+    for (const k of Object.keys(rr.fixes || {})) {
+      if (String(rr.fixes[k]).indexOf('#VALUE!') < 0) continue;
+      const [sn, rc] = k.split('|'); const [r, c] = rc.split(',').map(Number);
+      const 元 = (wb.Sheets[sn] && wb.Sheets[sn][XLSX.utils.encode_cell({ r, c })] || {}).f || '';
+      if (('=' + 元).indexOf('#VALUE!') >= 0) continue;
+      置換++;
+    }
+    T('★★置き換えた 数 ＝ 診断に 出す 数（1個も 黙らせない）★★', 置換 === 出.length,
+      '置き換え ' + 置換 + ' / 診断 ' + 出.length);
   }
 }
 
@@ -276,7 +342,11 @@ if (process.argv.includes('--self-test')) {
     /* ★★本当に 動いている 道を 壊す★★（2026-09-04）
        ＝実Excel の 見本を 通す 道。上の 8通りは ★断った 時の 受け皿★を 壊している。 */
     ['lib/table-refs.js', '★実物の 道＝控えるのを やめる（答えは 合うが 誰も 気づけない）★',
-      (t) => t.replace('    ctx.断り.push({', '    if (false) ctx.断り.push({')],
+      (t) => t.replace('    ctx.断り.push(元);', '    if (false) ctx.断り.push(元);')],
+    ['lib/table-refs.js', '★表の外から の 型を 黙らせる（前の 作りに 戻す）★',
+      (t) => t.replace("      元.種類 = 'thisrow_outside_table';", '      return;')],
+    ['lib/table-refs.js', '★直す 名前が 無いのに 在る事に する（前＝後の 嘘）★',
+      (t) => t.replace('      元.直し方 = null;', "      元.直し方 = { 前: 先の名, 後: 先の名 };")],
     ['lib/table-refs.js', '★実物の 道＝その行が 中か 外かを 見なくする★',
       (t) => t.replace('    return ctx.row >= (def.rw1 + def.header) && ctx.row <= (def.rw2 - def.totals);', '    return true;')],
     ['lib/table-refs.js', '★実物の 道＝Excel と 同じ 答えに しない（#ERROR に 戻す）★',
