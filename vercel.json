@@ -24,5 +24,10 @@
       "source": "/exally-canvas-grid.html",
       "destination": "/book.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/claude.js": {
+      "includeFiles": "prompt/**"
+    }
+  }
 }

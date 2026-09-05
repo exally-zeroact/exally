@@ -640,11 +640,13 @@ if (process.argv.includes('--self-test')) {
       (t) => t.replace("        content: [{ type: 'text', text: 最後.content, cache_control: { type: 'ephemeral' } }],", "        content: [{ type: 'text', text: 最後.content, cache_control: { type: 'ephemeral', ttl: '1h' } }],"),
       async (h) => { const p = await 捕まえる2(h, [{ role: 'user', content: 'a' }]); const m = p.messages.find((x) => Array.isArray(x.content)); return !m.content[0].cache_control.ttl; }],
     ['★①に 今の日時を混ぜる（毎回 置き直し＝2倍を毎回 払う）★',
-      /* ★2026-09-05★ 法定の数値を 倉庫から 拾うように したので 引数が 増えた。
-         ★書き換える 元の 字が ずれると『置換できず』＝赤に なる★（この 検査は それを 言った）。
-         ⇒★合図の 字を 短く して、また ずれにくく する★ */
-      (t) => t.replace('const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt(',
-        'const 共通 = new Date().toISOString() + SYSTEM_PROMPT_BASE + buildStatutoryPrompt('),
+      /* ★2026-09-05★ 前置きを prompt/*.md へ 出したので 組み立ての 字が 変わった。
+         ★書き換える 元の 字が ずれると『置換できず』＝赤★（この 検査は それを 言った）。
+         ⇒★合図は 短く★＝`const 共通 = 中身だけ(` まで。
+         ★実際に この 日 踏んだ★＝kansuu.md の 人向け注記（日付）が 前置きに 入り、
+         この 検査が 赤に なった（★①は 置いたまま 使い回す 所＝毎回 置き直しに なる★）。 */
+      (t) => t.replace('const 共通 = 中身だけ(',
+        'const 共通 = new Date().toISOString() + 中身だけ('),
       /* ★2回 呼んで比べる形だと 同じミリ秒に入って 素通りする（実際に素通りした）★
          ⇒ ★日付の形が混ざっていないか★ を見る（いつ走らせても 同じ答えになる） */
       async (h) => { const a = await 捕まえる2(h); return !/\d{4}-\d{2}-\d{2}/.test(a.system[0].text); }],

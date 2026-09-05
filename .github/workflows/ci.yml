@@ -28,6 +28,11 @@ jobs:
         run: node scripts/tests-registered.mjs
       - name: ★その見張り自身の自己確認 (わざと壊して赤になるか)
         run: node scripts/tests-registered.mjs --self-test
+      - name: ★AIの頭が 台帳と ずれていないか（prompt/ は 機械が 作る）
+        # ★手書きの「使えない関数」22個のうち ★17個が 間違い★だった（2026-09-05 実測）
+        #   足してあるのに「使えない」…4個／動かないのに 教えていない…13個
+        #   しかも 前置きは「LET・LAMBDA等を 積極的に 提案」＝★動かない式を 勧めていた★
+        run: node scripts/make-prompt.mjs --check
       - name: Cache-buster stamp guard (貼り忘れ検知・コードより先に見る)
         run: node scripts/stamp-build.mjs --check
       - name: Stamp tool tests (ハッシュが決定論か=CRLF/LF・OS差でブレないか)
