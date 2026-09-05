@@ -193,6 +193,8 @@ const FILES = [
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'kansuu-tana.test.mjs',                 // ★台帳の棚を engine に押して確かめる（2026-09-05）
   ['kansuu-tana.test.mjs', '--self-test'],//   ＝YENを「動かない」棚に置き AIが客に嘘を言う所だった
+  'ban-wo-okuru.test.mjs',                // ★客のExcelの版がAIまで届くか（会議の穴B・2026-09-05）
+  ['ban-wo-okuru.test.mjs', '--self-test'],//  ＝版を1度も送っておらず★全員365扱い★だった
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
   ['shindan.test.mjs', '--self-test'],
   'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
