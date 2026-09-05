@@ -84,16 +84,42 @@ console.log('\n[kansuu-tana] 台帳の 棚を engine に 押して 確かめる'
    （2026-08-29 の 実測＝907本を「合わない」と 誤報告した 家） */
 const 積めた = EF.registerExallyFunctions(HFns) === true;
 const hf = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+/* ★本番と 同じ★＝book.html は hf を 作った後 initExallyFormula(hf) を 1回 呼ぶ */
+EF.initExallyFormula(hf);
 const SID = hf.getSheetId(hf.addSheet('S'));
 
 /* ★本番と 同じ 道★＝convertFormula を 通してから engine に 渡す
    （素で 渡すと 本番と 違う物を 測る＝今日の YEN は それで 見落とした） */
+/* ★★引数の 形を 手で 決め打たない★★（2026-09-06 実測で 踏んだ）
+   ★1つの 形しか 試さないと、LAMBDA を 取る 関数（MAP/REDUCE/SCAN/MAKEARRAY）は
+     ★普通の 引数では 一度も 当たらない★
+   ⇒★動いているのに「動かない」に 落ちる★＝AIが 客に 嘘を 言う
+   ⇒★当たるまで 形を 増やす★／★JS層も 通す★（本番は 3段） */
+const 形たち = ['(1)', '()', '(A1:A2,1)', '(1,1)', '(A1:A2)', '(1,1,1)',
+  '(A1:A2,LAMBDA(v,v*2))', '(0,A1:A2,LAMBDA(a,b,a+b))', '(2,2,LAMBDA(r,c,r*c))',
+  '(x,2,x*3)', '(x,x+1)'];
 function 押す(名前, 引数) {
-  hf.setSheetContent(SID, [[EF.convertFormula('=' + 名前 + '(' + (引数 === undefined ? '1' : 引数) + ')')]]);
-  const v = hf.getCellValue({ sheet: SID, row: 0, col: 0 });
-  if (v && v.type === 'NAME') return '#NAME?';
-  if (v && v.type) return '#' + v.type;
-  return String(v);
+  const 形 = (引数 === undefined) ? 形たち : ['(' + 引数 + ')'];
+  let 最後 = '#NAME?';
+  for (const a of 形) {
+    const 式 = '=' + 名前 + a;
+    /* ①JS層（本番の 1段目）*/
+    if (typeof EF._jsComputeFormula === 'function') {
+      let j = null;
+      try { j = EF._jsComputeFormula(0, 式); } catch (e) { return 'JS層が 投げた'; }
+      if (j !== null) return String(j);
+    }
+    /* ②engine */
+    let 後; try { 後 = EF.convertFormula(式); } catch (e) { continue; }
+    try {
+      hf.setSheetContent(SID, [[1], [2], [3], [後]]);
+      const v = hf.getCellValue({ sheet: SID, row: 3, col: 0 });
+      if (v && v.type === 'NAME') { 最後 = '#NAME?'; continue; }
+      if (v && v.type) return '#' + v.type;
+      return String(v);
+    } catch (e) { return 'engine が 投げた'; }
+  }
+  return 最後;
 }
 
 const 動かない = Object.keys(台帳.足さない).sort();
@@ -122,7 +148,25 @@ T('★★「別名で動く」棚は 本当に 動く★★', () => {
 });
 
 T('★この 検査が 空振りしていない（棚が 空でない）', () => {
-  if (動かない.length < 10) throw new Error('動かない棚が 少なすぎます: ' + 動かない.length);
+  /* ★★数の 線を 引かない★★（2026-09-06 指示役の 差し戻し）
+     ★私は 15→9 に 減った時「10未満なら赤」を「5未満なら赤」に 下げた★
+     ⇒★次に 4個に なったら また 下げる★＝★線を 下げれば 通る＝いつも真＝死ぬ★
+     ⇒★★名前で 見る★★
+       ①棚が 空では ない（★1個以上＝これは 下げようが ない★）
+       ②★必ず 動かない 4個★が 居る
+         WEBSERVICE／STOCKHISTORY／IMAGE／RTD
+         ＝★外へ 聞きに 行く 物★＝★司さんの 決めが 出るまで 動きようが ない★
+         ⇒★減らないので 一生 下げる 必要が 出ない★
+         ⇒ 司さんが「作ってよい」と 決めたら ★その時 この 4個を 外す★
+           （★決めが 在って 外す★／★通らないから 下げる★では ない） */
+  if (!動かない.length) throw new Error('★動かない棚が 空★＝この 検査は 何も 見ていない');
+  const 必ず居る = ['WEBSERVICE', 'STOCKHISTORY', 'IMAGE', 'RTD'];
+  const 居ない = 必ず居る.filter((f) => 動かない.indexOf(f) < 0);
+  if (居ない.length) {
+    throw new Error('★外へ 聞きに 行く 物が 棚から 消えています★: ' + 居ない.join(' / ')
+      + '\n   → 司さんが「外へ 出てよい」と 決めたのなら ★この 4個の 名前を ここから 外す★'
+      + '\n   → 決めが 無いのに 消えたのなら ★台帳が 壊れています★');
+  }
   if (!別名.length) throw new Error('別名で動く棚が 空です（YEN が 居るはず）');
 });
 
