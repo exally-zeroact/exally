@@ -34,5 +34,5 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★SCAN★ … 同上
 - ★STOCKHISTORY★ … 外の データ配信が 要る
 - ★WEBSERVICE★ … 同上
-- ★YEN★ … ★実Excel に 存在しない★。円は DOLLAR が 出す
+- ★YEN★ … ★日本語版の 画面の 名前（＝英語名は DOLLAR）★。Exally は 英語名で 動くので ★DOLLAR を 使う★
 ```
