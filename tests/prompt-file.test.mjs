@@ -94,6 +94,35 @@ T('★★前置きが 台帳と 食い違っていない（動かない関数を
   }
 });
 
+/* ★★README の 表に 書いた ファイルが 本当に AIへ 渡っているか★★（2026-09-06）
+   ★実際に 起きた 事★ … 表には `nayami.md` `kiite-ageru.md` を「入れる」と 書いてあったのに
+     ★2本とも 存在せず、会議で 決めた「聞いてあげる」は AIに 1文字も 渡っていなかった★
+     `kotae-kata.md` は ★名前が 違った★（実物は kyoutsuu.md）
+   ⇒★表に 書いただけでは 入らない★＝★書いた 物が 実在し、前置きに 出るか まで 見る★ */
+T('★★README の 表の ファイルが 実在して 前置きに 出ている★★', () => {
+  const md = fs.readFileSync(path.join(部屋, 'README.md'), 'utf8');
+  const 表の = [...md.matchAll(/^\|\s*`([a-z0-9-]+\.md)`/gmi)].map((m) => m[1]);
+  if (表の.length < 4) throw new Error('★README の 表が 読めない★（検査が 空振り）: ' + 表の.length + '個');
+  const 無い = 表の.filter((f) => !fs.existsSync(path.join(部屋, f)));
+  if (無い.length) {
+    throw new Error('★表に 在るのに ファイルが 無い★: ' + 無い.join(' / ')
+      + '\n   → ★表に 書いただけでは AIに 渡りません★');
+  }
+  const p = handler.__buildPromptParts({ group: 'latest', name: 'Excel 365' });
+  const 全 = p.共通 + p.版ごと;
+  const 渡っていない = [];
+  for (const f of 表の) {
+    const 中 = fs.readFileSync(path.join(部屋, f), 'utf8');
+    const m = /```\r?\n([\s\S]*?)\r?\n```/.exec(中);
+    const 頭 = (m ? m[1] : 中).trim().split('\n').find((l) => l.trim().length > 8);
+    if (頭 && 全.indexOf(頭.trim()) < 0) 渡っていない.push(f);
+  }
+  if (渡っていない.length) {
+    throw new Error('★ファイルは 在るのに 前置きに 出ていない★: ' + 渡っていない.join(' / ')
+      + '\n   → api/claude.js の 要る[] と buildPromptParts に 足してください');
+  }
+});
+
 T('★どの 版でも 前置きが 組める（版ごとの 決まりが 入る）', () => {
   for (const g of ['latest', 'newer', 'older', 'online', 'exally_only']) {
     const p = handler.__buildPromptParts({ group: g, name: 'X' });

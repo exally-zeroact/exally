@@ -74,7 +74,11 @@ let _前置き = null;
 function 前置きを読む() {
   if (_前置き) return _前置き;
   const fs = require('fs'), path = require('path');
-  const 要る = ['base.md', 'kansuu.md', 'kyoutsuu.md', 'version.md'];
+  /* ★2026-09-06 に 2本 足した★＝kiite-ageru.md（聞く順）と nayami.md（客の 悩み）
+     ★prompt/README.md に「入れる」と 書いてあったのに ★存在しなかった★★
+     ＝会議で 決めた「聞いてあげる」は ★AIに 1文字も 渡っていなかった★ */
+  const 要る = ['base.md', 'kansuu.md', 'kyoutsuu.md', 'version.md',
+    'kiite-ageru.md', 'nayami.md'];
   const 出 = {};
   const 欠け = [];
   for (const f of 要る) {
@@ -311,8 +315,12 @@ function buildPromptParts(versionInfo, 法定の行) {
      ★①は 置いたまま 使い回す 所★なので、日付が 混ざると ★毎回 置き直し＝毎回 置き賃★。
      ⇒ 実際に 踏んだ（2026-09-05）＝`tests/api-claude.test.mjs` の
        「①に 毎回変わる物が 混ざっていない」が 赤に なった。 */
+  /* ★聞く順と 悩みは ★版で 変わらない★＝①（置いたまま 使い回す 所）に 入れる★
+     ⇒ 変わる物を 前に 置くと 毎回 置き直し＝毎回 置き賃（一次情報の 決まり） */
   const 共通 = 中身だけ(P['base.md'])
     + '\n\n' + 中身だけ(P['kansuu.md'])
+    + '\n\n' + 中身だけ(P['nayami.md'])
+    + '\n\n' + 中身だけ(P['kiite-ageru.md'])
     + buildStatutoryPrompt(null, 法定の行);
   const 版ごと = '\n' + 版の決まり(P['version.md'], versionInfo.group)
     + '\n' + 中身だけ(P['kyoutsuu.md']);
