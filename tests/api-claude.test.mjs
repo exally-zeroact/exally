@@ -147,6 +147,63 @@ T('★社保・雇用は 逆に「先の年」を 使わない（対象月の �
   }
 });
 
+/* ── ★AI が 作った 表を 捨てていないか★（2026-09-05 指示役の 裁定「丙」）──────
+ *  ★前は★ サーバが 表を 本文から 抜いて `tsv` に 入れ、★画面は `tsv` を 読まなかった★
+ *          ⇒ 表は 捨てられ、★丸ごと 表の 時は 本文が 空★ ⇒「AIから 空の返事が来ました」
+ *  ★今は★ ★印の 行だけ 外して 中身は 本文に 残す★（tsv の 欄は そのまま） */
+const 分ける答え = handler.__答えを分ける;
+const 印START = '--- TSV_START ---';
+const 印END = '--- TSV_END ---';
+const 表だけ = 印START + "\n" + '商品' + "\t" + '単価' + "\n" + '鉛筆' + "\t" + '100' + "\n" + 印END;
+const 本文と表 = '合計はこれだよ。' + "\n" + "\n" + 表だけ + "\n" + "\n" + '貼り付け後に幅を調整してね。';
+
+T('★丙①：印の行が 客の 字に 出ていない', () => {
+  for (const [な, v] of [['丸ごと表', 表だけ], ['本文＋表', 本文と表]]) {
+    const r = 分ける答え(v);
+    if (r.text.indexOf('TSV_START') >= 0 || r.text.indexOf('TSV_END') >= 0) {
+      throw new Error(な + ': 印が 客の 字に 残っています: ' + JSON.stringify(r.text));
+    }
+  }
+});
+
+T('★丙②：表の 中身は 1字も 消えていない', () => {
+  const r = 分ける答え(本文と表);
+  for (const 要る of ['商品', '単価', '鉛筆', '100', '合計はこれだよ。', '貼り付け後に幅を調整してね。']) {
+    if (r.text.indexOf(要る) < 0) throw new Error('本文から 消えた: ' + 要る + ' → ' + JSON.stringify(r.text));
+  }
+  /* ★タブが 残っている事★＝これが 無いと Excel に 貼っても 列が 分かれない */
+  if (r.text.indexOf("\t") < 0) throw new Error('★タブが 消えている＝貼っても 列が 分かれない★');
+});
+
+T('★★丙③：丸ごと 表の 時に「空の返事」に ならない★★', () => {
+  /* ★これが 一番 大事★＝前は ここで text が 空に なり、
+     画面(lib/ai-reason.js:76-80)が「AIから 空の返事が来ました」と 言っていた。 */
+  const r = 分ける答え(表だけ);
+  if (!r.text) throw new Error('★本文が 空＝画面は「空の返事」と 言う（表は 出来ているのに）★');
+  if (r.text.indexOf('鉛筆') < 0) throw new Error('本文に 表が 入っていない');
+});
+
+T('★丙④：tsv の 欄は 今までどおり 埋まる（消していない＝甲で 使う）', () => {
+  const r = 分ける答え(本文と表);
+  if (!r.tsv) throw new Error('★tsv が 空＝欄を 消してしまった★');
+  if (r.tsv.indexOf('鉛筆') < 0) throw new Error('tsv の 中身が ちがう: ' + JSON.stringify(r.tsv));
+});
+
+T('★丙⑤：表が 無い答え・空の答えは 今までどおり', () => {
+  const a = 分ける答え('ふつうの答えだよ。');
+  if (a.text !== 'ふつうの答えだよ。' || a.tsv !== '') throw new Error('表なしの 答えを 変えた: ' + JSON.stringify(a));
+  const b = 分ける答え('');
+  if (b.text !== '' || b.tsv !== '') throw new Error('★空は 空のまま★でなければ ならない: ' + JSON.stringify(b));
+  const c = 分ける答え(null);
+  if (c.text !== '' || c.tsv !== '') throw new Error('null で 落ちる: ' + JSON.stringify(c));
+});
+
+T('★丙⑥：表が 2つ 在っても 印は 全部 消える', () => {
+  const 二つ = 表だけ + "\n" + 'つづき' + "\n" + 表だけ;
+  const r = 分ける答え(二つ);
+  if (/TSV_(START|END)/.test(r.text)) throw new Error('2つ目の 印が 残った: ' + JSON.stringify(r.text));
+});
+
 /* ── ★失敗した時に 何を返すか（2026-08-22）★ ──────────────────────────
  *  前は ★どんな失敗でも status 200★ ＋ 言い訳を text に入れて返していた。
  *  画面は 200 を「つながった」と読むので ★言い訳が AIの答えとして 吹き出しに出る★。
@@ -607,6 +664,17 @@ if (process.argv.includes('--self-test')) {
       (t) => t.replace("    return res.status(k.status).json({ error: k.合言葉, text: '', tsv: '' });",
         "    return res.status(k.status).json({ error: k.合言葉, text: 'VercelのEnvironment VariablesにANTHROPIC_API_KEYを設定してください。', tsv: '' });"),
       async (h) => (await 押す(h, 鍵err)).body.text === ''],
+    /* ★丙：表を 捨てる 昔の 形に 戻したら 赤に なるか★（2026-09-05）
+       ★これが 無いと、誰かが 元に 戻しても 誰も 気づきません★（約5か月 気づかなかった） */
+    ['★AI が 作った 表を 本文から 捨てる（昔の 形に 戻す）★',
+      (t) => t.replace("全.replace(印, '')", "(塊 ? 全.replace(塊[0], '') : 全)"),
+      async (h) => {
+        const f = h.__答えを分ける;
+        if (typeof f !== 'function') return false;
+        /* ★丸ごと 表★の 時に 本文が 空に ならない事＝昔の 形に 戻すと 空に なる */
+        const 表だけ2 = ['--- TSV_START ---', '鉛筆', '--- TSV_END ---'].join("\n");
+        return !!f(表だけ2).text;
+      }],
   ];
   /* ★壊した版の記録は 検査の画面に出さない★（毎回そこで受け取って捨てる） */
   let 拾った = [];
