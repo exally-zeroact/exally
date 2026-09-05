@@ -110,6 +110,44 @@ Excelバージョン別（365/2024/2021/2019/2016/Mac/Online/なし）に合わ�
 - TSVの数式セルはExcelで動く形式（=SUM(B2:B10) など）で記載する
 - セル幅・書式は貼り付け後に手動調整が必要な旨を末尾に添える`;
 
+/* ══ ★AI の 答えを「本文」と「表」に 分ける★ ══════════════════════════════
+ *
+ *  ★2026-09-05 まで こう だった★
+ *      const text = fullText.replace(tsvMatch[0], '').trim();   // ★表を 本文から 消す★
+ *      return { text, tsv };
+ *    ⇒ 画面（book.html:16986）は `d.text` しか 読まない＝★`d.tsv` を 読む 所は
+ *      repo 全体で ★0か所★★（履歴でも 一度も 無い＝★消したのでは なく 最初から 片側だけ★）
+ *    ⇒★AI が 表を 作る たび、サーバが 抜いて、誰も 受け取らず、捨てていた★
+ *    ⇒★答えが 丸ごと 表だった 時は text が 空★ ⇒ 画面は「AIから 空の返事が来ました」
+ *      ＝★出来ていたのに「空」と 言う★
+ *    ★api/claude.js が 生まれた 日（2026-03-28 5481820）から 約5か月★
+ *
+ *  ★直し（2026-09-05 指示役の 裁定「丙」）★
+ *      ★印の 行（--- TSV_START --- / --- TSV_END ---）だけ 外し、★中身は 本文に 残す★★
+ *      ★`tsv` の 欄は そのまま 残す★（消さない＝画面に 表として 貼る「甲」で 使う）
+ *      ★前置きは 触らない★（AI には 今までどおり 表を 出させる）
+ *
+ *  ★やらなかった 事と その 訳★
+ *      ・前置きから TSV を やめる … ★却下★（元の 狙いを 消す／記録が 無い＝消してよい 証拠も 無い）
+ *      ・表として 画面に 貼る …… ★機能なので 司さん待ち★
+ *
+ *  ★知っておく 事（正直に）★
+ *      本文は `\n` を `<br>` に して 出すだけ（book.html formatAIText）＝
+ *      ★タブは HTML で 潰れる＝列が そろって 見えない★。
+ *      ただし ★字としては タブが 残る★ので ★選んで Excel に 貼れば 列は 分かれる★。
+ *      ★見た目まで 直すのは「甲」★。
+ */
+function 答えを分ける(fullText) {
+  const 全 = String(fullText == null ? '' : fullText);
+  /* ★tsv は 今までどおり 最初の 塊を 取る★（欄を 消さない＝甲で 使う） */
+  const 塊 = 全.match(/---[ \t]*TSV_START[ \t]*---\r?\n([\s\S]+?)\r?\n---[ \t]*TSV_END[ \t]*---/);
+  const tsv = 塊 ? 塊[1].trim() : '';
+  /* ★印の 行だけ 消す★（★中身は 1字も 消さない★）。塊が 2つ以上でも 全部 消す。 */
+  const 印 = /^[ \t]*---[ \t]*TSV_(?:START|END)[ \t]*---[ \t]*\r?\n?/gm;
+  const text = 全.replace(印, '').replace(/\n{3,}/g, '\n\n').trim();
+  return { text, tsv };
+}
+
 /* ══ ★法定の基準数値＝倉庫(Supabase public.statutory)から 拾う★ ═══════════════
  *  ★AI が 使うのは 4つだけ★／★どの 行から 来るか★（乙・2026-09-05 指示役）
  *    健康保険料率（東京）… kind='shakaihoken'  year=★社保年度(3月起算)★  data.kenko_total.tokyo
@@ -821,11 +859,8 @@ module.exports = async (req, res) => {
       .map(block => block.text)
       .join('');
 
-    const tsvMatch = fullText.match(/---\s*TSV_START\s*---\n([\s\S]+?)\n---\s*TSV_END\s*---/);
-    const tsv = tsvMatch ? tsvMatch[1].trim() : '';
-    const text = tsvMatch ? fullText.replace(tsvMatch[0], '').trim() : fullText;
-
-    return res.status(200).json({ text, tsv });
+    const 分け = 答えを分ける(fullText);
+    return res.status(200).json({ text: 分け.text, tsv: 分け.tsv });
 
   } catch (err) {
     console.error('Claude API error:', err);
@@ -901,6 +936,7 @@ function 失敗を分ける(err) {
 //   なぜ要るか: 基準数値が黙って NaN / undefined になっても、画面は普通に出てしまう。
 //   機械が数値そのものを見るための口。
 module.exports.__buildStatutoryPrompt = buildStatutoryPrompt;
+module.exports.__答えを分ける = 答えを分ける;
 module.exports.__法定を倉庫から拾う = 法定を倉庫から拾う;
 module.exports.__法定が取れない時 = 法定が取れない時;
 /* ★失敗した時に 本当に何を返すかを 機械が押すための窓★
