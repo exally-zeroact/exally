@@ -14,6 +14,7 @@
  *
  * 使い方: node tests/api-claude.test.mjs
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -103,6 +104,59 @@ T('★半分だけ 取れた時も 出さない（欠けた表が 一番 危な�
   const 半分 = [{ kind: 'shouhizei', year: 2019, data: { hyojun: 0.1, keigen: 0.08 } }];
   const s = handler.__buildStatutoryPrompt('2026-08', 半分);
   if (s !== 取れない) throw new Error('★半分の 表を 出しています★:' + s);
+});
+
+/* ★★会議(2026-09-05)の 穴 D★★
+   設計書は「最低賃金・労災率・源泉は 倉庫から」と 書いてあったのに、
+   ★実際に 読んでいたのは 健保・厚年・雇用・消費税の 4つだけ★
+   ⇒★AIは 最低賃金も 労災率も 源泉も ★記憶から 書いていた★
+   ⇒★しかも 見張りは「4つ 取れれば 緑」だったので 効かなかった★
+   ★直し★ … 表は 大きい（47都道府県／54業種）ので ★前置きに 貼らない★。
+             ★在るか と 年度だけ 出し、数字は 言わせない★。 */
+T('★★最低賃金・労災率・源泉は「数字を 言うな」と 書いてある★★', () => {
+  const 行 = [
+    { kind: 'shakaihoken', year: 2026, data: { kenko_total: { tokyo: 0.0991 }, kosei_total: 0.183 } },
+    { kind: 'koyo', year: 2026, data: { ippan: 0.0055 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.1, keigen: 0.08 } },
+    { kind: 'saitei_chingin', year: 2025, data: {} },
+    { kind: 'rousai_ritsu', year: 2024, data: {} },
+  ];
+  const s = handler.__buildStatutoryPrompt('2026-08', 行);
+  for (const 要る of ['最低賃金', '金額を 言わない', '都道府県か★を 聞く',
+    '労災保険率', '率を 言わない', '源泉徴収', '倉庫に 入っていない']) {
+    if (s.indexOf(要る) < 0) throw new Error('言っていない: ' + 要る + '\n' + s);
+  }
+});
+
+T('★★源泉の 率を 前置きに 書いていない（10.21% を 埋めない）★★', () => {
+  const 行 = [
+    { kind: 'shakaihoken', year: 2026, data: { kenko_total: { tokyo: 0.0991 }, kosei_total: 0.183 } },
+    { kind: 'koyo', year: 2026, data: { ippan: 0.0055 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.1, keigen: 0.08 } },
+  ];
+  const s = handler.__buildStatutoryPrompt('2026-08', 行);
+  /* ★10.21 は「書くな」の 例として 出るだけ★＝★率として 並んでいたら 赤★ */
+  if (/10\.21\s*[%％]（?(源泉|報酬)/.test(s)) throw new Error('★源泉の 率を 埋めています★');
+});
+
+T('★倉庫に 最低賃金の 行が 無くても 消費税まで 消さない（行き過ぎない）', () => {
+  const 行 = [
+    { kind: 'shakaihoken', year: 2026, data: { kenko_total: { tokyo: 0.0991 }, kosei_total: 0.183 } },
+    { kind: 'koyo', year: 2026, data: { ippan: 0.0055 } },
+    { kind: 'shouhizei', year: 2019, data: { hyojun: 0.1, keigen: 0.08 } },
+  ];
+  const s = handler.__buildStatutoryPrompt('2026-08', 行);
+  if (s.indexOf('10%（標準）') < 0) throw new Error('★消費税まで 消しています★');
+  if (s.indexOf('取れませんでした') < 0) throw new Error('★取れなかった事を 言っていない★');
+});
+
+T('★★倉庫から 拾う kind に 最低賃金と 労災率が 入っている★★', () => {
+  /* ★前置きの 文だけ 直しても、拾っていなければ 年度が 出せない★
+     ＝★字と 動きの 両方を 見る★ */
+  const src = fs.readFileSync(path.join(ROOT, 'api/claude.js'), 'utf8');
+  for (const k of ['kind.eq.saitei_chingin', 'kind.eq.rousai_ritsu']) {
+    if (src.indexOf(k) < 0) throw new Error('★倉庫から 拾っていない★: ' + k);
+  }
 });
 
 T('★倉庫の 数字を 変えたら 前置きも 変わる（倉庫を 本当に 見ている）', () => {
