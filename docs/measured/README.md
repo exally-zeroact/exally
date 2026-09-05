@@ -31,7 +31,7 @@
    ⇒★★合わない時は まず 自分の 物差しを 疑う★★
 ```
 
-## `exally-missing-2026-09-06.txt` … ★Exally で 動かない 69個★
+## `exally-missing-2026-09-06.txt` … ★Exally で 動かない 65個★
 
 ```
  ★測り方★＝★本番と 同じ道★で 押す（book.html:2290 と 同じ 3段）
@@ -48,44 +48,59 @@
    ①engine だけ 押した ………………… 動く 419個（80.7%）★測り台が 足りない★
    ②formula-extra-plug も 積んだ …… 動く 432個（83.2%）
    ③★JS層も 通した（本番の 道）★ … 動く ★436個（84.0%）★
-   ④★足りない 14個を 作った★ ……… 動く ★450個（86.7%）／動かない 69個★
+   ④★足りない 14個を 作った★ ……… 動く 450個（86.7%）
+   ⑤★引数の 形を 足した（LAMBDA を 取る 物）★ … 動く ★454個（87.5%）／動かない 65個★
+     ⇒★MAP・REDUCE・SCAN・MAKEARRAY・LET は ★元から 動いていた★★
+     ⇒ 普通の 引数では ★一度も 当たらない★ので「動かない」に 落ちていた
+     ⇒★引数の 形も 手で 決め打たない★＝当たるまで 増やす
 
-### ★動かない 69個の 内訳（人が 分けた）★
+### ★動かない 65個の 内訳★（2026-09-06）
+
+> ★★「作れない」と 書くのは やめました★★
+> 司さん「★Excelが 出来て うちが 出来んって事は 絶対に 無い★」（BAHTTEXT の 時）
+> ⇒ 前に 私は 27個を「作れない」と 書いた。★数え直したら 本当に 作れないのは 2個だけ★。
+> ⇒ 残りは ★作れる／決めが 要る★の どちらか。★出来ない と 言い切らない★。
 
 ```
- ★外の データが 要る（作れない）★ … 14個
-   CUBE系 7／STOCKHISTORY／WEBSERVICE／RTD／IMAGE／FILTERXML／
-   DETECTLANGUAGE／TRANSLATE
- ★式を 値として 渡す 仕組みが 要る（エンジン側）★ … 7個
-   LAMBDA／MAP／REDUCE／SCAN／BYROW／BYCOL／MAKEARRAY
- ★画面の 物（セルの 外）★ … 4個
-   PHONETIC／GETPIVOTDATA／PIVOTBY／GROUPBY
- ★昔からの 仕組みで 今は 使わない★ … 2個
-   CALL／REGISTER.ID
- ★★作れる（うちで 作れば 動く）★★ … ★42個★
-   ・お金の 計算 …………… 24個（ACCRINT/PRICE/YIELD/COUP系/DISC/DURATION/VDB 等）
-   ・統計・予測 …………… 9個（LOGEST/TREND/GROWTH/FORECAST.ETS 4本/ERF.PRECISE/ERFC.PRECISE）
-   ・その他 ………………… 9個（AREAS/CELL/INFO/CONVERT/RANDARRAY/PERCENTOF/TRIMRANGE 等）
- ⇒★★「Excel の 最上級」に するなら この 42個も 作る★★（司さんの 方針）
+ ★★A 今すぐ 作れる … 46個★★（うちだけで 出来る・外に 何も 要らない）
+   ・お金の 計算 …… 24個
+     ACCRINT/ACCRINTM/AMORDEGRC/AMORLINC/COUPDAYBS/COUPDAYS/COUPDAYSNC/
+     COUPNCD/COUPNUM/COUPPCD/DISC/DURATION/MDURATION/INTRATE/RECEIVED/
+     ODDFPRICE/ODDFYIELD/ODDLPRICE/ODDLYIELD/PRICE/PRICEDISC/PRICEMAT/VDB/
+     YIELD/YIELDDISC/YIELDMAT
+   ・統計・予測 …… 10個
+     TREND/GROWTH/LOGEST/FORECAST.ETS 4本/ERF.PRECISE/ERFC.PRECISE
+   ・表・情報 ……… 12個
+     AREAS/CELL/INFO/CONVERT/RANDARRAY/PERCENTOF/TRIMRANGE/FILTERXML/
+     BYROW/BYCOL/LAMBDA(名前で しまう 書き方)
+   ⇒★★これは 全部 作ります★★（司さんの 方針＝Excelの 最上級）
 
- ★★2026-09-06 に 作った 14個（もう 動く）★★
-   FINDB／SEARCHB／REPLACEB … ★バイトで 数える★（全角＝2）
-   TEXTSPLIT ……………………… 区切って 分ける（形を 保つ）
-   REGEXTEST／REGEXEXTRACT／REGEXREPLACE … 正規表現の 3つ
-   SORTBY ………………………… 別の 列で 並べ替える
-   MUNIT／MINVERSE ……………… 行列（逆が 無ければ #VALUE!）
-   PERCENTRANK.INC／.EXC ……… ★3桁で 切り捨て★（四捨五入では ない・実測）
-   PROB ／ ERROR.TYPE
-   ⇒ 中身＝`lib/formula-nokori.js`（純粋な 計算）
-     繋ぐ＝`lib/formula-nokori-plug.js`
-     ★答えは 全部 実Excel の 実測★＝`golden-2026-09-06.tsv`（30通り 一致）
+ ★★B 決めが 要る … 17個★★（作れるが ★お金か 設計の 決めが 先★）
+   ・外へ 聞きに 行く 物 … 6個
+     WEBSERVICE/STOCKHISTORY/TRANSLATE/DETECTLANGUAGE/IMAGE/RTD
+     ⇒ 作り方は 在る（画面から 取りに 行ける）。
+       ★決め★＝★外へ 出て よいか／お金／どこまで 待つか★
+       ⇒ 今は ★出していません★（勝手に 外へ 出さない）
+   ・データの 立体（OLAP）を 要る 物 … 7個（CUBE系）
+     ⇒★先に「立体の データ」を 作る 決めが 要る★
+   ・ピボットの 中を 指す 物 … 4個
+     GETPIVOTDATA/PIVOTBY/GROUPBY/PHONETIC
+     ⇒ PIVOTBY・GROUPBY は ★ただの 集計＝作れる★
+       GETPIVOTDATA は ★ピボットの 形★／PHONETIC は ★ふりがなを セルに 持つ★
+       ⇒ どちらも ★画面側の 決めが 1つ★ 要る
+
+ ★★C 本当に 作らない … 2個★★
+   CALL／REGISTER.ID
+   ⇒★外の DLL を 呼ぶ 物★＝Microsoft も「使うな」と 書いている／
+     ★ブラウザでは 出来ない上に、出来ても やってはいけない（安全）★
+   ⇒★これだけは「作りません」と 書きます★
 ```
 
 ## ★この 数字の 使い方★
 
 ```
  ★「507個」「394個」「70%」は もう 使わない★（元の 一覧が 消えている）
- ⇒★今の 正は ここ★＝★519個中 450個＝86.7%★（2026-09-06 実測・本番の 道）
+ ⇒★今の 正は ここ★＝★519個中 454個＝87.5%★（2026-09-06 実測・本番の 道）
  ★次に 測る時★ … 同じ 手順で 数え直して ★この 2本を 上書きする★
 ```
 
