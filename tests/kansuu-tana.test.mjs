@@ -127,7 +127,10 @@ T('★この 検査が 空振りしていない（棚が 空でない）', () =>
 });
 
 console.log('\n── 実測（本番と 同じ道＝convertFormula → engine） ──');
-for (const f of 別名) console.log('  ' + f + '(1234.5) → ' + 押す(f, '1234.5') + '  ★動く★');
+/* ★ここは「名前が 通るか」だけを 見る★＝#NAME? でなければ 通っている。
+   引数の 数は 名前ごとに 違うので #N/A などは 出る（それは 名前の 話では ない）。
+   ★引数まで 込みの 実測は tests/betsumei-zenbu.test.mjs が やる★ */
+for (const f of 別名) console.log('  ' + f + ' … 名前は 通る（' + 押す(f, '1234.5') + '）');
 console.log('  「動かない」棚 ' + 動かない.length + '個 … 全部 #NAME?（' + 動かない.join(' ') + '）');
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();
