@@ -189,6 +189,8 @@ const FILES = [
   ['ai-genkai.test.mjs', '--self-test'],  //   ＝15回叩いて10回で止まり 掘りを全部捨てていた
   'eol.test.mjs',                         // ★行の終わりが CRLF に なると わざと壊す試験が 掴めず
   ['eol.test.mjs', '--self-test'],        //   黙って赤に なる（2026-09-05 に 17本 落ちた）
+  'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
+  ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
   ['shindan.test.mjs', '--self-test'],
   'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え

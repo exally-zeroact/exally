@@ -31,84 +31,81 @@ const VERSION_MAP = {
   'excel_none':   { name: 'Excel持ってない',   group: 'exally_only' }
 };
 
-// ===== Exally未対応関数リスト =====
-const EXALLY_UNSUPPORTED = {
-  // 完全未対応（構造上Exally内で動作不可）
-  full: [
-    'RTD',
-    'CUBEMEMBER', 'CUBEVALUE', 'CUBESET', 'CUBESETCOUNT',
-    'CUBEMEMBERPROPERTY', 'CUBERANKEDMEMBER', 'CUBEKPIMEMBER',
-    'WEBSERVICE', 'FILTERXML', 'GETPIVOTDATA'
-  ],
-  // まだ未対応（将来実装予定）
-  pending: [
-    'GROUPBY', 'PIVOTBY',
-    'VSTACK', 'HSTACK', 'TOCOL', 'TOROW',
-    'CHOOSEROWS', 'CHOOSECOLS',
-    'TEXTSPLIT', 'TEXTBEFORE', 'TEXTAFTER'
-  ]
-};
+/* ★使えない関数の 一覧は prompt/kansuu.md へ 出しました（2026-09-05）★
+   ★手で 書かない★＝`node scripts/make-prompt.mjs` が lib/formula-extra.js の
+   台帳から 作る。★手書きの 22個は 17個 間違っていた★（実測）。 */
 
 // ===== バージョン情報取得（デフォルトexcel_365） =====
 function getVersionInfo(versionKey) {
   return VERSION_MAP[versionKey] || VERSION_MAP['excel_365'];
 }
 
-// ===== 共通ベースプロンプト =====
-const SYSTEM_PROMPT_BASE = `あなたはExally（エクサリー）というExcel完全代替SaaSのAI助手です。
-Exallyは日本の中小企業・個人事業主向けに作られた「Excelそのものになる」サービスで、
-Excel関数500件超に対応した自作グリッド（ブック）・チャット型AI・テンプレート自動生成を備えています。
-ユーザーはExally内だけで書類を完成させられます（Excelに戻らなくていい）。
-ExcelがPCに無いユーザーでも全機能が使えます。
-Excelバージョン別（365/2024/2021/2019/2016/Mac/Online/なし）に合わせた最適な回答をします。
+/* ★SYSTEM_PROMPT_BASE は prompt/base.md へ 出しました（2026-09-05 司さん）★
+   ここに べた書きすると 台帳と 二重に なり、★片方だけ 古くなる★。
+   ★実際に 起きた★＝手書きの『使えない関数』22個のうち ★17個が 間違い★。 */
 
-【回答ルール・絶対厳守】
-- 常に日本語で回答する
-- 回答は簡潔に・冗長な説明は禁止
-- 前置き・長い解説・余計な注意書きは禁止
-- ##・###などのMarkdown見出しは絶対に使わない
-- |（縦棒）を使ったMarkdownテーブルは絶対に使わない
-- 箇条書きの多用禁止
-- 関数・数式は必ずExcelで動く形式（=で始まる）で提示する
-- 数式を本文中に書く場合は必ずバッククォート（\`）で囲む
-- セル結合の提案は禁止
-- 語尾は「〜だよ」「〜してみて」調で短く
-- 結論を最初に書いてから必要なら一言補足する
-- 表やテンプレートを作る場合は必ずTSV形式でも出力する
+/* ══ ★AIの 頭は prompt/ の ファイルから 読む★（2026-09-05 司さん）══════════
+ *
+ *  ★司さん★「★AIの構造は ファイルにして 更新できるような 設計に しとけよ★」
+ *
+ *  ★なぜ（実測で 起きていた 事）★
+ *    前は この ファイルの 中に ★べた書き★だった。
+ *    ⇒ 台帳（`lib/formula-extra.js` の 数える()）と ★二重管理★
+ *    ⇒★手書きの「使えない関数」22個のうち 17個が 間違い★
+ *        ・足してあるのに「使えない」…★4個★（TOCOL/TOROW/CHOOSEROWS/CHOOSECOLS）
+ *        ・動かないのに 1つも 教えていない…★13個★（LAMBDA/LET/MAP/REDUCE/…）
+ *    ⇒ しかも `latest` の 決まりは ★「LET・LAMBDA等を 積極的に 提案」★
+ *       ＝★AIが 動かない 式を 勧めていた★
+ *
+ *  ★読めなかったら 500 で 落とす★
+ *    ★黙って 前置き 無しで 答えるのが 一番 危ない★＝法定の 時と 同じ 型。
+ *    ★合言葉は `shitaku_tarinai`★＝画面は「★うちの 支度が 足りません★」と 出す。
+ *    （★`ai_shippai` に しては いけない★＝「AI側の 問題です」は ★嘘★。
+ *      客も 管理者も AI を 疑い、★誰も うちを 見ない★＝2026-09-05 指示役）
+ *
+ *  ★Vercel に 載せる★
+ *    `vercel.json` の `functions.includeFiles` で `prompt/**` を 入れる。
+ *    ★効いたかは 配信して 初めて 分かる★＝Preview で 1回 叩いて 確かめる。
+ */
+const 前置きの部屋 = require('path').join(__dirname, '..', 'prompt');
+let _前置き = null;
 
-【数式の返答フォーマット・絶対厳守】
-数式を説明するときは必ず以下の順番で返答する：
+/** ★prompt/ を 読む（1回だけ・読めなければ 投げる）★ */
+function 前置きを読む() {
+  if (_前置き) return _前置き;
+  const fs = require('fs'), path = require('path');
+  const 要る = ['base.md', 'kansuu.md', 'kyoutsuu.md', 'version.md'];
+  const 出 = {};
+  const 欠け = [];
+  for (const f of 要る) {
+    try {
+      const t = fs.readFileSync(path.join(前置きの部屋, f), 'utf8');
+      if (!t || !t.trim()) { 欠け.push(f + '（空）'); continue; }
+      出[f] = t;
+    } catch (e) { 欠け.push(f + '（' + (e.code || 'よめない') + '）'); }
+  }
+  if (欠け.length) {
+    /* ★1本でも 欠けたら 止める★＝★前置きが 半分の AI は 嘘を 言う★ */
+    const err = new Error('prompt が 読めません: ' + 欠け.join(' / '));
+    err.支度足りない = true;
+    throw err;
+  }
+  _前置き = 出;
+  return 出;
+}
 
-①1行目：1文で結論（何ができるかだけ）
+/** ```で 囲った 中身だけ 取り出す（囲いが 無ければ そのまま） */
+function 中身だけ(md) {
+  const m = /```\r?\n([\s\S]*?)\r?\n```/.exec(md);
+  return (m ? m[1] : md).trim();
+}
 
-②各引数を絵文字で説明（必ず以下の順番・色を守る）
-🔵 A2 → （第1引数の説明）
-🟠 B1:D20 → （第2引数の説明）
-🟣 2 → （第3引数の説明）
-🟢 FALSE → （第4引数の説明）
-
-③最後に数式をコードブロック（バッククォート3つ）で提示
-例：
-\`\`\`
-=VLOOKUP(A2, Sheet2!$A:$C, 2, FALSE)
-\`\`\`
-
-- 日本語プレースホルダー（検索値・範囲・列番号など）は絶対に使わない
-- 必ず実際のセル参照（A2・B1:D20・$A:$C等）を使う
-- SUMIFは🔵範囲 🟠条件 🟣合計範囲 の3色
-- IFは🔵条件 🟠真の値 🟣偽の値 の3色
-- IFERRORは🔵数式 🟠エラー時の値 の2色
-
-【TSV出力ルール・絶対厳守】
-- 表・テンプレートを作る場合は、本文の説明の後に必ず以下の形式で出力する：
-
---- TSV_START ---
-（ここにタブ区切りのデータ）
---- TSV_END ---
-
-- TSVのセル区切りは必ずタブ文字（\\t）を使う・縦棒（|）は絶対に使わない
-- TSVの数式セルはExcelで動く形式（=SUM(B2:B10) など）で記載する
-- セル幅・書式は貼り付け後に手動調整が必要な旨を末尾に添える`;
+/** 版ごとの 決まり（version.md の `## <group>` を 取る） */
+function 版の決まり(md, group) {
+  const re = new RegExp('##\\s*' + group + '\\s*\\r?\\n+```\\r?\\n([\\s\\S]*?)\\r?\\n```');
+  const m = re.exec(md);
+  return m ? m[1].trim() : '';
+}
 
 /* ══ ★AI の 答えを「本文」と「表」に 分ける★ ══════════════════════════════
  *
@@ -300,97 +297,8 @@ function buildStatutoryPrompt(ymArg, 行たち) {
 
 // ===== 動的プロンプト生成 =====
 function buildDynamicPrompt(versionInfo, 法定の行) {
-  const group = versionInfo.group;
-  const name = versionInfo.name;
-
-  // グループ別の回答ルール
-  let groupRule = '';
-
-  if (group === 'latest') {
-    groupRule = `
-【ユーザーのExcel環境】
-使用中のExcel：${name}（最新バージョン）
-
-【回答ルール】
-- XLOOKUP・スピル関数（FILTER/SORT/UNIQUE等）・LET・LAMBDA等の最新関数を積極的に提案する
-- 「Exally内でも同じ数式が動くよ」程度の短い補足でOK（詳細対比は不要）
-- 基本関数（SUM/AVERAGE等）では補足不要`;
-  }
-  else if (group === 'newer') {
-    groupRule = `
-【ユーザーのExcel環境】
-使用中のExcel：${name}
-
-【回答ルール】
-- XLOOKUP等の新関数は使えるので積極提案
-- 動的配列関数（FILTER/SORT等）は一部対応・使用時は注記を添える
-- 「Exally内ならもっと便利な方法もあるよ」程度の補足を時々添える`;
-  }
-  else if (group === 'older') {
-    groupRule = `
-【ユーザーのExcel環境】
-使用中のExcel：${name}（旧バージョン）
-
-【回答ルール】
-- メイン回答は古いExcelで動く関数（VLOOKUP・ネストIF・配列数式・CONCATENATE等）を使う
-- XLOOKUP・FILTER・SORT・UNIQUE・LET・LAMBDA等は使わない
-- 必ず「💡 Exally内なら〜」を併記する（以下の対比がある場合）：
-  - VLOOKUP → XLOOKUP
-  - ネストIF → IFS/SWITCH
-  - 配列数式（Ctrl+Shift+Enter） → FILTER/SORT/UNIQUE
-  - CONCATENATE → TEXTJOIN/CONCAT
-- 併記フォーマット：
-  💡 Exally内なら 〇〇 がもっと便利
-  🔵🟠🟣🟢 で引数を色分けして説明
-  \`\`\`代替数式\`\`\`
-  ※違いを3点以内で示す
-- 基本関数（SUM/AVERAGE/COUNT等）は併記不要`;
-  }
-  else if (group === 'online') {
-    groupRule = `
-【ユーザーのExcel環境】
-使用中のExcel：${name}（機能制限あり）
-
-【回答ルール】
-- Excel Onlineは一部機能に制限があるので基本関数を中心に提案
-- 複雑な機能は「Excelデスクトップでお試し」と補足
-- 「💡 Exally内ならもっと便利に使えるよ」を時々併記`;
-  }
-  else if (group === 'exally_only') {
-    groupRule = `
-【ユーザーのExcel環境】
-使用中のExcel：${name}（Exally内完結）
-
-【回答ルール】
-- XLOOKUP・スピル関数・LET・LAMBDA等の最新関数を積極的に使用
-- 「AIに話しかけてセルに書き込み」機能を時々案内
-- Excelへの配慮は不要・Exallyの全機能を活かした回答をする`;
-  }
-
-  // 全グループ共通ルール
-  const commonRule = `
-
-【全グループ共通ルール】
-1. ユーザーが「動かない」「エラーが出る」「#NAME?」「#VALUE!」「#REF!」「古いExcel」「使えない」「対応してない」と反応してきたら、古いExcelで動く数式に切り替えて回答する
-2. 切り替え時は一言添える：「もしかしてExcel 2019以前？古い版でも動く書き方を提案するね」
-3. 適切なタイミングで「設定画面でExcelバージョンを変更できるよ」を案内する
-
-【Exally未対応関数の扱い】
-
-完全未対応（Exally内で構造上動かない）：
-${EXALLY_UNSUPPORTED.full.join(', ')}
-
-まだ未対応（将来実装予定）：
-${EXALLY_UNSUPPORTED.pending.join(', ')}
-
-これらの関数について質問されたら：
-1. Excelでの使い方を通常通り🔵🟠🟣🟢の色分けで説明する
-2. ⚠️ を付けて「Exally内ではこの関数は動かないよ」と明記する
-3. 💡 で代替手段を色分けで提案する（SUMIFS/FILTER/UNIQUE/INDEX等の対応関数で同じ結果を出す方法）
-4. 将来対応予定なら「※Exally内で対応予定」を添える（具体的な時期は書かない）
-`;
-
-  return SYSTEM_PROMPT_BASE + buildStatutoryPrompt(null, 法定の行) + groupRule + commonRule;
+  const 部品 = buildPromptParts(versionInfo, 法定の行);
+  return 部品.共通 + 部品.版ごと;
 }
 
 /* ★前置きを「置いたまま使い回す」ために 2つに分ける（2026-08-22）★
@@ -398,9 +306,16 @@ ${EXALLY_UNSUPPORTED.pending.join(', ')}
    ・後半＝★版ごとに変わる★（Excel 365 / 2016 / 持っていない …）＝置き場所の後ろに回す
    ★変わる物を前に置くと 毎回 置き直しになって 逆に高くなる★（一次情報の決まり） */
 function buildPromptParts(versionInfo, 法定の行) {
-  const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt(null, 法定の行);
-  const 全部 = buildDynamicPrompt(versionInfo, 法定の行);
-  const 版ごと = 全部.slice(共通.length);
+  const P = 前置きを読む();                       /* ★読めなければ 投げる★ */
+  /* ★``` の 中だけ 渡す★＝人向けの 注記（作り方・日付）を AIへ 送らない。
+     ★①は 置いたまま 使い回す 所★なので、日付が 混ざると ★毎回 置き直し＝毎回 置き賃★。
+     ⇒ 実際に 踏んだ（2026-09-05）＝`tests/api-claude.test.mjs` の
+       「①に 毎回変わる物が 混ざっていない」が 赤に なった。 */
+  const 共通 = 中身だけ(P['base.md'])
+    + '\n\n' + 中身だけ(P['kansuu.md'])
+    + buildStatutoryPrompt(null, 法定の行);
+  const 版ごと = '\n' + 版の決まり(P['version.md'], versionInfo.group)
+    + '\n' + 中身だけ(P['kyoutsuu.md']);
   return { 共通, 版ごと };
 }
 
@@ -926,6 +841,10 @@ function 見出しを読む(h) {
 function 失敗を分ける(err) {
   const msg = (err && err.message) || '';
   const st = err && err.status;
+  /* ★うちの 支度が 足りない（prompt/ が 読めない）★（2026-09-05 指示役）
+     ★一番 先に 見る★＝後ろに 置くと ai_shippai に 落ちて ★「AI側の 問題です」と 嘘を 言う★。
+     ⇒ 客も 管理者も AI を 疑い ★誰も うちを 見ない★。 */
+  if (err && err.支度足りない) return { status: 500, 合言葉: 'shitaku_tarinai' };
   if (/credit balance/i.test(msg) || /insufficient[_ ]?quota/i.test(msg)) return { status: 402, 合言葉: 'zandaka' };
   if (st === 401 || st === 403 || /api[ _-]?key/i.test(msg)) return { status: 401, 合言葉: 'kagi' };
   if (st === 429) return { status: 429, 合言葉: 'komiai' };
