@@ -28,11 +28,8 @@
 
 const LIVE = [
   { name: '本番 ハブ', url: 'https://exally.vercel.app/hub.html' },
-  { name: '本番 給与', url: 'https://exally.vercel.app/kyuyo/' },
-  { name: '本番 Web明細', url: 'https://exally.vercel.app/kyuyo/meisai.html?t=PROBE' },
   { name: '本番 グリッド', url: 'https://exally.vercel.app/book.html' },
   { name: 'テスト ハブ', url: 'https://exally-zeroact.github.io/exally-staging/hub.html' },
-  { name: 'テスト 給与', url: 'https://exally-zeroact.github.io/exally-staging/kyuyo/' },
   // ★2026-08-07 いったん足して、同じ日に外した★
   //   テストの配信が2つ（github.io と Vercel）になっていたので見張りに載せたが、
   //   Vercel版は★git連携が無く、手で打った時だけ更新される★＝黙って古くなる形だった。
@@ -47,22 +44,18 @@ const LIVE = [
 const OLD = [
   {
     name: '旧本番 給与 トップ', url: 'https://payslip-app-olive.vercel.app/',
-    to: 'https://exally.vercel.app/kyuyo/', landing: true,
   },
   {
     name: '旧本番 Web明細(配布リンクの形)', url: 'https://payslip-app-olive.vercel.app/meisai.html?t=PROBE&c=INIT',
-    to: 'https://exally.vercel.app/kyuyo/meisai.html', mustKeep: ['t=PROBE', 'c=INIT'], landing: true,
     why: '★従業員に配ったQR/リンクの形。うしろ(?t=/?c=)を落とすと明細が開けなくなる。',
   },
   {
     name: '旧本番 Web明細(cleanUrlsで化けた形)', url: 'https://payslip-app-olive.vercel.app/meisai?t=PROBE',
-    to: 'https://exally.vercel.app/kyuyo/meisai.html', mustKeep: ['t=PROBE'], landing: true,
     why: '★旧ホストは cleanUrls で /meisai.html を /meisai に変えていた。新ホストに /meisai は無いので、'
       + '.html を付け直して飛ばさないと 404 に着地する。',
   },
   {
     name: '旧本番 管理', url: 'https://payslip-app-olive.vercel.app/admin.html',
-    to: 'https://exally.vercel.app/kyuyo/admin.html', landing: true,
   },
   {
     name: '★旧本番 sw.js（ここだけ飛ばさない）', url: 'https://payslip-app-olive.vercel.app/sw.js',
@@ -88,16 +81,23 @@ const OLD = [
   },
   {
     name: '旧テスト 給与', url: 'https://exally-zeroact.github.io/payslip-app-test/',
-    to: 'https://exally-zeroact.github.io/exally-staging/kyuyo/',
   },
   {
     name: '旧テスト 給与(直リンク)', url: 'https://exally-zeroact.github.io/payslip-app-test/meisai.html?t=X#h',
-    to: 'https://exally-zeroact.github.io/exally-staging/kyuyo/',
     // ★飛び先の「うしろ」はブラウザが組み立てる（location.search/hash を足す）ので、
     //   HTMLの中には出てこない。だから「うしろを落とさない作りになっているか」を本文で見る。
     mustContainBody: ['location.search', 'location.hash'],
   },
 ];
+
+/* ★★2026-09-05 に 外しました★★（司さん「何のための Rakunally なんど」）
+ *   ★給与(kyuyo/)を Exally から 消した★／★入口は 飛ばす（vercel.json の redirects）★
+ *     /kyuyo/…  → https://rakually.vercel.app/kyuyo/…
+ *     ★従業員が 持っている QR・リンクを 死なせない為★（?t= ?c= # は そのまま 付いて行く）
+ *   ★AIが 読む 3本は lib/ へ 本体ごと 移した★（写しでは ない）
+ *     shakaihoken-hyo / koyo-hoken / shouhizei-ritsu
+ *   ★下の 一覧は 済んだ物★＝★消さずに 残す★（次に 同じ事を する 人の 為）
+ */
 
 /* ★これから塞ぐ入口（号令待ち）★ 2026-08-18 登録
  *   給与(kyuyo/)は Rakually へ移る。★22人が今 使っているので、移る日まで1バイトも外さない★。
@@ -108,8 +108,6 @@ const OLD = [
  *   詳しい下調べ: docs/KYUYO_MOVE_INVENTORY.md
  */
 const PLANNED = [
-  { name: '給与トップ', from: 'https://exally.vercel.app/kyuyo/', to: '<Rakuallyの本番URL>/' },
-  { name: '給与トップ(index.html)', from: 'https://exally.vercel.app/kyuyo/index.html', to: '<Rakuallyの本番URL>/' },
   {
     name: '★Web明細(配布リンクの形)', from: 'https://exally.vercel.app/kyuyo/meisai.html?t=…&c=…',
     to: '<Rakuallyの本番URL>/meisai.html',
@@ -120,7 +118,6 @@ const PLANNED = [
     to: '<Rakuallyの本番URL>/meisai.html',
     why: '★.html を付け直さないと 404 に着地する（旧ホストで実際に踏んだ）',
   },
-  { name: '給与 管理', from: 'https://exally.vercel.app/kyuyo/admin.html', to: '<Rakuallyの本番URL>/admin.html' },
   {
     name: '★/sw.js は飛ばさない', from: 'https://exally.vercel.app/sw.js', to: '（飛ばさない）',
     why: '★端末に住み着いた Service Worker はサーバを塞いでも消えない。kyuyo/admin.html が /sw.js を登録している',
@@ -128,9 +125,10 @@ const PLANNED = [
 ];
 /* ★先に行き先を決めないと外せない物★（2026-08-18 実測。docs/KYUYO_MOVE_INVENTORY.md の0章） */
 const BLOCKERS = [
-  '★api/claude.js が kyuyo/lib/ を3本 require（shakaihoken-hyo / koyo-hoken / shouhizei-ritsu）＝画面では気づけない',
-  'hub.html のタイル <a href="kyuyo/">',
-  '★テスト線の seikyu/ が kyuyo/lib/ を2本 読む（shiharai-chosho / shouhizei-ritsu）',
+  '★済（2026-09-05）★ api/claude.js の3本 → lib/ へ本体ごと移した（shakaihoken-hyo / koyo-hoken / shouhizei-ritsu）',
+  '★済（2026-09-05）★ hub.html のタイルを外した',
+  '★★まだ★★ テスト線(exally-staging)の seikyu/ が kyuyo/lib/ を2本 読む（shiharai-chosho / shouhizei-ritsu）'
+    + ' ⇒ ★本番から 消したので、テスト線を 同じにする 時に 先に 行き先を 決める★',
 ];
 
 async function get(url) {

@@ -1,12 +1,17 @@
 const Anthropic = require('@anthropic-ai/sdk');
-// ★法定の数値は kyuyo/lib/ の本体を読む（写しを作らない）。
-//   2026-08-02: リポジトリ直下に写しを置いていて、掃除でそれを消した時にここが
-//   MODULE_NOT_FOUND になり /api/claude が毎回500（＝チャットが全部落ちた）。
-//   本体を直接読めば、消しても場所が変わっても同じ所を指す。
-//   参照が生きているかは tests/refs-resolve.test.mjs がCIで見張っている。
-const SHAKAIHOKEN_HYO = require('../kyuyo/lib/shakaihoken-hyo.js');
-const KOYO_HOKEN      = require('../kyuyo/lib/koyo-hoken.js');
-const SHOUHIZEI_RITSU = require('../kyuyo/lib/shouhizei-ritsu.js');
+const https = require('node:https');
+/* ★法定の数値は「倉庫」から拾う。★Exally の中に 写しを 置かない★（2026-09-05 司さん）★
+ *   司さん「金関係のこと聞かれたりAIが入力する時だけSupabaseの共有から拾うやないんか」
+ *
+ *  ★倉庫★ = Supabase `public.statutory`（★全アプリ 共通・anon で 読める★）
+ *            給与(Rakunally)も 同じ 行を 読む＝★法が 変わった時に 直す所が 1つ★
+ *
+ *  ★ここまでの 経緯（同じ穴を 3回 掘らない為に 残す）★
+ *    2026-08-02 … repo直下に 写しを 置き、掃除で 消して MODULE_NOT_FOUND＝/api/claude が毎回500
+ *    2026-09-05 … 給与アプリ(kyuyo/)ごと Exally から 外した。
+ *                 ★その時 私は 3本の lib を Exally の lib/ へ 移そうとした＝写しを 残す向き★
+ *                 ⇒ 司さんに 止められた。★倉庫から 拾うのが 元からの 設計★。
+ */
 
 /* ★let にしてある理由★＝下の __setClient（テスト用の窓）から 偽のAIに差し替えて、
    ★失敗した時に本当に何を返すか★を機械で押すため。本番では 1ミリも挙動が変わらない。 */
@@ -105,27 +110,158 @@ Excelバージョン別（365/2024/2021/2019/2016/Mac/Online/なし）に合わ�
 - TSVの数式セルはExcelで動く形式（=SUM(B2:B10) など）で記載する
 - セル幅・書式は貼り付け後に手動調整が必要な旨を末尾に添える`;
 
-// ===== 税務・給与の基準数値（kyuyo/lib の本体から・年度は対象月で自己選択） =====
-//  ・健保/介護は社保年度（3月起算）、雇用保険は労働保険年度（4月起算）で切り替わる。
-//  ・呼び出しの【たびに】組み立てる＝年度をまたいでも古い値を返さない
-//    （関数が温まったまま年度が変わる、を避ける）。
-function buildStatutoryPrompt(ymArg) {
-  const ym = ymArg || new Date().toISOString().slice(0, 7);  // 'YYYY-MM'
-  const kenko = SHAKAIHOKEN_HYO.getKenko('tokyo', ym);       // {jugyoin, nendo}
-  const koyoYear = KOYO_HOKEN.employYearOfYm(ym);
-  const koyoRate = KOYO_HOKEN.employRate('ippan', koyoYear);
-  const koyoNendo = '令和' + (koyoYear - 2018) + '年度';
+/* ══ ★法定の基準数値＝倉庫(Supabase public.statutory)から 拾う★ ═══════════════
+ *  ★AI が 使うのは 4つだけ★／★どの 行から 来るか★（乙・2026-09-05 指示役）
+ *    健康保険料率（東京）… kind='shakaihoken'  year=★社保年度(3月起算)★  data.kenko_total.tokyo
+ *                          ★倉庫の値は 労使合計★ ⇒ 従業員負担 = ÷2
+ *    厚生年金保険料率     … kind='shakaihoken'  year=同上                data.kosei_total
+ *                          ★同じく 労使合計★     ⇒ 従業員負担 = ÷2
+ *    雇用保険料率（一般） … kind='koyo'         year=★労働保険年度(4月起算)★ data.ippan
+ *                          ★これは 最初から 従業員(労働者)負担★＝÷2 しない
+ *    消費税（標準/軽減）  … kind='shouhizei'    year=★その kind の 一番 新しい 行★  data.hyojun / data.keigen
+ *                          ★2019 と 決め打ちしない★＝倉庫の year は「施行年」で、
+ *                          税率が 変われば ★新しい year の 行が 増える★。決め打つと
+ *                          ★増えても 2019 を 読み続け、数字は 出るので 誰も 気づかない★。
+ *                          ★2019 は「消費税が 今の形に なった 年」＝年度では ない★
+ *  ★台帳の year は 種類ごとに 意味が ちがう★（社保年度／労働保険年度／施行年）＝上の通り。
+ *
+ *  ★年度は 呼ばれる たびに 選び直す★＝関数が 温まったまま 年を またいでも 古い率を 返さない。
+ *  ★行そのものは 10分だけ 手元に 置く★（法は 10分で 変わらない／毎回 倉庫を 叩くと AI が 遅くなる）
+ *    ＝★repo に 置く 写しとは 別物★（配ってもいないし、次に 冷えたら 消える）
+ *
+ *  ★拾えなかった 時は 数字を 出さない★（甲・2026-09-05 指示役）
+ *    ★黙って 抜くのが 一番 危ない★＝AI は 自分の 記憶の 率を 書いてしまう。
+ *    ⇒ 数字の 代わりに ★「今 出せない・推測で 書くな」と AI に 言う★。
+ */
+const 倉庫の行の寿命ミリ秒 = 10 * 60 * 1000;
+let _法定の行 = null, _法定を取った時 = 0;
+
+/** 共有の倉庫の口（★anon で読める 全アプリ共通の棚★＝サーバの鍵は要らない） */
+/* ★js/supa-config.js を 読む 所は 1つだけ★（2026-09-05）
+   ＝前は ★同じ 注記外しが この ファイルに 2つ★在った。片方だけ 直すと 静かに ずれる。
+   ★注記を外してから 読む★＝注記の中の URL を 本物と 読まない。
+   （tests/ の 見張りは scripts/lib/chuki.mjs を 使うが、ここは Vercel が 読む
+     CommonJS なので ESM を 取り込めない＝この ファイルの 中で 1つに 寄せる） */
+function supaConfigの中身() {
+  const fs = require('fs'), path = require('path');
+  return fs.readFileSync(path.join(__dirname, '..', 'js', 'supa-config.js'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ');
+}
+
+let _共有の口 = undefined;
+function 共有の口() {
+  if (_共有の口 !== undefined) return _共有の口;
+  _共有の口 = null;
+  try {
+    const src = supaConfigの中身();
+    const u = /https:\/\/[a-z0-9]+\.supabase\.co/.exec(src);
+    const k = /['"](ey[A-Za-z0-9_.-]{40,})['"]/.exec(src);
+    if (u && k) _共有の口 = { url: u[0], key: k[1] };
+  } catch (e) { _共有の口 = null; }
+  return _共有の口;
+}
+
+/** 倉庫から 3種類の行を 拾う。★取れなければ null★（前の値で ごまかさない）
+ *  ★fetch を 使わない★＝undici が 線を 繋いだまま 残し、process.exit と ぶつかって
+ *    ★node ごと 落ちる（Assertion failed: UV_HANDLE_CLOSING / src\win\async.c:76）★
+ *    ＝2026-09-05 実測（tests/api-claude は 49本 全部 緑なのに 終了の印 127）。
+ *    ⇒ node:https で 取り、★agent:false で 線を 毎回 閉じる★。Vercel でも 同じに 動く。 */
+function 倉庫を取る(u, key, ミリ秒) {
+  return new Promise((resolve) => {
+    let 済み = false;
+    const 終わり = (v) => { if (!済み) { 済み = true; resolve(v); } };
+    let req;
+    try {
+      req = https.get(u, { agent: false, headers: { apikey: key, Authorization: 'Bearer ' + key } }, (res) => {
+        if (res.statusCode !== 200) { res.resume(); return 終わり(null); }
+        let buf = '';
+        res.setEncoding('utf8');
+        res.on('data', (c) => { buf += c; });
+        res.on('end', () => { try { 終わり(JSON.parse(buf)); } catch (e) { 終わり(null); } });
+        res.on('error', () => 終わり(null));
+      });
+    } catch (e) { return 終わり(null); }
+    req.setTimeout(ミリ秒, () => { req.destroy(); 終わり(null); });   /* ★AI を 待たせ続けない★ */
+    req.on('error', () => 終わり(null));
+  });
+}
+
+async function 法定を倉庫から拾う(いま) {
+  const now = いま || Date.now();
+  if (_法定の行 && (now - _法定を取った時) < 倉庫の行の寿命ミリ秒) return _法定の行;
+  const 口 = 共有の口();
+  if (!口) return null;
+  const u = 口.url + '/rest/v1/statutory?select=kind,year,data'
+    + '&or=(kind.eq.shakaihoken,kind.eq.koyo,kind.eq.shouhizei)';
+  const 行 = await 倉庫を取る(u, 口.key, 4000);
+  if (!Array.isArray(行) || !行.length) return null;
+  _法定の行 = 行; _法定を取った時 = now;
+  return 行;
+}
+
+/* 年度の 決まり（★数値では なく 暦の 決まり★＝法定の数字では ない）
+ *   社保年度 … 3月起算（2026-02 は 令和7年度・2026-03 から 令和8年度）
+ *   労働保険年度 … 4月起算（2026-03 は 令和7年度・2026-04 から 令和8年度） */
+function 社保年度(ym) { const y = +String(ym).slice(0, 4), m = +String(ym).slice(5, 7); return m >= 3 ? y : y - 1; }
+function 労働保険年度(ym) { const y = +String(ym).slice(0, 4), m = +String(ym).slice(5, 7); return m >= 4 ? y : y - 1; }
+function 令和(y) { return '令和' + (y - 2018) + '年度'; }
+
+/** その年度の 行を 選ぶ。★無ければ 手前の 一番 新しい 年★（先の年は 使わない） */
+function その年度の行(行たち, kind, year) {
+  const 候補 = (行たち || []).filter((r) => r.kind === kind && typeof r.year === 'number');
+  if (!候補.length) return null;
+  const 以下 = 候補.filter((r) => r.year <= year).sort((a, b) => b.year - a.year);
+  if (以下.length) return 以下[0];
+  return 候補.sort((a, b) => a.year - b.year)[0];   /* 全部 先の年＝一番 手前を 使う */
+}
+
+/* ★拾えなかった 時に AI へ 言う 事★（甲）＝★数字を 書かせない★ */
+const 法定が取れない時 = `
+
+【税務・給与計算の基準数値】
+- ★今この場で 法定の数値（保険料率・税率）を取り出せませんでした★
+- 保険料率・税率・税額をたずねられたら、★数字を答えず★「今この数字を出せないので、少し時間をおいてもう一度きいてください」と伝えること
+- ★おぼえている率・推測した率を 答えに書かないこと★（古い率で計算すると 給与も税額もまちがう）
+- 率を使わない説明（数式の作り方・表の組み立て方）は これまでどおり答えてよい`;
+
+/**
+ * 法定の基準数値の 前置きを 組み立てる。
+ *   行たち … 法定を倉庫から拾う() の 返り（★null なら 数字を 出さない★）
+ *   ymArg  … 対象月 'YYYY-MM'（省略＝今日）
+ */
+/** その kind の ★一番 新しい 年の 行★（施行年で 持っている 種類＝消費税 など） */
+function そのkindの一番新しい行(行たち, kind) {
+  const 候補 = (行たち || []).filter((r) => r.kind === kind && typeof r.year === 'number');
+  if (!候補.length) return null;
+  return 候補.sort((a, b) => b.year - a.year)[0];
+}
+
+function buildStatutoryPrompt(ymArg, 行たち) {
+  const ym = ymArg || new Date().toISOString().slice(0, 7);
+  const 社保 = その年度の行(行たち, 'shakaihoken', 社保年度(ym));
+  const 雇用 = その年度の行(行たち, 'koyo', 労働保険年度(ym));
+  /* ★消費税は「年度」では なく「施行年」★＝対象月から 選ぶ 物では ない。
+     ⇒★その kind の 一番 新しい 行★を 取る（★2019 と 書かない★）。 */
+  const 消費 = そのkindの一番新しい行(行たち, 'shouhizei');
+  const 健保合計 = 社保 && 社保.data && 社保.data.kenko_total && 社保.data.kenko_total.tokyo;
+  const 厚年合計 = 社保 && 社保.data && 社保.data.kosei_total;
+  const 雇用率 = 雇用 && 雇用.data && 雇用.data.ippan;
+  const 標準 = 消費 && 消費.data && 消費.data.hyojun;
+  const 軽減 = 消費 && 消費.data && 消費.data.keigen;
+  /* ★1つでも 欠けたら 全部 出さない★＝半分だけの 表は 一番 危ない */
+  const 揃った = [健保合計, 厚年合計, 雇用率, 標準, 軽減].every((v) => typeof v === 'number' && isFinite(v));
+  if (!揃った) return 法定が取れない時;
   return `
 
 【税務・給与計算の基準数値】
-- 健康保険料率（東京）: ${(kenko.jugyoin * 100).toFixed(3)}%（従業員負担・労使折半・${kenko.nendo}）
-- 厚生年金保険料率: ${(SHAKAIHOKEN_HYO.KOSEI_NENKIN_RITSU_JUGYOIN * 100).toFixed(2)}%（従業員負担・労使折半・全国一律）
-- 雇用保険料率: ${(koyoRate * 100).toFixed(2)}%（従業員負担・一般の事業・${koyoNendo}）
-- 消費税: ${(SHOUHIZEI_RITSU.hyojun * 100).toFixed(0)}%（標準）/ ${(SHOUHIZEI_RITSU.keigen * 100).toFixed(0)}%（軽減）`;
+- 健康保険料率（東京）: ${(健保合計 / 2 * 100).toFixed(3)}%（従業員負担・労使折半・${令和(社保.year)}）
+- 厚生年金保険料率: ${(厚年合計 / 2 * 100).toFixed(2)}%（従業員負担・労使折半・全国一律）
+- 雇用保険料率: ${(雇用率 * 100).toFixed(2)}%（従業員負担・一般の事業・${令和(雇用.year)}）
+- 消費税: ${(標準 * 100).toFixed(0)}%（標準）/ ${(軽減 * 100).toFixed(0)}%（軽減）`;
 }
 
 // ===== 動的プロンプト生成 =====
-function buildDynamicPrompt(versionInfo) {
+function buildDynamicPrompt(versionInfo, 法定の行) {
   const group = versionInfo.group;
   const name = versionInfo.name;
 
@@ -216,16 +352,16 @@ ${EXALLY_UNSUPPORTED.pending.join(', ')}
 4. 将来対応予定なら「※Exally内で対応予定」を添える（具体的な時期は書かない）
 `;
 
-  return SYSTEM_PROMPT_BASE + buildStatutoryPrompt() + groupRule + commonRule;
+  return SYSTEM_PROMPT_BASE + buildStatutoryPrompt(null, 法定の行) + groupRule + commonRule;
 }
 
 /* ★前置きを「置いたまま使い回す」ために 2つに分ける（2026-08-22）★
    ・前半＝★どの版の人にも同じ★（作りの説明＋法定の基準数値）＝ここを置いたままにする
    ・後半＝★版ごとに変わる★（Excel 365 / 2016 / 持っていない …）＝置き場所の後ろに回す
    ★変わる物を前に置くと 毎回 置き直しになって 逆に高くなる★（一次情報の決まり） */
-function buildPromptParts(versionInfo) {
-  const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt();
-  const 全部 = buildDynamicPrompt(versionInfo);
+function buildPromptParts(versionInfo, 法定の行) {
+  const 共通 = SYSTEM_PROMPT_BASE + buildStatutoryPrompt(null, 法定の行);
+  const 全部 = buildDynamicPrompt(versionInfo, 法定の行);
   const 版ごと = 全部.slice(共通.length);
   return { 共通, 版ごと };
 }
@@ -273,11 +409,7 @@ let _repoの倉庫 = undefined;
 function repoの倉庫() {
   if (_repoの倉庫 !== undefined) return _repoの倉庫;
   try {
-    const fs = require('fs');
-    const path = require('path');
-    const src = fs.readFileSync(path.join(__dirname, '..', 'js', 'supa-config.js'), 'utf8')
-      /* ★注記を外してから読む★（注記の中の URL を 本物と読まない） */
-      .replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const src = supaConfigの中身();
     const m = /https:\/\/([a-z0-9]+)\.supabase\.co/.exec(src);
     _repoの倉庫 = m ? m[1] : null;
   } catch (e) { _repoの倉庫 = null; }
@@ -594,7 +726,10 @@ module.exports = async (req, res) => {
 
     // バージョンに応じた動的プロンプトを構築
     const versionInfo = getVersionInfo(excelVersion);
-    const dynamicPrompt = buildDynamicPrompt(versionInfo);
+    /* ★法定の数字は 押された その時に 倉庫から 拾う★（司さん 2026-09-05）
+       ★取れなければ null★＝下の 前置きが「数字を出すな」に 切り替わる */
+    const 法定の行 = await 法定を倉庫から拾う();
+    const dynamicPrompt = buildDynamicPrompt(versionInfo, 法定の行);
 
     /* ★置いたまま使い回す（prompt caching）★ 2026-08-22
        なぜ … 会話40件(20往復)を ★毎回まるごと送り直していた★＝1回 平均 約4円。
@@ -603,7 +738,7 @@ module.exports = async (req, res) => {
               ★印は最大4か所★／★読み直し 0.1倍・置く時 1.25倍（5分もつ）★＝一次情報。
               ★Sonnet 4.6 は 1,024トークン未満だと 黙って置かれない★ので 前置きは1つに束ねる。
        ★客の画面は 1文字も変えていない（我慢も 上限も していない）★ */
-    const 部品 = buildPromptParts(versionInfo);
+    const 部品 = buildPromptParts(versionInfo, 法定の行);
     /* ★①の共通の所だけ 1時間もつ置き方にする（2026-08-22 指示役の 1-b）★
        なぜ … 5分の置き方は ★2回目から★ 安くなる仕掛け。
               ★5分 空けて 1回だけ押して終わる人★は 毎回が「1回目」＝★ずっと +25%★。
@@ -766,6 +901,8 @@ function 失敗を分ける(err) {
 //   なぜ要るか: 基準数値が黙って NaN / undefined になっても、画面は普通に出てしまう。
 //   機械が数値そのものを見るための口。
 module.exports.__buildStatutoryPrompt = buildStatutoryPrompt;
+module.exports.__法定を倉庫から拾う = 法定を倉庫から拾う;
+module.exports.__法定が取れない時 = 法定が取れない時;
 /* ★失敗した時に 本当に何を返すかを 機械が押すための窓★
    （本番は module.exports を 関数として呼ぶだけなので 挙動は変わらない） */
 module.exports.__失敗を分ける = 失敗を分ける;

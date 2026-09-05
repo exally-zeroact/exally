@@ -130,7 +130,11 @@ const NOT_A_CHECK = {
 };
 
 const FILES = [];
-for (const dir of ['tests', 'kyuyo/tests']) {
+/* ★2026-09-05★ 給与(kyuyo/)を Exally から 外した（給与は Rakunally）。
+   ★在る 所だけ 見る★（無い 所で 落ちない）／★1つも 無ければ 空振りとして 止める★ */
+const 見る所 = ['tests', 'kyuyo/tests'].filter((d) => fs.existsSync(path.join(ROOT, d)));
+if (!見る所.length) throw new Error('★見る 所が 1つも 無い＝この 検査が 空振り★');
+for (const dir of 見る所) {
   for (const f of fs.readdirSync(path.join(ROOT, dir))) {
 
 
