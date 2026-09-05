@@ -189,6 +189,8 @@ const FILES = [
   ['ai-genkai.test.mjs', '--self-test'],  //   ＝15回叩いて10回で止まり 掘りを全部捨てていた
   'eol.test.mjs',                         // ★行の終わりが CRLF に なると わざと壊す試験が 掴めず
   ['eol.test.mjs', '--self-test'],        //   黙って赤に なる（2026-09-05 に 17本 落ちた）
+  'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
+  ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
