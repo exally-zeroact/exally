@@ -7,6 +7,9 @@
  *    ⇒★手書きの「使えない関数」22個のうち ★17個が 間違い★★
  *       ・足してあるのに「使えない」…4個（TOCOL/TOROW/CHOOSEROWS/CHOOSECOLS）
  *       ・動かないのに 1つも 教えていない…13個（LAMBDA/LET/MAP/REDUCE/…）
+ *         ★★その 13個の うち YEN は 数え間違い★★（同じ日の 夜に 実測）
+ *           ＝★打てば ¥1,235 が 出る★（Exally が 本名 DOLLAR に 直す）
+ *           ⇒★別名で動く★の 棚へ 移した。この 試験も それを 見る（下の self-test）
  *    ⇒ しかも latest の 決まりは「★LET・LAMBDA等を 積極的に 提案★」
  *       ＝★AIが 動かない 式を 勧めていた★
  *
@@ -25,7 +28,14 @@ const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e
 
 /** ★純関数★＝前置きの 字と 台帳から「食い違い」を 返す（self-test で 作り物を 通せる） */
 export function 食い違い(前置き, 台帳) {
-  const 足す = (台帳.足す || []).concat(Object.keys(台帳.別のlibで足す || {}));
+  /* ★★「別名で動く」も 動く 側★★（2026-09-05 に 足した）
+     ★実際に 起きた 事★ … YEN が 「足さない」の 棚に 置いてあった
+       ⇒ この 紙で ★「Exally内では まだ 動かない」の 列★に 並んでいた
+       ⇒★実際は ¥1,235 が 出るのに AIが 客に「動きません」と 言う★所だった
+     ⇒★ここに 足さないと、同じ 事が また 通る★ */
+  const 足す = (台帳.足す || [])
+    .concat(Object.keys(台帳.別のlibで足す || {}))
+    .concat(Object.keys(台帳.別名で動く || {}));
   const 足さない = Object.keys(台帳.足さない || {});
   const 出 = { 使えるのに使えないと言う: [], 動かないのに黙っている: [] };
   for (const f of 足す) {
@@ -53,6 +63,21 @@ if (process.argv.includes('--self-test')) {
   T('★正しければ 何も 出さない', () => {
     const r = 食い違い('つかえる: TAKE / 動かない: ★LAMBDA★', 台帳);
     if (r.使えるのに使えないと言う.length || r.動かないのに黙っている.length) throw new Error('誤検知');
+  });
+  /* ★★2026-09-05 に 実際に 通してしまった 形★★
+     YEN は 打てば ¥1,235 が 出るのに 「動かない」の 列に 並んでいた
+     ⇒★別名で動く を 数えていないと、この 見張りは 素通りする★ */
+  T('★★「別名で動く」物を「動かない」と 書いていたら 見つける★★', () => {
+    const 台2 = { 足す: ['TAKE'], 別名で動く: { YEN: 'DOLLAR に 直す' }, 足さない: { LAMBDA: '無い' } };
+    const r = 食い違い('動かない: ★LAMBDA★ / ★YEN★', 台2);
+    if (r.使えるのに使えないと言う.indexOf('YEN') < 0) {
+      throw new Error('★見つけていない＝AIが 客に「YEN は 動きません」と 言う★');
+    }
+  });
+  T('★別名で動く を 正しく 動く 側に 書いていれば 素通り', () => {
+    const 台2 = { 足す: ['TAKE'], 別名で動く: { YEN: 'DOLLAR に 直す' }, 足さない: { LAMBDA: '無い' } };
+    const r = 食い違い('動く: TAKE / YEN … DOLLAR に 直す / 動かない: ★LAMBDA★', 台2);
+    if (r.使えるのに使えないと言う.length) throw new Error('★誤検知★: ' + r.使えるのに使えないと言う.join(','));
   });
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);
@@ -128,7 +153,8 @@ T('★機械が 作る ファイルは 台帳と 一致（--check が 通る）'
 const p0 = handler.__buildPromptParts({ group: 'latest', name: 'Excel 365' });
 console.log('\n── 実測 ──');
 console.log('  前置き … 共通 ' + p0.共通.length + '字 ／ 版ごと ' + p0.版ごと.length + '字');
-console.log('  台帳 … 動く ' + (台帳.足す.length + Object.keys(台帳.別のlibで足す || {}).length)
+console.log('  台帳 … 動く ' + (台帳.足す.length + Object.keys(台帳.別のlibで足す || {}).length
+  + Object.keys(台帳.別名で動く || {}).length)
   + '個 ／ 動かない ' + Object.keys(台帳.足さない).length + '個');
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
