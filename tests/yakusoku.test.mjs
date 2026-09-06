@@ -153,6 +153,21 @@ try { doc.dispatchEvent(new win.Event('DOMContentLoaded', { bubbles: true })); }
 try { win.dispatchEvent(new win.Event('load')); } catch (e) { /* 続ける */ }
 
 const 中の数の試し = {
+  'hyou-ireru-undo': () => {
+    /* ★書いてある 約束＝「違ったら ↩ で 1押しで 戻ります」★
+       ⇒★入れる前を 控えてから 押す★（比べる相手は 測る前に 複製する） */
+    win.sheets[win.activeSheet].data = {};
+    const 前 = JSON.stringify(win.sheets[win.activeSheet].data);
+    const 前のundo = win.undoStack.length;
+    win.sel(0, 0, 0, 0);
+    const 番 = win._AIの表たち.push([['あ', 'い'], ['う', 'え'], ['お', 'か']]) - 1;
+    win.AIの表をシートに入れる(番);
+    const 積んだ = win.undoStack.length - 前のundo;
+    言う(積んだ === 1, '★undo に ' + 積んだ + '個 積んだ＝' + 積んだ + '回 押さないと 戻らない★');
+    win.doUndo();
+    言う(JSON.stringify(win.sheets[win.activeSheet].data) === 前,
+      '★1回 押しても 入れる前に 戻っていない★');
+  },
   'func-insert': () => {
     win.sel(0, 0, 0, 0);
     win.関数を入れる('SUM');
