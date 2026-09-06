@@ -16962,6 +16962,22 @@ function deepDiveExplain(){
    ★テスト線には AIの窓口がそもそも無いので、何度 試しても 失敗する★。
    理由と 次の一手は lib/ai-reason.js（お金を使わずに測った真値付き）。 */
 async function _aiFetch(body){
+  /* ★★お客さんの Excel の 版を 必ず 付ける★★（2026-09-05・会議で 見つけた 穴B）
+     ★前は 1度も 送っていなかった★＝送っていたのは message と history の 2つだけ
+     ⇒ サーバは 知らない 時 Excel 365 に 倒す（api/claude.js:40）
+     ⇒★★全員が 365 扱い★★＝2016・2019 の 客にも XLOOKUP・FILTER を 出していた
+       365扱いだと「LET・LAMBDA等を 積極的に 使え」も 効く
+     ⇒★版ごとの 言い方(prompt/version.md)は 誰にも 効いていなかった★
+     ★ここ 1か所で 付ける★＝呼ぶ側（説明・チャット・レシピ）で 付け忘れない
+     ★版を 選ぶ 画面は 前から 在る★（1F ボタン／localStorage exally_excel_version）
+       ＝繋がっていなかったのは ★送る 1か所だけ★
+     見張り … tests/ban-wo-okuru.test.mjs */
+  /* ★typeof で 守らない★＝getBookVer は この ファイルの 中に 在り
+     REQUIRED_FNS に 載せた（無ければ 起動時に 赤で 出る）。
+     守ると ★無くなった時に 黙って 365 に 戻る★＝一番 見つけにくい 形。 */
+  if(body && !body.excelVersion){
+    body = Object.assign({}, body, { excelVersion: getBookVer() });
+  }
   var 本番か = /vercel\.app$/.test(location.hostname) || !/github\.io$/.test(location.hostname);
   try{
     /* ★4 事故止め（2026-08-25）★ 回数は ★人ごと★に数える。
@@ -18918,6 +18934,8 @@ var REQUIRED_FNS = [
   'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
   'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
   'recalcSheet', 'convertFormula', 'forDisplay', 'fmtForDisplay', 'applyNumFmt', 'cfFormatAt',
+  /* ★お客さんの Excel の 版★ … 無いと AIへ 版が 届かず ★全員 365 扱い★に 戻る（2026-09-05） */
+  'getBookVer',
   // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）
   'initExallyFormula', 'addSheetToEngine'
 ];
