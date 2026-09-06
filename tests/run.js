@@ -189,12 +189,22 @@ const FILES = [
   ['ai-genkai.test.mjs', '--self-test'],  //   ＝15回叩いて10回で止まり 掘りを全部捨てていた
   'eol.test.mjs',                         // ★行の終わりが CRLF に なると わざと壊す試験が 掴めず
   ['eol.test.mjs', '--self-test'],        //   黙って赤に なる（2026-09-05 に 17本 落ちた）
+  'shouko-no-okiba.test.mjs',             // ★消える場所に repo の 物を 置いていないか（2026-09-05）
+  ['shouko-no-okiba.test.mjs', '--self-test'], //  ＝同じ日に 2回 落ちた（507個が 消えた／YENの控え）
+  'hyou-ireru-ui.test.mjs',               // ★AIの表を入れて★1押しで元に戻る★（本物の画面をjsdomで押す）
+  ['hyou-ireru-ui.test.mjs', '--self-test'],// ＝前は1セルずつ積み★16回押さないと戻らなかった★
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
   ['formula-nokori.test.mjs', '--self-test'],
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
   ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
+  'betsumei-zenbu.test.mjs',              // ★打てば動く別名を機械で全部出して台帳と突き合わせる（09-06 指示役）
+  ['betsumei-zenbu.test.mjs', '--self-test'],// ＝JISがどの棚にも無く★AIが知らない★状態だった
+  'kansuu-tana.test.mjs',                 // ★台帳の棚を engine に押して確かめる（2026-09-05）
+  ['kansuu-tana.test.mjs', '--self-test'],//   ＝YENを「動かない」棚に置き AIが客に嘘を言う所だった
+  'ban-wo-okuru.test.mjs',                // ★客のExcelの版がAIまで届くか（会議の穴B・2026-09-05）
+  ['ban-wo-okuru.test.mjs', '--self-test'],//  ＝版を1度も送っておらず★全員365扱い★だった
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
   ['shindan.test.mjs', '--self-test'],
   'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
