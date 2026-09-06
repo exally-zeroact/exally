@@ -193,6 +193,10 @@ const FILES = [
   ['shouko-no-okiba.test.mjs', '--self-test'], //  ＝同じ日に 2回 落ちた（507個が 消えた／YENの控え）
   'hyou-ireru-ui.test.mjs',               // ★AIの表を入れて★1押しで元に戻る★（本物の画面をjsdomで押す）
   ['hyou-ireru-ui.test.mjs', '--self-test'],// ＝前は1セルずつ積み★16回押さないと戻らなかった★
+  'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
+  ['formula-nokori.test.mjs', '--self-test'],
+  'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
+  ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'betsumei-zenbu.test.mjs',              // ★打てば動く別名を機械で全部出して台帳と突き合わせる（09-06 指示役）
