@@ -177,6 +177,33 @@ T('★まだ読めない書式は台帳に載っている（黙って放置し�
   }
 });
 
+/* ★★YEN は 打った人の 期待どおり 動く★★（2026-09-05 実測で 足した）
+   ★なぜ 要るか★
+     08-31 に「実Excel に YEN は 無い（#NAME?）」と 書いた ⇒★英語の 構文でだけ 測っていた★
+     09-05 に `.FormulaLocal` で 測り直したら ★¥1,234 が 出た★
+     ＝★日本語UIの 表示名で、本名は DOLLAR★（Excel 自身が 相互に 直す）
+   ★台帳(lib/formula-extra.js)の 字は 直したが、字は ★半分★★
+     ⇒★ここで engine に 通して「本当に ¥ が 出るか」を 押す★
+   ★直しているのは exally-formula.js の convertFormula★（YEN( → DOLLAR( ） */
+T('★★=YEN(…) が そのまま 動く（本名 DOLLAR に 直している）★★', () => {
+  const 直し = F.convertFormula('=YEN(1234.5)');
+  if (直し !== '=DOLLAR(1234.5)') throw new Error('★直していない★: ' + 直し);
+  hf.setSheetContent(SID, [[F.convertFormula('=YEN(1234.5)')], [F.convertFormula('=YEN(-1234.5)')]]);
+  const a = String(hf.getCellValue({ sheet: SID, row: 0, col: 0 }));
+  const b = String(hf.getCellValue({ sheet: SID, row: 1, col: 0 }));
+  /* ★実測（2026-09-05）★ … ¥1,235 / ¥-1,235（小数は 実Excel と 同じく 丸める） */
+  if (a !== '¥1,235') throw new Error('★¥ が 出ていない★: ' + a);
+  if (b !== '¥-1,235') throw new Error('★負の 数が 違う★: ' + b);
+});
+
+T('★この 試験が 空振りしていない（直しを 通さなければ 答えが 変わる）', () => {
+  /* ★「動いた」を 本当に 見張れているか★＝素の まま 渡したら ★¥ は 出ない★
+     ⇒ 出てしまうなら ★convertFormula を 通さなくても 通る＝何も 見ていない★ */
+  hf.setSheetContent(SID, [['=YEN(1234.5)']]);
+  const 素 = String(hf.getCellValue({ sheet: SID, row: 0, col: 0 }));
+  if (素 === '¥1,235') throw new Error('★直さなくても 通る＝この 試験は 何も 見ていない★');
+});
+
 console.log('\n── 実測（司さんの実物と同じ形） ──');
 [46023, 46024, 46025, 46026, 46027, 46028, 46029].forEach((s) => {
   console.log(`  =TEXT(${s},"aaa") → ${TEXT(s, 'aaa')}   （Excelの答え ${weekdayOf(s)}）`);

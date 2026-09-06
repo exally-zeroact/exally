@@ -15,6 +15,9 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 ★別の 部品で 足した 物★
 - BAHTTEXT … lib/bahttext.js（実Excel に 116通り 打たせて 合わせた）
 
+★別の 名前で 動く 物（★打たれたら そのまま 動く＝断っては いけない★）★
+- YEN … ★打てば そのまま 動く★＝Exally が ★DOLLAR★（本名）に 直して 答える。=YEN(1234.5) → ¥1,235。★YEN は 日本語UIの 表示名★で、ファイル／英語の 構文では DOLLAR
+
 ## ★★Exally で 動かない 関数（★勧めては いけない★）★★
 
 ★聞かれたら「Exally内では まだ 動かない」と はっきり 言う。★
@@ -34,5 +37,4 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★SCAN★ … 同上
 - ★STOCKHISTORY★ … 外の データ配信が 要る
 - ★WEBSERVICE★ … 同上
-- ★YEN★ … ★実Excel に 存在しない★。円は DOLLAR が 出す
 ```

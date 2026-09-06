@@ -191,6 +191,8 @@ const FILES = [
   ['eol.test.mjs', '--self-test'],        //   黙って赤に なる（2026-09-05 に 17本 落ちた）
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
+  'kansuu-tana.test.mjs',                 // ★台帳の棚を engine に押して確かめる（2026-09-05）
+  ['kansuu-tana.test.mjs', '--self-test'],//   ＝YENを「動かない」棚に置き AIが客に嘘を言う所だった
   'shindan.test.mjs',                     // ★5 E2診断1本目＝消えた参照が IFERROR で隠れている（実物122本）
   ['shindan.test.mjs', '--self-test'],
   'shindan-ui.test.mjs',                  // ★本物の画面で 知らせ・一覧・場所へ行く＋直した所の控え
