@@ -189,6 +189,8 @@ const FILES = [
   ['ai-genkai.test.mjs', '--self-test'],  //   ＝15回叩いて10回で止まり 掘りを全部捨てていた
   'eol.test.mjs',                         // ★行の終わりが CRLF に なると わざと壊す試験が 掴めず
   ['eol.test.mjs', '--self-test'],        //   黙って赤に なる（2026-09-05 に 17本 落ちた）
+  'shouko-no-okiba.test.mjs',             // ★消える場所に repo の 物を 置いていないか（2026-09-05）
+  ['shouko-no-okiba.test.mjs', '--self-test'], //  ＝同じ日に 2回 落ちた（507個が 消えた／YENの控え）
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'kansuu-tana.test.mjs',                 // ★台帳の棚を engine に押して確かめる（2026-09-05）
