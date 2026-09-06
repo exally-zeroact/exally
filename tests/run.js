@@ -195,6 +195,8 @@ const FILES = [
   ['hyou-ireru-ui.test.mjs', '--self-test'],// ＝前は1セルずつ積み★16回押さないと戻らなかった★
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
+  'betsumei-zenbu.test.mjs',              // ★打てば動く別名を機械で全部出して台帳と突き合わせる（09-06 指示役）
+  ['betsumei-zenbu.test.mjs', '--self-test'],// ＝JISがどの棚にも無く★AIが知らない★状態だった
   'kansuu-tana.test.mjs',                 // ★台帳の棚を engine に押して確かめる（2026-09-05）
   ['kansuu-tana.test.mjs', '--self-test'],//   ＝YENを「動かない」棚に置き AIが客に嘘を言う所だった
   'ban-wo-okuru.test.mjs',                // ★客のExcelの版がAIまで届くか（会議の穴B・2026-09-05）

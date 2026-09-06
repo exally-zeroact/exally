@@ -16,6 +16,17 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - BAHTTEXT … lib/bahttext.js（実Excel に 116通り 打たせて 合わせた）
 
 ★別の 名前で 動く 物（★打たれたら そのまま 動く＝断っては いけない★）★
+- BETADIST … ★打てば そのまま 動く★＝古い 名前。Exally が BETA.DIST(…,TRUE()) に 直して 答える（=BETADIST(0.5,1,2) → 0.75）（直している 場所＝convertFormula）
+- HYPGEOMDIST … ★打てば そのまま 動く★＝古い 名前。Exally が 4つ目の 引数に FALSE() を 足して 答える（=HYPGEOMDIST(1,2,3,4) → 0.5）（直している 場所＝convertFormula）
+- ISREF … ★打てば そのまま 動く★＝参照かどうかを 見る。Exally が 式を 読んで TRUE()/FALSE() に 直して 答える（直している 場所＝convertFormula）
+- JIS … ★打てば そのまま 動く★＝Exally が ★DBCS★（本名）に 直して 答える。=JIS("あ") → あ。JIS は 日本語UIの 表示名で、ファイル／英語の 構文では DBCS（YEN と 同じ 家／直している 場所＝exally-formula.js の convertFormula）
+- LET … ★打てば そのまま 動く★＝=LET(x,2,x*3) → 6（実測）。名前を 付けて 使い回す 書き方が そのまま 通る
+- MAKEARRAY … ★打てば そのまま 動く★＝=MAKEARRAY(2,2,LAMBDA(r,c,r*c)) が 答える（実測）
+- MAP … ★打てば そのまま 動く★＝=MAP(A1:A3,LAMBDA(v,v*2)) が 答える（実測）
+- NEGBINOMDIST … ★打てば そのまま 動く★＝古い 名前。Exally が 引数を 足して 答える（=NEGBINOMDIST(1,2,0.5) → 0.25）（直している 場所＝convertFormula）
+- NORMSDIST … ★打てば そのまま 動く★＝古い 名前。Exally が NORMSDIST(x,TRUE()) に 直して 答える（=NORMSDIST(1) → 0.8413…）。新しい 名前は NORM.S.DIST（直している 場所＝convertFormula）
+- REDUCE … ★打てば そのまま 動く★＝=REDUCE(0,A1:A3,LAMBDA(a,b,a+b)) → 9（実測）
+- SCAN … ★打てば そのまま 動く★＝途中の 計算を 並べて 返す（実測）
 - YEN … ★打てば そのまま 動く★＝Exally が ★DOLLAR★（本名）に 直して 答える。=YEN(1234.5) → ¥1,235。★YEN は 日本語UIの 表示名★で、ファイル／英語の 構文では DOLLAR
 
 ## ★★Exally で 動かない 関数（★勧めては いけない★）★★
@@ -23,18 +34,13 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 ★聞かれたら「Exally内では まだ 動かない」と はっきり 言う。★
 ★代わりの やり方を 出す。★★黙って 勧めない★★
 
-- ★BYCOL★ … 同上
-- ★BYROW★ … 同上
+- ★BYCOL★ … 同上（列ごと）
+- ★BYROW★ … 行ごとに まとめる 物＝まだ 作っていない（MAP・REDUCE・SCAN は 動く）
 - ★FIELDVALUE★ … 同上
 - ★IMAGE★ … 同上
-- ★LAMBDA★ … 式を 値として 渡す 仕組みが エンジンに 無い
-- ★LET★ … 同上
-- ★MAKEARRAY★ … 同上
-- ★MAP★ … 同上
+- ★LAMBDA★ … ★その場で 呼ぶ 書き方（=LAMBDA(x,x+1)(4)）は 動く★。セルに 名前として しまう 使い方は まだ 出来ない
 - ★PHONETIC★ … ふりがなは セルに 付いた データ＝エンジンでは 見えない
-- ★REDUCE★ … 同上
 - ★RTD★ … 同上
-- ★SCAN★ … 同上
 - ★STOCKHISTORY★ … 外の データ配信が 要る
 - ★WEBSERVICE★ … 同上
 ```
