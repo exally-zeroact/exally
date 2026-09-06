@@ -10,6 +10,10 @@
  *      ・★動かないのに 1つも 教えていない … 13個★
  *        LAMBDA / LET / MAP / REDUCE / SCAN / BYROW / BYCOL / MAKEARRAY /
  *        STOCKHISTORY / FIELDVALUE / IMAGE / PHONETIC / YEN
+ *        ★★YEN は この 数え方が 間違いだった（同じ日の 夜に 実測で 分かった）★★
+ *          ＝★打てば ¥1,235 が 出る★（Exally が 本名 DOLLAR に 直している）
+ *          ⇒★「動かない」ではなく ★別名で動く★の 棚へ 移した★
+ *          ⇒ もし 直していなかったら ★AIが 客に「YEN は 動きません」と 言っていた★
  *      ・しかも 前置きは ★「LET・LAMBDA等を 積極的に 使用」と 名指しで 勧めていた★
  *    ⇒★人が 写すから ずれる★。★写さない形に する★。
  *
@@ -32,7 +36,14 @@ const 出す先 = path.join(ROOT, 'prompt/kansuu.md');
 const 台帳 = require_(path.join(ROOT, 'lib/formula-extra.js')).数える();
 const 足す = 台帳.足す.slice().sort();
 const 別lib = Object.keys(台帳.別のlibで足す || {}).sort();
+const 別名 = Object.keys(台帳.別名で動く || {}).sort();
 const 足さない = 台帳.足さない;
+
+/* ★日付を AIへ 渡す 所から 外す★＝日付が 混ざると ★毎回 置き直し＝毎回 置き賃★。
+   理由の 全文は 台帳(lib/formula-extra.js)に 残っている。 */
+function 日付を外す(s) {
+  return String(s).replace(new RegExp('（?20\\d\\d-\\d\\d-\\d\\d[^）]*）?', 'g'), '').trim();
+}
 
 function 作る() {
   const L = [];
@@ -54,6 +65,16 @@ function 作る() {
     L.push('★別の 部品で 足した 物★');
     for (const f of 別lib) L.push('- ' + f + ' … ' + 台帳.別のlibで足す[f]);
   }
+  /* ★★別名で 動く 物は ★動く 側★に 出す★★（2026-09-05 に 足した）
+     ★なぜ★ … YEN が 「足さない」に 置いてあった
+       ⇒ AIへ 渡る 紙で ★「Exally内では まだ 動かない」の 列に 並んでいた★
+       ⇒★実際は ¥1,235 が 出るのに AIが お客さんに「動きません」と 言う★所だった
+     ⇒★★「足していない」と「動かない」は 別★★ */
+  if (別名.length) {
+    L.push('');
+    L.push('★別の 名前で 動く 物（★打たれたら そのまま 動く＝断っては いけない★）★');
+    for (const f of 別名) L.push('- ' + f + ' … ' + 日付を外す(台帳.別名で動く[f]));
+  }
   L.push('');
   L.push('## ★★Exally で 動かない 関数（★勧めては いけない★）★★');
   L.push('');
@@ -61,11 +82,7 @@ function 作る() {
   L.push('★代わりの やり方を 出す。★★黙って 勧めない★★');
   L.push('');
   for (const f of Object.keys(足さない).sort()) {
-    /* ★理由に 日付が 入っている 物が 在る★（例 YEN…実Excel に 存在しない）
-       ⇒★AIへ 渡す 所からは 外す★＝日付が 混ざると ★毎回 置き直し＝毎回 置き賃★。
-       理由の 全文は 台帳(lib/formula-extra.js)に 残っている。 */
-    var 訳 = String(足さない[f]).replace(new RegExp('（?20\\d\\d-\\d\\d-\\d\\d[^）]*）?', 'g'), '').trim();
-    L.push('- ★' + f + '★ … ' + 訳);
+    L.push('- ★' + f + '★ … ' + 日付を外す(足さない[f]));
   }
   L.push('```');
   L.push('');
@@ -81,11 +98,11 @@ if (process.argv.includes('--check')) {
     console.log('  ★人が 書き足すと AIが 嘘を 言います（2026-09-05 に 17個 ずれていた）★');
     process.exit(1);
   }
-  console.log('✓ prompt/kansuu.md は 台帳と 一致（動く ' + (足す.length + 別lib.length)
+  console.log('✓ prompt/kansuu.md は 台帳と 一致（動く ' + (足す.length + 別lib.length + 別名.length)
     + '個 / 動かない ' + Object.keys(足さない).length + '個）');
   process.exit(0);
 }
 fs.mkdirSync(path.dirname(出す先), { recursive: true });
 fs.writeFileSync(出す先, 新);
-console.log('作り直した … prompt/kansuu.md（動く ' + (足す.length + 別lib.length)
+console.log('作り直した … prompt/kansuu.md（動く ' + (足す.length + 別lib.length + 別名.length)
   + '個 / 動かない ' + Object.keys(足さない).length + '個）');
