@@ -561,7 +561,6 @@ function _jsLookup(val,lookupVals,resultVals){
   var r=resultVals[found];
   return (r===undefined||r===null)?'':r;
 }
-function _jsXlookup(val,lookupVals,returnVals,notFound){for(var i=0;i<lookupVals.length;i++){if(String(lookupVals[i])===String(val))return returnVals[i];}return notFound!==undefined?notFound:'#N/A';}
 // XMATCH(値, 配列, [一致モード], [検索モード])
 //   一致モード: 0=完全一致(既定・MATCHの既定と違う) / -1=完全一致か次に小さい / 1=完全一致か次に大きい / 2=ワイルドカード
 //   検索モード: 1=先頭から(既定) / -1=末尾から / 2,-2=二分探索(昇順前提。ここでは走査順としてだけ扱う)
@@ -1215,33 +1214,13 @@ function _jsComputeFormula(sheet, v) {
   var mQuart=fOrig.match(/^QUARTILE(?:\.INC|\.EXC)?\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([0-4])\s*\)$/i);
   if(mQuart){var vals=_getRangeVals(sheet,mQuart[1]);if(vals.length)return String(_jsQuartile(vals,parseInt(mQuart[2])));}
 
-  // MODE / MODE.SNGL / MODE.MULT
-  var mMode=fOrig.match(/^MODE(?:\.SNGL|\.MULT)?\s*\(([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mMode){var vals=_getRangeVals(sheet,mMode[1]);return String(_jsMode(vals));}
+  /* ★死にコードを 12か所 消した（2026-09-08）★＝入口の 関所を 通らない 段だった。訳と 名簿＝docs/measured/shini-code-2026-09-08.md */
 
-  // TRIMMEAN
-  var mTrim=fOrig.match(/^TRIMMEAN\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([0-9.]+)\s*\)$/i);
-  if(mTrim){var vals=_getRangeVals(sheet,mTrim[1]);return String(_jsTrimmean(vals,parseFloat(mTrim[2])));}
 
-  // PERCENTRANK / PERCENTRANK.INC / PERCENTRANK.EXC
-  var mPr=fOrig.match(/^PERCENTRANK(?:\.INC|\.EXC)?\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+|[0-9.]+)\s*(?:,\s*(\d+))?\s*\)$/i);
-  if(mPr){var vals=_getRangeVals(sheet,mPr[1]);var x=_getSingleVal(sheet,mPr[2])||parseFloat(mPr[2]);return String(_jsPercentrank(vals,x,parseInt(mPr[3])||3));}
 
-  // KURT
-  var mKurt=fOrig.match(/^KURT\s*\(([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mKurt){var vals=_getRangeVals(sheet,mKurt[1]);var r=_jsKurt(vals);return typeof r==='number'?String(Math.round(r*10000)/10000):r;}
 
-  // INTERCEPT
-  var mInter=fOrig.match(/^INTERCEPT\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mInter){var ys=_getRangeVals(sheet,mInter[1]),xs=_getRangeVals(sheet,mInter[2]);return String(_jsIntercept(ys,xs));}
 
-  // FORECAST / FORECAST.LINEAR
-  var mFc=fOrig.match(/^FORECAST(?:\.LINEAR)?\s*\(([A-Z]+\d+|[0-9.]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mFc){var x=_getSingleVal(sheet,mFc[1])||parseFloat(mFc[1]);var ys=_getRangeVals(sheet,mFc[2]),xs=_getRangeVals(sheet,mFc[3]);return String(_jsForecast(x,ys,xs));}
 
-  // IRR
-  var mIrr=fOrig.match(/^IRR\s*\(([A-Z]+\d+:[A-Z]+\d+)(?:\s*,\s*[0-9.]+)?\s*\)$/i);
-  if(mIrr){var vals=_getRangeAll(sheet,mIrr[1]).filter(function(v){return typeof v==='number';});return String(Math.round(_jsIrr(vals)*10000)/10000);}
 
   // DATESTRING
   var mDs=fOrig.match(/^DATESTRING\s*\(([A-Z]+\d+|[0-9]+)\)$/i);
@@ -1251,9 +1230,6 @@ function _jsComputeFormula(sheet, v) {
   var mOff=fOrig.match(/^OFFSET\s*\(([A-Z]+\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\)$/i);
   if(mOff){var v=_jsOffset(sheet,mOff[1],parseInt(mOff[2]),parseInt(mOff[3]));return String(v);}
 
-  // XLOOKUP
-  var mXl=fOrig.match(/^XLOOKUP\s*\(([^,()]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)(?:\s*,\s*"([^"]*)")?\s*\)$/i);
-  if(mXl){var lv=_getSingleVal(sheet,mXl[1]);if(lv===null)lv=mXl[1].replace(/^["']|["']$/g,'');var la=_getRangeAll(sheet,mXl[2]),ra=_getRangeAll(sheet,mXl[3]);return String(_jsXlookup(lv,la,ra,mXl[4]));}
 
   // N
   var mN=fOrig.match(/^N\s*\(([^)]+)\)$/i);
@@ -1263,9 +1239,6 @@ function _jsComputeFormula(sheet, v) {
   //   ここに 在った 物は 答えを 4桁で 丸めていた ⇒ =CONVERT(1,"lbm","kg") が ★0.4536★
   //   実Excel は ★0.45359237★／単位も 足りなかった（kibyte が #N/A）
 
-  // GESTEP
-  var mGe=fOrig.match(/^GESTEP\s*\(([A-Z]+\d+|[0-9.\-]+)(?:\s*,\s*([A-Z]+\d+|[0-9.\-]+))?\s*\)$/i);
-  if(mGe){var n=_getSingleVal(sheet,mGe[1])||parseFloat(mGe[1]);var s=mGe[2]?(_getSingleVal(sheet,mGe[2])||parseFloat(mGe[2])):0;return String(_jsGestep(n,s));}
 
   // REDUCE(initial, range, LAMBDA(...))
   var mReduce=fOrig.match(/^REDUCE\s*\(([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
@@ -1321,13 +1294,7 @@ function _jsComputeFormula(sheet, v) {
   var mLi=fOrig.match(/^LINEST\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
   if(mLi){var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);var r=_jsLinest(ys,xs);return String(Math.round(r[0]*10000)/10000);}
 
-  // PERMUT
-  var mPerm=fOrig.match(/^PERMUT\s*\(([0-9]+)\s*,\s*([0-9]+)\s*\)$/i);
-  if(mPerm)return String(_jsPermut(parseInt(mPerm[1]),parseInt(mPerm[2])));
 
-  // PERMUTATIONA
-  var mPa=fOrig.match(/^PERMUTATIONA\s*\(([0-9]+)\s*,\s*([0-9]+)\s*\)$/i);
-  if(mPa)return String(_jsPermutationa(parseInt(mPa[1]),parseInt(mPa[2])));
 
   // BINOM.DIST.RANGE
   var mBdr=fOrig.match(/^BINOM\.DIST\.RANGE\s*\(([0-9]+)\s*,\s*([0-9.]+)\s*,\s*([0-9]+)(?:\s*,\s*([0-9]+))?\s*\)$/i);
@@ -1337,9 +1304,6 @@ function _jsComputeFormula(sheet, v) {
   var mFreq=fOrig.match(/^FREQUENCY\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
   if(mFreq){var data=_getRangeVals(sheet,mFreq[1]),bins=_getRangeVals(sheet,mFreq[2]);var r=_jsFrequency(data,bins);return String(r[0]);}
 
-  // MDETERM
-  var mMd=fOrig.match(/^MDETERM\s*\(([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mMd){var m2=mMd[1].match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(m2){var s=_toRC(m2[1]),e=_toRC(m2[2]),n=e.r-s.r+1,mat=[];for(var r=0;r<n;r++){mat.push([]);for(var c=0;c<n;c++)mat[r].push(_hf.getCellValue({sheet:_hfSid(sheet),row:s.r+r,col:s.c+c})||0);}return String(Math.round(_jsMdeterm(mat)*10000)/10000);}}
 
   // IRR / XIRR (既存)
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
@@ -1392,7 +1356,7 @@ if (typeof module !== 'undefined' && module.exports) {
     _xlRound: _xlRound, _xlCmp: _xlCmp, _xlWildRe: _xlWildRe,
     // 参照系
     _jsIndirect: _jsIndirect, _jsOffset: _jsOffset,
-    _jsLookup: _jsLookup, _jsXlookup: _jsXlookup, _jsXmatch: _jsXmatch,
+    _jsLookup: _jsLookup, _jsXmatch: _jsXmatch,
     // 配列
     _jsSequence: _jsSequence, _jsRandarray: _jsRandarray, _jsSort: _jsSort,
     _jsUnique: _jsUnique, _jsFilter: _jsFilter, _jsTake: _jsTake, _jsDrop: _jsDrop,

@@ -123,8 +123,18 @@ T('★★カンマで 省いた 形は「まだ」＝黙って 逆を 返さな�
   /* ★実Excel は ここで TRUE を 返す★（toru-isomitted.ps1 で 実測）
      ⇒ うちは まだ 出来ない ⇒★誤りで 止まる（手が 止まるだけ）★
      ⇒★★TRUE でも FALSE でも 返したら 赤★★（＝黙って 逆を 返さない） */
+  /* ★★列の 形★★ ★式の 一番外側の 関数名★ ／ 式 ／ 実Excel の 答え ／ 型 ／ ★札★
+     ⇒ 2026-09-08 に ★1列目を 他の 20枚と 揃えた★（前は 1列目が 札だった）
+     ⇒ 訳 … ★grep で 数える 道具から この 紙が 16行 全部 漏れていた★
+       （私が 作った 紙が ★私の 掃除から 漏れた★）
+     ⇒ 札は ★消さず 5列目へ 移した★（指示役「中身を 残して 形を 揃える」）
+     ★★1列目は ★ISOMITTED とは 限りません★★
+       `=LAMBDA(x,y,ISOMITTED(y))(1,)` の 一番外側は ★LAMBDA★
+       ⇒ 中身 … ISOMITTED 3本／★LAMBDA 12本★／LET 1本
+       ⇒★一度 全部 ISOMITTED と 書いたら grep が 19本→★32本★に 化けた★
+         ＝★直しが 新しい 嘘を 作った★ので 式から 取り直した */
   const 組 = 読む('golden-isomitted-2026-09-08.tsv')
-    .filter((p) => p.length === 4 && p[2] === 'True');
+    .filter((p) => p.length >= 4 && p[2] === 'True' && /ISOMITTED/.test(p[1]));
   if (組.length < 3) throw new Error('★実測の True が ' + 組.length + '本 しか 無い★（3本 在るはず）');
   const 悪い = [];
   for (const [, 式, 正] of 組) {

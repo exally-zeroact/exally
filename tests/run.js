@@ -217,6 +217,8 @@ const FILES = [
   ['formula-complex.test.mjs','--self-test'],// ＝★数を返す4個(IMABS等)に かけると壊れる★ので押して確かめる
   'isomitted.test.mjs',                   // ★ISOMITTED＝『空のマス』と『省かれた引数』は別物(09-08 実Excel実測)
   ['isomitted.test.mjs','--self-test'],   //  ＝空のマスも FALSE／★カンマで省いた形は「まだ」＝黙って逆を返さない★
+  'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
+  ['js-sou-sekisho.test.mjs','--self-test'],// ＝死にコードは動かないだけでなく★人が数を間違える★(38個と数えていた)
   'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
   ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
