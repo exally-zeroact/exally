@@ -47,7 +47,6 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★CUBESETCOUNT★ … 分析用の 倉庫の まとまりの 数を 数える 物。繋ぐ 相手が 無い
 - ★CUBEVALUE★ … 分析用の 倉庫（キューブ）に 繋いで 値を 取る 物。繋ぐ 相手が 無い
 - ★FIELDVALUE★ … 株価や 地図の カードから 項目を 引く 物。そのカードの 仕組みが 無い
-- ★FILTERXML★ … XML から XPath で 取り出す 物。 取り出す 決まりの 書き方が 広く、少しだけ 作ると ★通る 式と 通らない 式が 混ざる★ ので 出していない
 - ★FORECAST.ETS★ … 季節を 見つけて 先を 読む 物。 実Excel と 同じ 答えに するには 季節の 見つけ方まで 揃える 必要が 有り、 まだ 揃っていない。近い 答えを 出すと ★予測が 少し ずれる★ ので 出さない
 - ★FORECAST.ETS.CONFINT★ … 先を 読んだ 時の 幅。季節の 見つけ方まで 揃わないと ずれる
 - ★FORECAST.ETS.SEASONALITY★ … 季節の 長さを 見つける 物。見つけ方が 実Excel と 揃っていない
