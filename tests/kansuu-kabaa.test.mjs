@@ -75,7 +75,7 @@ const 読む = (f) => fs.readFileSync(path.join(部屋, f), 'utf8').split(/\r?\n
 console.log('\n[kansuu-kabaa] 実Excel の 関数を どれだけ 動かせているか');
 
 T('★測った 物が repo に 在る（scratchpad に 置かない）', () => {
-  for (const f of ['excel-functions-2026-09-06.txt', 'exally-missing-2026-09-06.txt', 'README.md']) {
+  for (const f of ['excel-functions-2026-09-06.txt', 'exally-missing-2026-09-07.txt', 'README.md']) {
     const p = path.join(部屋, f);
     if (!fs.existsSync(p)) throw new Error('無い: ' + f);
     if (!fs.readFileSync(p, 'utf8').trim()) throw new Error('空: ' + f);
@@ -83,7 +83,9 @@ T('★測った 物が repo に 在る（scratchpad に 置かない）', () => 
 });
 
 const 全部 = 読む('excel-functions-2026-09-06.txt');
-const 動かない台帳 = 読む('exally-missing-2026-09-06.txt');
+/* ★09-07 に 22個 動くように なったので 台帳を 差し替えた★
+   （★古い 09-06 の 紙は 消さない★＝いつ 何が 動くように なったかが 追える） */
+const 動かない台帳 = 読む('exally-missing-2026-09-07.txt');
 
 /* ★本番と 同じ物を 積む★（片方 忘れると 13個が 嘘に なる） */
 const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
@@ -97,11 +99,17 @@ const 積2 = FXP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-extra.js')))
 /* ★2026-09-06 に 足した 3つ目★＝docs/measured/ の 一覧から 作った 物 */
 const FNP = require_(path.join(ROOT, 'lib/formula-nokori-plug.js'));
 const 積3 = FNP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-nokori.js')));
+/* ★2026-09-07 に 足した 4つ目★＝お金（債券・減価償却）22個
+   ★本番の book.html が 積んでいる 物を ここでも 全部 積む★
+   （1つ 忘れると その 分が「動かない」に 見えて ★嘘の 数★に なる） */
+const FKP = require_(path.join(ROOT, 'lib/formula-kane-plug.js'));
+const 積4 = FKP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-kane.js')));
 
 T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に なる）★★', () => {
   if (!積1) throw new Error('exally-formula の プラグインを 積めていない');
   if (!(積2 > 0)) throw new Error('formula-extra-plug を 積めていない（' + 積2 + '本）');
   if (!(積3 > 0)) throw new Error('formula-nokori-plug を 積めていない（' + 積3 + '本）');
+  if (!(積4 > 0)) throw new Error('formula-kane-plug を 積めていない（' + 積4 + '本）');
 });
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
@@ -152,7 +160,7 @@ T('★★「動かない」と 書いた 物が 本当に 動かない（AIが �
   if (食.動かないと書いたのに動く.length) {
     throw new Error('★動くのに「動かない」と 書いてあります★: '
       + 食.動かないと書いたのに動く.join(' / ')
-      + '\n   → docs/measured/exally-missing-2026-09-06.txt を 測り直してください');
+      + '\n   → docs/measured/exally-missing-2026-09-07.txt を 測り直してください');
   }
 });
 
@@ -169,6 +177,7 @@ console.log('  ★Exally で 動く ……… ' + 食.動いた数 + '個（'
 console.log('  動かない …………………… ' + (全部.length - 食.動いた数) + '個');
 console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '○' : '×')
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
+  + ' ／ formula-kane-plug ' + 積4 + '本'
   + ' ／ JS層 ' + (typeof JS層 === 'function' ? '○' : '×'));
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();

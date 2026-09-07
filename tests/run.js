@@ -195,6 +195,8 @@ const FILES = [
   ['hyou-ireru-ui.test.mjs', '--self-test'],// ＝前は1セルずつ積み★16回押さないと戻らなかった★
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
   ['formula-nokori.test.mjs', '--self-test'],
+  'formula-kane.test.mjs',                // ★お金の関数22個＝実Excelの答え700本と1本残らず突き合わせ(09-07)
+  ['formula-kane.test.mjs', '--self-test'],//  ＝ODDF/ODDLの4個は★合わない形が残るので出していない★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
   ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
   'hoshi-nashi.test.mjs',                 // ★お客さんの画面に出る字に★を使わない（09-06 指示役）
