@@ -633,7 +633,11 @@ function _jsAmordegrc(cost,date_purchased,first_period,salvage,period,rate){retu
 function _jsAmorlinc(cost,date_purchased,first_period,salvage,period,rate){return(cost-salvage)*rate;}
 
 // --- エンジニアリング ---
-function _jsConvert(num,from,to){var u={'g':1,'kg':1000,'mg':0.001,'lbm':453.592,'ozm':28.3495,'ton':1e6,'m':1,'km':1000,'cm':0.01,'mm':0.001,'mi':1609.344,'yd':0.9144,'ft':0.3048,'in':0.0254,'sec':1,'min':60,'hr':3600,'day':86400,'yr':31557600,'Pa':1,'atm':101325,'bar':100000,'psi':6894.76,'J':1,'cal':4.184,'eV':1.602e-19,'l':0.001,'ml':0.000001,'gal':0.003785,'qt':0.000946,'pt':0.000473};if(from==='C'&&to==='F')return num*9/5+32;if(from==='F'&&to==='C')return(num-32)*5/9;if(from==='C'&&to==='K')return num+273.15;if(from==='K'&&to==='C')return num-273.15;if(from==='F'&&to==='K')return(num-32)*5/9+273.15;if(from==='K'&&to==='F')return(num-273.15)*9/5+32;if(!u[from]||!u[to])return'#N/A';return num*u[from]/u[to];}
+/* ★_jsConvert は 2026-09-07 に 消した★
+   ⇒ 中の 表が ★手で 書いた 概数★だった（lbm 453.592／実Excel 453.59237、
+     cal 4.184／実Excel は 4.1868・4.184 は "c"、gal 0.003785／実Excel 0.003785411784）
+   ⇒★どこからも 呼ばれていない事を 確かめてから 消した★
+   ⇒ 今は lib/tanni-hyou.js（★実Excel から 機械で 作った 表★）を 使う */
 function _jsGestep(num,step){return num>=(step||0)?1:0;}
 
 // --- データベース ---
@@ -1013,7 +1017,9 @@ function _jsComputeFormula(sheet, v) {
     XIRR:1,
     DATESTRING:1,OFFSET:1,
     N:1,
-    CONVERT:1,
+    /* ★CONVERT は 2026-09-07 に ここから 外して lib/formula-yosoku-plug.js へ 移した★
+       ⇒ ここに 居た 物は ★答えを 4桁で 丸めていた★（0.4536／実Excel 0.45359237）
+       ⇒★1つの 関数は 1か所でだけ 定義する★（両方に 居ると 先に 当たった 方が 勝つ） */
     DSUM:1,DAVERAGE:1,DCOUNT:1,DCOUNTA:1,DMAX:1,DMIN:1,DPRODUCT:1,
     DGET:1,DSTDEV:1,DSTDEVP:1,DVAR:1,DVARP:1,
     LINEST:1,BINOM:1,FREQUENCY:1,
@@ -1075,9 +1081,9 @@ function _jsComputeFormula(sheet, v) {
   var mN=fOrig.match(/^N\s*\(([^)]+)\)$/i);
   if(mN){var sv=_getSingleVal(sheet,mN[1]);return String(_jsN(sv!==null?sv:mN[1]));}
 
-  // CONVERT
-  var mCv=fOrig.match(/^CONVERT\s*\(([A-Z]+\d+|[0-9.\-]+)\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)$/i);
-  if(mCv){var n=_getSingleVal(sheet,mCv[1])||parseFloat(mCv[1]);var r=_jsConvert(n,mCv[2],mCv[3]);return typeof r==='number'?String(Math.round(r*10000)/10000):r;}
+  // CONVERT … ★2026-09-07 に ここから 外した★（lib/formula-yosoku-plug.js へ）
+  //   ここに 在った 物は 答えを 4桁で 丸めていた ⇒ =CONVERT(1,"lbm","kg") が ★0.4536★
+  //   実Excel は ★0.45359237★／単位も 足りなかった（kibyte が #N/A）
 
   // GESTEP
   var mGe=fOrig.match(/^GESTEP\s*\(([A-Z]+\d+|[0-9.\-]+)(?:\s*,\s*([A-Z]+\d+|[0-9.\-]+))?\s*\)$/i);
@@ -1194,7 +1200,7 @@ if (typeof module !== 'undefined' && module.exports) {
     _jsIntrate: _jsIntrate, _jsDuration: _jsDuration, _jsAccrint: _jsAccrint,
     _jsAmordegrc: _jsAmordegrc, _jsAmorlinc: _jsAmorlinc,
     // その他
-    _jsConvert: _jsConvert, _jsGestep: _jsGestep, _jsDbFunc: _jsDbFunc,
+    _jsGestep: _jsGestep, _jsDbFunc: _jsDbFunc,
     _jsEncodeUrl: _jsEncodeUrl, _jsAggregate: _jsAggregate,
     _jsIsomitted: _jsIsomitted,
     // LET/LAMBDA系

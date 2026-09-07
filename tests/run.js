@@ -197,6 +197,10 @@ const FILES = [
   ['formula-nokori.test.mjs', '--self-test'],
   'formula-kane.test.mjs',                // ★お金の関数22個＝実Excelの答え700本と1本残らず突き合わせ(09-07)
   ['formula-kane.test.mjs', '--self-test'],//  ＝ODDF/ODDLの4個は★合わない形が残るので出していない★
+  'formula-yosoku.test.mjs',              // ★予測・統計・単位8個＝実Excelの答え473本と突き合わせ(09-07)
+  ['formula-yosoku.test.mjs', '--self-test'],// ＝★CONVERTは「無かった」でなく「4桁に丸めていた」★
+  'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
+  ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
   ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
   'hoshi-nashi.test.mjs',                 // ★お客さんの画面に出る字に★を使わない（09-06 指示役）

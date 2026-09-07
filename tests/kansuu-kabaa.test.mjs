@@ -104,12 +104,16 @@ const 積3 = FNP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-nokori.js'))
    （1つ 忘れると その 分が「動かない」に 見えて ★嘘の 数★に なる） */
 const FKP = require_(path.join(ROOT, 'lib/formula-kane-plug.js'));
 const 積4 = FKP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-kane.js')));
+/* ★2026-09-07 に 足した 5つ目★＝予測・統計・単位 8個（CONVERT は ここへ 移した） */
+const FYP = require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'));
+const 積5 = FYP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')));
 
 T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に なる）★★', () => {
   if (!積1) throw new Error('exally-formula の プラグインを 積めていない');
   if (!(積2 > 0)) throw new Error('formula-extra-plug を 積めていない（' + 積2 + '本）');
   if (!(積3 > 0)) throw new Error('formula-nokori-plug を 積めていない（' + 積3 + '本）');
   if (!(積4 > 0)) throw new Error('formula-kane-plug を 積めていない（' + 積4 + '本）');
+  if (!(積5 > 0)) throw new Error('formula-yosoku-plug を 積めていない（' + 積5 + '本）');
 });
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
@@ -149,7 +153,10 @@ function 押す(f) {
       hf.setSheetContent(SID, [[1, 3], [2, 4], [後]]);
       const v = hf.getCellValue({ sheet: SID, row: 2, col: 0 });
       if (!(v && v.type === 'NAME')) return true;
-    } catch (e) { return true; }   /* engine が 引数で 投げた＝名前は 通っている */
+    } catch (e) { /* ★投げただけでは「動く」と 数えない★
+      （2026-09-07 … FIELDVALUE が これで「動く」に 数えられていた。
+        本当は 押すと ★#NAME?★＝動かない。
+        ⇒★★『名前が エンジンに 在る』と『答えが 返る』は 別★★） */ }
   }
   return false;
 }
@@ -177,7 +184,7 @@ console.log('  ★Exally で 動く ……… ' + 食.動いた数 + '個（'
 console.log('  動かない …………………… ' + (全部.length - 食.動いた数) + '個');
 console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '○' : '×')
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
-  + ' ／ formula-kane-plug ' + 積4 + '本'
+  + ' ／ formula-kane-plug ' + 積4 + '本 ／ formula-yosoku-plug ' + 積5 + '本'
   + ' ／ JS層 ' + (typeof JS層 === 'function' ? '○' : '×'));
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();
