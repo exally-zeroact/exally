@@ -72,6 +72,31 @@ const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smar
 const SID = hf.getSheetId(hf.addSheet('Sheet1'));
 EF.initExallyFormula(hf);
 
+/* ★★★出口が 本当に 効いているかを ★先に 1本 押して★ 確かめる 門★★★
+   ⇒★2026-09-08 に 踏んだ★ … `HF_ERR` を 渡し忘れた まま「後」の 紙を 取り、
+     ★誤りの 名前が 全部 `#ERR` に なった 紙★を そのまま commit した
+     （`_hfGetDisplay` は `HF_ERR` が 無いと 例外に なり catch で `#ERR` を 返す）
+   ⇒★★道具が ★黙って 空（#ERR）★を 返しても 数は 出るので 気づけない★★
+   ⇒★『0件・空・無い』を『済んだ』と 読むな＝今日 2回目★
+   ⇒ だから ★当たりの 見本を 1本 通してから★ 測る（通らなければ ★止まる★） */
+function 門() {
+  const 見本 = [['=1/0', '#DIV/0!'], ['=NA()', '#N/A']];
+  const 表 = [[null]];
+  for (const [式, 正] of 見本) {
+    表[0][0] = 式;
+    hf.setSheetContent(SID, 表);
+    const 出 = String(EF._hfGetDisplay(0, 0, 0, true));
+    if (出 !== 正) {
+      console.error('★★出口が 効いていません★★ … ' + 式 + ' → ' + 出 + '（正 ' + 正 + '）');
+      console.error('  ⇒ `HF_ERR` を 渡しましたか（book.html の 表を そのまま 写す）');
+      console.error('  ⇒★黙って 測ると 誤りの 名前が 全部 #ERR に なります★');
+      process.exit(3);
+    }
+  }
+  console.error('  出口の 門 … ' + 見本.length + '本 とも 正しい 字（' +
+    見本.map((x) => x[1]).join(' ') + '）');
+}
+
 const 赤の名 = (t) => ({
   NA: '#N/A', DIV_BY_ZERO: '#DIV/0!', VALUE: '#VALUE!', NUM: '#NUM!',
   NAME: '#NAME?', REF: '#REF!', CYCLE: '#CYCLE!', ERROR: '#ERROR!', SPILL: '#SPILL!',
@@ -139,6 +164,8 @@ const 同じか = (出, 正, 型) => {
 };
 
 const さいころ = /^(NOW|TODAY|RAND|RANDBETWEEN|RANDARRAY)$/;
+門();   /* ★測る 前に 出口を 1本 押す★ */
+
 const 金 = fs.readFileSync(金道, 'utf-8')
   .split('\n').filter((l) => l && !l.startsWith('#'))
   .map((l) => l.split('\t')).filter((p) => p.length === 4)
