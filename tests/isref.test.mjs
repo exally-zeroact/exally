@@ -162,6 +162,31 @@ T('★★かっこが 入る 形は 全部 まだ（シート名の かっこも
   if (後2 !== 壊れそう) throw new Error('★閉じない かっこで 式を 触った★ … ' + 後2);
 });
 
+T('★★実Excel が 選んだ 16本と 1本 残らず 同じ★★（2026-09-08 の 総ざらい）', () => {
+  /* ★★司さん 2026-09-08「答え確かめて」で 見つかった★★
+     ⇒ `=ISREF(TRUE)` が ★#NAME?★に なっていた（実Excel は ★False★）
+     ⇒★#45 で 私が 本番に 入れた 戻り★（★直す前は FALSE＝合っていた★）
+     ⇒ 訳 … `convertFormula` は ★先に★ `TRUE` を `TRUE()` に 直すので
+       「かっこが 在れば 決められない」に 引っかかっていた
+     ★★引数の 形は 実Excel が 選んだ★★
+       `docs/measured/kansuu46/golden-346-2026-09-08.tsv`
+     ⇒★私が 手で 選ぶと ★自分が 通る 形しか 選ばない★★ */
+  const 道 = path.join(ROOT, 'docs/measured/kansuu46/golden-346-2026-09-08.tsv');
+  if (!fs.existsSync(道)) throw new Error('実測の 紙が 無い … golden-346-2026-09-08.tsv');
+  const 組 = fs.readFileSync(道, 'utf-8').split('\n')
+    .filter((l) => l.startsWith('ISREF\t') && l.split('\t').length === 4)
+    .map((l) => l.split('\t'));
+  if (組.length < 16) throw new Error('★実測が ' + 組.length + '本 しか 無い★（16本 在るはず）');
+  const 外れ = [];
+  for (const [, 式, 正] of 組) {
+    const 後 = EF.convertFormula(式);
+    const 出 = (後 === '=TRUE()') ? 'True' : (後 === '=FALSE()') ? 'False' : '(まだ)';
+    if (出 !== 正) 外れ.push(式 + '  正 ' + 正 + ' ／ 出 ' + 出 + '（' + 後 + '）');
+  }
+  console.log('      実Excel が 選んだ 形 … ' + 組.length + '本');
+  if (外れ.length) throw new Error('★' + 外れ.length + '本 違う★\n      ' + 外れ.join('\n      '));
+});
+
 T('★AI に 渡る 紙が「動く」と 言い切っていない★', () => {
   const 紙 = fs.readFileSync(path.join(ROOT, 'prompt/kansuu.md'), 'utf-8');
   const 行 = 紙.split('\n').filter((l) => /ISREF/.test(l));
@@ -171,8 +196,24 @@ T('★AI に 渡る 紙が「動く」と 言い切っていない★', () => {
       throw new Error('★「打てば そのまま 動く」が 残っている★＝AI が 客に 嘘を 言う\n      ' + l);
     }
   }
-  if (!/かっこが 入っている 形は 全部 まだ/.test(行.join(' '))) {
-    throw new Error('★「まだ」に あたる 字が 無い★＝出せない 形が 在る事を 言っていない\n      ' + 行.join('\n      '));
+  /* ★★2026-09-08 に 書き直した★★
+     ⇒ 前は ★昔の 文を そのまま★ 探していた（「かっこが 入っている 形は 全部 まだ」）
+     ⇒ 台帳を ★正しく★ 直したのに 見張りが 赤に なった
+       （TRUE()／FALSE() は かっこが 在っても 動くので「全部 まだ」は ★もう 嘘★）
+     ⇒★★見張りが 見るのは ★文の 形★では なく ★守りたい 中身★★★
+     ★この 見張りが 今 守る 物（1つずつ）★
+       ①「打てば そのまま 動く」と 言い切っていない（上の 段で 見ている）
+       ②★出せない 形が 在る★と 言っている（「まだ」）
+       ③★その時 何が 出るか★を 言っている（「#NAME?」）
+       ④★「全部 動く」と 読める 言い方を していない★ */
+  const 全 = 行.join(' ');
+  const 足りない = [];
+  if (!/まだ/.test(全)) 足りない.push('②「まだ」＝出せない 形が 在る事を 言っていない');
+  if (!/#NAME\?/.test(全)) 足りない.push('③「#NAME?」＝その時 何が 出るかを 言っていない');
+  if (/全部\s*動く|どの 形でも 動く/.test(全)) 足りない.push('④「全部 動く」と 読める 言い方が 在る');
+  if (足りない.length) {
+    throw new Error('★AI に 渡る 紙が 足りない★\n      ' + 足りない.join('\n      ')
+      + '\n      ---\n      ' + 行.join('\n      '));
   }
 });
 
@@ -219,6 +260,34 @@ if (自己試験) {
     if (String(r.値) !== '#NAME?') {
       throw new Error('★字だけでは 決まらない 形に 答えを 出した★ … ' + r.値 + '（' + r.後 + '）');
     }
+  });
+  /* ★★2026-09-08 に 足した＝紙の 見張りが ★本当に 噛むか★★
+     ⇒ 訳 … 前の 見張りは ★昔の 文を そのまま★ 探していたので
+       ★台帳を 正しく 直した だけで 赤★に なった（＝守りたい 物を 見ていなかった）
+     ⇒ だから ★悪い 紙を 3通り 作って 3通りとも 赤に なるか★を 見る
+     ★壊すのは 写しだけ★＝prompt/kansuu.md は 1バイトも 触らない */
+  T('★★紙の 見張りは 悪い 紙 3通りを 全部 捕まえる★★', () => {
+    const 見る = (l) => {
+      const 全 = l;
+      const 足りない = [];
+      if (!/まだ/.test(全)) 足りない.push('②');
+      if (!/#NAME\?/.test(全)) 足りない.push('③');
+      if (/全部\s*動く|どの 形でも 動く/.test(全)) 足りない.push('④');
+      return 足りない;
+    };
+    const 悪い紙 = [
+      ['②「まだ」が 無い', '- ISREF … マスを 指しているか。A1 は 動く。関数入りは #NAME? に なる'],
+      ['③「#NAME?」が 無い', '- ISREF … マスを 指しているか。A1 は 動く。関数入りは まだ'],
+      ['④「全部 動く」と 書いた', '- ISREF … マスを 指しているか。★全部 動く★（まだ／#NAME? も 書いてある）'],
+    ];
+    const 逃した = [];
+    for (const [札, 紙] of 悪い紙) if (!見る(紙).length) 逃した.push(札);
+    console.log('      … 悪い 紙 ' + 悪い紙.length + '通りを 試した ／ 逃した ' + 逃した.length + '通り');
+    if (逃した.length) throw new Error('★見張りが 素通りさせた★ … ' + 逃した.join(' ／ '));
+    /* ★良い 紙（＝今 本番に 在る 物）は 通らないと おかしい★ */
+    const 本物 = fs.readFileSync(path.join(ROOT, 'prompt/kansuu.md'), 'utf-8')
+      .split('\n').filter((l) => /ISREF/.test(l)).join(' ');
+    if (見る(本物).length) throw new Error('★今の 紙を 落とした★ … ' + 見る(本物).join(' '));
   });
 }
 
