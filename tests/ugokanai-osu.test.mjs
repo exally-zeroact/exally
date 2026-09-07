@@ -92,7 +92,6 @@ const 式たち = {
   'CUBESET': '=CUBESET("x","[a].[b].children")',
   'CUBESETCOUNT': '=CUBESETCOUNT(A1)',
   'CUBEVALUE': '=CUBEVALUE("x","[a].[b]")',
-  'DETECTLANGUAGE': '=DETECTLANGUAGE("こんにちは")',
   'FILTERXML': '=FILTERXML("<a><b>1</b></a>","//b")',
   'FORECAST.ETS': '=FORECAST.ETS(45658,{10;12;16;14},{45292;45323;45352;45383})',
   'FORECAST.ETS.CONFINT': '=FORECAST.ETS.CONFINT(45658,{10;12;16;14},{45292;45323;45352;45383})',
@@ -101,7 +100,6 @@ const 式たち = {
   'GETPIVOTDATA': '=GETPIVOTDATA("売上",A1)',
   'GROUPBY': '=GROUPBY(A1:A4,B1:B4,SUM)',
   'IMAGE': '=IMAGE("https://example.invalid/a.png")',
-  'INFO': '=INFO("system")',
   'LAMBDA': '=LAMBDA(x,x+1)',
   'ODDFPRICE': '=ODDFPRICE(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0785,0.0625,100,2,0)',
   'ODDFYIELD': '=ODDFYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0575,84.5,100,2,0)',
@@ -111,13 +109,10 @@ const 式たち = {
   'PIVOTBY': '=PIVOTBY(A1:A4,B1:B4,C1:C4,SUM)',
   'REGISTER.ID': '=REGISTER.ID("kernel32","GetTickCount","J")',
   'RTD': '=RTD("a",,"b")',
-  'STOCKHISTORY': '=STOCKHISTORY("MSFT",DATE(2024,1,1))',
-  'TRANSLATE': '=TRANSLATE("hello","en","ja")',
   /* ★式を 置く 所（A9）を 含む 範囲に しない★
      ＝A1:A10 に すると ★自分を 指す★ので #CYCLE に なり、
        「名前が 通らない」かどうかが 見えなく なる（1度 踏んだ） */
   'TRIMRANGE': '=TRIMRANGE(C1:C4)',
-  'WEBSERVICE': '=WEBSERVICE("https://example.invalid/")',
 };
 
 const 台帳 = fs.readFileSync(path.join(ROOT, 'docs/measured/exally-missing-2026-09-07.txt'), 'utf-8')

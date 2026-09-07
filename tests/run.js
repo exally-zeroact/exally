@@ -199,6 +199,10 @@ const FILES = [
   ['formula-kane.test.mjs', '--self-test'],//  ＝ODDF/ODDLの4個は★合わない形が残るので出していない★
   'formula-yosoku.test.mjs',              // ★予測・統計・単位8個＝実Excelの答え473本と突き合わせ(09-07)
   ['formula-yosoku.test.mjs', '--self-test'],// ＝★CONVERTは「無かった」でなく「4桁に丸めていた」★
+  'soto-api.test.mjs',                    // ★外へ出る口が守る物＝許した相手だけ／http・中の網は断る(09-07)
+  ['soto-api.test.mjs', '--self-test'],   //  ＝ブラウザから撃つと★4回/4回とも相手に届く★（実測）
+  'formula-soto.test.mjs',                // ★外へ出る関数4個＝外は作り物で押す（お金も迷惑もかけない）
+  ['formula-soto.test.mjs', '--self-test'],
   'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
   ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）

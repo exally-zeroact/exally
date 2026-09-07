@@ -83,6 +83,26 @@ console.log('\n[kansuu-tana] 台帳の 棚を engine に 押して 確かめる'
 /* ★プラグインを 積む★＝積み忘れると 素の engine が 答えて ★嘘の 緑★に なる
    （2026-08-29 の 実測＝907本を「合わない」と 誤報告した 家） */
 const 積めた = EF.registerExallyFunctions(HFns) === true;
+/* ★★lib の プラグインも 全部 積む★★（2026-09-07）
+   ⇒ 前は ★exally-formula しか 積んでいなかった★
+   ⇒★棚に 載っている 物が「本当は 動く」かを ★本番と 同じ 積み方★で 見ないと 分からない★
+   ⇒ CONVERT が「動かない」棚に 載ったまま 間違った 数を 返していたのと ★同じ 家★ */
+const HF0 = HFns.HyperFormula;
+const H2 = Object.assign(Object.create(HF0), HFns,
+  { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
+const 積んだlib = [];
+for (const n of ['extra', 'nokori', 'kane', 'yosoku']) {
+  積んだlib.push(require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
+    .つなぐ(H2, require_(path.join(ROOT, 'lib/formula-' + n + '.js')),
+      n === 'yosoku' ? function () { return { シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }; } : undefined));
+}
+/* ★外へ 出る 物は「必ず 断る 作り物」で 積む★＝ここでは 外へ 1回も 出さない */
+積んだlib.push(require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
+  .つなぐ(H2, require_(path.join(ROOT, 'lib/formula-soto.js')), {
+    取る: async () => { throw new Error('ここでは 外へ 出ません'); },
+    聞く: async () => { throw new Error('ここでは AI に 聞きません'); },
+    再計算: () => {},
+  }));
 const hf = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 /* ★本番と 同じ★＝book.html は hf を 作った後 initExallyFormula(hf) を 1回 呼ぶ */
 EF.initExallyFormula(hf);
@@ -153,14 +173,19 @@ T('★この 検査が 空振りしていない（棚が 空でない）', () =>
      ⇒★次に 4個に なったら また 下げる★＝★線を 下げれば 通る＝いつも真＝死ぬ★
      ⇒★★名前で 見る★★
        ①棚が 空では ない（★1個以上＝これは 下げようが ない★）
-       ②★必ず 動かない 4個★が 居る
-         WEBSERVICE／STOCKHISTORY／IMAGE／RTD
-         ＝★外へ 聞きに 行く 物★＝★司さんの 決めが 出るまで 動きようが ない★
-         ⇒★減らないので 一生 下げる 必要が 出ない★
-         ⇒ 司さんが「作ってよい」と 決めたら ★その時 この 4個を 外す★
-           （★決めが 在って 外す★／★通らないから 下げる★では ない） */
+       ②★必ず 動かない 物★が 居る
+         ★★2026-09-07 に 2個 外した（★決めが 在って 外した★）★★
+           司さん「★全部やって★」
+           ⇒ WEBSERVICE／STOCKHISTORY を ★作った★（うちの サーバを 通す 形）
+           ⇒★『通らないから 下げた』では なく『★決めが 出たから 外した★』★
+           ⇒ 作った 中身 … docs/measured/soto/TSUKUTTA.md
+         ★残る 2個★ … IMAGE／RTD
+           IMAGE … ★絵を セルの 上に 置く 仕組みが まだ 無い★
+           RTD  … ★向こうから 押してくる 相手（配信の 元）が うちに 無い★
+           ⇒★どちらも「外の 契約」では なく「うちの 作り」が 足りない★
+           ⇒★作ったら その時 外す★ */
   if (!動かない.length) throw new Error('★動かない棚が 空★＝この 検査は 何も 見ていない');
-  const 必ず居る = ['WEBSERVICE', 'STOCKHISTORY', 'IMAGE', 'RTD'];
+  const 必ず居る = ['IMAGE', 'RTD'];
   const 居ない = 必ず居る.filter((f) => 動かない.indexOf(f) < 0);
   if (居ない.length) {
     throw new Error('★外へ 聞きに 行く 物が 棚から 消えています★: ' + 居ない.join(' / ')
