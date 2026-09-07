@@ -89,7 +89,14 @@
 ⇒★★17通りの 型紙を 519個 全部に 当てている★事★★
 　（お金の 関数に `(1)` を 渡しても 正しい 呼び方に なりません）
 
-### ★70個の 名簿★
+### ★70個の 名簿（★70個 全部★）★
+
+> ★★はじめ 60個しか 並べず 最後を「（ほか）」で 終わらせていました★★（指示役が 数えて 見つけた）
+> ⇒★★『70』と 書いた 隣に 60 しか 無い＝★数が 中身を 裏切っている★★★
+> ⇒ 今日 何度も 潰してきた 形 そのもの（「紙だけ 置いて 中身が 空」）
+> ⇒★★数を 書いたら ★その 数だけ★ 並べる／並べられないなら ★道を 書く★★
+> ★出どころ★ `node docs/measured/osu-wakeru.mjs` の 出力（`osu-wakeru.txt`）
+> ⇒★手で 写していません★（写すと また 減ります）
 
 ```
 ACCRINT ACCRINTM ACOTH AMORDEGRC AMORLINC ARABIC ATANH BASE BETA.DIST BETADIST
@@ -98,8 +105,11 @@ CUMPRINC DATEDIF DATEVALUE DECIMAL DETECTLANGUAGE DISC DSTDEV DURATION DVAR F.IN
 FISHER FORECAST FORECAST.LINEAR FORMULATEXT GAMMA.INV GAMMAINV HLOOKUP HYPGEOM.DIST
 INDIRECT INFO INTRATE LOGINV LOGNORM.INV MDURATION MIRR MODE MODE.SNGL NA NORM.INV
 NORM.S.INV NORMINV NORMSINV OFFSET PRICE PRICEDISC PRICEMAT RATE RECEIVED STEYX
-STOCKHISTORY T.INV T.TEST （ほか）
+STOCKHISTORY T.INV T.TEST TBILLEQ TBILLPRICE TBILLYIELD TIMEVALUE TTEST VLOOKUP
+WEBSERVICE YIELD YIELDDISC YIELDMAT
 ```
+
+★数え直し★ … 上を 空白で 割ると ★70個★（`osu-wakeru.txt` の 数と 一致）
 
 ★この 中に ★411本 突き合わせ済みの CELL★ と ★705本 突き合わせ済みの お金の 関数★が
 居る事を 見て ください★
