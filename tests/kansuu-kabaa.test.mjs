@@ -116,6 +116,17 @@ const 積6 = FSP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), 
   聞く: async () => { throw new Error('ここでは AI に 聞きません'); },
   再計算: () => {},
 });
+/* ★2026-09-07 に 足した 7つ目★＝XML から 取り出す
+   ★XPath は ブラウザの 物★＝ここでは jsdom の 同じ 物を 入れる
+   （jsdom が 無ければ 入れない＝その時は #VALUE! に なるので ★偽の 緑に ならない★） */
+let XML部品 = null;
+try {
+  const { JSDOM } = require_('jsdom');
+  const w = new JSDOM('').window;
+  XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
+} catch (e) { XML部品 = null; }
+const 積7 = require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
+  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
 
 T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に なる）★★', () => {
   if (!積1) throw new Error('exally-formula の プラグインを 積めていない');
@@ -124,6 +135,7 @@ T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に 
   if (!(積4 > 0)) throw new Error('formula-kane-plug を 積めていない（' + 積4 + '本）');
   if (!(積5 > 0)) throw new Error('formula-yosoku-plug を 積めていない（' + 積5 + '本）');
   if (!(積6 > 0)) throw new Error('formula-soto-plug を 積めていない（' + 積6 + '本）');
+  if (!(積7 > 0)) throw new Error('formula-filterxml-plug を 積めていない（' + 積7 + '本）');
 });
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
@@ -195,7 +207,7 @@ console.log('  動かない …………………… ' + (全部.length - 食.�
 console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '○' : '×')
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
   + ' ／ formula-kane-plug ' + 積4 + '本 ／ formula-yosoku-plug ' + 積5 + '本'
-  + ' ／ formula-soto-plug ' + 積6 + '本'
+  + ' ／ formula-soto-plug ' + 積6 + '本 ／ formula-filterxml-plug ' + 積7 + '本'
   + ' ／ JS層 ' + (typeof JS層 === 'function' ? '○' : '×'));
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();

@@ -103,6 +103,15 @@ for (const n of ['extra', 'nokori', 'kane', 'yosoku']) {
     聞く: async () => { throw new Error('ここでは AI に 聞きません'); },
     再計算: () => {},
   }));
+/* ★XML から 取り出す★＝XPath は jsdom の 物を 入れる（無ければ 入れない） */
+let XML部品 = null;
+try {
+  const { JSDOM } = require_('jsdom');
+  const w = new JSDOM('').window;
+  XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
+} catch (e) { XML部品 = null; }
+積んだlib.push(require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
+  .つなぐ(H2, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品));
 const hf = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 /* ★本番と 同じ★＝book.html は hf を 作った後 initExallyFormula(hf) を 1回 呼ぶ */
 EF.initExallyFormula(hf);
