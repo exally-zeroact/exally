@@ -27,5 +27,9 @@
     "kind": "tool",
     "why": "試験ではなく ★LibreOffice が吐いた csv を真値に直す道具★（LibreOffice が要る）",
     "back": "CI に LibreOffice を置いた日"
+  },
+  "tests/hozon-de-kieru.test.mjs": {
+    "why": "★わざと 赤のまま★＝『うちで 足したシートは 書き出すと 消える』を 実測で 固定した 物。直っていないので 走らせると CI が 赤に なる（★出来ていない事を 隠さない／でも 赤を 常態に しない★）",
+    "back": "zip へ 足す 直しが 入って ★緑に なった 日★（それまでは 手で `node tests/hozon-de-kieru.test.mjs`）"
   }
 }

@@ -197,6 +197,8 @@ const FILES = [
   ['formula-nokori.test.mjs', '--self-test'],
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
   ['kansuu-kabaa.test.mjs', '--self-test'],//  ＝08-29の「507個」は一覧を消して★中身の無い数字★になった
+  'hairanai.test.mjs',                    // ★書き出すファイルに入らない物を「言う」（09-06 実測）
+  ['hairanai.test.mjs', '--self-test'],   //   ＝うちで足したシートは消える。黙って消さない
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'betsumei-zenbu.test.mjs',              // ★打てば動く別名を機械で全部出して台帳と突き合わせる（09-06 指示役）

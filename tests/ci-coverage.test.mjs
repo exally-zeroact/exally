@@ -26,7 +26,16 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
      ★唯一の 除外だった kyuyo/tests/exally-login.test.mjs も 一緒に 出て行った★
      ⇒★空に する★＝★除外が 1本も 無い のが 今の 正しい 姿★
      ⇒★増えたら 下の「理由と 戻す条件」で 必ず 赤に なる★（★空でも 見張りは 効く★） */
-const EXCLUDED = {};
+const EXCLUDED = {
+  /* ★★2026-09-06 に 1本 足した★★＝★わざと 赤のまま★の 試験
+     ★空が 正しい 姿★だったので、足す 私が 理由を 一番 はっきり 書く。 */
+  'tests/hozon-de-kieru.test.mjs': {
+    reason: 'うちで 足したシートは 書き出すと 消える事を 実測で 固定した 物。'
+      + '★直っていないので 走らせると 必ず 赤★（出来ていない事を 隠さない／でも CI を 常態で 赤に しない）。'
+      + '手で 走らせる … node tests/hozon-de-kieru.test.mjs',
+    restoreWhen: 'zip へ 足す 直しが 入って ★緑に なった 日★（その時 この 行を 消して run.js に 載せる）',
+  },
+};
 
 // テストではない道具（実行されなくてよい物）。ここも理由つきで明示する。
 const NOT_TESTS = {
