@@ -48,10 +48,12 @@ for (const n of ['extra', 'nokori', 'kane', 'yosoku']) {
 const 頼まれた = [];
 const 返す = new Map();
 let 再計算した = 0;
+const 知らせ = [];
 const 道具 = {
   取る: async (url) => { 頼まれた.push(url); if (!返す.has(url)) throw new Error('作り物に 用意が ない: ' + url); return 返す.get(url); },
   聞く: async (文) => { 頼まれた.push('ai:' + 文.slice(0, 20)); return 返す.get('ai') || ''; },
   再計算: () => { 再計算した++; },
+  知らせる: (文) => { 知らせ.push(文); },
 };
 const 積 = P.つなぐ(H, F, 道具);
 
@@ -182,6 +184,29 @@ await TA('★TRANSLATE / DETECTLANGUAGE … AI の 返事を 整える★', asyn
   押す('=DETECTLANGUAGE("こんにちは")');
   await 待つ();
   if (押す('=DETECTLANGUAGE("こんにちは")') !== 'ja') throw new Error('言語コードが 出ない');
+});
+
+await TA('★★お客さんに「取りに 行っています」が 見える★★（#N/A だけだと 壊れたに 見える）', async () => {
+  P.覚えを消す();
+  知らせ.length = 0;
+  返す.set('https://stooq.com/q/d/l?s=nnn.us&i=d', 'Date,Close' + '\n' + '2024-01-02,5');
+  押す('=INDEX(STOCKHISTORY("NNN"),2,2)');
+  if (!知らせ.length) throw new Error('取りに 行き始めた のに 何も 出ない');
+  if (!/取りに 行っています/.test(知らせ[0])) throw new Error('文が 違う … ' + 知らせ[0]);
+  await 待つ();
+  const 後 = 知らせ[知らせ.length - 1];
+  if (!/届きました/.test(後)) throw new Error('届いた 後の 知らせが 出ない … ' + 後);
+  /* ★お客さんに 出る 字に ★ を 使わない★（会社の 決まり） */
+  for (const 文 of 知らせ) if (文.indexOf('★') >= 0) throw new Error('お客さんの 字に ★ が 混 じっている … ' + 文);
+});
+
+await TA('★取れなかった 時も 黙らない★', async () => {
+  P.覚えを消す();
+  知らせ.length = 0;
+  押す('=WEBSERVICE("https://stooq.com/q/d/l?s=yyy.us&i=d")');
+  await 待つ();
+  const 後 = 知らせ[知らせ.length - 1];
+  if (!/取れませんでした/.test(後)) throw new Error('だめだった 事を 言っていない … ' + 後);
 });
 
 T('★出す 名簿は lib が 正本★（繋ぐ 側が 別の 名簿を 持っていない）', () => {
