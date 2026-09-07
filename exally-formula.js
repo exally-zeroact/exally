@@ -820,8 +820,12 @@ function _jsMakearrayCompute(sheet, rows, cols, lambdaFormula) {
   return res===null?'0':String(res);
 }
 
-// ISOMITTED(arg) - 省略チェック
-function _jsIsomitted(v) { return v===undefined||v===null; }
+/* ★★`_jsIsomitted` は 2026-09-08 に 消した★★
+   ⇒ 中身は `v===undefined||v===null`＝★「マスが 空か」★を 見ていた
+   ⇒ ISOMITTED は「★LAMBDA の 引数が 省かれたか★」を 見る 関数で、★別物★
+     （実Excel … =ISOMITTED(空のマス) は ★False★／カンマで 省いた 時だけ True）
+   ⇒★間違った 意味の 物を 名前だけ 残すと ★次に 触る 人が 使う★★ので 消した
+   ⇒ 今の 作りは この ファイルの `ISOMITTED(` の 所（実測の 表を 隣に 書いた） */
 
 // ================================================================
 // convertFormula: 文字列変換
@@ -1279,9 +1283,35 @@ function _jsComputeFormula(sheet, v) {
   var mMkarr=fOrig.match(/^MAKEARRAY\s*\(([0-9]+)\s*,\s*([0-9]+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
   if(mMkarr){var mkR=_jsMakearrayCompute(sheet,parseInt(mMkarr[1]),parseInt(mMkarr[2]),mMkarr[3]);if(mkR!==null)return mkR;}
 
-  // ISOMITTED(ref)
+  /* ★★ISOMITTED … ★『空の マス』と『省かれた 引数』は 別物★★（2026-09-08 実Excel 実測）
+     ★前は こう だった★ `_getSingleVal` が null なら true
+       ⇒★「マスが 空か」を 見ていた★／ISOMITTED は「★LAMBDA の 引数が 省かれたか★」を 見る 関数
+       ⇒ =ISOMITTED(A1) も =ISOMITTED(2) も =ISOMITTED("あ") も ★true★ を 返していた
+       ⇒★実Excel は 16本 とも False★（金の紙 golden-346-2026-09-08.tsv）
+     ★実Excel に 聞いた（docs/measured/kansuu46/toru-isomitted.ps1）★
+       =ISOMITTED(C1)（★空の マス★）               → ★False★
+       =LAMBDA(x,ISOMITTED(x))(C1)（空の マス）    → ★False★
+       =LAMBDA(x,y,ISOMITTED(y))(1,2)（渡した）   → False
+       =LET(x,1,ISOMITTED(x))                    → False
+       ★=LAMBDA(x,y,ISOMITTED(y))(1,)（カンマで 省く）→ True★  ←★ここだけ True★
+       ★=LAMBDA(x,y,ISOMITTED(x))(,2)★                → True★
+       ★=LAMBDA(x,y,z,ISOMITTED(y))(1,,3)★            → True★
+       =LAMBDA(x,y,ISOMITTED(y))(1)（数が 足りない）  → ★#VALUE!★
+       =ISOMITTED()（裸）                          → ★実Excel が 式ごと 受け付けない★
+     ⇒★★引数が 書いてあれば 実Excel は ★必ず False★★（空の マスでも）
+     ★カンマで 省いた 形は ★まだ★★＝`_jsLambdaExpand` が `ISOMITTED(())` に 展開し、
+       下の 型（かっこの 中に かっこ）に 当たらないので ★ここを 素通りして 誤りに なる★
+       ⇒★『まだ』は 誤りで 止まる＝★黙って 逆を 返さない★★（本番の 今も #ERROR）
+       ⇒ 直すのは ★別の 押し★（`_jsLambdaExpand` を 触る＝LAMBDA を 取る 6個 全部に 効く）
+     ★大文字★ … 画面には ★この 字が そのまま 出る★（book.html … cell.d = jsResult）
+       ⇒ 実Excel の 画面は ★FALSE（大文字）★（tests/boolean.test.mjs 2026-08-30 実測）
+       ⇒★前は 小文字 'false' を 返していた＝★出た 字が 違った★★
+       ⇒ このファイルで 小文字を 返していたのは ★ここ 1か所だけ★（他は 全部 'TRUE'/'FALSE'） */
   var mIso=fOrig.match(/^ISOMITTED\s*\(([^)]*)\)$/i);
-  if(mIso){var isoSv=_getSingleVal(sheet,mIso[1].trim());return String(_jsIsomitted(isoSv));}
+  if(mIso){
+    if(!mIso[1].trim()) return null;   /* =ISOMITTED() … 実Excel が 受け付けない ⇒ 答えを 出さない */
+    return 'FALSE';
+  }
 
   // DSUM / DAVERAGE / DCOUNT / DCOUNTA / DMAX / DMIN / DPRODUCT / DGET / DSTDEV / DSTDEVP / DVAR / DVARP
   var mDb=fOrig.match(/^(DSUM|DAVERAGE|DCOUNT|DCOUNTA|DMAX|DMIN|DPRODUCT|DGET|DSTDEV|DSTDEVP|DVAR|DVARP)\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
@@ -1376,7 +1406,7 @@ if (typeof module !== 'undefined' && module.exports) {
     // その他
     _jsGestep: _jsGestep, _jsDbFunc: _jsDbFunc,
     _jsEncodeUrl: _jsEncodeUrl, _jsAggregate: _jsAggregate,
-    _jsIsomitted: _jsIsomitted,
+    /* _jsIsomitted は 2026-09-08 に 消した（「マスが 空か」を 見ていた＝別物） */
     // LET/LAMBDA系
     _parseFuncArgs: _parseFuncArgs,
     _jsLetExpand: _jsLetExpand, _jsLambdaExpand: _jsLambdaExpand,
