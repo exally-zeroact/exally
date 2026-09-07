@@ -33,6 +33,7 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★この 棚の 物は 下の 説明の とおり 答えて ください★
   ⇒「★この 形なら 出ます／この 形は まだです★」と 形を 名指しで 言う
 - AREAS … ★範囲が 幾つに 分かれているかを 数える★。★出る 形★＝ふつうの 範囲（B2:D4）／1マス／列ぜんぶ（A:A）／行ぜんぶ（1:1）／とびとび（(B2:D4,E5,F6:I9) → 3）／重なり（B2:D4 C3:E5 → 1）／シート付き（別の シートを またぐ とびとびは #VALUE!）。★まだの 形★＝★かっこが 入っている 物 全部★（=AREAS(INDEX(...)) の ような 関数入り／シート名に かっこが 在る 物）と、★重ならない 重なり（=AREAS(B2:D4 A1)）★ ⇒ #NAME? に なる。★訳★ 関数が 指せたかは 字だけでは 決まらず（INDEX(...,1,1) は 1／INDEX(...,99,1) は #REF!）、どちらも 計算すると 誤りに なるので 見分けられない。重ならない 重なりは 実Excel が #NULL! を 返すが うちの エンジンに その 誤りが 無い。間違った 数を 出すより「まだ」と 言う
+- ISOMITTED … ★LAMBDA の 引数が 省かれたかを 見る★。★出る 形★＝引数を 書いた 物 全部 → ★FALSE★（=ISOMITTED(A1)／=ISOMITTED(2)／=ISOMITTED("あ")／★空の マスも FALSE★＝=ISOMITTED(C1)／=LET(x,1,ISOMITTED(x))／LAMBDA に 渡した 物 =LAMBDA(x,y,ISOMITTED(y))(1,2)）。★まだの 形★＝★カンマで 省いた 物★ ⇒ 誤りに なる（=LAMBDA(x,y,ISOMITTED(y))(1,)／=LAMBDA(x,y,ISOMITTED(x))(,2)／=LAMBDA(x,y,z,ISOMITTED(y))(1,,3) … 実Excel は ★TRUE★）。★訳★ うちの LAMBDA は 字を 置き換えて 展開する 作りで、省かれた 引数が ISOMITTED(()) に なり 見分けられない。間違った TRUE/FALSE を 出すより「まだ」と 言う。★『空の マス』と『省かれた 引数』は 別物★
 
 ## ★★Exally で 動かない 関数（★勧めては いけない★）★★
 

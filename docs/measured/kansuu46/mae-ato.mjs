@@ -86,17 +86,38 @@ function 土台() {
   表[1][3] = '=DATE(2026,1,1)';
   return 表;
 }
+/* ★★`_hfGetDisplay` は ★book.html の グローバル `HF_ERR`★ を 見る★★
+   ⇒ node で 呼ぶと それが 無く `'#'+type` に なる（★#NAME? では なく #NAME★）
+   ⇒★実際に 踏んだ★ … 物差しを 直したら 「名前が 通らない 22本」が
+     「こちらだけ 誤り」に 移った（177 → 199）＝★字が 違うだけ★だった
+   ⇒★★『本番と 同じ 出口』は ★出口の 中が 見ている 物★まで 揃えて 初めて 同じ★★
+   ⇒ 下の 表は ★book.html の HF_ERR を そのまま 写した★（1文字も 変えていない） */
+globalThis.HF_ERR = {
+  DIV_BY_ZERO: '#DIV/0!', NUM: '#NUM!', NA: '#N/A', VALUE: '#VALUE!',
+  REF: '#REF!', NAME: '#NAME?', CYCLE: '#CYCLE!', NULL: '#NULL!',
+  SPILL: '#SPILL!', GETTING_DATA: '#GETTING_DATA',
+};
+
+/* ★★2026-09-08 に 直した＝★お客さんが 見る 字と 別の 字を 測っていた★★
+   ⇒ 前は engine の 値を `String()` で 字に していた
+   ⇒★でも 画面は `_hfGetDisplay` を 通る★（book.html … cell.d = jsResult ?? _hfGetDisplay(...)）
+   ⇒ `_hfGetDisplay` は ★はい/いいえを 大文字に 直す★（実Excel の 画面は TRUE/FALSE）
+   ⇒★だから 私の 紙には 小文字 true/false が 並んでいた＝★画面には 出ない 字★★
+     （Boolean を 大文字小文字 無視で 比べていたので ★数は 合っていた＝穴が 見えなかった★）
+   ⇒★★物差しは ★本番と 同じ 出口★を 通す★★ */
 function 押す(式) {
   let 後;
   try { 後 = EF.convertFormula(式); } catch (e) { return '★書き換えで 例外★'; }
   try {
     const js = EF._jsComputeFormula(0, 式);
-    if (js !== null && js !== undefined) return js;
+    if (js !== null && js !== undefined) return js;   /* ★JS層の 字は そのまま 画面へ★ */
   } catch (e) { /* engine へ */ }
   try {
     const 表 = 土台();
     表[0][7] = 後;
     hf.setSheetContent(SID, 表);
+    /* ★本番と 同じ 出口★（式の セルなので 第4引数は true） */
+    if (typeof EF._hfGetDisplay === 'function') return EF._hfGetDisplay(0, 0, 7, true);
     const v = hf.getCellValue({ sheet: SID, row: 0, col: 7 });
     if (v && v.type) return 赤の名(v.type);
     return v;
@@ -123,6 +144,12 @@ const 金 = fs.readFileSync(金道, 'utf-8')
   .map((l) => l.split('\t')).filter((p) => p.length === 4)
   .map((p) => ({ 名: p[0], 式: p[1], 答: p[2], 型: p[3] }));
 
+/* ★★2026-09-08 に 足した＝★判定だけ 見ると 値が 動いた 事が 見えない★★
+   ⇒ #48（IM系）で 私は「変わった 行 78本」、指示役は「83本」と 出した
+   ⇒ 差の 5本＝★値は 変わったが 判定は『違う』の まま★
+   ⇒ 今回は 害が 無かった（合った → 違う は 0本）が、
+     ★次の 直しで「★合った のまま 値が 変わる★」と ★誰も 気づけない★★
+   ⇒ だから ★判定★と ★値★を 両方 書き出す（3列目が 値） */
 const 行 = [];
 let 数えた = 0;
 for (const g of 金) {
