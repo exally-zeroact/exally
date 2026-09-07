@@ -24,6 +24,11 @@
        1回  connect-src → https://example.invalid/web-kara-yomu.html
        1回  img-src → https://example.invalid/wazato-tomeru.png
   ★わざと 止めた 物を 拾えたか … はい（物差しは 効いている）★
+  ★式を 押した★
+      JS層 evalFormula          … ★出来なかった … Error: evalFormula が 居ない★
+      本道 setCellFormula        … ★出来なかった … Error: setCellFormula が 居ない★
+      本道 LEN                   … ★出来なかった … Error: setCellFormula が 居ない★
+      JS層 CONVERT              … ★出来なかった … Error: setCellFormula が 居ない★
 
 ## ★(い) 中に 書いた 物を 許す 形★
 
@@ -43,11 +48,43 @@
        1回  connect-src → https://example.invalid/web-kara-yomu.html
        1回  img-src → https://example.invalid/wazato-tomeru.png
   ★わざと 止めた 物を 拾えたか … はい（物差しは 効いている）★
+  ★式を 押した★
+      JS層 evalFormula          … ★出来た（7）★
+      本道 setCellFormula        … ★出来た（9）★
+      本道 LEN                   … ★出来た（3）★
+      JS層 CONVERT              … ★出来た（100）★
+
+## ★(う) (い) から 'unsafe-eval' だけ 外した 形★
+
+```
+  default-src 'self'
+  script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
+  font-src 'self' https://fonts.gstatic.com
+  img-src 'self' data: blob:
+  connect-src 'self' https://*.supabase.co
+  frame-ancestors 'none'
+  base-uri 'self'
+  form-action 'self'
+```
+
+  ★止まった 数 … 2件★
+       1回  connect-src → https://example.invalid/web-kara-yomu.html
+       1回  img-src → https://example.invalid/wazato-tomeru.png
+  ★わざと 止めた 物を 拾えたか … はい（物差しは 効いている）★
+  ★式を 押した★
+      JS層 evalFormula          … ★出来なかった … 答えが 違う（7 の はず）★
+      本道 setCellFormula        … ★出来た（9）★
+      本道 LEN                   … ★出来た（3）★
+      JS層 CONVERT              … ★出来た（100）★
 
 ## ★差★
 
-  ★きつい 形 … 864件 止まる★
-  ★ゆるい 形 … 2件 止まる★
+  ★きつい 形 …………………… 864件 止まる／通った 道 0本★
+  ★ゆるい 形 …………………… 2件 止まる／通った 道 4本★
+  ★'unsafe-eval' を 外した 形 … 2件 止まる／通った 道 3本★
+
+  ★★'unsafe-eval' は 要るか … ★要ります★（外すと 通らなく なる 道 … JS層 evalFormula）★★
 
 ★この 測りが 見ていない 物★
   ・押さないと 動かない 所（AIに 聞く／倉庫に 入る／ファイルを 開く／印刷）

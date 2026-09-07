@@ -67,11 +67,46 @@ document.addEventListener('securitypolicyviolation', function (e) {
 （function () {
   try { fetch('https://example.invalid/web-kara-yomu.html'); } catch (e) { /* 止まった */ }
 })();
+/* ★式を 1つ 押す★＝開いた だけでは 通らない 道（計算）を 通す
+   ⇒ 'unsafe-eval' が 要るかは ★ここを 通さないと 分からない★ */
+var 押した = { 道: [] };
+function 押す(名, 何, 正しい答え) {
+  var o = { 名: 名, 出来た: false, 答え: '', 訳: '' };
+  try {
+    var v = 何();
+    o.答え = String(v);
+    o.出来た = (String(v) === String(正しい答え));
+    if (!o.出来た) o.訳 = '答えが 違う（' + 正しい答え + ' の はず）';
+  } catch (e) { o.訳 = String(e && (e.name + ': ' + e.message)).slice(0, 160); }
+  押した.道.push(o);
+}
 setTimeout(function () {
+  /* ★道①＝JS層の 逃げ道★ … 中で Function(...) を 使っている
+     （book.html evalFormula）⇒ ★ここが 'unsafe-eval' の 有る／無しで 変わる★ */
+  押す('JS層 evalFormula', function () {
+    if (typeof evalFormula !== 'function') throw new Error('evalFormula が 居ない');
+    return evalFormula('=1+2*3', 0, 0);
+  }, 7);
+  /* ★道②＝本番の 本道★ … セルに 式を 入れる（book.html setCellFormula）
+     ⇒ HyperFormula を 通る／HF が 赤を 返した 時だけ 道① へ 逃げる */
+  押す('本道 setCellFormula', function () {
+    if (typeof setCellFormula !== 'function') throw new Error('setCellFormula が 居ない');
+    return setCellFormula(0, 0, 0, '=SUM(1,2)*3');
+  }, 9);
+  /* ★道③＝字の 関数を 1つ 通す★ */
+  押す('本道 LEN', function () {
+    if (typeof setCellFormula !== 'function') throw new Error('setCellFormula が 居ない');
+    return setCellFormula(0, 1, 0, '=LEN("あいう")');
+  }, 3);
+  /* ★道④＝JS層でしか 動かない 関数★（_jsSet の 中） */
+  押す('JS層 CONVERT', function () {
+    if (typeof setCellFormula !== 'function') throw new Error('setCellFormula が 居ない');
+    return setCellFormula(0, 2, 0, '=CONVERT(1,"m","cm")');
+  }, 100);
   var x = new XMLHttpRequest();
   x.open('POST', '/report', true);
   x.setRequestHeader('Content-Type', 'text/plain');
-  x.send(JSON.stringify(止まった));
+  x.send(JSON.stringify({ 止まった: 止まった, 押した: 押した }));
 }, 6000);
 `.split('（function').join('(function');
 
@@ -80,14 +115,19 @@ let html = 本体.体.toString('utf-8');
 html = html.replace(/<head([^>]*)>/i, '<head$1><script src="/__spy.js"></script>');
 
 const 拾った = [];
+const 押した = [];
 async function 走らせる(名, CSP) {
-  拾った.length = 0;
+  拾った.length = 0; 押した.length = 0;
   const 蔵 = new Map();
   const さば = http.createServer(async (req, res) => {
     const 道 = req.url.split('?')[0];
     if (req.method === 'POST' && 道 === '/report') {
       let b = ''; req.on('data', (c) => { b += c; });
-      req.on('end', () => { try { 拾った.push(...JSON.parse(b)); } catch (e) { /* 読めない */ } res.end('ok'); });
+      req.on('end', () => {
+        try { const o = JSON.parse(b); 拾った.push(...(o.止まった || [])); 押した.push(o.押した || null); }
+        catch (e) { /* 読めない */ }
+        res.end('ok');
+      });
       return;
     }
     res.setHeader('Content-Security-Policy', CSP);
@@ -112,7 +152,7 @@ async function 走らせる(名, CSP) {
   await new Promise((ok) => { ch.on('exit', ok); setTimeout(() => { try { ch.kill(); } catch (e) { /* もう 死んでいる */ } ok(); }, 45000); });
   await new Promise((ok) => setTimeout(ok, 600));
   さば.close();
-  return 拾った.slice();
+  return { 止 : 拾った.slice(), 押: 押した[0] || null };
 }
 
 const 相手たち = "https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://*.supabase.co";
@@ -129,8 +169,11 @@ const ゆるい = きつい
   .replace("script-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'")
   .replace("style-src 'self'", "style-src 'self' 'unsafe-inline'");
 
+/* ★'unsafe-eval' が 要るか★＝(い) から それだけ 外して 撃つ */
+const 評価なし = ゆるい.replace(" 'unsafe-eval'", '');
 const あ = await 走らせる('きつい', きつい);
 const い = await 走らせる('ゆるい', ゆるい);
+const う = await 走らせる('評価なし', 評価なし);
 
 const 出 = [];
 const 言う = (s) => { 出.push(s); console.log(s); };
@@ -148,7 +191,12 @@ const まとめ = (並) => {
 言う('★本番には 入れていません★（手元に 同じ 画面を 立てて 測った）');
 言う('★止まった 物は ブラウザ自身に 言わせた（securitypolicyviolation）★');
 言う('');
-for (const [名, 決, 並] of [['(あ) 中に 書いた 物を 許さない 形', きつい, あ], ['(い) 中に 書いた 物を 許す 形', ゆるい, い]]) {
+for (const [名, 決, 結] of [
+  ['(あ) 中に 書いた 物を 許さない 形', きつい, あ],
+  ['(い) 中に 書いた 物を 許す 形', ゆるい, い],
+  ["(う) (い) から 'unsafe-eval' だけ 外した 形", 評価なし, う],
+]) {
+  const 並 = 結.止;
   言う('## ★' + 名 + '★');
   言う('');
   言う('```');
@@ -159,12 +207,26 @@ for (const [名, 決, 並] of [['(あ) 中に 書いた 物を 許さない 形'
   for (const [k, n] of まとめ(並)) 言う('    ' + String(n).padStart(4) + '回  ' + k);
   const 確かめ = 並.some((x) => String(x.相手).includes('example.invalid') || x.決まり.startsWith('img-src'));
   言う('  ★わざと 止めた 物を 拾えたか … ' + (確かめ ? 'はい（物差しは 効いている）' : '★いいえ＝物差しが 壊れている★') + '★');
+  const 押 = 結.押;
+  言う('  ★式を 押した★');
+  for (const o of ((押 && 押.道) || [])) {
+    言う('      ' + o.名.padEnd(24) + ' … ' + (o.出来た ? '★出来た（' + o.答え + '）★' : '★出来なかった … ' + (o.訳 || o.答え) + '★'));
+  }
+  if (!押 || !押.道) 言う('      ★返事が 無い★');
   言う('');
 }
 言う('## ★差★');
 言う('');
-言う('  ★きつい 形 … ' + あ.length + '件 止まる★');
-言う('  ★ゆるい 形 … ' + い.length + '件 止まる★');
+const 通った = (結) => ((結.押 && 結.押.道) || []).filter((o) => o.出来た).map((o) => o.名);
+言う('  ★きつい 形 …………………… ' + あ.止.length + '件 止まる／通った 道 ' + 通った(あ).length + '本★');
+言う('  ★ゆるい 形 …………………… ' + い.止.length + '件 止まる／通った 道 ' + 通った(い).length + '本★');
+言う("  ★'unsafe-eval' を 外した 形 … " + う.止.length + '件 止まる／通った 道 ' + 通った(う).length + '本★');
+言う('');
+const 落ちた道 = 通った(い).filter((n) => !通った(う).includes(n));
+言う("  ★★'unsafe-eval' は 要るか … "
+  + (落ちた道.length ? '★要ります★（外すと 通らなく なる 道 … ' + 落ちた道.join(' / ') + '）'
+    : (う.止.length === い.止.length ? '★要りません★（外しても 同じ）' : '★要ります★（止まる 数が 変わった）'))
+  + '★★');
 言う('');
 言う('★この 測りが 見ていない 物★');
 言う('  ・押さないと 動かない 所（AIに 聞く／倉庫に 入る／ファイルを 開く／印刷）');
