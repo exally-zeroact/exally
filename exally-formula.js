@@ -1138,6 +1138,16 @@ function _rewriteIsRef(f){
 /** ★字だけで 決まる 形か★ true／false／★null＝決められない★ */
 function _isRefKotae(中){
   if(!中) return null;
+  /* ★★TRUE()／FALSE() は かっこが 在っても ★値★★（2026-09-08 に 踏んだ）
+     ⇒ `convertFormula` は ★この 関数より 先に★ `TRUE` を `TRUE()` に 直している
+       （上の `f.replace(/\bTRUE\b(?!\s*\()/g, 'TRUE()')`）
+     ⇒ だから ここへ 来る 時には ★もう かっこが 付いている★
+     ⇒ 下の「かっこが 在れば 決められない」に 先に 引っかかり
+       `=ISREF(TRUE)` が ★#NAME?★に なっていた（★実Excel は False★）
+     ⇒★★#45 で 私が 本番に 入れた 戻り★★（★直す前は FALSE＝合っていた★）
+     ⇒★『かっこが 在る＝関数』は 早すぎる 決めつけだった★
+     ⇒★見つけ方★ 司さんの「答え確かめて」で 実Excel の 16本と 突き合わせて 出た */
+  if(/^(TRUE|FALSE)\s*\(\s*\)$/i.test(中.trim())) return false;
   if(/[()]/.test(中)) return null;                 /* ★関数が 入る＝決められない★ */
   var s = 中.replace(/\$/g, '');
   /* ★シートの 名前が 付いていたら 外す★（'a b'!A1 も） */
