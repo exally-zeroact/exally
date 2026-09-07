@@ -1,0 +1,61 @@
+# ★今 画面が 外へ 出ている 先★（2026-09-07）
+
+★開いた 物 … https://exally.vercel.app/hub.html★
+★本物の Chrome の 通信の 記録から 数えた（字で 探したのでは ない）★
+
+## ★本当に 出て行った 相手（画面が 出した 物だけ）★
+
+  ★Chrome 自身の 用事 … 5の 相手（何も 無い ページで 数えて 引いた）★
+  ★引く前 … 11／引いた後 … 6★
+
+  ★a.nel.cloudflare.com★
+      https://a.nel.cloudflare.com/report/v4?s=RCGz5z5rde%2FeeJ1Xeq5XfoSpMyl0w2SNAGAI4cviBnA7O9ZvS%2BmSUbrLPN9IHbR38…
+  ★cdn.jsdelivr.net★
+      https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4
+      https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4
+      https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4
+  ★exally.vercel.app★
+      https://exally.vercel.app/hub.html
+      https://exally.vercel.app/hub.html
+      https://exally.vercel.app/hub.html
+  ★fonts.googleapis.com★
+      https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP:wght@400;700&display=swap
+      https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP:wght@400;700&display=swap
+      https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Noto+Sans+JP:wght@400;700&display=swap
+  ★fonts.gstatic.com★
+      https://fonts.gstatic.com/
+      https://fonts.gstatic.com/
+      https://fonts.gstatic.com/
+
+  ★★画面が 出した 相手の 数 … 5★★
+
+## ★引いても 残った Chrome 自身の 用事（道で 見分けた／隠さず 並べる）★
+
+  content-autofill.googleapis.com  … 自動入力の 問い合わせ
+
+## ★字で 探すと どう 見えるか（比べる）★
+
+  33回   schemas.openxmlformats.org  … 出ていない（名札 か 押した 時だけ）
+  18回   www.w3.org  … 出ていない（名札 か 押した 時だけ）
+  12回   schemas.microsoft.com  … 出ていない（名札 か 押した 時だけ）
+  6回    purl.org  … 出ていない（名札 か 押した 時だけ）
+  6回    openoffice.org  … 出ていない（名札 か 押した 時だけ）
+  5回    fonts.googleapis.com  … ★本当に 出た★
+  2回    cdn.jsdelivr.net  … ★本当に 出た★
+  2回    fonts.gstatic.com  … ★本当に 出た★
+  2回    sheetjs.com  … 出ていない（名札 か 押した 時だけ）
+  2回    purl.oclc.org  … 出ていない（名札 か 押した 時だけ）
+  2回    docs.oasis-open.org  … 出ていない（名札 か 押した 時だけ）
+  1回    tnfwipbgfgjaymlszeid.supabase.co  … 出ていない（名札 か 押した 時だけ）
+  1回    support.microsoft.com  … 出ていない（名札 か 押した 時だけ）
+  1回    macVmlSchemaUri  … 出ていない（名札 か 押した 時だけ）
+  1回    sheetjs.openxmlformats.org  … 出ていない（名札 か 押した 時だけ）
+
+  ★字では 15件／うち ★12件は 1回も 出ていない★★
+  ⇒ ★字で 探した 数を そのまま 出すと 嘘に なる★
+
+## ★この 測りが 見ていない 物（隠さず 書く）★
+
+  ★押さないと 出ない 先★ … AIに 聞く（/api/claude）／倉庫（supabase）／
+  「Web から」の 窓（お客さんが 打った 住所）／絵の 貼り付け
+  ⇒ ★この 測りは「開いた だけ」＝半分です★

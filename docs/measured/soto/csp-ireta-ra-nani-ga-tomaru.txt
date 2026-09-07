@@ -1,0 +1,54 @@
+# ★CSP を 入れたら 何が 止まるか★（2026-09-07）
+
+★本番には 入れていません★（手元に 同じ 画面を 立てて 測った）
+★止まった 物は ブラウザ自身に 言わせた（securitypolicyviolation）★
+
+## ★(あ) 中に 書いた 物を 許さない 形★
+
+```
+  default-src 'self'
+  script-src 'self' https://cdn.jsdelivr.net
+  style-src 'self' https://fonts.googleapis.com
+  font-src 'self' https://fonts.gstatic.com
+  img-src 'self' data: blob:
+  connect-src 'self' https://*.supabase.co
+  frame-ancestors 'none'
+  base-uri 'self'
+  form-action 'self'
+```
+
+  ★止まった 数 … 864件★
+     855回  style-src-attr → inline
+       4回  style-src-elem → inline
+       3回  script-src-elem → inline
+       1回  connect-src → https://example.invalid/web-kara-yomu.html
+       1回  img-src → https://example.invalid/wazato-tomeru.png
+  ★わざと 止めた 物を 拾えたか … はい（物差しは 効いている）★
+
+## ★(い) 中に 書いた 物を 許す 形★
+
+```
+  default-src 'self'
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
+  font-src 'self' https://fonts.gstatic.com
+  img-src 'self' data: blob:
+  connect-src 'self' https://*.supabase.co
+  frame-ancestors 'none'
+  base-uri 'self'
+  form-action 'self'
+```
+
+  ★止まった 数 … 2件★
+       1回  connect-src → https://example.invalid/web-kara-yomu.html
+       1回  img-src → https://example.invalid/wazato-tomeru.png
+  ★わざと 止めた 物を 拾えたか … はい（物差しは 効いている）★
+
+## ★差★
+
+  ★きつい 形 … 864件 止まる★
+  ★ゆるい 形 … 2件 止まる★
+
+★この 測りが 見ていない 物★
+  ・押さないと 動かない 所（AIに 聞く／倉庫に 入る／ファイルを 開く／印刷）
+  ⇒ ★開いた だけ＝半分です★
