@@ -124,8 +124,8 @@ ok('★ぐるぐるの 矢印は 丸より 先に 描く★', (() => {
   return f.indexOf('ぐるぐるの 矢印') < f.indexOf('for (var i = 0; i < 場.length; i++)');
 })());
 ok('★箱から はみ出さない（数式）★', /if \(x > X \+ W - 6\) break;/.test(抜く('数式を描く') || ''));
-ok('★節が 空なら 断る★', /★1つも 書かれていません★/.test(book));
-ok('★図解を 選んでいないと 断る★', /★図解を 選んでください★/.test(book));
+ok('★節が 空なら 断る★', /1つも 書かれていません/.test(book));
+ok('★図解を 選んでいないと 断る★', /図解を 選んでください/.test(book));
 ok('★alert / prompt / confirm を 使っていない★', !/\balert\(|\bprompt\(|\bconfirm\(/.test(book));
 
 console.log('\n[⑥ 副題を 決めていない 窓が 増えていないか]');

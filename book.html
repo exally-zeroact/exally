@@ -2509,7 +2509,7 @@ function _字を安全に(s){
  *  ★1セルずつ 積むと N回 押さないと 戻らない★＝それでは「元に戻せる」と 言えない。 */
 function AIの表をシートに入れる(番){
   var 表 = _AIの表たち[番];
-  if(!表 || !表.length){ notify('★その 表は もう ありません★'); return 0; }
+  if(!表 || !表.length){ notify('その 表は もう ありません'); return 0; }
   /* ★typeof で 守らない★＝無ければ ★黙って 戻せない 表を 入れる★事に なる */
   _pushRowColUndo();
   for(var r = 0; r < 表.length; r++){
@@ -2518,7 +2518,7 @@ function AIの表をシートに入れる(番){
   render(); updateBar();
   /* この 知らせの 約束は ★実際に 押して★ 確かめている
      （lib/yakusoku-daicho.js に 1行／tests/yakusoku.test.mjs が 入れて→1回 戻す） */
-  notify('★' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列★ 入れました'  /* data-yakusoku="hyou-ireru-undo" */
+  notify('' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列 入れました'  /* data-yakusoku="hyou-ireru-undo" */
     + '（違ったら ★↩（元に戻す）で 1押しで 戻ります★）');
   return 表.length;
 }
@@ -3121,7 +3121,7 @@ function 紙の線を描く(){
 function ブックの表示を変える(番){
   hideCtxMenu();
   番 = Number(番);
-  if (番 !== 1 && 番 !== 2 && 番 !== 3) { notify('★1・2・3 の どれかです★'); return 0; }
+  if (番 !== 1 && 番 !== 2 && 番 !== 3) { notify('1・2・3 の どれかです'); return 0; }
   ブックの表示 = 番;
   var 名 = ViewMode.表示たち.filter(function (v) { return v.番 === 番; })[0];
   render();
@@ -3209,7 +3209,7 @@ function 改ページを足す(){
   if (c > 0 && 手の改ページ.列.indexOf(c) < 0) { 手の改ページ.列.push(c); 足した.push(colLetter(c) + '列'); }
   手の改ページ.行.sort(function (a, b) { return a - b; });
   手の改ページ.列.sort(function (a, b) { return a - b; });
-  if (!足した.length) { notify('★A1 の 所には 切れ目を 置けません★'); return 0; }
+  if (!足した.length) { notify('A1 の 所には 切れ目を 置けません'); return 0; }
   if (ブックの表示 === 1) ブックの表示を変える(2); else { render(); 紙の帯を出す(); }
   notify(足した.join('と') + ' の 手前で 切るように しました');
   return 足した.length;
@@ -3220,7 +3220,7 @@ function 改ページを外す(){
   var 消した = 0;
   if (i >= 0) { 手の改ページ.行.splice(i, 1); 消した++; }
   if (j >= 0) { 手の改ページ.列.splice(j, 1); 消した++; }
-  if (!消した) { notify('★ここには 手で 置いた 切れ目が ありません★'); return 0; }
+  if (!消した) { notify('ここには 手で 置いた 切れ目が ありません'); return 0; }
   render(); 紙の帯を出す();
   notify('手で 置いた 切れ目を ' + 消した + '個 外しました');
   return 消した;
@@ -3327,7 +3327,7 @@ var 三次元の決め = { 形: null, 名: '', 横: 0.6, 縦: 0.3 };
 function 三次元を開く(){
   hideCtxMenu();
   var 入 = document.getElementById('objFileInput');
-  if (!入) { notify('★入り口が 見つかりません★'); return 0; }
+  if (!入) { notify('入り口が 見つかりません'); return 0; }
   入.value = '';
   入.click();
   return 1;
@@ -3337,13 +3337,13 @@ function 三次元を読む(ファイル){
   var 名 = String(ファイル.name || '');
   if (!/\.obj$/i.test(名)) {
     /* ★出来ない事は 出来ないと 言う★ */
-    notify('★.obj の ファイルだけ 読めます★（' + 名 + ' は 中身の 決まりが 大きくて 読めません）');
+    notify('.obj の ファイルだけ 読めます（' + 名 + ' は 中身の 決まりが 大きくて 読めません）');
     return 0;
   }
   var 読 = new FileReader();
   読.onload = function () {
     var 形 = Model3D.objを読む(String(読.result || ''));
-    if (!形) { notify('★点が 1つも 見つかりませんでした★'); return; }
+    if (!形) { notify('点が 1つも 見つかりませんでした'); return; }
     三次元の決め.形 = 形;
     三次元の決め.名 = 名;
     三次元を置く();
@@ -3373,7 +3373,7 @@ function 三次元を置く(){
 }
 function 三次元を回す(横, 縦){
   var o = 選んだ物;
-  if (!o || o.種類 !== '3D') { notify('★3D を 選んでください★'); return 0; }
+  if (!o || o.種類 !== '3D') { notify('3D を 選んでください'); return 0; }
   o.横 = (o.横 || 0) + 横;
   o.縦 = (o.縦 || 0) + 縦;
   render();
@@ -3475,7 +3475,7 @@ function _表をHTMLから(字){
 function Webの字から入れる(){
   var e = document.getElementById('webHtml');
   var 表 = e ? _表をHTMLから(e.value) : null;
-  if (!表) { notify('★表（table）が 見つかりません★'); return 0; }
+  if (!表) { notify('表（table）が 見つかりません'); return 0; }
   return _表を入れる(表, '貼った 字');
 }
 function _表を入れる(表, どこから){
@@ -3493,24 +3493,24 @@ function _表を入れる(表, どこから){
   Connections.足す(つなぎたち, 'web', どこから, どこから, 表);
   接続の帯を出す();
   関数の窓を閉じる();
-  notify('★' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列★ 入れました（' + どこから + '）');
+  notify('' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列 入れました（' + どこから + '）');
   return 表.length;
 }
 function Webを取りに行く(){
   var e = document.getElementById('webUrl');
   var url = e ? String(e.value || '').trim() : '';
-  if (!/^https?:\/\//.test(url)) { notify('★https:// から 始まる 所を 書いてください★'); return 0; }
+  if (!/^https?:\/\//.test(url)) { notify('https:// から 始まる 所を 書いてください'); return 0; }
   notify('読みに 行っています…');
   fetch(url).then(function (r) {
     if (!r.ok) throw new Error('返事が ' + r.status);
     return r.text();
   }).then(function (t) {
     var 表 = _表をHTMLから(t);
-    if (!表) { notify('★その ページに 表（table）が ありません★'); return; }
+    if (!表) { notify('その ページに 表（table）が ありません'); return; }
     _表を入れる(表, url);
   }).catch(function (err) {
     /* ★出来なかった 事を 隠さない★ */
-    notify('★読めませんでした★（' + String(err && err.message ? err.message : err) + '）'
+    notify('読めませんでした（' + String(err && err.message ? err.message : err) + '）'
       + '／向こうの ページが 許していない 時は 字を 貼ってください');
   });
   return 1;
@@ -3599,8 +3599,8 @@ function つながりを足す(){
     if (表[i].名 === lp[0]) 左 = 表[i];
     if (表[i].名 === rp[0]) 右 = 表[i];
   }
-  if (!左 || !右) { notify('★表が 見つかりません★'); return 0; }
-  if (左 === 右) { notify('★同じ 表どうしは つなげません★'); return 0; }
+  if (!左 || !右) { notify('表が 見つかりません'); return 0; }
+  if (左 === 右) { notify('同じ 表どうしは つなげません'); return 0; }
   var 見 = DataModel.つなげるか(左, lp[1], 右, rp[1]);
   if (!見.出来る) { notify(見.訳); return 0; }
   DataModel.つなぎを足す(つながりたち, lp[0], lp[1], rp[0], rp[1]);
@@ -3616,16 +3616,16 @@ function つながりを消す(i){
 }
 function つなげて出す(i){
   var v = つながりたち[i];
-  if (!v) { notify('★見つかりません★'); return 0; }
+  if (!v) { notify('見つかりません'); return 0; }
   var 表 = _この画面の表たち();
   var 左 = null, 右 = null;
   for (var j = 0; j < 表.length; j++) {
     if (表[j].名 === v.左表) 左 = 表[j];
     if (表[j].名 === v.右表) 右 = 表[j];
   }
-  if (!左 || !右) { notify('★表が 見つかりません★'); return 0; }
+  if (!左 || !右) { notify('表が 見つかりません'); return 0; }
   var 出 = DataModel.つなげる(左, v.左列, 右, v.右列);
-  if (!出) { notify('★つなげられませんでした★'); return 0; }
+  if (!出) { notify('つなげられませんでした'); return 0; }
   var 名 = 'つないだ表';
   var 新 = { name: 名, data: {}, colW: {}, rowH: {}, hiddenRows: {}, hiddenCols: {} };
   sheets.push(新);
@@ -3636,7 +3636,7 @@ function つなげて出す(i){
   }
   render();
   関数の窓を閉じる();
-  notify('★' + (出.length - 1) + '行★ を 新しい シートに 出しました');
+  notify('' + (出.length - 1) + '行 を 新しい シートに 出しました');
   return 出.length;
 }
 
@@ -3645,7 +3645,7 @@ function データ分析(){
   hideCtxMenu();
   var rng = _表の範囲();
   var 中身 = _範囲を配列にする(rng);
-  if (中身.length < 2) { notify('★表を 選んでください★'); return 0; }
+  if (中身.length < 2) { notify('表を 選んでください'); return 0; }
   var 見出し = (中身[0] || []).map(function (v) { return String(v); }).join('・');
   var お願い = '次の 表を 見て、気づいた 事を 3つ 教えてください。'
     + '（' + cellAddr(rng.r1, rng.c1) + ':' + cellAddr(rng.r2, rng.c2)
@@ -3679,7 +3679,7 @@ function インクを図形に(){
   hideCtxMenu();
   var 箱 = sheets[activeSheet].ink || [];
   var 対象 = えらんだ線たち.length ? えらんだ線たち.slice() : 箱.slice();
-  if (!対象.length) { notify('★手書きの 線が ありません★'); return 0; }
+  if (!対象.length) { notify('手書きの 線が ありません'); return 0; }
   var 物箱 = 物の箱();
   var 出 = 0;
   var 数え = {};
@@ -3700,9 +3700,9 @@ function インクを図形に(){
   えらんだ線たち = [];
   SheetObjects.順をそろえる(物箱);
   render();
-  if (!出) { notify('★図形に 出来る 線が ありませんでした★'); return 0; }
+  if (!出) { notify('図形に 出来る 線が ありませんでした'); return 0; }
   var 中 = Object.keys(数え).map(function (k) { return k + ' ' + 数え[k] + '個'; }).join('・');
-  notify('★' + 出 + '本★ を 図形に しました（' + 中 + '）');
+  notify('' + 出 + '本 を 図形に しました（' + 中 + '）');
   return 出;
 }
 function インクを数式に(){
@@ -3745,7 +3745,7 @@ function マップを作る(){
   var rng = _表の範囲();
   var 元 = _範囲を配列にする(rng);
   if (元.length < 2 || 元[0].length < 2) {
-    notify('★県の 名前と 数の 2列を 選んでください★'); return 0;
+    notify('県の 名前と 数の 2列を 選んでください'); return 0;
   }
   var 行たち = [];
   for (var i = 0; i < 元.length; i++) 行たち.push([元[i][0], 元[i][1]]);
@@ -3755,14 +3755,14 @@ function マップを作る(){
     Theme.濃淡);
   地図の決め = r;
   var 出た = r.升たち.filter(function (v) { return v.あるか; }).length;
-  if (!出た) { notify('★都道府県の 名前が 1つも 見つかりません★'); return 0; }
+  if (!出た) { notify('都道府県の 名前が 1つも 見つかりません'); return 0; }
   地図の窓を開く();
-  notify('★' + 出た + '県★ に 色を 付けました'
+  notify('' + 出た + '県 に 色を 付けました'
     + (r.見つからない.length ? ('／★' + r.見つからない.length + '個は 県の 名前では ありません★') : ''));
   return 出た;
 }
 function 地図の窓を開く(){
-  if (!地図の決め) { notify('★先に「マップ」を 押してください★'); return 0; }
+  if (!地図の決め) { notify('先に「マップ」を 押してください'); return 0; }
   var r = 地図の決め;
   var 広 = JpMap.広さ();
   document.getElementById('funcTitle').textContent = 'マップ（都道府県）';
@@ -3803,7 +3803,7 @@ function タイムラインを作る(){
   hideCtxMenu();
   var rng = _表の範囲();
   var 元 = _範囲を配列にする(rng);
-  if (元.length < 2) { notify('★日付の 列を 含む 表を 選んでください★'); return 0; }
+  if (元.length < 2) { notify('日付の 列を 含む 表を 選んでください'); return 0; }
   /* ★どの 列が 日付か 数で 決める★（一番 たくさん 日付に 読めた 列） */
   /* ★書式も 見る★＝見ないと 金額の 列（100・200…）を 日付だと 思い込む
      （08-30 実ブラウザで 見つけた＝100 が 1900-04-09 に なった） */
@@ -3817,14 +3817,14 @@ function タイムラインを作る(){
     }
     if (n > 一番の数) { 一番の数 = n; 一番 = c; }
   }
-  if (一番 < 0 || 一番の数 === 0) { notify('★日付に 読める 列が ありません★'); return 0; }
+  if (一番 < 0 || 一番の数 === 0) { notify('日付に 読める 列が ありません'); return 0; }
   時の決め.列 = rng.c1 + 一番;
   時の決め.r1 = rng.r1 + 1;
   時の決め.r2 = rng.r2;
   時の決め.始め = null; 時の決め.終わり = null;
   タイムラインを組む();
   タイムラインの窓を開く();
-  notify('★' + colLetter(時の決め.列) + '列★ を 日付の 列に しました（' + 一番の数 + '個 読めました）');
+  notify('' + colLetter(時の決め.列) + '列 を 日付の 列に しました（' + 一番の数 + '個 読めました）');
   return 一番の数;
 }
 function タイムラインを組む(){
@@ -3842,7 +3842,7 @@ function タイムラインを組む(){
   return out.目盛り.length;
 }
 function タイムラインの窓を開く(){
-  if (時の決め.列 < 0) { notify('★先に「タイムライン」を 押してください★'); return 0; }
+  if (時の決め.列 < 0) { notify('先に「タイムライン」を 押してください'); return 0; }
   document.getElementById('funcTitle').textContent = 'タイムライン';
   窓の副題(colLetter(時の決め.列) + '列 の 日付（' + 時の決め.種 + '・目盛り '
     + 時の決め.目盛り.length + '個）');
@@ -3904,7 +3904,7 @@ function タイムラインを押す(i){
   render();
   タイムラインの窓を開く();
   var 数 = 残す ? Object.keys(残す).length : (時の決め.r2 - 時の決め.r1 + 1);
-  notify('★' + 数 + '行★ を 見せています');
+  notify('' + 数 + '行 を 見せています');
   return 数;
 }
 function タイムラインを外す(){
@@ -3945,7 +3945,7 @@ var XMLの決め = { 木: null, 名: '', 結び: [], 元の字: '' };
 function XMLの窓を開く(){
   hideCtxMenu();
   var 入 = document.getElementById('xmlFileInput');
-  if (!入) { notify('★入り口が 見つかりません★'); return 0; }
+  if (!入) { notify('入り口が 見つかりません'); return 0; }
   入.value = '';
   入.click();
   return 1;
@@ -3956,7 +3956,7 @@ function XMLを読む(ファイル){
   読.onload = function () {
     var 字 = String(読.result || '');
     var 木 = XmlMap.木にする(字);
-    if (!木) { notify('★XML として 読めませんでした★'); return; }
+    if (!木) { notify('XML として 読めませんでした'); return; }
     XMLの決め.木 = 木;
     XMLの決め.名 = XmlMap.名前を決める(木.名);
     XMLの決め.結び = [];
@@ -3968,7 +3968,7 @@ function XMLを読む(ファイル){
   return 1;
 }
 function XMLの道を出す(){
-  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.木) { notify('先に XML を 読んでください'); return 0; }
   var 道たち = XmlMap.道を集める(XMLの決め.木).filter(function (v) { return v.葉; });
   document.getElementById('funcTitle').textContent = 'XML の ソース';
   窓の副題('「' + XMLの決め.名 + '」の 中の 道（' + 道たち.length + '本）');
@@ -4008,7 +4008,7 @@ function XMLの結びを探す(道){
   return null;
 }
 function XMLを結ぶ(道){
-  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.木) { notify('先に XML を 読んでください'); return 0; }
   var 前 = XMLの結びを探す(道);
   if (前) { 前.r = selR1; 前.c = selC1; }
   else XMLの決め.結び.push({ 道: 道, r: selR1, c: selC1 });
@@ -4017,23 +4017,23 @@ function XMLを結ぶ(道){
   return XMLの決め.結び.length;
 }
 function XMLを読み込む(){
-  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.木) { notify('先に XML を 読んでください'); return 0; }
   if (!XMLの決め.結び.length) {
     /* ★実Excel と 同じ 断り方★ */
-    notify('★対応付けられている 要素が ありません★＝先に「今の セルに 結ぶ」を 押してください');
+    notify('対応付けられている 要素が ありません＝先に「今の セルに 結ぶ」を 押してください');
     return 0;
   }
   var 入 = XmlMap.読み込む(XMLの決め.木, XMLの決め.結び);
   for (var i = 0; i < 入.length; i++) setCell(入[i].r, 入[i].c, 入[i].値);
   render();
   関数の窓を閉じる();
-  notify('★' + 入.length + '個★ 入れました（' + XMLの決め.結び.length + '本の 道）');
+  notify('' + 入.length + '個 入れました（' + XMLの決め.結び.length + '本の 道）');
   return 入.length;
 }
 function XMLを書き出す(){
   if (!XmlMap.出せるか(XMLの決め.結び)) {
     /* ★実Excel と 同じ＝結ぶ前は 出せない（IsExportable=False）★ */
-    notify('★対応付けが 出せません★（実Excel も IsExportable が False の 時は 断ります）');
+    notify('対応付けが 出せません（実Excel も IsExportable が False の 時は 断ります）');
     return 0;
   }
   var d = sheets[activeSheet].data;
@@ -4042,7 +4042,7 @@ function XMLを書き出す(){
     if (!x) return '';
     return (x.d !== undefined && x.d !== null && x.d !== '') ? x.d : (x.v === undefined ? '' : x.v);
   });
-  if (!字) { notify('★出す 中身が ありません★'); return 0; }
+  if (!字) { notify('出す 中身が ありません'); return 0; }
   FileOut.deliver(字, (XMLの決め.木 ? XMLの決め.木.名 : 'data') + '.xml', { type: 'application/xml' });
   関数の窓を閉じる();
   notify('XML を 書き出しました（' + 字.length + '文字）');
@@ -4077,9 +4077,9 @@ function XMLの決めを見る(){
 }
 function XMLを更新(){
   hideCtxMenu();
-  if (!XMLの決め.木) { notify('★先に XML を 読んでください★'); return 0; }
+  if (!XMLの決め.木) { notify('先に XML を 読んでください'); return 0; }
   if (!XMLの決め.結び.length) {
-    notify('★対応付けられている 要素が ありません★（実Excel も 同じ 断り方でした）');
+    notify('対応付けられている 要素が ありません（実Excel も 同じ 断り方でした）');
     return 0;
   }
   var 入 = XmlMap.読み込む(XMLの決め.木, XMLの決め.結び);
@@ -4147,7 +4147,7 @@ function コントロールを置く(種){
 function コントロールのプロパティ(){
   hideCtxMenu();
   var o = 選んだ物;
-  if (!o || o.種類 !== 'コントロール') { notify('★コントロールを 選んでください★'); return 0; }
+  if (!o || o.種類 !== 'コントロール') { notify('コントロールを 選んでください'); return 0; }
   document.getElementById('funcTitle').textContent = 'コントロールの プロパティ';
   窓の副題('「' + o.名 + '」の 決め');
   var h = '<div style="display:flex;flex-direction:column;gap:8px;">'
@@ -4202,12 +4202,12 @@ function コントロールを押す(o){
     /* ★うちは VBA を 動かさない★＝ボタンには ★言葉の お願い★を つなぐ。
        送り先は ★AI の 入り口 1つだけ★（同じ事を する 道を 2つ 作らない）。
        ★typeof で 守らない★＝無い 物を 呼ぶ 守りは 嘘の 安全網（見張りが 赤に する）。 */
-    if (!o.レシピ) { notify('★この ボタンには まだ 何も ついていません★（プロパティで 決めます）'); return 0; }
+    if (!o.レシピ) { notify('この ボタンには まだ 何も ついていません（プロパティで 決めます）'); return 0; }
     notify('「' + o.レシピ + '」を AI に 送ります');
     return AIへ送る(o.レシピ);
   }
   if (o.部品 === 'dropdown') {
-    if (!o.中身.length) { notify('★中身が ありません★'); return 0; }
+    if (!o.中身.length) { notify('中身が ありません'); return 0; }
     o.選び = (o.選び + 1) % o.中身.length;
     render();
     notify('「' + o.中身[o.選び] + '」を 選びました');
@@ -4321,17 +4321,17 @@ function スペルを直す(札){
   var 語 = 札.getAttribute('data-w');
   var 新 = 札.getAttribute('data-n');
   var m = /^(.*)!([A-Z]+\d+)$/.exec(場);
-  if (!m) { notify('★場所が 分かりません★'); return 0; }
+  if (!m) { notify('場所が 分かりません'); return 0; }
   var si = -1;
   for (var i = 0; i < sheets.length; i++) if (sheets[i].name === m[1]) si = i;
-  if (si < 0) { notify('★シートが 見つかりません★'); return 0; }
+  if (si < 0) { notify('シートが 見つかりません'); return 0; }
   var rc = _字を範囲に(m[2]);
-  if (!rc) { notify('★場所が 分かりません★'); return 0; }
+  if (!rc) { notify('場所が 分かりません'); return 0; }
   var x = sheets[si].data[rc.r1 + ',' + rc.c1];
-  if (!x) { notify('★セルが 空です★'); return 0; }
+  if (!x) { notify('セルが 空です'); return 0; }
   var 元 = String(x.d !== undefined && x.d !== null ? x.d : x.v);
   var 後 = 元.split(語).join(新);
-  if (後 === 元) { notify('★その 言葉が 見つかりません★'); return 0; }
+  if (後 === 元) { notify('その 言葉が 見つかりません'); return 0; }
   if (si !== activeSheet) switchSheet(si);
   setCell(rc.r1, rc.c1, 後);
   render();
@@ -4391,7 +4391,7 @@ function 見やすさを見る(){
 function 絵の説明を入れる(){
   hideCtxMenu();
   var o = 選んだ物;
-  if (!o) { notify('★絵や 図を 選んでください★'); return 0; }
+  if (!o) { notify('絵や 図を 選んでください'); return 0; }
   document.getElementById('funcTitle').textContent = '代替テキスト';
   窓の副題('「' + (o.名 || '物') + '」が 何の 絵か 一言で');
   document.getElementById('funcBody').innerHTML =
@@ -4424,7 +4424,7 @@ function 類義語を聞く(){
   hideCtxMenu();
   var x = sheets[activeSheet].data[selR1 + ',' + selC1];
   var 語 = x ? String(x.d !== undefined && x.d !== null ? x.d : x.v) : '';
-  if (!語) { notify('★言葉が 入っている セルを 選んでください★'); return 0; }
+  if (!語) { notify('言葉が 入っている セルを 選んでください'); return 0; }
   _AIに聞く('「' + 語 + '」の 言いかえ（似た 意味の 言葉）を 5つ 挙げてください。',
     '類義語辞典', '★実Excel の 類義語辞典は 大きな 辞書を 使います★。'
     + 'うちは 辞書を 持たないので ★AI に 聞きます★。');
@@ -4434,7 +4434,7 @@ function 翻訳を聞く(){
   hideCtxMenu();
   var x = sheets[activeSheet].data[selR1 + ',' + selC1];
   var 語 = x ? String(x.d !== undefined && x.d !== null ? x.d : x.v) : '';
-  if (!語) { notify('★字が 入っている セルを 選んでください★'); return 0; }
+  if (!語) { notify('字が 入っている セルを 選んでください'); return 0; }
   _AIに聞く('次の 字を 英語に して ください（答えだけ）。\n' + 語,
     '翻訳', '★実Excel の 翻訳は Microsoft の サービスに つながります★。'
     + 'うちは ★AI に 聞きます★。');
@@ -4456,7 +4456,7 @@ function _AIに聞く(お願い, 題, 説明){
 function AIへ送る(お願い){
   関数の窓を閉じる();
   var 入 = document.getElementById('ai-input');
-  if (!入) { notify('★AI の 入り口が 見つかりません★'); return 0; }
+  if (!入) { notify('AI の 入り口が 見つかりません'); return 0; }
   入.value = お願い;
   var 札 = document.getElementById('ai-float-btn');
   if (札) 札.click();
@@ -4478,14 +4478,14 @@ function 変更内容を見る(){
      守ると 無くなった 時に ★黙って 素通り★する（見張り no-silent-optional が 赤に する）。
      在るか どうかは ★呼んでいるのに 無い 働き★の 見張りが 見ている。 */
   openRireki('校閲');
-  notify('★この ブックで やった 事★を 出しました'
+  notify('この ブックで やった 事を 出しました'
     + '（実Excel の「変更内容を表示」は 何人かで 開いている 時の 物です）');
   return 1;
 }
 function 共有を解除(){
   hideCtxMenu();
   /* ★実測＝MultiUserEditing は False（共有していない）★ */
-  notify('★この ブックは 共有していません★（実Excel も 共有していない 時は 何も 起きません）');
+  notify('この ブックは 共有していません（実Excel も 共有していない 時は 何も 起きません）');
   return 0;
 }
 
@@ -4580,13 +4580,13 @@ function 詳細設定を実行(){
   var 重複 = document.getElementById('advUniq');
   if (!先字) return 0;
   var 先 = _字を範囲に(先字.value);
-  if (!先) { notify('★出す 所を A1 の ように 書いてください★'); return 0; }
+  if (!先) { notify('出す 所を A1 の ように 書いてください'); return 0; }
   var 元 = _範囲を配列にする(_表の範囲());
-  if (元.length < 2) { notify('★元の 表が 見出しだけです★'); return 0; }
+  if (元.length < 2) { notify('元の 表が 見出しだけです'); return 0; }
   var 条 = null;
   if (String(条字.value || '').trim()) {
     var 条範 = _字を範囲に(条字.value);
-    if (!条範) { notify('★条件の 表を C1:C2 の ように 書いてください★'); return 0; }
+    if (!条範) { notify('条件の 表を C1:C2 の ように 書いてください'); return 0; }
     条 = _範囲を配列にする(条範);
   }
   var 出 = AdvFilter.絞る(元, 条, !!(重複 && 重複.checked));
@@ -4597,7 +4597,7 @@ function 詳細設定を実行(){
   }
   render();
   関数の窓を閉じる();
-  notify('★' + 出.length + '行★ 出しました（見出し ＋ ' + (出.length - 1) + '行）');
+  notify('' + 出.length + '行 出しました（見出し ＋ ' + (出.length - 1) + '行）');
   return 出.length;
 }
 
@@ -4606,7 +4606,7 @@ function 表から接続を作る(){
   hideCtxMenu();
   var rng = _表の範囲();
   var 中身 = _範囲を配列にする(rng);
-  if (中身.length < 2) { notify('★表を 選んでください★'); return 0; }
+  if (中身.length < 2) { notify('表を 選んでください'); return 0; }
   var v = Connections.足す(つなぎたち, 'range',
     sheets[activeSheet].name + ' の 表',
     sheets[activeSheet].name + '!' + cellAddr(rng.r1, rng.c1) + ':' + cellAddr(rng.r2, rng.c2),
@@ -4651,7 +4651,7 @@ function 接続の窓を開く(){
 }
 function 接続を更新(名){
   var v = Connections.探す(つなぎたち, 名);
-  if (!v) { notify('★見つかりません★'); return 0; }
+  if (!v) { notify('見つかりません'); return 0; }
   if (v.種 === 'range' && v.置き場) {
     var 中身 = _範囲を配列にする({ r1: v.置き場.r, c1: v.置き場.c, r2: v.置き場.r2, c2: v.置き場.c2 });
     v.行数 = 中身.length; v.列数 = 中身[0] ? 中身[0].length : 0;
@@ -4662,18 +4662,18 @@ function 接続を更新(名){
   }
   if (v.種 === 'csv') {
     関数の窓を閉じる();
-    notify('★ブラウザは 前の ファイルを 開けません★＝もう一度 選んでください');
+    notify('ブラウザは 前の ファイルを 開けません＝もう一度 選んでください');
     CSVの窓を開く();
     return 0;
   }
-  notify('★この つなぎは まだ 更新できません★（' + v.種 + '）');
+  notify('この つなぎは まだ 更新できません（' + v.種 + '）');
   return 0;
 }
 function 接続を消す(名){
   var 消えた = Connections.消す(つなぎたち, 名);
   接続の帯を出す();
   接続の窓を開く();
-  notify(消えた ? ('「' + 名 + '」を 消しました') : '★見つかりません★');
+  notify(消えた ? ('「' + 名 + '」を 消しました') : '見つかりません');
   return 消えた ? 1 : 0;
 }
 function すべて更新(){
@@ -4785,7 +4785,7 @@ function 図解を置く(種){
   選んだ物 = g; えらんだ物たち = [g];
   render();
   関数の窓を閉じる();
-  notify('図解を 置きました（' + g.名 + '・節 ' + g.節.length + '個）★実Excel も はじめ 5個★');
+  notify('図解を 置きました（' + g.名 + '・節 ' + g.節.length + '個）実Excel も はじめ 5個');
   return g.節.length;
 }
 function 図解の窓を開く(){
@@ -4811,7 +4811,7 @@ function 図解の窓を開く(){
 function 図解の節を直す(){
   hideCtxMenu();
   var o = 選んだ物;
-  if (!o || o.種類 !== '図解') { notify('★図解を 選んでください★'); return 0; }
+  if (!o || o.種類 !== '図解') { notify('図解を 選んでください'); return 0; }
   document.getElementById('funcTitle').textContent = '図解の 節';
   窓の副題('1行に 1つ 書きます（今 ' + o.節.length + '個）');
   document.getElementById('funcBody').innerHTML =
@@ -4830,7 +4830,7 @@ function 図解の節を決める(){
   if (!o || !入) return 0;
   var 行 = String(入.value || '').split('\n').map(function (v) { return v.trim(); })
     .filter(function (v) { return v; });
-  if (!行.length) { notify('★1つも 書かれていません★'); return 0; }
+  if (!行.length) { notify('1つも 書かれていません'); return 0; }
   o.節 = 行;
   render();
   関数の窓を閉じる();
@@ -4876,7 +4876,7 @@ function アイコンの窓を開く(){
 function 数式を置く(){
   var 入 = document.getElementById('mathInput');
   var 字 = 入 ? String(入.value || '').trim() : '';
-  if (!字) { notify('★式を 書いてください★'); return 0; }
+  if (!字) { notify('式を 書いてください'); return 0; }
   var 箱 = 物の箱();
   var o = { 種類: '数式', 式: 字, w: 220, h: 60,
     x: 画面から物のX(HDR_W + 40), y: 画面から物のY(HDR_H + 40), z: 箱.length + 1 };
@@ -4920,7 +4920,7 @@ function チェックボックスを入れる(){
     n++;
   }
   render();
-  notify(n + '個の セルを ★TRUE / FALSE★ に しました'
+  notify(n + '個の セルを TRUE / FALSE に しました'
     + '（★実Excel の 新しい チェック ボックスも セルの 中の TRUE / FALSE です★）');
   return n;
 }
@@ -4929,7 +4929,7 @@ function チェックボックスを入れる(){
 function 画面を撮って貼る(){
   hideCtxMenu();
   var cv = document.getElementById('grid-canvas');
-  if (!cv) { notify('★撮る 所が ありません★'); return 0; }
+  if (!cv) { notify('撮る 所が ありません'); return 0; }
   var 絵 = new Image();
   絵.onload = function () {
     var 箱 = 物の箱();
@@ -4941,9 +4941,9 @@ function 画面を撮って貼る(){
     SheetObjects.順をそろえる(箱);
     選んだ物 = o; えらんだ物たち = [o];
     render();
-    notify('この シートを 撮って 貼りました（★ブラウザは 他のアプリの 窓を 撮れません★）');
+    notify('この シートを 撮って 貼りました（ブラウザは 他のアプリの 窓を 撮れません）');
   };
-  try { 絵.src = cv.toDataURL('image/png'); } catch (e) { notify('★撮れませんでした★'); return 0; }
+  try { 絵.src = cv.toDataURL('image/png'); } catch (e) { notify('撮れませんでした'); return 0; }
   return 1;
 }
 
@@ -5364,7 +5364,7 @@ function テーマの効果を選ぶ(名){
 function 背景を選ぶ(){
   hideCtxMenu();
   var 入 = document.getElementById('bgFileInput');
-  if (!入) { notify('★絵を 選ぶ 入り口が ありません★'); return 0; }
+  if (!入) { notify('絵を 選ぶ 入り口が ありません'); return 0; }
   入.value = '';
   入.click();
   return 1;
@@ -5380,7 +5380,7 @@ function 背景を読み込む(ファイル){
       w.style.backgroundRepeat = 'repeat';
     }
     render();
-    notify('背景に「' + ファイル.name + '」を 敷きました（★紙には 刷られません★＝実Excel も 同じ）');
+    notify('背景に「' + ファイル.name + '」を 敷きました（紙には 刷られません＝実Excel も 同じ）');
   };
   読.readAsDataURL(ファイル);
   return 1;
@@ -5431,7 +5431,7 @@ function ふりがなを入れる(){
   var キー = selR1 + ',' + selC1;
   var セル = sh.data[キー];
   if (!セル || (セル.d === undefined && セル.v === undefined)) {
-    notify('★字が 入っている セルを 選んでください★'); return 0;
+    notify('字が 入っている セルを 選んでください'); return 0;
   }
   document.getElementById('funcTitle').textContent = 'ふりがな';
   窓の副題(cellAddr(selR1, selC1) + '「' + String(セル.d !== undefined ? セル.d : セル.v) + '」の 読み方');
@@ -5514,9 +5514,9 @@ function シートビューを新規(){
 function シートビューを保持(){
   hideCtxMenu();
   var 名 = 今のシートビュー[sheets[activeSheet].name];
-  if (!名) { notify('★先に「新規」で ビューを 作ってください★'); return 0; }
+  if (!名) { notify('先に「新規」で ビューを 作ってください'); return 0; }
   var v = SheetView.探す(_このシートのビュー(), 名);
-  if (!v) { notify('★その ビューが 見つかりません★'); return 0; }
+  if (!v) { notify('その ビューが 見つかりません'); return 0; }
   v.見え方 = SheetView.写し取る(_今の見え方());
   シートビューの帯を出す();
   notify('「' + 名 + '」に 今の 見え方を 覚えさせました');
@@ -5534,7 +5534,7 @@ function シートビューを終了(){
 function シートビューを切り替え(名){
   var たち = _このシートのビュー();
   var v = SheetView.取り出す(たち, 名);
-  if (!v) { notify('★「' + 名 + '」が 見つかりません★'); return 0; }
+  if (!v) { notify('「' + 名 + '」が 見つかりません'); return 0; }
   _見え方を当てる(v);
   今のシートビュー[sheets[activeSheet].name] = 名;
   シートビューの帯を出す();
@@ -5549,7 +5549,7 @@ function シートビューを消す(名){
   }
   シートビューの帯を出す();
   シートビューの窓を開く();
-  notify(消えた ? ('「' + 名 + '」を 消しました') : '★見つかりません★');
+  notify(消えた ? ('「' + 名 + '」を 消しました') : '見つかりません');
   return 消えた ? 1 : 0;
 }
 function シートビューの帯を出す(){
@@ -5642,7 +5642,7 @@ function ブックのビューを足す(){
 }
 function ブックのビューを出す(名){
   var v = SheetView.取り出す(ブックのビュー, 名);
-  if (!v) { notify('★見つかりません★'); return 0; }
+  if (!v) { notify('見つかりません'); return 0; }
   _見え方を当てる(v);
   関数の窓を閉じる();
   notify('「' + 名 + '」の 見え方に 戻しました');
@@ -5651,7 +5651,7 @@ function ブックのビューを出す(名){
 function ブックのビューを消す(名){
   var 消えた = SheetView.消す(ブックのビュー, 名);
   ブックのビューの窓を開く();
-  notify(消えた ? ('「' + 名 + '」を 消しました') : '★見つかりません★');
+  notify(消えた ? ('「' + 名 + '」を 消しました') : '見つかりません');
   return 消えた ? 1 : 0;
 }
 
@@ -5697,16 +5697,16 @@ function 新しいウィンドウを開く(){
   var 番 = _生きている窓().length + 2;
   var w = null;
   try { w = window.open(location.href, '_blank', 'width=1100,height=700'); } catch (e) { w = null; }
-  if (!w) { notify('★新しい 窓を 開けませんでした★（ブラウザが 止めています。許可すると 開きます）'); return 0; }
+  if (!w) { notify('新しい 窓を 開けませんでした（ブラウザが 止めています。許可すると 開きます）'); return 0; }
   うちが開いた窓.push(w);
   窓の帯を出す();
-  notify('新しい 窓を 開きました（' + _窓の名前(番) + '）★同じ ブックを 2つの 窓で 見ます★');
+  notify('新しい 窓を 開きました（' + _窓の名前(番) + '）同じ ブックを 2つの 窓で 見ます');
   return _生きている窓().length + 1;
 }
 function 窓を整列(やり方){
   hideCtxMenu();
   var 窓たち = _生きている窓();
-  if (!窓たち.length) { notify('★動かせる 窓が ありません★（先に「新しいウィンドウを開く」を 押してください）'); return 0; }
+  if (!窓たち.length) { notify('動かせる 窓が ありません（先に「新しいウィンドウを開く」を 押してください）'); return 0; }
   var W = screen.availWidth || 1280, H = screen.availHeight || 800;
   var 全部 = 窓たち.length + 1;   /* 自分も 数える */
   var 動いた = 0;
@@ -5718,7 +5718,7 @@ function 窓を整列(やり方){
   }
   var 自分 = _整列の場所(やり方, 0, 全部, W, H);
   try { window.moveTo(自分.左, 自分.上); window.resizeTo(自分.幅, 自分.高); } catch (e) {}
-  notify(動いた ? (動いた + '個の 窓を 並べました') : '★ブラウザが 窓を 動かすのを 断りました★');
+  notify(動いた ? (動いた + '個の 窓を 並べました') : 'ブラウザが 窓を 動かすのを 断りました');
   return 動いた;
 }
 function _整列の場所(やり方, 番, 全部, W, H){
@@ -5753,9 +5753,9 @@ function 整列の窓を開く(){
 }
 function 並べて比較(){
   hideCtxMenu();
-  if (!_生きている窓().length) { notify('★比べる 相手の 窓が ありません★（先に「新しいウィンドウを開く」を 押してください）'); return 0; }
+  if (!_生きている窓().length) { notify('比べる 相手の 窓が ありません（先に「新しいウィンドウを開く」を 押してください）'); return 0; }
   var 数 = 窓を整列('上下');            /* 実測＝並べて比較は ★上下★に 並ぶ */
-  if (数) notify('上下に 並べました（実Excel の「並べて比較」も ★上下★でした）');
+  if (数) notify('上下に 並べました（実Excel の「並べて比較」も 上下でした）');
   return 数;
 }
 function 窓の位置を元に戻す(){
@@ -5797,18 +5797,18 @@ function _スクロールを知らせる(){
 function 窓を表示しない(){
   hideCtxMenu();
   var 窓たち = _生きている窓();
-  if (!窓たち.length) { notify('★うちが 開いた 窓が ありません★（ブラウザは 他の 窓を 隠せません）'); return 0; }
+  if (!窓たち.length) { notify('うちが 開いた 窓が ありません（ブラウザは 他の 窓を 隠せません）'); return 0; }
   var 隠した = 0;
   for (var i = 0; i < 窓たち.length; i++) {
     try { 窓たち[i].blur(); window.focus(); 隠した++; } catch (e) {}
   }
-  notify(隠した + '個の 窓を 後ろに 回しました（★ブラウザは 窓を 消せません＝後ろに 回すまで★）');
+  notify(隠した + '個の 窓を 後ろに 回しました（ブラウザは 窓を 消せません＝後ろに 回すまで）');
   return 隠した;
 }
 function 窓を再表示(){
   hideCtxMenu();
   var 窓たち = _生きている窓();
-  if (!窓たち.length) { notify('★戻す 窓が ありません★'); return 0; }
+  if (!窓たち.length) { notify('戻す 窓が ありません'); return 0; }
   var 出した = 0;
   for (var i = 0; i < 窓たち.length; i++) { try { 窓たち[i].focus(); 出した++; } catch (e) {} }
   notify(出した + '個の 窓を 前に 出しました');
@@ -5839,7 +5839,7 @@ function 窓の切り替えを開く(){
 }
 function 窓へ移る(i){
   var 窓たち = _生きている窓();
-  if (!窓たち[i]) { notify('★その 窓は もう 閉じています★'); return 0; }
+  if (!窓たち[i]) { notify('その 窓は もう 閉じています'); return 0; }
   try { 窓たち[i].focus(); } catch (e) {}
   関数の窓を閉じる();
   return 1;
@@ -5860,7 +5860,7 @@ function 窓の帯を出す(){
 function 分割する(){
   hideCtxMenu();
   if (分割.行 || 分割.列) return 分割をやめる();
-  if (selR1 === 0 && selC1 === 0) { notify('★A1 では 分けられません★（分ける 所の セルを 選んでください）'); return 0; }
+  if (selR1 === 0 && selC1 === 0) { notify('A1 では 分けられません（分ける 所の セルを 選んでください）'); return 0; }
   分割.行 = selR1; 分割.列 = selC1;
   分割.上のずれ = scrollTop; 分割.左のずれ = scrollLeft;
   render();
@@ -11838,17 +11838,17 @@ function 刷る時のヘッダー(どちら){
 /* リボンから 1つずつ 切り替える（Excelの「印刷の向き」「枠線」「見出し」） */
 function 向きを切り替える(){
   ページ設定.向き 　= (ページ設定.向き === 'landscape') ? 'portrait' : 'landscape';
-  notify('用紙の 向き … ' + (ページ設定.向き === 'landscape' ? '★横★' : '★縦★'));
+  notify('用紙の 向き … ' + (ページ設定.向き === 'landscape' ? '横' : '縦'));
   return ページ設定.向き;
 }
 function 枠線を刷るか(){
   ページ設定.枠線 = !ページ設定.枠線;
-  notify('枠線 … ' + (ページ設定.枠線 ? '★刷る★' : '刷らない'));
+  notify('枠線 … ' + (ページ設定.枠線 ? '刷る' : '刷らない'));
   return ページ設定.枠線;
 }
 function 見出しを刷るか(){
   ページ設定.行列番号 = !ページ設定.行列番号;
-  notify('行と列の 見出し … ' + (ページ設定.行列番号 ? '★刷る★' : '刷らない'));
+  notify('行と列の 見出し … ' + (ページ設定.行列番号 ? '刷る' : '刷らない'));
   return ページ設定.行列番号;
 }
 
@@ -11910,7 +11910,7 @@ function 選んだ所のロックを切り替える(){
     }
   }
   render(); updateBar();
-  notify(数 + '個の セルの ロックを ' + (外す ? '★外しました★（保護中でも 直せます）' : '★掛けました★'));
+  notify(数 + '個の セルの ロックを ' + (外す ? '外しました（保護中でも 直せます）' : '掛けました'));
   return 外す;
 }
 
@@ -11922,7 +11922,7 @@ function 枠線の表示を切り替える(){
   枠線を出す = !枠線を出す;
   window.枠線を出す = 枠線を出す;
   render();
-  notify('画面の 枠線 … ' + (枠線を出す ? '★出す★' : '消す'));
+  notify('画面の 枠線 … ' + (枠線を出す ? '出す' : '消す'));
   return 枠線を出す;
 }
 /* ★セルの挿入／削除（1つだけ ずらす）★ 2026-08-29
@@ -12306,7 +12306,7 @@ function 並べ替えを決める(){
 function 見出しを出すか(){
   window.見出しを出す = (window.見出しを出す === false) ? true : false;
   resize(); render();
-  notify('行と列の 見出し … ' + (window.見出しを出す === false ? '消す' : '★出す★'));
+  notify('行と列の 見出し … ' + (window.見出しを出す === false ? '消す' : '出す'));
   return window.見出しを出す !== false;
 }
 function 数式バーを出すか(){
@@ -12315,7 +12315,7 @@ function 数式バーを出すか(){
   var 出す = (el.style.display === 'none');
   el.style.display = 出す ? '' : 'none';
   resize(); render();
-  notify('数式バー … ' + (出す ? '★出す★' : '消す'));
+  notify('数式バー … ' + (出す ? '出す' : '消す'));
   return 出す;
 }
 /* ══ ★表示｜表示 の 組★（2026-08-30）════════════════
@@ -12350,7 +12350,7 @@ function ルーラーを出すか(){
   } else {
     帯.style.display = 'none';
   }
-  notify('ルーラー … ' + (出す ? '★出す★' : '消す'));
+  notify('ルーラー … ' + (出す ? '出す' : '消す'));
   return 出す;
 }
 
@@ -12358,7 +12358,7 @@ function ルーラーを出すか(){
 function セルにフォーカスを切り替える(){
   window.セルにフォーカス = !window.セルにフォーカス;
   render();
-  notify('セルにフォーカス … ' + (window.セルにフォーカス ? '★出す★' : '消す'));
+  notify('セルにフォーカス … ' + (window.セルにフォーカス ? '出す' : '消す'));
   return !!window.セルにフォーカス;
 }
 
@@ -12731,7 +12731,7 @@ function フォームの窓を開く(){
   }
   var 中身の上 = 場所.r1 + 1;                 /* 1行目は 見出し（実Excelの 見立てと 同じ） */
   if (中身の上 > 場所.r2) {
-    notify('★中身の 行が ありません★（見出しの 下に 1行 以上 要ります）');
+    notify('中身の 行が ありません（見出しの 下に 1行 以上 要ります）');
     return 0;
   }
   _フォーム = { r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2, 見出し: 見出し, 今の行: 中身の上 };
@@ -12877,7 +12877,7 @@ function 参照元のトレース(){
   var f = cell ? String(cell.f || '') : '';
   var 元たち = 式の中の番地(f);
   if (!元たち.length) {
-    notify('★このセルは 他のセルを 見ていません★（式では ないか、番地が 入っていません）');
+    notify('このセルは 他のセルを 見ていません（式では ないか、番地が 入っていません）');
     return 0;
   }
   for (var i = 0; i < 元たち.length; i++) {
@@ -12906,7 +12906,7 @@ function 参照先のトレース(){
     }
   }
   if (!先たち.length) {
-    notify('★このセルを 見ている セルは ありません★');
+    notify('このセルを 見ている セルは ありません');
     return 0;
   }
   for (var k = 0; k < 先たち.length; k++) {
@@ -12958,7 +12958,7 @@ function 数式の検証を開く(){
   hideCtxMenu();
   var cell = sheets[activeSheet].data[selR1 + ',' + selC1];
   var f = cell ? String(cell.f || '') : '';
-  if (f.charAt(0) !== '=') { notify('★このセルは 式では ありません★'); return 0; }
+  if (f.charAt(0) !== '=') { notify('このセルは 式では ありません'); return 0; }
   _検証 = { 元の式: f, 今: f, 手: 0, 終わり: false };
   document.getElementById('evalWhere').textContent = cellAddr(selR1, selC1) + ' … ' + f;
   数式の検証を描く();
@@ -13131,7 +13131,7 @@ var そろえ方 = [
 ];
 function 物をそろえる(番){
   var 物たち = 今の物たち();
-  if (物たち.length < 2) { notify('★2つ以上 選んでください★（Ctrl を 押しながら 押すと 足せます）'); return 0; }
+  if (物たち.length < 2) { notify('2つ以上 選んでください（Ctrl を 押しながら 押すと 足せます）'); return 0; }
   var w = 囲みを取る(物たち);
   for (var i = 0; i < 物たち.length; i++) {
     var o = 物たち[i];
@@ -13185,7 +13185,7 @@ function 配置の窓を開く(){
 function グループにする(){
   hideCtxMenu();
   var 物たち = 今の物たち();
-  if (物たち.length < 2) { notify('★2つ以上 選んでください★'); return 0; }
+  if (物たち.length < 2) { notify('2つ以上 選んでください'); return 0; }
   var 箱 = 物の箱();
   var w = 囲みを取る(物たち);
   var 中身 = [];
@@ -13208,7 +13208,7 @@ function グループにする(){
 function グループを解く(){
   hideCtxMenu();
   var g = 選んだ物;
-  if (!g || g.種類 !== 'グループ') { notify('★まとめた 物を 選んでください★'); return 0; }
+  if (!g || g.種類 !== 'グループ') { notify('まとめた 物を 選んでください'); return 0; }
   var 箱 = 物の箱();
   var i = 箱.indexOf(g);
   if (i >= 0) 箱.splice(i, 1);
@@ -13247,7 +13247,7 @@ function グループの窓を開く(){
 function 物を回す(度){
   hideCtxMenu();
   var 物たち = 今の物たち();
-  if (!物たち.length) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  if (!物たち.length) { notify('先に 物を 押して 選んでください'); return 0; }
   for (var i = 0; i < 物たち.length; i++) {
     物たち[i].回転 = (((物たち[i].回転 || 0) + 度) % 360 + 360) % 360;
   }
@@ -13378,7 +13378,7 @@ function 描画を始める(){
   if (!描画の道具) 描画の道具 = { 種類: 'ペン', ペン: Ink.ペンたち[0] };
   描画バーを描く();
   document.getElementById('inkBar').style.display = 'block';
-  notify('★指か マウスで 書けます★（やめる を 押すと 元に 戻ります）');
+  notify('指か マウスで 書けます（やめる を 押すと 元に 戻ります）');
   return 1;
 }
 function 描画を終わる(){
@@ -13550,7 +13550,7 @@ function インクを描く(){
 /* ★インクの 再生★＝引いた 順に 少しずつ 出す */
 function インクを再生(){
   var 箱 = (sheets[activeSheet].ink || []).slice();
-  if (!箱.length) { notify('★まだ 何も 書いていません★'); return 0; }
+  if (!箱.length) { notify('まだ 何も 書いていません'); return 0; }
   var 元 = sheets[activeSheet].ink;
   sheets[activeSheet].ink = [];
   render();
@@ -13655,7 +13655,7 @@ function テキストを置く(){ hideCtxMenu(); return 物を足す('テキス�
 function 画像の窓を開く(){
   hideCtxMenu();
   var el = document.getElementById('imgFileInput');
-  if (!el) { notify('★入り口が 見つかりません★'); return 0; }
+  if (!el) { notify('入り口が 見つかりません'); return 0; }
   el.value = '';
   el.click();
   return 1;
@@ -13674,7 +13674,7 @@ function 画像を読む(el){
         元の名: f.name, 中身: 読み手.result });
       render();
     };
-    img.onerror = function () { notify('★その 画像は 読めませんでした★'); };
+    img.onerror = function () { notify('その 画像は 読めませんでした'); };
     img.src = String(読み手.result || '');
   };
   読み手.readAsDataURL(f);
@@ -13716,7 +13716,7 @@ function 物を押したか(px, py){
 }
 function 前面へ移動(){
   hideCtxMenu();
-  if (!選んだ物) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  if (!選んだ物) { notify('先に 物を 押して 選んでください'); return 0; }
   SheetObjects.前面へ(物の箱(), 選んだ物);
   render();
   notify('「' + 選んだ物.名 + '」を 前面へ 出しました');
@@ -13724,7 +13724,7 @@ function 前面へ移動(){
 }
 function 背面へ移動(){
   hideCtxMenu();
-  if (!選んだ物) { notify('★先に 物を 押して 選んでください★'); return 0; }
+  if (!選んだ物) { notify('先に 物を 押して 選んでください'); return 0; }
   SheetObjects.背面へ(物の箱(), 選んだ物);
   render();
   notify('「' + 選んだ物.名 + '」を 背面へ 送りました');
@@ -13798,7 +13798,7 @@ function 物を選ぶ(名){
 function CSVの窓を開く(){
   hideCtxMenu();
   var el = document.getElementById('csvFileInput');
-  if (!el) { notify('★入り口が 見つかりません★'); return 0; }
+  if (!el) { notify('入り口が 見つかりません'); return 0; }
   el.value = '';
   el.click();
   return 1;
@@ -13828,10 +13828,10 @@ function CSVを読む(el){
 }
 function CSVを入れる(字, ファイル名, 字の種類){
   var r = CsvIn.読む(字);
-  if (!r.表.length) { notify('★中身が ありませんでした★'); return 0; }
+  if (!r.表.length) { notify('中身が ありませんでした'); return 0; }
   var 前 = activeSheet;
   addSheet();
-  if (activeSheet === 前) { notify('★新しい シートを 作れませんでした★'); return 0; }
+  if (activeSheet === 前) { notify('新しい シートを 作れませんでした'); return 0; }
   for (var i = 0; i < r.表.length; i++) {
     for (var j = 0; j < r.表[i].length; j++) {
       var v = r.表[i][j];
@@ -13903,10 +13903,10 @@ function サブテーブルを作る(){
   for (var i = 0; i < 表.length; i++) for (var j = 0; j < 表[i].length; j++) {
     if (String(表[i][j] === null || 表[i][j] === undefined ? '' : 表[i][j]) !== '') { 何か = true; break; }
   }
-  if (!何か) { notify('★選んだ所に 中身が ありません★'); return 0; }
+  if (!何か) { notify('選んだ所に 中身が ありません'); return 0; }
   var 前 = activeSheet;
   addSheet();
-  if (activeSheet === 前) { notify('★新しい シートを 作れませんでした★'); return 0; }
+  if (activeSheet === 前) { notify('新しい シートを 作れませんでした'); return 0; }
   for (var i2 = 0; i2 < 表.length; i2++) {
     for (var j2 = 0; j2 < 表[i2].length; j2++) {
       var v = 表[i2][j2];
@@ -13939,7 +13939,7 @@ function リンクを全部消す(){
   }
   s0.links = {};
   render(); updateBar();
-  notify(鍵.length + '個の リンクを 消しました（★字は 消していません★）');
+  notify(鍵.length + '個の リンクを 消しました（字は 消していません）');
   return 鍵.length;
 }
 
@@ -13958,10 +13958,10 @@ function 空の行を数える(){
     ある行[r] = true;
     if (r > 一番下) 一番下 = r;
   }
-  if (一番下 < 0) { notify('★このシートに 中身が ありません★'); return 0; }
+  if (一番下 < 0) { notify('このシートに 中身が ありません'); return 0; }
   var 空 = 0;
   for (var r2 = 0; r2 <= 一番下; r2++) if (!ある行[r2]) 空++;
-  notify('1行目から ' + (一番下 + 1) + '行目までの 中で ★空の 行は ' + 空 + '行★です'
+  notify('1行目から ' + (一番下 + 1) + '行目までの 中で 空の 行は ' + 空 + '行です'
     + '（中身の 在る 行は ' + (一番下 + 1 - 空) + '行）');
   return 空;
 }
@@ -14007,14 +14007,14 @@ function テーブルをJSONにする(){
     }
     if (何か) 出.push(物);
   }
-  if (!出.length) { notify('★出す 中身が ありません★'); return 0; }
+  if (!出.length) { notify('出す 中身が ありません'); return 0; }
   var 字 = JSON.stringify(出, null, 2);
   var 名 = (sheets[activeSheet].name || 'テーブル') + '.json';
   /* ★ファイルの 渡し口は 1本だけ★（js/file-out.js）。
      ここで Blob を 作らない＝作ると iPhone で「開けないファイル」に なる型の 事故に なる
      （見張り ios-unsupported.test.mjs が 赤に した／2026-08-30）。 */
   if (typeof FileOut === 'undefined' || !FileOut.deliver) {
-    notify('★ファイルの 渡し口が 読めていません★'); return 0;
+    notify('ファイルの 渡し口が 読めていません'); return 0;
   }
   FileOut.deliver(字, 名, { type: 'application/json' });
   notify('「' + 名 + '」で 出しました（' + 出.length + '件）');
@@ -14361,7 +14361,7 @@ var スライサーの決め = null;   /* { 表, 列, 選び:{値:true} } */
 function スライサーを開く(){
   hideCtxMenu();
   var 表 = 今いる表();
-  if (!表) { notify('★先に テーブルに してください★（挿入→テーブル ／ Ctrl+T）'); return 0; }
+  if (!表) { notify('先に テーブルに してください（挿入→テーブル ／ Ctrl+T）'); return 0; }
   var c = selC1;
   if (c < 表.c1 || c > 表.c2) c = 表.c1;
   var data = sheets[activeSheet].data;
@@ -14401,7 +14401,7 @@ function スライサーを押す(値){
   d.選び[値] = !d.選び[値];
   var 数 = 0;
   for (var k in d.選び) if (d.選び[k]) 数++;
-  if (!数) { d.選び[値] = true; notify('★1つも 選ばないと 全部 消えてしまいます★'); return 0; }
+  if (!数) { d.選び[値] = true; notify('1つも 選ばないと 全部 消えてしまいます'); return 0; }
   スライサーを描く();
   return スライサーを効かせる();
 }
@@ -14471,7 +14471,7 @@ function ピボットの窓を開く(おすすめか){
   document.getElementById('pvFrom').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
   var 表 = ピボットの元の表(document.getElementById('pvFrom').value);
   if (!表 || 表.length < 2) {
-    notify('★見出しの 行と 中身が 1行 以上 要ります★');
+    notify('見出しの 行と 中身が 1行 以上 要ります');
     return 0;
   }
   var 見出し = 表[0].map(function (x) { return (x === null || x === undefined) ? '' : String(x); });
@@ -14875,7 +14875,7 @@ function フラッシュフィル(){
   hideCtxMenu();
   var s0 = sheets[activeSheet], d = s0.data;
   var c = selC1;
-  if (c <= 0) { notify('★左に 元の 列が ありません★'); return 0; }
+  if (c <= 0) { notify('左に 元の 列が ありません'); return 0; }
   var 中身 = function (r, cc) {
     var cell = d[r + ',' + cc];
     if (!cell) return '';
@@ -14898,9 +14898,9 @@ function フラッシュフィル(){
       最後に打った = r;
     }
   }
-  if (!例.length) { notify('★先に 1つ 見本を 打ってください★（この列に 1つだけ 答えを 書く）'); return 0; }
+  if (!例.length) { notify('先に 1つ 見本を 打ってください（この列に 1つだけ 答えを 書く）'); return 0; }
   var 決まり = FlashFill.覚える(例);
-  if (!決まり) { notify('★どう すればよいか 分かりませんでした★（何も 直していません）'); return 0; }
+  if (!決まり) { notify('どう すればよいか 分かりませんでした（何も 直していません）'); return 0; }
   var 埋めた = 0;
   for (var r2 = 最後に打った + 1; r2 < ROWS; r2++) {
     var 左が空2 = true, 元2 = [];
@@ -14916,7 +14916,7 @@ function フラッシュフィル(){
     埋めた++;
   }
   render(); updateBar();
-  if (!埋めた) { notify('★埋める 行が ありませんでした★（' + 決まり.名 + '）'); return 0; }
+  if (!埋めた) { notify('埋める 行が ありませんでした（' + 決まり.名 + '）'); return 0; }
   notify(埋めた + '行 埋めました（' + 決まり.名 + '）');
   return 埋めた;
 }
@@ -14928,7 +14928,7 @@ function フラッシュフィル(){
 var 前の絞り = null;   /* { 表, 列, 残す } */
 function 絞りを再適用(){
   hideCtxMenu();
-  if (!前の絞り) { notify('★まだ 絞っていません★'); return 0; }
+  if (!前の絞り) { notify('まだ 絞っていません'); return 0; }
   var sh = sheets[activeSheet], data = sh.data;
   var get = function (r, cc) { return data[r + ',' + cc]; };
   var t = 前の絞り.表;
@@ -15128,13 +15128,13 @@ function ブックの保護を決める(){
   ブックを守っている = document.getElementById('bookProtOn').checked;
   ブックの保護を閉じる();
   render();
-  notify(ブックを守っている ? '★シートの 足す・消す・名前を変える を 止めました★' : 'ブックの 守りを 外しました');
+  notify(ブックを守っている ? 'シートの 足す・消す・名前を変える を 止めました' : 'ブックの 守りを 外しました');
   return ブックを守っている;
 }
 /* シートを いじる前に 通る 門（★黙って 素通りさせない★） */
 function ブックの守りに引っかかる(何を){
   if (!ブックを守っている) return false;
-  notify('★ブックを 守っています★＝' + 何を + 'は できません（校閲→ブックの保護 で 外せます）');
+  notify('ブックを 守っています＝' + 何を + 'は できません（校閲→ブックの保護 で 外せます）');
   return true;
 }
 
@@ -15285,7 +15285,7 @@ function 計算方法を決める(){
   計算方法の窓を閉じる();
   if (計算方法 === 'auto') { すべて再計算(); 計算していない印(false); }
   else 計算していない印(true);
-  notify(計算方法 === 'auto' ? '自動で 計算します' : '★手動★＝F9 で 計算します');
+  notify(計算方法 === 'auto' ? '自動で 計算します' : '手動＝F9 で 計算します');
   return 計算方法;
 }
 /* ★計算していない★を 画面に 出す（黙って 古い数を 見せない） */
@@ -15494,7 +15494,7 @@ function 範囲から名前を作る(){
   範囲から名前の窓を閉じる();
   すべて再計算();
   /* ★とばした物を 黙らない★ */
-  notify(作った + '個 作りました' + (とばした.length ? '（★' + とばした.length + '個は 名前に 出来ません：'
+  notify(作った + '個 作りました' + (とばした.length ? '（' + とばした.length + '個は 名前に 出来ません：'
     + とばした.join('・') + '★）' : ''));
   return 作った;
 }
@@ -16363,7 +16363,7 @@ function openColorPalette(evt, target){
   var _もと = (evt && evt.currentTarget) ? evt.currentTarget
     : (document.getElementById(_paletteTarget === 'bgColor' ? 'fmt-bg-icon' : 'fmt-color-icon')
        || document.getElementById('fmt-font-size'));
-  if(!_もと){ notify('★色を 出す 所が 見つかりません★'); return; }
+  if(!_もと){ notify('色を 出す 所が 見つかりません'); return; }
   var rect=_もと.getBoundingClientRect();
   pal.style.left=Math.max(8, rect.left)+'px';
   pal.style.top=(rect.bottom+4)+'px';

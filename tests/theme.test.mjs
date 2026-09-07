@@ -123,7 +123,7 @@ ok('★人が 高さを 決めた 行は 触らない★', /&& !sh\.rowH\[r\]\) 
 ok('★ふりがなは 人が 入れる事を 画面に 書いてある★', /ふりがなが 入りません/.test(book));
 ok('★ふりがなは シートごとに 持つ★', /sheets\[activeSheet\]\.ruby/.test(book));
 ok('★出していない 時は 描かない★', /if \(ふりがなを出す\) \{/.test(book));
-ok('★字が 無い セルは 断る★', /★字が 入っている セルを 選んでください★/.test(book));
+ok('★字が 無い セルは 断る★', /字が 入っている セルを 選んでください/.test(book));
 ok('★alert / prompt / confirm を 使っていない★', !/\balert\(|\bprompt\(|\bconfirm\(/.test(book));
 
 console.log('\n[⑤ 副題を 決めていない 窓が 増えていないか]');
