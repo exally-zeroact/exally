@@ -39,6 +39,10 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★FIELDVALUE★ … 同上
 - ★IMAGE★ … 同上
 - ★LAMBDA★ … ★その場で 呼ぶ 書き方（=LAMBDA(x,x+1)(4)）は 動く★。セルに 名前として しまう 使い方は まだ 出来ない
+- ★ODDFPRICE★ … 端数の 初回が 1期に 収まる 形なら 実Excel と 合うが、日数の 数え方 2・3 や 準期間 3つ以上で ずれる。半分 合う 答えは 出さないと 決めた。合う 形だけ 切り出せるように なったら 出す
+- ★ODDFYIELD★ … 同上（ODDFPRICE の 裏返し）
+- ★ODDLPRICE★ … 端数の 最後が 2期までなら 実Excel と 合うが、3期以上で ずれる。半分 合う 答えは 出さないと 決めた。合う 形だけ 切り出せるように なったら 出す
+- ★ODDLYIELD★ … 同上（ODDLPRICE の 裏返し）
 - ★PHONETIC★ … ふりがなは セルに 付いた データ＝エンジンでは 見えない
 - ★RTD★ … 同上
 - ★STOCKHISTORY★ … 外の データ配信が 要る
