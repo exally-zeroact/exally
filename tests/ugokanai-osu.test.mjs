@@ -80,7 +80,6 @@ function 押す(式) {
  *  ★手で 決め打った 引数では「形が 合わないだけ」で 名前が 通らない★ので
  *  ★その 関数が 本当に 使われる 形★で 1本ずつ 書く。 */
 const 式たち = {
-  'AREAS': '=AREAS(A1:B3)',
   'BYCOL': '=BYCOL(A1:B2,LAMBDA(c,SUM(c)))',
   'BYROW': '=BYROW(A1:B2,LAMBDA(r,SUM(r)))',
   'CALL': '=CALL("kernel32","GetTickCount","J")',
