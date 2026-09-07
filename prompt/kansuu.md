@@ -18,7 +18,7 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 ★別の 名前で 動く 物（★打たれたら そのまま 動く＝断っては いけない★）★
 - BETADIST … ★打てば そのまま 動く★＝古い 名前。Exally が BETA.DIST(…,TRUE()) に 直して 答える（=BETADIST(0.5,1,2) → 0.75）（直している 場所＝convertFormula）
 - HYPGEOMDIST … ★打てば そのまま 動く★＝古い 名前。Exally が 4つ目の 引数に FALSE() を 足して 答える（=HYPGEOMDIST(1,2,3,4) → 0.5）（直している 場所＝convertFormula）
-- ISREF … ★打てば そのまま 動く★＝参照かどうかを 見る。Exally が 式を 読んで TRUE()/FALSE() に 直して 答える（直している 場所＝convertFormula）
+- ISREF … ★マスを 指しているか★を 見る。★A1／A1:B2／A:A／1:1／Sheet1!A1 は そのまま 動く★（実Excel と 突き合わせ済み）。★かっこが 入っている 形は 全部 まだ★＝#NAME? に なる（=ISREF(INDEX(...)) の ような 関数入り／★シート名に かっこが 在る 物（'売上(旧)'!A1）も★）。★指せたか どうかが 字だけでは 決まらない為（INDIRECT("A1") は TRUE／INDIRECT("zzz") は FALSE）。間違った TRUE/FALSE を 出すより「まだ」と 言う
 - JIS … ★打てば そのまま 動く★＝Exally が ★DBCS★（本名）に 直して 答える。=JIS("あ") → あ。JIS は 日本語UIの 表示名で、ファイル／英語の 構文では DBCS（YEN と 同じ 家／直している 場所＝exally-formula.js の convertFormula）
 - LET … ★打てば そのまま 動く★＝=LET(x,2,x*3) → 6（実測）。名前を 付けて 使い回す 書き方が そのまま 通る
 - MAKEARRAY … ★打てば そのまま 動く★＝=MAKEARRAY(2,2,LAMBDA(r,c,r*c)) が 答える（実測）

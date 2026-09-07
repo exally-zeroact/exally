@@ -986,8 +986,96 @@ function convertFormula(f, シート) {
   f = f.replace(/\bBETADIST\s*\(([^,()]+,[^,()]+,[^,()]+)\)/gi, 'BETA.DIST($1,TRUE())');
   f = f.replace(/\bHYPGEOMDIST\s*\(([^()]+)\)/gi, function(m,args){return args.split(',').length===4?'HYPGEOMDIST('+args+',FALSE())':m;});
   f = f.replace(/\bNEGBINOMDIST\s*\(([^()]+)\)/gi, function(m,args){return args.split(',').length===3?'NEGBINOMDIST('+args+',FALSE())':m;});
-  f = f.replace(/\bISREF\s*\(([^)]+)\)/gi, function(m,arg){return /^[A-Z]+\d+(:[A-Z]+\d+)?$/i.test(arg.trim())?'TRUE()':'FALSE()';});
+  f = _rewriteIsRef(f);
   return f;
+}
+
+/* ★ISREF＝『マスを 指しているか』を 見る 関数★（2026-09-07 に 作り直した）
+ *
+ *  ★★前の 作りは 壊れていました（本番に 在りました）★★
+ *    `f.replace(/\bISREF\s*\(([^)]+)\)/gi, …)`
+ *    ⇒★`[^)]+` は ★最初の ) で 止まります★＝★入れ子を 数えません★
+ *      `=ISREF(SUM(A1:A2))` → `=FALSE())`      ←★閉じかっこが 1つ 多い＝#ERROR!★
+ *      `=ISREF(IF(TRUE,A1,B1))` → `=FALSE(),A1,B1))`
+ *    ⇒ さらに TRUE に する 形が ★A1 と A1:B2 だけ★でした
+ *      `=ISREF(A:A)` `=ISREF(1:1)` `=ISREF(Sheet1!A1)` … ★実Excel は TRUE／うちは FALSE★
+ *      ⇒★誤りも 出ない＝★黙って 逆の 答え★＝一番 見つけにくい★
+ *
+ *  ★★答えは 実Excel に 打たせて 取りました★★
+ *    `docs/measured/kansuu46/golden-isref-2026-09-07.tsv`（25本）
+ *    ★実Excel の 決まり★＝★中身では なく ★マスを 指しているか★だけ★
+ *      `ISREF(E5)` … E5 が `#DIV/0!` でも ★TRUE★（★誤りは 伝わらない★）
+ *      `ISREF(INDEX(A1:B2,1,1))` … ★TRUE★（INDEX は マスを 指す）
+ *      `ISREF(SUM(A1:A2))` …… FALSE（SUM は 値）
+ *      `ISREF(INDIRECT("zzz"))` … ★FALSE★（指せなかった）
+ *      `ISREF(INDEX(A1:B2,99,1))` … ★FALSE★（外を 指した）
+ *
+ *  ★★今回は「嘘を 止める」所までです★★（指示役 2026-09-07・2a）
+ *    ★字だけで ★確かに★ 決まる 形★ … TRUE / FALSE を 出す
+ *    ★関数が 中に 入る 形★ ………… ★出しません★
+ *      ⇒`INDIRECT("A1")` は TRUE ／`INDIRECT("zzz")` は FALSE
+ *        ＝★指せたかは 字だけでは 決まりません★（AREAS と 同じ）
+ *      ⇒★★間違った TRUE/FALSE より #NAME?（＝まだです）の 方が 良い★★
+ *      ⇒ ISREF の まま 残す＝エンジンが #NAME? を 返す
+ *    ★名前（なまえ）★ も 同じ＝★まだ 出しません★（名前の 一覧を 見ないと 決まらない）
+ *
+ *  見張り: tests/isref.test.mjs
+ */
+function _rewriteIsRef(f){
+  if(!/\bISREF\s*\(/i.test(f)) return f;
+  var 出='', i=0;
+  while(i < f.length){
+    var m = /\bISREF\s*\(/i.exec(f.slice(i));
+    if(!m){ 出 += f.slice(i); break; }
+    var 頭 = i + m.index;                 /* ISREF の 先頭 */
+    var 開 = 頭 + m[0].length;            /* ( の 次 */
+    出 += f.slice(i, 頭);
+    /* ★かっこを ★数えて★ 閉じを 探す★（字の かたまりの 中の かっこは 数えない） */
+    var 深 = 1, j = 開, 字中 = false;
+    while(j < f.length){
+      var c = f.charAt(j);
+      if(字中){ if(c === '"') 字中 = false; }
+      else if(c === '"') 字中 = true;
+      else if(c === '(') 深++;
+      else if(c === ')'){ 深--; if(!深) break; }
+      j++;
+    }
+    if(深){ 出 += f.slice(頭); break; }   /* 閉じが 無い＝触らない（式を 壊さない） */
+    var 中 = f.slice(開, j).trim();
+    var 答 = _isRefKotae(中);
+    /* ★★決められない 形は ★そのままに しては いけません★★（2026-09-07 実測）
+       ⇒ エンジンは ★自分の ISREF を 持っています★
+       ⇒ そのまま 渡すと ★エンジンが 答えを 出してしまう★
+         実測 … `ISREF(INDIRECT("A1"))` → ★false★（実Excel は TRUE）
+                `ISREF(INDIRECT("zzz"))` → ★true★（実Excel は FALSE）
+                `ISREF(A1:INDEX(…))` → ★#ERROR!★
+       ⇒★★『そのまま 残す＝黙る』では なく『別の 誰かが 嘘を 言う』でした★★
+       ⇒ だから ★無い 名前★に 置き換えて ★#NAME?（＝まだです）★を 出す
+         （お客さんに 見える 式は 元の まま＝書き換えた 字は 画面に 出ません） */
+    出 += (答 === null) ? 'ISREF.MADA()'
+                        : (答 ? 'TRUE()' : 'FALSE()');
+    i = j + 1;
+  }
+  return 出;
+}
+
+/** ★字だけで 決まる 形か★ true／false／★null＝決められない★ */
+function _isRefKotae(中){
+  if(!中) return null;
+  if(/[()]/.test(中)) return null;                 /* ★関数が 入る＝決められない★ */
+  var s = 中.replace(/\$/g, '');
+  /* ★シートの 名前が 付いていたら 外す★（'a b'!A1 も） */
+  s = s.replace(/^'[^']*'!/, '').replace(/^[A-Za-z0-9_　-鿿]+!/, '');
+  /* ★マスを 指す 形（実測で TRUE）★ */
+  if(/^[A-Za-z]{1,3}[0-9]{1,7}(:[A-Za-z]{1,3}[0-9]{1,7})?$/.test(s)) return true;  /* A1 / A1:B2 */
+  if(/^[A-Za-z]{1,3}:[A-Za-z]{1,3}$/.test(s)) return true;                          /* A:A */
+  if(/^[0-9]{1,7}:[0-9]{1,7}$/.test(s)) return true;                                /* 1:1 */
+  /* ★値そのもの（実測で FALSE）★ */
+  if(/^"[^"]*"$/.test(中)) return false;                                            /* "a" */
+  if(/^-?[0-9]+(\.[0-9]+)?$/.test(中)) return false;                                /* 1 / 1.5 */
+  if(/^(TRUE|FALSE)(\(\))?$/i.test(中)) return false;                               /* TRUE */
+  if(/[+\-*/&^]/.test(中)) return false;                                            /* 1+1 / A1&"" */
+  return null;                                     /* ★名前など＝まだ 決めない★ */
 }
 
 // ================================================================
