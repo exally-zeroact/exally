@@ -262,6 +262,10 @@ async function redirectAllowed(ref, target) {
 
 const rows = { c1: [], c2: [], c3: [], c4: [], c5: [], c6: [] };
 let yellow = 0, red = 0;
+/* ★★読めなかった ファイルの 本数★★（2026-09-07 指示役の 注文）
+   ⇒ 印（🟢🔴🟡）の 数だけでは ★何本 見ていないか★が 表に 出ない
+   ⇒ 上限に 当たって こぼれた 分は ★広げた つもりで 狭く なっている★ 所 */
+const 読めず = { 上限で: 0, 木が切れた: 0, 取れなかった: 0 };
 const bump = (mark) => { if (mark === '🟡') yellow++; if (mark === '🔴') red++; };
 
 /* ── ① アプリのコード（＋アマかせは②の実効値も兼ねる） ── */
@@ -542,7 +546,7 @@ async function measureTools() {
     const hard = [], soft = [], known = [];
     for (const f of look) {
       const c = await ghGet(`https://raw.githubusercontent.com/${b.repo}/${def}/${f.path}`, gh);
-      if (!c.ok) continue;
+      if (!c.ok) { 読めず.取れなかった++; continue; }
       /* ★役目で 分ける★（2026-09-07 指示役）＝「在る／無い」では 決めない */
       const 違う = [...new Set([...refsIn(c.text), ...bareRefsIn(c.text)])].filter((r) => r !== b.want);
       if (!違う.length) continue;
@@ -555,7 +559,9 @@ async function measureTools() {
       else soft.push(`${f.path}（${判[0].訳}）`);
     }
     const capped = all.length > look.length ? `／★${all.length - look.length}本は見ていない=未測定★` : '';
+    if (all.length > look.length) 読めず.上限で += all.length - look.length;
     const truncated = t.truncated ? '／★treeが途中で切れている=未測定★' : '';
+    if (t.truncated) 読めず.木が切れた++;
     const openHandover = known.some((k) => k.includes('🟡'));
     const mark = hard.length ? '🔴' : (soft.length || capped || truncated || openHandover) ? '🟡' : '🟢';
     bump(mark);
@@ -733,6 +739,18 @@ console.log(`  🟢 正しい : ${all.filter((r) => r.mark === '🟢').length}`)
 console.log(`  🔴 ★誤り : ${all.filter((r) => r.mark === '🔴').length}★`);
 console.log(`  🟡 ★未測定: ${all.filter((r) => r.mark === '🟡').length}★  ← 0件・異常なしにしない`);
 console.log(`  —  対象外 : ${all.filter((r) => r.mark === '—').length}`);
+/* ★★読めなかった 本数を 必ず 出す★★（2026-09-07 指示役）
+   ⇒★『31個 見た』は『見るべき 物を 見た』では ない★
+   ⇒★上限に 当たって こぼれた 分は「広げた つもりで 狭い」所★ */
+{
+  const 外 = 見る範囲を数える().入らない;
+  const 合 = 読めず.上限で + 読めず.取れなかった;
+  console.log(`  ★読めなかった ファイル : ${合}本★`
+    + (合 ? `（上限で ${読めず.上限で} ／ 取れなかった ${読めず.取れなかった}）` : '')
+    + (読めず.木が切れた ? `／★一覧が 途中で 切れた repo ${読めず.木が切れた}本★` : ''));
+  console.log(`  ★見る 範囲の 外 : ${外.length}本★`
+    + (外.length ? `（${外.map((x) => x.道 + '＝' + x.訳).join(' ／ ')}）` : ''));
+}
 if (JSON_OUT) console.log('\n' + JSON.stringify(rows, null, 2));
 console.log(red ? '\n★🔴があります。向き先が違う所を直すこと★' : '\n🔴は0件（🟡の本数は上を見ること）');
 process.exit(red ? 3 : 0);
