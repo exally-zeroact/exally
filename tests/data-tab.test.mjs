@@ -44,7 +44,7 @@ function 抜く(名) {
 
 console.log('\n[① 測った 道具が 残っている]');
 ok('tools/measure-data-tab.ps1 が 在る', fs.existsSync(path.join(ROOT, 'tools/measure-data-tab.ps1')));
-ok('★決まりの 並びは うちの物★ と 書いてある', /★未測定★/.test(lib) && /うちの物/.test(lib));
+ok('★決まりの 並びは うちの物★ と 書いてある', /未測定/.test(lib) && /うちの物/.test(lib));
 
 console.log('\n[② フラッシュ フィル（実測と 同じ 出方）]');
 {
@@ -87,7 +87,7 @@ for (const n of ['フラッシュフィル', '絞りを再適用', 'ゴールシ
 ok('部品を 読み込んでいる', /src="lib\/flash-fill\.js/.test(book));
 ok('★Ctrl+E で 出る（実Excelと 同じ）★', /if\(ek==='e'\)\{[^}]*フラッシュフィル\(\)/.test(book));
 ok('★見本が 無ければ 断る★', /先に 1つ 見本を 打ってください/.test(book));
-ok('★分からなければ 何も 直さないと 言う★', /どう すればよいか 分かりませんでした★（何も 直していません）/.test(book));
+ok('★分からなければ 何も 直さないと 言う★', /どう すればよいか 分かりませんでした（何も 直していません）/.test(book));
 ok('★左に 元の 列が 無ければ 断る★', /左に 元の 列が ありません/.test(book));
 ok('★絞った時に 覚えて 再適用できる★', /前の絞り = \{ 表: _絞る表, 列: _絞る列, 残す: 残す \}/.test(book));
 ok('★まだ 絞っていなければ 断る★', /まだ 絞っていません/.test(book));
