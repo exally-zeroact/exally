@@ -56,6 +56,18 @@ require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
 require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
   .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
 
+/* ★★IM系の 字を 直す 物★★（★入っていない 置き場（＝「前」）でも 走るように 包む★）
+   ⇒★★これを 積み忘れると「直しが 効かないまま」測る事に なる★★
+     ⇒「0本 直る」と 出て ★自分の 直しが 見えない★（＝物差しが 直した物を 見ていない）
+   ⇒ だから ★積めたか どうかを 必ず 出す★（下の 一言）*/
+let 複素 = '★入っていない★';
+try {
+  const 数 = require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js')));
+  複素 = 数 ? ('★' + 数 + '個 包んだ★') : '★在るのに 0個＝繋がっていない★';
+} catch (e) { /* 「前」の 置き場には まだ 無い＝それで 良い */ }
+console.error('  IM系の 字を 直す 物 … ' + 複素);
+
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
 const SID = hf.getSheetId(hf.addSheet('Sheet1'));
 EF.initExallyFormula(hf);

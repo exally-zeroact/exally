@@ -213,6 +213,8 @@ const FILES = [
   ['isref.test.mjs', '--self-test'],      //  ＝[^)]+ が入れ子を数えず =FALSE()) を作っていた
   'formula-cell.test.mjs',                // ★CELL＝実Excelに7回 打たせた411本と突き合わせ(09-07)
   ['formula-cell.test.mjs', '--self-test'],//  ＝★" "の中の( は数えない★／$は通貨でない／yyyy/d はG
+  'formula-complex.test.mjs',             // ★IM系＝出す字を実Excelと同じ15桁に★丸める★(09-08 実測78本 直る)
+  ['formula-complex.test.mjs','--self-test'],// ＝★数を返す4個(IMABS等)に かけると壊れる★ので押して確かめる
   'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
   ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
