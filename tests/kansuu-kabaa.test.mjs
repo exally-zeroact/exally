@@ -173,7 +173,12 @@ function 押す(f) {
     const 式 = '=' + f + a;
     /* ①JS層 */
     if (typeof JS層 === 'function') {
-      try { if (JS層(0, 式) !== null) return true; } catch (e) { return true; }
+      /* ★★投げただけでは「動く」と 数えない★★（2026-09-07・指示役が 見つけた 穴A）
+         ⇒ 下の ②engine では 同じ事を 2026-09-07 に 直していたのに
+           ★こちら（①JS層）は 手つかずだった★＝★1か所 直して 終わりにするな★
+         ⇒★実測★ この 直しで 減る 数は ★0個★（今は 誰も ここに 頼っていない）
+           ⇒★でも 直す★＝★いつか 火が つく 罠★を 残さない */
+      try { if (JS層(0, 式) !== null) return true; } catch (e) { /* 数えない */ }
     }
     /* ②engine */
     let 後; try { 後 = EF.convertFormula(式); } catch (e) { continue; }
@@ -205,11 +210,39 @@ T('★★動いていた 物が 動かなく なっていない（後戻りを �
   }
 });
 
+/* ★★『動く』と 呼ぶのを やめました★★（2026-09-07・指示役の 決定）
+ *
+ *  ★この 数の 本当の 意味★
+ *    上の `押す(f)` は ★引数の 型紙 17通りを 519個 全部に 当てて★
+ *    ★1つでも #NAME? で なければ 数える★ 作りです。
+ *    ⇒★★答えが 合っているかは 1度も 見ていません★★
+ *    ⇒★★他の 形も 1度も 押していません★★
+ *    ⇒ だから これは『動く』では なく ★『名前が 通った』★です。
+ *
+ *  ★★数を 1つに 混ぜない★★（混ぜた 瞬間に 一部が 消える）
+ *    ・答えを 実Excel と 突き合わせた … 別に 数える
+ *    ・名前が 通っただけ ……………… ここ
+ *    ・名前も 通らない ………………… ここ
+ */
 console.log('\n── 実測（★本番の 道★＝JS層 → convertFormula → engine） ──');
 console.log('  実Excel が 知っている … ' + 全部.length + '個');
-console.log('  ★Exally で 動く ……… ' + 食.動いた数 + '個（'
-  + (食.動いた数 / 全部.length * 100).toFixed(1) + '%）★');
-console.log('  動かない …………………… ' + (全部.length - 食.動いた数) + '個');
+console.log('  ★★名前が 通った ……… ' + 食.動いた数 + '個（'
+  + (食.動いた数 / 全部.length * 100).toFixed(1) + '%）★★');
+console.log('      ⇒★これは「合っている」では ありません★');
+console.log('        ＝★引数の 型紙 17通りの うち 1つが #NAME? を 返さなかった★だけ');
+console.log('  ★名前も 通らない ……… ' + (全部.length - 食.動いた数) + '個');
+console.log('');
+console.log('  ★★『合っているか』は ★まだ 測っていません★★');
+console.log('    ⇒ 今の 押し方は ★#NAME? だけ★を 赤に しています。');
+console.log('      #VALUE! も #REF! も #NUM! も #N/A も ★全部 緑★です（穴B）。');
+console.log('    ⇒★★でも「誤りしか 返らない＝壊れている」では ありません★★');
+console.log('      実測 … `NA()` → `#N/A` は ★これが 正しい 動き★');
+console.log('             `CELL("a")` → `#VALUE!` も ★実Excel と 同じ★');
+console.log('             （CELL は 2026-09-07 に ★411本★ 実Excel と 突き合わせ済み）');
+console.log('             お金の 関数に `(1)` を 渡して #NUM! も ★断るのが 正しい★');
+console.log('    ⇒ 本当の 病気は ★17通りの 型紙を 519個 全部に 当てている★事です。');
+console.log('    ⇒★いつ 全部 測るかは 司さんの 決め（お金と 順番）★');
+console.log('    ⇒ 詳しく … docs/measured/ugoku-tana-no-uchiwake.md');
 console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '○' : '×')
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
   + ' ／ formula-kane-plug ' + 積4 + '本 ／ formula-yosoku-plug ' + 積5 + '本'
