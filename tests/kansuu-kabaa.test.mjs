@@ -107,6 +107,15 @@ const 積4 = FKP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-kane.js')));
 /* ★2026-09-07 に 足した 5つ目★＝予測・統計・単位 8個（CONVERT は ここへ 移した） */
 const FYP = require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'));
 const 積5 = FYP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')));
+/* ★2026-09-07 に 足した 6つ目★＝外へ 出る 4個
+   ★ここでは 外へ 1回も 出さない★＝道具を「必ず 断る 作り物」に する
+   ⇒ 見たいのは ★名前が 通るか★だけ（答えは 別の 試験 tests/formula-soto.test.mjs） */
+const FSP = require_(path.join(ROOT, 'lib/formula-soto-plug.js'));
+const 積6 = FSP.つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
+  取る: async () => { throw new Error('ここでは 外へ 出ません'); },
+  聞く: async () => { throw new Error('ここでは AI に 聞きません'); },
+  再計算: () => {},
+});
 
 T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に なる）★★', () => {
   if (!積1) throw new Error('exally-formula の プラグインを 積めていない');
@@ -114,6 +123,7 @@ T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に 
   if (!(積3 > 0)) throw new Error('formula-nokori-plug を 積めていない（' + 積3 + '本）');
   if (!(積4 > 0)) throw new Error('formula-kane-plug を 積めていない（' + 積4 + '本）');
   if (!(積5 > 0)) throw new Error('formula-yosoku-plug を 積めていない（' + 積5 + '本）');
+  if (!(積6 > 0)) throw new Error('formula-soto-plug を 積めていない（' + 積6 + '本）');
 });
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
@@ -185,6 +195,7 @@ console.log('  動かない …………………… ' + (全部.length - 食.�
 console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '○' : '×')
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
   + ' ／ formula-kane-plug ' + 積4 + '本 ／ formula-yosoku-plug ' + 積5 + '本'
+  + ' ／ formula-soto-plug ' + 積6 + '本'
   + ' ／ JS層 ' + (typeof JS層 === 'function' ? '○' : '×'));
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();

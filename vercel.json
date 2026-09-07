@@ -9,6 +9,10 @@
       "destination": "/api/claude"
     },
     {
+      "source": "/api/soto",
+      "destination": "/api/soto"
+    },
+    {
       "source": "/",
       "destination": "/hub.html"
     },

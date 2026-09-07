@@ -10,8 +10,9 @@
  *    golden-convert3-2026-09-07.tsv … 接頭辞が 付く 単位（147本）
  *    ⇒ どれも Excel 16.0 build 20326（UI 1041）に 打たせた 物
  *
- *  ★★出さない 9個も 見張る★★
- *    AREAS / CELL / FILTERXML / INFO / TRIMRANGE / FORECAST.ETS 4つ
+ *  ★★出さない 物も 見張る★★
+ *    AREAS / CELL / FILTERXML / TRIMRANGE / FORECAST.ETS 4つ
+ *    （★INFO は 2026-09-07「全部やって」で 出しました★）
  *    ⇒ 出す 名簿に 入っていない事／動かない 棚に 訳つきで 載っている事
  *
  *  使い方: node tests/formula-yosoku.test.mjs
@@ -47,7 +48,10 @@ const 積3 = require_(path.join(ROOT, 'lib/formula-nokori-plug.js'))
 const 積4 = require_(path.join(ROOT, 'lib/formula-kane-plug.js'))
   .つなぐ(H, require_(path.join(ROOT, 'lib/formula-kane.js')));
 const Y = require_(path.join(ROOT, 'lib/formula-yosoku.js'));
-const 積5 = require_(path.join(ROOT, 'lib/formula-yosoku-plug.js')).つなぐ(H, Y);
+const 積5 = require_(path.join(ROOT, 'lib/formula-yosoku-plug.js')).つなぐ(H, Y, function () {
+  /* ★場の 事★＝試験では 決めた 物を 入れる（画面は 本物を 入れる） */
+  return { シート数: 3, 版: 'Exally test', 台: 'win', OS: 'Windows (64-bit) NT 10.00', 左上: '$A$1' };
+});
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
 const SID = hf.getSheetId(hf.addSheet('S'));
@@ -123,11 +127,27 @@ T('★答えの 紙が 空でない／どの Excel かが 書いてある★', (
   }
 });
 
-T('★出す 8個は 1本 残らず 実Excel と 同じ★', () => {
+/* ★★実Excel と 同じに ならない と 決めた 物★★（1つずつ 訳を 書く）
+   ⇒★ここに 書かずに 黙って 外すと『合っている』の 意味が 薄まる★ */
+const 別扱い = {
+  'INFO': '★場の 事を 返す 物★＝実Excel は「Excel の 版」「開いている ブックの 数」を 返す。'
+    + ' Exally が 同じ 数を 名乗ったら ★嘘★に なる。'
+    + ' ⇒ うちの 版・うちの シートの 数を 返す（別の 試験で 1つずつ 押す）',
+};
+
+T('★実Excel と 同じに しない 物には 訳が 書いてある★', () => {
+  for (const n of Object.keys(別扱い)) {
+    if (出す.indexOf(n) < 0) throw new Error(n + ' は 出していないのに 別扱いに 書いてある');
+    if (String(別扱い[n]).length < 20) throw new Error(n + ' の 訳が 短すぎる');
+  }
+});
+
+T('★出す 物は 1本 残らず 実Excel と 同じ★（別扱いを 除く）', () => {
   const 外れ = [];
   let 見た = 0;
   for (const 行 of 行たち) {
     if (出す.indexOf(行.名) < 0) continue;
+    if (別扱い[行.名]) continue;
     見た++;
     const 出 = 押す(行.式);
     if (!合うか(行, 出)) 外れ.push(行.式 + '\n        正 ' + 行.答 + ' ／ 出 ' + 出);
@@ -168,18 +188,32 @@ T('★でたらめの 表は 頼まれた 形と 範囲を 守る★（計算だ
   }
 });
 
+T('★★INFO は 分かる 物だけ 答え、無い 物は 作らない★★（2026-09-07 司さん「全部やって」）', () => {
+  const 見 = [['=INFO("numfile")', 3], ['=INFO("recalc")', '自動'],
+    ['=INFO("system")', 'pcdos'], ['=INFO("release")', 'Exally test']];
+  for (const [f, 正] of 見) {
+    const v = 押す(f);
+    if (String(v) !== String(正)) throw new Error(f + ' … 正 ' + 正 + ' ／ 出 ' + v);
+  }
+  /* ★パソコンの フォルダは ブラウザに 無い★＝それらしい 物を 作らない */
+  for (const f of ['=INFO("directory")', '=INFO("memavail")']) {
+    if (押す(f) !== '#N/A') throw new Error(f + ' が #N/A で ない … ' + 押す(f));
+  }
+  if (押す('=INFO("なんとか")') !== '#VALUE!') throw new Error('知らない 合言葉が #VALUE! で ない');
+});
+
 T('★単位の 表は 手で 書いていない★（答えの 紙から 機械で 作った ままか）', () => {
   const 出 = require_('node:child_process').spawnSync(process.execPath,
     [path.join(ROOT, 'scripts/make-tanni-hyou.mjs'), '--check'], { encoding: 'utf-8' });
   if (出.status !== 0) throw new Error((出.stdout || '') + (出.stderr || ''));
 });
 
-T('★保留の 9個は 出していない★（半分 合う 計算を 客に 見せない）', () => {
+T('★保留の 物は 出していない★（半分 合う 計算を 客に 見せない）', () => {
   for (const n of 保留) if (出す.indexOf(n) >= 0) throw new Error(n + ' が 出す 名簿に 入っている');
-  if (保留.length !== 9) throw new Error('保留は 9個の はず（今 ' + 保留.length + '）');
+  if (!保留.length) throw new Error('保留が 0個＝棚が 空＝数え忘れ');
 });
 
-T('★保留の 9個は「動かない 棚」に 訳つきで 載っている★', () => {
+T('★保留の 物は「動かない 棚」に 訳つきで 載っている★', () => {
   const EX = require_(path.join(ROOT, 'lib/formula-extra.js'));
   const 棚 = (EX.数える && EX.数える().足さない) || {};
   for (const n of 保留) {
