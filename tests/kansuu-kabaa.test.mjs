@@ -127,6 +127,11 @@ try {
 } catch (e) { XML部品 = null; }
 const 積7 = require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
   .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
+/* ★2026-09-07 に 足した 8つ目★＝CELL（そのマスが どう 見えているか）
+   ★見た目は 画面が 入れる★ので ここでは ★何も 入れない★
+   ⇒ 既定の 見た目（＝まっさらな Excel と 同じ）で 答える＝★空回りでは ない★ */
+const 積8 = require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
+  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
 
 T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に なる）★★', () => {
   if (!積1) throw new Error('exally-formula の プラグインを 積めていない');
@@ -136,6 +141,7 @@ T('★★本番と 同じ物を 積めた（片方 忘れると 13個が 嘘に 
   if (!(積5 > 0)) throw new Error('formula-yosoku-plug を 積めていない（' + 積5 + '本）');
   if (!(積6 > 0)) throw new Error('formula-soto-plug を 積めていない（' + 積6 + '本）');
   if (!(積7 > 0)) throw new Error('formula-filterxml-plug を 積めていない（' + 積7 + '本）');
+  if (!(積8 > 0)) throw new Error('formula-cell-plug を 積めていない（' + 積8 + '本）');
 });
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
@@ -208,6 +214,7 @@ console.log('  積んだ プラグイン ……… exally-formula ' + (積1 ? '�
   + ' ／ formula-extra-plug ' + 積2 + '本 ／ formula-nokori-plug ' + 積3 + '本'
   + ' ／ formula-kane-plug ' + 積4 + '本 ／ formula-yosoku-plug ' + 積5 + '本'
   + ' ／ formula-soto-plug ' + 積6 + '本 ／ formula-filterxml-plug ' + 積7 + '本'
+  + ' ／ formula-cell-plug ' + 積8 + '本'
   + ' ／ JS層 ' + (typeof JS層 === 'function' ? '○' : '×'));
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 hf.destroy();

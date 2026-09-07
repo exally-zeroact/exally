@@ -112,6 +112,9 @@ try {
 } catch (e) { XML部品 = null; }
 積んだlib.push(require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
   .つなぐ(H2, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品));
+/* ★CELL★＝見た目は 画面が 入れる（ここでは 入れない＝既定の 見た目で 答える） */
+積んだlib.push(require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
+  .つなぐ(H2, require_(path.join(ROOT, 'lib/formula-cell.js')), null));
 const hf = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 /* ★本番と 同じ★＝book.html は hf を 作った後 initExallyFormula(hf) を 1回 呼ぶ */
 EF.initExallyFormula(hf);
