@@ -1,0 +1,21 @@
+# ★実Excel に 打たせた AREAS の 答え（4回目・残していた 穴）★
+# 取った 日 … 2026-09-07
+# ★どの Excel で 打ったか★ … 版 16.0 ／ build 20326
+# ★名前★ ひとつ=1か所 ／ とびとび=2か所 ／ みっつ=3か所
+# ★シート★ Sheet1 ／ '二 枚目'（★名前に 空白★）
+# 関数	式	実Excel の 答え	型
+AREAS	=AREAS((とびとび,A1))	3	Double
+AREAS	=AREAS((A1,とびとび))	3	Double
+AREAS	=AREAS((とびとび,とびとび))	4	Double
+AREAS	=AREAS(みっつ)	3	Double
+AREAS	=AREAS((みっつ,とびとび))	5	Double
+AREAS	=AREAS(( A1 , B2 ))	2	Double
+AREAS	=AREAS((A1,A2,A3))	3	Double
+AREAS	=AREAS(($A$1,$B$2))	2	Double
+AREAS	=AREAS((A1:B2,A1:B2,A1:B2))	3	Double
+AREAS	=AREAS('二 枚目'!A1)	1	Double
+AREAS	=AREAS(('二 枚目'!A1,'二 枚目'!C3))	2	Double
+AREAS	=AREAS((A1:C3 B2:D4,E5))	2	Double
+AREAS	=AREAS((A1:C3,B2:D4 C3:E5))	2	Double
+AREAS	=AREAS((A:A,1:1))	2	Double
+AREAS	=AREAS((A1,B2,C3,D4,E5,F6,G7,H8))	8	Double

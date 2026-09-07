@@ -1,0 +1,23 @@
+# ★実Excel に 打たせた AREAS の 答え（3回目・答えが 割れる 組）★
+# 取った 日 … 2026-09-07
+# ★どの Excel で 打ったか★ … 版 16.0 ／ build 20326
+# ★置いた 中身★ A1='あいう'（字）／A2='かきく'（字）／B1=11（数）／C1=空／D1==1/0（誤り）
+# ★聞きたい 事★ 『出てきた 値が 字なら #VALUE!』で よいか
+#   ⇒ A1 が ★字★でも マスを 指していれば 1 なら、その 決まりは ★間違い★
+# 関数	式	実Excel の 答え	型
+AREAS	=AREAS(IF(TRUE,A1,A2))	1	Double
+AREAS	=AREAS(IF(TRUE,A1:A2,B1))	1	Double
+AREAS	=AREAS(INDEX(A1:A2,1))	1	Double
+AREAS	=AREAS(CHOOSE(1,A1,A2))	1	Double
+AREAS	=AREAS(INDIRECT("A1"))	1	Double
+AREAS	=AREAS(OFFSET(A1,0,0))	1	Double
+AREAS	=AREAS(IF(TRUE,C1,B1))	1	Double
+AREAS	=AREAS(INDEX(C1:C2,1))	1	Double
+AREAS	=AREAS(IF(TRUE,D1,B1))	1	Double
+AREAS	=AREAS(INDEX(D1:D2,1))	1	Double
+AREAS	=AREAS(IF(TRUE,"x","y"))	#VALUE!	error値
+AREAS	=AREAS(CHOOSE(1,"x","y"))	#VALUE!	error値
+AREAS	=AREAS(IF(TRUE,A1&"",B1))	#VALUE!	error値
+AREAS	=AREAS(IF(TRUE,1,2))	#VALUE!	error値
+AREAS	=AREAS(CHOOSE(1,1,2))	#VALUE!	error値
+AREAS	=AREAS(IF(TRUE,TRUE,FALSE))	#VALUE!	error値

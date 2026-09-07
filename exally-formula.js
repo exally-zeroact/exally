@@ -987,8 +987,84 @@ function convertFormula(f, シート) {
   f = f.replace(/\bHYPGEOMDIST\s*\(([^()]+)\)/gi, function(m,args){return args.split(',').length===4?'HYPGEOMDIST('+args+',FALSE())':m;});
   f = f.replace(/\bNEGBINOMDIST\s*\(([^()]+)\)/gi, function(m,args){return args.split(',').length===3?'NEGBINOMDIST('+args+',FALSE())':m;});
   f = _rewriteIsRef(f);
+  f = _rewriteAreas(f);
   return f;
 }
+
+/* ★AREAS＝『範囲が 幾つに 分かれているか』を 数える★（2026-09-07）
+ *
+ *  ★★なぜ ここ（式の 字を 書き換える 段）で やるか★★
+ *    エンジンは ★とびとびの 範囲を ★式を 読む 所★で 断ります★
+ *      `=SUM((A1:B3,D1:D2))` … Parsing error（RParen を 待っていたら , が 来た）
+ *    ⇒★関数の 所まで 届かない＝プラグインでは 受け取れない★
+ *    ⇒★JS層も 駄目★＝★式の 一番 外側でしか 効かない★
+ *      （実測 … AREAS は 入れ子で 使われる
+ *        `=SUM(AREAS((A1,A2)),1)` → 3 ／ `=AREAS((A1,A2))+AREAS(B2:D4)` → 3）
+ *    ⇒★★字を 数に 置き換えれば 入れ子も そのまま 正しく なる★★
+ *      `=SUM(AREAS((A1,A2)),1)` → `=SUM(2,1)` → 3
+ *
+ *  ★答え★ 実Excel に 4回 打たせた ★89本★
+ *    `docs/measured/kansuu46/golden-areas*-2026-09-07.tsv`
+ *    ★決まり★＝★中身では なく ★マスを 指しているか★だけ★（ISREF と 同じ）
+ *      `AREAS(IF(TRUE,D1,B1))` … D1 が `#DIV/0!` でも ★1★
+ *
+ *  ★★出さない 形★★（★半分 合う 答えを 出さない★）
+ *    ★かっこが 入る 形は 全部★（`AREAS(INDEX(...))` ／ シート名の かっこ）
+ *    ⇒ 実測 … `AREAS(INDEX(D1:D2,1))` は ★1★／`AREAS(INDEX(A1:C3,99,1))` は ★#REF!★
+ *      ⇒★どちらも「計算したら 誤り」＝★値では 見分けられない★★
+ *    ⇒★★今の 作りでは 出せません★＝`AREAS.MADA()` に して `#NAME?`（＝まだです）
+ *      ★★そのまま 残しては いけない★★＝ISREF で 踏んだ
+ *        （エンジンは AREAS を 知らないので #NAME? に なるが、
+ *          ★とびとびは 式を 読む 所で 止まって #ERROR! に なる★）
+ *
+ *  ★`#NULL!` も 今は 出せません★
+ *    実測 … エンジンの 誤りの 種類に ★NULL が 無い★
+ *    ⇒ `AREAS(B2:D4 A1)`（重ならない 重なり）は ★まだ★に する
+ *      （★#ERROR! で 出すと 実Excel と 字が 違う★）
+ *
+ *  見張り: tests/formula-areas.test.mjs
+ */
+function _rewriteAreas(f){
+  if(!/\bAREAS\s*\(/i.test(f)) return f;
+  var A = null;
+  try{
+    A = (typeof module === 'object' && module.exports && typeof require === 'function')
+      ? require('./lib/formula-areas.js')
+      : (typeof self !== 'undefined' ? self.FormulaAreas : null);
+  }catch(e){ A = (typeof self !== 'undefined' ? self.FormulaAreas : null); }
+  if(!A || typeof A.区画を数える !== 'function') return f;   /* 部品が 無い＝触らない */
+  var 出='', i=0;
+  while(i < f.length){
+    var m = /\bAREAS\s*\(/i.exec(f.slice(i));
+    if(!m){ 出 += f.slice(i); break; }
+    var 頭 = i + m.index, 開 = 頭 + m[0].length;
+    出 += f.slice(i, 頭);
+    /* ★かっこを 数えて 閉じを 探す★（字の かたまりの 中の かっこは 数えない） */
+    var 深=1, j=開, 字中=false;
+    while(j < f.length){
+      var c = f.charAt(j);
+      if(字中){ if(c === '"') 字中 = false; }
+      else if(c === '"') 字中 = true;
+      else if(c === '(') 深++;
+      else if(c === ')'){ 深--; if(!深) break; }
+      j++;
+    }
+    if(深){ 出 += f.slice(頭); break; }               /* 閉じが 無い＝触らない */
+    var 答 = A.区画を数える(f.slice(開, j));
+    if(typeof 答 === 'number') 出 += String(答);
+    /* ★★#VALUE! は エンジンが 持っている＝★そのまま 出す★★
+       （実測 … `AREAS((Sheet1!A1,二枚目!A1))` は 実Excel も #VALUE!）
+       ⇒★出せる 答えを「まだ」に しない★＝それも 嘘に なる */
+    else if(答 && 答.誤り === 'VALUE') 出 += '#VALUE!';
+    /* ★★#NULL! は エンジンに 無い★★（実測 … 誤りの 種類に NULL が 無い）
+       ⇒ `#ERROR!` で 出すと ★実Excel と 字が 違う★
+       ⇒★だから ここだけ「まだです」に する★ */
+    else 出 += 'AREAS.MADA()';
+    i = j + 1;
+  }
+  return 出;
+}
+
 
 /* ★ISREF＝『マスを 指しているか』を 見る 関数★（2026-09-07 に 作り直した）
  *

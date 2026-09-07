@@ -207,6 +207,8 @@ const FILES = [
   ['formula-filterxml.test.mjs', '--self-test'],// ＝自分で少しだけ作ると★通る式と通らない式が混ざる★
   'nul-nashi.test.mjs',                   // ★生のNULを配る物に入れない＝git が「絵」と決めて差分が消える(09-07)
   ['nul-nashi.test.mjs', '--self-test'],  //  ＝前の見張りは lib/pivot.js ★1本だけ★を見ていた(550本中)
+  'formula-areas.test.mjs',               // ★AREAS＝エンジンが式を読む所で断る「とびとび」を通す(09-08 実測89本)
+  ['formula-areas.test.mjs','--self-test'],//  ＝間違いが★出さない側に倒れる★ので下限を実測の29本で見張る
   'isref.test.mjs',                       // ★ISREF＝本番で かっこを 壊し 逆の答えを 返していた(09-07 実測25本)
   ['isref.test.mjs', '--self-test'],      //  ＝[^)]+ が入れ子を数えず =FALSE()) を作っていた
   'formula-cell.test.mjs',                // ★CELL＝実Excelに7回 打たせた411本と突き合わせ(09-07)
