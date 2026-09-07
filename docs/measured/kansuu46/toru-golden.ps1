@@ -14,8 +14,12 @@
 
 $ErrorActionPreference = 'Stop'
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$入 = Join-Path $ここ 'cases-kane.txt'
-$出 = Join-Path $ここ 'golden-kane-2026-09-07.tsv'
+$入名 = 'cases-kane.txt'
+if ($args.Count -ge 1) { $入名 = $args[0] }
+$入 = Join-Path $ここ $入名
+$出名 = 'golden-kane-2026-09-07.tsv'
+if ($args.Count -ge 2) { $出名 = $args[1] }
+$出 = Join-Path $ここ $出名
 
 $行 = Get-Content -LiteralPath $入 -Encoding UTF8 | Where-Object { $_.Trim() -ne '' }
 Write-Host "式 $($行.Count) 本"
@@ -76,7 +80,7 @@ $xl.Quit()
 [System.Runtime.InteropServices.Marshal]::ReleaseComObject($xl) | Out-Null
 
 $頭 = @(
-  "# ★実Excel に 打たせた 答え（お金の 26個）★",
+  "# ★実Excel に 打たせた 答え★（入 $入）",
   "# 取った 日 … 2026-09-07",
   "# ★どの Excel で 打ったか★ … 版 $版 ／ build $ビルド ／ UI の 言語 $言語",
   "# ★読み方★ … 数は .Value2 を 'R'（丸めない 書き方）で 出している",
