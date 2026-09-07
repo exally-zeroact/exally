@@ -84,7 +84,6 @@ const 式たち = {
   'BYCOL': '=BYCOL(A1:B2,LAMBDA(c,SUM(c)))',
   'BYROW': '=BYROW(A1:B2,LAMBDA(r,SUM(r)))',
   'CALL': '=CALL("kernel32","GetTickCount","J")',
-  'CELL': '=CELL("row",B7)',
   'CUBEKPIMEMBER': '=CUBEKPIMEMBER("x","y",1)',
   'CUBEMEMBER': '=CUBEMEMBER("x","[a].[b]")',
   'CUBEMEMBERPROPERTY': '=CUBEMEMBERPROPERTY("x","[a].[b]","p")',

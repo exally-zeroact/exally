@@ -205,6 +205,8 @@ const FILES = [
   ['formula-soto.test.mjs', '--self-test'],
   'formula-filterxml.test.mjs',           // ★XMLから取り出す＝★XPathはブラウザの物をそのまま使う★(09-07)
   ['formula-filterxml.test.mjs', '--self-test'],// ＝自分で少しだけ作ると★通る式と通らない式が混ざる★
+  'formula-cell.test.mjs',                // ★CELL＝実Excelに7回 打たせた411本と突き合わせ(09-07)
+  ['formula-cell.test.mjs', '--self-test'],//  ＝★" "の中の( は数えない★／$は通貨でない／yyyy/d はG
   'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
   ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）

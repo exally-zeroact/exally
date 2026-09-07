@@ -38,7 +38,6 @@ ARRAYTOTEXT / AVERAGEIFS / CHOOSECOLS / CHOOSEROWS / DROP / EXPAND / MODE.MULT /
 - ★BYCOL★ … 列ごとに まとめる 物＝まだ 作っていない（MAP・REDUCE・SCAN は 動く）
 - ★BYROW★ … 行ごとに まとめる 物＝まだ 作っていない（MAP・REDUCE・SCAN は 動く）
 - ★CALL★ … パソコンの 中の 外部の 部品を 呼ぶ 物。ブラウザの 中には その 仕組みが 無い
-- ★CELL★ … 行・列・番地は 出せるが、幅・書式・保護は ★画面の 見た目や ブックの 設定★を 見に 行く 物で、計算の 所からは 見えない。 一部だけ 返すと どれが 本物か 分からない ので 出していない
 - ★CUBEKPIMEMBER★ … 分析用の 倉庫の 目標の 値を 取る 物。繋ぐ 相手が 無い
 - ★CUBEMEMBER★ … 分析用の 倉庫（キューブ）の 項目を 指す 物。繋ぐ 相手が 無い
 - ★CUBEMEMBERPROPERTY★ … 分析用の 倉庫の 項目の 中身を 取る 物。繋ぐ 相手が 無い
