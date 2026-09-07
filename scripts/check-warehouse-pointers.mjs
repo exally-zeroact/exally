@@ -154,7 +154,13 @@ export function bareRefsIn(text) {
  *  ★どちらでも「なぜ そう 数えたか」を 1行 出す★
  */
 export function 設定のファイルか(path) {
-  return /(^|\/)[a-z0-9_-]*config[a-z0-9_-]*\.(m?js|ts|json)$/i.test(String(path));
+  const p = String(path);
+  /* ★画面（.html）の 中に 直に 書いて ある 住所も「設定」★（2026-09-07 指示役）
+     ⇒ 代行請求は `daikou-seikyu.html` の 中に 住所を 直書きしている
+     ⇒★今は 本番も テスト線も 正しい★／★でも 明日 反対に なっても 誰も 気づかない★
+     ⇒★『起きていない』と『起きない』は 別★ */
+  if (/\.html?$/i.test(p)) return true;
+  return /(^|\/)[a-z0-9_-]*config[a-z0-9_-]*\.(m?js|ts|json)$/i.test(p);
 }
 export function 繋ぐ呼び出しの中か(text, ref) {
   const 行 = String(text).split(/\r?\n/);
@@ -488,22 +494,23 @@ export function 見る範囲を数える(apps = APPS) {
   for (const a of apps) {
     if (!a.cfg) continue;
     const 道 = String(a.cfg).replace(/^\//, '');
-    if (設定の道.test(道) || (TOOL_DIRS.test(道) && /\.(m?js|ts)$/.test(道))) {
+    if (設定の道.test(道) || /\.html?$/i.test(道) || (TOOL_DIRS.test(道) && /\.(m?js|ts)$/.test(道))) {
       if (入る.indexOf(道) < 0) 入る.push(道);
     } else if (!入らない.some((x) => x.道 === 道)) {
       入らない.push({
         道: 道,
-        訳: /\.html?$/i.test(道) ? '画面の 中に 直書き（この 見張りは js/ts/json だけ 読む）'
-          : '配信の 口（repo の ファイルでは ない）',
+        訳: '配信の 口（repo の ファイルでは ない）',
       });
     }
   }
   return {
-    範囲: 'scripts/tests/tools の js・ts ＋ ★config の 名前の ファイルは どこでも★',
+    範囲: 'scripts/tests/tools の js・ts ＋ ★config の 名前の ファイル★ ＋ ★画面(.html)★ は どこでも',
     入る: 入る, 入らない: 入らない,
   };
 }
-const MAX_FILES = 400;
+/* ★上限を 上げた（2026-09-07）★＝`.html` を 範囲に 足したので
+   400 のままだと ★見ていない＝未測定★が 増えて 穴が 広がる */
+const MAX_FILES = 900;
 async function measureTools() {
   /* ★★見る 範囲を 先に 出す★★（2026-09-07 指示役の 決まり） */
   const 範 = 見る範囲を数える();
@@ -527,7 +534,10 @@ async function measureTools() {
     if (!tree.ok) { rows.c6.push({ repo: b.repo, mark: '🟡', text: `未測定（treeを読めない ${tree.status}${tree.err ? ' ' + tree.err : ''}）` }); yellow++; continue; }
     const t = JSON.parse(tree.text);
     const all = (t.tree || []).filter((x) => x.type === 'blob'
-      && ((TOOL_DIRS.test(x.path) && /\.(m?js|ts)$/.test(x.path)) || 設定の道.test(x.path)));
+      && ((TOOL_DIRS.test(x.path) && /\.(m?js|ts)$/.test(x.path))
+        || 設定の道.test(x.path)
+        /* ★画面（.html）も 読む★＝住所を 直に 書いて いる 画面が 在る */
+        || /\.html?$/i.test(x.path)));
     const look = all.slice(0, MAX_FILES);
     const hard = [], soft = [], known = [];
     for (const f of look) {
@@ -643,6 +653,13 @@ if (argv.includes('--self-test')) {
     eq(r.mark, '🟡', '見張りの 定数');
     /* ★でも 試験の 外なら 同じ 名前で 🔴★（甘くしすぎていない事） */
     eq(役目で分ける('js/supa-from-config.mjs', 中, PROD_REF).mark, '🔴', '試験の 外');
+  });
+  T('★★画面（.html）の 中の 直書きも 🔴★★（2026-09-07 指示役の 注文）', () => {
+    const 中 = "<script>const SUPA_URL='https://" + TEST_REF + ".supabase" + ".co';</" + "script>";
+    eq(役目で分ける('daikou-seikyu.html', 中, TEST_REF).mark, '🔴', '画面の 直書き');
+    /* ★試験の 中の .html は 先に tests/ で 外れる★ */
+    eq(役目で分ける('tests/fixtures/a.html', "expect(x).not.toContain('" + TEST_REF + "');", TEST_REF).mark,
+      '🟡', '試験の 中');
   });
   T('★設定の ファイルの 見分け（名前だけで 決める）', () => {
     if (!設定のファイルか('js/dk-config.js')) throw new Error('dk-config.js を 設定と 見ていない');
