@@ -574,6 +574,61 @@ font-family:'Noto Sans JP',sans-serif;
 .inline-code{font-family:'DM Mono',monospace;background:rgba(82,183,136,0.12);color:#3D9E72;padding:1px 5px;border-radius:4px;font-size:11px;}
 .copy-btn{background:#C8ECD8;border:none;color:#2E7D54;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.18s;display:block;margin-top:4px;}
 .copy-btn:hover{background:#3D9E72;color:white;}
+/* ★書き出す ファイルに 入らない 物の 知らせ★（2026-09-06）
+   ★字と 背景を 同じ 色に しない★（08-27 司さん「文字と 囲ってる 背景 一緒で 見にくいやろが」）
+   ★注意書きは flex の 箱で 潰さない★＝行を 折り返させる（09-04 の 決まり） */
+.hairanai{background:#FFF6E5;border:1px solid #E8B54D;border-left:4px solid #E8B54D;
+  border-radius:8px;padding:10px 12px;margin-bottom:12px;
+  color:#5A4110;font-size:12px;line-height:1.7;white-space:normal;word-break:break-word;}
+.ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
+.ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;user-select:text;}
+.ai-msg-ai{text-align:left;margin-bottom:8px;clear:both;}
+.ai-msg-ai .ai-bubble{background:#fff;border:1px solid #C8ECD8;border-radius:8px 8px 8px 2px;padding:5px 8px;display:inline-block;max-width:95%;font-size:11px;line-height:1.6;user-select:text;}
+#ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+#ai-input {
+flex:1;
+border:1px solid #C8ECD8;
+border-radius:8px;
+padding:5px 10px;
+font-size:16px;
+font-family:inherit;
+resize:none;
+outline:none;
+line-height:1.4;
+color:#1A2B22;
+background:#F8FEFC;
+max-height:60px;
+overflow-y:auto;
+}
+#ai-input:focus { border-color:#3D9E72; }
+#ai-send {
+background:#3D9E72;
+color:#fff;
+border:none;
+border-radius:8px;
+width:32px; height:32px;
+font-size:14px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-shrink:0;
+}
+/* ===== ボトム統合スタック（Sheetタブ＋ボトムナビ一体化） ===== */
+.bottom-stack {
+position:fixed;
+bottom:0;
+left:0; right:0;
+z-index:100;
+display:flex;
+flex-direction:column;
+background:#ffffff;
+padding-bottom:env(safe-area-inset-bottom);
+box-shadow:0 -2px 10px rgba(30,60,40,0.06);
+}
+@media(min-width:769px){
+.bottom-stack{padding-bottom:max(4px, env(safe-area-inset-bottom));}
+}
 /* ★AIが 出した 表＝押したら そのまま シートに 入る★（司さん 2026-09-05）
    ★字と 背景を 同じ 色に しない★（08-27 司さん「文字と 囲ってる 背景 一緒で 見にくいやろが」）
    ★ボタンは 裸で 並べない＝flex+gap の 箱に 入れる★（09-04 司さん「なんで ボタンが 引っ付くんど」） */
@@ -1391,100 +1446,103 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=c02a1040"></script>
+<script src="hyperformula.full.min.js?v=2e787124"></script>
 <!-- ★BAHTTEXT（タイ語の 金額）★ 2026-09-04＝答えは 実Excel に 116通り 打たせて 合わせた -->
-<script src="lib/bahttext.js?v=c02a1040"></script>
-<script src="lib/formula-extra.js?v=c02a1040"></script>
-<script src="lib/formula-extra-plug.js?v=c02a1040"></script>
+<script src="lib/bahttext.js?v=2e787124"></script>
+<script src="lib/formula-extra.js?v=2e787124"></script>
+<script src="lib/formula-extra-plug.js?v=2e787124"></script>
+<!-- ★書き出す ファイルに「入らない 物」を 数えて 言う（2026-09-06 実測）★
+     ＝うちで 足した シート等は 元の zip に 入らない。★黙って 消さない★ -->
+<script src="lib/hairanai.js?v=2e787124"></script>
 <!-- ★実Excel に 在って まだ 動かなかった 関数（2026-09-06）★
      一覧の 出どころ＝docs/measured/exally-missing-2026-09-06.txt（測って 出た 物） -->
-<script src="lib/formula-nokori.js?v=c02a1040"></script>
-<script src="lib/formula-nokori-plug.js?v=c02a1040"></script>
+<script src="lib/formula-nokori.js?v=2e787124"></script>
+<script src="lib/formula-nokori-plug.js?v=2e787124"></script>
 
-<script src="exally-formula.js?v=c02a1040"></script>
+<script src="exally-formula.js?v=2e787124"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=c02a1040"></script>
+<script src="js/file-out.js?v=2e787124"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=c02a1040"></script>
-<script src="lib/grid-xlsx.js?v=c02a1040"></script>
+<script src="lib/typed-value.js?v=2e787124"></script>
+<script src="lib/grid-xlsx.js?v=2e787124"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=c02a1040"></script>
-<script src="lib/autosum.js?v=c02a1040"></script>
-<script src="lib/grid-sort.js?v=c02a1040"></script>
-<script src="lib/grid-filter.js?v=c02a1040"></script>
-<script src="lib/grid-find.js?v=c02a1040"></script>
-<script src="lib/grid-print.js?v=c02a1040"></script>
-<script src="lib/ai-reason.js?v=c02a1040"></script>
-<script src="lib/menu-place.js?v=c02a1040"></script>
-<script src="lib/grid-stats.js?v=c02a1040"></script>
-<script src="lib/grid-valid.js?v=c02a1040"></script>
-<script src="lib/cond-format.js?v=c02a1040"></script>
-<script src="lib/ref-graph.js?v=c02a1040"></script>
-<script src="lib/shindan.js?v=c02a1040"></script>
+  <script src="lib/grid-refedit.js?v=2e787124"></script>
+<script src="lib/autosum.js?v=2e787124"></script>
+<script src="lib/grid-sort.js?v=2e787124"></script>
+<script src="lib/grid-filter.js?v=2e787124"></script>
+<script src="lib/grid-find.js?v=2e787124"></script>
+<script src="lib/grid-print.js?v=2e787124"></script>
+<script src="lib/ai-reason.js?v=2e787124"></script>
+<script src="lib/menu-place.js?v=2e787124"></script>
+<script src="lib/grid-stats.js?v=2e787124"></script>
+<script src="lib/grid-valid.js?v=2e787124"></script>
+<script src="lib/cond-format.js?v=2e787124"></script>
+<script src="lib/ref-graph.js?v=2e787124"></script>
+<script src="lib/shindan.js?v=2e787124"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=c02a1040"></script>
-<script src="lib/vba-mikata.js?v=c02a1040"></script>
-<script src="lib/vba-tejun.js?v=c02a1040"></script>
-<script src="lib/rireki.js?v=c02a1040"></script>
-<script src="lib/ai-genkai.js?v=c02a1040"></script>
-<script src="lib/chizu.js?v=c02a1040"></script>
-<script src="lib/horu.js?v=c02a1040"></script>
-<script src="lib/excel-version.js?v=c02a1040"></script>
-<script src="lib/teian.js?v=c02a1040"></script>
-<script src="lib/kikan.js?v=c02a1040"></script>
-<script src="lib/recipe.js?v=c02a1040"></script>
-<script src="lib/kirikae.js?v=c02a1040"></script>
-<script src="js/recipe-store.js?v=c02a1040"></script>
-<script src="js/rireki-store.js?v=c02a1040"></script>
-<script src="lib/excel-version.js?v=c02a1040"></script>
+<script src="lib/vba.js?v=2e787124"></script>
+<script src="lib/vba-mikata.js?v=2e787124"></script>
+<script src="lib/vba-tejun.js?v=2e787124"></script>
+<script src="lib/rireki.js?v=2e787124"></script>
+<script src="lib/ai-genkai.js?v=2e787124"></script>
+<script src="lib/chizu.js?v=2e787124"></script>
+<script src="lib/horu.js?v=2e787124"></script>
+<script src="lib/excel-version.js?v=2e787124"></script>
+<script src="lib/teian.js?v=2e787124"></script>
+<script src="lib/kikan.js?v=2e787124"></script>
+<script src="lib/recipe.js?v=2e787124"></script>
+<script src="lib/kirikae.js?v=2e787124"></script>
+<script src="js/recipe-store.js?v=2e787124"></script>
+<script src="js/rireki-store.js?v=2e787124"></script>
+<script src="lib/excel-version.js?v=2e787124"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=c02a1040">
-<script src="lib/named-ranges.js?v=c02a1040"></script>
-<script src="lib/cell-styles.js?v=c02a1040"></script>
-<script src="lib/chart.js?v=c02a1040"></script>
-<script src="lib/sparkline.js?v=c02a1040"></script>
-<script src="lib/table.js?v=c02a1040"></script>
-<script src="lib/flash-fill.js?v=c02a1040"></script>
-<script src="lib/pivot.js?v=c02a1040"></script>
-<script src="lib/csv-in.js?v=c02a1040"></script>
-<script src="lib/objects.js?v=c02a1040"></script>
-<script src="lib/ink.js?v=c02a1040"></script>
-<script src="lib/view-mode.js?v=c02a1040"></script>
-<script src="lib/sheet-view.js?v=c02a1040"></script>
-<script src="lib/theme.js?v=c02a1040"></script>
-<script src="lib/diagram.js?v=c02a1040"></script>
-<script src="lib/adv-filter.js?v=c02a1040"></script>
-<script src="lib/connections.js?v=c02a1040"></script>
-<script src="lib/review.js?v=c02a1040"></script>
-<script src="lib/xml-map.js?v=c02a1040"></script>
-<script src="lib/ink-shape.js?v=c02a1040"></script>
-<script src="lib/jp-map.js?v=c02a1040"></script>
-<script src="lib/timeline.js?v=c02a1040"></script>
-<script src="lib/model3d.js?v=c02a1040"></script>
-<script src="lib/data-model.js?v=c02a1040"></script>
-<script src="lib/symbols.js?v=c02a1040"></script>
-<script src="lib/view-extras.js?v=c02a1040"></script>
-<script src="lib/ribbon-spec.js?v=c02a1040"></script>
-<script src="lib/ribbon-label.js?v=c02a1040"></script>
-<script src="lib/ribbon-scope.js?v=c02a1040"></script>
-<script src="lib/ribbon-actions.js?v=c02a1040"></script>
-<script src="lib/ribbon-keys.js?v=c02a1040"></script>
-<script src="lib/ribbon-keytips.js?v=c02a1040"></script>
-<script src="lib/ribbon-launcher.js?v=c02a1040"></script>
-<script src="lib/ctx-menu.js?v=c02a1040"></script>
-<script src="lib/header-footer.js?v=c02a1040"></script>
-<script src="lib/ribbon.js?v=c02a1040"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=2e787124">
+<script src="lib/named-ranges.js?v=2e787124"></script>
+<script src="lib/cell-styles.js?v=2e787124"></script>
+<script src="lib/chart.js?v=2e787124"></script>
+<script src="lib/sparkline.js?v=2e787124"></script>
+<script src="lib/table.js?v=2e787124"></script>
+<script src="lib/flash-fill.js?v=2e787124"></script>
+<script src="lib/pivot.js?v=2e787124"></script>
+<script src="lib/csv-in.js?v=2e787124"></script>
+<script src="lib/objects.js?v=2e787124"></script>
+<script src="lib/ink.js?v=2e787124"></script>
+<script src="lib/view-mode.js?v=2e787124"></script>
+<script src="lib/sheet-view.js?v=2e787124"></script>
+<script src="lib/theme.js?v=2e787124"></script>
+<script src="lib/diagram.js?v=2e787124"></script>
+<script src="lib/adv-filter.js?v=2e787124"></script>
+<script src="lib/connections.js?v=2e787124"></script>
+<script src="lib/review.js?v=2e787124"></script>
+<script src="lib/xml-map.js?v=2e787124"></script>
+<script src="lib/ink-shape.js?v=2e787124"></script>
+<script src="lib/jp-map.js?v=2e787124"></script>
+<script src="lib/timeline.js?v=2e787124"></script>
+<script src="lib/model3d.js?v=2e787124"></script>
+<script src="lib/data-model.js?v=2e787124"></script>
+<script src="lib/symbols.js?v=2e787124"></script>
+<script src="lib/view-extras.js?v=2e787124"></script>
+<script src="lib/ribbon-spec.js?v=2e787124"></script>
+<script src="lib/ribbon-label.js?v=2e787124"></script>
+<script src="lib/ribbon-scope.js?v=2e787124"></script>
+<script src="lib/ribbon-actions.js?v=2e787124"></script>
+<script src="lib/ribbon-keys.js?v=2e787124"></script>
+<script src="lib/ribbon-keytips.js?v=2e787124"></script>
+<script src="lib/ribbon-launcher.js?v=2e787124"></script>
+<script src="lib/ctx-menu.js?v=2e787124"></script>
+<script src="lib/header-footer.js?v=2e787124"></script>
+<script src="lib/ribbon.js?v=2e787124"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
-<script src="js/supa-config.js?v=c02a1040"></script>
-<script src="js/exally-login.js?v=c02a1040"></script>
-<script src="js/auth.js?v=c02a1040"></script>
+<script src="js/supa-config.js?v=2e787124"></script>
+<script src="js/exally-login.js?v=2e787124"></script>
+<script src="js/auth.js?v=2e787124"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -18711,6 +18769,20 @@ function _diffFmt(v, cell){
 }
 /* ★直す前に必ず見せる窓★。押されるまで待つ（true=書き込む / false=やめる）。
    ★alert・confirm は使わない（画面が止まる／中の言葉が出る）★ */
+/** ★書き出す ファイルに 入らない「浮かぶ物」を 数える★（2026-09-06）
+ *  ★画面の 入れ物を そのまま 数える★＝勝手に 分類しない
+ *    sheets[i].objects … 図形・グラフ・画像が ★同じ 箱★
+ *    sheets[i].comments … 付箋 ／ sheets[i].sparklines … スパークライン */
+function _浮かぶ物を数える(){
+  var 出 = { '図形・グラフ・画像': 0, '付箋': 0, 'スパークライン': 0 };
+  for (var i = 0; i < sheets.length; i++) {
+    var s = sheets[i];
+    if (s.objects) 出['図形・グラフ・画像'] += s.objects.length;
+    if (s.comments) 出['付箋'] += Object.keys(s.comments).length;
+    if (s.sparklines) 出['スパークライン'] += Object.keys(s.sparklines).length;
+  }
+  return 出;
+}
 function _askBeforeWrite(plan, fileName){
   return new Promise(function(resolve){
     var ov = document.getElementById('diffOverlay');
@@ -18744,7 +18816,20 @@ function _askBeforeWrite(plan, fileName){
       }
       html += '</div>';
     }
-    body.innerHTML = html;
+    /* ★★「入りません」を 先に 出す★★（2026-09-06・指示役の 裁定②）
+       ★消える 事より 黙って 消える 方が 重い★
+       ・数を 出す（グラフ◯個・新しいシート◯枚）
+       ・★「入りません」と はっきり★（「触っていません」では 通じない）
+       ・★出来ない事の 横に 今 出来る事を 1行★
+       ★typeof で 守らない★＝無ければ 黙って 出なくなる（一番 見つけにくい） */
+    var 入らない = Hairanai.入らない物を数える(
+      ((BookOpen.current() || {}).sheetNames) || [], sheets, _浮かぶ物を数える());
+    if (入らない.件) {
+      body.innerHTML = '<div class="hairanai">'
+        + _esc(Hairanai.言葉(入らない)).replace(/\n/g, '<br>') + '</div>' + html;
+    } else {
+      body.innerHTML = html;
+    }
     go.textContent = DiffPreview.goLabel(plan);   // ★言葉は lib の1か所だけ★
     ov.style.display = 'flex';
     var done = function(v){
