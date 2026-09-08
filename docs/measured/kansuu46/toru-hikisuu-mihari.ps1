@@ -17,6 +17,42 @@
 #  使い方: powershell -File docs/measured/kansuu46/toru-hikisuu-mihari.ps1
 
 $ErrorActionPreference = 'Stop'
+
+# ══ ★★2つ目の 窓（2026-09-09 に 足した）★★ ══════════════════
+#  ★なぜ 後から 足したか★
+#    この 道具は #52 で 作りました。その 時 まだ ★2つ目の 窓の 決まりが 無かった★。
+#    #54（物差しの 直し）が main に 入って ★見張りが 出来た★ので、
+#    ★#52 と #54 は 別々では 緑・一緒に すると 赤★に なりました。
+#    ⇒★どちらの PR でも 見えない 形★＝入ってから 出た
+#
+#  ★物差しの 欠陥★ .Value2 は ★0 で ない 値に 0 を 返す★
+#    =0.1+0.2-0.3    … .Value2 ★0★ ／ =(式)=0 ★False★ ／ (式)*1e17 5.55
+#    =11.1+22.2-33.3 … .Value2 0   ／ =(式)=0 ★True★  ／ (式)*1e17 0
+#    ⇒★.Value2 では この 2つが どちらも 0 に 見える★
+#    正体 …★最後の 演算が ＋か− の 時だけ 実Excel が ★見せる 時に★ 0 に する★
+#  ★もう1つ★ =DEC2BIN(0.5) は ★文字列の "0"★＝数の 0 では ない
+#    ⇒ ="0"=0 は FALSE ⇒★見せかけの 0 と 同じ 顔★⇒★型を 見ないと 分けられない★
+#  ⇒★見張り tests/monosashi-mado.test.mjs が これを 入れて いない 道具を 赤に する★
+function 窓２_型($v) {
+  if ($null -eq $v) { return 'Empty' }
+  if ($v -is [string]) { return 'String' }
+  if ($v -is [bool]) { return 'Boolean' }
+  if ($v -is [double] -or $v -is [int] -or $v -is [long]) { return 'Number' }
+  return 'Other'
+}
+function 窓２_本当にゼロか($sh, [string]$式) {
+  # ★『0』が 出た 時だけ 呼ぶ★ … =(式)=0 の 真偽を 返す
+  $中 = $式 -replace '^=\s*', ''
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $中 + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
 $出 = Join-Path $ここ 'golden-hikisuu-mihari-2026-09-08.tsv'
 
@@ -71,7 +107,17 @@ try {
         return @{ 値 = $誤りの番号[[int]$v]; 型 = 'Error' }
       }
       if ($v -is [bool]) { return @{ 値 = $(if ($v) { 'True' } else { 'False' }); 型 = 'Boolean' } }
-      if ($v -is [double]) { return @{ 値 = $v.ToString('R'); 型 = 'Double' } }
+      # ★★『0』が 出た 時だけ 2つ目の 窓を 開ける★★（.Value2 の 0 を そのまま 信じない）
+      #   ★型も 一緒に 出す★＝★見せかけの 0★と★字の "0"★は .Value2 では 同じ 顔
+      if ($v -is [string] -and $v -eq '0') {
+        return @{ 値 = '0'; 型 = '字の"0"'; 窓2 = (窓２_本当にゼロか $sh $式); 窓2型 = (窓２_型 $v) }
+      }
+      if ($v -is [double]) {
+        if ($v -eq 0) {
+          return @{ 値 = '0'; 型 = 'Double'; 窓2 = (窓２_本当にゼロか $sh $式); 窓2型 = (窓２_型 $v) }
+        }
+        return @{ 値 = $v.ToString('R'); 型 = 'Double' }
+      }
       if ($v -is [int] -or $v -is [long]) { return @{ 値 = [string]$v; 型 = 'Int32' } }
       return @{ 値 = [string]$v; 型 = 'String' }
     } catch { return @{ 値 = '★受け付けない★'; 型 = 'Rejected' } }
@@ -105,7 +151,11 @@ try {
     Write-Host ('    ' + ($ならび -join '  '))
   }
 
-  [System.IO.File]::WriteAllLines($出, $行, (New-Object System.Text.UTF8Encoding($false)))
+  # ★★書き戻しは 必ず LF（2026-09-09 に 直した）★★
+  #   `WriteAllLines` は Windows では ★CRLF★ で 書きます。
+  #   ⇒ この 紙は CRLF に なって いました（★repo の 決まりは LF★・`tests/eol.test.mjs`）
+  #   ⇒ 行を 自分で つないで `WriteAllText` で 書く
+  [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
   Write-Host ''
   Write-Host ('★★書けた … ' + $本数 + '本★★')
   Write-Host ('★書いた … ' + $出 + '★')
