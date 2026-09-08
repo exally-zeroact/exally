@@ -217,6 +217,8 @@ const FILES = [
   ['formula-complex.test.mjs','--self-test'],// ＝★数を返す4個(IMABS等)に かけると壊れる★ので押して確かめる
   'isomitted.test.mjs',                   // ★ISOMITTED＝『空のマス』と『省かれた引数』は別物(09-08 実Excel実測)
   ['isomitted.test.mjs','--self-test'],   //  ＝空のマスも FALSE／★カンマで省いた形は「まだ」＝黙って逆を返さない★
+  'gyousuu-gamen-to-enjin.test.mjs',       // ★画面は100万行なのにエンジンは4万行＝★96%が黙って0★(09-08 本番実測)
+  ['gyousuu-gamen-to-enjin.test.mjs','--self-test'],// ＝数を揃えるだけでなく★実際に押して0でない事★まで見る
   'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
   ['js-sou-sekisho.test.mjs','--self-test'],// ＝死にコードは動かないだけでなく★人が数を間違える★(38個と数えていた)
   'hikisuu-mihari.test.mjs',              // ★引数の見張り＝実Excelが断る所でうちも断る(09-08 実測180本 57→6)
