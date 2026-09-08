@@ -26,6 +26,36 @@
 #  使い方: powershell -File docs/measured/kansuu46/toru-346.ps1
 
 $ErrorActionPreference = 'Stop'
+
+# ══ ★★2つ目の 窓（2026-09-08 に 足した）★★ ══════════════════
+#  ★物差しの 欠陥★ .Value2 は ★0 で ない 値に 0 を 返す★
+#    =0.1+0.2-0.3    … .Value2 ★0★ ／ =(式)=0 ★False★ ／ (式)*1e17 5.55
+#    =11.1+22.2-33.3 … .Value2 0   ／ =(式)=0 ★True★  ／ (式)*1e17 0
+#    ⇒★.Value2 では この 2つが どちらも 0 に 見える★
+#    正体 …★最後の 演算が ＋か− の 時だけ 実Excel が ★見せる 時に★ 0 に する★
+#  ★もう1つ★ =DEC2BIN(0.5) は ★文字列の "0"★＝数の 0 では ない
+#    ⇒ ="0"=0 は FALSE ⇒★見せかけの 0 と 同じ 顔★⇒★型を 見ないと 分けられない★
+#  ⇒★見張り tests/monosashi-mado.test.mjs が これを 入れて いない 道具を 赤に する★
+function 窓２_型($v) {
+  if ($null -eq $v) { return 'Empty' }
+  if ($v -is [string]) { return 'String' }
+  if ($v -is [bool]) { return 'Boolean' }
+  if ($v -is [double] -or $v -is [int] -or $v -is [long]) { return 'Number' }
+  return 'Other'
+}
+function 窓２_本当にゼロか($sh, [string]$式) {
+  # ★『0』が 出た 時だけ 呼ぶ★ … =(式)=0 の 真偽を 返す
+  $中 = $式 -replace '^=\s*', ''
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $中 + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
 $出 = Join-Path $ここ 'golden-346-2026-09-08.tsv'
 
@@ -41,7 +71,7 @@ $誤りの番号 = @{
   -2146826246 = '#N/A';
   # ★★ここから 下が 2026-09-08 に 足した 分★★
   -2146826243 = '#SPILL!';   -2146826242 = '#CONNECT!'; -2146826241 = '#BLOCKED!';
-  -2146826240 = '#UNKNOWN!'; -2146826239 = '#FIELD!';   -2146826238 = '#CALC!'
+  -2146826240 = '#UNKNOWN!'; -2146826239 = '#FIELD!';   -2146826238 = '#CALC!'; -2146826237 = '#BUSY!'
 }
 
 # ★引数の 形の 候補★（★人が 決めるのは ここだけ★）
