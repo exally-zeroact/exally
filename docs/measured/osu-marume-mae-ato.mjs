@@ -151,10 +151,23 @@ for (const x of B.答え) {
   組ら.push({ 名: 'BINOM.DIST.RANGE', 材料: {}, 式: x.式, 実Excel: x.実Excel, 型: x.型, 幅: 幅.BINOM });
 }
 
-/* ══ ★前の 版を 取り出す（★git の HEAD＝直す 前★）★ ══════════════ */
-const 前の字 = execFileSync('git', ['show', 'HEAD:exally-formula.js'], { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }).toString('utf-8');
-if (!/Math\.round\(_jsXirr\(vals,dates\)\*10000\)\/10000/.test(前の字)) {
-  console.error('★HEAD の exally-formula.js に 丸めが 無い＝比べる 相手が 違う★');
+/* ══ ★前の 版を 取り出す（★丸めが 在る 版を git から 自分で 探す★）★ ══
+   ★はじめは `HEAD:exally-formula.js` を 見て いました★が、
+   ★直しを commit した 途端に HEAD も 直った 版に なる＝比べる 相手が 消える★。
+   ⇒★履歴を さかのぼって ★丸めが 在る 一番 新しい 版★を 自分で 探す★
+   ⇒ 直した 後も・merge した 後も この 紙は 取り直せます */
+const 丸めの印 = /Math\.round\(_jsXirr\(vals,dates\)\*10000\)\/10000/;
+let 前の字 = null, 前の版 = null;
+const 履歴 = execFileSync('git', ['rev-list', '--max-count=300', 'HEAD', '--', 'exally-formula.js'],
+  { cwd: ROOT, maxBuffer: 8 * 1024 * 1024 }).toString('utf-8').split('\n').filter(Boolean);
+for (const h of 履歴) {
+  let s;
+  try { s = execFileSync('git', ['show', h + ':exally-formula.js'], { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }).toString('utf-8'); }
+  catch (e) { continue; }
+  if (丸めの印.test(s)) { 前の字 = s; 前の版 = h; break; }
+}
+if (前の字 === null) {
+  console.error('★履歴 ' + 履歴.length + '本を 見ましたが ★丸めが 在る 版が 見つかりません★＝比べる 相手が 無い');
   process.exit(2);
 }
 const 仮置き = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'marume-')), 'exally-formula.js');
@@ -176,7 +189,7 @@ const 行 = [];
 const 言う = (s) => { 行.push(s); console.log(s); };
 言う('# ★A群の 丸めを 外す 前と 後を 同じ 紙・同じ 行で 押し比べた★（2026-09-08）');
 言う('#');
-言う('# ★前★ git の HEAD の exally-formula.js（丸めが 在る）');
+言う('# ★前★ 丸めが 在る 一番 新しい 版 … ' + 前の版 + '（★履歴から 自分で 探した★）');
 言う('# ★後★ 今 手元の exally-formula.js（丸めを 外した）');
 言う('# ★正★ 実Excel の 実測（golden の 紙）');
 言う('#   ⇒★「丸めを 外しただけ だから 同じ はず」は 私の 頭の 中の 話★');

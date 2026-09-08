@@ -219,6 +219,8 @@ const FILES = [
   ['isomitted.test.mjs','--self-test'],   //  ＝空のマスも FALSE／★カンマで省いた形は「まだ」＝黙って逆を返さない★
   'monosashi-mado.test.mjs',                // ★測り道具が「0」を2つの窓で取っているか（09-08 .Value2 が 0でない値に0を返す）
   ['monosashi-mado.test.mjs','--self-test'],// ＝★見せかけの0★と★字の"0"★は .Value2 では見分けが付かない
+  'marume-mihari.test.mjs',                 // ★答えを黙って丸めている所が増えていないか（09-08 A群4→0）
+  ['marume-mihari.test.mjs','--self-test'], // ＝★A群かを機械に判じさせない★新しい丸めは全部赤・人がA〜Eに分ける
   'gyousuu-gamen-to-enjin.test.mjs',       // ★画面は100万行なのにエンジンは4万行＝★96%が黙って0★(09-08 本番実測)
   ['gyousuu-gamen-to-enjin.test.mjs','--self-test'],// ＝数を揃えるだけでなく★実際に押して0でない事★まで見る
   'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
