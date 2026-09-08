@@ -1292,13 +1292,18 @@ function _jsComputeFormula(sheet, v) {
 
   // LINEST
   var mLi=fOrig.match(/^LINEST\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
-  if(mLi){var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);var r=_jsLinest(ys,xs);return String(Math.round(r[0]*10000)/10000);}
+  // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.00108… が 0.0011 に なって いた（相対 1.85e-2）
+  //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv
+  if(mLi){var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);var r=_jsLinest(ys,xs);return String(r[0]);}
 
 
 
   // BINOM.DIST.RANGE
   var mBdr=fOrig.match(/^BINOM\.DIST\.RANGE\s*\(([0-9]+)\s*,\s*([0-9.]+)\s*,\s*([0-9]+)(?:\s*,\s*([0-9]+))?\s*\)$/i);
-  if(mBdr)return String(Math.round(_jsBinomDistRange(parseInt(mBdr[1]),parseFloat(mBdr[2]),parseInt(mBdr[3]),mBdr[4]?parseInt(mBdr[4]):undefined)*10000)/10000);
+  // ★4桁の 丸めを 外した（2026-09-08）★ 12本 測って ★3本が ちょうど 0★ に なって いた
+  //   実Excel 2.1426377248779138e-7 → 0 ／ 相対の ずれ 最大 1.807e-1
+  //   ⇒ docs/measured/golden-marume-A4-binom-2026-09-08.tsv
+  if(mBdr)return String(_jsBinomDistRange(parseInt(mBdr[1]),parseFloat(mBdr[2]),parseInt(mBdr[3]),mBdr[4]?parseInt(mBdr[4]):undefined));
 
   // FREQUENCY - 最初の値だけ返す（スピル）
   var mFreq=fOrig.match(/^FREQUENCY\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
@@ -1306,8 +1311,10 @@ function _jsComputeFormula(sheet, v) {
 
 
   // IRR / XIRR (既存)
+  // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.5478870809078217 が 0.5479 に なって いた（相対 2.4e-5）
+  //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv（★お金の 利回り＝丸めては いけない★）
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mXirr){var vals=_getRangeAll(sheet,mXirr[1]).filter(function(v){return typeof v==='number';});var dates=_getRangeAll(sheet,mXirr[2]).filter(function(v){return typeof v==='number';});return String(Math.round(_jsXirr(vals,dates)*10000)/10000);}
+  if(mXirr){var vals=_getRangeAll(sheet,mXirr[1]).filter(function(v){return typeof v==='number';});var dates=_getRangeAll(sheet,mXirr[2]).filter(function(v){return typeof v==='number';});return String(_jsXirr(vals,dates));}
 
   // DATESTRING
   var mDstr=fOrig.match(/^DATESTRING\s*\(([A-Z]+\d+|[0-9]+)\)$/i);
