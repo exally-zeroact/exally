@@ -333,6 +333,22 @@ function _jsBinomDistRange(n,p,s1,s2){function bp(t,pr,k){var c=1;for(var i=0;i<
 function _jsSlope(ys,xs){var n=ys.length,sx=0,sy=0,sxx=0,sxy=0;for(var i=0;i<n;i++){sx+=xs[i];sy+=ys[i];sxx+=xs[i]*xs[i];sxy+=xs[i]*ys[i];}return(n*sxy-sx*sy)/(n*sxx-sx*sx);}
 function _jsIntercept(ys,xs){var slope=_jsSlope(ys,xs),n=ys.length,sx=ys.reduce(function(a,_,i){return a+xs[i];},0)/n,sy=ys.reduce(function(a,b){return a+b;})/n;return sy-slope*sx;}
 function _jsForecast(x,ys,xs){return _jsIntercept(ys,xs)+_jsSlope(ys,xs)*x;}
+// ★★範囲が「1本の 並び」か（縦1列 か 横1行）★★（2026-09-09）
+//   ★なぜ 要るか★
+//     LINEST の x が ★2本以上（重回帰）★の 時、うちは 範囲を 平らに 1本と して 読み、
+//     ★誤りに ならず 違う 数を 返して いた★（=LINEST(G1:G6,H1:I6)
+//       実Excel 0.7708333333333329 ／ うち 7.390243902439025）。
+//     ⇒★縦にも 横にも 2つ以上 広がって いたら「1本」では ない＝受けない★
+//   ★戻り★ true＝1本の 並び（縦1列 か 横1行）／ false＝表（2本以上）
+//   ★形が 読めない 時は false★（★分からない物を 受けない★）
+function _一本の並びか(範囲){
+  var m=/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/i.exec(String(範囲||'').trim());
+  if(!m)return false;
+  var 列1=m[1].toUpperCase(),列2=m[3].toUpperCase();
+  var 行1=parseInt(m[2],10),行2=parseInt(m[4],10);
+  if(!isFinite(行1)||!isFinite(行2))return false;
+  return (列1===列2)||(行1===行2);   /* 縦1列 ／ 横1行 */
+}
 function _jsLinest(ys,xs){return[_jsSlope(ys,xs),_jsIntercept(ys,xs)];}
 function _jsLogest(ys,xs){var lys=ys.map(function(v){return Math.log(v);});return[Math.exp(_jsSlope(lys,xs)),Math.exp(_jsIntercept(lys,xs))];}
 function _jsTrend(ys,xs,newXs){var s=_jsSlope(ys,xs),i=_jsIntercept(ys,xs);return newXs.map(function(x){return i+s*x;});}
@@ -1294,7 +1310,18 @@ function _jsComputeFormula(sheet, v) {
   var mLi=fOrig.match(/^LINEST\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
   // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.00108… が 0.0011 に なって いた（相対 1.85e-2）
   //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv
-  if(mLi){var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);var r=_jsLinest(ys,xs);return String(r[0]);}
+  // ★★x が 2本以上（重回帰）の 時は ★答えず 断る★（2026-09-09）★★
+  //   前は ★数を 返して いた★ … =LINEST(G1:G6,H1:I6)
+  //     実Excel 0.7708333333333329 ／ うち ★7.390243902439025★
+  //   ⇒ x の 範囲を ★1本の 並びとして 平らに★ 読んで いた＝★静かに 違う 答え★
+  //   ⇒★誤りに ならず 数が 出る＝お客さんは 気づけない★（#NAME? の 方が まだ まし）
+  //   ⇒★ここでは 答えず 素通りする★＝他の LINEST の 形と 同じ ★#NAME?★ に なる
+  //     （★出来ない物を「出来ている顔」で 出さない★／正しく 計算するのは 別の 直し）
+  //   ⇒ 実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 114本）
+  if(mLi&&_一本の並びか(mLi[1])&&_一本の並びか(mLi[2])){
+    var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);
+    var r=_jsLinest(ys,xs);return String(r[0]);
+  }
 
 
 
