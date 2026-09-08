@@ -52,6 +52,18 @@
 #材料	L1	1
 #材料	K2	7
 #材料	L2	2
+#材料	N1	100
+#材料	N2	1
+#材料	O1	120
+#材料	O2	2
+#材料	P1	140
+#材料	P2	3
+#材料	Q1	160
+#材料	Q2	4
+#材料	R1	180
+#材料	R2	5
+#材料	S1	200
+#材料	S2	6
 #
 # 組	式	実Excel の 答え	型	窓２(=(式)=0)	何の 場所
 x1本・きれい	=LINEST(A1:A5,B1:B5)	19.999999999999993	Double	—	裸（★うちが 拾う 形★）
@@ -168,3 +180,8 @@ x1本・端数	=INDEX(LINEST(D1:D5,E1:E5,TRUE,TRUE),1,0)	2.1299999999999994	Doub
 ★点が 2つだけ★	=INDEX(LINEST(K1:K2,L1:L2,TRUE,TRUE),1,9)	#REF!	Error	—	★表の 外を 指した（境目）★
 ★点が 2つだけ★	=INDEX(LINEST(K1:K2,L1:L2,TRUE,TRUE),0,1)	4	Double	—	★表の 外を 指した（境目）★
 ★点が 2つだけ★	=INDEX(LINEST(K1:K2,L1:L2,TRUE,TRUE),1,0)	4	Double	—	★表の 外を 指した（境目）★
+★横1行★	=LINEST(N1:S1,N2:S2)	20.000000000000004	Double	—	★横1行（x も 1本）★
+★横1行★	=ROWS(LINEST(N1:S1,N2:S2))	1	Double	—	★横1行（x も 1本）★
+★横1行★	=COLUMNS(LINEST(N1:S1,N2:S2))	2	Double	—	★横1行（x も 1本）★
+★横1行★	=INDEX(LINEST(N1:S1,N2:S2),1,1)	20.000000000000004	Double	—	★横1行（x も 1本）★
+★横1行★	=INDEX(LINEST(N1:S1,N2:S2),1,2)	79.99999999999999	Double	—	★横1行（x も 1本）★

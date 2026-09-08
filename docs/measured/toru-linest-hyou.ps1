@@ -76,6 +76,14 @@ $組 = @(
   @{ 札 = '★点が 2つだけ★';  y列 = 'K'; y = @(3, 7);
      x列 = @('L'); xの中 = @{ 'L' = @(1, 2) } }
 )
+# ★★横1行の 組（★縦だけを 見て 決めない★）★★（2026-09-09 に 足した）
+#   ★x が 1本かどうかは 縦1列 だけで なく ★横1行★も 在る★
+#   ⇒ 上の 表は 縦向きなので、横向きは 別に 敷いて 別に 測る
+#   N1:S1 ＝ y（横）／ N2:S2 ＝ x（横）
+$横 = @{ y = @(100, 120, 140, 160, 180, 200); x = @(1, 2, 3, 4, 5, 6); 列 = @('N', 'O', 'P', 'Q', 'R', 'S') }
+if ($横.y.Count -ne $横.列.Count -or $横.x.Count -ne $横.列.Count) {
+  Write-Error '★横の 組の 数が 合わない★'; exit 2
+}
 # ★★敷く 前に 数を 確かめる（★平らに なって いたら ここで 止まる★）★★
 foreach ($c in $組) {
   foreach ($col in $c.x列) {
@@ -103,6 +111,11 @@ try {
         $sh.Range($col + ($i + 1)).Value2 = [double]$c.xの中[$col][$i]
       }
     }
+  }
+  # ★横1行の 組を 敷く★
+  for ($i = 0; $i -lt $横.列.Count; $i++) {
+    $sh.Range($横.列[$i] + '1').Value2 = [double]$横.y[$i]
+    $sh.Range($横.列[$i] + '2').Value2 = [double]$横.x[$i]
   }
 
   function 押して字に([string]$式) {
@@ -145,6 +158,10 @@ try {
         $行.Add('#材料' + "`t" + ($col + ($i + 1)) + "`t" + ([double]$c.xの中[$col][$i]).ToString('R'))
       }
     }
+  }
+  for ($i = 0; $i -lt $横.列.Count; $i++) {
+    $行.Add('#材料' + "`t" + ($横.列[$i] + '1') + "`t" + ([double]$横.y[$i]).ToString('R'))
+    $行.Add('#材料' + "`t" + ($横.列[$i] + '2') + "`t" + ([double]$横.x[$i]).ToString('R'))
   }
   $行.Add('#')
   $行.Add('# 組' + "`t" + '式' + "`t" + '実Excel の 答え' + "`t" + '型' + "`t" + '窓２(=(式)=0)' + "`t" + '何の 場所')
@@ -201,6 +218,18 @@ try {
 
     Write-Host ('  ' + $c.札 + ' … 済')
   }
+
+  # ══ ★横1行の 組を 押す（★縦だけを 見て 決めない★）★ ══
+  foreach ($f in @('=LINEST(N1:S1,N2:S2)',
+                   '=ROWS(LINEST(N1:S1,N2:S2))',
+                   '=COLUMNS(LINEST(N1:S1,N2:S2))',
+                   '=INDEX(LINEST(N1:S1,N2:S2),1,1)',
+                   '=INDEX(LINEST(N1:S1,N2:S2),1,2)')) {
+    $r = 押して字に $f
+    $行.Add('★横1行★' + "`t" + $f + "`t" + $r.値 + "`t" + $r.型 + "`t" + $r.窓2 + "`t" + '★横1行（x も 1本）★')
+    $本数++
+  }
+  Write-Host '  ★横1行★ … 済'
 
   # ★★書き戻しは LF★★（WriteAllLines は Windows で CRLF に なる）
   [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
