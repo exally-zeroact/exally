@@ -1,6 +1,6 @@
-/* ★LINEST の 紙を ★うちの 本番の 道★で 押して 突き合わせる★（2026-09-09・2件目）
+/* ★予測3関数の 紙を ★うちの 本番の 道★で 押して 突き合わせる★（2026-09-09・2件目）
  *
- *  ★正★ … `golden-linest-hyou-2026-09-09.tsv`（実Excel の 実測）
+ *  ★正★ … `golden-yosoku-3kansuu-2026-09-09.tsv`（実Excel の 実測）
  *  ★押す 道★ … 本番と 同じ ①JS層 `_jsComputeFormula` → ②`convertFormula` → エンジン
  *
  *  ★材料は 紙から 読む★（★手で 写さない★＝2026-09-08/09 に 3回 写し間違えた）
@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const 紙 = path.join(ROOT, 'docs/measured/golden-linest-hyou-2026-09-09.tsv');
-const 出す先 = path.join(ROOT, 'docs/measured/golden-linest-hyou-awase-2026-09-09.tsv');
+const 紙 = path.join(ROOT, 'docs/measured/golden-yosoku-3kansuu-2026-09-09.tsv');
+const 出す先 = path.join(ROOT, 'docs/measured/golden-yosoku-3kansuu-awase-2026-09-09.tsv');
 
 const require_ = createRequire(path.join(ROOT, 'package.json'));
 const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
@@ -156,9 +156,9 @@ function 合うか(う, 正) {
 
 const 行 = [];
 const 言う = (s) => { 行.push(s); console.log(s); };
-言う('# ★LINEST の 紙を うちの 本番の 道で 押して 突き合わせた★（2026-09-09・2件目）');
+言う('# ★予測3関数の 紙を うちの 本番の 道で 押して 突き合わせた★（2026-09-09・2件目）');
 言う('#');
-言う('# ★正★ golden-linest-hyou-2026-09-09.tsv（実Excel の 実測）');
+言う('# ★正★ golden-yosoku-3kansuu-2026-09-09.tsv（実Excel の 実測）');
 言う('# ★押す 道★ 本番と 同じ ①JS層 → ②convertFormula → エンジン');
 言う('# ★材料は 紙から 読んだ★（' + Object.keys(材料).length + 'マス）★手で 写して いません★');
 言う('# ★合う 幅★ 相対 ' + 幅 + '（★字が そのまま 同じ 物は そのまま 合う★）');
