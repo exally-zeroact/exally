@@ -30,17 +30,68 @@ import { createRequire } from 'node:module';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const 出す先 = path.join(ROOT, 'docs/measured/golden-marume-mae-ato-2026-09-08.tsv');
 
-/* ══ ★押す 台を 1つ 作る（前の 版／後の 版 で 1つずつ）★ ══════════ */
+/* ══ ★押す 台を 1つ 作る（前の 版／後の 版 で 1つずつ）★ ══════════
+   ★★測り台には ★本番が 積んで いる 物を 全部★ 積む★★（2026-09-09 に 直した）
+     ★1回目は プラグインを ★1本も★ 積んで いなかった★
+     ⇒ 本番（book.html）は ★8本★ 読む
+     ⇒★本番に 在る 物が 無い 状態で 押して いた＝★嘘の 数字が 出る恐れ★
+     ⇒ この 台で 出した「直った18／壊れた0」は ★積み直して 取り直す★
+   ★同じ 型の 再発です★（同じ日に 別の 道具でも 踏んだ）
+   ⇒★book.html が 読む 数と 合わなければ ★止める★★ */
+function 本番のプラグイン数() {
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
+  return new Set([...html.matchAll(/lib\/(formula-[a-z]+)-plug\.js/g)].map((m) => m[1])).size;
+}
 function 台を作る(式ファイル) {
   const require_ = createRequire(path.join(ROOT, 'package.json'));
   const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
   const EF = require_(式ファイル);
   EF.registerExallyFunctions(HFns);
   const HF0 = HFns.HyperFormula;
+  const H = Object.assign(Object.create(HF0), HFns,
+    { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
+  let 積んだ = 0;
+  for (const n of ['extra', 'nokori', 'kane']) {
+    require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
+      .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js')));
+    積んだ++;
+  }
+  require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
+      () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }));
+  積んだ++;
+  /* ★網の 外へ 出る 物は 出させない（司さんの 決め）★ */
+  require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
+      取る: async () => { throw new Error('外へ 出ません'); },
+      聞く: async () => { throw new Error('AI に 聞きません'); },
+      再計算: () => {},
+    });
+  積んだ++;
+  let XML部品 = null;
+  try {
+    const { JSDOM } = require_('jsdom');
+    const w = new JSDOM('').window;
+    XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
+  } catch (e) { XML部品 = null; }
+  require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
+  積んだ++;
+  require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
+  積んだ++;
+  require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js')));
+  積んだ++;
+  const 要る = 本番のプラグイン数();
+  if (積んだ !== 要る) {
+    console.error('★book.html は ' + 要る + '本 読むのに、測り台は ' + 積んだ + '本しか 積んで いない★');
+    process.exit(2);
+  }
   const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
   const SID = hf.getSheetId(hf.addSheet('S'));
   EF.initExallyFormula(hf);
-  return { hf, SID, 押す: EF._jsComputeFormula };
+  return { hf, SID, 押す: EF._jsComputeFormula, 積んだ };
 }
 
 /* ══ ★★材料も 正解も ★紙から 読む★（★私が 書き写さない★）★★ ══════
