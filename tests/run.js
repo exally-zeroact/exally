@@ -221,6 +221,8 @@ const FILES = [
   ['gyousuu-gamen-to-enjin.test.mjs','--self-test'],// ＝数を揃えるだけでなく★実際に押して0でない事★まで見る
   'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
   ['js-sou-sekisho.test.mjs','--self-test'],// ＝死にコードは動かないだけでなく★人が数を間違える★(38個と数えていた)
+  'hikisuu-mihari.test.mjs',              // ★引数の見張り＝実Excelが断る所でうちも断る(09-08 実測180本 57→6)
+  ['hikisuu-mihari.test.mjs','--self-test'],// ＝★一番危ないのは誤りでなく「静かに違う答え」★(REPLACEB 1.5 が axcde)
   'ugokanai-osu.test.mjs',                // ★「動かない」台帳35個を★本物の式で全部押す★(09-07 指示役)
   ['ugokanai-osu.test.mjs', '--self-test'],//  ＝CONVERTが「動かない」棚に居ながら★間違った数を返していた★
   'kansuu-kabaa.test.mjs',                // ★実Excelの関数を どれだけ動かせているか（09-06 実測 519/432）
