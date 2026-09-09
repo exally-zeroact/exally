@@ -22,7 +22,9 @@ const FILES = [
   ['ctx-menu-items.test.mjs', '--self-test'], // ★右クリックの 中身が 実 Excel に 追いついているか★
   ['header-footer.test.mjs', '--self-test'], // ★紙の 上と 下に 入れる 字（印は 実 Excel に 刷らせて 測った）★
   ['ribbon-launcher.test.mjs', '--self-test'], // ★組の 右下の ↘（開く先の 窓は 既に 在る）★
-  ['ribbon-context.test.mjs', '--self-test'], // ★コンテキストタブ 8タブ／235部品の 正本★
+  ['ribbon-context.test.mjs', '--self-test'],
+  'bunbo-context.test.mjs',                 // ★コンテキストタブの分母が3か所で揃うか（09-09 文書に 188/265/235 が同居していた）
+  ['bunbo-context.test.mjs','--self-test'], // ＝古い数は消さず「今の正本は235」の印を必ず付ける // ★コンテキストタブ 8タブ／235部品の 正本★
   ['formula-extra.test.mjs', '--self-test'], // ★足りない 関数 12個（答えは 実 Excel の 実測）★
   ['valign.test.mjs', '--self-test'],        // ★上下揃え＝実Excelの既定は中央（実測）★
   ['clear.test.mjs', '--self-test'],         // ★クリア3通り＝中身だけ/書式だけ/すべて（実測）★
