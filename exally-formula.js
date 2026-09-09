@@ -1328,6 +1328,18 @@ function _jsComputeFormula(sheet, v) {
   //  ★残る5つ(PERCENTILE/QUARTILE/N/DSUM/DCOUNT)は「版上げで不要になる可能性」枠。判断日 2026-09-30。
   var _jsSet = {PERCENTILE:1,QUARTILE:1,
     XIRR:1,
+    /* ★IRR と XNPV も 2026-09-09 に 足した★
+       ★エンジン（借り物）が 実Excel と 違う 答えを 返して いた★ので JS層で 先に 受ける
+         =IRR(全部プラス) … 実Excel #NUM! ／ エンジン 16693338463349.688
+         =XNPV(0,…)       … 実Excel #NUM! ／ エンジン 300
+       ⇒★関所に 入れないと ★私の 段まで 届きません★（★実際 1回 素通りした★）★ */
+    /* ★XNPV だけ 足した（2026-09-09）★
+       ★IRR は 足しませんでした★＝`_PLUGIN_FUNCS` に 既に 在り（EX.IRR）、
+       ★_jsSet にも 入れると 1つの 関数が 2か所に なる★
+       ⇒ 見張り `tests/xlsx-harness/compare.mjs` が
+         「★同じ 関数が 2箇所で 定義されている★」で 赤に して 教えて くれました
+       ⇒★IRR は エンジン側（下の EX.IRR）で 直します★ */
+    XNPV:1,
     DATESTRING:1,OFFSET:1,
     N:1,
     /* ★CONVERT は 2026-09-07 に ここから 外して lib/formula-yosoku-plug.js へ 移した★
@@ -1463,6 +1475,50 @@ function _jsComputeFormula(sheet, v) {
      ⇒ 実Excel は 見当が ★−1 以下★で ★#NUM!★ を 返しますが、うちは 数を 返して いた
         =XIRR(E1:E3,F1:F3,-0.9) … 実Excel #NUM! ／ うち 1.0011933213132864
      ⇒ 実測 … 見当 0.1 / 0 / 10 / 1e6 は ★値を 返す★／−1 と −2 は ★#NUM!★ */
+  /* ★★IRR は ここで 受けません（2026-09-09）★★
+     ★1回 ここに 段を 作りましたが 外しました★
+     ⇒ IRR は `_PLUGIN_FUNCS` に 在り ★エンジン側（EX.IRR）で 既に 自分たちが 計算して います★
+     ⇒ ここにも 置くと ★1つの 関数が 2か所★に なる（見張りが 赤に した）
+     ⇒★直すのは エンジン側 1か所★（下の `statFn('exIrr', 'EX.IRR', …)`） */
+
+  /* ══ ★XNPV★（2026-09-09）══════════════════════════════
+     ★エンジンは 実Excel が 断る 所で 数を 返して いました★
+       =XNPV(0,…)      実Excel #NUM! ／ うち ★300★
+       =XNPV(-0.01,…)  実Excel #NUM! ／ うち ★305.022090126012★
+       =XNPV(-0.99,…)  実Excel #NUM! ／ うち ★7847.371130821853★
+       空が 混ざる・字が 混ざる … 実Excel #NUM! ／ うち #VALUE!（★誤りの 種類が 違う★）
+     ★★利率の 境目は 刻んで 詰めました★★
+       −2／−1.01／−1／−0.99／−0.5／−0.1／−0.01／−0.001／★0★ … 全部 #NUM!
+       ★0.0001★ から 値（299.9501405358503）
+       ⇒★境目は 0（0 は 断る）★
+       ⇒★★XIRR の 見当（0 は 通る）とは 逆＝1つの 関数で 決めた 線を 家族に 広げない★★ */
+  var mXnpv=fOrig.match(/^XNPV\s*\((-?[0-9.]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
+  if(mXnpv){
+    var x利=Number(mXnpv[1]);
+    var x値=_getRangeAll(sheet,mXnpv[2]),x日=_getRangeAll(sheet,mXnpv[3]);
+    if(!isFinite(x利))return '#VALUE!';
+    /* ★範囲の 大きさが 違う＝#NUM!★ */
+    if(x値.length!==x日.length)return '#NUM!';
+    /* ★★空も 字も #NUM!★★（★XIRR は 空を 0 と 見て 通す＝ここが 違う★） */
+    for(var xi=0;xi<x値.length;xi++){
+      var xv=x値[xi],xd=x日[xi];
+      if(xv===null||xv===undefined||xv==='')return '#NUM!';
+      if(xd===null||xd===undefined||xd==='')return '#NUM!';
+      if(typeof xv==='boolean'||typeof xd==='boolean')return '#NUM!';
+      if(!isFinite(Number(xv))||!isFinite(Number(xd)))return '#NUM!';
+    }
+    if(x値.length<1)return '#NUM!';
+    /* ★日付が 昇順で ない＝#NUM!★ */
+    for(var xj=1;xj<x日.length;xj++)if(Number(x日[xj])<Number(x日[xj-1]))return '#NUM!';
+    /* ★利率が 0 以下＝#NUM!★（★刻んで 詰めた 境目★） */
+    if(!(x利>0))return '#NUM!';
+    var x0=Number(x日[0]),x和=0;
+    for(var xk=0;xk<x値.length;xk++){
+      x和+=Number(x値[xk])/Math.pow(1+x利,(Number(x日[xk])-x0)/365);
+    }
+    return String(x和);
+  }
+
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)(?:\s*,\s*(-?[0-9.]+))?\s*\)$/i);
   // ★★実Excel と 同じ 条件で 同じ 誤りを 返す（2026-09-09）★★
   //   ★前は 断らずに 数を 返して いた★
@@ -2218,8 +2274,40 @@ function registerExallyFunctions(HFns) {
     if(v===null) return '#N/A';
     return _jsPercentrank(arr, v, (sig===undefined||sig===null) ? undefined : optNum(sig, 3));
   });
+  /* ★★IRR … 実Excel と 同じ 条件で 同じ 誤りを 返す（2026-09-09）★★
+     ★前は 断らずに 数を 返して いました★
+       =IRR(全部プラス)   実Excel #NUM! ／ うち ★16693338463349.688★
+       =IRR(全部マイナス) 実Excel #NUM! ／ うち ★16693338463349.688★
+       =IRR(全部0)        実Excel #NUM! ／ うち 0.1
+       =IRR(1件だけ)      実Excel #NUM! ／ うち 0.1
+       =IRR(A1:A3,10)     実Excel 0.18881944173101095 ／ うち ★-2168772783.613375★
+       =IRR(A1:A3,100)    実Excel 0.18881944173155896 ／ うち ★-336432261411301570★
+     ⇒ 条件は ★私が 決めず 実Excel に 打たせました★
+        docs/measured/golden-okane-4kansuu-2026-09-09.tsv（69本）
+     ★実Excel は 見当が 何でも 同じ 答え★（−0.99〜100 の 11通りで 全部 0.1888…）
+     ★空・字は 落として 計算する★（実測 0.10000000000000009＝−1000 と 1100 の 2件）
+     ★1件だけ は #NUM!★（★XIRR は #N/A＝同じ 家族でも 違う★） */
   statFn('exIrr', 'EX.IRR', function(arr, guess){
-    return _jsIrr(arr, (guess===undefined||guess===null) ? undefined : optNum(guess, 0.1));
+    var 数=[];
+    for(var i=0;i<arr.length;i++){
+      var v=arr[i];
+      if(v===null||v===undefined||v==='')continue;            /* ★空は 落とす★ */
+      if(typeof v==='boolean')continue;
+      if(typeof v==='string'&&!isFinite(Number(v)))continue;   /* ★字も 落とす★ */
+      数.push(Number(v));
+    }
+    if(数.length<2)return '#NUM!';                             /* ★1件だけ★ */
+    var 正=false,負=false;
+    for(var j=0;j<数.length;j++){ if(数[j]>0)正=true; if(数[j]<0)負=true; }
+    if(!正||!負)return '#NUM!';                                /* ★符号が 片方だけ★ */
+    /* ★★期間を 日付に 直して XIRR の 落ち着かせ方を 使う★★
+       ⇒ `_jsXirr` は ★−1 より 下へ 行かせない／落ち着かなければ やり直す★を 持って いる
+       ⇒★同じ 計算を 2つ 書かない★ */
+    var 日=[];
+    for(var k=0;k<数.length;k++)日.push(k*365);
+    var g=(guess===undefined||guess===null)?0.1:optNum(guess,0.1);
+    if(!isFinite(g))return '#VALUE!';
+    return _jsXirr(数,日,g);
   });
   //  ys と xs の2範囲を取る物
   function twoRangeFn(name, key, calc){

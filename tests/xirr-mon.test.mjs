@@ -21,9 +21,13 @@
  *    ④★見当が 大きくても 落ち着く★（★前は NaN に なって いた★）
  *
  *  ★★見て いない 範囲（★書かない 見張りは「全部 守った」と 読まれる★）★★
- *    ・★IRR / MIRR / NPV / XNPV は 見て いません★（同じ 形の 穴が 在るかは ★未測定★）
+ *    ・★MIRR は 見て いません★＝★向きが 逆の 穴が 2本 在ります★（別件）
+ *        `=MIRR(全部マイナス,0.1,0.12)` 実Excel ★−1★ ／ うち ★#DIV/0!★
+ *        `=MIRR(A1:A3,-1,0.12)`        実Excel ★0.17132403714770583★ ／ うち ★#DIV/0!★
+ *        ⇒★実Excel が 答えるのに うちが 断って いる＝出来る 物を 止めて いる★
+ *    ・★NPV は 測って 穴が 0本でした★（★触って いません★）
  *    ・★答えの 細かい 桁は 見て いません★（★幅 1e-6★＝実Excel 自身が 見当で 9.65e-8 ばらつく）
- *    ・エンジン側は 見て いません（XIRR は JS層が 受けます）
+ *    ・★XIRR と XNPV は JS層／IRR は エンジン側（EX.IRR）★＝★本番と 同じ 道で 押します★
  *
  *  使い方: node tests/xirr-mon.test.mjs [--self-test]
  */
@@ -62,8 +66,27 @@ function 押す(値ら, 日ら, 見当) {
   hf.setSheetContent(SID, 板);
   const 式 = '=XIRR(A1:A' + 値ら.length + ',B1:B' + 日ら.length
     + (見当 === undefined ? '' : ',' + 見当) + ')';
-  return { 式, 答: EF._jsComputeFormula(0, 式) };
+  return { 式, 答: 本番の道(板, 式) };
 }
+/* ★★本番と 同じ 道★★ ①JS層 → ②convertFormula → エンジン */
+function 本番の道(板, 式) {
+  hf.setSheetContent(SID, 板.map((r) => r.slice()));
+  const js = EF._jsComputeFormula(0, 式);
+  if (js !== null && js !== undefined) return String(js);
+  const 盤 = 板.map((r) => r.slice());
+  while (盤.length <= 式の行) 盤.push(new Array(盤[0].length).fill(null));
+  盤[式の行][0] = EF.convertFormula(式);
+  hf.setSheetContent(SID, 盤);
+  const v = hf.getCellValue({ sheet: SID, row: 式の行, col: 0 });
+  if (v && v.type) return '#' + v.type;
+  return v === null || v === undefined ? '(空)' : String(v);
+}
+/* ★★本番と 同じ 道で 押す（2026-09-09 に 足した）★★
+   ★1回目は JS層だけ★を 押して いました。
+   ⇒ IRR を ★エンジン側（EX.IRR）★に 移したら ★null が 返り 見張りが 赤★に
+   ⇒★本番は ①JS層 → ②convertFormula → エンジン★＝★同じ 道で 押す★
+   （★見張りが 見る 道を 本番と 揃える★＝今日 3回 踏んだ 型） */
+const 式の行 = 30;
 const 近い = (う, 正) => {
   const a = Number(う), b = Number(正);
   if (!isFinite(a) || !isFinite(b)) return false;
@@ -143,6 +166,85 @@ T('★門と 計算が ★同じ 組★を 見て いる（口裏が 合って �
       + '\n      ⇒★門は 空を 0 と 見るのに 計算が 落として いる＝口裏が 合って いない★');
   }
   console.log('      … 空の マスと 0 が 同じ 答え（' + 空あり.答 + '）');
+});
+
+/* ══ ★IRR と XNPV も 同じ 家族（2026-09-09 に 足した）★ ══════════
+   ★XIRR を 直した 後、同じ 家族を 測ったら ★穴が 16本★ 在りました★
+   ⇒ IRR 6本＋XNPV 8本 は ★同じ 直し方（実Excel と 同じ 誤りを 返す）★＝ここに 入れる
+   ⇒ MIRR 2本は ★向きが 逆（実Excel が 答えるのに うちが 断る）★＝★別件★ */
+T('★★IRR … 実Excel と 同じ 条件で 同じ 誤り★★', () => {
+  const 組 = [
+    [[100, 200, 300], undefined, '#NUM!', '★全部 プラス（前は 16693338463349.688）★'],
+    [[-100, -200, -300], undefined, '#NUM!', '★全部 マイナス★'],
+    [[0, 0, 0], undefined, '#NUM!', '★全部 0★'],
+    [[-1000], undefined, '#NUM!', '★1件だけ（★XIRR は #N/A・家族でも 違う★）★'],
+  ];
+  for (const [v, g, 正, 札] of 組) {
+    const 板 = v.map((x) => [x, null]);
+    板.push([null, null]);
+    const 式 = '=IRR(A1:A' + v.length + (g === undefined ? '' : ',' + g) + ')';
+    const r = 本番の道(板, 式);
+    if (r !== 正) throw new Error('★' + 札 + '（' + 式 + '）… うち ' + r + ' ／ 実Excel ' + 正 + '★');
+  }
+  console.log('      … ' + 組.length + '通り とも 実Excel と 同じ 誤り');
+});
+
+T('★★IRR … 見当が 何でも 同じ 答え（前は 発散して いた）★★', () => {
+  /* ★実測 … −0.99〜100 の 11通りで 全部 0.1888…★ */
+  const 正 = 0.18881944173074183;
+  for (const g of [undefined, -0.99, -0.5, 0, 0.1, 1, 10, 100]) {
+    const 式 = '=IRR(A1:A3' + (g === undefined ? '' : ',' + g) + ')';
+    const r = 本番の道([[-1000, null], [600, null], [700, null], [null, null]], 式);
+    if (String(r) === 'NaN') throw new Error('★見当 ' + g + ' で NaN★');
+    if (!近い(r, 正)) throw new Error('★見当 ' + g + ' … うち ' + r + ' ／ 実Excel ' + 正 + '★'
+      + ' ⇒★前は 見当 10 で -2168772783.613375 ／ 100 で -336432261411301570★');
+  }
+  console.log('      … 見当 8通り とも 0.1888…（★前は 大きい 見当で 発散★）');
+});
+
+T('★★XNPV … 利率の 境目は 0（★XIRR の 見当とは 逆★）★★', () => {
+  const 敷く = () => hf.setSheetContent(SID, [[-1000, 45292], [600, 45383], [700, 45474], [null, null]]);
+  /* ★0 以下は 断る★（刻んで 詰めた） */
+  for (const r2 of [-2, -1, -0.5, -0.01, -0.001, 0]) {
+    敷く();
+    const v = EF._jsComputeFormula(0, '=XNPV(' + r2 + ',A1:A3,B1:B3)');
+    if (v !== '#NUM!') throw new Error('★利率 ' + r2 + ' … うち ' + v + ' ／ 実Excel #NUM!★');
+  }
+  /* ★0 より 大きければ 通す★（★出来る 物を 止めない★） */
+  敷く();
+  const v1 = EF._jsComputeFormula(0, '=XNPV(0.0001,A1:A3,B1:B3)');
+  if (!近い(v1, 299.9501405358503)) throw new Error('★利率 0.0001 … うち ' + v1 + ' ／ 実Excel 299.9501405358503★');
+  敷く();
+  const v2 = EF._jsComputeFormula(0, '=XNPV(0.1,A1:A3,B1:B3)');
+  if (!近い(v2, 253.4216596369007)) throw new Error('★利率 0.1 … うち ' + v2 + ' ／ 実Excel 253.4216596369007★');
+  console.log('      … 0 以下 6通り 断る ／ 0.0001 と 0.1 は 通る（★境目は 0★）');
+});
+
+T('★★XNPV … 空・字・日付の 順・大きさ は #NUM!（★XIRR と 違う★）★★', () => {
+  const 組 = [
+    [[-1000, null, 1100], [45292, 45383, 45474], '★空が 混ざる（★XIRR は 通す★）★'],
+    [[-1000, 'あ', 1100], [45292, 45383, 45474], '★字が 混ざる（★XIRR は #VALUE!★）★'],
+    [[-1000, 600, 700], [45474, 45383, 45292], '★日付が 逆順★'],
+  ];
+  for (const [v, d, 札] of 組) {
+    const 板 = [];
+    for (let i = 0; i < v.length; i++) 板.push([v[i], d[i]]);
+    板.push([null, null]);
+    hf.setSheetContent(SID, 板);
+    const r = EF._jsComputeFormula(0, '=XNPV(0.1,A1:A3,B1:B3)');
+    if (r !== '#NUM!') throw new Error('★' + 札 + ' … うち ' + r + ' ／ 実Excel #NUM!★');
+  }
+  console.log('      … 3通り とも #NUM!（★同じ 家族でも XIRR とは 違う★）');
+});
+
+T('★★NPV は 穴が 無かった（★測って 無かった事も 成果★）★★', () => {
+  /* ★69本 中 NPV は 0本 穴が 在りませんでした★＝★触りません★
+     ⇒ ここでは ★触って いない事★を 記録します（★直した ふりを しない★） */
+  const s = fs.readFileSync(path.join(ROOT, 'exally-formula.js'), 'utf-8');
+  if (/mNpv|NPV:1/.test(s)) {
+    throw new Error('★NPV を JS層で 受けて いる★＝★穴が 無いのに 触って いる★');
+  }
+  console.log('      … NPV は JS層で 受けて いない（★穴 0本＝触らない★）');
 });
 
 T('★紙（実測）と 試験の 材料が 同じ★', () => {
