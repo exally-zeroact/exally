@@ -627,7 +627,138 @@ function _jsChooserows(matrix,rows){return rows.map(function(r){return matrix[r-
 
 // --- 財務 ---
 function _jsIrr(values,guess){guess=guess===undefined?0.1:guess;var rate=guess;for(var iter=0;iter<1000;iter++){var npv=0,dnpv=0;values.forEach(function(v,i){var f=Math.pow(1+rate,i);npv+=v/f;dnpv-=i*v/Math.pow(1+rate,i+1);});if(Math.abs(dnpv)<1e-15)break;var nr=rate-npv/dnpv;if(Math.abs(nr-rate)<1e-10){rate=nr;break;}rate=nr;}return rate;}
-function _jsXirr(values,dates,guess){guess=guess===undefined?0.1:guess;var d0=dates[0],rate=guess;for(var iter=0;iter<1000;iter++){var npv=0,dnpv=0;values.forEach(function(v,i){var t=(dates[i]-d0)/365,f=Math.pow(1+rate,t);npv+=v/f;dnpv-=t*v/Math.pow(1+rate,t+1);});if(Math.abs(dnpv)<1e-15)break;var nr=rate-npv/dnpv;if(Math.abs(nr-rate)<1e-10){rate=nr;break;}rate=nr;}return rate;}
+/* ★★XIRR の 組を 作る（★門と 計算が 同じ 物を 見る 為★）★★（2026-09-09）
+ *   ★門と 計算で 別々に 組を 作ると 口裏が 合いません★
+ *     ⇒ 実際 踏みました … 門は 通したのに 計算側が `filter(typeof v==='number')` で
+ *       ★空の マスを 落として 日付と ずれた★
+ *       AA1=-1000／AA2=★空★／AA3=1100 … 実Excel 0.21063382029533387 ／ うち 0.46563424984948343
+ *   ★空の マスは 0★（実測）／★日付が 無い 組は 数えない★
+ *   @returns {{組:Array,値:Array,日:Array}}
+ */
+function _xirrの組(生値,生日){
+  var 組=[],値=[],日=[];
+  for(var i=0;i<生値.length;i++){
+    var v=生値[i],d=生日[i];
+    var 値が空=(v===null||v===undefined||v==='');
+    var 日が空=(d===null||d===undefined||d==='');
+    if(日が空)continue;
+    var a=値が空?0:Number(v),b=Number(d);
+    組.push([a,b]); 値.push(a); 日.push(b);
+  }
+  return {組:組,値:値,日:日};
+}
+
+/* ★★XIRR の 門★★（2026-09-09）
+ *   ★どこから 断るかは 私が 決めて いません＝実Excel に 打たせました★
+ *   実測 … `docs/measured/golden-xirr-sakaime-2026-09-09.tsv`（61本）
+ *
+ *   ★実Excel が 断る 条件★
+ *     ・字が 混ざる ………………………… ★#VALUE!★
+ *     ・値と 日付の 数が 違う …………… ★#NUM!★
+ *     ・お金が 1件だけ …………………… ★#N/A★
+ *     ・符号が 片方だけ（全部＋／全部−／全部0）… ★#NUM!★
+ *     ・日付が 昇順で ない（逆順・バラバラ）…… ★#NUM!★
+ *     ・日付に 負の 数 …………………… ★#NUM!★
+ *   ★実Excel が 断らない 条件（★止めては いけない★）★
+ *     ・空の マスが 混ざる ……… 値を 返す（0.21063382029533387）
+ *     ・同じ 日付が 2つ ………… 値を 返す（2.071931099891663）
+ *     ・0 を 含む ………………… 値を 返す（0.21063382029533387）
+ *
+ *   ★見当を 変えても 誤りは 変わりません★（0.1 / 0 / -0.9 / 10 の 4通りで 確かめた）
+ *   ⇒★繰り返し 計算の 失敗では なく ★入口の 門★★
+ *
+ *   @returns {string|null} 誤りの 字（'#NUM!' など）／断らないなら null
+ */
+function _xirrの門(生値,生日,見当){
+  var i;
+  /* ★字が 混ざる＝#VALUE!★（★空は 字では ない★＝下で 落とす） */
+  for(i=0;i<生値.length;i++){
+    var a=生値[i];
+    if(typeof a==='string'&&a!==''){ if(!isFinite(Number(a)))return '#VALUE!'; }
+    if(typeof a==='boolean')return '#VALUE!';
+  }
+  for(i=0;i<生日.length;i++){
+    var b=生日[i];
+    if(typeof b==='string'&&b!==''){ if(!isFinite(Number(b)))return '#VALUE!'; }
+    if(typeof b==='boolean')return '#VALUE!';
+  }
+  /* ★★範囲の 大きさが 違う＝#NUM!★★（★中身の 数では ない★）
+     実測 … `=XIRR(X1:X3,Y1:Y2)`（3マス と 2マス）… ★#NUM!★ */
+  if(生値.length!==生日.length)return '#NUM!';
+  /* ★★空の マスは ★0★ として 扱う（★落とさない★）★★
+     実測 … AA1=-1000／AA2=★空★／AA3=1100 と I1=-1000／I2=0／I3=1100 が
+            ★どちらも 0.21063382029533387★＝★空は 0★
+     ⇒★1回目 私は「空は 落とす」と 書き、★数が 違う→#NUM!★ に して いました★
+       ⇒ 実Excel は 値を 返すのに ★うちだけ 断る★＝★出来る 物を 止める★所でした */
+  var 組=_xirrの組(生値,生日).組;
+  /* ★1件だけ＝#N/A★（★#NUM! では ない★＝実測） */
+  if(組.length<2)return '#N/A';
+  /* ★日付に 負の 数＝#NUM!★ */
+  for(i=0;i<組.length;i++)if(!(組[i][1]>=0))return '#NUM!';
+  /* ★日付が 昇順で ない＝#NUM!★（★同じ 日付は 通る★＝実測） */
+  for(i=1;i<組.length;i++)if(組[i][1]<組[i-1][1])return '#NUM!';
+  /* ★符号が 片方だけ＝#NUM!★（★プラスと マイナスが 両方 要る★） */
+  var 正が在る=false,負が在る=false;
+  for(i=0;i<組.length;i++){ if(組[i][0]>0)正が在る=true; if(組[i][0]<0)負が在る=true; }
+  if(!正が在る||!負が在る)return '#NUM!';
+  /* ★★見当が 0 より 小さい＝#NUM!★★（実測）
+     ★1回目 私は「−1 以下」と 決めました★（−1／−2／−0.9 の 3つしか 打って いなかった）
+     ⇒★刻んで 打ち直したら ★−0.01 でも #NUM!★＝私の 決めが 間違い★
+     実測（`=XIRR(E1:E3,F1:F3,見当)`）
+       −0.99 −0.95 −0.9 −0.8 −0.7 −0.5 −0.3 −0.1 ★−0.01★ … 全部 ★#NUM!★
+       ★0★ … 値（1.0011933300781244）／0.01 0.5 1 2 5 100 10000 … 値
+     ⇒★境目は 0★（0 は 通る・0 より 小さいと 断る）
+     ⇒★境目は 私が 決めず ★刻んで 打ちました★★ */
+  if(見当!==undefined){
+    if(!isFinite(見当))return '#VALUE!';
+    if(見当<0)return '#NUM!';
+  }
+  return null;
+}
+/* ★★見当が 大きいと 発散して NaN に なって いた（2026-09-09 に 直した）★★
+ *   =XIRR(E1:E3,F1:F3,10)     … 実Excel 1.0011933278292418 ／ うち ★NaN★
+ *   =XIRR(G1:G2,H1:H2,10)     … 実Excel 0.1000000024214387 ／ うち ★-2038322207737022.2★
+ *   =XIRR(E1:E3,F1:F3,1000000)… 実Excel 1.0011933255782424 ／ うち ★NaN★
+ *   ⇒ ニュートン法が ★1+rate が 0 か 負★の 所へ 飛び、`Math.pow` が NaN に なる
+ *   ⇒★実Excel は どの 見当でも 同じ 所に 落ち着きます★（実測 … 0.01〜10000 で 全部 1.00119…）
+ *   ★直し方★
+ *     ①★1+rate が 0 以下に なったら 戻す★（−1 より 下へ 行かせない）
+ *     ②★NaN に なったら 打ち切って 見当を 0.1 から やり直す★
+ *     ⇒★★出来る 物を 止めない★★（断るのでは なく 落ち着かせる）
+ */
+function _jsXirr(values,dates,guess){
+  var 始め=(guess===undefined)?0.1:guess;
+  var r=_xirrを解く(values,dates,始め);
+  /* ★落ち着かなければ 0.1 から やり直す★（実Excel は 見当が 何でも 同じ 所に 落ちる） */
+  if(!isFinite(r)&&始め!==0.1)r=_xirrを解く(values,dates,0.1);
+  return r;
+}
+function _xirrを解く(values,dates,guess){
+  var d0=dates[0],rate=guess;
+  for(var iter=0;iter<1000;iter++){
+    var npv=0,dnpv=0,壊れた=false;
+    for(var i=0;i<values.length;i++){
+      var t=(dates[i]-d0)/365;
+      var 底=1+rate;
+      if(!(底>0)){壊れた=true;break;}      /* ★1+rate が 0 以下＝累乗が 成り立たない★ */
+      var f=Math.pow(底,t);
+      if(!isFinite(f)||f===0){壊れた=true;break;}
+      npv+=values[i]/f;
+      dnpv-=t*values[i]/Math.pow(底,t+1);
+    }
+    if(壊れた)return NaN;
+    if(!isFinite(npv)||!isFinite(dnpv))return NaN;
+    if(Math.abs(dnpv)<1e-15)break;
+    var nr=rate-npv/dnpv;
+    if(!isFinite(nr))return NaN;
+    /* ★★−1 より 下へ 行かせない★★（行くと 次の 回で 必ず 壊れる）
+       ⇒ 半分だけ 戻す＝★ゆっくり 近づける★ */
+    if(nr<=-1)nr=(rate-1)/2;
+    if(Math.abs(nr-rate)<1e-10){rate=nr;break;}
+    rate=nr;
+  }
+  return rate;
+}
 function _jsVdb(cost,salvage,life,start,end,factor){factor=factor||2;var total=0;for(var p=Math.floor(start);p<Math.ceil(end);p++){var s=Math.max(start,p),e2=Math.min(end,p+1);var book=cost;for(var i=0;i<p;i++)book-=Math.min(book*factor/life,book-salvage);total+=Math.min(book*factor/life,book-salvage)*(e2-s);}return total;}
 function _jsDisc(settlement,maturity,pr,redemption){var t=(maturity-settlement)/365;return(redemption-pr)/(redemption*t);}
 function _jsIntrate(settlement,maturity,investment,redemption){var t=(maturity-settlement)/365;return(redemption-investment)/(investment*t);}
@@ -1327,8 +1458,33 @@ function _jsComputeFormula(sheet, v) {
   // IRR / XIRR (既存)
   // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.5478870809078217 が 0.5479 に なって いた（相対 2.4e-5）
   //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv（★お金の 利回り＝丸めては いけない★）
-  var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
-  if(mXirr){var vals=_getRangeAll(sheet,mXirr[1]).filter(function(v){return typeof v==='number';});var dates=_getRangeAll(sheet,mXirr[2]).filter(function(v){return typeof v==='number';});return String(_jsXirr(vals,dates));}
+  /* ★★見当（第3引数）も 受ける（2026-09-09）★★
+     ★前は 2つの 範囲だけ★の 形でした ⇒ `=XIRR(範囲,範囲,見当)` は ここを 素通り
+     ⇒ 実Excel は 見当が ★−1 以下★で ★#NUM!★ を 返しますが、うちは 数を 返して いた
+        =XIRR(E1:E3,F1:F3,-0.9) … 実Excel #NUM! ／ うち 1.0011933213132864
+     ⇒ 実測 … 見当 0.1 / 0 / 10 / 1e6 は ★値を 返す★／−1 と −2 は ★#NUM!★ */
+  var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)(?:\s*,\s*(-?[0-9.]+))?\s*\)$/i);
+  // ★★実Excel と 同じ 条件で 同じ 誤りを 返す（2026-09-09）★★
+  //   ★前は 断らずに 数を 返して いた★
+  //     =XIRR(全部プラス)  … 実Excel #NUM! ／ うち ★375686054239746.3★
+  //     =XIRR(日付が逆順)  … 実Excel #NUM! ／ うち ★-0.5002981524324954★
+  //   ⇒★誤りに ならず 数が 出る＝お客さんは 気づけない★（★お金の 利回り★）
+  //   ⇒★これは「機能を 減らす」では ありません＝★実Excel と 同じに する★★
+  //   ⇒ 条件は ★私が 決めず 実Excel に 打たせました★
+  //      docs/measured/golden-xirr-sakaime-2026-09-09.tsv（61本）
+  if(mXirr){
+    var 生値=_getRangeAll(sheet,mXirr[1]),生日=_getRangeAll(sheet,mXirr[2]);
+    var 見当=(mXirr[3]===undefined||mXirr[3]==='')?undefined:Number(mXirr[3]);
+    var 判=_xirrの門(生値,生日,見当);
+    if(判)return 判;                       /* ★実Excel と 同じ 誤り★ */
+    /* ★★門が 作った 組を そのまま 使う★★
+       ★前は ここで `filter(typeof v==='number')` を して いました★
+       ⇒★空の マスが 落ちて 日付と ずれる★＝門が 通しても 答えが 変わって いた
+         AA1=-1000／AA2=★空★／AA3=1100 … 実Excel 0.21063382029533387 ／ うち ★0.46563424984948343★
+       ⇒★門と 計算で ★同じ 組★を 見る★（★口裏を 合わせる★） */
+    var 組=_xirrの組(生値,生日);
+    return String(_jsXirr(組.値,組.日,見当));
+  }
 
   // DATESTRING
   var mDstr=fOrig.match(/^DATESTRING\s*\(([A-Z]+\d+|[0-9]+)\)$/i);

@@ -346,8 +346,15 @@ if (自己試験) {
       const s = 素で読む(p);
       if (s === null) return null;
       if (path.relative(ROOT, p).replace(/\\/g, '/') !== 'exally-formula.js') return s;
-      return s.replace('String(_jsXirr(vals,dates))',
-        'String(Math.round(_jsXirr(vals,dates)*10000)/10000)');
+      /* ★★探す 字が 古く なって いました（2026-09-09 に 直した）★★
+         前は `String(_jsXirr(vals,dates))` を 探して いました。
+         ⇒ XIRR に 門を 付けた 時 呼び方が `String(_jsXirr(組.値,組.日,見当))` に なり
+           ★字が 当たらなく なって 自己試験が「戻したのに 0か所」と 言った★
+         ⇒★本体は 緑・自己試験だけ 赤★＝★見張りが 見て いない事を 自己試験が 捕まえた★
+         ⇒★字を 1つに 決め打ちせず、★在る 物を 見つけてから 包む★★ */
+      const m = /String\(_jsXirr\(([^)]*)\)\)/.exec(s);
+      if (!m) return s;                       /* ★見つからなければ そのまま★（下で 赤に なる） */
+      return s.replace(m[0], 'String(Math.round(_jsXirr(' + m[1] + ')*10000)/10000)');
     };
     const 免除の道 = new Set(四桁の免除.map((x) => x.道));
     const 前 = 探す(素で読む).filter((x) => /\*\s*10000\s*\)\s*\/\s*10000/.test(x.字)).filter((x) => !免除の道.has(x.道));
