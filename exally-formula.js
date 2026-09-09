@@ -1197,6 +1197,13 @@ function _jsComputeFormula(sheet, v) {
   //  ★残る5つ(PERCENTILE/QUARTILE/N/DSUM/DCOUNT)は「版上げで不要になる可能性」枠。判断日 2026-09-30。
   var _jsSet = {PERCENTILE:1,QUARTILE:1,
     XIRR:1,
+    /* ★MIRR も 2026-09-09 に 足した★
+       ★エンジン（借り物）が ★実Excel が 答える 所で #DIV/0! を 返して いた★
+         =MIRR(全部マイナス,0.1,0.12) 実Excel ★−1★ ／ うち ★#DIV/0!★
+         =MIRR(A1:A3,-1,0.12)        実Excel ★0.17132403714770583★ ／ うち ★#DIV/0!★
+       ⇒★出来る 物を 止めて いた＝方針（全部 つける）に 反する★
+       ⇒★借り物の 中は 読まず、JS層で 先に 受けて 自分で 出す★ */
+    MIRR:1,
     DATESTRING:1,OFFSET:1,
     N:1,
     /* ★CONVERT は 2026-09-07 に ここから 外して lib/formula-yosoku-plug.js へ 移した★
@@ -1327,6 +1334,61 @@ function _jsComputeFormula(sheet, v) {
   // IRR / XIRR (既存)
   // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.5478870809078217 が 0.5479 に なって いた（相対 2.4e-5）
   //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv（★お金の 利回り＝丸めては いけない★）
+  /* ══ ★MIRR★（2026-09-09）══════════════════════════════
+     ★★これは「断る」では なく「止めて いたのを 動かす」直しです★★
+     ★前は エンジンが 実Excel の 答える 所で 断って いました★
+       =MIRR(全部マイナス,0.1,0.12) 実Excel ★−1★ ／ うち ★#DIV/0!★
+       =MIRR(A1:A3,-1,0.12)        実Excel ★0.17132403714770583★ ／ うち ★#DIV/0!★
+     ⇒★出来る 物を 止めて いた＝方針（Excel の 最上級・全部 つける）に 反する★
+
+     ★実Excel の 実測★（docs/measured/golden-okane-4kansuu-2026-09-09.tsv・69本）
+       普通 …………………… 0.17132403714770583
+       ★全部 マイナス★ …… ★−1★（★断らない★）
+       全部 プラス ………… #DIV/0!
+       全部 0 ……………… #DIV/0!
+       1件だけ …………… #DIV/0!
+       空・字が 混ざる …… 0.10000000000000009（★落として 計算する★）
+       ★借りる 利率★ ……… −1／−0.5／−0.01／0／0.01 ★どれでも 同じ 答え★
+                            ⇒★答えに 効かない★（負の 流れが 1件で 0期に 在るから）
+       ★回す 利率★ ……… −1 だけ ★#DIV/0!★／−0.5 は 0／0 は 0.14017542509913805
+
+     ★★式は 実Excel の 定義から 自分で 書きました（借り物は 読んで いません）★★
+       MIRR ＝ ( −(正の 流れを 回す利率で 最後まで 育てた 合計)
+                 ÷ (負の 流れを 借りる利率で 今に 引き戻した 合計) )^(1/(n−1)) − 1
+       ⇒★手で 検算して 実Excel と 6通り 一致★してから 入れました */
+  var mMirr=fOrig.match(/^MIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(-?[0-9.]+)\s*,\s*(-?[0-9.]+)\s*\)$/i);
+  if(mMirr){
+    var m生=_getRangeAll(sheet,mMirr[1]);
+    var m借=Number(mMirr[2]),m回=Number(mMirr[3]);
+    if(!isFinite(m借)||!isFinite(m回))return '#VALUE!';
+    var m数=[];
+    for(var mi=0;mi<m生.length;mi++){
+      var mv=m生[mi];
+      if(mv===null||mv===undefined||mv==='')continue;              /* ★空は 落とす★（実測） */
+      if(typeof mv==='boolean')continue;
+      if(typeof mv==='string'&&!isFinite(Number(mv)))continue;      /* ★字も 落とす★（実測） */
+      m数.push(Number(mv));
+    }
+    var mn=m数.length;
+    if(mn<2)return '#DIV/0!';                                       /* ★1件だけ★（実測） */
+    var m負=0,m正=0,m負が在る=false;
+    for(var mj=0;mj<mn;mj++){
+      if(m数[mj]<0){ m負が在る=true; m負+=m数[mj]/Math.pow(1+m借,mj); }
+      if(m数[mj]>0){ m正+=m数[mj]*Math.pow(1+m回,mn-1-mj); }
+    }
+    /* ★負の 流れが 1つも 無い＝割れない＝#DIV/0!★（実測 … 全部プラス・全部0） */
+    if(!m負が在る||m負===0)return '#DIV/0!';
+    if(!isFinite(m負)||!isFinite(m正))return '#DIV/0!';
+    /* ★★回す 利率が −1＝#DIV/0!★★（実測）
+       (1+回す利率) が 0 に なり ★正の 流れが 全部 0 に 潰れます★
+       ⇒ 実Excel は #DIV/0!（うちは 直す 前 -0.16333997346592444 を 返して いた）
+       ⇒★1回目 私は これを 見落として いました★＝★11通り 押して 1本だけ 違った★ */
+    if(1+m回===0)return '#DIV/0!';
+    var m比=-m正/m負;
+    if(!(m比>=0))return '#NUM!';
+    return String(Math.pow(m比,1/(mn-1))-1);
+  }
+
   var mXirr=fOrig.match(/^XIRR\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\)$/i);
   if(mXirr){var vals=_getRangeAll(sheet,mXirr[1]).filter(function(v){return typeof v==='number';});var dates=_getRangeAll(sheet,mXirr[2]).filter(function(v){return typeof v==='number';});return String(_jsXirr(vals,dates));}
 
