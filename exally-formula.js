@@ -333,6 +333,11 @@ function _jsBinomDistRange(n,p,s1,s2){function bp(t,pr,k){var c=1;for(var i=0;i<
 function _jsSlope(ys,xs){var n=ys.length,sx=0,sy=0,sxx=0,sxy=0;for(var i=0;i<n;i++){sx+=xs[i];sy+=ys[i];sxx+=xs[i]*xs[i];sxy+=xs[i]*ys[i];}return(n*sxy-sx*sy)/(n*sxx-sx*sx);}
 function _jsIntercept(ys,xs){var slope=_jsSlope(ys,xs),n=ys.length,sx=ys.reduce(function(a,_,i){return a+xs[i];},0)/n,sy=ys.reduce(function(a,b){return a+b;})/n;return sy-slope*sx;}
 function _jsForecast(x,ys,xs){return _jsIntercept(ys,xs)+_jsSlope(ys,xs)*x;}
+/* ★★`_一本の並びか()` は 外しました（2026-09-09）★★
+   「x が 2本以上なら 断る」為に 作った 門でした。
+   ⇒★断るのを やめて 直した★ので ★誰からも 呼ばれません★
+   ⇒★呼ばれない 物を 置くと「そこで 見て いる」と 読まれる★＝消します
+   （今は `lib/formula-yosoku.js` の `直線の係数()` が x を 何本でも 解きます） */
 function _jsLinest(ys,xs){return[_jsSlope(ys,xs),_jsIntercept(ys,xs)];}
 function _jsLogest(ys,xs){var lys=ys.map(function(v){return Math.log(v);});return[Math.exp(_jsSlope(lys,xs)),Math.exp(_jsIntercept(lys,xs))];}
 function _jsTrend(ys,xs,newXs){var s=_jsSlope(ys,xs),i=_jsIntercept(ys,xs);return newXs.map(function(x){return i+s*x;});}
@@ -1199,7 +1204,10 @@ function _jsComputeFormula(sheet, v) {
        ⇒★1つの 関数は 1か所でだけ 定義する★（両方に 居ると 先に 当たった 方が 勝つ） */
     DSUM:1,DAVERAGE:1,DCOUNT:1,DCOUNTA:1,DMAX:1,DMIN:1,DPRODUCT:1,
     DGET:1,DSTDEV:1,DSTDEVP:1,DVAR:1,DVARP:1,
-    LINEST:1,BINOM:1,FREQUENCY:1,
+    /* ★LINEST は 2026-09-09 に 外しました★＝JS層で 受けなく なった
+       （`lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返す）
+       ⇒★関所に 残すと「JS層に 段が 在る」と 読まれる★ */
+    BINOM:1,FREQUENCY:1,
     REDUCE:1,SCAN:1,MAP:1,MAKEARRAY:1,ISOMITTED:1};
   if(!_jsSet[_fnBase]) return null; // JS非対象 → HFへ
 
@@ -1290,11 +1298,17 @@ function _jsComputeFormula(sheet, v) {
   var mDb=fOrig.match(/^(DSUM|DAVERAGE|DCOUNT|DCOUNTA|DMAX|DMIN|DPRODUCT|DGET|DSTDEV|DSTDEVP|DVAR|DVARP)\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
   if(mDb){var funcMap={'DSUM':'SUM','DAVERAGE':'AVG','DCOUNT':'CNT','DCOUNTA':'CNTA','DMAX':'MAX','DMIN':'MIN','DPRODUCT':'PROD','DGET':'GET','DSTDEV':'STD','DSTDEVP':'STDP','DVAR':'VAR','DVARP':'VARP'};var fn=funcMap[mDb[1].toUpperCase()];var fieldArg=mDb[3].trim().replace(/^["']|["']$/g,'');var fieldVal=parseInt(fieldArg)||fieldArg;return String(_jsDbFunc(fn,sheet,mDb[2],fieldVal,mDb[4]));}
 
-  // LINEST
-  var mLi=fOrig.match(/^LINEST\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
-  // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.00108… が 0.0011 に なって いた（相対 1.85e-2）
-  //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv
-  if(mLi){var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);var r=_jsLinest(ys,xs);return String(r[0]);}
+  // ★★LINEST は ここで 受けません（2026-09-09 に 外しました）★★
+  //   ★前の 形★ 裸の =LINEST(範囲,範囲) だけを 拾い ★傾き 1つ★を 返して いた。
+  //     ⇒ `=INDEX(LINEST(…),1,1)` は ★#NAME?★（エンジンに 積んで いなかった）
+  //     ⇒★x が 2本以上（重回帰）で ★静かに 違う 答え★★
+  //         =LINEST(G1:G6,H1:I6) … 実Excel 0.7708333333333329 ／ うち ★7.390243902439025★
+  //     ⇒ LINEST は ★表を 返す 関数★なのに ★1つの 数★しか 返せない 場所だった
+  //   ★今★ `lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返します。
+  //     ・LOGEST と ★同じ 土台（回帰）★＝重回帰も 統計の 5行も 出せる
+  //     ・実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 119本）
+  //   ⇒★ここで 受けると エンジンより 先に 答えて しまう★ので ★何も しません★
+  //   （`_jsLinest` は 残して 在りますが ★もう 呼んで いません★＝TREND/LOGEST/GROWTH と 同じ）
 
 
 
