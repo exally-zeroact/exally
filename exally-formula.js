@@ -1215,7 +1215,10 @@ function _jsComputeFormula(sheet, v) {
        ⇒★1つの 関数は 1か所でだけ 定義する★（両方に 居ると 先に 当たった 方が 勝つ） */
     DSUM:1,DAVERAGE:1,DCOUNT:1,DCOUNTA:1,DMAX:1,DMIN:1,DPRODUCT:1,
     DGET:1,DSTDEV:1,DSTDEVP:1,DVAR:1,DVARP:1,
-    LINEST:1,BINOM:1,FREQUENCY:1,
+    /* ★LINEST は 2026-09-09 に 外しました★＝JS層で 受けなく なった
+       （`lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返す）
+       ⇒★関所に 残すと「JS層に 段が 在る」と 読まれる★ */
+    BINOM:1,FREQUENCY:1,
     REDUCE:1,SCAN:1,MAP:1,MAKEARRAY:1,ISOMITTED:1};
   if(!_jsSet[_fnBase]) return null; // JS非対象 → HFへ
 
@@ -1306,22 +1309,17 @@ function _jsComputeFormula(sheet, v) {
   var mDb=fOrig.match(/^(DSUM|DAVERAGE|DCOUNT|DCOUNTA|DMAX|DMIN|DPRODUCT|DGET|DSTDEV|DSTDEVP|DVAR|DVARP)\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
   if(mDb){var funcMap={'DSUM':'SUM','DAVERAGE':'AVG','DCOUNT':'CNT','DCOUNTA':'CNTA','DMAX':'MAX','DMIN':'MIN','DPRODUCT':'PROD','DGET':'GET','DSTDEV':'STD','DSTDEVP':'STDP','DVAR':'VAR','DVARP':'VARP'};var fn=funcMap[mDb[1].toUpperCase()];var fieldArg=mDb[3].trim().replace(/^["']|["']$/g,'');var fieldVal=parseInt(fieldArg)||fieldArg;return String(_jsDbFunc(fn,sheet,mDb[2],fieldVal,mDb[4]));}
 
-  // LINEST
-  var mLi=fOrig.match(/^LINEST\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*\)$/i);
-  // ★4桁の 丸めを 外した（2026-09-08）★ 実Excel 0.00108… が 0.0011 に なって いた（相対 1.85e-2）
-  //   ⇒ docs/measured/golden-marume-A-2026-09-08.tsv
-  // ★★x が 2本以上（重回帰）の 時は ★答えず 断る★（2026-09-09）★★
-  //   前は ★数を 返して いた★ … =LINEST(G1:G6,H1:I6)
-  //     実Excel 0.7708333333333329 ／ うち ★7.390243902439025★
-  //   ⇒ x の 範囲を ★1本の 並びとして 平らに★ 読んで いた＝★静かに 違う 答え★
-  //   ⇒★誤りに ならず 数が 出る＝お客さんは 気づけない★（#NAME? の 方が まだ まし）
-  //   ⇒★ここでは 答えず 素通りする★＝他の LINEST の 形と 同じ ★#NAME?★ に なる
-  //     （★出来ない物を「出来ている顔」で 出さない★／正しく 計算するのは 別の 直し）
-  //   ⇒ 実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 114本）
-  if(mLi&&_一本の並びか(mLi[1])&&_一本の並びか(mLi[2])){
-    var ys=_getRangeVals(sheet,mLi[1]),xs=_getRangeVals(sheet,mLi[2]);
-    var r=_jsLinest(ys,xs);return String(r[0]);
-  }
+  // ★★LINEST は ここで 受けません（2026-09-09 に 外しました）★★
+  //   ★前の 形★ 裸の =LINEST(範囲,範囲) だけを 拾い ★傾き 1つ★を 返して いた。
+  //     ⇒ `=INDEX(LINEST(…),1,1)` は ★#NAME?★（エンジンに 積んで いなかった）
+  //     ⇒★x が 2本以上（重回帰）で ★静かに 違う 答え★★
+  //         =LINEST(G1:G6,H1:I6) … 実Excel 0.7708333333333329 ／ うち ★7.390243902439025★
+  //     ⇒ LINEST は ★表を 返す 関数★なのに ★1つの 数★しか 返せない 場所だった
+  //   ★今★ `lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返します。
+  //     ・LOGEST と ★同じ 土台（回帰）★＝重回帰も 統計の 5行も 出せる
+  //     ・実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 119本）
+  //   ⇒★ここで 受けると エンジンより 先に 答えて しまう★ので ★何も しません★
+  //   （`_jsLinest` は 残して 在りますが ★もう 呼んで いません★＝TREND/LOGEST/GROWTH と 同じ）
 
 
 
