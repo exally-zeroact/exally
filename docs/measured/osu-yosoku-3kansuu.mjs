@@ -76,7 +76,28 @@ require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
   }
   console.log('★本番と 同じ ' + 数 + '本の プラグインを つないだ★');
 }
-const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
+/* ★★本番と 同じ 建て方に する（2026-09-09 に 直した）★★
+   ★1回目は 既定の まま★でした。本番（book.html:1764）は こう 建てて います
+     { licenseKey, useArrayArithmetic:true, ★smartRounding:false★, maxRows:1048576, maxColumns:18278 }
+   ⇒★smartRounding が 既定（true）だと エンジンが 答えを 勝手に 丸める★
+     803.6538461538445 が ★803.65384615★ に なって いた＝★桁が 落ちる★
+   ⇒★本番に 無い 丸めを 測り台が 足して いた＝嘘の 数字が 出る★ */
+const hf = HF0.buildEmpty({
+  licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false,
+  maxRows: 1048576, maxColumns: 18278,
+});
+{ /* ★本番の 建て方と 食い違ったら 止める★ */
+  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
+  const m = /buildEmpty\(\{([\s\S]{0,240}?)\}\)/.exec(html);
+  if (!m) { console.error('★book.html の buildEmpty が 読めない★'); process.exit(2); }
+  for (const 要る of ['useArrayArithmetic:true', 'smartRounding:false']) {
+    const [k, v] = 要る.split(':');
+    if (!new RegExp(k + '\s*:\s*' + v).test(m[1].replace(/\s+/g, ''))) {
+      console.error('★本番の buildEmpty に ' + 要る + ' が 無い＝測り台の 建て方を 見直して ください★');
+      process.exit(2);
+    }
+  }
+}
 const SID = hf.getSheetId(hf.addSheet('S'));
 EF.initExallyFormula(hf);
 
@@ -146,8 +167,24 @@ function 押す(式) {
 
 /* ★合うか（★幅は 場所ごとに 変える＝1つの 数で 決めない★）★ */
 const 幅 = 1e-9;
+/* ★★誤りの 名前の 書き方を 揃える（2026-09-09 に 足した）★★
+   実Excel は `#N/A` / `#DIV/0!` / `#NUM!` と 書き、エンジンは `#NA` / `#DIV_BY_ZERO` / `#NUM` と 返す。
+   ⇒★同じ 誤りなのに「違う」と 数えて いました★（★字が 違うだけ★）
+   ⇒★名前を 揃えてから 比べる★
+   ★注意★ これは ★同じ 誤りを 同じと 見る★だけです。
+          ★違う 誤り（#REF! と #NUM! など）は そのまま 違うと 数えます★ */
+const 誤りの名 = (s) => {
+  const t = String(s).trim().toUpperCase().replace(/[#!]/g, '').replace(/[\/_]/g, '');
+  const 表 = { NA: 'NA', DIVBY0: 'DIV0', DIVBYZERO: 'DIV0', DIV0: 'DIV0', NUM: 'NUM',
+    VALUE: 'VALUE', REF: 'REF', NAME: 'NAME', NULL: 'NULL', SPILL: 'SPILL',
+    CALC: 'CALC', CYCLE: 'CYCLE', ERROR: 'ERROR' };
+  return 表[t] || null;
+};
 function 合うか(う, 正) {
   if (う === 正) return true;
+  const 誤り1 = 誤りの名(う), 誤り2 = 誤りの名(正);
+  if (誤り1 && 誤り2) return 誤り1 === 誤り2;   /* ★どちらも 誤り＝名前で 比べる★ */
+  if (誤り1 || 誤り2) return false;             /* ★片方だけ 誤り＝違う★ */
   const a = Number(う), b = Number(正);
   if (!isFinite(a) || !isFinite(b)) return false;
   if (b === 0) return a === 0;
