@@ -227,6 +227,8 @@ const FILES = [
   ['marume-mihari.test.mjs','--self-test'],
   'linest-x-nihon.test.mjs',                // ★LINESTのxが2本以上で静かに違う答えを出さない（09-09 実Excel 0.77 vs うち 7.39）
   ['linest-x-nihon.test.mjs','--self-test'],// ＝断る（正しく計算するのは別の直し）／出来ていた1本の形は止めない // ＝★A群かを機械に判じさせない★新しい丸めは全部赤・人がA〜Eに分ける
+  'xirr-mon.test.mjs',                      // ★XIRRが実Excelと同じ条件で同じ誤りを返すか（09-09 全部プラスで 375兆 を返していた）
+  ['xirr-mon.test.mjs','--self-test'],      // ＝断らない所は断らない（空マス・同じ日付・0を含む は値を返す）
   'gyousuu-gamen-to-enjin.test.mjs',       // ★画面は100万行なのにエンジンは4万行＝★96%が黙って0★(09-08 本番実測)
   ['gyousuu-gamen-to-enjin.test.mjs','--self-test'],// ＝数を揃えるだけでなく★実際に押して0でない事★まで見る
   'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
