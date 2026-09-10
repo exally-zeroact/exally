@@ -8,6 +8,15 @@
  *
  *  使い方: node docs/measured/osu-linest-hyou.mjs
  */
+
+/* ★★★この 台の 数は 画面の 数では ありません★★★（2026-09-10 に 書いた）
+   ★ここは `setSheetContent` で ★板ごと★ 入れて います★（本番は 1マスずつ）。
+   ⇒ 2026-09-10 … 板ごと 入れた せいで 裸の `=LINEST(…)` が ★#VALUE!★ に なり、
+     ★「本番が 壊れて いる」と 報告する 一歩 手前★まで 行きました。
+     ⇒ 実配信を ★ブラウザで 押したら 4本とも 動いて いました★＝★台の 産物★
+   ⇒★画面の 事を 言いたい なら ★ブラウザで 押して ください★★
+     （`setCellFormula` は エンジンに 入れるだけ／`setCell(r,c,v)` が 画面側・★シート番号は 取らない★）
+   ⇒ 見張り `tests/hakaridai-mon.test.mjs` が この 断りの 有無を 見ます */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
