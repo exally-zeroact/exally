@@ -1,30 +1,27 @@
-/* ★予測3関数の 紙を ★うちの 本番の 道★で 押して 突き合わせる★（2026-09-09・2件目）
+/* ★XIRR の 紙を ★うちの 本番の 道★で 押して 突き合わせる★（2026-09-09・2件目）
  *
- *  ★正★ … `golden-yosoku-3kansuu-2026-09-09.tsv`（実Excel の 実測）
+ *  ★正★ … `golden-xirr-sakaime-2026-09-09.tsv`（実Excel の 実測）
  *  ★押す 道★ … 本番と 同じ ①JS層 `_jsComputeFormula` → ②`convertFormula` → エンジン
+ *
+ *  ★★この 台の 数は ★画面の 数では ありません★★★
+ *    ★板ごと `setSheetContent` で 入れて います★（本番は 1マスずつ `setCellFormula`）
+ *    ⇒ 2026-09-10 … 板ごと 入れた 台で 裸の `=LINEST` が `#VALUE!` に なり
+ *      ★本番が 壊れて いると 報告する 一歩 手前★まで 行きました
+ *    ⇒★画面の 事を 言いたい時は ★ブラウザで 押す★★
  *
  *  ★材料は 紙から 読む★（★手で 写さない★＝2026-09-08/09 に 3回 写し間違えた）
  *  ★数だけで 済ませない★＝★出た 字を 並べて 出す★
  *
  *  使い方: node docs/measured/osu-linest-hyou.mjs
  */
-
-/* ★★★この 台の 数は 画面の 数では ありません★★★（2026-09-10 に 書いた）
-   ★ここは `setSheetContent` で ★板ごと★ 入れて います★（本番は 1マスずつ）。
-   ⇒ 2026-09-10 … 板ごと 入れた せいで 裸の `=LINEST(…)` が ★#VALUE!★ に なり、
-     ★「本番が 壊れて いる」と 報告する 一歩 手前★まで 行きました。
-     ⇒ 実配信を ★ブラウザで 押したら 4本とも 動いて いました★＝★台の 産物★
-   ⇒★画面の 事を 言いたい なら ★ブラウザで 押して ください★★
-     （`setCellFormula` は エンジンに 入れるだけ／`setCell(r,c,v)` が 画面側・★シート番号は 取らない★）
-   ⇒ 見張り `tests/hakaridai-mon.test.mjs` が この 断りの 有無を 見ます */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const 紙 = path.join(ROOT, 'docs/measured/golden-yosoku-3kansuu-2026-09-09.tsv');
-const 出す先 = path.join(ROOT, 'docs/measured/golden-yosoku-3kansuu-awase-2026-09-09.tsv');
+const 紙 = path.join(ROOT, 'docs/measured/golden-xirr-sakaime-2026-09-09.tsv');
+const 出す先 = path.join(ROOT, 'docs/measured/golden-xirr-sakaime-awase-2026-09-09.tsv');
 
 const require_ = createRequire(path.join(ROOT, 'package.json'));
 const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
@@ -116,7 +113,15 @@ const 答え = [];
 for (const l of fs.readFileSync(紙, 'utf-8').split('\n')) {
   if (l.startsWith('#材料')) {
     const c = l.split('\t');
-    if (c.length >= 3) 材料[c[1].trim()] = Number(c[2]);
+    if (c.length >= 3) {
+      /* ★★数で ない 材料も 在る★★（`★字「あ」★` `★空★`）
+         ⇒★Number() に すると NaN に なり ★別の 物を 敷いて しまう★
+         ⇒ 印で 見分けて ★字は 字の まま／空は 空の まま★ 敷く */
+      const 生 = c[2].trim();
+      if (/^★字「(.*)」★$/.test(生)) 材料[c[1].trim()] = 生.replace(/^★字「|」★$/g, '');
+      else if (生 === '★空★') 材料[c[1].trim()] = null;
+      else 材料[c[1].trim()] = Number(生);
+    }
     continue;
   }
   if (l.startsWith('#') || !l.trim()) continue;
@@ -175,7 +180,13 @@ function 押す(式) {
 }
 
 /* ★合うか（★幅は 場所ごとに 変える＝1つの 数で 決めない★）★ */
-const 幅 = 1e-9;
+/* ★★XIRR の 幅は 1e-6★★（★測ってから 決めた 数★）
+   実Excel の XIRR は ★見当（第3引数）を 変えるだけで 自分の 答えが 動きます★
+     1万・1年ごと・3回 … 0.06023252382874489 〜 0.06023252964019775 ＝★相対 9.65e-8★
+   ⇒★実Excel 同士でも 落ちる 幅で 比べては いけない★
+   ⇒ 実測の ばらつき 最大の 10倍で ★1e-6★
+   ★この 幅で 見逃す 悪さ★ … 相対 1e-6 より 小さい 狂いは この 紙では 捕まりません */
+const 幅 = 1e-6;
 /* ★★誤りの 名前の 書き方を 揃える（2026-09-09 に 足した）★★
    実Excel は `#N/A` / `#DIV/0!` / `#NUM!` と 書き、エンジンは `#NA` / `#DIV_BY_ZERO` / `#NUM` と 返す。
    ⇒★同じ 誤りなのに「違う」と 数えて いました★（★字が 違うだけ★）
@@ -202,9 +213,9 @@ function 合うか(う, 正) {
 
 const 行 = [];
 const 言う = (s) => { 行.push(s); console.log(s); };
-言う('# ★予測3関数の 紙を うちの 本番の 道で 押して 突き合わせた★（2026-09-09・2件目）');
+言う('# ★XIRR の 紙を うちの 本番の 道で 押して 突き合わせた★（2026-09-09・2件目）');
 言う('#');
-言う('# ★正★ golden-yosoku-3kansuu-2026-09-09.tsv（実Excel の 実測）');
+言う('# ★正★ golden-xirr-sakaime-2026-09-09.tsv（実Excel の 実測）');
 言う('# ★押す 道★ 本番と 同じ ①JS層 → ②convertFormula → エンジン');
 言う('# ★材料は 紙から 読んだ★（' + Object.keys(材料).length + 'マス）★手で 写して いません★');
 言う('# ★合う 幅★ 相対 ' + 幅 + '（★字が そのまま 同じ 物は そのまま 合う★）');

@@ -221,12 +221,18 @@ const FILES = [
   ['isomitted.test.mjs','--self-test'],   //  ＝空のマスも FALSE／★カンマで省いた形は「まだ」＝黙って逆を返さない★
   'monosashi-mado.test.mjs',                // ★測り道具が「0」を2つの窓で取っているか（09-08 .Value2 が 0でない値に0を返す）
   ['monosashi-mado.test.mjs','--self-test'],// ＝★見せかけの0★と★字の"0"★は .Value2 では見分けが付かない
+  'hakaridai-mon.test.mjs',                 // ★測り台が本番と違うのを止める（09-09〜10 に 1日で 5回 転んだ）
+  ['hakaridai-mon.test.mjs','--self-test'], // ＝node の台の数は 画面の数ではない／板ごと入れるなら断りを書く
   'shisuu-utenai.test.mjs',                 // ★指数の字(=1.64E-14)を打つと #ERROR になっていた（09-10）
   ['shisuu-utenai.test.mjs','--self-test'], // ＝大文字Eをエンジンが数と読めない／セル参照(E14)は壊さない
   'marume-mihari.test.mjs',                 // ★答えを黙って丸めている所が増えていないか（09-08 A群4→0）
   ['marume-mihari.test.mjs','--self-test'],
+  'mirr-tomeru-na.test.mjs',                // ★MIRRが実Excelの答える所で断っていないか（09-09 全部マイナスで #DIV/0! を返していた）
+  ['mirr-tomeru-na.test.mjs','--self-test'],// ＝出来る物を止めない（式は実Excelの定義から自分で書いた）
   'linest-x-nihon.test.mjs',                // ★LINESTのxが2本以上で静かに違う答えを出さない（09-09 実Excel 0.77 vs うち 7.39）
   ['linest-x-nihon.test.mjs','--self-test'],// ＝断る（正しく計算するのは別の直し）／出来ていた1本の形は止めない // ＝★A群かを機械に判じさせない★新しい丸めは全部赤・人がA〜Eに分ける
+  'xirr-mon.test.mjs',                      // ★XIRRが実Excelと同じ条件で同じ誤りを返すか（09-09 全部プラスで 375兆 を返していた）
+  ['xirr-mon.test.mjs','--self-test'],      // ＝断らない所は断らない（空マス・同じ日付・0を含む は値を返す）
   'gyousuu-gamen-to-enjin.test.mjs',       // ★画面は100万行なのにエンジンは4万行＝★96%が黙って0★(09-08 本番実測)
   ['gyousuu-gamen-to-enjin.test.mjs','--self-test'],// ＝数を揃えるだけでなく★実際に押して0でない事★まで見る
   'js-sou-sekisho.test.mjs',              // ★JS層の関所を通らない段＝★1度も届かない死にコード★(09-08 実測12か所)
