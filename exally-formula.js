@@ -367,10 +367,14 @@ function _jsForecast(x,ys,xs){return _jsIntercept(ys,xs)+_jsSlope(ys,xs)*x;}
    ⇒★断るのを やめて 直した★ので ★誰からも 呼ばれません★
    ⇒★呼ばれない 物を 置くと「そこで 見て いる」と 読まれる★＝消します
    （今は `lib/formula-yosoku.js` の `直線の係数()` が x を 何本でも 解きます） */
-function _jsLinest(ys,xs){return[_jsSlope(ys,xs),_jsIntercept(ys,xs)];}
-function _jsLogest(ys,xs){var lys=ys.map(function(v){return Math.log(v);});return[Math.exp(_jsSlope(lys,xs)),Math.exp(_jsIntercept(lys,xs))];}
-function _jsTrend(ys,xs,newXs){var s=_jsSlope(ys,xs),i=_jsIntercept(ys,xs);return newXs.map(function(x){return i+s*x;});}
-function _jsGrowth(ys,xs,newXs){var lg=_jsLogest(ys,xs);return newXs.map(function(x){return lg[1]*Math.pow(lg[0],x);});}
+/* ★★LINEST／LOGEST／TREND／GROWTH の 下請け 4本は 外しました（2026-09-11）★★
+   ★誰からも 呼ばれて いませんでした★（数えた … 呼び出し 0本／試験 0本／道具 0本）
+     `_jsGrowth` が `_jsLogest` を 呼ぶ 1本だけが 4本の 中の 行き来でした。
+   ★今は `lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返します★
+     ・1つの 数しか 返せない 段では LINEST は 出せません（実測 … 実Excel 0.7708… ／ うち 7.390…）
+     ・実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 119本）
+   ⇒★呼ばれない 物を 置くと「そこで 見て いる」と 読まれます★（上の `_一本の並びか()` と 同じ）
+   ★司さん（2026-09-02）「使わんもんは 消せや」★ */
 
 // --- 行列 ---
 function _jsMdeterm(m){var n=m.length;if(n===1)return m[0][0];if(n===2)return m[0][0]*m[1][1]-m[0][1]*m[1][0];var det=0;for(var c=0;c<n;c++){var sub=m.slice(1).map(function(r){return r.filter(function(_,ci){return ci!==c;});});det+=Math.pow(-1,c)*m[0][c]*_jsMdeterm(sub);}return det;}
@@ -1540,7 +1544,7 @@ function _jsComputeFormula(sheet, v) {
   //     ・LOGEST と ★同じ 土台（回帰）★＝重回帰も 統計の 5行も 出せる
   //     ・実測 … docs/measured/golden-linest-hyou-2026-09-09.tsv（実Excel 119本）
   //   ⇒★ここで 受けると エンジンより 先に 答えて しまう★ので ★何も しません★
-  //   （`_jsLinest` は 残して 在りますが ★もう 呼んで いません★＝TREND/LOGEST/GROWTH と 同じ）
+  //   （下請けの `_jsLinest` `_jsLogest` `_jsTrend` `_jsGrowth` は ★2026-09-11 に 消しました★）
 
 
 
@@ -1717,7 +1721,6 @@ if (typeof module !== 'undefined' && module.exports) {
     _jsPermutationa: _jsPermutationa, _jsProb: _jsProb, _jsBinomDistRange: _jsBinomDistRange,
     // 回帰
     _jsSlope: _jsSlope, _jsIntercept: _jsIntercept, _jsForecast: _jsForecast,
-    _jsLinest: _jsLinest, _jsLogest: _jsLogest, _jsTrend: _jsTrend, _jsGrowth: _jsGrowth,
     // 行列
     _jsMdeterm: _jsMdeterm, _jsMinverse: _jsMinverse,
     // 文字列
