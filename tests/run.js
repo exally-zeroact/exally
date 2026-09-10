@@ -223,6 +223,8 @@ const FILES = [
   ['monosashi-mado.test.mjs','--self-test'],// ＝★見せかけの0★と★字の"0"★は .Value2 では見分けが付かない
   'hakaridai-mon.test.mjs',                 // ★測り台が本番と違うのを止める（09-09〜10 に 1日で 5回 転んだ）
   ['hakaridai-mon.test.mjs','--self-test'], // ＝node の台の数は 画面の数ではない／板ごと入れるなら断りを書く
+  'shisuu-utenai.test.mjs',                 // ★指数の字(=1.64E-14)を打つと #ERROR になっていた（09-10）
+  ['shisuu-utenai.test.mjs','--self-test'], // ＝大文字Eをエンジンが数と読めない／セル参照(E14)は壊さない
   'marume-mihari.test.mjs',                 // ★答えを黙って丸めている所が増えていないか（09-08 A群4→0）
   ['marume-mihari.test.mjs','--self-test'],
   'mirr-tomeru-na.test.mjs',                // ★MIRRが実Excelの答える所で断っていないか（09-09 全部マイナスで #DIV/0! を返していた）
