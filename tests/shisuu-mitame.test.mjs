@@ -1,0 +1,232 @@
+/* shisuu-mitame.test.mjs — ★画面に 出る 字を 実Excel と 同じに する★（2026-09-10）
+ *
+ *  ★★2026-09-09 に 私は「画面は きれい」と 報告しました＝★間違い★でした★★
+ *    ★実Excel の ★中の 数★と 比べて いて ★画面に 出る 字★と 比べて いませんでした★
+ *      =1/3                実Excel ★0.333333333★（9桁）／うち 0.333333333333333
+ *      =10/3               実Excel ★3.333333333★      ／うち 3.33333333333333
+ *      =1234567.1-1234567  実Excel ★0.1★             ／うち 0.100000000093132
+ *      =1.64E-14           実Excel ★1.64E-14★        ／うち 1.64e-14（小文字）
+ *    ⇒★お客さんの ふつうの マスに ゴミが 出て いました★
+ *
+ *  ★★実Excel の 決まり（★私が 決めず 実Excel に 打たせた★）★★
+ *    `docs/measured/golden-shisuu-mitame-2026-09-10.tsv`（41の 数 × 14の 幅 ＝ ★574本★）
+ *      ①★幅 11 以上は どの 幅でも 同じ★（11/12/13/15/20/30/50 の ★7通りが 一致★）
+ *      ②★まず 15桁に 丸めてから 字数に 収める★
+ *      ③★十進で 収まらない 時だけ 指数★／★大文字 E ＋ 符号 ＋ 2桁★
+ *      ④★十進と 指数は 有効桁が 多い 方★（同じなら 十進）
+ *      ⑤★末尾の 0 は 落とす★
+ *
+ *  ★★見て いない 範囲（★書かない 見張りは「全部 守った」と 読まれる★）★★
+ *    ・★幅が 11 未満の 時の 縮み方は ★直して いません★★
+ *        測って あります＝`枠 = floor(幅)` で ★270/287★
+ *        ★残り 17本は 全部 `####`（幅が 足りない 時の 出方）★＝★別の 直し★
+ *    ・★`#####` を 出す 道は 作って いません★
+ *    ・★書式（numFmt）の 付いた マスは この 道を 通りません★（`fmtForDisplay` が 先に 受ける）
+ *
+ *  使い方: node tests/shisuu-mitame.test.mjs [--self-test]
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const ここ = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(ここ, '..');
+const 直に走った = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+const 自己試験 = 直に走った && process.argv.includes('--self-test');
+
+let pass = 0, fail = 0;
+const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
+
+/* ══ ★本番の 段を book.html から 切り出す（★写しを 置かない★）★ ══
+   ★写しを 置くと 本番が 変わっても 見張りは 緑の まま★＝それが 一番 怖い */
+const 本 = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
+function 切り出す(名) {
+  const 頭 = 本.indexOf('function ' + 名 + '(');
+  if (頭 < 0) throw new Error('★book.html に ' + 名 + ' が 無い★');
+  const 開き = 本.indexOf('{', 頭);
+  let 深さ = 0, i = 開き;
+  for (; i < 本.length; i++) {
+    if (本[i] === '{') 深さ++;
+    else if (本[i] === '}') { 深さ--; if (深さ === 0) break; }
+  }
+  if (深さ !== 0) throw new Error('★' + 名 + ' の 閉じが 見つからない★');
+  return 本.slice(頭, i + 1);
+}
+const 枠の行 = /var GEN_枠 = (\d+);/.exec(本);
+if (!枠の行) throw new Error('★book.html に GEN_枠 が 無い★');
+const GEN_枠 = Number(枠の行[1]);
+const 段たち = ['_指数の字数', '_平らな十進', 'excelGeneral', 'forDisplay'];
+/* ★つなぎ目に 逃がし（バックスラッシュ n）を 使いません★
+   ＝2026-09-07/10 に ★heredoc で 生の 改行に 化ける★のを 3回 踏んだ */
+const 作る = (返す) => new Function(
+  段たち.map((名) => 切り出す(名)).join(' ') + ' var GEN_枠 = ' + GEN_枠 + '; return ' + 返す + ';'
+)();
+const forDisplay = 作る('forDisplay');
+const excelGeneral = 作る('excelGeneral');
+
+/* ══ ★紙（実Excel の 実測）を 読む★ ══ */
+const 紙の道 = path.join(ROOT, 'docs/measured/golden-shisuu-mitame-2026-09-10.tsv');
+const 紙 = fs.readFileSync(紙の道, 'utf-8').split(/\r?\n/)
+  .filter((l) => l && !l.startsWith('#'))
+  .map((l) => l.split('\t'))
+  .filter((c) => c.length >= 5)
+  .map((c) => ({ 札: c[0], 数: c[1], 幅: Number(c[2]), 字: c[3] }));
+
+console.log('\n[shisuu-mitame] ★画面に 出る 字を 実Excel と 同じに する★');
+
+T('★紙が 読めて いる（★空振りして いない★）★', () => {
+  if (紙.length < 400) throw new Error('★紙が ' + 紙.length + '本しか 読めない★');
+  const 幅 = [...new Set(紙.map((r) => r.幅))];
+  if (幅.length < 10) throw new Error('★幅が ' + 幅.length + '通りしか 無い★（3点で 線を 決めない）');
+  console.log('      … ' + 紙.length + '本 ／ 幅 ' + 幅.length + '通り');
+});
+
+T('★★幅 11 以上は どの 幅でも 実Excel と 同じ 字（★これが 本体★）★★', () => {
+  const 対象 = 紙.filter((r) => r.幅 >= GEN_枠);
+  if (!対象.length) throw new Error('★幅 ' + GEN_枠 + ' 以上の 行が 紙に 無い★');
+  const 違う = [];
+  for (const r of 対象) {
+    const うち = String(forDisplay(Number(r.数)));
+    if (うち !== r.字) 違う.push(r.数 + ' 幅' + r.幅 + ' 実Excel=' + r.字 + ' ／ うち=' + うち);
+  }
+  if (違う.length) {
+    throw new Error('★' + 違う.length + '/' + 対象.length + '本が 違う★\n      '
+      + 違う.slice(0, 8).join('\n      '));
+  }
+  console.log('      … ' + 対象.length + '本 とも 同じ（幅 '
+    + [...new Set(対象.map((r) => r.幅))].join('／') + '）');
+});
+
+T('★★お客さんが 一番 よく 見る 計算の 答え（★ゴミが 出て いた 所★）★★', () => {
+  /* ★紙から 引く＝手で 写さない★ */
+  const 組 = [
+    ['0.3333333333333333', '=1/3'],
+    ['3.3333333333333335', '=10/3'],
+    ['0.10000000009313226', '=1234567.1-1234567'],
+    ['187999.99999999997', '=206800/1.1（税抜き）'],
+    ['199.99999999999997', '=2200*0.1/1.1（消費税）'],
+    ['26718.499999999996', '距離の 合計'],
+    ['20.00000000000003', 'LINEST の 傾き'],
+    ['0.30000000000000004', '=0.1+0.2'],
+  ];
+  const 悪い = [];
+  for (const [数, 札] of 組) {
+    const 実 = 紙.find((r) => r.数 === 数 && r.幅 === GEN_枠);
+    if (!実) throw new Error('★紙に 無い … ' + 数 + '★（★手で 写さず 紙から 引く★）');
+    const うち = String(forDisplay(Number(数)));
+    if (うち !== 実.字) 悪い.push(札 + ' … 実Excel=' + 実.字 + ' ／ うち=' + うち);
+  }
+  if (悪い.length) throw new Error('★' + 悪い.length + '本が 違う★\n      ' + 悪い.join('\n      '));
+  console.log('      … ' + 組.length + '本 とも 実Excel と 同じ');
+});
+
+T('★★指数は 大文字 E ＋ 符号 ＋ 2桁（★小文字 e を 出さない★）★★', () => {
+  const 指数 = 紙.filter((r) => r.幅 >= GEN_枠 && /E[+-]/.test(r.字));
+  if (指数.length < 5) throw new Error('★指数の 行が ' + 指数.length + '本しか 無い★');
+  for (const r of 指数) {
+    const うち = String(forDisplay(Number(r.数)));
+    if (/e/.test(うち)) throw new Error('★小文字 e が 出た … ' + r.数 + ' → ' + うち + '★');
+    if (!/E[+-]\d\d/.test(うち)) throw new Error('★E＋符号＋2桁で ない … ' + r.数 + ' → ' + うち + '★');
+  }
+  console.log('      … ' + 指数.length + '本 とも 大文字 E ＋ 符号 ＋ 2桁');
+});
+
+T('★★数で ない 物を 壊して いない（★一番 危ない所★）★★', () => {
+  const 組 = [
+    ['あいうえお', 'あいうえお', '★日本語★'],
+    ['', '', '★空★'],
+    ['#DIV/0!', '#DIV/0!', '★誤り★'],
+    ['TRUE', 'TRUE', '★真偽★'],
+    ['007', '007', '★頭に 0（番号かも）★'],
+    ['-007', '-007', '★頭に 0・負★'],
+    ['2024/01/05', '2024/01/05', '★日付の 字★'],
+    ['1,234', '1,234', '★カンマ★'],
+    ['¥1000', '¥1000', '★通貨の 印★'],
+    /* ★★ここは 私の 期待の 方が 間違って いました（2026-09-10）★★
+       最初 `'1e5'` は そのままの はずと 書きましたが ★実Excel は 数として 100000 と 出します★
+       ⇒★`recalcSheet` は 答えを ★字★ で 置く★ので 指数の 答えは ここに 字で 来ます
+       ⇒★字だから 触らない、では 画面に 小文字の まま 出ます★ */
+    ['1e5', '100000', '★指数の 字＝数として 読む（実Excel と 同じ）★'],
+    ['1.64e-14', '1.64E-14', '★指数の 字＝大文字に 直す★'],
+    ['1e', '1e', '★数に ならない 字★'],
+    ['abc1e5', 'abc1e5', '★字の 中に 数★'],
+    ['1e5x', '1e5x', '★後ろに 字★'],
+  ];
+  for (const [入, 正, 札] of 組) {
+    const 出 = forDisplay(入);
+    if (String(出) !== 正) throw new Error('★' + 札 + '（' + 入 + '）… うち ' + 出 + ' ／ 期待 ' + 正 + '★');
+  }
+  /* ★数でも 無限・NaN は そのまま★ */
+  for (const v of [Infinity, -Infinity, NaN]) {
+    if (String(forDisplay(v)) !== String(v)) throw new Error('★' + v + ' を 変えた★');
+  }
+  console.log('      … ' + (組.length + 3) + '通り とも そのまま');
+});
+
+T('★0 と 整数は そのまま 読める★', () => {
+  const 組 = [[0, '0'], [-0, '0'], [1, '1'], [-1, '-1'], [1234, '1234'], [100000, '100000']];
+  for (const [v, 正] of 組) {
+    const 出 = String(forDisplay(v));
+    if (出 !== 正) throw new Error('★' + v + ' → ' + 出 + '（' + 正 + ' のはず）★');
+  }
+  console.log('      … ' + 組.length + '通り とも そのまま');
+});
+
+T('★★「幅が 11 未満は 直して いない」の 断りが 残って いる★★', () => {
+  const s = fs.readFileSync(path.join(ここ, 'shisuu-mitame.test.mjs'), 'utf-8');
+  if (!/幅が 11 未満の 時の 縮み方は ★直して いません★/.test(s)) {
+    throw new Error('★未完の 断りが 消えた★＝★書かない 見張りは「全部 守った」と 読まれる★');
+  }
+  /* ★実際 狭い 幅で 合って いない事も 押して 見せる★（★緑に しない★） */
+  const 狭い = 紙.filter((r) => r.幅 < GEN_枠);
+  const 違う = 狭い.filter((r) => String(forDisplay(Number(r.数))) !== r.字);
+  if (!違う.length) {
+    throw new Error('★狭い 幅も 全部 合って いる★＝★断りの 方が 古い（直したのに 未完と 書いて 在る）★');
+  }
+  console.log('      … 狭い 幅 ' + 狭い.length + '本の うち ★' + 違う.length + '本は まだ 違う★（★別の 直し★）');
+});
+
+/* ══ ★自己試験（★壊すのは 写し★＝ファイルは 1バイトも 触らない）★ ══ */
+if (自己試験) {
+  console.log('\n★自己試験（★壊すのは 写し★＝ファイルは 1バイトも 触らない）★');
+
+  T('★★枠を 広げると 赤に なる（＝字数に 収める のが 効いて いる）★★', () => {
+    const 悪い = 紙.filter((r) => r.幅 >= GEN_枠 && String(excelGeneral(Number(r.数), 20)) !== r.字);
+    if (!悪い.length) throw new Error('★枠を 20 に しても 全部 合う★＝★枠が 効いて いない★');
+    console.log('      … 枠を 20 に すると ' + 悪い.length + '本が 違う（例 ' + 悪い[0].数 + ' → '
+      + excelGeneral(Number(悪い[0].数), 20) + '）');
+  });
+
+  T('★★15桁の 丸めを 外すと 赤に なる★★', () => {
+    /* ★26718.499999999996 は ★先に 15桁★に すると 26718.5＝幅5で 26719★
+       ⇒ 15桁を 外すと 26718 に なる（実Excel と 違う） */
+    const 数 = 26718.499999999996;
+    const 先に15 = excelGeneral(数, 5);
+    const 実 = 紙.find((r) => r.数 === '26718.499999999996' && r.幅 === 5);
+    if (!実) throw new Error('★紙に 無い★');
+    if (先に15 !== 実.字) throw new Error('★今の コードが 紙と 違う（' + 先に15 + ' ／ ' + 実.字 + '）★');
+    if (String(Math.round(数)) === 実.字) {
+      throw new Error('★ただ 丸めただけでも 同じ 字に なる★＝★この 試験は 何も 守って いない★');
+    }
+    console.log('      … 先に 15桁で ' + 実.字 + '（ただ 丸めると ' + Math.round(数) + '＝違う）');
+  });
+
+  T('★★書き換えが コードに 在る（空振りして いない）★★', () => {
+    if (!/function excelGeneral/.test(本)) throw new Error('★excelGeneral が 無い★');
+    if (!/return excelGeneral\(n, GEN_枠\);/.test(本)) throw new Error('★forDisplay から 呼んで いない★');
+    if (!/var GEN_枠 = \d+;/.test(本)) throw new Error('★GEN_枠 が 無い★');
+    console.log('      … 段も 呼び出しも 枠も 在る');
+  });
+
+  T('★紙を 1本 変えたら 赤に なる（★紙を 見て いる★）★', () => {
+    const 写し = 紙.map((r) => ({ ...r }));
+    const 的 = 写し.find((r) => r.幅 >= GEN_枠);
+    的.字 = '★わざと 壊した★';
+    const 違う = 写し.filter((r) => r.幅 >= GEN_枠 && String(forDisplay(Number(r.数))) !== r.字);
+    if (!違う.length) throw new Error('★紙を 壊しても 赤に ならない★');
+    console.log('      … 紙を 1本 壊すと ' + 違う.length + '本が 違う');
+  });
+}
+
+console.log('\n' + pass + ' passed, ' + fail + ' failed');
+if (fail) process.exit(1);
