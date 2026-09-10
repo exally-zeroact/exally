@@ -36,6 +36,33 @@ $材料 = @(
   @{ マス='K1'; 入=  '=TODAY()-TODAY()';       何='日付の 引き算（0 に なる）' }
 )
 
+# ★★この 下の 2つは docs/measured/toru-shisuu-mitame.ps1 から そのまま 写しました★★
+#   ★1文字も 変えて いません★（見張り … tests/monosashi-mado.test.mjs）
+# ══ ★★2つ目の 窓（★「0」を 1つの 窓だけで 取らない★）★★ ══
+#   ★この 道具は 画面に 出る 字（.Text）を 見ます★
+#   ⇒★狭い 列では ★0で ない 小さい 数が「0」に 見える★★
+#     （例 … 幅が 足りないと 実Excel は 丸めて 出す）
+#   ⇒★字が「0」に 見えた 時は 実Excel に ★=(A1)=0★ を 打って
+#     ★本当に 0 か★を 聞く★（.Value2 だけ／字だけ では 見分けが 付かない）
+#   ⇒★型も 一緒に 取る★（String と Number を 取り違えない）
+function 窓２_型($v) {
+  if ($null -eq $v) { return 'Empty' }
+  if ($v -is [string]) { return 'String' }
+  if ($v -is [bool]) { return 'Boolean' }
+  if ($v -is [double] -or $v -is [int] -or $v -is [long]) { return 'Number' }
+  return 'Other'
+}
+function 窓２_本当にゼロか($sh, [string]$マス) {
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $マス + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $xl = New-Object -ComObject Excel.Application
 $xl.Visible = $false
 $xl.DisplayAlerts = $false
@@ -101,7 +128,10 @@ try {
     $字 = [string]$c.Text
     $v = $c.Value2
     $答 = if ($null -eq $v) { '(空)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
-    $行.Add($m.マス + "`t" + $m.入 + "`t" + $式 + "`t" + $字 + "`t" + $答 + "`t" + $m.何)
+    $型 = 窓２_型 $v
+    # ★「0」に 見えた 時だけ 実Excel に 聞く★（狭い 列では 0で ない 数が 0 に 見える）
+    $窓2 = if ($字 -match '^-?0(\.0+)?$') { 窓２_本当にゼロか $sh $m.マス } else { '—' }
+    $行.Add($m.マス + "`t" + $m.入 + "`t" + $式 + "`t" + $字 + "`t" + $答 + "`t" + $型 + "`t" + $窓2 + "`t" + $m.何)
     Write-Host ('  ' + $m.マス.PadRight(4) + ' 式=' + $式.PadRight(26) + ' 出る字=' + $字.PadRight(16) + ' 答え=' + $答)
   }
 

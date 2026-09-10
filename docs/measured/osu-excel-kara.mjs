@@ -55,8 +55,12 @@ const 実 = new Map();
 for (const l of fs.readFileSync(紙, 'utf-8').split(/\r?\n/)) {
   if (!l || l.startsWith('#')) continue;
   const c = l.split('\t');
-  if (c.length < 6) continue;
-  実.set(c[0], { 入: c[1], 式: c[2], 字: c[3], 答: c[4], 何: c[5] });
+  if (c.length < 8) continue;
+  /* ★2026-09-11 に 窓を 2つ 足しました★（tests/monosashi-mado.test.mjs が 求める 形）
+       型   … String と Number を 取り違えない
+       窓２ … 字が「0」に 見えた 時 実Excel に `=(A1)=0` を 打って 本当に 0 か 聞く
+     ⇒★足した ので 「何を 見て いるか」は 8つ目に 動きました★ */
+  実.set(c[0], { 入: c[1], 式: c[2], 字: c[3], 答: c[4], 型: c[5], 窓2: c[6], 何: c[7] });
 }
 if (!実.size) { console.error('★紙が 読めない★'); process.exit(2); }
 
@@ -156,10 +160,14 @@ try {
   for (const [マス, e] of 実) {
     const u = await 読む(マス);
     const 窓 = [];
-    /* ①★答え★＝中の 数（★出る字と 混ぜない★） */
+    /* ①★答え★＝中の 数（★出る字と 混ぜない★）
+       ★実Excel が String と 言って いる 物を 数として 比べない★
+       ＝TEXT の 答え「3.00」を 数に すると 3 と 同じに なって しまい、
+         ★桁が 落ちた 事を 見逃します★（記憶の 決まり … 中の数が同じは同じでない） */
     const a = 数と読む(e.答), b = 数と読む(u.値);
     let 答合う;
-    if (a !== null && b !== null) 答合う = Math.abs(a - b) <= Math.max(1e-12, Math.abs(a) * 1e-9);
+    if (e.型 === 'String') 答合う = String(e.答) === String(u.値);
+    else if (a !== null && b !== null) 答合う = Math.abs(a - b) <= Math.max(1e-12, Math.abs(a) * 1e-9);
     else 答合う = String(e.答) === String(u.値);
     if (!答合う) 窓.push('答え Excel=' + e.答 + ' うち=' + u.値);
     /* ②★出る字★＝画面が 描いた 字（大文字小文字も 見る） */
