@@ -1,0 +1,148 @@
+/* hashira-haba.test.mjs — ★列の 幅を 実Excel と 同じに する★（2026-09-11）
+ *
+ *  ★★何を 守るか★★
+ *    ①★列の 幅を 読む★（`cellStyles` が 無いと SheetJS は 1つも くれない）
+ *    ②★点(px)への 直し方★＝`ファイルの width × 一字の幅`（実Excel と 差 0.00）
+ *    ③★一字の幅★＝その本の 既定の 字体で「0」を 測って ★切り捨て★
+ *    ④★開いた ブックは その 字体で 描く★（うちの 字は 細くて 桁が 多く 入って いた）
+ *    ⑤★マスの 余白は 3点★（実Excel の 境目から 割り出した）
+ *    ⑥★`General` は 書式では ない★
+ *    ⑦★書式を 持つ マスは 中の 数から 字を 作る★（出来た 字に また 書式を 掛けない）
+ *
+ *  ★★実Excel に 聞いた 事（docs/measured/toru-hashira-haba.ps1）★★
+ *    字数     2     3     5     8.44   10    12     15     20     30
+ *    実Excelの点 20.5 28.5  44.5  72     84.5  100.5  124.5  164.5  244.5
+ *    ⇒ 一直線＝`点 = 字数 × 8 + 4.5`（游ゴシック 11pt）
+ *    ファイルの width で 突き合わせると ★8列とも 差 0.00★
+ *
+ *  ★この 台は エンジンを 建てません★＝`book-open.js` を そのまま 動かして 板を 作るだけ。
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+import { 注記を外す } from '../scripts/lib/chuki.mjs';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(path.join(ROOT, 'package.json'));
+const 本 = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
+const 開く元 = fs.readFileSync(path.join(ROOT, 'js/book-open.js'), 'utf-8');
+const 見本 = path.join(ROOT, 'docs/measured/hashira-haba-2026-09-11.xlsx');
+const 紙 = path.join(ROOT, 'docs/measured/golden-hashira-haba-2026-09-11.tsv');
+
+let pass = 0, fail = 0;
+const T = (n, f) => {
+  try { f(); pass++; console.log('  ✓ ' + n); }
+  catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + e.message); }
+};
+
+console.log('');
+console.log('[hashira-haba] ★列の 幅を 実Excel と 同じに する★');
+
+/* ★実Excel の 紙を 読む★（数を 書き込まない） */
+const 実 = [];
+for (const l of fs.readFileSync(紙, 'utf-8').split(/\r?\n/)) {
+  if (!l || l.startsWith('#')) continue;
+  const c = l.split('\t');
+  if (c.length < 5) continue;
+  実.push({ 列: Number(c[0]), 字数: Number(c[1]), 点: Number(c[4]) });
+}
+
+T('★紙が 読めて いる（空振りして いない）★', () => {
+  if (実.length < 5) throw new Error('★実Excel の 紙が ' + 実.length + '行★');
+});
+
+T('★★①`cellStyles` が 在る（無いと 幅が 1つも 来ない）★★', () => {
+  const 動く = 注記を外す(開く元);
+  if (動く.indexOf('cellStyles: true') < 0) {
+    throw new Error('★`cellStyles: true` が 無い★＝SheetJS は `!cols` を 作りません'
+      + '（幅を 読む 所は 在るのに ★材料が 空★に なります）');
+  }
+});
+
+T('★★②実Excel の 点と 合う（★1点も ずれない★）★★', () => {
+  const 場 = { XLSX: require_(path.join(ROOT, 'lib/xlsx.full.min.js')) };
+  new Function('self', 開く元)(場);
+  const BO = 場.BookOpen;
+  const wb = 場.XLSX.read(fs.readFileSync(見本), { type: 'buffer', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  /* ★字体は node に 無い＝逃げの 8（游ゴシック 11pt の 実測値）が 使われる★
+     ⇒ ここで 見るのは ★直し方★（width × 8）／画面の 絵は 別に 取って 在る */
+  const 板 = BO.sheetToGrid(ws, wb.SheetNames[0], {});
+  const 違い = [];
+  for (const r of 実) {
+    const 出た = 板.colW[r.列 - 1];
+    if (出た === undefined) continue;               /* ★標準の 幅の 列は ファイルに 書かれない★ */
+    if (Math.abs(出た - r.点) > 0.5) 違い.push('列' + r.列 + ' 実Excel ' + r.点 + '点 ／ うち ' + 出た + '点');
+  }
+  if (違い.length) throw new Error('★' + 違い.length + '本 ずれた★  ' + 違い.join(' ／ '));
+  console.log('      … ファイルに 幅が 在る 列は 実Excel と ★ぴったり★');
+});
+
+T('★★③SheetJS の `wpx` を 使って いない（★1字 14点と 思い込んで いる★）★★', () => {
+  const 動く = 注記を外す(開く元);
+  if (/col\.wpx/.test(動く)) {
+    throw new Error('★`col.wpx` を 使って いる★＝5字の 列で 実Excel 44.5点 ／ SheetJS 78点'
+      + '（★幅が 足りて しまい #### に ならない★）');
+  }
+});
+
+T('★★④一字の幅は 切り捨て（游ゴシック 8 ／ Calibri 7）★★', () => {
+  const 動く = 注記を外す(開く元);
+  if (動く.indexOf('Math.floor') < 0 || 動く.indexOf("measureText('0')") < 0) {
+    throw new Error('★「0」を 測って 切り捨てて いない★'
+      + '（游ゴシック11pt 8.153→8 ／ Calibri11pt 7.430→7 で 実Excel と 合う）');
+  }
+});
+
+T('★★⑤開いた ブックは その 字体で 描く★★', () => {
+  const 動く = 注記を外す(本, { html: true });
+  if (動く.indexOf('既定の字体名') < 0 || 動く.indexOf('既定の字大') < 0) {
+    throw new Error('★ブックの 字体を 使って いない★'
+      + '＝うちの 字は 細く、同じ 幅に ★桁が 多く 入ります★'
+      + '（実測 … 実Excel「1.001193」8桁 ／ うち「1.001193321」11桁）');
+  }
+});
+
+T('★★⑥マスの 余白は 3点（実Excel の 境目から 割り出した）★★', () => {
+  const 動く = 注記を外す(本, { html: true });
+  const m = /var マスの余白 = (\d+)/.exec(動く);
+  if (!m) throw new Error('★`マスの余白` が 無い★');
+  if (Number(m[1]) !== 3) {
+    throw new Error('★余白が ' + m[1] + '★＝実Excel の 境目は ★0.6〜3.5★'
+      + '（12.3% は 幅40.5で 出ず 44.5で 出る／字の 点 39.99）');
+  }
+  /* ★引き算の 所が 全部 この 数を 使って いるか★＝1つ 取り残すと そこだけ 別の 幅に なる */
+  if (/w - 8[^0-9]/.test(動く.slice(動く.indexOf('var マスの余白'), 動く.indexOf('var マスの余白') + 2500))) {
+    throw new Error('★まだ 8 を 引いて いる 所が 在る★');
+  }
+});
+
+T('★★⑦`General` は 書式では ない★★', () => {
+  const 動く = 注記を外す(本, { html: true });
+  if (動く.indexOf("=== 'General'") < 0) {
+    throw new Error("★`General` を 本物の 書式として 扱って いる★"
+      + '＝幅で 桁を 決める 道を 通らず、実Excel「1.001193」が「1.001193321」に なります');
+  }
+});
+
+T('★★⑧書式を 持つ マスは 中の 数から 字を 作る★★', () => {
+  const 動く = 注記を外す(本, { html: true });
+  if (!/cell\.numFmt && cell\.numFmt !== 'General' && typeof cell\.v === 'number'/.test(動く)) {
+    throw new Error('★出来上がった 字に また 書式を 掛けて いる★'
+      + '＝"1,234,567.89" を 数と 読むと ★1★（コンマで 止まる）⇒ 画面に "1.00"');
+  }
+});
+
+T('★★⑨書式を 持つ マスも #### に なる★★', () => {
+  const 動く = 注記を外す(本, { html: true });
+  if (/!cell\.numFmt && _数が入らないか/.test(動く)) {
+    throw new Error('★書式付きは #### に ならない ままに なって いる★'
+      + '（実Excel は #,##0.00 の 1234567.891 を 幅5の 列で ★####★）');
+  }
+  if (動く.indexOf('_数が入らないか(raw, display, w)') < 0) throw new Error('★#### の 判じが 無い★');
+});
+
+console.log('');
+console.log('  ' + pass + ' passed, ' + fail + ' failed');
+process.exit(fail ? 1 : 0);
