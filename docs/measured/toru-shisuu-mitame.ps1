@@ -25,6 +25,10 @@
 #    ・★見るのは `.Text`（★画面に 出る 字★）★／`.Value2` は ★中の 数★（別物）
 #    ・★中の 数が 変わって いない事も 同時に 出す★（★出方だけの 話だと 示す★）
 #    ・★`#####`（幅が 足りない）も そのまま 書く★＝★隠さない★
+#    ・★★「0」を 1つの 窓だけで 取らない★★
+#      ★狭い 列では 0で ない 小さい 数が「0」に 見えます★
+#      ⇒★字が「0」に 見えた 時は `=(A1)=0` を 打って ★本当に 0 か★を 聞く★
+#      ⇒★型も 一緒に 取る★（String と Number を 取り違えない）
 #    ・材料は 紙に 書き出す（使う 側が 手で 写さない）
 #    ・書き戻しは LF
 #
@@ -98,6 +102,31 @@ $幅たち = @(5.0, 6.0, 7.0, 8.0, 8.43, 9.0, 10.0, 11.0, 12.0, 13.0, 15.0, 20.0
 #   ★3点で 決めた 線は 線では ない★（2026-09-09 XIRR の 見当で 踏んだ）
 #   ⇒★幅を 1つずつ 刻んで 打つ★
 
+# ══ ★★2つ目の 窓（★「0」を 1つの 窓だけで 取らない★）★★ ══
+#   ★この 道具は 画面に 出る 字（.Text）を 見ます★
+#   ⇒★狭い 列では ★0で ない 小さい 数が「0」に 見える★★
+#     （例 … 幅が 足りないと 実Excel は 丸めて 出す）
+#   ⇒★字が「0」に 見えた 時は 実Excel に ★=(A1)=0★ を 打って
+#     ★本当に 0 か★を 聞く★（.Value2 だけ／字だけ では 見分けが 付かない）
+#   ⇒★型も 一緒に 取る★（String と Number を 取り違えない）
+function 窓２_型($v) {
+  if ($null -eq $v) { return 'Empty' }
+  if ($v -is [string]) { return 'String' }
+  if ($v -is [bool]) { return 'Boolean' }
+  if ($v -is [double] -or $v -is [int] -or $v -is [long]) { return 'Number' }
+  return 'Other'
+}
+function 窓２_本当にゼロか($sh, [string]$マス) {
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $マス + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $xl = New-Object -ComObject Excel.Application
 $xl.Visible = $false
 $xl.DisplayAlerts = $false
@@ -123,7 +152,7 @@ try {
   foreach ($n in $数) { $行.Add('#材料' + "`t" + $n.札 + "`t" + $n.s) }
   $行.Add('#幅' + "`t" + ($幅たち -join ','))
   $行.Add('#')
-  $行.Add('# 札' + "`t" + '打った 字' + "`t" + '幅' + "`t" + '★画面に 出る 字(.Text)★' + "`t" + '中の 数(.Value2)' + "`t" + '指数か')
+  $行.Add('# 札' + "`t" + '打った 字' + "`t" + '幅' + "`t" + '★画面に 出る 字(.Text)★' + "`t" + '中の 数(.Value2)' + "`t" + '指数か' + "`t" + '型' + "`t" + '窓２(=(A1)=0)')
 
   $本数 = 0
   foreach ($n in $数) {
@@ -145,7 +174,10 @@ try {
       $sh.Columns.Item(1).ColumnWidth = $w
       $字 = [string]$sh.Range('A1').Text
       $指数か = if ($字 -match 'E[+-]') { '★指数★' } elseif ($字 -match '^#+$') { '★#####★' } else { '—' }
-      $行.Add($n.札 + "`t" + $n.s + "`t" + ([string]$w) + "`t" + $字 + "`t" + $中 + "`t" + $指数か)
+      $型 = 窓２_型 $生
+      # ★字が「0」に 見えた 時だけ 実Excel に 聞く★（毎回 打つと 遅いので 要る 時だけ）
+      $窓2 = if ($字 -match '^-?0(\.0+)?$') { 窓２_本当にゼロか $sh 'A1' } else { '—' }
+      $行.Add($n.札 + "`t" + $n.s + "`t" + ([string]$w) + "`t" + $字 + "`t" + $中 + "`t" + $指数か + "`t" + $型 + "`t" + $窓2)
       $本数++
     }
     Write-Host ('  ' + $n.s.PadRight(24) + ' → ' + (($幅たち | ForEach-Object {
