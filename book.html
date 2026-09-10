@@ -2723,8 +2723,61 @@ function _古い溢れを消す(sheetIdx, data) {
   return 消す.length;
 }
 
+/* ★★#SPILL! の 式を 打ち直す（2026-09-11）★★
+   ★エンジンは じゃまが 消えても 計算し直しません★（素の 台で 切り分けた）
+     塞ぐ → #SPILL ／ ★じゃまを 消す → #SPILL の まま★ ／ 式を 打ち直す → 溢れる
+   ★実Excel は すぐ 溢れ直します★（COM で 打って 確かめた）
+     塞いだ 時 C1「#スピル!」⇒ じゃまを 消す ⇒★C1..C5 = 1,2,3,4,5★
+   ⇒★だから うちが 打ち直します★（借り物の 中は 読まず、外から 同じ 式を 入れ直すだけ）
+   ★1回で 止めます★＝打ち直しても まだ #SPILL なら ★本当に 塞がって いる★ */
+var _溢れ直し中 = false;
+function _溢れ直しを試す(sheetIdx, data) {
+  /* ★★ぐるぐる回りの 止め金★★
+     打ち直す → 計算し直す → まだ #SPILL → また 打ち直す … で ★画面が 固まりました★
+     （2026-09-11 実物の 画面で 固めました。止め金 無しで 出しかけました）
+     ⇒★1回の 計算で 1度だけ★＝直らない 時は 次の 打ち込みまで 待つ */
+  if (_溢れ直し中) return 0;
+  _溢れ直し中 = true;
+  try { return _溢れ直しの中身(sheetIdx, data); } finally { _溢れ直し中 = false; }
+}
+function _溢れ直しの中身(sheetIdx, data) {
+  var keys = Object.keys(data), 直した = 0;
+  for (var i = 0; i < keys.length; i++) {
+    var cell = data[keys[i]];
+    if (!cell || !cell.f || cell.f[0] !== '=') continue;
+    var p = keys[i].split(',');
+    var r = parseInt(p[0]), c = parseInt(p[1]);
+    var v = hf.getCellValue({sheet: sheetIdx, row: r, col: c});
+    if (!(v && v.type === 'SPILL')) continue;
+    /* ★★打ち直す 時も ★入れる 時と 同じ 道★を 通す（2026-09-11）★★
+       ★ここで つまずきました★＝`cell.f` を ★そのまま★ 渡して いました。
+       画面が 持って いる 式は ★Excel が 付けた 印が 付いた まま★の 事が 在ります
+         例）Excel の ファイルの 中では `=_xlws.SORT(E1:E5)`
+       ⇒ 入れる 時（`loadSheetIntoEngine`）は
+         ★`quoteSheetRefs(convertFormula(f))`★ を 通して 印を 外して います。
+       ⇒ 打ち直しだけ 素通りさせて いたので、★#SPILL が #ERROR に 化けました★
+         （Excel で SORT を 使った 表を 開くと 全部 壊れる）
+       ⇒★同じ 1本の 道を 通します★（片方だけ 直さない） */
+    var 渡す = cell.f;
+    try {
+      if (typeof convertFormula === 'function') 渡す = convertFormula(渡す);
+      if (typeof quoteSheetRefs === 'function') 渡す = quoteSheetRefs(渡す);
+    } catch (e) { 渡す = cell.f; }
+    /* ★塞がった ままなら 打ち直しても #SPILL の まま★＝それで 正しい（実Excel も 同じ）
+       ★掛かる 手間★＝塞がって いる 間は 計算の たび 1回 余分に 打ち直す。
+         止め金が 在るので ★1段で 止まります★（ぐるぐるには ならない） */
+    try {
+      hf.setCellContents({sheet: sheetIdx, row: r, col: c}, [[渡す]]);
+      直した++;
+    } catch (e) { /* ★打ち直せない 時は そのまま★ */ }
+  }
+  return 直した;
+}
+
 function recalcSheet(sheetIdx, data) {
   if(!hf) return;
+  /* ★じゃまが 消えて いれば 溢れ直す★（★先に やる★＝下の 写しが 新しい 値を 見る） */
+  _溢れ直しを試す(sheetIdx, data);
   /* ★先に 古い 溢れを 消す★＝式が 短く なった 時に 古い 数が 残らない */
   _古い溢れを消す(sheetIdx, data);
   var keys = Object.keys(data);

@@ -34,14 +34,22 @@
  *      ⇒★私の 直しでも undo でも ありません★／実Excel なら すぐ 計算し直します
  *      ⇒★まだ 直して いません＝別の 直し★
  *
- *  ★★まだ 見て いない 範囲★★
- *    ・★溢れた マスの 上で「配列の 一部は 変えられません」と 断る事★は して いません
- *      （実Excel は 断る。うちは ★打てて しまい #SPILL! に なる★）
+ *  ★★2026-09-11 … 「実Excel は 断る」は ★私の 思い込み★でした★★
+ *    ★実Excel に 打たせて 確かめました★（COM で 溢れた マスに 値を 入れた）
+ *      溢れた 直後 … C1..C5 = 1,2,3,4,5
+ *      ★C3 に「あとから打った」を 入れた ⇒ ★断られません★★
+ *      その 後 … C1 ★#スピル!★／C2,C4,C5 空／C3「あとから打った」
+ *    ⇒★うちと 1つも 違いません★（うちも 打てて #SPILL! に なる）
+ *    ⇒★「配列の 一部は 変えられません」は ★古い 形の 配列式（Ctrl+Shift+Enter）★の 話★
+ *      ＝★今の 溢れ（動的配列）では 出ません★
+ *    ⇒★棚から 下ろしました★（直す 所は 在りません）
+ *    ★教訓★＝★「実Excel は こうする はず」を 根拠に しない★（今日 3回目）
  *
  *  使い方: node tests/afureru.test.mjs [--self-test]
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { 注記を外す } from '../scripts/lib/chuki.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
@@ -257,7 +265,114 @@ T('★★①溢れた マスに 打つと 字は 残り 式が #SPILL に なる
   console.log('      … 字は 残り、式は #SPILL（★実Excel と 同じ★）');
 });
 
-T('★★③元に戻しても #SPILL の まま（★エンジン自身の 癖★・まだ 直して いない）★★', () => {
+T('★★①実Excel も 断らない（★私の 思い込みが 外れた★）★★', () => {
+  /* ★2026-09-11 実測（COM で 実Excel に 打たせた）★
+       溢れた C3 に 値を 入れる ⇒★断られない★
+       その 後 … C1 ★#スピル!★／C2,C4,C5 空／C3 は 打った 字
+     ⇒★うちと 1つも 違いません★
+     ⇒「配列の 一部は 変えられません」は ★古い 形の 配列式★の 話（動的配列では 出ない） */
+  const { hf, SID } = 台();
+  [3, 1, 5, 2, 4].forEach((v, i) => 打つ(hf, SID, 'A' + (i + 1), v));
+  打つ(hf, SID, 'C1', '=SORT(A1:A5)');
+  打つ(hf, SID, 'C3', 'あとから打った');
+  if (値(hf, SID, 2, 2) !== 'あとから打った') throw new Error('★打てなかった＝実Excel と 違う★');
+  if (String(値(hf, SID, 0, 2)) !== '#SPILL') throw new Error('★C1 が ' + 値(hf, SID, 0, 2) + '★');
+  for (const r of [1, 3, 4]) {
+    if (値(hf, SID, r, 2) !== null) throw new Error('★C' + (r + 1) + ' が 残って いる★');
+  }
+  console.log('      … 打てて #SPILL／他の 溢れは 消える（★実Excel と 同じ★）');
+});
+
+T('★★②じゃまを 消したら 溢れ直す（★画面が やる★）★★', () => {
+  /* ★★実Excel（2026-09-11 COM で 打った）★★
+       C3 に じゃま ⇒ C1「#スピル!」／★じゃまを 消す ⇒ C1..C5 = 1,2,3,4,5★
+     ★エンジンは やって くれません★（素の 台で 切り分けた・下の ③）
+     ⇒★画面が 式を 打ち直します★（book.html `_溢れ直しを試す`）
+     ★借り物の 中は 読んで いません★＝外から 同じ 式を 入れ直すだけ
+     ★絵で 確かめた★ … docs/measured/e-afurenaoshi-2026-09-11.png
+       （本物の ブラウザで マスを 押して 打った … docs/measured/osu-afurenaoshi.mjs） */
+  if (本.indexOf('_溢れ直しを試す') < 0) throw new Error('★画面に 溢れ直しが 無い★');
+  const 中 = 本.slice(本.indexOf('function recalcSheet'), 本.indexOf('function recalcSheet') + 900);
+  if (中.indexOf('_溢れ直しを試す') < 0) throw new Error('★recalcSheet が 溢れ直しを 呼んで いない★');
+  console.log('      … recalcSheet が 溢れ直しを 呼ぶ');
+});
+
+T('★★②-2 ぐるぐる回りの 止め金が 在る（★画面を 固めた★）★★', () => {
+  /* ★★2026-09-11 実物の 画面を 固めました★★
+       打ち直す → 計算し直す → まだ #SPILL → また 打ち直す …で ★止まらない★
+       ⇒★止め金 無しで 出しかけました★（絵を 撮ろうとして 固まって 気付いた）
+     ⇒★1回の 計算で 1度だけ★＝直らない 時は 次の 打ち込みまで 待つ */
+  if (本.indexOf('_溢れ直し中') < 0) throw new Error('★止め金が 無い＝ぐるぐる回る★');
+  const 頭 = 本.indexOf('function _溢れ直しを試す');
+  const 中 = 本.slice(頭, 頭 + 600);
+  if (中.indexOf('if (_溢れ直し中) return') < 0) throw new Error('★入口で 止めて いない★');
+  if (中.indexOf('finally') < 0) throw new Error('★finally で 下ろして いない＝一度 落ちたら 二度と 直らない★');
+  console.log('      … 入口で 止めて finally で 下ろす');
+});
+
+T('★★②-2b 打ち直しは ★入れる 時と 同じ 道★を 通る★★', () => {
+  /* ★★2026-09-11 ここで つまずきました★★
+       打ち直しで `cell.f` を ★そのまま★ エンジンに 渡して いた
+       ⇒ Excel の ファイルの 式は `=_xlws.SORT(E1:E5)`（Excel が 付ける 印）
+       ⇒ 入れる 時（loadSheetIntoEngine）は 印を 外して いるのに
+         ★打ち直しだけ 素通り★ ⇒★#SPILL が #ERROR に 化けた★
+       ⇒★Excel で SORT を 使った 表を 開くと 全部 壊れる★所でした
+     ★見つけ方★＝★向きを 変えて 測った★（Excel が 作った 物を うちで 開く）
+       docs/measured/osu-excel-kara.mjs
+     ★作る 道が 2本 在る時は 両方 直せ★（記憶の 決まり）＝ここは その 実物 */
+  /* ★★注記を 外してから 探します★★
+     ★2026-09-11 ここでも つまずきました★＝この 見張りの 最初の 版は 生の 字を 探して いて、
+     ★私が 上に 書いた 説明の 中の「convertFormula」を 読んで 緑★に なりました。
+     わざと 抜いても 赤に ならず、★見張りが 効いて いない★ ＝ 気付いたのは 壊して 試した 時。
+     ⇒★探す 前に 注記を 外す★（scripts/lib/chuki.mjs＝他の 見張りと 同じ 部品） */
+  const 動く本 = 注記を外す(本, { html: true });
+  const 頭 = 動く本.indexOf('function _溢れ直しの中身');
+  if (頭 < 0) throw new Error('★打ち直しの 中身が 無い★');
+  const 中 = 動く本.slice(頭, 頭 + 1800);
+  if (中.indexOf('convertFormula') < 0) {
+    throw new Error('★打ち直しが convertFormula を 通って いない★'
+      + '＝Excel の `_xlws.` が 残って #ERROR に なります');
+  }
+  if (中.indexOf('quoteSheetRefs') < 0) {
+    throw new Error('★打ち直しが quoteSheetRefs を 通って いない★＝別の 板を 指す 式が 壊れます');
+  }
+  /* ★入れる 時と 同じ 2つを 通って いるか★＝片方だけ 直して いないか */
+  const 入 = 動く本.indexOf('function loadSheetIntoEngine');
+  const 入中 = 動く本.slice(入, 入 + 2000);
+  for (const 段 of ['convertFormula', 'quoteSheetRefs']) {
+    if (入中.indexOf(段) >= 0 && 中.indexOf(段) < 0) {
+      throw new Error('★入れる 時は ' + 段 + ' を 通るのに 打ち直しは 通らない★');
+    }
+  }
+  console.log('      … 入れる 時と 同じ 2つ（convertFormula／quoteSheetRefs）を 通る');
+});
+
+T('★★②-3 空マスが 混ざった SORT の 並び（★実Excel と 同じ★）★★', () => {
+  /* ★★画面で 見て「うちが 違うのでは」と 思った 所★★（2026-09-11）
+       A=(1,5,2,4,空) を SORT ⇒ うちは ★1,2,4,5,0★＝★0 が 最後★
+       「Excel なら 0 が 先では」と 思ったので ★実Excel に 打たせた★
+     ★実Excel（COM・2026-09-11）★ A=(3,1,空,2,4) ⇒★1,2,3,4,0★＝★0 は 最後★
+     ⇒★うちと 同じ★＝★直さなくて 正解でした★
+     ★思っただけで 直して いたら 実Excel と 違う 物に して いました★ */
+  const { hf, SID } = 台();
+  [1, 5, 2, 4].forEach((v, i) => 打つ(hf, SID, 'A' + (i + 1), v));   /* A5 は 空 */
+  打つ(hf, SID, 'C1', '=SORT(A1:A5)');
+  const 出 = [0, 1, 2, 3, 4].map((r) => 値(hf, SID, r, 2));
+  /* ★エンジンは 5枚目を null で 返します★／画面は そこに ★0★を 出します
+     （本物の ブラウザで 見た … docs/measured/osu-afurenaoshi.mjs の 絵で C5 が 0）
+     ⇒★お客さんが 見る 字は 実Excel と 同じ★ */
+  const 並び = 出.slice(0, 4).map(String).join(',');
+  if (並び !== '1,2,4,5') throw new Error('★並びが ' + 並び + '★（実Excel は 1,2,4,5 … 空は 最後）');
+  if (出[4] !== null && String(出[4]) !== '0') {
+    throw new Error('★5枚目が ' + JSON.stringify(出[4]) + '★＝空が 最後に 来て いない');
+  }
+  console.log('      … 1,2,4,5 の 後ろに 空（★実Excel も 0 を 最後に 置く★）');
+});
+
+T('★★③エンジン自身は 溢れ直さない（★癖★・だから 画面が 打ち直す）★★', () => {
+  /* ★これは ★エンジンの 話★です★＝画面は ②で 打ち直して 直します
+     ★ここが 緑の うちは「画面の 打ち直し」を 外せません★
+     もし エンジンが 直る 版に なったら ここが 赤に なる ⇒★その時 打ち直しを 外す★ */
   const { hf, SID } = 台();
   [3, 1, 5, 2, 4].forEach((v, i) => 打つ(hf, SID, 'A' + (i + 1), v));
   打つ(hf, SID, 'C3', 'じゃま');
@@ -265,7 +380,7 @@ T('★★③元に戻しても #SPILL の まま（★エンジン自身の 癖�
   if (String(値(hf, SID, 0, 2)) !== '#SPILL') throw new Error('★塞いだのに #SPILL に ならない★');
   hf.setCellContents({ sheet: SID, row: 2, col: 2 }, [[null]]);   /* ★じゃまを 消す★ */
   if (String(値(hf, SID, 0, 2)) !== '#SPILL') {
-    throw new Error('★じゃまを 消したら 溢れ直した★＝★この 断りの 方が 古い（もう 直って いる）★');
+    throw new Error('★エンジンが 自分で 溢れ直した★＝★画面の 打ち直し（②）は もう 要りません★');
   }
   打つ(hf, SID, 'C1', '=SORT(A1:A5)');                            /* ★打ち直す★ */
   if (String(値(hf, SID, 0, 2)) !== '1') throw new Error('★打ち直しても 直らない★');
@@ -287,7 +402,7 @@ T('★★②書き出しの 警告が 本当の 事を 言って いる★★', 
 
 T('★★「まだ 見て いない 事」の 断りが 残って いる★★', () => {
   const s = fs.readFileSync(path.join(ここ, 'afureru.test.mjs'), 'utf-8');
-  for (const 断り of ['配列の 一部は 変えられません', 'エンジン自身の 癖', 'まだ 直して いません']) {
+  for (const 断り of ['私の 思い込み', 'エンジン自身の 癖', 'まだ 直して いません']) {
     if (s.indexOf(断り) < 0) throw new Error('★断りが 消えた … ' + 断り + '★');
   }
   console.log('      … 3つの 断りが 残って いる（★未完を 緑に しない★）');
