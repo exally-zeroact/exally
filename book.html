@@ -2765,7 +2765,9 @@ function _溢れを写す(sheetIdx, data, r, c) {
       if (!t) t = data[k] = {};
       t.d = _hfGetDisplay(sheetIdx, r + i, c + j, true);
       /* ★溢れた 先も 同じ★＝`=TEXT(...)` を 溢れさせた 時に 数に 化けない為 */
-      t.d字 = (typeof _hf答えの型 === 'function' && _hf答えの型(sheetIdx, r + i, c + j) === 'string');
+      if (typeof _hf答えの型 === 'function'
+          && _hf答えの型(sheetIdx, r + i, c + j) === 'string') t.d字 = true;
+      else delete t.d字;
       t[溢れの印] = 元;
       作った++;
     }
@@ -2783,7 +2785,10 @@ function _古い溢れを消す(sheetIdx, data) {
     var p = keys[i].split(',');
     var なお = hf.getCellType({sheet:sheetIdx, row:parseInt(p[0]), col:parseInt(p[1])}) === 'ARRAY';
     if (なお) continue;
-    delete t.d; delete t[溢れの印];
+    /* ★`d字` は `d` の 連れ★＝一緒に 消す（2026-09-11）
+       ★消し忘れて 見張りに 捕まりました★＝`d字: false` が 残ると
+       下の「中身が 在るか」が ★いつも 在る★に なり、★古い マスが 一生 消えません★ */
+    delete t.d; delete t.d字; delete t[溢れの印];
     /* ★書式だけ 残って いる マスは 消さない★（お客さんが 付けた 色や 書式） */
     var 中身が在る = false;
     for (var k2 in t) { if (t[k2] !== undefined && t[k2] !== '') { 中身が在る = true; break; } }
@@ -2871,9 +2876,13 @@ function recalcSheet(sheetIdx, data) {
          ⇒★当て推量で 決めません★＝今まで通り「字では ない」に して おきます
          ⇒★DATESTRING など 字を 返す 物が JS層に 居ます★＝そこは まだ 測って いません
             （ただし 令和8年… の ような 字は 数に 読めないので 今も 化けません） */
-      cell.d字 = (jsResult !== null)
-        ? false
-        : (typeof _hf答えの型 === 'function' && _hf答えの型(sheetIdx, r, c) === 'string');
+      /* ★★「本当の 時だけ 付ける」★★（2026-09-11）
+         ★`d字: false` を 全部の マスに 付けると 危ない★＝
+           マスの 中身が 空かを 見る 所（古い 溢れの 掃除・保存の 比べ）が
+           ★いつも「中身が 在る」★と 読みます（実際 見張りに 捕まりました） */
+      if ((jsResult === null) && typeof _hf答えの型 === 'function'
+          && _hf答えの型(sheetIdx, r, c) === 'string') cell.d字 = true;
+      else delete cell.d字;
       /* ★JS層が 答えた 時は 溢れない★（1つの 値を 返す 段なので）
          ⇒ エンジンが 答えた 時だけ 溢れを 見る */
       if (jsResult === null) _溢れを写す(sheetIdx, data, r, c);
@@ -10180,8 +10189,10 @@ function setCell(r,c,v,noUndo){
      数を そのまま 入れると 数式バーが (cell.f||'').replace で ★落ちる★
      （2026-08-30 実測＝TypeError: (cell.f || "").replace is not a function）。
      v は 打った物の まま（数は 数）＝計算は 変えない。 */
-  var next = Object.assign({}, existing, {v:v, f:(v===null||v===undefined)?'':String(v), d:String(d),
-    d字: _打った答えは字か});   /* ★答えが 文字なら 数に 読み直さない★（2026-09-11） */
+  var next = Object.assign({}, existing, {v:v, f:(v===null||v===undefined)?'':String(v), d:String(d)});
+  /* ★答えが 文字なら 数に 読み直さない★（2026-09-11）
+     ★本当の 時だけ 付けます★＝false を 置くと 空かを 見る 所が 狂います */
+  if (_打った答えは字か) next.d字 = true; else delete next.d字;
   /* ★日付には日付の表示形式を自動で付ける（Excelと同じ）。人が選んだ書式は上書きしない。
      これが無いと「30日後」が 46295 という裸の数字で出て、客には壊れて見える。 */
   if(!existing.numFmt){

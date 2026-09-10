@@ -81,13 +81,19 @@ T('★★③道が 全部 通って いる（★1本でも 抜けると 化け�
   };
   const 道 = [
     ['ファイルを 開いた 時（recalcSheet）',
-      () => 近くで('var jsResult = _jsComputeFormula(sheetIdx, cell.f)', 'cell.d字 =', 900)],
+      /* ★注記を 外した 後も 桁は ずれません★（空白で 埋める）＝説明が 長い分 だけ 離れます
+         ⇒ 探す 幅は ★その 段が 収まる 長さ★に する（近すぎると 中身が 在るのに 赤） */
+      () => 近くで('cell.d = jsResult!==null', 'cell.d字 = true', 1600)],
     ['溢れた 先（_溢れを写す）',
-      () => 近くで('t.d = _hfGetDisplay(sheetIdx, r + i, c + j, true)', 't.d字 =', 300)],
+      () => 近くで('t.d = _hfGetDisplay(sheetIdx, r + i, c + j, true)', 't.d字 = true', 400)],
     ['お客さんが 打った 時（setCellFormula の 呼び手）',
       () => 近くで('var hfResult = setCellFormula(activeSheet, r, c, v)', '_打った答えは字か =', 900)],
     ['打った 答えを マスに 入れる 所',
-      () => 近くで('var next = Object.assign({}, existing,', 'd字: _打った答えは字か', 300)],
+      () => 近くで('var next = Object.assign({}, existing,', 'next.d字 = true', 400)],
+    ['★false を 置かず 消して いる★（空かを 見る 所が 狂う）',
+      () => (動く.match(/delete (cell|t|next)\.d字/g) || []).length >= 3],
+    ['★古い 溢れを 消す 時に d字 も 消す★',
+      () => 近くで('delete t.d; delete t.d字', 'delete t[溢れの印]', 120)],
   ];
   const 抜け = [];
   for (const [名, 見る] of 道) if (!見る()) 抜け.push(名);
@@ -95,7 +101,7 @@ T('★★③道が 全部 通って いる（★1本でも 抜けると 化け�
     throw new Error('★' + 抜け.length + '本 抜けて いる★  ' + 抜け.join(' ／ ')
       + '  ⇒★1本でも 抜けると その 道だけ 数に 化けます★');
   }
-  console.log('      … 開いた時／溢れた先／打った時／マスに 入れる所 の 4つ');
+  console.log('      … 開いた時／溢れた先／打った時／入れる所／false を 置かない／掃除 の 6つ');
 });
 
 T('★★④文字なら そのまま 出す（描く 所 2つ とも）★★', () => {
