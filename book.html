@@ -2641,6 +2641,35 @@ var マスの余白 = 3;
    ★数を 持たない マス（式の 答え など）は 今まで 通り d★
    ★★この 1本に まとめました★★＝前は 同じ 式が ★4か所★に 散って いて、
      直した 所と 直さない 所が 出ました（記憶の 決まり … 作る道が2本ある時は両方直せ） */
+/* ★★マスの 字体を 作る★★（2026-09-11）
+   ★開いた ブックは ★その ブックの 既定の 字体★で 描きます★
+     うちの 既定（Noto Sans JP 12点）は 実Excel（游ゴシック 11pt）より ★細い★
+       1桁 … うち 6.66点 ／ 実Excel 8点（実測）
+     ⇒ 同じ 幅に ★うちの 方が 多く 入って★ いました
+       実測 … 実Excel「1.001193」8桁 ／ うち「1.001193321」11桁
+   ★マスが 自分の 字体を 持って いれば そちらが 勝ちます★
+   ★新しく 作る ブックは 今まで 通り★（`既定の字大` を 持たない）
+   ★★1本に まとめました★★＝前は ふつうの マスと 結合した マスで ★別々に 書いて★ いて、
+     片方だけ 直す 所でした（記憶の 決まり … 作る道が2本ある時は両方直せ） */
+/** ★リボンに 出す「字の 大きさ」★＝実Excel は 開いた ブックの 既定（游ゴシック なら 11）を 出す
+ *  ★ここも 同じ 1本★＝前は `cell.fontSize||12` と 直に 書いて いて、
+ *    開いた ブックでも ★12★ と 出て いました（実Excel は 11） */
+function _マスの字大の札(cell) {
+  var 板 = sheets[activeSheet];
+  return (cell && cell.fontSize) || (板 && 板.既定の字大) || 12;
+}
+function _マスの字大(cell) {
+  var 板 = sheets[activeSheet];
+  var 既定 = (!cell || !cell.fontSize) && 板 && 板.既定の字大 ? 板.既定の字大 * 96 / 72 : 12;
+  return Math.max(9, Math.min(72, Math.round(((cell && cell.fontSize) || 既定) * scale)));
+}
+function _マスの書体(cell) {
+  var 板 = sheets[activeSheet];
+  if (cell && cell.fontName) return '"' + cell.fontName + '","Noto Sans JP",sans-serif';
+  var 既定名 = 板 && 板.既定の字体名 ? 板.既定の字体名 : '';
+  return 既定名 ? ('"' + 既定名 + '","Noto Sans JP",sans-serif') : '"Noto Sans JP",sans-serif';
+}
+
 function _字の元(cell) {
   if (!cell) return '';
   if (cell.numFmt && cell.numFmt !== 'General' && typeof cell.v === 'number') return cell.v;
@@ -3119,7 +3148,7 @@ function updateFormatBar(cell) {
   if((el=document.getElementById('fmt-align-right')))  el.classList.toggle('active',cell.align==='right');
   // フォントサイズ
   if((el=document.getElementById('fmt-font-size'))){
-    var fs = cell.fontSize||12;
+    var fs = _マスの字大の札(cell);
     if(parseInt(el.value)!==fs) el.value=String(fs);
   }
   // 文字色アイコン
@@ -6721,8 +6750,8 @@ function _renderPass() {
          ★applyNumFmt だけでは 足りません★＝書式の 無い マスが 素通りして いた */
       var display=fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
       if (_数が入らないか(raw, display, w)) display = _井桁で埋める(w);   /* ★書式付きも 同じ（2026-09-11）★ */
-      var fs=Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)));
-      ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px "Noto Sans JP",sans-serif';
+      var fs=_マスの字大(cell);   /* ★ふつうの マスと 同じ 1本★（2026-09-11） */
+      ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px '+_マスの書体(cell);
       ctx.fillStyle=cell.color||C_CELL_TXT;
       ctx.textBaseline='middle';
       var align=cell.align||'left';
@@ -6863,7 +6892,7 @@ function drawText(r,c){
      値の 代わりに ★式そのもの★ を 出す。式でないセルは そのまま。 */
   if(window.数式を表示 && cell.f && cell.f[0]==='='){
     var display = cell.f;
-    ctx.font = 'normal normal '+Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)))+'px "Noto Sans JP",sans-serif';
+    ctx.font = 'normal normal '+_マスの字大(cell)+'px '+_マスの書体(cell);   /* ★同じ 1本★ */
     ctx.fillStyle = '#333333'; ctx.textAlign='left'; ctx.textBaseline='middle';
     ctx.fillText(display, x+4, _vY(cell.valign||'middle', y, h, 12, 1));
     return;
@@ -6892,16 +6921,12 @@ function drawText(r,c){
      ⇒★字を 揃えれば 桁も 揃います★
      ★マスが 自分の 字体を 持って いれば そちらが 勝ちます★
      ★新しく 作る ブックは 今まで 通り★（`既定の字大` を 持たない） */
-  var _板 = sheets[activeSheet];
-  var _既定大 = (!cell.fontSize && _板 && _板.既定の字大) ? _板.既定の字大 * 96 / 72 : 12;
-  var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||_既定大)*scale)));
+  var fontSize = _マスの字大(cell);
   var _cf = (typeof cfFormatAt==='function') ? cfFormatAt(r,c,cell) : null;   /* ★条件付き書式★ */
   var weight = ((_cf && _cf.太字!==undefined) ? _cf.太字 : cell.bold) ? 'bold' : 'normal';
   var style  = cell.italic ? 'italic' : 'normal';
   /* ★フォント名（ホーム→フォント）★＝決めてあれば その字で 描く（実Excel既定は 游ゴシック 11） */
-  var _既定名 = (!cell.fontName && _板 && _板.既定の字体名) ? _板.既定の字体名 : '';
-  var _書体 = cell.fontName ? ('"' + cell.fontName + '","Noto Sans JP",sans-serif')
-            : (_既定名 ? ('"' + _既定名 + '","Noto Sans JP",sans-serif') : '"Noto Sans JP",sans-serif');
+  var _書体 = _マスの書体(cell);
   ctx.font = style+' '+weight+' '+fontSize+'px '+_書体;
 
   /* ★幅で 出る 字が 変わる★＝★このマスに 何文字 入るか★を 渡す */
