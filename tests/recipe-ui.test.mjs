@@ -44,7 +44,9 @@ const 切る = (頭, 尻, なに) => {
 const レシピの所 = () => 切る('var _覚えた手順 = [];', 'function 診断を始める(){', 'レシピの所');
 /* ★見せる字は 描く側と 同じ関数で作る★ので、その関数も 本物から 切り出して 載せる
    （写し取らない＝写した瞬間に 古くなる）。XLSX が無い機械でも 動く道（applyNumFmt）に落ちる。 */
-const 字にする所 = () => 切る('function forDisplay(v) {', 'function _debounce(', '字にする所');
+/* ★2026-09-11 … `forDisplay(v)` に 枠が 増えて `forDisplay(v, 枠)` に なりました★
+   ⇒★頭の 字を 決め打ちで 探すと 空振りします★（今日 3回 踏んだ） */
+const 字にする所 = () => 切る('function forDisplay(v, 枠) {', 'function _debounce(', '字にする所');
 const 窓の字 = () => 切る('<div id="rcOverlay"', '<!-- ★6 履歴', '見せる窓');
 
 let JSDOM;
