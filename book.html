@@ -2620,6 +2620,32 @@ function undoCellFormula(sheet, r, c, v) { return setCellFormula(sheet, r, c, v)
      ①割り算で 当たりを つける ②入るなら 1つずつ 増やす ③はみ出すなら 減らす
    ★左右の 余白 8点を 引きます★（描く 時に x+4 から 書いて いる）
    ★字体は 呼ぶ 前に 決まって いる 事★（drawText で 順番を 入れ替えた） */
+/* ★幅が 足りない 時の `#####`（2026-09-11）★
+   ★実Excel は 数が 入らないと `#` で 埋めます★（字は 埋めません＝はみ出す）
+     実測（09-10 の 紙）… 幅5 → ★####★（4個）／幅6 → ★#####★（5個）
+   ★何個 出すかは 測って 決めます★（数え打ちしない） */
+function _井桁で埋める(w) {
+  try {
+    var 使える = w - 8;
+    if (!(使える > 0)) return '';
+    var 一つ = ctx.measureText('#').width;
+    if (!(一つ > 0)) return '';
+    var n = Math.floor(使える / 一つ);
+    while (n > 0 && ctx.measureText(new Array(n + 1).join('#')).width > 使える) n--;
+    return n > 0 ? new Array(n + 1).join('#') : '';
+  } catch (e) { return ''; }
+}
+
+/* ★このマスに 数が 入るか★＝入らなければ `#####` に する
+   ★字（数で ない 物）は `#####` に しません★＝実Excel も しない（はみ出す） */
+function _数が入らないか(raw, display, w) {
+  var n = (typeof raw === 'number') ? raw
+        : ((typeof raw === 'string' && /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(raw) && !/^-?0\d/.test(raw))
+            ? Number(raw) : null);
+  if (n === null || !isFinite(n)) return false;   /* ★字は はみ出させる★ */
+  try { return ctx.measureText(String(display)).width > (w - 8); } catch (e) { return false; }
+}
+
 function _入る字数(w, raw, fmt) {
   try {
     var 使える = w - 8;
@@ -3074,6 +3100,84 @@ function _平らな十進(x) {
   return 符号 + '0.' + new Array(-ex).join('0') + 数字;
 }
 
+/* ★指数の 形で 列の 幅に 収める★（入らなければ null） */
+function _指数を幅に(a, e, 使える) {
+  var ew = _指数の字数(e);
+  /* ★★「E+ は 1文字ぶん 太い」は ★外れ★でした（2026-09-11）★★
+     幅5 の `1E+05` は 入らない のに、幅11 の `1.23457E+20`（11字）は ★入ります★。
+     ⇒ `.` が 細いので ★相殺されて いる★＝★字数では 説明が 付きません★
+     ⇒★実Excel は 点（見た目の 幅）で 判じて います★
+     ⇒★うちも 点で 判じます★＝ここは ★形と 桁数だけ★ 決めて、
+       `#####` に するかは ★描く 所が measureText で 測って★ 決めます
+     ⇒★当て推量の「+1」は 取り消しました★（1.23457E+20 を 全部 1桁 減らして いた） */
+  var d = 使える - 1 - ew;
+  if (d < 1) d = (使える >= 1 + ew) ? 1 : 0;
+  if (d < 1) return null;
+  var t = a.toExponential(d - 1);
+  var mm = /^(\d(?:\.\d+)?)e([+-])(\d+)$/.exec(t);
+  if (!mm) return null;
+  var 仮 = mm[1];
+  if (仮.indexOf('.') >= 0) 仮 = 仮.replace(/0+$/, '').replace(/\.$/, '');
+  var 指 = mm[3].length < 2 ? '0' + mm[3] : mm[3];
+  var 出 = 仮 + 'E' + mm[2] + 指;
+  /* ★★`E+` は 1文字ぶん 太い（2026-09-11 実測・574本 全部で 合った）★★
+     実Excel は ★字数では なく 点（見た目の 幅）で★ 入るかを 判じます。
+     `+` は 数字より 太いので ★同じ 字数でも はみ出す★。
+     実物（09-10 の 紙・★この 見立てで 574本 とも 説明が 付く★）
+       1E+05  幅5（5字）… ★####★（入らない）
+       1E+08  幅6（5字）… ★1E+08★（入る）
+       -1E+20 幅6（6字）… ★#####★（入らない）／ 幅7 … ★-1E+20★
+       -2E-14 幅6（6字）… ★-2E-14★（入る）★E- だから★
+       1E-06  幅5（5字）… ★1E-06★（入る）★E- だから★
+     ⇒★E+ の 時だけ 1字ぶん 余分に 要ると 見なします★ */
+  return 出.length <= 使える ? 出 : null;
+}
+
+/* ★十進の まま 列の 幅に 収める★（★形は もう 決まって いる★）
+   ★入らなければ null★＝呼ぶ 側が `#####` を 描く
+   ★指数に 逃げません★＝実Excel も 逃げない（100000 は 幅5 で ★####★・1E+05 に しない） */
+function _十進を幅に(a, 使える) {
+  var 生 = _平らな十進(a);
+  if (生.length <= 使える) return 生;
+  var e = Math.floor(Math.log10(a));
+  if (a >= Math.pow(10, e + 1)) e++; else if (a < Math.pow(10, e)) e--;
+  var d;
+  if (e < 0) d = 使える - 2 - (-e - 1);
+  else {
+    var g = e + 1;
+    if (使える >= g + 2) d = 使える - 1;
+    else if (使える >= g) d = g;
+    else {
+      /* ★★整数の 桁数が 入らない★★
+         ★実Excel は ここで ★指数に 逃げる 時と 逃げない 時が 在ります★
+           100000    幅5 → ★####★（1E+05＝5字は 入る はずなのに 逃げない）
+           100000000 幅6 → ★1E+08★（逃げる）
+           -1E+20    幅6 → ★#####★／-2E-14 幅6 → ★-2E-14★（どちらも 6字）
+         ⇒★字数では 説明が 付きません★＝★実Excel は 点（見た目の 幅）で 判じて います★
+           （`+` は 数字より 太い＝同じ 字数でも はみ出す）
+         ⇒★うちは 形を 作って 出し、`#####` に するかは ★描く 所が 点で 測って★ 決めます★
+         ⇒ だから ここでは ★指数に 逃がします★（入らなければ 描く 所が ##### にする） */
+      var 逃 = _指数を幅に(a, e, 使える);
+      return 逃;
+    }
+  }
+  if (d < 1) {
+    /* ★★十進で 出すと 中身が 全部 消える時★★（0.0001 を 幅5 に 入れる 等）
+       ★実Excel は ①指数に 逃げる ②それも 入らなければ 0 に する★（実測）
+         0.0001            幅5 → ★1E-04★（指数が 5字で 入る）
+         0.0000000000000164 幅5 → ★2E-14★
+         -0.0000000000000164 幅5 → ★-0★（-1E-14 は 6字＝入らない）
+       ⇒★1より 小さい 数は 0 に 丸めれば 必ず 入る★ので ##### に なりません */
+    var 指 = _指数を幅に(a, e, 使える);
+    if (指 !== null) return 指;
+    return (使える >= 1) ? '0' : null;
+  }
+  var 出 = _平らな十進(Number(a.toPrecision(d)));
+  if (出.length <= 使える) return 出;
+  var 指2 = _指数を幅に(a, e, 使える);
+  return 指2 !== null ? 指2 : ((a < 1 && 使える >= 1) ? '0' : null);
+}
+
 /* ★実Excel の General と 同じ 字を 作る★（枠＝出せる 字数） */
 function excelGeneral(n, 枠) {
   if (!isFinite(n)) return String(n);
@@ -3081,44 +3185,63 @@ function excelGeneral(n, 枠) {
   var v = Number(n.toPrecision(15));
   if (v === 0) return '0';
   var 負 = v < 0, a = Math.abs(v);
-  var 使える = 枠 - (負 ? 1 : 0);
+  /* ★★形を 決める 枠と、字数を 決める 枠は 別です（2026-09-11 実測）★★
+     ★実Excel は ★形（十進か 指数か）を 11字で 決めて★、
+       ★それから 列の 幅に 収まるように 丸めます★
+     実物（09-10 の 紙）
+       100000 … 幅5 ★####★／幅6 ★100000★
+         ＝十進は 6字。11字には 収まる ⇒★十進に 決まる★
+         ⇒ 幅5 では どう 丸めても 6字＝★入らない＝####★（1E+05 に 逃げない）
+       0.000000999999999 … 幅5 でも ★1E-06★
+         ＝十進は 17字。11字に 収まらない ⇒★指数に 決まる★⇒ 5字で 入る
+     ⇒★形を 幅で 決めると 100000 が 1E+05 に 化けます★（実Excel と 違う） */
+  var 決め枠 = GEN_枠 - (負 ? 1 : 0);   /* ★形を 決める＝いつも 11★ */
+  var 使える = 枠 - (負 ? 1 : 0);       /* ★字数を 決める＝列の 幅★ */
   /* ★②そのままの 十進が 収まるなら それ★ */
   var 生 = _平らな十進(a);
-  if (生.length <= 使える) return (負 ? '-' : '') + 生;
+  /* ★★②そのままの 十進が ★11字★に 収まるなら 十進に 決まる★★（幅では 判じない） */
+  if (生.length <= 決め枠) {
+    if (生.length <= 使える) return (負 ? '-' : '') + 生;
+    var 縮 = _十進を幅に(a, 使える);
+    return 縮 === null ? null : (負 ? '-' : '') + 縮;
+  }
   /* ★桁（10 の 何乗か）★ … log10 の 端の ずれを 押して 直す */
   var e = Math.floor(Math.log10(a));
   if (a >= Math.pow(10, e + 1)) e++;
   else if (a < Math.pow(10, e)) e--;
-  /* ★③十進で 出せる 有効桁★ */
-  var d十 = 0;
-  if (e < 0) {
-    d十 = 使える - 2 - (-e - 1);            /* "0." ＋ 頭の 0 の 数 */
-  } else {
-    var g = e + 1;                          /* 整数の 桁数 */
-    if (使える >= g + 2) d十 = 使える - 1;   /* 小数点が 1字 要る */
-    else if (使える >= g) d十 = g;           /* 整数だけ */
-  }
-  /* ★④指数で 出せる 有効桁★ */
-  var ew = _指数の字数(e);
-  var d指 = 使える - 1 - ew;
-  if (d指 < 1) d指 = (使える >= 1 + ew) ? 1 : 0;
-  /* ★⑤有効桁が 多い 方を 採る（同じなら 十進）★ */
-  if (d十 >= 1 && d十 >= d指) {
-    var 十 = _平らな十進(Number(a.toPrecision(d十)));
-    if (十.length <= 使える) return (負 ? '-' : '') + 十;
-  }
-  if (d指 >= 1) {
-    var t = a.toExponential(d指 - 1);
-    var mm = /^(\d(?:\.\d+)?)e([+-])(\d+)$/.exec(t);
-    if (mm) {
-      var 仮 = mm[1];
-      if (仮.indexOf('.') >= 0) 仮 = 仮.replace(/0+$/, '').replace(/\.$/, '');
-      var 指 = mm[3].length < 2 ? '0' + mm[3] : mm[3];
-      return (負 ? '-' : '') + 仮 + 'E' + mm[2] + 指;
+  /* ★③④どちらの 形に するかは ★11字★で 決める★（★幅では 決めない★）
+     実物（09-10 の 紙）
+       100000 … 十進 6字＝11字に 収まる ⇒★十進に 決まる★
+         ⇒ 幅5 では どう 丸めても 6字＝★入らない＝####★（1E+05 に 逃げない）
+       0.000000999999999 … 十進 17字＝11字に 収まらない ⇒★指数に 決まる★⇒ 幅5 でも 1E-06 */
+  var 桁 = function (枠2) {
+    var d = 0;
+    if (e < 0) d = 枠2 - 2 - (-e - 1);
+    else {
+      var g = e + 1;
+      if (枠2 >= g + 2) d = 枠2 - 1;
+      else if (枠2 >= g) d = g;
     }
+    return d;
+  };
+  var ew = _指数の字数(e);
+  var 指桁 = function (枠2) {
+    var d = 枠2 - 1 - ew;
+    if (d < 1) d = (枠2 >= 1 + ew) ? 1 : 0;
+    return d;
+  };
+  var 十進にする = (桁(決め枠) >= 1 && 桁(決め枠) >= 指桁(決め枠));
+  /* ★⑤決めた 形を ★列の 幅★に 収まるように 出す★ */
+  if (十進にする) {
+    var 縮2 = _十進を幅に(a, 使える);
+    return 縮2 === null ? null : (負 ? '-' : '') + 縮2;
   }
-  /* ★どうしても 収まらない＝そのまま出す★（実Excel は ##### に するが 別の 直し） */
-  return (負 ? '-' : '') + 生;
+  var 指出 = _指数を幅に(a, e, 使える);
+  if (指出 !== null) return (負 ? '-' : '') + 指出;
+  /* ★指数でも 入らない★＝★1より 小さければ 0 に 丸める★（実測 … -1.64E-14 は 幅5 で -0） */
+  if (a < 1 && 使える >= 1) return (負 ? '-' : '') + '0';
+  /* ★どうしても 収まらない★＝★null を 返す＝呼ぶ 側が ##### を 描く★ */
+  return null;
 }
 
 /* ★★幅で 出る 字が 変わる（2026-09-11）★★
@@ -3142,7 +3265,14 @@ function forDisplay(v, 枠) {
     if (!/^-?0\d/.test(v)) n = Number(v);
   }
   if (n === null || !isFinite(n)) return v;
-  return excelGeneral(n, (typeof 枠 === 'number' && 枠 > 0) ? Math.min(GEN_枠, Math.floor(枠)) : GEN_枠);
+  /* ★入らない 時は excelGeneral が null を 返します★
+     ⇒★ここでは 11字の 形を 返す★（描く 所が 幅を 見て ##### に する）
+     ⇒ 書き出し・窓など ★幅の 無い 呼び手★は これまで通り 字が 返る */
+  var 枠2 = (typeof 枠 === 'number' && 枠 > 0) ? Math.min(GEN_枠, Math.floor(枠)) : GEN_枠;
+  var 出 = excelGeneral(n, 枠2);
+  if (出 !== null) return 出;
+  var 予 = excelGeneral(n, GEN_枠);
+  return 予 !== null ? 予 : String(v);
 }
 
 /* ★画面に出す文字を作る。計算は触らない★
@@ -6502,6 +6632,7 @@ function _renderPass() {
          ⇒★だから `fmtForDisplay` を 通す★（書式も 15桁も 字数も 一度に 効く）
          ★applyNumFmt だけでは 足りません★＝書式の 無い マスが 素通りして いた */
       var display=fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
+      if (!cell.numFmt && _数が入らないか(raw, display, w)) display = _井桁で埋める(w);
       var fs=Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)));
       ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px "Noto Sans JP",sans-serif';
       ctx.fillStyle=cell.color||C_CELL_TXT;
@@ -6668,6 +6799,8 @@ function drawText(r,c){
 
   /* ★幅で 出る 字が 変わる★＝★このマスに 何文字 入るか★を 渡す */
   var display = fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
+  /* ★数が 入らなければ `#####`★（★字は そのまま はみ出させる★＝実Excel と 同じ） */
+  if (!cell.numFmt && _数が入らないか(raw, display, w)) display = _井桁で埋める(w);
 
   // 文字色
   var isFormula = cell.f && cell.f[0]==='=';
