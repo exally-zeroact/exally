@@ -225,6 +225,10 @@ const FILES = [
   ['hakaridai-mon.test.mjs','--self-test'], // ＝node の台の数は 画面の数ではない／板ごと入れるなら断りを書く
   /* ★1つの式が何マスにも広がる（溢れ）＝SORT/UNIQUE/FILTER/SEQUENCE/LINEST がまとめて動く（09-10）
      ＝エンジンは元から溢れていて★画面がそれを読む道だけが無かった★ */
+  /* ★うちが書いた物が実Excelで開けるか（09-10 司さん「ExallyでもExcelでも使えるように確かめながらやってるか」）
+     ＝今まで★実Excel→うち★しか見ていなかった。★うち→Excel★を足した */
+  'oufuku.test.mjs',
+  ['oufuku.test.mjs','--self-test'],
   'afureru.test.mjs',
   ['afureru.test.mjs','--self-test'],
   'shirase-omoku-nuru-na.test.mjs',        // ★知らせの箱を濃い色で塗らない（09-10 司さん「絶対これがええ」）

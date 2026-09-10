@@ -78,6 +78,12 @@ function 型を見て居るか(s) {
    ⇒★★迷ったら 免除しない★★（★免除は 少ない方が 安全★） */
 const 免除 = {
   'docs/measured/kansuu46/toru-isref.ps1': 'ISREF … ★真偽（TRUE/FALSE）しか 返さない★＝0 が 出ない',
+  'docs/measured/toru-oufuku.ps1':
+    '★この 道具は 実Excel に ★式を 打たせません★＝★うちが 書いた ファイルを 開いて 読むだけ★。'
+    + '見るのは ①式(.Formula) ②出る字(.Text) ③答え(.Value2) の 3つで、'
+    + '★「0」が 出る 所が ありません★（材料は お金の 利回りと 並べ替え）。'
+    + '⇒ 2つ目の 窓（=(式)=0）の 当たる 先が 無い。'
+    + '★型は 見て います★＝`.Value2` が double か どうかで 分けて 書いて います。',
   'docs/measured/toru-oou-daiarogu.ps1':
     '★実Excel の 数を 1つも 読みません★＝シートに 色を 塗って ★絵を 撮る★だけの 道具。'
     + '見るのは ★絵の 点の 明るさ★で、`.Value2` も `.Text` も 使いません。'
