@@ -57,7 +57,16 @@
       }
 
       // ★表示用の読み取り（見るだけ）★
-      var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false });
+      /* ★★`cellStyles: true` が 無いと 列の 幅が 1つも 来ません★★（2026-09-11 実測）
+           SheetJS は これが 無いと `ws['!cols']` を ★作りません★
+           ⇒ 幅を 読む 所は 前から 書いて 在ったのに ★材料が ずっと 空★でした
+           ⇒★実Excel より 列が 広く、`####` に ならず、桁が 多く 出て いた★
+             （実測 … Excel「1.001193」／うち「1.001193321」）
+         ★重く ならないか 先に 測りました★（司さんの 実物 代行計算表2026.xlsb・15枚）
+           今のまま … 309ms / 236ms ／ 山 21MB ／★幅が 来た板 0/15★
+           足した後 … 276ms / 263ms ／ 山 26MB ／★幅が 来た板 15/15★
+           ⇒★遅く なりません★（山は +5MB） */
+      var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
 
       /* ★表の名前での参照（Table[列名]）を、実際のA1範囲に直す★（2026-08-18）
          読み込みライブラリは .xlsb で ★表の名前も列名も捨てる★。
@@ -101,6 +110,10 @@
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
   function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り) {
+      /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
+         （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
+           {"sz":11,"name":"游ゴシック",...}） */
+      既定の字体 = (wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0]) ? wb.Styles.Fonts[0] : null;
       var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
@@ -170,7 +183,62 @@
     return (Number(m[2]) - 1) + ',' + (c - 1);
   }
 
+  /* ══ ★★列の 幅を 実Excel と 同じ 点(px)に 直す★★（2026-09-11）══════════════
+     ★実Excel に 聞いて 決めました★（docs/measured/toru-hashira-haba.ps1）
+       打った 字数  2     3     5     8.44   10    12     15     20     30
+       実Excel の点 20.5  28.5  44.5  72     84.5  100.5  124.5  164.5  244.5
+       ⇒★一直線★＝`点 = 字数 × 8 + 4.5`（游ゴシック 11pt）
+     ★ファイルの 中の 数（width）で 突き合わせた★（8列とも ★差 0.00★）
+       width 2.5625 → ×8 = 20.5 ／ width 30.5625 → ×8 = 244.5
+       ⇒★点 = ファイルの width × 一字の幅★
+     ★SheetJS の `wpx` は 使えません★＝1字を 14点と 思い込んで います
+       実測 … 5字の 列 … 実Excel ★44.5点★ ／ SheetJS ★78点★
+       ⇒ そのまま 使うと ★幅が 足りて しまい `####` に ならない★
+     ★一字の幅は 字体で 変わります★＝★その本の 既定の 字体で「0」を 測って 切り捨て★
+       游ゴシック 11pt … 8.153 → ★8★（実Excel と 一致）
+       Calibri   11pt … 7.430 → ★7★（実Excel と 一致）
+       ⇒★2つの 字体で 実Excel と 合う 事を 確かめました★（当て推量では ありません）
+     ★まだ 出来て いない 事★
+       ・★幅を 書いて いない 列（標準の 幅）★は ファイルの 既定を 読めません
+         （SheetJS が `defaultColWidth` を 出さない）
+         ⇒ 実Excel の 標準（8.43字）で 置き換えます＝★その本が 標準を 変えて いたら 合いません★ */
+
+  /** ★実Excel の 標準の 列幅（字）★＝どの 版でも 8.43（実測 2026-09-11 … 8.44 と 出る） */
+  var 標準の字数 = 8.43;
+  /** ★字体が 読めない 時の 逃げ先★＝游ゴシック 11pt の 実測値 */
+  var 逃げの字幅 = 8;
+
+  /** ★その本の 既定の 字体★（SheetJS は `wb.Styles.Fonts[0]` に 入れる） */
+  var 既定の字体 = null;
+
+  /** ★「0」1文字の 点(px)★＝★画面と 同じ 測り方★（canvas で 測る）
+   *  ★切り捨て★＝実Excel も 整数の 点で 持つ（8.153 → 8 ／ 7.430 → 7 で 一致した） */
+  function 一字の幅(字体) {
+    try {
+      var d = root.document;
+      if (!d || !d.createElement) return 逃げの字幅;
+      var x = d.createElement('canvas').getContext('2d');
+      if (!x) return 逃げの字幅;
+      var 名 = (字体 && 字体.name) ? 字体.name : '游ゴシック';
+      var 大 = (字体 && 字体.sz) ? 字体.sz : 11;
+      x.font = 大 + 'pt "' + 名 + '",sans-serif';
+      var w = Math.floor(x.measureText('0').width);
+      return (w > 0 && w < 100) ? w : 逃げの字幅;
+    } catch (e) { return 逃げの字幅; }
+  }
+
+  /** ★1列ぶんの 幅を 点に★／読めない 時は 0（＝画面の 既定に 任せる） */
+  function 幅を点に(col, 字幅) {
+    if (!col) return 0;
+    /* ★ファイルの 中の 数を 使う★＝これが 実Excel と 差 0.00 で 合う */
+    if (typeof col.width === 'number' && col.width > 0) return Math.round(col.width * 字幅);
+    /* ★width が 無い 時だけ 字数から 作る★（`点 = 字数 × 一字の幅 + 余白5`） */
+    if (typeof col.wch === 'number' && col.wch > 0) return Math.round(col.wch * 字幅 + 5);
+    return 0;
+  }
+
   function sheetToGrid(ws, name, tableFixes) {
+
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
       if (a.charAt(0) === '!') return;
@@ -219,8 +287,10 @@
       data[rc.r + ',' + rc.c] = cell;
     });
     var colW = {};
+    var 字幅 = 一字の幅(既定の字体);
     (ws['!cols'] || []).forEach(function (col, i) {
-      if (col && (col.wpx || col.wch)) colW[i] = col.wpx || Math.round(col.wch * 7);
+      var px = 幅を点に(col, 字幅);
+      if (px) colW[i] = px;
     });
     /* ★表の枠（!ref）も 覚えておく★（2026-08-27 指示役の指摘）
        ＝★「値か式が在る所」と「表の枠」は 違う★。
@@ -234,7 +304,17 @@
         枠 = { 行数: rg.e.r + 1, 列数: rg.e.c + 1 };
       }
     } catch (e) { /* 読めない時は null＝「未測定」（0にしない） */ }
-    return { name: name, data: data, colW: colW, rowH: {}, hiddenRows: {}, hiddenCols: {}, 枠: 枠, _fromFile: true };
+    /* ★幅を 書いて いない 列（標準の 幅）も 実Excel に 合わせる★
+       ＝画面の 既定は 80点／実Excel の 標準は ★72点★（8.43字 × 8 + 5）
+       ⇒ これが 無いと ★Excel 8桁／うち 11桁★の ままです（実測）
+       ⇒★この 板だけの 既定★＝新しく 作る ブックの 既定は 動かしません */
+    var 標準の点 = Math.round(標準の字数 * 字幅 + 5);
+    return { name: name, data: data, colW: colW, 既定の列幅: 標準の点,
+      /* ★その ブックの 既定の 字体★＝画面も 同じ 字で 描く
+         ⇒ 同じ 幅に 入る 桁数が 実Excel と 揃う（うちの 字は 細くて 多く 入って いた） */
+      既定の字体名: (既定の字体 && 既定の字体.name) ? 既定の字体.name : '',
+      既定の字大: (既定の字体 && 既定の字体.sz) ? 既定の字体.sz : 0,
+      rowH: {}, hiddenRows: {}, hiddenCols: {}, 枠: 枠, _fromFile: true };
   }
 
   /* ── 保存：★元のバイト列を書き換える★ ── */
