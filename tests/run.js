@@ -221,6 +221,8 @@ const FILES = [
   ['isomitted.test.mjs','--self-test'],   //  ＝空のマスも FALSE／★カンマで省いた形は「まだ」＝黙って逆を返さない★
   'monosashi-mado.test.mjs',                // ★測り道具が「0」を2つの窓で取っているか（09-08 .Value2 が 0でない値に0を返す）
   ['monosashi-mado.test.mjs','--self-test'],// ＝★見せかけの0★と★字の"0"★は .Value2 では見分けが付かない
+  'hakaridai-mon.test.mjs',                 // ★測り台が本番と違うのを止める（09-09〜10 に 1日で 5回 転んだ）
+  ['hakaridai-mon.test.mjs','--self-test'], // ＝node の台の数は 画面の数ではない／板ごと入れるなら断りを書く
   'marume-mihari.test.mjs',                 // ★答えを黙って丸めている所が増えていないか（09-08 A群4→0）
   ['marume-mihari.test.mjs','--self-test'],
   'linest-x-nihon.test.mjs',                // ★LINESTのxが2本以上で静かに違う答えを出さない（09-09 実Excel 0.77 vs うち 7.39）
