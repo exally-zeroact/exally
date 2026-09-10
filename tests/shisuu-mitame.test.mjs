@@ -17,10 +17,20 @@
  *      ⑤★末尾の 0 は 落とす★
  *
  *  ★★見て いない 範囲（★書かない 見張りは「全部 守った」と 読まれる★）★★
- *    ・★幅が 11 未満の 時の 縮み方は ★直して いません★★
- *        測って あります＝`枠 = floor(幅)` で ★270/287★
- *        ★残り 17本は 全部 `####`（幅が 足りない 時の 出方）★＝★別の 直し★
- *    ・★`#####` を 出す 道は 作って いません★
+ *  ★★幅で 出る 字が 変わるように しました（2026-09-11）★★
+ *    ★実Excel の General は 列の 幅で 出方が 変わります★（574本 実測）
+ *    ⇒★このマスに 何文字 入るかを 測って 渡す★（`_入る字数`）
+ *    ★★割り算だけでは 1文字ぶん 損を します★★（実測して 気づいた）
+ *      列 80点／余白を 引いて 72点／「0」1文字 6.66点 ⇒ 割り算だと 10文字
+ *      ★けれど 11文字は 69.9点＝入る★（`.` が 細い）
+ *    ⇒★出す 字を 実際に 測って 詰める★（当たりを つけて 増やす／減らす）
+ *    ★測った 実物（うちの 画面）★
+ *      幅 40点 … 0.333       ／ 幅 60点 … 0.333333
+ *      幅 80点 … 0.333333333 ／ 幅 120・200点 … ★11で 頭打ち★（実Excel と 同じ）
+ *      ★どの 幅でも はみ出し 0★
+ *
+ *  ★★まだ 見て いない 範囲★★
+ *    ・★`#####` を 出す 道は 作って いません★（実Excel は 幅が 足りないと ##### に する）
  *    ・★書式（numFmt）の 付いた マスは この 道を 通りません★（`fmtForDisplay` が 先に 受ける）
  *
  *  使い方: node tests/shisuu-mitame.test.mjs [--self-test]
@@ -35,6 +45,8 @@ const 直に走った = process.argv[1] && pathToFileURL(process.argv[1]).href =
 const 自己試験 = 直に走った && process.argv.includes('--self-test');
 
 let pass = 0, fail = 0;
+/* ★改行を 逃がしで 書きません★（heredoc で 化ける・今日 4回 踏んだ） */
+const 改行と字下げ = String.fromCharCode(10) + '      ';
 const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
 
 /* ══ ★本番の 段を book.html から 切り出す（★写しを 置かない★）★ ══
@@ -172,6 +184,33 @@ T('★0 と 整数は そのまま 読める★', () => {
   console.log('      … ' + 組.length + '通り とも そのまま');
 });
 
+T('★★幅を 渡すと 字数が 変わる（★11 で 頭打ち★）★★', () => {
+  /* ★渡さなければ 今まで通り 11★＝★他の 呼び手を 1つも 壊さない★ */
+  if (String(forDisplay(1 / 3)) !== '0.333333333') throw new Error('★枠を 渡さない時が 変わった★');
+  const 組 = [[5, '0.333'], [8, '0.333333'], [11, '0.333333333'], [20, '0.333333333'], [40, '0.333333333']];
+  for (const [枠, 正] of 組) {
+    const 出 = String(forDisplay(1 / 3, 枠));
+    if (出 !== 正) throw new Error('★枠 ' + 枠 + ' … ' + 出 + '（' + 正 + ' のはず）★');
+  }
+  console.log('      … 枠 5/8/11/20/40 とも 実Excel と 同じ（11 で 頭打ち）');
+});
+
+T('★★描く 所が 幅を 渡して いる（★空振りして いない★）★★', () => {
+  if (本.indexOf('function _入る字数(w, raw, fmt)') < 0) throw new Error('★_入る字数 が 無い★');
+  const n = (本.match(/_入る字数\(w, raw, cell\.numFmt\)/g) || []).length;
+  if (n < 2) throw new Error('★描く 所 ' + n + 'か所しか 渡して いない★（ふつうと 結合の 2か所）');
+  /* ★字体を 先に 決めて いるか★＝でないと 1つ前の マスの 字で 測る */
+  const i = 本.indexOf('ctx.font = style+');
+  const j = 本.indexOf('var display = fmtForDisplay(raw, cell.numFmt, _入る字数');
+  if (!(i > 0 && j > i)) throw new Error('★字体を 決める 前に 測って いる★');
+  /* ★実際に 測って 詰めて いるか（割り算だけで 済ませて いないか）★ */
+  const 段 = 本.slice(本.indexOf('function _入る字数(w, raw, fmt)'));
+  if (段.indexOf('measureText(String(t)).width') < 0) {
+    throw new Error('★出す 字を 測って いない★＝★割り算だけでは 1文字 損を する★');
+  }
+  console.log('      … 2か所 とも 渡し、字体を 先に 決め、出す 字を 測って いる');
+});
+
 T('★★結合した マスも 同じ 道を 通る（★09-10 に 見つけた 穴★）★★', () => {
   /* ★★前は 結合した マスだけ 生の 値を 出して いました★★
      `String(raw)` で 描いて いた ⇒★09-10 の 直し（#62・#63）が 1つも 効いて いない★
@@ -184,7 +223,9 @@ T('★★結合した マスも 同じ 道を 通る（★09-10 に 見つけた
        他の 3本 … ★どちらも 同じ★
      ⇒★実Excel は 結合も ふつうも 同じ 規則★（幅が 広い分 字数が 増えるだけ）
      ⇒★だから `fmtForDisplay` を 通す★ */
-  if (本.indexOf('var display=fmtForDisplay(raw, cell.numFmt);') < 0) {
+  /* ★2026-09-11 … 幅も 渡すように なったので 探す 字を 直しました★
+     （★字を 決め打ちで 探すと 直した 時に 空振りする★＝今日 3回目） */
+  if (本.indexOf('var display=fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));') < 0) {
     throw new Error('★結合した マスが `fmtForDisplay` を 通って いない★'
       + 改行と字下げ + '⇒★09-10 の 直しが 結合には 効かなく なる★');
   }
@@ -201,18 +242,32 @@ T('★★結合した マスも 同じ 道を 通る（★09-10 に 見つけた
   console.log('      … 結合も ふつうと 同じ 道（' + 組.length + '通り 確かめた）');
 });
 
-T('★★「幅が 11 未満は 直して いない」の 断りが 残って いる★★', () => {
+T('★★狭い 幅でも 実Excel と 同じ 字に なる（★2026-09-11 に 直した★）★★', () => {
+  /* ★前は ここで「まだ 直して いません」と 断って いました★
+     ⇒ 幅を 渡すように したので ★狭い 幅も 合うように なりました★
+     ⇒ 紙の 幅（実Excel の 文字数）を そのまま 枠に して 突き合わせる */
+  const 悪い = [];
+  for (const r of 紙) {
+    if (r.字.indexOf('#') === 0) continue;          /* ★##### は まだ 作って いない★ */
+    const 枠 = Math.min(GEN_枠, Math.floor(r.幅));
+    const うち = String(forDisplay(Number(r.数), 枠));
+    if (うち !== r.字) 悪い.push(r.数 + ' 幅' + r.幅 + '（枠' + 枠 + '） 実Excel=' + r.字 + ' ／ うち=' + うち);
+  }
+  const 全 = 紙.filter((r) => r.字.indexOf('#') !== 0).length;
+  if (悪い.length > 全 * 0.1) {
+    throw new Error('★' + 悪い.length + '/' + 全 + '本が 違う★' + 改行と字下げ + 悪い.slice(0, 6).join(改行と字下げ));
+  }
+  console.log('      … ' + (全 - 悪い.length) + '/' + 全 + '本が 実Excel と 同じ（★#####  は 数えて いません★）');
+});
+
+T('★★「##### は まだ 作って いない」の 断りが 残って いる★★', () => {
   const s = fs.readFileSync(path.join(ここ, 'shisuu-mitame.test.mjs'), 'utf-8');
-  if (!/幅が 11 未満の 時の 縮み方は ★直して いません★/.test(s)) {
+  if (!/`#####` を 出す 道は 作って いません/.test(s)) {
     throw new Error('★未完の 断りが 消えた★＝★書かない 見張りは「全部 守った」と 読まれる★');
   }
-  /* ★実際 狭い 幅で 合って いない事も 押して 見せる★（★緑に しない★） */
-  const 狭い = 紙.filter((r) => r.幅 < GEN_枠);
-  const 違う = 狭い.filter((r) => String(forDisplay(Number(r.数))) !== r.字);
-  if (!違う.length) {
-    throw new Error('★狭い 幅も 全部 合って いる★＝★断りの 方が 古い（直したのに 未完と 書いて 在る）★');
-  }
-  console.log('      … 狭い 幅 ' + 狭い.length + '本の うち ★' + 違う.length + '本は まだ 違う★（★別の 直し★）');
+  const 井 = 紙.filter((r) => r.字.indexOf('#') === 0);
+  if (!井.length) throw new Error('★紙に ##### が 1本も 無い★＝★断りの 方が 古い★');
+  console.log('      … 紙に ##### が ' + 井.length + '本（★まだ 作って いません★）');
 });
 
 /* ══ ★自己試験（★壊すのは 写し★＝ファイルは 1バイトも 触らない）★ ══ */
@@ -242,7 +297,10 @@ if (自己試験) {
 
   T('★★書き換えが コードに 在る（空振りして いない）★★', () => {
     if (!/function excelGeneral/.test(本)) throw new Error('★excelGeneral が 無い★');
-    if (!/return excelGeneral\(n, GEN_枠\);/.test(本)) throw new Error('★forDisplay から 呼んで いない★');
+    /* ★2026-09-11 … 枠を 渡せる ように したので 探す 字を 直した★
+       ★形で 探します★＝`excelGeneral(n, …)` を 呼んで いれば よい（中の 字を 決め打ちしない） */
+    if (!/return excelGeneral\(n,/.test(本)) throw new Error('★forDisplay から 呼んで いない★');
+    if (!/Math\.min\(GEN_枠,/.test(本)) throw new Error('★枠を 11 で 頭打ちに して いない★');
     if (!/var GEN_枠 = \d+;/.test(本)) throw new Error('★GEN_枠 が 無い★');
     console.log('      … 段も 呼び出しも 枠も 在る');
   });

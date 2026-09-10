@@ -2610,6 +2610,39 @@ function undoCellFormula(sheet, r, c, v) { return setCellFormula(sheet, r, c, v)
    ★借り物（エンジン）の 中は 読んで いません★
      ＝`getCellType` で ★外から★ 型を 聞いて 広さを 数えます */
 
+/* ★このマスに ★何文字 入るか★（2026-09-11）★
+   ★★割り算だけでは 1文字ぶん 損を します★★（実測して 気づいた）
+     列の 幅 80点／余白を 引いて 72点／「0」1文字＝6.66点
+     ⇒ 割り算だと 10文字（72÷6.66）
+     ⇒★けれど 実際に 測ると 11文字は 69.9点＝★入る★★
+       （`.` が 細いので 平らな 割り算では はみ出すと 思って しまう）
+   ⇒★だから ★出す 字を 実際に 測って 詰めます★★
+     ①割り算で 当たりを つける ②入るなら 1つずつ 増やす ③はみ出すなら 減らす
+   ★左右の 余白 8点を 引きます★（描く 時に x+4 から 書いて いる）
+   ★字体は 呼ぶ 前に 決まって いる 事★（drawText で 順番を 入れ替えた） */
+function _入る字数(w, raw, fmt) {
+  try {
+    var 使える = w - 8;
+    if (!(使える > 0)) return 1;
+    var 一文字 = ctx.measureText('0').width;
+    if (!(一文字 > 0)) return GEN_枠;
+    var n = Math.floor(使える / 一文字);
+    if (n < 1) n = 1;
+    if (n > GEN_枠) n = GEN_枠;
+    var 測る = function (k) {
+      var t = fmtForDisplay(raw, fmt, k);
+      return ctx.measureText(String(t)).width;
+    };
+    /* ★入るなら 増やす（★上限 GEN_枠★）★ */
+    var 回 = 0;
+    while (n < GEN_枠 && 回 < 12 && 測る(n + 1) <= 使える) { n++; 回++; }
+    /* ★はみ出すなら 減らす★ */
+    回 = 0;
+    while (n > 1 && 回 < 12 && 測る(n) > 使える) { n--; 回++; }
+    return n;
+  } catch (e) { return GEN_枠; }
+}
+
 var 溢れの印 = '_溢れ元';           /* ★このマスは 溢れで 出来た★という 印 */
 var 溢れの上限 = 100000;            /* ★暴走止め★（SEQUENCE(1000000) 等） */
 
@@ -3088,7 +3121,14 @@ function excelGeneral(n, 枠) {
   return (負 ? '-' : '') + 生;
 }
 
-function forDisplay(v) {
+/* ★★幅で 出る 字が 変わる（2026-09-11）★★
+   ★実Excel の General は ★列の 幅で 出方が 変わります★★（574本 実測・09-10）
+     幅 8.43（既定）… =1/3 → ★0.333333★（8字）
+     幅 11 以上     … =1/3 → ★0.333333333★（11字）／★11 以上は どの 幅でも 同じ★
+   ★結合した マスも 同じ★＝広がった 分だけ 字数が 増える（09-10 実測）
+   ⇒★枠（使える 字数）を 呼ぶ 側から 渡せる ように します★
+   ★渡さなければ 今まで通り 11★＝★他の 呼び手を 1つも 壊さない★ */
+function forDisplay(v, 枠) {
   //  recalcSheet は答えを ★文字★ で置く（_hfGetDisplay の戻り）ので、数だけ見ていると素通りする
   var n = null;
   if (typeof v === 'number') n = v;
@@ -3102,7 +3142,7 @@ function forDisplay(v) {
     if (!/^-?0\d/.test(v)) n = Number(v);
   }
   if (n === null || !isFinite(n)) return v;
-  return excelGeneral(n, GEN_枠);
+  return excelGeneral(n, (typeof 枠 === 'number' && 枠 > 0) ? Math.min(GEN_枠, Math.floor(枠)) : GEN_枠);
 }
 
 /* ★画面に出す文字を作る。計算は触らない★
@@ -3114,7 +3154,7 @@ function forDisplay(v) {
    使えなければ applyNumFmt、それも知らない書式なら 15桁に丸めて見せる。
    ★裸の数字にしか使わない★ — "1/21" や "7,000" "¥1,000" を数に戻して
    作り直すと、日付が 1/1 になるような壊し方をする。 */
-function fmtForDisplay(raw, fmt) {
+function fmtForDisplay(raw, fmt, 枠) {
   if (fmt && raw !== '' && raw !== undefined && raw !== null) {
     if (/^-?\d+(\.\d+)?$/.test(String(raw))
         && typeof BookOpen !== 'undefined' && BookOpen.isOpened()
@@ -3125,7 +3165,7 @@ function fmtForDisplay(raw, fmt) {
     var out = applyNumFmt(raw, fmt);
     if (String(out) !== String(raw)) return out;   // うちが知っている書式だった
   }
-  return forDisplay(raw);
+  return forDisplay(raw, 枠);
 }
 function applyNumFmt(val, fmt) {
   // 日付書式判定（小文字 y/m/d ベース）
@@ -6461,7 +6501,7 @@ function _renderPass() {
          ⇒★実Excel は 結合も ふつうも ★同じ 規則★★（幅が 広い分 字数が 増えるだけ）
          ⇒★だから `fmtForDisplay` を 通す★（書式も 15桁も 字数も 一度に 効く）
          ★applyNumFmt だけでは 足りません★＝書式の 無い マスが 素通りして いた */
-      var display=fmtForDisplay(raw, cell.numFmt);
+      var display=fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
       var fs=Math.max(9,Math.min(72,Math.round((cell.fontSize||12)*scale)));
       ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px "Noto Sans JP",sans-serif';
       ctx.fillStyle=cell.color||C_CELL_TXT;
@@ -6611,7 +6651,11 @@ function drawText(r,c){
   }
   var raw = (cell.d!==undefined&&cell.d!=='') ? cell.d : cell.v;
   if(!raw) return;
-  var display = fmtForDisplay(raw, cell.numFmt);
+  /* ★★字を 作る 前に 字体を 決める（2026-09-11）★★
+     ★幅を 字数に 直すには ★今の 字で「0」1文字の 幅を 測る★ 必要が 在ります★
+     ⇒ 前は ★字を 作った 後★に `ctx.font` を 決めて いたので、
+       測ると ★1つ前の マスの 字★で 測る 事に なりました
+     ⇒★順番を 入れ替えました★（描く 物は 1つも 変わりません） */
 
   // フォント
   var fontSize = Math.max(9, Math.min(72, Math.round((cell.fontSize||12)*scale)));
@@ -6621,6 +6665,9 @@ function drawText(r,c){
   /* ★フォント名（ホーム→フォント）★＝決めてあれば その字で 描く（実Excel既定は 游ゴシック 11） */
   var _書体 = cell.fontName ? ('"' + cell.fontName + '","Noto Sans JP",sans-serif') : '"Noto Sans JP",sans-serif';
   ctx.font = style+' '+weight+' '+fontSize+'px '+_書体;
+
+  /* ★幅で 出る 字が 変わる★＝★このマスに 何文字 入るか★を 渡す */
+  var display = fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
 
   // 文字色
   var isFormula = cell.f && cell.f[0]==='=';
