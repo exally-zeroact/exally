@@ -10,6 +10,7 @@ const FILES = [
   'stamp.test.mjs',         // キャッシュバスター(?v=)の道具そのもの
   ['sql-guard.test.mjs', '--self-test'],  // ★倉庫にSQLを当てる門番（本番の実データが同居している）★
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
+  ['moji-no-kotae.test.mjs'],                  // ★文字を 返す 式が 数に 化けない（2026-09-11 実Excel 14本 一致）★
   ['hashira-haba.test.mjs'],                   // ★列の 幅を 実Excel と 同じに する（2026-09-11 実測 8列 差0.00）★
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
   ['no-lookbehind.test.mjs', '--self-test'],  // ★後読み正規表現＝旧iOS Safariで かたまりが丸ごと動かない★

@@ -212,8 +212,13 @@ T('★★描く 所が 幅を 渡して いる（★空振りして いない★
   const n = (本.match(/_入る字数\(w, raw, cell\.numFmt\)/g) || []).length;
   if (n < 2) throw new Error('★描く 所 ' + n + 'か所しか 渡して いない★（ふつうと 結合の 2か所）');
   /* ★字体を 先に 決めて いるか★＝でないと 1つ前の マスの 字で 測る */
+  /* ★★2026-09-11 … 字面から 中身の 検査に 変えました★★
+     ★変えた 訳★＝文字を 返す 式（TEXT など）を そのまま 出す 為に
+       `var display = _答えは字か(cell) ? String(raw) : fmtForDisplay(...)` に なった。
+     ★守る 中身は 同じ★＝★字体を 決めてから 幅を 測る★（でないと 1つ前の マスの 字で 測る）
+     ★字面だけ 見て いると 中身が 同じでも 赤に なります★ */
   const i = 本.indexOf('ctx.font = style+');
-  const j = 本.indexOf('var display = fmtForDisplay(raw, cell.numFmt, _入る字数');
+  const j = 本.indexOf('_入る字数(w, raw, cell.numFmt)', i > 0 ? i : 0);
   if (!(i > 0 && j > i)) throw new Error('★字体を 決める 前に 測って いる★');
   /* ★実際に 測って 詰めて いるか（割り算だけで 済ませて いないか）★ */
   const 段 = 本.slice(本.indexOf('function _入る字数(w, raw, fmt)'));
@@ -237,7 +242,10 @@ T('★★結合した マスも 同じ 道を 通る（★09-10 に 見つけた
      ⇒★だから `fmtForDisplay` を 通す★ */
   /* ★2026-09-11 … 幅も 渡すように なったので 探す 字を 直しました★
      （★字を 決め打ちで 探すと 直した 時に 空振りする★＝今日 3回目） */
-  if (本.indexOf('var display=fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));') < 0) {
+  /* ★2026-09-11 … ここも 中身で 見ます★（文字を そのまま 出す 枝が 前に 付いた） */
+  const 結合頭 = 本.indexOf('var raw=_字の元(cell);');
+  const 結合中 = 結合頭 >= 0 ? 本.slice(結合頭, 結合頭 + 2500) : '';
+  if (結合中.indexOf('fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt))') < 0) {
     throw new Error('★結合した マスが `fmtForDisplay` を 通って いない★'
       + 改行と字下げ + '⇒★09-10 の 直しが 結合には 効かなく なる★');
   }

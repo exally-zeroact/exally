@@ -131,7 +131,12 @@ T('★描く所は fmtForDisplay を通している（書式つきのセルも�
   if (!/function fmtForDisplay/.test(html)) throw new Error('book.html に fmtForDisplay が無い');
   /* ★2026-09-11 … 幅も 渡すように なったので 形で 探します★
      （★字を 決め打ちで 探すと 直した 時に 空振りする★＝今日 3回 踏んだ） */
-  if (!/var display\s*=\s*fmtForDisplay\(raw, cell\.numFmt/.test(html)) {
+  /* ★★2026-09-11 … 字面から 中身の 検査に 変えました★★
+     文字を 返す 式（TEXT など）を そのまま 出す 為に
+       `var display = _答えは字か(cell) ? String(raw) : fmtForDisplay(raw, cell.numFmt, ...)`
+     に なりました。★守る 中身は 同じ★＝★描く 所は fmtForDisplay を 通る★
+     ⇒★字を 決め打ちで 探すと 直した 時に 空振りする★（この 注記の 通りに なりました） */
+  if (!/var display\s*=[^;]*fmtForDisplay\(raw, cell\.numFmt/.test(html)) {
     throw new Error('★描く所で fmtForDisplay を通していない★\n'
       + '   applyNumFmt は Excel の書式をほとんど知らない。司さんの実物では\n'
       + '   ★書式つき 6,568セルが全部 素通り★していた（"#,##0_ " も "General" も知らない）。\n'

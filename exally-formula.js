@@ -66,6 +66,35 @@ function _hfGetDisplay(sheet, r, c, 式のセルか) {
     return String(val);
   } catch(e) { return '#ERR'; }
 }
+/* ★★答えが「文字」か「数」かを 返す★★（2026-09-11）
+ *
+ *  ★何が 起きて いたか★
+ *    `=TEXT(A1,"0.00")` の 答えは 実Excel では ★文字の "3.00"★
+ *      実測 … LEN=4 ／ ISTEXT=TRUE ／ 出る字 "3.00"（docs/measured/golden-moji-no-kotae-2026-09-11.tsv）
+ *    ★エンジンも 文字で 返して います★（typeof が 'string'）
+ *    ★でも `_hfGetDisplay` が `String(val)` に した 時点で ★型が 消える★★
+ *    ⇒ 画面が それを ★数として 読み直して★ ★"3" と 出して いました★
+ *
+ *  ★★TEXT だけの 話では ありません★★
+ *    `=LEFT("3.00",4)` `=RIGHT("12.50",5)` `=MID(...)` `=TRIM("  4.50  ")`
+ *    `=SUBSTITUTE("1,5",",",".")` `=CONCATENATE(...)` `=REPT("1",3)` `=A1&""`
+ *    ⇒★文字を 返す 式は 全部★（実Excel で 11本 確かめた・全部 String）
+ *    （`="007"` だけは ★頭の ゼロ★の 決まりで たまたま 守られて いた）
+ *
+ *  ★返す 物★ … 'string' / 'number' / 'boolean' / 'error' / 'empty'
+ *  ★`_hfGetDisplay` と 同じ 物を 見ます★＝ずれない
+ */
+function _hf答えの型(sheet, r, c) {
+  try {
+    var val = _hf.getCellValue({sheet:_hfSid(sheet), row:r, col:c});
+    if(val===null||val===undefined) return 'empty';
+    if(typeof val==='object'&&val.type) return 'error';
+    if(typeof val==='boolean') return 'boolean';
+    if(typeof val==='string') return 'string';
+    if(typeof val==='number') return 'number';
+    return 'other';
+  } catch(e) { return 'error'; }
+}
 function _toRC(addr) {
   var m = addr.match(/^([A-Z]+)(\d+)$/i);
   if(!m) return null;
@@ -1679,7 +1708,7 @@ if (typeof module !== 'undefined' && module.exports) {
     // 補助・内部
     _hfSid: _hfSid, _toRC: _toRC, _getRangeVals: _getRangeVals,
     _getRangeAll: _getRangeAll, _getSingleVal: _getSingleVal,
-    _hfGetDisplay: _hfGetDisplay, _applyTextFormat: _applyTextFormat,
+    _hfGetDisplay: _hfGetDisplay, _hf答えの型: _hf答えの型, _applyTextFormat: _applyTextFormat,
     addSheetToEngine: addSheetToEngine,
     // 統計
     _jsRank: _jsRank, _jsPercentile: _jsPercentile, _jsQuartile: _jsQuartile,
@@ -1728,6 +1757,7 @@ if (typeof module !== 'undefined' && module.exports) {
     convertFormula: convertFormula,
     /* ★見張りが 中を1つずつ 試せるように 出す★（入口だけ見て 緑にしない） */
     _stripXlPrefix: _stripXlPrefix, _mergeRangeChains: _mergeRangeChains,
+    _hf答えの型: _hf答えの型,
     _jsComputeFormula: _jsComputeFormula
   };
 }
