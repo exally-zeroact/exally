@@ -28,11 +28,22 @@ const ROOT = path.join(ここ, '..');
 const 直に走った = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
 const 自己試験 = 直に走った && process.argv.includes('--self-test');
 
+const { 注記を外す } = await import(
+  pathToFileURL(path.join(ROOT, 'scripts/lib/chuki.mjs')).href);
+
 let pass = 0, fail = 0;
 const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
 
 /** ★段を 数える★（★字を 読む 所を 先に 名指しする★） */
 function 数える(生) {
+  /* ★★注記を 外してから 関所を 読む（2026-09-09 に 直した）★★
+     ★前は 生の まま★読んで いました。
+     ⇒ 関所の 注記に `=MIRR(A1:A3,-1,0.12)` と 書いたら
+       ★`A1` を 関数名として 拾い「関所に 在るのに 段が 無い」と 赤★に なりました
+     ⇒★注記の 字を 数えて いた＝見張りの 側の 欠陥★
+     ⇒★注記外しは 自前で 書かない★＝共通の 部品を 使う
+       （自前だと URL の // や 字の中の /* を 間違える。tests/chuki.test.mjs が 自前を 赤に する） */
+  生 = 注記を外す(生);
   const m = 生.match(/var _jsSet\s*=\s*\{[\s\S]*?\};/);
   if (!m) throw new Error('★_jsSet（関所）が 見つからない★＝この 見張りは 何も 見ていない');
   const 通す = new Set([...m[0].matchAll(/([A-Z][A-Z0-9]*)\s*:/g)].map((x) => x[1]));
