@@ -51,6 +51,10 @@ const 見る = ['book.html', 'hub.html', 'chat.html', 'css/hub.css', 'lib/ribbon
 
 function 明るさ(r, g, b) { return 0.299 * r + 0.587 * g + 0.114 * b; }
 
+/* ★改行を 逃がし（バックスラッシュ n）で 書きません★
+   ＝2026-09-07/10 に ★heredoc で 生の 改行に 化ける★のを 4回 踏んだ */
+const 改行と字下げ = String.fromCharCode(10) + '      ';
+
 /* ★色は ★文字で 探さず 値に 直す★★（2026-08-10 の 決まり）
    ①#RRGGBB ②rgb()/rgba() の 2通り。★# 無し と 0〜1の 小数は CSS の 塗りには 出ない★ */
 function 色に直す(v) {
@@ -117,20 +121,26 @@ T('★★知らせの 箱を 濃い色で 塗って いない（★これが 本
 });
 
 T('★★濃い色は 左の 帯として 残って いる（★色を 消した わけでは ない★）★★', () => {
-  const 帯 = [];
+  /* ★★数を 書き込みません★★（2026-09-10 に 踏んだ）
+     ★最初 「帯が 2か所 以上」と 書きました＝Exally の 数を 見張りに 焼き込んで いた★
+     ⇒ 給与（知らせ 1本）で ★中身は 正しいのに 赤★に なった
+     ⇒★決まりは「★塗りを 持つ 知らせは 帯も 持つ★」＝★数では なく 対★ */
+  const 悪い = [], 帯 = [];
   for (const f of 全) {
     for (const r of 知らせの規則(f.字)) {
-      const b = /border-left\s*:\s*(\d+)px\s+solid\s+([^;\n}]+)/.exec(r.中);
-      if (!b) continue;
+      if (!/background(?:-color)?\s*:/.test(r.中)) continue;
+      const b = /border-left\s*:\s*(\d+)px\s+solid\s+([^;}]+)/.exec(r.中);
+      if (!b) { 悪い.push(f.名 + ':' + r.位置 + '  ' + r.名 + '  ★帯が 無い★'); continue; }
       const v = 色に直す(b[2]);
-      if (!v) continue;
-      帯.push({ 所: f.名, 太さ: +b[1], 明: 明るさ(...v.c) });
+      if (!v) { 悪い.push(f.名 + ':' + r.位置 + '  帯の 色が 読めない'); continue; }
+      if (+b[1] > 8) { 悪い.push(f.名 + ':' + r.位置 + '  ★帯が 太すぎる（' + b[1] + 'px）★＝また 塗り面に なる'); continue; }
+      帯.push({ 太さ: +b[1], 明: 明るさ(...v.c) });
     }
   }
-  if (帯.length < 2) throw new Error('★左の 帯が ' + 帯.length + 'か所しか 無い★＝★色が 消えて しまって いる★');
-  const 太い = 帯.filter((x) => x.太さ > 8);
-  if (太い.length) throw new Error('★帯が 太すぎる（' + 太い[0].太さ + 'px）★＝また 塗り面に なる');
-  console.log('      … 左の 帯 ' + 帯.length + 'か所（太さ ' + [...new Set(帯.map((x) => x.太さ))].join('/') + 'px）');
+  if (悪い.length) throw new Error('★' + 悪い.length + 'か所★' + 改行と字下げ + 悪い.join(改行と字下げ));
+  if (!帯.length) throw new Error('★帯が 1つも 無い★＝★色が 消えて しまって いる★');
+  console.log('      … 塗りを 持つ 知らせ ' + 帯.length + 'か所 とも 帯つき（太さ '
+    + [...new Set(帯.map((x) => x.太さ))].join('/') + 'px）');
 });
 
 T('★白地に 白い 字を 置いて いない（★読めなく なって いない★）★', () => {
@@ -193,6 +203,34 @@ if (自己試験) {
     if (写し === hub.字) throw new Error('★写しを 壊せて いない★');
     if (!判じ(写し)) throw new Error('★戻しても 赤に ならない★');
     console.log('      … 戻すと 見つかる');
+  });
+
+  T('★★帯を 1本 外したら 赤に なる（★見逃す側★を 塞いだ 証拠）★★', () => {
+    /* ★★2026-09-10 監査（経営者）が 見つけた 穴★★
+       前は `if (帯.length < 2)` と 書いて いました。
+       ⇒★2本 帯が 在れば、帯の 無い 知らせが 何本 混じって いても 緑★
+         ＝★守りたい物（塗りだけで 帯が 無い 知らせ）を 通して しまう★
+       ⇒★数の 合計では なく ★塗りと 帯の 対★で 見る★に 直した
+       ⇒ この 自己試験は ★その 直しが 効いて いる 証拠★ */
+    const 数える = (字) => {
+      const 悪い = [];
+      for (const r of 知らせの規則(字)) {
+        if (!/background(?:-color)?\s*:/.test(r.中)) continue;
+        if (!/border-left\s*:\s*\d+px\s+solid/.test(r.中)) 悪い.push(r.名);
+      }
+      return 悪い;
+    };
+    /* ★塗りも 帯も 持つ 知らせが 2本、その 上に ★帯の 無い 3本目★ を 足す★ */
+    const 二本 = '#toast{position:fixed;background:#fff;border-left:5px solid #2E7D54;}'
+      + ' .toast{position:fixed;background:#fff;border-left:5px solid #2E7D54;}';
+    if (数える(二本).length) throw new Error('★正しい 2本を 悪いと 言って いる★');
+    const 三本目 = 二本 + ' .toast-shirase{position:fixed;background:#2E7D54;color:#fff;}';
+    const 出 = 数える(三本目);
+    if (!出.length) {
+      throw new Error('★帯の 無い 知らせを 足しても 赤に ならない★'
+        + '＝★前の「2本 在れば 緑」に 戻って いる★');
+    }
+    console.log('      … 帯の 無い 知らせを 1本 混ぜると 赤（' + 出.join('/') + '）');
   });
 
   T('★★薄い 覆い（alpha 0.4）は 赤に しない（★狼少年に しない★）★★', () => {
