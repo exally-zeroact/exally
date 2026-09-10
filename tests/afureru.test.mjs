@@ -369,6 +369,52 @@ T('★★②-3 空マスが 混ざった SORT の 並び（★実Excel と 同�
   console.log('      … 1,2,4,5 の 後ろに 空（★実Excel も 0 を 最後に 置く★）');
 });
 
+T('★★④Excel が 書いた「広がった 先」を じゃま 扱いしない★★', () => {
+  /* ★★2026-09-11 実測で 見つけた 本当の 穴★★
+       ★Excel は 広がった 先の 答えも ファイルに 書きます★
+       SheetJS で 読むと（docs/measured/excel-kara-2026-09-11.xlsx）
+         G1 … {v:1, f:"_xlws.SORT(E1:E5)", ★F:"G1:G5"★}   ← 溢れの 元
+         G2 … {v:1,                        ★F:"G1:G5"★}   ← ★広がった 先（式は 無い）★
+       ⇒ 前は それを ★ただの 数★として 読み、うちの 溢れ先を 塞いで いた
+       ⇒★Excel の SORT / UNIQUE / FILTER が 3つとも #SPILL!★（実測）
+     ★直し方★＝うちが 溢れで 作った マスと ★同じ 印★を 付ける（`v` を 持たせない）
+     ★この 見張りは 実物の ファイルを 通します★（作り物の 板では ない） */
+  const 見本 = path.join(ROOT, 'docs/measured/excel-kara-2026-09-11.xlsx');
+  if (!fs.existsSync(見本)) throw new Error('★見本の xlsx が 無い … ' + 見本 + '★');
+
+  /* ★book-open.js を そのまま 動かす★（写さない） */
+  const 場 = { XLSX: require_(path.join(ROOT, 'lib/xlsx.full.min.js')) };
+  const src = fs.readFileSync(path.join(ROOT, 'js/book-open.js'), 'utf-8');
+  new Function('self', src)(場);
+  const BO = 場.BookOpen;
+  if (!BO || typeof BO.sheetToGrid !== 'function') throw new Error('★book-open.js が 読めない★');
+
+  const wb = 場.XLSX.read(fs.readFileSync(見本), { type: 'buffer', cellFormula: true, cellNF: true, sheetStubs: false });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const 板 = BO.sheetToGrid(ws, wb.SheetNames[0], {});
+
+  /* ★印は book.html と 同じ 字か★＝違うと 画面が 気付かない */
+  const 印 = (本.match(/var 溢れの印 = '([^']+)'/) || [])[1];
+  if (!印) throw new Error('★book.html の 溢れの印が 読めない★');
+  const 印2 = (fs.readFileSync(path.join(ROOT, 'js/book-open.js'), 'utf-8').match(/var 溢れの印 = '([^']+)'/) || [])[1];
+  if (印 !== 印2) throw new Error('★印が 食い違う … book.html「' + 印 + '」／book-open.js「' + 印2 + '」★');
+
+  /* ★G1 は 元＝式を 持つ／G2・G3 は 先＝印が 付いて `v` を 持たない★ */
+  const 元 = 板.data['0,6'];
+  if (!元 || !元.f) throw new Error('★G1 に 式が 無い★');
+  if (元[印]) throw new Error('★溢れの 元にまで 印を 付けて いる★＝式が エンジンに 渡らない');
+  for (const [場所, 名] of [['1,6', 'G2'], ['2,6', 'G3'], ['1,7', 'H2'], ['1,8', 'I2']]) {
+    const 先 = 板.data[場所];
+    if (!先) throw new Error('★' + 名 + ' が 消えて いる★');
+    if (!先[印]) throw new Error('★' + 名 + ' に 印が 無い★＝ただの 数として 溢れ先を 塞ぎます');
+    if (先.v !== '' && 先.v !== undefined && 先.v !== null) {
+      throw new Error('★' + 名 + ' が v を 持って いる（' + JSON.stringify(先.v) + '）★＝塞ぎます');
+    }
+    if (String(先.d) === '') throw new Error('★' + 名 + ' の 出る字が 空★');
+  }
+  console.log('      … 元 G1 は 式／先 G2・G3・H2・I2 は 印つきで v を 持たない');
+});
+
 T('★★③エンジン自身は 溢れ直さない（★癖★・だから 画面が 打ち直す）★★', () => {
   /* ★これは ★エンジンの 話★です★＝画面は ②で 打ち直して 直します
      ★ここが 緑の うちは「画面の 打ち直し」を 外せません★
