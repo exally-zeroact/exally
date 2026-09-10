@@ -88,10 +88,19 @@ function 台を作る(式ファイル) {
     console.error('★book.html は ' + 要る + '本 読むのに、測り台は ' + 積んだ + '本しか 積んで いない★');
     process.exit(2);
   }
-  const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
+  /* ★★本番と 同じ 建て方に する（2026-09-10）★★
+     本番（book.html:1764）は
+       { licenseKey, useArrayArithmetic:true, ★smartRounding:false★, maxRows, maxColumns }
+     ⇒★既定（true）だと エンジンが 答えを 勝手に 丸める★
+       803.6538461538445 が ★803.65384615★ に なって いた（2026-09-09 実測）
+     ⇒ 見張り `tests/hakaridai-mon.test.mjs` が これを 赤に します */
+  const hf = HF0.buildEmpty({
+    licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false,
+    maxRows: 1048576, maxColumns: 18278,
+  });
   const SID = hf.getSheetId(hf.addSheet('S'));
   EF.initExallyFormula(hf);
-  return { hf, SID, 押す: EF._jsComputeFormula, 積んだ };
+  return { hf, SID, 押す: EF._jsComputeFormula, 変換: EF.convertFormula, 積んだ };
 }
 
 /* ══ ★★材料も 正解も ★紙から 読む★（★私が 書き写さない★）★★ ══════
@@ -227,13 +236,33 @@ fs.writeFileSync(仮置き, 前の字);
 const 前台 = 台を作る(仮置き);
 const 後台 = 台を作る(path.join(ROOT, 'exally-formula.js'));
 
+/* ★★JS層で 止めず エンジンまで 通す（2026-09-10 に 直した）★★
+   ★前は JS層が null を 返した 時点で 諦めて いました★
+   ⇒ #57 で LINEST が ★JS層 → エンジン★ に 移った 後、
+     この 道具は ★「JS層が 受け持って いない」を 3本 出し「壊れた 3」と 数えた★
+   ⇒★壊れて いません＝道具が 本番の 道の 途中で 止まって いただけ★
+   ⇒★本番は ①JS層 → ②convertFormula → エンジン★＝★同じ 道で 押す★ */
+const 式の行 = 60;
 function 押す(台, 組) {
+  const 板 = [];
   if (Object.keys(組.材料).length) 材料を敷く(台, 組.材料);
   else 台.hf.setSheetContent(台.SID, [[0]]);
   try {
     const r = 台.押す(0, 組.式);
-    return r === null ? '★JS層が 受け持って いない★' : String(r);
+    if (r !== null && r !== undefined) return String(r);
   } catch (e) { return '★投げた（' + (e && e.message) + '）★'; }
+  /* ★JS層が 受けない＝エンジンに 聞く★ */
+  try {
+    const 盤 = 板;
+    const 元 = 台.hf.getSheetSerialized ? null : null;
+    /* ★材料を もう一度 敷いてから 式を 下に 置く★ */
+    if (Object.keys(組.材料).length) 材料を敷く(台, 組.材料);
+    else 台.hf.setSheetContent(台.SID, [[0]]);
+    台.hf.setCellContents({ sheet: 台.SID, row: 式の行, col: 0 }, 台.変換(組.式));
+    const v = 台.hf.getCellValue({ sheet: 台.SID, row: 式の行, col: 0 });
+    if (v && v.type) return '#' + v.type;
+    return v === null || v === undefined ? '(空)' : String(v);
+  } catch (e) { return '★エンジンで 投げた（' + (e && e.message) + '）★'; }
 }
 
 const 行 = [];
