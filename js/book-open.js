@@ -147,6 +147,29 @@
   /** SheetJS の1シート → グリッドの形 { name, data:{'r,c':{v,f,d,numFmt}}, colW, ... }
    *  tableFixes … 'シート名|r,c' → 表の参照を A1 範囲に直した式（TableRefs が作る）。
    *               ★無い物は元のまま★＝直せなかったセルは触らない。 */
+  /* ★★うちが 溢れで 作った マスと 同じ 印★★
+     ★book.html の `溢れの印` と 同じ 字で なければ なりません★
+     ＝違うと 画面が「これは 溢れの 先だ」と 気付かず、古い 数が 残ります。
+     ★見張り★ … tests/afureru.test.mjs が 両方が 同じ 字か 突き合わせます */
+  var 溢れの印 = '_溢れ元';
+
+  /** ★その マスが「広がった 先」か★＝★元では ない★ */
+  function 溢れの先か(c, rc) {
+    if (c.f !== undefined && c.f !== null && c.f !== '') return false;   // ★式を 持つ＝元★
+    var 元 = 溢れの元の場所(c.F);
+    if (!元) return false;
+    return 元 !== (rc.r + ',' + rc.c);
+  }
+
+  /** ★"G1:G5" → "0,6"★（左上＝溢れの 元）／読めない 時は null */
+  function 溢れの元の場所(F) {
+    var m = /^([A-Z]+)(\d+):/.exec(String(F || ''));
+    if (!m) return null;
+    var c = 0, s = m[1];
+    for (var i = 0; i < s.length; i++) c = c * 26 + (s.charCodeAt(i) - 64);
+    return (Number(m[2]) - 1) + ',' + (c - 1);
+  }
+
   function sheetToGrid(ws, name, tableFixes) {
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
@@ -157,6 +180,27 @@
         var fixed = fixes[name + '|' + rc.r + ',' + rc.c];
         cell.f = fixed !== undefined ? fixed : ('=' + c.f);
         cell.d = c.v !== undefined && c.v !== null ? c.v : '';   // ★ファイルの答え（キャッシュ）をそのまま出す★
+      } else if (c.F && 溢れの先か(c, rc)) {
+        /* ══ ★★Excel が 書き込んだ「広がった 先の 答え」★★（2026-09-11）══════
+           ★実物で 測った 事★（docs/measured/toru-excel-kara.ps1 で 作った ファイルを
+             SheetJS で 読んだ … 2026-09-11）
+               G1 … {v:1, f:"_xlws.SORT(E1:E5)", ★F:"G1:G5"★}   ← 溢れの 元
+               G2 … {v:1,                        ★F:"G1:G5"★}   ← ★広がった 先★（式は 無い）
+               G3 … {v:3,                        ★F:"G1:G5"★}
+           ⇒★Excel は 広がった 先の 答えも ファイルに 書きます★
+           ⇒ 前は それを ★ただの 数★として 読んで いた
+             ⇒ うちの エンジンから 見ると ★溢れ先が 塞がって いる★
+             ⇒★#SPILL! ＝ Excel の SORT / UNIQUE / FILTER が 全部 開けない★
+                （2026-09-11 実測 … G1・H1・I1 の 3つとも #SPILL!）
+           ⇒★うちが 溢れで 作った マスと 同じ 印を 付けます★（book.html の `溢れの印`）
+             ＝`v` を 持たせない ⇒ `_pushGrid` は null を 送る ⇒ 塞がない
+             ⇒ うちの エンジンが 溢れ直し、`_溢れを写す` が 中身を 入れ直す
+           ★断り★＝うちが その 関数を 計算できない 時は、
+             ファイルに 在った 答えは ★消えます★（元の 式が エラーに なる）。
+             前は「全部 #SPILL!」だったので ★どちらでも 出ません★が、
+             ★出なく なる 物が 在る事は 書いて おきます★ */
+        cell.d = c.v !== undefined && c.v !== null ? c.v : '';
+        cell[溢れの印] = 溢れの元の場所(c.F);
       } else {
         cell.v = c.v !== undefined && c.v !== null ? c.v : '';
         cell.d = c.w !== undefined ? c.w : cell.v;               // w = Excelが表示していた文字
