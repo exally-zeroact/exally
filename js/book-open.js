@@ -317,6 +317,33 @@
       }
       data[rc.r + ',' + rc.c] = cell;
     });
+    /* ══ ★★結合した マスを 読む★★（2026-09-11）══════════════════════════
+       ★前は 1組も 読んで いませんでした★（`!merges` を 一度も 見て いない）
+       ⇒ 実Excel で ★G1:H1★ と 2マス分 に 広げて ある 所を 1マス分と して 扱い、
+         字が 入らず ★`######`★ に なって いました
+         実測 … 司さんの 実物「給料表」G1「640,098 円」/ 幅59点（本当は 2マス分）
+       ★画面の 持ち方★（book.html と 同じ）
+         元の マス … `mergeEnd = {r, c}`（右下の 場所）
+         中の マス … `merged = {r, c}`（元の 場所）
+       ★SheetJS は `!merges` で くれます★（実測 … 給料表で 24組） */
+    var 結合の数 = 0;
+    (ws['!merges'] || []).forEach(function (m) {
+      if (!m || !m.s || !m.e) return;
+      if (m.s.r === m.e.r && m.s.c === m.e.c) return;      /* ★1マスだけは 結合では ない★ */
+      var 元 = data[m.s.r + ',' + m.s.c];
+      if (!元) 元 = data[m.s.r + ',' + m.s.c] = { v: '', f: '', d: '' };
+      元.mergeEnd = { r: m.e.r, c: m.e.c };
+      for (var r = m.s.r; r <= m.e.r; r++) {
+        for (var c = m.s.c; c <= m.e.c; c++) {
+          if (r === m.s.r && c === m.s.c) continue;
+          var 子 = data[r + ',' + c];
+          if (!子) 子 = data[r + ',' + c] = { v: '', f: '', d: '' };
+          子.merged = { r: m.s.r, c: m.s.c };
+        }
+      }
+      結合の数++;
+    });
+
     var colW = {};
     var 字幅 = 一字の幅(既定の字体);
     (ws['!cols'] || []).forEach(function (col, i) {
