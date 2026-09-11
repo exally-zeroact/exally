@@ -10496,6 +10496,17 @@ function xToC(x){
   }
   var est = Math.max(0, Math.floor(px / (COL_W * scale)) - 5);
   var cx = colX(est);
+  /* ★★当たりが 行き過ぎる 事が 在ります★★（2026-09-11 実測・司さんの 実物で 見つけた）
+     当たりは「全部 既定の 幅／高さ」と 思って 出します。
+     ★既定より 広い（高い）物が 在ると 行き過ぎます★。
+     前は ★前へ 歩くだけ★で、行き過ぎたら 1つ 戻して 終わって いました。
+     ⇒ 実測 … 売上表（列2〜4が 165点・既定は 72点）で scrollLeft=4164 の 時
+        本当は ★列34★ が 見えて いるのに ★51★ と 答えて いた
+     ⇒ 描く 所は ★画面の 外の 列★を 描き、★右へ 動かすと 画面が 真っ白★に なって いました
+     ⇒★今日 幅を 読むように した ので 表に 出ました★（前は 全部 既定の 幅＝当たりが 当たって いた）
+     ⇒★行き過ぎたら 戻ります★ */
+  var _戻 = 0;
+  while(est > 0 && cx > x && _戻 < COLS){ est--; cx -= cW(est); _戻++; }
   for(var c = est; c < COLS; c++){
     var w = cW(c);
     if(w <= 0) continue;                 /* ★隠れている列は 選ばない★ */
@@ -10526,6 +10537,9 @@ function yToR(y){
   }
   var est = Math.max(0, Math.floor(py / (ROW_H * scale)) - 5);
   var ry = rowY(est);
+  /* ★列と 同じ★＝高い 行が 在ると 当たりが 行き過ぎます（上の xToC に 実測が 在ります） */
+  var _戻2 = 0;
+  while(est > 0 && ry > y && _戻2 < ROWS){ est--; ry -= rH(est); _戻2++; }
   for(var r = est; r < ROWS; r++){
     var h = rH(r);
     if(h <= 0) continue;                 /* ★隠れている行は 選ばない（Excelと同じ）★ */
