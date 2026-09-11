@@ -2656,18 +2656,19 @@ var マスの余白 = 3;
  *    開いた ブックでも ★12★ と 出て いました（実Excel は 11） */
 function _マスの字大の札(cell) {
   var 板 = sheets[activeSheet];
-  return (cell && cell.fontSize) || (板 && 板.既定の字大) || 12;
+  return (cell && cell.fontSize) || (板 && 板.既定の字大) || 11;
 }
 function _マスの字大(cell) {
   var 板 = sheets[activeSheet];
-  var 既定 = (!cell || !cell.fontSize) && 板 && 板.既定の字大 ? 板.既定の字大 * 96 / 72 : 12;
+  /* ★新しい ブックも 実Excel と 同じ★＝游ゴシック 11pt（2026-09-11 司さんの 決め） */
+  var 既定 = ((!cell || !cell.fontSize) && 板 && 板.既定の字大 ? 板.既定の字大 : 11) * 96 / 72;
   return Math.max(9, Math.min(72, Math.round(((cell && cell.fontSize) || 既定) * scale)));
 }
 function _マスの書体(cell) {
   var 板 = sheets[activeSheet];
   if (cell && cell.fontName) return '"' + cell.fontName + '","Noto Sans JP",sans-serif';
-  var 既定名 = 板 && 板.既定の字体名 ? 板.既定の字体名 : '';
-  return 既定名 ? ('"' + 既定名 + '","Noto Sans JP",sans-serif') : '"Noto Sans JP",sans-serif';
+  var 既定名 = (板 && 板.既定の字体名) ? 板.既定の字体名 : '游ゴシック';
+  return '"' + 既定名 + '","Yu Gothic","Noto Sans JP",sans-serif';
 }
 
 function _字の元(cell) {
@@ -9622,7 +9623,15 @@ window.addEventListener('load',updateBookVerBadge);
 
 <script>
 // ===== 定数 =====
-var ROW_H = 22, COL_W = 80, HDR_W = 46, HDR_H = 22, ROWS = 1048576, COLS = 16384;
+/* ★★実Excel の 既定に 揃えました★★（2026-09-11 司さん「フォントと揃えとけや」）
+   ★実Excel に 聞いた 値★（新しい ブックを 作って COM で 測った）
+     標準の 列幅 … 8.44字 ＝★72点★（うちは 80点＝広かった）
+     標準の 行高 … 17.7pt ＝★23.5点★（うちは 22点）
+     字体       … ★游ゴシック 11pt★（うちは Noto Sans JP 12点＝細かった）
+   ⇒ 広くて 細いので ★同じ マスに 桁が 多く 入って★ いました
+     実測 … =1/3 … 実Excel「0.333333」6桁 ／ うち「0.333333333」9桁
+   ⇒★ファイルから 開いた ブックは 09-11 に 揃えました★／ここは ★新しく 作る 方★ */
+var ROW_H = 24, COL_W = 72, HDR_W = 46, HDR_H = 22, ROWS = 1048576, COLS = 16384;
 /* ★見出しを 消せる様に する★（表示タブ／実Excelの 既定は 出す）2026-08-29
    ★元の 数は 変えない★＝消す時だけ 0 として 使う（戻した時に 元へ 帰る） */
 var HDR_W0 = HDR_W, HDR_H0 = HDR_H;
