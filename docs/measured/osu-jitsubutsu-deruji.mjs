@@ -115,65 +115,105 @@ try {
        ⇒★予約して から 待って、それから 読みます★
      ★画面に 出て いる 所しか 描かれません★
        ⇒★画面を 動かしながら 何度も 描いて 集めます★（お客さんと 同じ 動かし方） */
+  /* ★★どの マスを 描いた 時の 字かを 直に 取ります★★（2026-09-11）
+     ★★前の 版は 座標で 当てて いて、取りこぼしました★★
+       画面は 描く 途中で ★自分で スクロールの 値を 動かして 戻します★（固定・分割の 為）。
+       ⇒ 描いた 時と 読む 時で ずれ、★売上表で 933マスが「空」に 見えました★。
+       ⇒★絵を 撮ったら ちゃんと 出て いました★＝★物差しの 方が 間違い★。
+     ⇒★`drawText(r, c)` を 包んで、その 中で 出た 字を そのまま 受けます★
+       ＝★座標の 当て推量が 1つも 要りません★ */
   await page.evaluate(() => {
-    window.__箱 = [];
-    const 元 = CanvasRenderingContext2D.prototype.fillText;
+    window.__字 = {};
+    const 元描く = window.drawText;
+    const 元字 = CanvasRenderingContext2D.prototype.fillText;
+    let 今 = null;
+    window.__座 = [];
     CanvasRenderingContext2D.prototype.fillText = function (t, x, y) {
-      try { window.__箱.push([String(t), x, y]); } catch (e) { /* 何も しない */ }
-      return 元.apply(this, arguments);
+      try {
+        if (今) { if (window.__字[今] === undefined) window.__字[今] = String(t); }
+        else {
+          /* ★★`drawText` を 通らない 描き所が 在ります★★（2026-09-11 実測）
+             ★結合した マスは `_renderPass` の 中で 直に 描いて います★
+             ⇒ その分は ★場所で 拾います★（絶対の 位置＝画面の ずれを 足し戻す） */
+          window.__座.push([String(t), x + scrollLeft - HDR_W, y + scrollTop - HDR_H]);
+        }
+      } catch (e) { /* 何も しない */ }
+      return 元字.apply(this, arguments);
     };
-    /* ★どこまで 動かすか★＝マスの 場所から 決める（当て推量の 数を 使わない） */
-    window.__動かして描く = (r, c) => {
+    window.drawText = function (r, c) {
+      const 前 = 今;
+      今 = r + ',' + c;
+      try { return 元描く.apply(this, arguments); } finally { 今 = 前; }
+    };
+    /* ★動かす 順番を 先に 作ります★＝`render()` は ★予約だけ★なので
+       まとめて 呼ぶと ★最後の 1回しか 描かれません★（実測 … 239マスしか 取れなかった）
+       ⇒★1歩 動かして 1回 待つ★を 繰り返します */
+    window.__順番 = () => {
       const sh = sheets[activeSheet];
-      let y = 0; for (let i = 0; i < r; i++) y += (sh.rowH[i] || ROW_H);
-      let x = 0; for (let j = 0; j < c; j++) x += (sh.colW[j] || COL_W);
-      scrollTop = Math.max(0, y - ROW_H * 3);
-      scrollLeft = Math.max(0, x - COL_W * 2);
-      window.__箱.length = 0;
-      render();
+      let maxR = 0, maxC = 0;
+      for (const k in sh.data) { const p = k.split(','); if (+p[0] > maxR) maxR = +p[0]; if (+p[1] > maxC) maxC = +p[1]; }
+      const 縦 = []; { let y = 0, r = 0; while (r <= maxR) { 縦.push(y); let d = 0, m = 0;
+        while (r + m <= maxR && d < 300) { d += (sh.rowH[r + m] || ROW_H); m++; } y += d; r += m; } }
+      const 横 = []; { let x = 0, c = 0; while (c <= maxC) { 横.push(x); let d = 0, n = 0;
+        while (c + n <= maxC && d < 400) { d += (sh.colW[c + n] || COL_W); n++; } x += d; c += n; } }
+      const 出 = [];
+      for (const y of 縦) for (const x of 横) 出.push([y, x]);
+      return 出;
     };
-    window.__読む = (r, c) => {
-      const x = colX(c), y = rowY(r), w = cW(c), h = rH(r);
-      for (const [t, tx, ty] of window.__箱) {
-        if (tx >= x - 1 && tx <= x + w + 1 && ty >= y - 1 && ty <= y + h + 1) return t;
-      }
-      return '';
-    };
+    window.__一歩 = (y, x) => { scrollTop = y; scrollLeft = x; render(); };
   });
+
+  /* ★1歩 動かして 1回 待つ★（`render()` は 予約だけ） */
+  const 順 = await page.evaluate(() => window.__順番());
+  console.log('★動かす 回数 … ' + 順.length + '★');
+  for (let i = 0; i < 順.length; i++) {
+    await page.evaluate(([y, x]) => window.__一歩(y, x), 順[i]);
+    await page.waitForTimeout(45);
+  }
+  await page.waitForTimeout(500);
+  const 集め = await page.evaluate(() => window.__字);
+  console.log('★描かれた マス … ' + Object.keys(集め).length + '★');
 
   const 場所 = (n) => {
     const m = /^([A-Z]+)([0-9]+)$/.exec(n);
     let c = 0; for (const ch of m[1]) c = c * 26 + (ch.charCodeAt(0) - 64);
     return { r: Number(m[2]) - 1, c: c - 1 };
   };
-  /* ★★同じ 辺りは 1回だけ 描いて、まとめて 読みます★★
-     1マスずつ 行き来すると 大きい 板（468行×131列 など）で 終わりません */
-  const 束 = new Map();
+  const 描いた = {};
+  const まだ = [];
   for (const e of 実) {
     const p = 場所(e.マス);
-    const 辺り = Math.floor(p.r / 10) + ',' + Math.floor(p.c / 5);
-    if (!束.has(辺り)) 束.set(辺り, []);
-    束.get(辺り).push({ 名: e.マス, r: p.r, c: p.c });
+    const v = 集め[p.r + ',' + p.c];
+    描いた[e.マス] = v === undefined ? '' : v;
+    if (v === undefined) まだ.push({ 名: e.マス, r: p.r, c: p.c });
   }
-  const 描いた = {};
-  let 済 = 0;
-  for (const [, 組] of 束) {
-    await page.evaluate(([r, c]) => window.__動かして描く(r, c), [組[0].r,組[0].c]);
-    await page.waitForTimeout(90);
-    const 出 = await page.evaluate((組) => 組.map((x) => window.__読む(x.r, x.c)), 組);
-    組.forEach((x, i) => { 描いた[x.名] = 出[i]; });
-    /* ★★取れなかった 分は 1マスずつ 測り直します★★（2026-09-11）
-       まとめて 描くと ★端の マスが 画面の 外★に 出る 事が 在ります。
-       ★空を「うちは 何も 出さない」と 決めつけない★＝★もう一度 そのマスに 寄って 測る★
-       （実際 118マスが これで ★取れて いなかっただけ★でした） */
-    for (const x of 組) {
-      if (描いた[x.名] !== '') continue;
-      await page.evaluate(([r, c]) => window.__動かして描く(r, c), [x.r, x.c]);
-      await page.waitForTimeout(90);
-      描いた[x.名] = await page.evaluate(([r, c]) => window.__読む(r, c), [x.r, x.c]);
+  /* ★★取れなかった 分は その マスに 寄って もう一度★★
+     ★空を「うちは 何も 出さない」と 決めつけない★＝
+     2026-09-11 に ★933マスを 穴だと 見誤り★ました（絵を 撮ったら 出て いた） */
+  if (まだ.length) {
+    console.log('★もう一度 寄って 測る … ' + まだ.length + 'マス★');
+    for (const x of まだ) {
+      await page.evaluate(([r, c]) => {
+        const sh = sheets[activeSheet];
+        let y = 0; for (let i = 0; i < r; i++) y += (sh.rowH[i] || ROW_H);
+        let X = 0; for (let j = 0; j < c; j++) X += (sh.colW[j] || COL_W);
+        window.__一歩(Math.max(0, y - ROW_H), Math.max(0, X - COL_W));
+      }, [x.r, x.c]);
+      await page.waitForTimeout(45);
+      const v = await page.evaluate(([k, r, c]) => {
+        if (window.__字[k] !== undefined) return window.__字[k];
+        /* ★結合した マス＝場所で 拾う★（その マスの 箱に 入って いる 字） */
+        const sh = sheets[activeSheet];
+        let y = 0; for (let i = 0; i < r; i++) y += (sh.rowH[i] || ROW_H);
+        let X = 0; for (let j = 0; j < c; j++) X += (sh.colW[j] || COL_W);
+        const w = (sh.colW[c] || COL_W), h = (sh.rowH[r] || ROW_H);
+        for (const [t, tx, ty] of window.__座) {
+          if (tx >= X - 2 && tx <= X + w + 2 && ty >= y - 2 && ty <= y + h + 2) return t;
+        }
+        return undefined;
+      }, [x.r + ',' + x.c, x.r, x.c]);
+      if (v !== undefined) 描いた[x.名] = v;
     }
-    済 += 組.length;
-    if (済 % 500 < 組.length) console.log('  … ' + 済 + ' / ' + 実.length);
   }
 
   行.push('# ★司さんの実物の「出る字」を うちと 突き合わせた★（2026-09-11）');
