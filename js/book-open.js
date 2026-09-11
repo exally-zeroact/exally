@@ -47,9 +47,11 @@
          ③★VBAは 動かさない★（うちはブラウザ。Windows＋マクロ有効化が要る物は 勧めない）
          ④★VBAが要る仕事は うちの側（レシピ）で済ませる★＝画面でも そう言う */
       var hasVba = false;
+      var _zip = null;
       if (kind !== 'xls' && root.ZipSurgeon) {
         try {
           var z = root.ZipSurgeon.read(bytes);
+          _zip = z;
           if (z.has('xl/workbook.bin')) kind = 'xlsb';
           else if (z.has('xl/vbaProject.bin')) { kind = 'xlsm'; hasVba = true; }
           else if (z.has('xl/workbook.xml')) kind = 'xlsx';
@@ -66,6 +68,22 @@
            今のまま … 309ms / 236ms ／ 山 21MB ／★幅が 来た板 0/15★
            足した後 … 276ms / 263ms ／ 山 26MB ／★幅が 来た板 15/15★
            ⇒★遅く なりません★（山は +5MB） */
+      /* ══ ★★字体は ★借り物より 先に★ 読みます★★（2026-09-11）══════════════
+         ★後から 読もうとしたら ファイルが 開かなく なりました★（120秒 待っても 開かない）
+         ⇒ 切り分けた … ★袋から 1本 取り出す 所★で 返って 来ない
+         ⇒★画面の 中で 直に 試すと 速い★（袋 1ms／styles 1ms／字体 3ms・3,432マス）
+         ⇒★違いは 順番★＝借り物の `XLSX.read` の 後だと 元の バイト列が 使えなく なる
+         ⇒★だから 先に 読みます★（板の 名前も `workbook.bin` から 自分で 取るので
+           借り物を 待つ 必要が 在りません）
+         ★時間切れ 5秒★＝★ファイルが 開く 事の 方が ずっと 大事★ */
+      var 字体待ち = Promise.resolve(null);
+      if (kind === 'xlsb' && _zip && root.XlsbEdit && root.XlsbJitai) {
+        try {
+          var 遅い = new Promise(function (ok) { setTimeout(function () { ok(null); }, 5000); });
+          字体待ち = Promise.race([字体を読む(_zip), 遅い]).catch(function () { return null; });
+        } catch (e) { 字体待ち = Promise.resolve(null); }
+      }
+      return 字体待ち.then(function (字体表) {
       var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
 
       /* ★表の名前での参照（Table[列名]）を、実際のA1範囲に直す★（2026-08-18）
@@ -104,17 +122,18 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表); });
+      });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
       既定の字体 = (wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0]) ? wb.Styles.Fonts[0] : null;
-      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes); });
+      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
          ★計算し直した瞬間に 46043 と食い違い、全部「変わった」ことになる★
@@ -143,6 +162,51 @@
       };
       return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null,
         表の断り: tr断り || [] };
+  }
+
+  /** ★袋から 1本 取り出す★（縮んで いれば ほどく） */
+  function 袋から(z, 名) {
+    var e = null, list = z.entries || [];
+    for (var i = 0; i < list.length; i++) if (list[i].name === 名) { e = list[i]; break; }
+    if (!e) return Promise.resolve(null);
+    if (e.method === 0) return Promise.resolve(e.raw);
+    return Promise.resolve(root.ZipSurgeon.inflateRaw(e.raw)).then(function (b) {
+      return b ? new Uint8Array(b) : null;
+    });
+  }
+
+  /** ★.xlsb の「板ごと・マスごとの 字体」を 読む★ … { 板の名前: { 'r,c': {pt,名} } }
+   *  ★読めなければ null★＝断って 元のまま（勝手に 直さない） */
+  function 字体を読む(z) {
+    var XE = root.XlsbEdit, JT = root.XlsbJitai;
+    return Promise.all([
+      袋から(z, 'xl/styles.bin'),
+      袋から(z, 'xl/workbook.bin'),
+      袋から(z, 'xl/_rels/workbook.bin.rels'),
+    ]).then(function (三つ) {
+      if (!三つ[0] || !三つ[1] || !三つ[2]) return null;
+      var sp = XE.parse(三つ[0]), wp = XE.parse(三つ[1]);
+      if (!sp.ok || !wp.ok) return null;
+      var 字 = '';
+      for (var i = 0; i < 三つ[2].length; i++) 字 += String.fromCharCode(三つ[2][i]);
+      var 対応 = JT.板とファイル(wp.recs, 字);
+      if (!対応) return null;
+      var 名ら = Object.keys(対応), 仕事 = [], 出 = {};
+      for (var k = 0; k < 名ら.length; k++) {
+        (function (名) {
+          仕事.push(袋から(z, 対応[名]).then(function (sb) {
+            if (!sb) return;
+            var p2 = XE.parse(sb);
+            if (!p2.ok) return;
+            var 表 = JT.板の字体(sp.recs, p2.recs);
+            if (表) 出[名] = 表;
+          }, function () { /* 1枚 読めなくても 他は 使う */ }));
+        })(名ら[k]);
+      }
+      return Promise.all(仕事).then(function () {
+        return Object.keys(出).length ? 出 : null;
+      });
+    }, function () { return null; });
   }
 
   /* ★日本語の曜日（aaa / aaaa）を先に本物の文字へ置き換える★
@@ -268,7 +332,7 @@
     return 0;
   }
 
-  function sheetToGrid(ws, name, tableFixes) {
+  function sheetToGrid(ws, name, tableFixes, 字体) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
@@ -367,6 +431,26 @@
        ⇒ これが 無いと ★Excel 8桁／うち 11桁★の ままです（実測）
        ⇒★この 板だけの 既定★＝新しく 作る ブックの 既定は 動かしません */
     var 標準の点 = Math.round(標準の字数 * 字幅 + 5);
+    /* ★★マスごとの 字体を 足す★★（2026-09-11）
+       ★借り物は .xlsb の 字体を くれません★（司さんの 実物 35,760マス中 ★0マス★）
+       ⇒ `lib/xlsb-jitai.js` で 自分で 読んだ 物を ここで 付けます
+       ⇒ 付けないと 実Excel が 9pt で 書いた 所を 11pt で 描き ★`######`★ に なります */
+    if (字体) {
+      for (var jk in 字体) {
+        var jc = data[jk];
+        if (!jc) continue;
+        if (字体[jk].pt) jc.fontSize = 字体[jk].pt;
+        if (字体[jk].名) jc.fontName = 字体[jk].名;
+        /* ★★164未満の 書式番号は 国で 中身が 変わります★★＝借り物は 日本の 物を くれない
+           ★借り物は ★間違った 字★を 言う 事が 在ります★（実測 2026-09-11）
+             55番 … 実Excel「yyyy"年"m"月"」／借り物「m/d/yy」
+             ⇒ D1 は 何も 言わず 直せたが、D45 は `m/d/yy` と 言って いて 直せなかった
+           ⇒★測った 番号は こちらが 勝ちます★
+             （ここに 書くのは ★実Excel に 聞いて 測った 番号だけ★＝当て推量で 増やさない） */
+        if (字体[jk].書式) jc.numFmt = 字体[jk].書式;
+      }
+    }
+
     return { name: name, data: data, colW: colW, 既定の列幅: 標準の点,
       /* ★その ブックの 既定の 字体★＝画面も 同じ 字で 描く
          ⇒ 同じ 幅に 入る 桁数が 実Excel と 揃う（うちの 字は 細くて 多く 入って いた） */
