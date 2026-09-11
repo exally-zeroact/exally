@@ -298,7 +298,13 @@ function testWiring(pages, opens) {
   }
   const open = fs.readFileSync(path.join(ROOT, 'js', 'book-open.js'), 'utf8');
   ok(/TableRefs\.resolve\(/.test(open), '★book-open.js が TableRefs.resolve を呼んでいる');
-  ok(/sheetToGrid\(wb\.Sheets\[nm\], nm, trFixes\)/.test(open), '★直した式が画面の形に渡っている');
+  /* ★★2026-09-11 … 字面から 中身の 検査に 変えました★★
+     ★変えた 訳★＝`sheetToGrid` に ★字体★を 渡す 引数が 増えた（.xlsb の 字体を 自分で 読む 為）。
+       `sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null)`
+     ★守る 中身は 同じ★＝★直した 式（trFixes）が 画面の 形に 渡って いる★
+     ★字面だけ 見て いると 中身が 同じでも 赤に なります★（今日 4本目） */
+  ok(open.indexOf("sheetToGrid(wb.Sheets[nm], nm, trFixes") >= 0,
+    '★直した式が画面の形に渡っている');
   ok(fs.existsSync(path.join(ROOT, 'lib', 'table-refs.js')), 'lib/table-refs.js が実在する');
 }
 
