@@ -11,6 +11,8 @@ const FILES = [
   ['sql-guard.test.mjs', '--self-test'],  // ★倉庫にSQLを当てる門番（本番の実データが同居している）★
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
   ['shini-code.test.mjs'],                     // ★呼ばれない 物を 置いたままに しない（2026-09-11 下請け4本を 消した）★
+  ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★
+  ['kumikomi-shoshiki.test.mjs'],              // ★国で 変わる 書式番号38／15桁に 丸めてから 出す（実物で 見つけた）★
   ['moji-no-kotae.test.mjs'],                  // ★文字を 返す 式が 数に 化けない（2026-09-11 実Excel 14本 一致）★
   ['hashira-haba.test.mjs'],                   // ★列の 幅を 実Excel と 同じに する（2026-09-11 実測 8列 差0.00）★
   ['filter-shape.test.mjs', '--self-test'],    // ★FILTERの形／_xlws.の印／範囲の鎖（実物52+10本が これで合う）★
