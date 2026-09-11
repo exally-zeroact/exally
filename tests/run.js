@@ -11,6 +11,11 @@ const FILES = [
   ['sql-guard.test.mjs', '--self-test'],  // ★倉庫にSQLを当てる門番（本番の実データが同居している）★
   ['empty-ref-zero.test.mjs', '--self-test'],  // ★式が空セルを指したら Excelは0（実物2,918本が これで合う）★
   ['shini-code.test.mjs'],                     // ★呼ばれない 物を 置いたままに しない（2026-09-11 下請け4本を 消した）★
+  ['shiki-kiru.test.mjs'],
+  ['shiki-katachi.test.mjs'],
+  ['shiki-sansho.test.mjs'],                   // ★参照を 読む（地図を 作る 前に 要る）★                  // ★切った かたまりを 形に する（土台を 自作する 2枚目）★                     // ★式を 字の かたまりに 切る（土台を 自作する 1枚目）★
+  ['shiki-chizu.test.mjs'],                    // ★頼りの 地図＝どの 順に 計算するか★
+  ['shiki-keisan.test.mjs'],                   // ★つなぎ（＋−×÷＾＆ 大小 ％）＝実Excel 162通り★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★
