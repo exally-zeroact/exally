@@ -2004,8 +2004,27 @@ function registerExallyFunctions(HFns) {
       if(isErr(v)) return v;
       if(isErr(fmt)) return fmt;
       var raw = flat(v)[0];
+      /* ★★空の マスは 0★★（2026-09-11 実Excel に 打たせて 測った）
+         ★空の マス★と ★空の 字★は ★別物★です
+           =TEXT(空のマス,"0.00") → ★"0.00"★   （0 として 書式を 掛ける）
+           =TEXT("","0.00")      → ★""★       （字の まま）
+           =TEXT("abc","0.00")   → "abc"      （数に ならない 字は そのまま）
+           =TEXT(" ","0.00")     → " "
+           =TEXT(TRUE,"0.00")    → "TRUE"
+           =TEXT("12","0.00")    → "12.00"    （数に なる 字は 数として）
+         ★見つけ方★＝司さんの 実物（計算の 板）を 1マスずつ 突き合わせた
+           B299 `=TEXT(A299,"aaa")`（A299 は 空）… 実Excel「土」／うち「」
+           （0日目＝1900/1/0 は 土曜） */
+      /* ★★空の マスは ★記号★で 来ます★★（2026-09-11 実測）
+         `unwrap` が 記号を `''` に するので、★空の 字と 見分けが 付かなく なります★。
+         ⇒★記号の うちに 見ます★ */
+      var 生 = (v && typeof v==='object' && v.data) ? [].concat.apply([], v.data)[0]
+             : (Array.isArray(v) ? [].concat.apply([], v)[0] : v);
+      if(typeof 生 === 'symbol') raw = 0;              /* ★空の マス＝0★ */
+      /* ★真偽は 字の まま★（実測 … =TEXT(TRUE,"0.00") → 「TRUE」／うちは 1.00 に して いた） */
+      if(typeof raw === 'boolean') return raw ? 'TRUE' : 'FALSE';
       var n = toNum(raw);
-      if(n===null) return raw===null||raw===undefined ? '' : String(raw);
+      if(n===null) return raw==='' ? '' : String(raw);
       var r = _applyTextFormat(n, String(fmt));
       return r===null ? String(n) : r;
     });

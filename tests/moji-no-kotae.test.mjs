@@ -18,6 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { 注記を外す } from '../scripts/lib/chuki.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -124,6 +125,53 @@ T('★★⑥JS層の 答えは「まだ 見て いない」と 書いて 在る�
   if (本.indexOf('まだ 見て いません') < 0 && 本.indexOf('まだ 測って いません') < 0) {
     throw new Error('★JS層を どう 扱ったかの 断りが 無い★＝未測定を 黙って 緑に しない');
   }
+});
+
+/* ★`async` に しない★＝`T` は 待たないので ★中の 失敗が 届かず 緑に なります★
+   （2026-09-11 実際 そうなり、壊しても 赤に なりませんでした） */
+T('★★⑦TEXT に 空の マスを 渡すと 0（★空の 字とは 別物★）★★', () => {
+  /* ★★実Excel に 打たせて 測った★★（2026-09-11）
+       =TEXT(空のマス,"aaa")   → ★土★     （0日目＝1900/1/0 は 土曜）
+       =TEXT(空のマス,"0.00")  → ★0.00★
+       =TEXT("","aaa")        → ★""★      （★空の 字は そのまま★）
+       =TEXT("abc","0.00")    → "abc"／=TEXT(" ","0.00") → " "
+       =TEXT(TRUE,"0.00")     → ★TRUE★    （うちは 1.00 に して いた）
+       =TEXT("12","0.00")     → "12.00"
+     ★見つけ方★＝司さんの 実物（計算の 板）を 1マスずつ 突き合わせた
+       B299 `=TEXT(A299,"aaa")`（A299 は 空）… 実Excel「土」／うち「」
+     ★★空の マスは ★記号★で 来ます★★＝`unwrap` が `''` に するので
+       ★空の 字と 見分けが 付かなく なります★ ⇒★記号の うちに 見ます★
+     ★まだ 合って いない 1本★（断り）
+       =TEXT(0,"yyyy/m/d") … 実Excel「1900/1/0」／うち「1899/12/30」
+       ＝Excel 独特の「0日目」＝★直して いません★ */
+  /* ★★字を 探すのでは なく 本物を 動かします★★（2026-09-11）
+     ★最初の 版は 字で 探して いて、抜いても 赤に なりませんでした★
+     ⇒★本番と 同じ 台を 建てて 実際に 打ちます★ */
+  const require2 = createRequire(path.join(ROOT, 'package.json'));
+  const HFns = require2(path.join(ROOT, 'hyperformula.full.min.js'));
+  const EF = require2(path.join(ROOT, 'exally-formula.js'));
+  EF.registerExallyFunctions(HFns);
+  const hf = HFns.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true,
+    smartRounding: false, maxRows: 1048576, maxColumns: 18278 });
+  const SID = hf.getSheetId(hf.addSheet('S'));
+  EF.initExallyFormula(hf);
+  hf.setCellContents({ sheet: SID, row: 4, col: 0 }, [['abc']]);
+  const 打つ = (f) => {
+    hf.setCellContents({ sheet: SID, row: 2, col: 1 }, [[EF.convertFormula(f, 'S')]]);
+    const v = hf.getCellValue({ sheet: SID, row: 2, col: 1 });
+    return (v && v.type) ? ('#' + v.type) : String(v == null ? '' : v);
+  };
+  /* ★実Excel に 打たせて 測った 正解★（2026-09-11） */
+  const 正 = [
+    ['=TEXT(A1,"aaa")', '土'], ['=TEXT(A1,"aaaa")', '土曜日'], ['=TEXT(A1,"0.00")', '0.00'],
+    ['=TEXT(0,"aaa")', '土'], ['=TEXT(1,"aaa")', '日'],
+    ['=TEXT("","aaa")', ''], ['=TEXT("abc","0.00")', 'abc'], ['=TEXT(A5,"0.00")', 'abc'],
+    ['=TEXT(" ","0.00")', ' '], ['=TEXT(TRUE,"0.00")', 'TRUE'], ['=TEXT("12","0.00")', '12.00'],
+  ];
+  const 違い = [];
+  for (const [f, 期待] of 正) { const 出 = 打つ(f); if (出 !== 期待) 違い.push(f + ' 実Excel「' + 期待 + '」／うち「' + 出 + '」'); }
+  if (違い.length) throw new Error('★' + 違い.length + '本 違う★  ' + 違い.join(' ／ '));
+  console.log('      … 空のマス＝0／空の字＝そのまま／真偽＝字');
 });
 
 console.log('');
