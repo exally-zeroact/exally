@@ -128,6 +128,14 @@ const 免除 = [
       + '★答えの 正しさは 実Excel が 出して います★'
       + '（docs/measured/toru-jitsubutsu-deruji.ps1 が 同じ ファイルを 開いて 測った）。'
       + '★司さんの 実物と その 紙は repo に 入れて いません★（取引先の 名前・金額）。' },
+  { 名: 'osu-shikaku-kansuu.mjs',
+    訳: '★2026-09-13 の 道具★＝★buildEmpty を 1度も 呼びません★（自分の 台を 建てない）。'
+      + 'やる事は ★実Excel に 打って 取った 紙（golden-shikaku-kansuu-2026-09-13.tsv）★と '
+      + '★見張り（tests/shiki-kansuu.test.mjs）の 中の 37通り★を ★字で 突き合わせる★ 事だけ。'
+      + '⇒★エンジンは 借り物も 自前も 1つも 呼びません★（fs と path しか 使って いません）。'
+      + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
+      + '★答えの 正しさは 実Excel が 出して います★'
+      + '（docs/measured/toru-shikaku-kansuu.ps1 で 40通り 打たせて 測った）。' },
 ];
 
 console.log('\n[hakaridai-mon] ★測り台が 本番と 違うのを 止める★');
