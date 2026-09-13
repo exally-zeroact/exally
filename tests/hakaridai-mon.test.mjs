@@ -144,6 +144,23 @@ const 免除 = [
       + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
       + '★答えの 正しさは 実Excel が 出して います★'
       + '（docs/measured/toru-tsunagi.ps1 で 162通り 打たせて 測った）。' },
+  { 名: 'osu-sashikomi.mjs',
+    訳: '★2026-09-13 の 道具★＝★buildEmpty を 1度も 呼びません★（自分の 台を 建てない）。'
+      + 'やる事は ★実Excel に 打って 取った 紙（golden-sashikomi-2026-09-13.tsv）★と '
+      + '★見張り（tests/shiki-sashikomi.test.mjs）の 中の 17通り★を ★字で 突き合わせる★ 事だけ。'
+      + '⇒★エンジンは 借り物も 自前も 1つも 呼びません★（fs と path しか 使って いません）。'
+      + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
+      + '★答えの 正しさは 実Excel が 出して います★'
+      + '（docs/measured/toru-sashikomi.ps1 で 17通り 打たせて 測った）。' },
+  { 名: 'osu-afure.mjs',
+    訳: '★2026-09-13 の 道具★＝★buildEmpty を 1度も 呼びません★（自分の 台を 建てない）。'
+      + 'やる事は ★実Excel に 打って 取った 紙（golden-afure-2026-09-13.tsv）★と '
+      + '★自前の 溢れの 台（lib/shiki-afure.js）の 答え★を ★字で 突き合わせる★ 事だけ。'
+      + '⇒★読み込むのは lib/shiki-keisan.js と lib/shiki-afure.js の 2本だけ★＝'
+      + '★どちらも 借り物を 1行も 読みません★（借り物を 外す 為に 自分で 書いた 台）。'
+      + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
+      + '★答えの 正しさは 実Excel が 出して います★'
+      + '（docs/measured/toru-afure.ps1 で 16通り 打たせて 測った）。' },
 ];
 
 console.log('\n[hakaridai-mon] ★測り台が 本番と 違うのを 止める★');

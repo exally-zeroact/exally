@@ -17,6 +17,9 @@ const FILES = [
   ['shiki-chizu.test.mjs'],                    // ★頼りの 地図＝どの 順に 計算するか★
   ['shiki-keisan.test.mjs'],                   // ★つなぎ（＋−×÷＾＆ 大小 ％）＝実Excel 162通り★
   ['shiki-kansuu.test.mjs'],                   // ★四角（A1:A3）と 関数＝実Excel 37通り（土台④の 後半）★
+  ['shiki-hyou.test.mjs'],                     // ★本体＝表を持ち 依存を追い 変わった所だけ直す（借り物の 55.2%）★
+  ['shiki-sashikomi.test.mjs'],                // ★行/列の 入れ消しで 式が 追従する＝実Excel 17通り★
+  ['shiki-afure.test.mjs'],                    // ★溢れ＝1つの式が 何マスにも 広がる（実Excel 16通り）★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★
