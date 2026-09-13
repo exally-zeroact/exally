@@ -8,3 +8,5 @@ tests/xlsx-harness/golden/pending-*.json
 #   道具（docs/measured/toru-jitsubutsu-deruji.ps1 ／ osu-jitsubutsu-deruji.mjs）は
 #   手元で 走らせて 手元で 見ます＝★紙は 置いて いきません★
 docs/measured/golden-jitsubutsu-*.tsv
+.wakete-kiroku.json
+lib/shiki-tsunagi.js
