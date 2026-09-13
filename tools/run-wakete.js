@@ -22,15 +22,15 @@
  *    ⇒★作る道を 2本に しない★（名簿を 2本に すると ★片方だけ 増えた試験★が 永久に 走らない）
  *
  *  使い方:
- *    node tests/run-wakete.js --hajime        … 記録を 消して 始める
- *    node tests/run-wakete.js 1 12            … 12に 分けた うちの 1つ目
- *    node tests/run-wakete.js --shime         … ★1枚に まとめて 出す（296本と 突き合わせ）★
+ *    node tools/run-wakete.js --hajime        … 記録を 消して 始める
+ *    node tools/run-wakete.js 1 12            … 12に 分けた うちの 1つ目
+ *    node tools/run-wakete.js --shime         … ★1枚に まとめて 出す（296本と 突き合わせ）★
  */
 'use strict';
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { FILES } = require('./run.js');
+const { FILES } = require('../tests/run.js');
 
 const 記録 = path.join(__dirname, '..', '.wakete-kiroku.json');
 const 引数 = process.argv.slice(2);
@@ -79,7 +79,7 @@ if (引数[0] === '--shime') {
 const 何個目 = Number(引数[0]);
 const 何分割 = Number(引数[1] || 12);
 if (!何個目 || !何分割 || 何個目 < 1 || 何個目 > 何分割) {
-  console.error('使い方: node tests/run-wakete.js <何個目> <何分割>  ／ --hajime ／ --shime');
+  console.error('使い方: node tools/run-wakete.js <何個目> <何分割>  ／ --hajime ／ --shime');
   process.exit(2);
 }
 const 一かたまり = Math.ceil(全部 / 何分割);
@@ -96,7 +96,7 @@ for (const f of 組) {
   let 通った = true;
   try {
     execFileSync(process.execPath,
-      ['--max-old-space-size=4096', path.join(__dirname, file), ...args],
+      ['--max-old-space-size=4096', path.join(__dirname, '..', 'tests', file), ...args],
       { stdio: 'inherit' });
   } catch (e) {
     通った = false; ng++;
