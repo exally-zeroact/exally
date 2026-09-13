@@ -136,6 +136,14 @@ const 免除 = [
       + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
       + '★答えの 正しさは 実Excel が 出して います★'
       + '（docs/measured/toru-shikaku-kansuu.ps1 で 40通り 打たせて 測った）。' },
+  { 名: 'osu-tsunagi.mjs',
+    訳: '★2026-09-11 の 道具★＝★buildEmpty を 1度も 呼びません★（自分の 台を 建てない）。'
+      + 'やる事は ★実Excel に 打って 取った 紙（golden-tsunagi-2026-09-11.tsv）★と '
+      + '★見張り（tests/shiki-keisan.test.mjs）の 中の 162通り★を ★字で 突き合わせる★ 事だけ。'
+      + '⇒★エンジンは 借り物も 自前も 1つも 呼びません★（fs と path しか 使って いません）。'
+      + '⇒★この 道具が 積む 物は 1つも 在りません★（積みようが ない）。'
+      + '★答えの 正しさは 実Excel が 出して います★'
+      + '（docs/measured/toru-tsunagi.ps1 で 162通り 打たせて 測った）。' },
 ];
 
 console.log('\n[hakaridai-mon] ★測り台が 本番と 違うのを 止める★');

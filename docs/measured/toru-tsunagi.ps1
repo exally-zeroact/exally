@@ -1,4 +1,4 @@
-# toru-tsunagi.ps1 — ★実Excel に「つなぎ」を 聞き直す★（2026-09-11）
+﻿# toru-tsunagi.ps1 — ★実Excel に「つなぎ」を 聞き直す★（2026-09-11）
 #
 #   ★★何の 為か★★
 #     `lib/shiki-keisan.js`（＋−×÷＾＆ 大小 ％）の 答えは
@@ -29,6 +29,30 @@ foreach ($m in [regex]::Matches($中, "\['(=[^']*)'\s*,")) { $式たち += $m.Gr
 if ($式たち.Count -lt 100) { throw "★式が $($式たち.Count)本 しか 取れない★（162本 のはず）" }
 Write-Host "★見張りから 取り出した 式 … $($式たち.Count)本★"
 
+# ══ ★★2つ目の 窓（★「0」を 1つの 窓だけで 取らない★）★★ ══
+#   ★この 道具は 画面に 出る 字（.Text）を 見ます★
+#   ⇒★狭い 列では ★0で ない 小さい 数が「0」に 見える★★
+#   ⇒★字が「0」に 見えた 時は 実Excel に ★=(A2)=0★ を 打って
+#     ★本当に 0 か★を 聞く★（.Value2 だけ／字だけ では 見分けが 付かない）
+#   ⇒★型も 一緒に 取る★（String と Number を 取り違えない）
+function 窓２_型($v) {
+  if ($null -eq $v) { return 'Empty' }
+  if ($v -is [string]) { return 'String' }
+  if ($v -is [bool]) { return 'Boolean' }
+  if ($v -is [double] -or $v -is [int] -or $v -is [long]) { return 'Number' }
+  return 'Other'
+}
+function 窓２_本当にゼロか($sh, [string]$マス) {
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $マス + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $x = New-Object -ComObject Excel.Application
 $x.Visible = $false
 $x.DisplayAlerts = $false
@@ -39,12 +63,20 @@ $ws.Columns.Item(1).ColumnWidth = 60    # ★字が 切れると 測り違える
 $out = @()
 $out += "# ★実Excel に「つなぎ」を 打って 読んだ 紙★（2026-09-11）"
 $out += "# ★D1 は 空マス★／★列の 幅を 60に 広げて 字が 切れないように して 在る★"
-$out += "# 打った字`t出た字`t中の値"
+$out += "# ★型★と★本当にゼロか★も 取って います（「0」を 1つの 窓だけで 取らない）"
+$out += "# 打った字`t出た字`t中の値`t型`t本当にゼロか"
 $r = 2                                   # ★1行目は 使わない★（D1 を 空の ままに する為 上の 行に 書く）
 foreach ($f in $式たち) {
   $c = $ws.Range('A' + $r)
-  try   { $c.Formula = $f; $out += ($f + "`t" + $c.Text + "`t" + $c.Value2) }
-  catch { $out += ($f + "`t★打てない★`t") }
+  try {
+    $c.Formula = $f
+    $字 = [string]$c.Text
+    $v = $c.Value2
+    $型 = 窓２_型 $v
+    $ゼ = if ($字 -match '^-?0(\.0+)?$') { 窓２_本当にゼロか $ws ("A" + $r) } else { "—" }
+    $out += ($f + "`t" + $字 + "`t" + $v + "`t" + $型 + "`t" + $ゼ)
+  }
+  catch { $out += ($f + "`t★打てない★`t`t`t") }
   $r++
 }
 $wb.Close($false)
