@@ -34,16 +34,16 @@ export const 本の道 = 'C:\\Users\\zeroa\\kyukyu-0907\\代行計算表2026.xls
 
 export const 裸に = (f) => String(f).replace(/"(?:[^"]|"")*"/g, '""');
 export const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f));
-const マス拾い = /(^|[^A-Z0-9_."!])(\$?[A-Z]{1,3}\$?[0-9]{1,5})(?![0-9(])/g;
-const 四角拾い = /(\$?[A-Z]{1,3}\$?[0-9]{1,5})\s*:\s*(\$?[A-Z]{1,3}\$?[0-9]{1,5})/g;
-const 番地 = (a) => {
+export const マス拾い = /(^|[^A-Z0-9_."!])(\$?[A-Z]{1,3}\$?[0-9]{1,5})(?![0-9(])/g;
+export const 四角拾い = /(\$?[A-Z]{1,3}\$?[0-9]{1,5})\s*:\s*(\$?[A-Z]{1,3}\$?[0-9]{1,5})/g;
+export const 番地 = (a) => {
   const m = /^\$?([A-Z]{1,3})\$?([0-9]{1,5})$/.exec(a.replace(/\$/g, ''));
   if (!m) return null;
   let c = 0;
   for (let i = 0; i < m[1].length; i++) c = c * 26 + (m[1].charCodeAt(i) - 64);
   return { r: Number(m[2]), c };
 };
-const 名に = (r, c) => { let s = '', x = c; while (x > 0) { const y = (x - 1) % 26; s = String.fromCharCode(65 + y) + s; x = Math.floor((x - 1) / 26); } return s + r; };
+export const 名に = (r, c) => { let s = '', x = c; while (x > 0) { const y = (x - 1) % 26; s = String.fromCharCode(65 + y) + s; x = Math.floor((x - 1) / 26); } return s + r; };
 
 /** ★本を 開いて 表の 参照を 直す★（★読むだけ★） */
 export async function 本を開く() {

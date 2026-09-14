@@ -23,43 +23,33 @@
  *
  *  使い方: node docs/measured/osu-jitsubutsu-awanai37.mjs
  */
-import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 
-const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const require_ = createRequire(path.join(ROOT, 'package.json'));
-const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
-const TR = require_(path.join(ROOT, 'lib/table-refs.js'));
-const ZS = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
-const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
+/* ★★押し方は ここに 書いて いません★★（2026-09-15・指示役1 の ①）
+   ★`osu-jitsubutsu-dodai.mjs` を 呼ぶだけ★です。
+   ★訳★＝★掘る 道具を 書き起こしたら 染まりの 印が 抜けました★
+         ⇒ 本番が 押して いない マスを 押し ★別の マスの 数★を 読みかけた
+         ⇒★「付け忘れ」では ない＝別の 道を 作れば 印は 毎回 抜ける★ */
+const ここ = path.dirname(fileURLToPath(import.meta.url));
+const 土台 = await import(pathToFileURL(path.join(ここ, 'osu-jitsubutsu-dodai.mjs')).href);
+const XLSX = 土台.XLSX;
+const 裸に = 土台.裸に;
+const 板か = 土台.板か;
+/* ★下請けも 土台から 借ります★＝★同じ 物を 2か所に 書かない★ */
+const マス拾い = 土台.マス拾い;
+const 四角拾い = 土台.四角拾い;
+const 番地 = 土台.番地;
+const 名に = 土台.名に;
 
-const 本 = 'C:\\Users\\zeroa\\kyukyu-0907\\代行計算表2026.xlsb';
-if (!fs.existsSync(本)) { console.error('★本体が 無い★'); process.exit(2); }
-const 前 = fs.statSync(本);
-const bytes = new Uint8Array(fs.readFileSync(本));
-const wb = XLSX.read(bytes, { type: 'array', cellFormula: true });
-const 直し = await TR.resolve(bytes, 'xlsb', wb, ZS).then((r) => (r && r.fixes) ? r.fixes : (r || {}));
-
-const 裸に = (f) => String(f).replace(/"(?:[^"]|"")*"/g, '""');
-const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f));
-const マス拾い = /(^|[^A-Z0-9_."!])(\$?[A-Z]{1,3}\$?[0-9]{1,5})(?![0-9(])/g;
-const 四角拾い = /(\$?[A-Z]{1,3}\$?[0-9]{1,5})\s*:\s*(\$?[A-Z]{1,3}\$?[0-9]{1,5})/g;
-const 番地 = (a) => {
-  const m = /^\$?([A-Z]{1,3})\$?([0-9]{1,5})$/.exec(a.replace(/\$/g, ''));
-  if (!m) return null;
-  let c = 0;
-  for (let i = 0; i < m[1].length; i++) c = c * 26 + (m[1].charCodeAt(i) - 64);
-  return { r: Number(m[2]), c };
-};
-const 名に = (r, c) => { let s = '', x = c; while (x > 0) { const y = (x - 1) % 26; s = String.fromCharCode(65 + y) + s; x = Math.floor((x - 1) / 26); } return s + r; };
+const { wb, 直し, 前 } = await 土台.本を開く();
 
 /* ★IFERROR( … , … ) の 1つ目の 引数だけ 取り出す★（★括弧を 数えます★＝正規表現では 切れない） */
 function IFERRORの中(f) {
   const i = f.toUpperCase().indexOf('IFERROR(');
   if (i < 0) return null;
-  let 深 = 0, 字中 = false, 始 = i + 'IFERROR('.length;
+  let 深 = 0, 字中 = false;
+  const 始 = i + 'IFERROR('.length;
   for (let k = 始; k < f.length; k++) {
     const c = f.charAt(k);
     if (c === '"') { 字中 = !字中; continue; }
@@ -85,58 +75,10 @@ const 伏せ = (x) => String(x).replace(/[0-9]/g, '9');
 const 板ごとの式 = {};
 
 for (let si = 0; si < wb.SheetNames.length; si++) {
-  const 名 = wb.SheetNames[si];
-  const ws = wb.Sheets[名];
-  if (!ws || !ws['!ref']) continue;
-  const R = XLSX.utils.decode_range(ws['!ref']);
-  const 式たち = {}, 値たち = {};
-  for (let r = R.s.r; r <= R.e.r; r++) {
-    for (let c = R.s.c; c <= R.e.c; c++) {
-      const a = XLSX.utils.encode_cell({ r, c });
-      const s = ws[a];
-      if (!s) continue;
-      if (s.f) 式たち[a] = (直し[名 + '|' + r + ',' + c] !== undefined) ? String(直し[名 + '|' + r + ',' + c]) : ('=' + s.f);
-      if (s.v !== undefined && s.v !== null) 値たち[a] = s;
-    }
-  }
-  /* ★染まりを 印す（四角の 中まで）★ */
-  const 染 = {};
-  for (const a of Object.keys(式たち)) if (板か(式たち[a])) 染[a] = true;
-  for (let 回 = 0; 回 < 80; 回++) {
-    let 増 = 0;
-    for (const a of Object.keys(式たち)) {
-      if (染[a]) continue;
-      const f = 裸に(式たち[a]);
-      let 当 = false;
-      四角拾い.lastIndex = 0;
-      let q;
-      while ((q = 四角拾い.exec(f)) !== null && !当) {
-        const p1 = 番地(q[1]), p2 = 番地(q[2]);
-        if (!p1 || !p2) continue;
-        const r0 = Math.min(p1.r, p2.r), r1 = Math.max(p1.r, p2.r);
-        const c0 = Math.min(p1.c, p2.c), c1 = Math.max(p1.c, p2.c);
-        if ((r1 - r0 + 1) * (c1 - c0 + 1) > 200000) { 当 = true; break; }
-        for (let rr = r0; rr <= r1 && !当; rr++) for (let cc = c0; cc <= c1; cc++) if (染[名に(rr, cc)]) { 当 = true; break; }
-      }
-      if (!当) { マス拾い.lastIndex = 0; let m; while ((m = マス拾い.exec(f)) !== null) if (染[m[2].replace(/\$/g, '')]) { 当 = true; break; } }
-      if (当) { 染[a] = true; 増++; }
-    }
-    if (!増) break;
-  }
-
+  const 板 = 土台.板を押す(wb, 直し, si);
+  if (!板) continue;
+  const { 名, 式たち, 値たち, 染, 表 } = 板;
   板ごとの式[名] = 式たち;
-  const 表 = H.表();
-  for (const a of Object.keys(値たち)) {
-    if (式たち[a]) continue;
-    const s = 値たち[a];
-    if (typeof s.v === 'number') { 表.打つ(a, String(s.v)); continue; }
-    表.打つ(a, 'x');
-    if (表.中身 && 表.中身[a]) {
-      表.中身[a].値 = (typeof s.v === 'boolean') ? { 型: '真偽', 値: s.v } : { 型: '字', 値: String(s.v) };
-      表.中身[a].打った字 = String(s.v);
-    }
-  }
-  for (const a of Object.keys(式たち)) if (!板か(式たち[a]) && !染[a]) 表.打つ(a, 式たち[a]);
 
   for (const a of Object.keys(式たち)) {
     if (板か(式たち[a]) || 染[a]) continue;
@@ -276,10 +218,10 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
   }
 }
 
-const 後 = fs.statSync(本);
+const 本 = 土台.触っていないか(前);
 console.log('# ★合わない 37本の 中を 見た★（2026-09-15）');
-console.log('#   ★読むだけ★ … ' + 後.size + ' バイト … '
-  + ((前.mtimeMs === 後.mtimeMs && 前.size === 後.size) ? '★動いて いません★' : '★★動いた★★'));
+console.log('#   ★読むだけ★ … ' + 本.大きさ + ' バイト … ' + 本.字);
+console.log('#   ★押し方は `osu-jitsubutsu-dodai.mjs` に 1つだけ★（この 道具は 呼ぶだけ）');
 console.log('#   ★出すのは 数と 関数の 名前だけ★');
 console.log('');
 console.log('★合わない★ … ' + 合わない + '本');
