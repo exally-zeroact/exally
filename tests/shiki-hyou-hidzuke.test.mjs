@@ -113,6 +113,39 @@ T('★★通し番号の 出し方が 2か所で 同じ★★（lib/formula-soto
   }
 });
 
+T('★★通し番号は 3か所とも 同じ★★（shiki-hyou ／ formula-soto ／ formula-kane）', () => {
+  const KANE = require_(path.join(ROOT, 'lib/formula-kane.js'));
+  const h = H.表();
+  for (const [y, m, d] of [[2024, 1, 15], [2026, 1, 1], [2000, 2, 29], [1999, 12, 31]]) {
+    const 字 = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    h.打つ('Z1', '=SUM("' + 字 + '")');
+    const 三 = [Number(h.字('Z1')), SOTO.日から数(y, m, d), KANE.日から数(y, m, d)];
+    if (三[0] !== 三[1] || 三[1] !== 三[2]) {
+      throw new Error('★ずれた★ ' + 字 + ' … 土台 ' + 三[0] + ' ／ soto ' + 三[1] + ' ／ kane ' + 三[2]);
+    }
+  }
+});
+
+T('★★現代の 日付は 往復する★★（数 → 日 → 数 で 戻る）', () => {
+  const KANE = require_(path.join(ROOT, 'lib/formula-kane.js'));
+  for (const n of [45292, 45306, 46023, 40000, 30000, 61]) {
+    const p = KANE.数から日(n);
+    const 戻 = KANE.日から数(p.y, p.m, p.d);
+    if (戻 !== n) throw new Error('★戻らない★ ' + n + ' → ' + p.y + '-' + p.m + '-' + p.d + ' → ' + 戻);
+  }
+});
+
+/* ★★1900年の 辺りは 往復しません＝実測済み（2026-09-15）★★
+   数から日(1)=1900-01-01 ／ ★日から数(1900,1,1)=3★ … ★1〜60 の 全部で 戻りません★
+   数から日(60) と 数から日(61) が ★同じ 日★＝★60 に 当たる 日が 無い★
+   ★元★＝`日から数` は n<61 で +1 するが `数から日` は 引いて いない
+   ★どちらが 正しいかは 実Excel を 打つまで 分かりません★＝★ここでは 押しません★
+   ★でも「うちの 中で 矛盾して いる」事は 書いて 残します★（棚 ⑨） */
+T('★1900年の 往復が 合わない事が 棚に 書いて 在る★（黙って 通さない）', () => {
+  const 棚 = fs.readFileSync(path.join(ROOT, 'docs/measured/karimono-hazushi-no-tana.md'), 'utf8');
+  if (!/往復（数→日→数）が 合って いません/.test(棚)) throw new Error('★棚に 書いて いない★');
+});
+
 T('★マスに 打った 字は 今まで どおり★（数に 化けて いない）', () => {
   const h = H.表();
   h.打つ('A1', '12:30');
