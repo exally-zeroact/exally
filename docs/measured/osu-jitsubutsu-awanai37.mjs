@@ -85,7 +85,7 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
 
   for (const a of Object.keys(式たち)) {
     if (板か(式たち[a]) || 染[a]) continue;
-    const 正 = 値たち[a] ? 値たち[a].v : undefined;
+    const 正 = 土台.正の値(値たち[a]);   /* ★誤りの マスは `w` で 比べる★ */
     if (正 === undefined) continue;
     const 出 = String(表.字(a));
     if (出 === '#NAME?') continue;

@@ -33,7 +33,10 @@ const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
 export const 本の道 = 'C:\\Users\\zeroa\\kyukyu-0907\\代行計算表2026.xlsb';
 
 export const 裸に = (f) => String(f).replace(/"(?:[^"]|"")*"/g, '""');
-export const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f));
+/* ★板を またぐか★（★`#REF!` は 板では ない★＝2026-09-15 に 直した）
+     ★前は `#REF!` を 板名と 読んで いました★＝★测ったら 93本★
+     ⇒★押せるのに 押して いなかった／それに 頼った 式まで 染めて いた★ */
+export const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f).replace(/#REF!/g, ''));
 export const マス拾い = /(^|[^A-Z0-9_."!])(\$?[A-Z]{1,3}\$?[0-9]{1,5})(?![0-9(])/g;
 export const 四角拾い = /(\$?[A-Z]{1,3}\$?[0-9]{1,5})\s*:\s*(\$?[A-Z]{1,3}\$?[0-9]{1,5})/g;
 export const 番地 = (a) => {
@@ -143,6 +146,18 @@ export function 板を押す(wb, 直し, si, 逆) {
   }
   return { 名, si, 式たち, 値たち, 染, 表, 押した, 段数 };
 }
+
+/** ★ファイルに 焼かれた 答えを「比べられる 形」に する★（2026-09-15）
+ *  ★★誤りの マスは `v` が ★数★★（実測＝`t:'e'` ／ `v:23` ／ `w:"#REF!"` が 69マス）
+ *    ⇒★`v` の まま 比べると `#REF!` と 23 を 比べる★＝★★偽の 負け★★
+ *    （2026-09-15 実測＝`=SUBTOTAL(109,#REF!)` 1本が これで「合わない」に なって いた）
+ *  ⇒★誤りの 時だけ `w`（画面の 字）を 使う★
+ *  ★`.v` を 直に 読まない事★＝`tests/hakaridai-mon.test.mjs` が 赤に します */
+export const 正の値 = (セル) => {
+  if (!セル) return undefined;
+  if (セル.t === 'e') return String(セル.w !== undefined ? セル.w : セル.v);
+  return セル.v;
+};
 
 /** ★突き合わせ★（★ファイルに 焼かれた 実Excel の 答えと★） */
 export function 合うか(出, 正) {

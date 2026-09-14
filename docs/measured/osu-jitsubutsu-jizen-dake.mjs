@@ -59,7 +59,7 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
     if (出 === '#NAME?') { 名前が無い++; continue; }
     通った++;
 
-    const 正 = 値たち[a] ? 値たち[a].v : undefined;
+    const 正 = 土台.正の値(値たち[a]);   /* ★誤りの マスは `w` で 比べる★ */
     if (正 === undefined) {
       違った++;
       違いの訳['★ファイルに 答えが 無い★'] = (違いの訳['★ファイルに 答えが 無い★'] || 0) + 1;

@@ -49,6 +49,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { 注記を外す } from '../scripts/lib/chuki.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require_ = createRequire(path.join(ROOT, 'package.json'));
@@ -178,25 +179,12 @@ const 免除 = new Set([
 
 /* ★覚書きは 数えない★（覚書きは 動きません。
      ★覚書きを 数えると「この 形は ダメ」と 書いた 人が 赤に なります★）
-   ★行番号を ずらさない 為 改行は 残して 空白に する★ */
-function 素にする(s) {
-  var 出 = '', i = 0, n = s.length;
-  while (i < n) {
-    var c = s.charAt(i), d = s.charAt(i + 1);
-    if (c === '/' && d === '*') {
-      var e = s.indexOf('*/', i + 2); if (e < 0) e = n; else e += 2;
-      for (var k = i; k < e; k++) 出 += (s.charAt(k) === '\n') ? '\n' : ' ';
-      i = e; continue;
-    }
-    if (c === '/' && d === '/') {
-      var e2 = s.indexOf('\n', i); if (e2 < 0) e2 = n;
-      for (var k2 = i; k2 < e2; k2++) 出 += ' ';
-      i = e2; continue;
-    }
-    出 += c; i++;
-  }
-  return 出;
-}
+   ★★外す 道具は 自前で 書かない★★＝`scripts/lib/chuki.mjs`（2026-08-26 の 決まり）
+     ★訳★…★字の 中の `//` や 正規表現の 中の `/` を 注記と 読む★のを 避ける為。
+     ★私は 2026-09-15 に これを 自前で 書いて `chuki.test.mjs` に 赤く されました★
+     （見張りは 正しかった＝★作る前に 探せ★）
+   ★`残す` の 既定が true★＝★行番号を ずらさない★ */
+const 素にする = (s) => 注記を外す(s);
 
 function 集める(d) {
   const p = path.join(ROOT, d);

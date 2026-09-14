@@ -36,7 +36,10 @@ const wb = XLSX.read(bytes, { type: 'array', cellFormula: true });
 /* ★表の 参照か★／★板を またぐか★（★引用符の 中は 見ない★） */
 const 裸に = (f) => String(f).replace(/"(?:[^"]|"")*"/g, '""');
 const 表か = (f) => /\[[^\]]*\]/.test(裸に(f));
-const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f));
+/* ★板を またぐか★（★`#REF!` は 板では ない★＝2026-09-15）
+     ★前は ここだけ 直って いませんでした★＝★作る道が 2本★
+     ⇒★`tests/hakaridai-mon.test.mjs` が 2本目を 赤に します★ */
+const 板か = (f) => /[A-Za-z0-9_\u3000-\u9fff']+!/.test(裸に(f).replace(/#REF!/g, ''));
 
 function 数える(取り) {
   let 全 = 0, 表 = 0, 板 = 0, 表も板も = 0;
