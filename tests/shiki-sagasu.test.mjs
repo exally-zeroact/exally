@@ -50,6 +50,9 @@ const 紙たち = [
   /* ★③ 残り 4個★（IF／IFERROR／SUBTOTAL／TEXT）… 99本
      ★TEXT は まだ 書いて いません★＝`#NAME?` に なるので ひとりでに 飛びます（棚 ⑮） */
   { 道: 'docs/measured/kansuu46/golden-nokori4-kimari-2026-09-15.tsv', 打つ列: 0, 既定のマス: null },
+  /* ★棚 ⑫⑬ を 埋めた 分★（35本）… ★書いた 後でも 測る★
+     ⑫ MATCH の 型 -1（降順 6本＋崩れた 並び 6本）／⑬ ①2次元 ②後ろが 空 ③`~` ④式が 作った 表 ⑤横1本 */
+  { 道: 'docs/measured/kansuu46/golden-tana-12-13-2026-09-15.tsv', 打つ列: 0, 既定のマス: null },
 ];
 
 console.log('\n[shiki-sagasu] ★INDEX と MATCH★ … 実Excel の 紙と 1本ずつ 突き合わせる');
