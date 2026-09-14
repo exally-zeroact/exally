@@ -20,6 +20,12 @@ const FILES = [
   ['shiki-hyou.test.mjs'],                     // ★本体＝表を持ち 依存を追い 変わった所だけ直す（借り物の 55.2%）★
   ['shiki-sashikomi.test.mjs'],                // ★行/列の 入れ消しで 式が 追従する＝実Excel 17通り★
   ['shiki-afure.test.mjs'],                    // ★溢れ＝1つの式が 何マスにも 広がる（実Excel 16通り）★
+  ['shiki-tsunagi.test.mjs'],                  // ★自前の 土台に 自前の 61個を 繋ぐ 皮（借り物を 1行も 通さない）★
+  ['shiki-tsunagi.test.mjs', '--self-test'],   // ★皮を 外したら 赤に なるか／形を 潰したら 潰れるか★
+  ['shiki-hyou-afure.test.mjs'],               // ★本体が 溢れ（こぼれ）を 置ける＝実Excel 16通り（土台⑤）★
+  ['shiki-hyou-afure.test.mjs', '--self-test'],// ★材料を 変えたら 答えも 変わるか／紙に 無い 式を 押して いないか★
+  ['shiki-hyou-omosa.test.mjs'],               // ★表が 大きく なっても N の 2乗に ならない（2026-09-14 に 2乗だった）★
+  ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★

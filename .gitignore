@@ -9,4 +9,3 @@ tests/xlsx-harness/golden/pending-*.json
 #   手元で 走らせて 手元で 見ます＝★紙は 置いて いきません★
 docs/measured/golden-jitsubutsu-*.tsv
 .wakete-kiroku.json
-lib/shiki-tsunagi.js
