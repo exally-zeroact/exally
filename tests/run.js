@@ -28,6 +28,8 @@ const FILES = [
   ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
   ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208…）★
   ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
+  ['shiki-hyou-hishigata.test.mjs'],           // ★菱形の頼りで古い答えが残らない（実物 37/176本→0/0）★
+  ['shiki-hyou-hishigata.test.mjs','--self-test'],// ★輪を壊していない／棚に直す前の数が在る★
   ['shiki-sagasu.test.mjs'],                   // ★INDEX と MATCH＝実物の のべ 68%（実Excel 193本と 突き合わせ）★
   ['shiki-sagasu.test.mjs', '--self-test'],    // ★見つからない時／転け方 2種／打つマスで 変わる／型1は 二分探索★
   ['shoshiki.test.mjs'],                       // ★書式の台＝TEXT も 画面も 同じ 台（実Excel 192行と 一致）★
