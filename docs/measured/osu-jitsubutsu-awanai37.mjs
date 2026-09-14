@@ -70,6 +70,7 @@ const 形の例 = {};
 const 合わない印 = {}, 百番台印 = {};
 const 中の形 = {}, 中のずれ = {}, 中と正 = {};
 const 四角の中 = {}, 四角の正しさ = {}, 子の有無 = {};
+const 丸の型 = {};
 const 五本の形 = {}, 五本の値 = {};
 const 伏せ = (x) => String(x).replace(/[0-9]/g, '9');
 const 板ごとの式 = {};
@@ -86,11 +87,10 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
     if (正 === undefined) continue;
     const 出 = String(表.字(a));
     if (出 === '#NAME?') continue;
-    let 同じ;
-    if (typeof 正 === 'number') { const x = Number(出); 同じ = Number.isFinite(x) && Math.abs(x - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9); }
-    else if (typeof 正 === 'boolean') 同じ = 出.toUpperCase() === String(正).toUpperCase();
-    else 同じ = 出 === String(正);
-    if (同じ) continue;
+    /* ★★突き合わせは 土台の 1本だけ★★（2026-09-15・指示役1 の ④）
+       ★前は ここに 書き写して いました★＝★空の 字の 守りが 抜けて いた★
+       （`Number('')` は ★0★＝★空を 返しても 0 と 合って しまう★） */
+    if (土台.合うか(出, 正)) continue;
 
     合わない++;
     合わない印[名 + '|' + a] = true;
@@ -150,7 +150,7 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
             if (s3 && typeof s3.v === 'number') { 紙の和 += s3.v; 紙の数++; }
           }
         }
-        const 合うか = Math.abs(紙の和 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9);
+        const 合うか = 土台.合うか(String(紙の和), 正);   /* ★土台の 1本だけ★ */
         const k3 = 合うか
           ? '★ファイルの 値を 足すと 合う★（四角は 正しい／うちの 値が 違う）'
           : '★ファイルの 値を 足しても 合わない★（★四角が 違う★＝表の 端が ずれて いる）';
@@ -192,9 +192,19 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
         /* ★中だけ 押した 値と ファイルの 値を くらべる★
            ＝★IFERROR が 飲み込んだ かどうかの 手がかり★ */
         if (typeof 正 === 'number') {
-          const 中数 = Number(中の出);
-          if (Number.isFinite(中数)) {
-            const 同 = Math.abs(中数 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9);
+          {
+            /* ★★ここも 土台の 1本に 揃えました★★（2026-09-15）
+               ★前は `Number.isFinite` も 空の 字の 守りも 無く、別の 決め方★でした
+               ⇒★同じ 字なのに 合う／合わないが 分かれる★という 辻褄の 合わない 数が 出て いました */
+            const 同 = 土台.合うか(中の出, 正);
+            /* ★★丸ごとの 答えは 数か 字か★★（2026-09-15）
+               ★字なら IFERROR が 逃げ道（2つ目の 引数）を 返して います★
+               ＝★うちは 中を「誤り」と 見た★のに ★中だけ 押すと 誤りでは ない★
+               ⇒★同じ 式が 置き場所で 変わる★＝★輪（自分を 指す）を 疑う★ */
+            const 丸は数か = Number.isFinite(Number(出)) && String(出).trim() !== '';
+            const k5 = (同 ? '★中だけ 合う★' : '中だけも 合わない')
+              + ' ／ 丸ごとは ' + (丸は数か ? '数' : '★字か 誤り★');
+            丸の型[k5] = (丸の型[k5] || 0) + 1;
             中と正[同 ? '★中だけ 押すと 合う★' : '中だけ 押しても 合わない'] =
               (中と正[同 ? '★中だけ 押すと 合う★' : '中だけ 押しても 合わない'] || 0) + 1;
             if (同) {
@@ -308,6 +318,10 @@ console.log('★★中だけなら 合う 分の「丸ごとの 形」★★（�
 Object.keys(五本の形).forEach((k) => console.log('  ' + String(五本の形[k]).padStart(4) + '本  ' + k));
 console.log('★★その 値（数字は 9 に 潰して 在ります）★★');
 Object.keys(五本の値).forEach((k) => console.log('  ' + String(五本の値[k]).padStart(4) + '本  ファイル ' + k));
+console.log('');
+console.log('★★丸ごとの 答えは 数か 字か★★（字なら IFERROR が 逃げ道を 返して います）');
+Object.keys(丸の型).sort((a, b) => 丸の型[b] - 丸の型[a])
+  .forEach((k) => console.log('  ' + String(丸の型[k]).padStart(4) + '本  ' + k));
 console.log('');
 console.log('★中だけ 押した 値と ファイルの 値★');
 Object.keys(中と正).forEach((k) => console.log('  ' + String(中と正[k]).padStart(4) + '本  ' + k));
