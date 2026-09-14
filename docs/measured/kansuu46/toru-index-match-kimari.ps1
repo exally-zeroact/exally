@@ -26,6 +26,25 @@ $誤りの番号 = @{
   -2146826246 = '#N/A';   -2146826243 = '#SPILL!'; -2146826238 = '#CALC!'; -2146826237 = '#BUSY!'
 }
 
+# ══ ★★2つ目の 窓★★ ══（2026-09-15・見張り `tests/monosashi-mado.test.mjs` の 決め）
+#  ★物差しの 欠陥★ `.Value2` は ★0 で ない 値に 0 を 返します★
+#    =0.1+0.2-0.3    … .Value2 ★0★ ／ =(式)=0 ★False★
+#    =11.1+22.2-33.3 … .Value2 0   ／ =(式)=0 ★True★
+#    ⇒★.Value2 だけでは この 2つが 同じ 顔に なります★
+#  ⇒★『0』が 出た 時だけ ★=(式)=0 の 真偽★も 取って 紙に 並べます★
+#    （この 紙にも 0 が 出ます … `=INDEX(E1:E5,4)`＝★空マスを 指した 時★）
+function 窓２_本当にゼロか($sh, [string]$式) {
+  $中 = $式 -replace '^=\s*', ''
+  try {
+    $sh.Range('BZ1').Clear() | Out-Null
+    $sh.Range('BZ1').Formula = ('=(' + $中 + ')=0')
+    $z = $sh.Range('BZ1').Value2
+    $sh.Range('BZ1').Clear() | Out-Null
+    if ($z -is [bool]) { return $(if ($z) { 'TRUE' } else { 'FALSE' }) }
+    return '★判じられない★'
+  } catch { return '★判じられない★' }
+}
+
 $xl = New-Object -ComObject Excel.Application
 $xl.Visible = $false; $xl.DisplayAlerts = $false; $xl.ScreenUpdating = $false
 $版 = $xl.Version; $ビルド = $xl.Build
@@ -130,7 +149,10 @@ foreach ($s in $式たち) {
     elseif ($v -is [object[,]]) { $答 = '(こぼれ)'; $型 = 'Object[,]' }
     else { $答 = [string]$v; $型 = $v.GetType().Name }
   } catch { $答 = '★受け付けない★'; $型 = '-' }
-  [void]$結果.Add(("{0}`t{1}`t{2}`t{3}`t{4}" -f $マス, $式, $答, $型, $訳))
+  # ★『0』が 出た 時だけ 2つ目の 窓★（★見せかけの 0 と 本当の 0 を 分ける★）
+  $窓２ = '-'
+  if ($答 -eq '0' -and $型 -eq 'Double') { $窓２ = 窓２_本当にゼロか $ws $式 }
+  [void]$結果.Add(("{0}`t{1}`t{2}`t{3}`t{4}`t{5}" -f $マス, $式, $答, $型, $窓２, $訳))
 }
 
 # ★材料は Excel から 読み返す★（私が 計算しない）
@@ -166,8 +188,11 @@ $頭 = @(
   '#   ⇒★★突き合わせる 側も 同じ マスに 打って ください★★（H1 の 紙を A10 で 押すと 答えが 変わります）',
   '# ★前の 式の 跡を 消してから 打ち、CalculateFull してから 読んで います★',
   '#   ＝2026-09-15、消さずに 測る 道具が ★同じ 式に 2回で 違う 答え★を 返しました',
-  '# ★★材料（機械が 読む）★★ … #材料<タブ>マス<タブ>値<タブ>型（★Excel から 読み返した 値★）'
+  '# ★★材料（機械が 読む）★★ … #材料<タブ>マス<タブ>値<タブ>型（★Excel から 読み返した 値★）',
+  '# ★★2つ目の 窓★★ … 答えが 0 の 行だけ `=(式)=0` の 真偽も 取って 在ります（5列目）',
+  '#   ＝`.Value2` は ★0 で ない 値に 0 を 返す★事が 在る（足し引きで 終わる 式）',
+  '#   ★この 紙の 0 … `=INDEX(E1:E5,4)`＝空マスを 指した 時★'
 )
-$見出し = @("# 打ったマス`t式`t実Excel の 答え`t型`t何を 測って いるか")
+$見出し = @("# 打ったマス`t式`t実Excel の 答え`t型`t窓②=0の真偽`t何を 測って いるか")
 [System.IO.File]::WriteAllText($出, ((($頭 + $材料の行 + $見出し + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
 Write-Host "★書いた … $出★（式 $($式たち.Count) 本）"
