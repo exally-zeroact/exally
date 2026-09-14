@@ -42,6 +42,7 @@ const NOT_TESTS = {
   'tests/run.js': 'ランナー本体',
   'tests/fake-supa.js': 'テスト用のSupabaseモック（他テストが読む部品）',
   'tests/repo-supa.mjs': 'このリポジトリの接続先(js/supa-config.js)を返す部品。実DBに触る道具が読む（テストではない）',
+  'tests/monosashi.mjs': '★式のほどき方と 答えの見方（1e-9の許し・誤りの比べ方）の 部品★。formula-kane.test.mjs と 借り物を外す皮の突き合わせが 読む（テストではない）。★物差しを 2本に しない為に 切り出した★（2026-09-14）',
   'tests/dbtest-seed.mjs': 'DB-testに種データを入れる手動ツール（CIから叩かない）',
   'tests/live-seed.mjs': '実DBに種を入れる手動ツール（CIから叩かない）',
   'tests/live-roundtrip.mjs': '実DBに触る手動確認ツール（CIから叩かない）',

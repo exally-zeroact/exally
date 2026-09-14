@@ -82,29 +82,24 @@ const 呼ぶ = {
   YIELDDISC: (a) => K.割引債の利回り(a[0], a[1], a[2], a[3], a[4]),
   YIELDMAT: (a) => K.満期一括の利回り(a[0], a[1], a[2], a[3], a[4], a[5]),
 };
+import { 式をほどく, 答えを見る } from './monosashi.mjs';   /* ★物差しは 1本★ */
+
 const 二桁 = (n) => (n < 10 ? '0' : '') + n;
 const 年月日 = (serial) => { const p = K.数から日(serial); return p.y + '-' + 二桁(p.m) + '-' + 二桁(p.d); };
 
-/** ★1行 押して 合っているかを 返す★（純粋＝自己試験からも 呼べる） */
+/** ★1行 押して 合っているかを 返す★（純粋＝自己試験からも 呼べる）
+ *  ★物差し（式をほどく／答えを見る）は `tests/monosashi.mjs` に 1本だけ 置いて 在ります★
+ *  ＝2026-09-14。借り物を 外す 為の 自前の 皮も ★同じ物★ を 読みます。
+ *  ★日付の 字に する のは ここ（群ごと）★＝物差しは 中身に 依らせない。 */
 export function 押して比べる(行) {
-  const 字包み = 行.式.match(/^=TEXT\((.+),"yyyy-mm-dd"\)$/);
-  const 中 = 字包み ? '=' + 字包み[1] : 行.式;
-  const m = 中.match(/^=([A-Z.]+)\((.*)\)$/);
-  if (!m) return { 合: false, 訳: '式が 読めない' };
-  const fn = 呼ぶ[m[1]];
+  const ほ = 式をほどく(行.式);
+  if (!ほ) return { 合: false, 訳: '式が 読めない' };
+  const fn = 呼ぶ[ほ.名];
   if (!fn) return { 合: null, 訳: '出していない 関数' };
   let 出;
-  try { 出 = fn(引数を割る(m[2]).map(値にする)); } catch (e) { 出 = { 誤り: 'EX' }; }
-  if (字包み && typeof 出 === 'number') 出 = 年月日(出);
-  if (出 && 出.誤り) {
-    const 合 = String(行.答) === '#' + 出.誤り + '!' || String(行.答) === '#' + 出.誤り;
-    return { 合: 合, 出: '#' + 出.誤り + '!' };
-  }
-  if (行.型 === 'Double') {
-    const 正 = Number(行.答);
-    return { 合: Math.abs(出 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9), 出: String(出) };
-  }
-  return { 合: String(出) === String(行.答), 出: String(出) };
+  try { 出 = fn(引数を割る(ほ.引数の字).map(値にする)); } catch (e) { 出 = { 誤り: 'EX' }; }
+  if (ほ.字包み && typeof 出 === 'number') 出 = 年月日(出);   /* ★群ごとの 直し★ */
+  return 答えを見る(出, 行);
 }
 
 const 行たち = fs.readFileSync(金の道, 'utf-8').split('\n')
