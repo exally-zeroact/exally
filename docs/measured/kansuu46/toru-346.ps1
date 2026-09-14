@@ -200,7 +200,14 @@ foreach ($f in $関数たち) {
   foreach ($a in $候補) {
     $式 = '=' + $f + $a
     try {
+      # ★★同じ 道具を 2回 回したら 答えが 1行 違った★★（2026-09-15 実測）
+      #   `=MATCH(3,A1:A5,2)` … 1回目 ★#N/A★ ／ 2回目 ★3★
+      #   ⇒★測り道具が 再現しない＝どちらが 実Excel の 答えか 言えません★
+      #   ⇒ 直し 2つ … ①★前の 式の 跡（溢れ）を 消す★ ②★計算させてから 読む★
+      #     （`.Formula` を 入れただけで 読むと ★前の 値を 読む 事が 在ります★）
+      $ws.Range('H1:Z50').Clear() | Out-Null
       $ws.Range('H1').Formula = $式
+      $xl.CalculateFull()
       $v = $ws.Range('H1').Value2
       if ($null -eq $v) { continue }
       # ★誤りは 既定では 捨てます★＝★この 道具は 引数の 形を 総当たりする 物★なので
