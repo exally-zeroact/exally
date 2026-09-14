@@ -117,7 +117,7 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
         for (let r2 = rr.s.r; r2 <= rr.e.r; r2++) {
           for (let c2 = rr.s.c; c2 <= rr.e.c; c2++) {
             const n2 = XLSX.utils.encode_cell({ r: r2, c: c2 });
-            const t = (表.中身 && 表.中身[n2]) ? String(表.中身[n2].打った字 || '') : '';
+            const t = 表.打った字(n2);   /* ★鍵が `板名!A1` に なった★ので 口を 通す */
             if (/^=\s*SUBTOTAL\s*\(/i.test(t)) 入れ子++;
             else if (t === '') 字なし++;
             else 字あり++;

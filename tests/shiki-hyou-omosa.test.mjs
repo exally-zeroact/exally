@@ -82,7 +82,8 @@ T('★見られている は 名札の 束★（並びに 戻すと また N の
   h.打つ('C1', '=A1+2');
   const 者 = h.見られている('A1');
   if (!Array.isArray(者)) throw new Error('★外に 出す 形は 並びの まま★');
-  if (者.slice().sort().join(',') !== 'B1,C1') throw new Error('中身が 違う … ' + 者.join(','));
+  /* ★名札は 板つき★（㋖・2026-09-15）＝★道連れは 板を またぐ★ので 板が 要る */
+  if (者.slice().sort().join(',') !== '板1!B1,板1!C1') throw new Error('中身が 違う … ' + 者.join(','));
   /* 同じ 式を 打ち直しても 増えない（重複が 入らない） */
   h.打つ('B1', '=A1+9');
   if (h.見られている('A1').length !== 2) throw new Error('★打ち直しで 増えた★ … ' + h.見られている('A1').length);
