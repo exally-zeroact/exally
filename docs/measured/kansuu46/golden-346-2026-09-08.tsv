@@ -9,6 +9,29 @@
 # ★呼び方が 見つからない★ … 
 # ★呼び方が 見つからない★ … BINOM.DIST BINOM.DIST.RANGE BINOM.INV BINOMDIST CRITBINOM CUMIPMT CUMPRINC DAVERAGE DCOUNTA DGET DMAX DMIN DPRODUCT DSTDEV DSTDEVP DVAR DVARP HLOOKUP MAKEARRAY MAP MIRR NEGBINOM.DIST NEGBINOMDIST PERCENTILE.EXC RATE REDUCE SCAN T.TEST TTEST XIRR
 # 関数	式	実Excel の 答え	型
+# ★★材料（機械が 読む）★★ … `#材料<タブ>マス<タブ>値` の 形
+#   ★2026-09-14 に 足しました★。★新しく 測った 物では ありません★＝
+#   この 紙の 頭に 文章で 書いて 在る「★材料★ A1:A5=1..5 ／ B1:B5=2,4,6,8,10」を、
+#   機械が 読める 形に 直した だけ。
+#   ★訳★＝材料が 文章だと、使う 道具が めいめい 手で 写す。
+#         写し間違えれば ★紙は 緑・本番は 赤★ に なる。
+#   ★★D1/D2（2024/1/1・2026/1/1）は わざと 載せて いません★★
+#     実Excel の 中身は 日付を ★通し番号★で 持つ。通し番号に 直すには
+#     ★私が 計算する★ 事に なり、それは 実測では ない。
+#     （`golden-marume-A` に 45292 が 在るが、★その 紙は それを 日付と 書いて いない★
+#      ＝裏が 取れて いない）
+#     ⇒ D を 使う 行は「材料が 無い」の まま 残す。★半分 合う 物を 出さない★
+#   ★答えの 行は 1行も 触って いません★（足したのは # の行だけ）
+#材料	A1	1
+#材料	A2	2
+#材料	A3	3
+#材料	A4	4
+#材料	A5	5
+#材料	B1	2
+#材料	B2	4
+#材料	B3	6
+#材料	B4	8
+#材料	B5	10
 ABS	=ABS(A1)	1	Double
 ABS	=ABS(A2)	2	Double
 ABS	=ABS(A1:A5)	1	Double
