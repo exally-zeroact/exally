@@ -47,6 +47,9 @@ const 合わないと分かっている = {
 const 紙たち = [
   { 道: 'docs/measured/kansuu46/golden-index-match2-2026-09-15.tsv', 打つ列: null, 既定のマス: 'H1' },
   { 道: 'docs/measured/kansuu46/golden-index-match-kimari-2026-09-15.tsv', 打つ列: 0, 既定のマス: null },
+  /* ★③ 残り 4個★（IF／IFERROR／SUBTOTAL／TEXT）… 99本
+     ★TEXT は まだ 書いて いません★＝`#NAME?` に なるので ひとりでに 飛びます（棚 ⑮） */
+  { 道: 'docs/measured/kansuu46/golden-nokori4-kimari-2026-09-15.tsv', 打つ列: 0, 既定のマス: null },
 ];
 
 console.log('\n[shiki-sagasu] ★INDEX と MATCH★ … 実Excel の 紙と 1本ずつ 突き合わせる');
@@ -95,7 +98,11 @@ for (const 紙 of 紙たち) {
     let 同じ;
     if (型 === 'Boolean') 同じ = 出.toUpperCase() === 正.toUpperCase();
     else if (型 === 'Double') {
-      const a = Number(出), b = Number(正);
+      /* ★★空の 字を 0 と 見ない★★（2026-09-15 に わざと 壊して 見つけた 穴）
+         `Number('')` は ★0★ です ⇒ うちが ★空★ を 返しても
+         紙の ★0★ と 同じに 見えて いました（★見張りが 穴を 通す★）。
+         ⇒★数の 所は 数の 字で ある事も 見る★ */
+      const a = 出.trim() === '' ? NaN : Number(出), b = Number(正);
       同じ = Number.isFinite(a) && Number.isFinite(b)
         && Math.abs(a - b) <= Math.max(1e-9, Math.abs(b) * 1e-9);
     } else 同じ = 出 === 正;
