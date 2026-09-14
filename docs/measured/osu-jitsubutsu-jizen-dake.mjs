@@ -30,6 +30,9 @@
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
+/* ★--gyaku で 押す順を 逆に★＝★順でも 逆でも 同じ 答えか★を 測る（菱形の 直しの 効き目） */
+const 逆 = process.argv.includes('--gyaku');
+
 const ここ = path.dirname(fileURLToPath(import.meta.url));
 const 土台 = await import(pathToFileURL(path.join(ここ, 'osu-jitsubutsu-dodai.mjs')).href);
 
@@ -40,7 +43,7 @@ let 名前が無い = 0, 違った = 0, 十五桁で合う = 0;
 const 違いの訳 = {}, 違いの関数 = {}, ずれの段 = {};
 
 for (let si = 0; si < wb.SheetNames.length; si++) {
-  const 板 = 土台.板を押す(wb, 直し, si);
+  const 板 = 土台.板を押す(wb, 直し, si, 逆);
   if (!板) continue;
   const { 式たち, 値たち, 染, 表 } = 板;
 

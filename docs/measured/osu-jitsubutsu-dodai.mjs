@@ -66,7 +66,11 @@ export function 触っていないか(前) {
 }
 
 /** ★1枚の 板を 建てて 押す★（★染まりの 印まで 必ず ここで 付ける★） */
-export function 板を押す(wb, 直し, si) {
+/* ★`逆` に true を 渡すと 式を ★逆順★ で 押します★（2026-09-15）
+     ★なぜ 口に したか★ … ★前は 手で 書き換えて 測って いました★＝★残らない★。
+     ★押す順で 答えが 変わったら 台が 壊れて います★（⑱の 菱形が そうでした）
+     ⇒ ★いつでも 測れる よう 口に して 残します★ */
+export function 板を押す(wb, 直し, si, 逆) {
   const 名 = wb.SheetNames[si];
   const ws = wb.Sheets[名];
   if (!ws || !ws['!ref']) return null;
@@ -126,14 +130,14 @@ export function 板を押す(wb, 直し, si) {
     if (式たち[a]) continue;                        /* 式の マスは 下で 打つ */
     const s = 値たち[a];
     if (typeof s.v === 'number') { 表.打つ(a, String(s.v)); continue; }
-    表.打つ(a, 'x');
-    if (表.中身 && 表.中身[a]) {
-      表.中身[a].値 = (typeof s.v === 'boolean') ? { 型: '真偽', 値: s.v } : { 型: '字', 値: String(s.v) };
-      表.中身[a].打った字 = String(s.v);
-    }
+    /* ★型つきの 口★（土台⑲・2026-09-15）＝真偽は 真偽、字は 字のまま
+       ★前は 中身を 直に 書き換えて いた★＝★見て いる 式に 報せが 行かない★ */
+    表.置く(a, (typeof s.v === 'boolean') ? s.v : String(s.v), String(s.v));
   }
   const 押した = [];
-  for (const a of Object.keys(式たち)) {
+  const 式の名 = Object.keys(式たち);
+  if (逆) 式の名.reverse();                          /* ★押す順を 逆に★ */
+  for (const a of 式の名) {
     if (板か(式たち[a]) || 染[a]) continue;
     try { 表.打つ(a, 式たち[a]); 押した.push(a); } catch (e) { /* 呼ぶ側が 数える */ }
   }
