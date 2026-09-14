@@ -79,6 +79,8 @@ const SUBTOTALの型 = {}, 割れ方 = {}, 関数ごと = {};
 const 形の例 = {};
 const 合わない印 = {}, 百番台印 = {};
 const 中の形 = {}, 中のずれ = {}, 中と正 = {};
+const 五本の形 = {}, 五本の値 = {};
+const 伏せ = (x) => String(x).replace(/[0-9]/g, '9');
 const 板ごとの式 = {};
 
 for (let si = 0; si < wb.SheetNames.length; si++) {
@@ -193,6 +195,18 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
             const 同 = Math.abs(中数 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9);
             中と正[同 ? '★中だけ 押すと 合う★' : '中だけ 押しても 合わない'] =
               (中と正[同 ? '★中だけ 押すと 合う★' : '中だけ 押しても 合わない'] || 0) + 1;
+            if (同) {
+              /* ★★中だけなら 合うのに 丸ごとだと 合わない★★
+                 ⇒★覆い（IFERROR）の 所で 分かれて います★
+                 ⇒★丸ごとの 形も 見ます★（★字は "…" に／数は 9 に★） */
+              const 丸 = String(f)
+                .replace(/"(?:[^"]|"")*"/g, '"…"')
+                .replace(/[0-9]+(\.[0-9]+)?/g, (x, d) => (d ? '9.9' : '9'))
+                .replace(/\s+/g, '');
+              五本の形[丸] = (五本の形[丸] || 0) + 1;
+              五本の値[伏せ(正) + ' ／ 丸ごと ' + 伏せ(出) + ' ／ 中だけ ' + 伏せ(中の出)] =
+                (五本の値[伏せ(正) + ' ／ 丸ごと ' + 伏せ(出) + ' ／ 中だけ ' + 伏せ(中の出)] || 0) + 1;
+            }
           }
         }
       } else {
@@ -274,6 +288,11 @@ console.log('');
 console.log('★★① IFERROR を 外して 中を 押した★★');
 Object.keys(割れ方).sort((a, b) => 割れ方[b] - 割れ方[a])
   .forEach((k) => console.log('  ' + String(割れ方[k]).padStart(4) + '本  ' + k + '   （例の 関数 … ' + (形の例[k] || '-') + '）'));
+console.log('');
+console.log('★★中だけなら 合う 分の「丸ごとの 形」★★（字は "…"／数は 9）');
+Object.keys(五本の形).forEach((k) => console.log('  ' + String(五本の形[k]).padStart(4) + '本  ' + k));
+console.log('★★その 値（数字は 9 に 潰して 在ります）★★');
+Object.keys(五本の値).forEach((k) => console.log('  ' + String(五本の値[k]).padStart(4) + '本  ファイル ' + k));
 console.log('');
 console.log('★中だけ 押した 値と ファイルの 値★');
 Object.keys(中と正).forEach((k) => console.log('  ' + String(中と正[k]).padStart(4) + '本  ' + k));
