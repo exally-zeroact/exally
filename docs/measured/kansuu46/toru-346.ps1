@@ -105,7 +105,27 @@ $候補 = @(
   '(D1)', '(D1,D2)', '(D1,2)', '(D1,D2,1)', '(D1,D2,0)',
   '(D1,D2,0.05,0.1,100,2,0)', '(D1,D2,0.05,0.1,2)', '(D1,D2,0.05,100,2)',
   '(TRUE)', '(FALSE)', '(2,TRUE)', '(2,3,TRUE)',
-  '(A1:A5,B1:B5,1)', '(2,3,4,5,6)', '(-2)', '(2.5,1)'
+  '(A1:A5,B1:B5,1)', '(2,3,4,5,6)', '(-2)', '(2.5,1)',
+  # ★2026-09-14 に 足した★＝★まだ 答えを 取って いない 45個★に 当たる 形。
+  #   （今までの 53通りでは VLOOKUP／MATCH／SUBTOTAL／TEXTJOIN／XLOOKUP 等に 当たりません）
+  #   ★どれが 正しいかは 実Excel が 決めます★（人が 決めるのは 候補だけ）
+  '(A1,A1:A5,B1:B5)',            # XLOOKUP／LOOKUP
+  '(A1,A1:B5,2,FALSE)',          # VLOOKUP（完全一致）
+  '(A1,A1:B5,2)',                # HLOOKUP／VLOOKUP（近い一致）
+  '(A1,A1:A5,0)',                # MATCH
+  '(9,A1:A5)',                   # SUBTOTAL（9＝合計）
+  '(",",TRUE,A1:A5)',            # TEXTJOIN
+  '(A1:A5,A1:A5>2)',             # FILTER
+  '(A1:A5,0.5)',                 # PERCENTILE／QUARTILE.EXC（0〜1 の 位置）
+  '(A1:A5,B1:B5,1,1)',           # T.TEST／TTEST
+  '(A1:B5,1,D1:D2)',             # D系（DSUM DGET DAVERAGE …）
+  '(TRUE,1)', '(TRUE,1,2)',      # IFS／IF
+  '(1/0,2)',                     # IFERROR／IFNA
+  '(D1,1)',                      # EDATE／EOMONTH
+  '(0.05,12,100)',               # RATE／PMT／NPER
+  '(0.05,12,100,0,0)',           # RATE（見当つき）
+  '(100,0.05,1,12,0,0)',         # CUMIPMT／CUMPRINC（6つ）
+  '(A1:A5,1,0)'                  # PERCENTRANK ほか
 )
 
 if (-not $名簿) { $名簿 = Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt' }
