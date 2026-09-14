@@ -79,6 +79,7 @@ const SUBTOTALの型 = {}, 割れ方 = {}, 関数ごと = {};
 const 形の例 = {};
 const 合わない印 = {}, 百番台印 = {};
 const 中の形 = {}, 中のずれ = {}, 中と正 = {};
+const 四角の中 = {}, 四角の正しさ = {}, 子の有無 = {};
 const 五本の形 = {}, 五本の値 = {};
 const 伏せ = (x) => String(x).replace(/[0-9]/g, '9');
 const 板ごとの式 = {};
@@ -158,7 +159,66 @@ for (let si = 0; si < wb.SheetNames.length; si++) {
 
     /* ══ ②SUBTOTAL の 第1引数 ══ */
     const st = /SUBTOTAL\s*\(\s*([0-9]+)/i.exec(裸に(f));
-    if (st) SUBTOTALの型[st[1]] = (SUBTOTALの型[st[1]] || 0) + 1;
+    if (st) {
+      SUBTOTALの型[st[1]] = (SUBTOTALの型[st[1]] || 0) + 1;
+      /* ★★四角の 中に 何が 在るか★★（指示役1 の 手・2026-09-15）
+         ①★打った字が 在る マス★ ②★字が 無い マス★ ③★その うち SUBTOTAL★
+         ★②が 0 なら「押して いない マスを 足して いる」という 見当は 外れ★
+         ★★この 道具は 本番と 同じ 染まりの 印を 付けて います★★
+           ＝★印の 無い 道具で 数えると 別の マスを 数えます★（2026-09-15 に 踏んだ） */
+      const mm = /SUBTOTAL\s*\(\s*[0-9]+\s*,\s*([A-Z]+[0-9]+:[A-Z]+[0-9]+)\s*\)/i.exec(裸に(f));
+      if (mm) {
+        const rr = XLSX.utils.decode_range(mm[1]);
+        let 字あり = 0, 字なし = 0, 入れ子 = 0;
+        for (let r2 = rr.s.r; r2 <= rr.e.r; r2++) {
+          for (let c2 = rr.s.c; c2 <= rr.e.c; c2++) {
+            const n2 = XLSX.utils.encode_cell({ r: r2, c: c2 });
+            const t = (表.中身 && 表.中身[n2]) ? String(表.中身[n2].打った字 || '') : '';
+            if (/^=\s*SUBTOTAL\s*\(/i.test(t)) 入れ子++;
+            else if (t === '') 字なし++;
+            else 字あり++;
+          }
+        }
+        const k2 = '字あり ' + 字あり + ' ／ ★字なし ' + 字なし + '★ ／ 入れ子 ' + 入れ子;
+        四角の中[k2] = (四角の中[k2] || 0) + 1;
+        /* ★★ファイルの 値を その 四角で 足すと 合うか★★（2026-09-15）
+           ＝★合えば 四角は 正しい／合わなければ 四角が 違う★
+             （`Table9[#Data]` を 直した 先が ★本当の 表の 端★かを 見る）
+           ★ファイルの 値＝実Excel が 出した 答え★なので ★足せば 実Excel の 合計★に なるはず */
+        /* ★★その 四角の 中に「合わない 23本」が 何個 在るか★★（2026-09-15）
+           ★前に 測ったのは 逆向き★（23本が 14本に 頼って いるか ＝ ★0本★）
+           ⇒★向きを 変えます★＝★14本が 23本を 足して いないか★
+           ★合って いれば 根は 1つ★＝★23本を 直せば 14本も 直る★ */
+        let 合わない子 = 0;
+        for (let r4 = rr.s.r; r4 <= rr.e.r; r4++) {
+          for (let c4 = rr.s.c; c4 <= rr.e.c; c4++) {
+            const n4 = XLSX.utils.encode_cell({ r: r4, c: c4 });
+            if (合わない印[名 + '|' + n4]) 合わない子++;
+          }
+        }
+        const k4 = 合わない子 > 0
+          ? '★四角の 中に 合わない マスが 在る（' + 合わない子 + '個）★'
+          : '四角の 中に 合わない マスは 無い';
+        子の有無[k4] = (子の有無[k4] || 0) + 1;
+        let 紙の和 = 0, 紙の数 = 0;
+        for (let r2 = rr.s.r; r2 <= rr.e.r; r2++) {
+          for (let c2 = rr.s.c; c2 <= rr.e.c; c2++) {
+            const n3 = XLSX.utils.encode_cell({ r: r2, c: c2 });
+            const s3 = 値たち[n3];
+            if (s3 && typeof s3.v === 'number') { 紙の和 += s3.v; 紙の数++; }
+          }
+        }
+        const 合うか = Math.abs(紙の和 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9);
+        const k3 = 合うか
+          ? '★ファイルの 値を 足すと 合う★（四角は 正しい／うちの 値が 違う）'
+          : '★ファイルの 値を 足しても 合わない★（★四角が 違う★＝表の 端が ずれて いる）';
+        四角の正しさ[k3] = (四角の正しさ[k3] || 0) + 1;
+        if (!形の例[k3]) 形の例[k3] = '数の マス ' + 紙の数 + '個';
+      } else {
+        四角の中['★四角を 切り出せない（範囲が 1つの 四角では ない）★'] =
+          (四角の中['★四角を 切り出せない（範囲が 1つの 四角では ない）★'] || 0) + 1;
+      }
+    }
 
     /* ══ ①IFERROR を 外して 中だけ 押す ══ */
     if (/IFERROR\s*\(/i.test(裸に(f))) {
@@ -285,6 +345,19 @@ console.log('');
   console.log('  ★根と 関わりが 見つからない★     … ' + 根と無関係 + '本');
   console.log('');
 }
+console.log('★★SUBTOTAL の 四角の 中に 何が 在るか★★（★本番と 同じ 染まりの 印つき★）');
+Object.keys(四角の中).sort((a, b) => 四角の中[b] - 四角の中[a])
+  .forEach((k) => console.log('  ' + String(四角の中[k]).padStart(4) + '本  ' + k));
+console.log('');
+console.log('★★14本の 四角の 中に「合わない マス」が 在るか★★（★向きを 変えた★）');
+Object.keys(子の有無).sort((a, b) => 子の有無[b] - 子の有無[a])
+  .forEach((k) => console.log('  ' + String(子の有無[k]).padStart(4) + '本  ' + k));
+console.log('');
+console.log('★★ファイルの 値を その 四角で 足すと 合うか★★');
+Object.keys(四角の正しさ).sort((a, b) => 四角の正しさ[b] - 四角の正しさ[a])
+  .forEach((k) => console.log('  ' + String(四角の正しさ[k]).padStart(4) + '本  ' + k
+    + '   （' + (形の例[k] || '-') + '）'));
+console.log('');
 console.log('★★① IFERROR を 外して 中を 押した★★');
 Object.keys(割れ方).sort((a, b) => 割れ方[b] - 割れ方[a])
   .forEach((k) => console.log('  ' + String(割れ方[k]).padStart(4) + '本  ' + k + '   （例の 関数 … ' + (形の例[k] || '-') + '）'));
