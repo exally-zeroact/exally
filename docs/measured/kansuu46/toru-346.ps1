@@ -125,7 +125,18 @@ $候補 = @(
   '(0.05,12,100)',               # RATE／PMT／NPER
   '(0.05,12,100,0,0)',           # RATE（見当つき）
   '(100,0.05,1,12,0,0)',         # CUMIPMT／CUMPRINC（6つ）
-  '(A1:A5,1,0)'                  # PERCENTRANK ほか
+  '(A1:A5,1,0)',                 # PERCENTRANK ほか
+  # ★2026-09-14 の 1回目で ★呼び方が 見つからなかった 9個★に 当てる 形★
+  #   BINOM.INV CRITBINOM CUMIPMT CUMPRINC DATEDIF DGET NEGBINOM.DIST NEGBINOMDIST RATE
+  '(10,0.5,0.5)',                # BINOM.INV／CRITBINOM（試行・確率・α）
+  '(2,3,0.5)',                   # NEGBINOM.DIST／NEGBINOMDIST（失敗・成功・確率）
+  '(2,3,0.5,TRUE)',              # NEGBINOM.DIST（累積つき）
+  '(0.05,12,100,1,12,0)',        # CUMIPMT／CUMPRINC（利率・期間・現価・始・終・型）
+  '(D1,D2,"D")', '(D1,D2,"M")',  # DATEDIF（日数・月数）
+  '(12,-10,100)',                # RATE（期間・支払・現価）
+  '(12,-10,100,0,0,0.1)',        # RATE（見当つき）
+  '(A1:B5,1,A1:A2)',             # DGET（表・列・条件）
+  '(A1:B5,"A",A1:A2)'            # DGET（列を 名前で）
 )
 
 if (-not $名簿) { $名簿 = Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt' }
@@ -133,7 +144,12 @@ elseif (-not [System.IO.Path]::IsPathRooted($名簿)) { $名簿 = Join-Path $こ
 if (-not (Test-Path $名簿)) { throw "★名簿が 無い★: $名簿" }
 Write-Host "★名簿★ $名簿"
 Write-Host "★出し先★ $出"
-$名簿 = Get-Content $名簿 -Encoding UTF8 |
+# ★★名前を 分ける★★（2026-09-14 に 踏んだ）
+#   `param([string]$名簿)` に ★並びを 入れると PowerShell が 1本の 字に 潰します★
+#   （`[string]$x = @('A','B')` → `"A B"`）
+#   ⇒ 2026-09-14、45個の 名簿が ★1個の 関数★に なり ★式 0本★で 終わりました。
+#   ⇒★読む 所（道）と 読んだ 物（並び）で 名前を 分ける★
+$関数たち = Get-Content $名簿 -Encoding UTF8 |
   Where-Object { $_ -and -not $_.StartsWith('#') -and -not $_.StartsWith('★') } |
   ForEach-Object { $_ -split '\s+' } | Where-Object { $_ -match '^[A-Z][A-Z0-9._]*$' } |
   Sort-Object -Unique
@@ -158,13 +174,13 @@ $結果 = New-Object System.Collections.ArrayList
 $呼び方あり = 0; $呼び方なし = 0; $本数 = 0
 $見つからない名 = New-Object System.Collections.ArrayList
 $i = 0
-foreach ($f in $名簿) {
+foreach ($f in $関数たち) {
   $i++
   # ★進みを こまめに 出す★（2026-09-14 に 直した）
   #   前は ★25個ごと★＝名簿が 45個だと ★1回しか 出ません★。
   #   ★殺された 時に「どこまで 測ったか」が 分かる 様に★ 毎回 出す（指示役1 の 注文）。
   #   ★紙は 書き上がってから 置きます★＝★進みは 画面だけ★（出来かけの 紙を 残さない）
-  Write-Host ("  … {0}/{1} {2}  （ここまで 式 {3}本）" -f $i, $名簿.Count, $f, $本数)
+  Write-Host ("  … {0}/{1} {2}  （ここまで 式 {3}本）" -f $i, $関数たち.Count, $f, $本数)
   $当たり = 0
   foreach ($a in $候補) {
     $式 = '=' + $f + $a
@@ -183,6 +199,22 @@ foreach ($f in $名簿) {
   if ($当たり) { $呼び方あり++ } else { $呼び方なし++; [void]$見つからない名.Add($f) }
 }
 
+# ★★材料を 機械が 読める 形で 控える★★（2026-09-14 に 足した）
+#   前は 頭に ★文章でしか★ 書いて いませんでした。
+#   ⇒ 押す 道具が ★空の 表★で 押して ★偽の 負け★が 出ます
+#     （2026-09-14 実測＝`=PRODUCT(A1:A5)` が 0 に なり「土台が 壊れている」と 報告される所だった）
+#   ★値は Excel から 読み返します★＝★私が 計算しません★（日付の 通し番号も そのまま）
+#   形 … `#材料<タブ>マス<タブ>値<タブ>型`（型＝数／字／真偽／式／空）
+$材料の行 = New-Object System.Collections.ArrayList
+foreach ($マス in @('A1','A2','A3','A4','A5','B1','B2','B3','B4','B5','D1','D2')) {
+  $mv = $ws.Range($マス).Value2
+  if ($null -eq $mv) { [void]$材料の行.Add("#材料`t$マス`t`t空"); continue }
+  if ($mv -is [bool]) { [void]$材料の行.Add(("#材料`t{0}`t{1}`t真偽" -f $マス, $(if ($mv) {'TRUE'} else {'FALSE'}))); continue }
+  if ($mv -is [string]) { [void]$材料の行.Add(("#材料`t{0}`t{1}`t字" -f $マス, $mv)); continue }
+  $ms = if ($mv -is [double]) { $mv.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture) } else { [string]$mv }
+  [void]$材料の行.Add(("#材料`t{0}`t{1}`t数" -f $マス, $ms))
+}
+
 $wb.Close($false); $xl.Quit()
 foreach ($o in @($ws, $wb, $xl)) { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($o) | Out-Null }
 
@@ -194,10 +226,14 @@ $頭 = @(
   "#   ⇒★人が 決めるのは 形の 候補だけ／どれが 正しいかは 実Excel が 決める★",
   "#   ⇒★1本だけだと『当たり前の 答え』で 通ってしまう★ので ★当たった 形は 全部 残す★",
   "# ★材料★ A1:A5=1..5 ／ B1:B5=2,4,6,8,10 ／ D1=2024/1/1 ／ D2=2026/1/1",
-  "# ★数★ 関数 $($名簿.Count)個 ／ 呼び方が 見つかった $呼び方あり 個 ／ 見つからない $呼び方なし 個 ／ 式 $本数 本",
-  "# ★呼び方が 見つからない★ … " + ($見つからない名 -join ' '),
-  "# 関数`t式`t実Excel の 答え`t型"
+  "# ★★材料（機械が 読む）★★ … `#材料<タブ>マス<タブ>値<タブ>型`（★Excel から 読み返した 値★）",
+  "# ★数★ 関数 $($関数たち.Count)個 ／ 呼び方が 見つかった $呼び方あり 個 ／ 見つからない $呼び方なし 個 ／ 式 $本数 本",
+  "# ★呼び方が 見つからない★ … " + ($見つからない名 -join ' ')
 )
-[System.IO.File]::WriteAllText($出, ((($頭 + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
+
+# ★見出しは 必ず 一番 下の # 行★（読む 側が 「最後の # 行」を 見出しと 見る 為）
+#   ⇒ ★材料の 行を 見出しの 前に 挟む★
+$見出し = @("# 関数`t式`t実Excel の 答え`t型")
+[System.IO.File]::WriteAllText($出, ((($頭 + $材料の行 + $見出し + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
 Write-Host "★書いた … $出★"
-Write-Host "★関数 $($名簿.Count)個 ／ 呼び方あり $呼び方あり 個 ／ なし $呼び方なし 個 ／ ★式 $本数 本★★"
+Write-Host "★関数 $($関数たち.Count)個 ／ 呼び方あり $呼び方あり 個 ／ なし $呼び方なし 個 ／ ★式 $本数 本★★"
