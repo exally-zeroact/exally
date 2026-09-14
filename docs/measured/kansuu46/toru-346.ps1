@@ -33,7 +33,8 @@
 param(
   [string]$名簿 = '',
   [string]$出 = '',
-  [switch]$上書き
+  [switch]$上書き,
+  [switch]$誤りも残す
 )
 
 $ErrorActionPreference = 'Stop'
@@ -197,7 +198,18 @@ foreach ($f in $関数たち) {
       $ws.Range('H1').Formula = $式
       $v = $ws.Range('H1').Value2
       if ($null -eq $v) { continue }
-      if ($v -is [int] -and $誤りの番号.ContainsKey([int]$v)) { continue }  # 誤り＝呼び方が 違う
+      # ★誤りは 既定では 捨てます★＝★この 道具は 引数の 形を 総当たりする 物★なので
+      #   ★誤り＝その 形は 呼び方では ない★と 見るのが 元の 狙い。
+      # ★★でも「正しい 誤り」も 在ります★★（2026-09-15 に 踏んだ）
+      #   `=MATCH(9,A1:A5,0)` → ★#N/A★＝★見つからない＝正しい 答え★
+      #   ⇒ `-誤りも残す` を 付けると ★誤りも 紙に 残します★
+      #   ★既定は 今の まま★＝★他の 紙の 数を 動かさない★
+      if ($v -is [int] -and $誤りの番号.ContainsKey([int]$v)) {
+        if (-not $誤りも残す) { continue }
+        [void]$結果.Add(("{0}`t{1}`t{2}`t{3}" -f $f, $式, $誤りの番号[[int]$v], 'error値'))
+        $当たり++; $本数++
+        continue
+      }
       $型 = $v.GetType().Name
       if ($型 -eq 'Object[,]') { continue }                                  # こぼれる 物は 別の 話
       $答 = if ($v -is [double]) { $v.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
@@ -236,6 +248,7 @@ $頭 = @(
   "#   ⇒★1本だけだと『当たり前の 答え』で 通ってしまう★ので ★当たった 形は 全部 残す★",
   "# ★材料★ A1:A5=1..5 ／ B1:B5=2,4,6,8,10 ／ D1=2024/1/1 ／ D2=2026/1/1",
   "# ★★材料（機械が 読む）★★ … `#材料<タブ>マス<タブ>値<タブ>型`（★Excel から 読み返した 値★）",
+  "# ★誤りも 残したか★ … $(if ($誤りも残す) { '★残した（-誤りも残す）＝「正しい 誤り」も 紙に 在ります★' } else { '残して いません（既定）＝誤りを 返す 形は 捨てました' })",
   "# ★数★ 関数 $($関数たち.Count)個 ／ 呼び方が 見つかった $呼び方あり 個 ／ 見つからない $呼び方なし 個 ／ 式 $本数 本",
   "# ★呼び方が 見つからない★ … " + ($見つからない名 -join ' ')
 )
