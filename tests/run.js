@@ -30,6 +30,8 @@ const FILES = [
   ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
   ['shiki-sagasu.test.mjs'],                   // ★INDEX と MATCH＝実物の のべ 68%（実Excel 193本と 突き合わせ）★
   ['shiki-sagasu.test.mjs', '--self-test'],    // ★見つからない時／転け方 2種／打つマスで 変わる／型1は 二分探索★
+  ['shoshiki.test.mjs'],                       // ★書式の台＝TEXT も 画面も 同じ 台（実Excel 192行と 一致）★
+  ['shoshiki.test.mjs', '--self-test'],        // ★時の隣の m は 分／-0 を 出さない／1900年の起点 2つ／曜日は 割り算★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★

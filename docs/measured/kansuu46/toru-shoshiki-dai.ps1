@@ -96,6 +96,27 @@ foreach ($書 in $書式たち) {
     $i++
     $見た目 = ''
     try { $見た目 = [string]$ws.Cells.Item($i, 2).Text } catch { $見た目 = '★取れない★' }
+    # ══ ★★2つ目の 窓★★ ══（見張り `tests/monosashi-mado.test.mjs` の 決め）
+    #   ★見た目が「0」に 見える 時、中も 本当に 0 か★を 別の 窓で 見ます。
+    #   ★この 道具では 生の 数を 置いて いる★ので 見せかけの 0 は 出ない はずですが、
+    #   ★「はず」で 免除に 逃げない★＝★測って 出します★。
+    #   （`.Value2` は ★0 で ない 値に 0 を 返す★事が 在る＝足し引きで 終わる 式の 時）
+    $窓２ = '-'
+    if ($見た目 -match '^\s*0([.,]0+)?\s*$') {
+      try {
+        $ws.Range('BZ1').Clear() | Out-Null
+        $ws.Range('BZ1').Formula = ('=(B' + $i + ')=0')
+        $z = $ws.Range('BZ1').Value2
+        $ws.Range('BZ1').Clear() | Out-Null
+        $窓２ = if ($z -is [bool]) { $(if ($z) { 'TRUE' } else { 'FALSE' }) } else { '★判じられない★' }
+      } catch { $窓２ = '★判じられない★' }
+    }
+    # ★型も 見ます★（`.Value2` が 何の 型で 返ったか）
+    $型 = '-'
+    try { $v2 = $ws.Cells.Item($i, 2).Value2
+      $型 = if ($null -eq $v2) { 'Empty' } elseif ($v2 -is [string]) { 'String' }
+            elseif ($v2 -is [bool]) { 'Boolean' } elseif ($v2 -is [double]) { 'Number' } else { 'Other' }
+    } catch { $型 = '-' }
     $tv = $ws.Cells.Item($i, 3).Value2
     $t答 = ''
     if ($null -eq $tv) { $t答 = '(空)' }
@@ -103,8 +124,13 @@ foreach ($書 in $書式たち) {
     elseif ($tv -is [double]) { $t答 = $tv.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture) }
     else { $t答 = [string]$tv }
     $同じ = if ($見た目 -eq $t答) { '同じ' } else { '★違う★' }
-    [void]$結果.Add(("{0}`t{1}`t{2}`t{3}`t{4}`t{5}`t{6}" -f `
-      $書, $世界, $v[0], ([double]$v[1]).ToString('R', [System.Globalization.CultureInfo]::InvariantCulture), $見た目, $t答, $同じ))
+    # ★★1列目を 番号に する★★（2026-09-15 に 踏んだ）
+    #   ★書式の 字は `#` で 始まります★（`#,##0` …）
+    #   ⇒★紙の 決まり「# で 始まる 行は 覚え書き」と ぶつかります★
+    #   ⇒★読む 道具が その 行を 黙って 飛ばしました★（16種の うち ★7種が 消えた★）
+    #   ⇒★1列目を 番号に して 行の 頭を `#` に しない★
+    [void]$結果.Add(("{0}`t{1}`t{2}`t{3}`t{4}`t{5}`t{6}`t{7}`t{8}`t{9}" -f `
+      ($結果.Count + 1), $書, $世界, $v[0], ([double]$v[1]).ToString('R', [System.Globalization.CultureInfo]::InvariantCulture), $見た目, $t答, $同じ, $窓２, $型))
   }
 }
 
@@ -120,7 +146,9 @@ for ($t = 0; $t -lt 40; $t++) {
 if ($残り.Count -eq 0) { Write-Host ('★Excel は 残って いません（0個・' + (($t + 1) * 0.5) + '秒で 消えた）★') }
 else { Write-Host ('★★Excel が ' + $残り.Count + '個 残って います＝20秒 待っても 消えません★★') }
 
-$違い = @($結果 | Where-Object { $_ -like '*★違う★' }).Count
+# ★★数え方★★ … 8列目が 「★違う★」の 行（★後ろに 列を 足したので `-like '*…'` では 数えられません★）
+#   2026-09-15 … 列を 2本 足した 時 ★この 数が 30→0 に なりました★（★静かに 嘘に なる★）
+$違い = @($結果 | Where-Object { ($_ -split "`t")[7] -eq '★違う★' }).Count
 $頭 = @(
   '# ★書式の 台が 何を すれば よいか 実Excel に 聞いた★（2026-09-15）',
   '#   ★測って 選んだ 書式★＝司さんの 実物が 実際に 使って いる 物',
@@ -134,7 +162,10 @@ $頭 = @(
   '# ★★一番 大事な 列＝7列目★★',
   '#   ★マスに 付けた 時の 見た目★と ★TEXT() に 渡した 時★が 同じか',
   "#   ⇒★違う 行 … $違い 本★（0 なら ★台は 1つで 足ります★）",
-  '# 書式(この国)' + "`t" + '書式(世界)' + "`t" + '値の名' + "`t" + '値' + "`t" + 'マスの見た目' + "`t" + 'TEXT()の答え' + "`t" + '同じか'
+  '# ★★2つ目の 窓★★ … 見た目が 0 の 行だけ `=(B行)=0` の 真偽も 取って 在ります（9列目）',
+  '#   ＝`.Value2` は ★0 で ない 値に 0 を 返す★事が 在る（足し引きで 終わる 式）',
+  '#   ★この 道具は 生の 数を 置くだけ★＝見せかけの 0 は 出ない はずですが ★測って 出します★',
+  '# 番号' + "`t" + '書式(この国)' + "`t" + '書式(世界)' + "`t" + '値の名' + "`t" + '値' + "`t" + 'マスの見た目' + "`t" + 'TEXT()の答え' + "`t" + '同じか' + "`t" + '窓②=0の真偽' + "`t" + '型'
 )
 [System.IO.File]::WriteAllText($出, ((($頭 + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
 Write-Host "★書いた … $出★（行 $($結果.Count) 本 ／ ★違う 行 $違い 本★）"
