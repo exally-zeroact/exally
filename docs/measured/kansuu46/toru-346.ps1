@@ -24,6 +24,17 @@
 #      ★同じ 式を Exally に 打たせて 1本ずつ 突き合わせます★
 #
 #  使い方: powershell -File docs/measured/kansuu46/toru-346.ps1
+#          （名簿と 出し先を 変える 時）
+#          pwsh -NoProfile -File docs/measured/kansuu46/toru-346.ps1 `
+#               -名簿 ../mada-hakatte-inai-2026-09-14.txt -出 golden-mada-2026-09-14.tsv
+
+# ★名簿と 出し先は 引数で 変えられます★（2026-09-14 に 足した＝★道具を 複製しない★）
+#   例）pwsh -File toru-346.ps1 -名簿 ../mada-hakatte-inai.txt -出 golden-mada-2026-09-14.tsv
+param(
+  [string]$名簿 = '',
+  [string]$出 = '',
+  [switch]$上書き
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -57,7 +68,15 @@ function 窓２_本当にゼロか($sh, [string]$式) {
 }
 
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$出 = Join-Path $ここ 'golden-346-2026-09-08.tsv'
+if (-not $出) { $出 = Join-Path $ここ 'golden-346-2026-09-08.tsv' }
+elseif (-not [System.IO.Path]::IsPathRooted($出)) { $出 = Join-Path $ここ $出 }
+# ★もう 在る 紙を 黙って 上書きしない★（2026-09-14 に 足した）
+#   訳＝この 紙には 後から ★`#材料` の 行★や 直しが 入って いる 事が 在ります。
+#       走らせ直すと ★その 手入れが 消え★、★取った 日も 黙って 変わります★。
+#   ⇒ わざと 取り直す 時だけ ★-上書き★ を 付ける。
+if ((Test-Path $出) -and -not $上書き) {
+  throw "★もう 在ります★: $出 `n  取り直すなら -上書き を 付けて ください（★前の 紙は 消えます★）"
+}
 
 # ★★2026-09-08 に 足した＝★この 表に 無い 番号は「数」として 紙に 載ってしまう★★
 #   ⇒ 実際に 起きた … =SEQUENCE(0.5) の 答えが ★-2146826238★ の まま 6本 載っていた
@@ -89,7 +108,12 @@ $候補 = @(
   '(A1:A5,B1:B5,1)', '(2,3,4,5,6)', '(-2)', '(2.5,1)'
 )
 
-$名簿 = Get-Content (Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt') -Encoding UTF8 |
+if (-not $名簿) { $名簿 = Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt' }
+elseif (-not [System.IO.Path]::IsPathRooted($名簿)) { $名簿 = Join-Path $ここ $名簿 }
+if (-not (Test-Path $名簿)) { throw "★名簿が 無い★: $名簿" }
+Write-Host "★名簿★ $名簿"
+Write-Host "★出し先★ $出"
+$名簿 = Get-Content $名簿 -Encoding UTF8 |
   Where-Object { $_ -and -not $_.StartsWith('#') -and -not $_.StartsWith('★') } |
   ForEach-Object { $_ -split '\s+' } | Where-Object { $_ -match '^[A-Z][A-Z0-9._]*$' } |
   Sort-Object -Unique
