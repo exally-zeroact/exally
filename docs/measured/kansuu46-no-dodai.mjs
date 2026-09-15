@@ -68,14 +68,24 @@ export function 押す(台, 式) {
   const { EF, hf, SID } = 台;
   let 後;
   try { 後 = EF.convertFormula(式); } catch (e) { return { 道: '変換', 字: '★投げた★' }; }
+
+  /* ★★材料を 先に 板へ 入れる★★（★2026-09-15 に 直しました★）
+       ★前は JS層を 呼んでから 材料を 入れて いました★
+       ⇒★★JS層（`_jsSet` 27個）は ★空の 板★を 読んで いました★★
+       ★実測★ `=DSUM(A1:B5,1,A1:A2)` … ★前 0★／★後 2★（実Excel 2）
+              9本の D系で ★合うのが 0本 → 5本★に なりました
+       ⇒★★全部 「うちが 負けて いる」向きの 偽の 負け★★
+       ★本番の 順★ … `book.html` 2873 は ★本を 読み込んだ 後★に `_jsComputeFormula`
+       ⇒★だから ★材料が 入って いるのが 本番★ */
+  const 表 = 材料();
+  表[式の行][式の列] = 後;
+  try { hf.setSheetContent(SID, 表); } catch (e) { return { 道: 'エンジン', 字: '★投げた★' }; }
+
   try {
     const js = EF._jsComputeFormula(0, 式);
     if (js !== null && js !== undefined) return { 道: 'JS層', 字: String(js) };
   } catch (e) { /* JS層が 投げた＝engine へ */ }
   try {
-    const 表 = 材料();
-    表[式の行][式の列] = 後;
-    hf.setSheetContent(SID, 表);
     const v = hf.getCellValue({ sheet: SID, row: 式の行, col: 式の列 });
     if (v && v.type) return { 道: 'エンジン', 字: 赤の名(v.type) };
     if (v === null || v === undefined) return { 道: 'エンジン', 字: '' };
