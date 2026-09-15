@@ -6,7 +6,7 @@
 #   ★下の どれか 1つでも 変わったら この 紙は 古い★＝`tests/kami-no-zairyou.test.mjs` が 赤に します
 #   ★「取った日」は「走らせた 証し」では ありません★（2026-09-15 に 実際に 起きた）
 # ★材料★	docs/measured/honban-no-michi.mjs	e8c7a3724b5cacf0
-# ★材料★	docs/measured/osu-86-karimono-no-ima.mjs	38defde338206db2
+# ★材料★	docs/measured/osu-86-karimono-no-ima.mjs	dc4b7916fd906aaa
 # ★材料★	docs/measured/zairyou-no-yubimon.mjs	36cf1a2607f2534c
 # ★材料★	exally-formula.js	91aab55b09c186f1
 # ★材料★	hyperformula.full.min.js	6685699641037e65
@@ -1082,23 +1082,7 @@ PROB	(2,2,LAMBDA(r,c,r*c))	エンジン	#NAME
 PROB	(x,2,x*3)	エンジン	#NAME
 PROB	(x,x+1)	エンジン	#NUM
 PROB	("<a><b>1</b></a>","//b")	エンジン	#NUM
-RANDARRAY	(1)	エンジン	0.3835606892031834
-RANDARRAY	()	エンジン	0.9990096815961536
-RANDARRAY	(A1:A2,1)	エンジン	#VALUE
-RANDARRAY	(1,1)	エンジン	0.6749929072340229
-RANDARRAY	(A1:A2)	エンジン	#VALUE
-RANDARRAY	(1,1,1)	エンジン	#VALUE
-RANDARRAY	("a")	エンジン	#VALUE
-RANDARRAY	(A1)	エンジン	0.37445676554859886
-RANDARRAY	(1,1,1,1)	エンジン	1
-RANDARRAY	(A1:B2,1,A1:A2)	エンジン	#VALUE
-RANDARRAY	(A1:A2,A1:A2)	エンジン	#VALUE
-RANDARRAY	(A1:A2,LAMBDA(v,v*2))	エンジン	#NAME
-RANDARRAY	(0,A1:A2,LAMBDA(a,b,a+b))	エンジン	#NAME
-RANDARRAY	(2,2,LAMBDA(r,c,r*c))	エンジン	#NAME
-RANDARRAY	(x,2,x*3)	エンジン	#NAME
-RANDARRAY	(x,x+1)	エンジン	#NAME
-RANDARRAY	("<a><b>1</b></a>","//b")	エンジン	#VALUE
+RANDARRAY	★毎回 変わる（乱数）★	形だけ	★誤りでない 5通り／誤り 12通り★（★答えは 焼かない★）
 RECEIVED	(1)	エンジン	#NUM
 RECEIVED	()	エンジン	#NUM
 RECEIVED	(A1:A2,1)	エンジン	#VALUE
