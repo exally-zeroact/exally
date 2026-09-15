@@ -1035,6 +1035,99 @@
      ＝★★台が 知らない 417個は 結局 借り物へ 落ちる★★
   ★★本丸は 417個★★
 ```
+---
+
+## ★★㉝ 「移すだけ」は 見立てだった＝★包むだけの 皮が 自前に 見える★★★ … ★測りました（2026-09-15）★
+
+### ★★何が 起きたか★★
+
+```
+  ★私は こう 書きました★（㉜）
+     「★417個の うち 50個は ★移すだけ★／中身は もう 在る★」
+  ★指示役1 が 止めました★
+     「★それも まだ 測って いません★／★まず 1個 移して 手間を 出せ★」
+  ★1個目（IMCOS）を 開いた ところ★
+     `lib/formula-complex-plug.js` は
+       `var 元 = H.getFunctionPlugin('IMCOS');`
+       `十五桁のIM.prototype[手] = function () { return F.字を直す(元の手.apply(this, arguments)); };`
+     ＝★★借り物の 実装を そのまま 継いで／出た 字を 15桁に 丸めるだけ★★
+     ＝★複素数の 計算は ★1行も 自前では ない★★
+  ★8本の プラグインを 数えた★ … `getFunctionPlugin` を 使うのは ★この 1本だけ★
+     （他 7本＝cell / extra / filterxml / kane / nokori / soto / yosoku は ★0件★）
+```
+
+### ★★直した 数★★
+
+```
+  ★前（㉜）★  移すだけ 25（プラグイン）＋25（JS層）＝50 ／ ★書く 367★
+  ★★後★★    ★移すだけ 4（プラグイン）＋25（JS層）＝29★ ／ ★★書く 388★★
+  ★残った 4個★ … DETECTLANGUAGE STOCKHISTORY TRANSLATE WEBSERVICE（`formula-soto-plug.js`）
+  ★消えた 21個★ … IMCONJUGATE IMCOS IMCOSH IMCOT IMCSC IMCSCH IMDIV IMEXP IMLN
+                   IMLOG10 IMLOG2 IMPOWER IMPRODUCT IMSEC IMSECH IMSIN IMSINH
+                   IMSQRT IMSUB IMSUM IMTAN
+  ★★母数は 動いて いません★★ … 492／自前 75（15.2%）／知らない 417
+```
+
+### ★★なぜ 見つけにくいか★★
+
+```
+  ★`lib/formula-complex.js` は ★自前の 紙★です★（覚書きも 実測も 丁寧に 書いて ある）
+  ★名前も 自前の 名簿に 載って います★（`文字を返す` 21個）
+  ⇒★★名前を 数えると 自前に 見える★★
+  ★違いは ★1行★★ … `getFunctionPlugin` が 在るか
+  ⇒★★「自前か」は ★名簿では なく ★誰が 計算して いるか★で 決まる★★
+  ★関わる 決まり★ … `feedback_warui_kakikata_wo_sagasu_yori_yoi_yobikata_wo_kazoero`
+                     `feedback_imi_no_nai_kazu_wa_ichiban_mitsukenikui`
+```
+
+### ★★同じ 日に 出た 道具の 穴（★7つ目の 偽の 負け★）★★
+
+```
+  `docs/measured/kansuu46-no-dodai.mjs` の `押す` は
+     ★材料を 板に 入れる ★前★★に JS層（`_jsSet` 27個）を 呼んで いた
+  ⇒★★JS層は ★空の 板★を 読んで いた★★
+  ★実測（D系 9本）★ ★合うのが 0本 → 5本★
+     `=DSUM(A1:B5,1,A1:A2)`     ★0 → 2★（実Excel 2）
+     `=DAVERAGE(A1:B5,1,A1:A2)` ★0 → 2★（実Excel 2）
+     `=DCOUNT(A1:B5,1,A1:A2)`   ★0 → 1★（実Excel 1）
+     `=DCOUNTA(A1:B5,1,A1:A2)`  ★0 → 1★（実Excel 1）
+     `=DGET(A1:B5,1,A1:A2)`     ★#NUM! → 2★（実Excel 2）
+  ⇒★全部「うちが 負けて いる」向き★
+  ★本番の 順★ … `book.html` 2873 は ★本を 読み込んだ 後★に `_jsComputeFormula`
+  ★効く 範囲を 数えた★ … 86個の 紙 と JS層 27個 の 重なり ★0個★
+     ⇒★★あの 紙の 答えは 変わりません★★（★指紋だけ 古く なった＝焼き直しが 要る★）
+```
+
+### ★★1個 移した 手間（★見積りの 元★）★★
+
+```
+  ★移した 物★ … ★DSUM★（IMCOS が 消えたので）
+  ★物差し★   … ★実Excel★（`kansuu46/golden-mada-2026-09-14.tsv` 73-74行）
+      `=DSUM(A1:B5,1,D1:D2)` → ★14★ ／ `=DSUM(A1:B5,1,A1:A2)` → ★2★
+  ★手間★
+      `lib/shiki-kansuu.js`               ★+92行★（★動く 69 ／ 覚書き 23★）
+      `tests/shiki-kansuu-dsum.test.mjs`  ★116行・試験 5本★（★先に 5本とも 赤★）
+      `docs/measured/kansuu46-no-dodai.mjs` ★+13 −3★
+  ★★「移すだけ」では 無かった 訳★★
+      今の DSUM（`exally-formula.js` の `_jsDbFunc`）は
+        ★計算は 自前★／★読む 先が `_hf.getCellValue`（★借り物の 表★）★
+      ⇒★★台へ 持って 来る＝読む 所を 全部 書き直す★★
+  ★残り 11個（D系）の 見込み★ … ★土台（`D系の値たち`）は もう 書いた★
+      ⇒★1個 10行くらい★（★まだ 測って いません＝見込みです★）
+```
+
+### ★★出た 欠陥（★客に 出ます★）★★
+
+```
+  `=DSUM(A1:B5,1,D1:D2)` … ★今の 製品 0 ／ 実Excel 14★
+  ★何が 起きて いるか★
+     ★条件の 見出しが 台帳の 見出しと 合わない 時★
+     ・実Excel … ★その 条件は 効かない★（＝全部 足す）
+     ・うち   … `headers.indexOf(...)` が ★-1★ → ★列 -1 を 読む★ → ★0件★
+  ★D系 12個は ぜんぶ `_jsDbFunc` を 通る★
+     ⇒★★同じ 穴の はず★★（★DSUM 以外は まだ 測って いません★）
+  ★台（自前）は 直して あります★（＝★紐付かない 列は 縛らない★）
+```
 
 ---
 
