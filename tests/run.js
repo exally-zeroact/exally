@@ -40,6 +40,8 @@ const FILES = [
   ['dkei6-honban.test.mjs','--self-test'],     // ★「まだ」は名指し＋訳つき／合ったら許しを外させる★
   ['dkei-honban.test.mjs'],                    // ★D系12個を 本番の道で 実Excel 21行と 突き合わせ（見出しが 紐付かない 形）★
   ['dkei-honban.test.mjs','--self-test'],      // ★穴の 場所と 直した 印が 字で 在る／見ていない 6か所は 棚★
+  ['shiki-kansuu-kami.test.mjs'],              // ★台が知る87個を 手元の紙60枚で 押す（632行）＝書くたび 自動で増える★
+  ['shiki-kansuu-kami.test.mjs','--self-test'],// ★押した行が0なら赤／「まだ」は名指し16件・訳つき★
   ['shiki-kansuu-dkei.test.mjs'],              // ★D系12個を台へ＝実Excel 21行＋17行（0件の決めが 関数ごとに 違う）★
   ['shiki-kansuu-dkei.test.mjs','--self-test'],// ★台が知るD系を 呼んで数える（12/12）★
   ['shiki-kansuu-dsum.test.mjs'],              // ★417個の うち 移した 最初の 1個＝DSUM（実Excel 14／2）★
