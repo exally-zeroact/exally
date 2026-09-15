@@ -30,6 +30,8 @@ const FILES = [
   ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
   ['shiki-hyou-hishigata.test.mjs'],           // ★菱形の頼りで古い答えが残らない（実物 37/176本→0/0）★
   ['shiki-hyou-hishigata.test.mjs','--self-test'],// ★輪を壊していない／棚に直す前の数が在る★
+  ['kami-no-zairyou.test.mjs'],                // ★紙が 古いまま 置かれるのを 止める（材料の指紋）★
+  ['kami-no-zairyou.test.mjs','--self-test'],  // ★1バイト変わったら気づく／合う指紋は通す／消えた材料★
   ['shiki-hyou-itamatagi.test.mjs'],           // ★板またぎ＝菱形・輪・無い板・裸のA1はその式の板★
   ['shiki-hyou-itamatagi.test.mjs','--self-test'],// ★下見の数が紙に在る★
   ['shiki-hyou-kata-no-kuchi.test.mjs'],       // ★型つきの口＝置いた事が 見ている式に 伝わる／直書き0個★
