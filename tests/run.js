@@ -36,6 +36,8 @@ const FILES = [
   ['shiki-hyou-itamatagi.test.mjs','--self-test'],// ★下見の数が紙に在る★
   ['shiki-hyou-kata-no-kuchi.test.mjs'],       // ★型つきの口＝置いた事が 見ている式に 伝わる／直書き0個★
   ['shiki-hyou-kata-no-kuchi.test.mjs','--self-test'],// ★変数に受けて逃げる形も捕まえる／覚書きは数えない★
+  ['dkei-honban.test.mjs'],                    // ★D系12個を 本番の道で 実Excel 21行と 突き合わせ（見出しが 紐付かない 形）★
+  ['dkei-honban.test.mjs','--self-test'],      // ★穴の 場所と 直した 印が 字で 在る／見ていない 6か所は 棚★
   ['shiki-kansuu-dsum.test.mjs'],              // ★417個の うち 移した 最初の 1個＝DSUM（実Excel 14／2）★
   ['shiki-kansuu-dsum.test.mjs','--self-test'],// ★DSUMを 外したら 5本とも 赤に なるか★（★土台が 在る 今は 素通り＝記録★）
   ['shiki-sagasu.test.mjs'],                   // ★INDEX と MATCH＝実物の のべ 68%（実Excel 193本と 突き合わせ）★
