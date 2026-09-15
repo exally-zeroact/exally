@@ -807,12 +807,38 @@
   ★指示役1 の 棚にも「18個は 引数が 足りないだけ」と 書かれて いました★＝★そちらも 訂正★
 ```
 
+### ★★㉘の 続き＝数に しました（2026-09-15・★Excel は 開いて いません★）★★
+
+```
+  ★★紙が もう 答えを 持って いました★★
+     `docs/measured/kansuu46/golden-kane-2026-09-07.tsv`（★700行・26個・実Excel 16.0 build 20326★）
+     ★その 紙の 式は 最初から `DATE(…)` の 形★
+     ⇒★★「実Excel が DATE() を 受けるか」は 測る 要が 無かった＝紙に 在った★★
+     ⇒★私は Excel の 枠を 取ろうと して いました★＝★★作る前に 探せ★★
+
+  ★★700行 押した 結果＝合った 14／700★★
+     ★#VALUE!（入口で 落ちる）★ ★21個★ … 0/全
+        ACCRINT ACCRINTM AMORDEGRC AMORLINC COUPDAYBS COUPDAYS COUPDAYSNC
+        COUPNCD COUPNUM COUPPCD DISC DURATION INTRATE MDURATION PRICE
+        PRICEDISC PRICEMAT RECEIVED YIELD YIELDDISC YIELDMAT
+     ★#NAME?（そもそも 無い）★ ★4個★ … 0/全
+        ODDFPRICE ODDFYIELD ODDLPRICE ODDLYIELD（★「名乗らない 30」の 中★）
+     ★VDB★ ★14/16★ … 外れ 2本は ★端の 桁★
+        `=VDB(2400,300,10,6,10,1.5)`      うち `605.1588374999999` ／実Excel `605.1588375`
+        `=VDB(10000,0,5,3,5,2,TRUE)`      うち `1382.3999999999996` ／実Excel `1382.4`
+        ⇒★字は 違います★（★「中の 数が 同じ」は「同じ」では ない★）
+  ★★⇒ お金の 26個の うち ★25個が 1本も 合いません★★★
+     ＝★棚に「21個」と 書いて いたのは ★少なすぎ★★（★4個の #NAME? を 数えて いなかった★）
+```
+
 ### ★まだ 見て いない 事★
 
 ```
   ・★中の どこで 落ちて いるか★（`lib/formula-kane.js` を まだ 読んで いません）
   ・★他の 日付を 取る 関数★（`YEARFRAC` 等）が 同じか
-  ・★実Excel が 本当に その 答えを 出すか★は ★紙が 持って います★（`golden-kane-2026-09-07.tsv`）
+  ・★マスで 渡した 形を 実Excel が どう 答えるか★
+     ＝★うちが #VALUE! を 返す のは 測り済★／★実Excel 側は 紙に 無い★
+     ⇒★★但し 答えは 変わりません★★（DATE() 形だけで 25個が 0/全）
   ・★いつ 壊れたか★（★二分で 探して いません★）
 ```
 
