@@ -107,6 +107,49 @@ T('★② 指紋の 行が 読める 形★（★字が 崩れたら 黙って �
   console.log('      … 指紋の 行 ' + 行数 + '本 とも 形は 正しい');
 });
 
+/* ══ ★★一番 守りたい 本が 入って いるかを ★名指しで★ 確かめる★★ ══
+     ★なぜ 要るか★
+       指紋は ★字で 追って★ 集めて います（`docs/measured/○○.mjs` を 拾う）。
+       ★字で 追う 手は 必ず 抜けます★
+         道を 組み立てる／別の 置き場／引数で 渡る 道 …
+       ★抜けたら ★紙は 古いのに 緑★★＝★今日の XIRR と 同じ 形★
+     ★実際に 1回 踏んで います★（2026-09-15）
+       最初の 作りでは ★`honban-no-michi.mjs` が 1行も 入って いませんでした★
+       ＝★`smartRounding:false` と プラグイン 8本を 決める 本★
+     ⇒★★集め方が 抜けても ここで 止まります★★ */
+T('★★③ 一番 守りたい 本が 指紋に 入って いる★★（★名指し★）', () => {
+  /* ★この 紙は これを 読んで 取ったはず★（道具ごとに 決める） */
+  const 必ず = {
+    'golden-86-karimono-2026-09-15.tsv': [
+      'docs/measured/honban-no-michi.mjs',          /* ★建て方（smartRounding／プラグイン 8本）★ */
+      'docs/measured/osu-86-karimono-no-ima.mjs',   /* ★書き出した 道具そのもの★ */
+      'docs/measured/zairyou-no-yubimon.mjs',       /* ★指紋を 作る 本★ */
+      'exally-formula.js',                          /* ★自前層★ */
+      'hyperformula.full.min.js',                   /* ★借り物★ */
+    ],
+  };
+  const 悪い = [];
+  let 見た = 0;
+  for (const [名, 一覧] of Object.entries(必ず)) {
+    const p = path.join(紙置き, 名);
+    if (!fs.existsSync(p)) { 悪い.push(名 + ' … ★紙が 無い★'); continue; }
+    見た++;
+    const s = fs.readFileSync(p, 'utf8');
+    for (const f of 一覧) {
+      if (s.indexOf(印 + f + '\t') < 0) {
+        悪い.push(名 + '\n          ★指紋に 無い★ ' + f);
+      }
+    }
+  }
+  console.log('      … 名指しで 見た 紙 ' + 見た + '枚 ／ 必ず 入って いるべき 本 '
+    + Object.values(必ず).reduce((a, x) => a + x.length, 0) + '本');
+  if (悪い.length) {
+    throw new Error('★一番 守りたい 本が 指紋に 入って いません★\n        ' + 悪い.join('\n        ')
+      + '\n        ⇒★集め方（字で 追う 手）が 抜けて います★'
+      + '\n        ⇒★この ままだと 「紙は 古いのに 緑」に なります★');
+  }
+});
+
 if (process.argv.includes('--self-test')) {
   console.log('\n[kami-no-zairyou --self-test] ★わざと 壊したら 赤に なるか★');
 
