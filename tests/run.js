@@ -36,6 +36,8 @@ const FILES = [
   ['shiki-hyou-itamatagi.test.mjs','--self-test'],// ★下見の数が紙に在る★
   ['shiki-hyou-kata-no-kuchi.test.mjs'],       // ★型つきの口＝置いた事が 見ている式に 伝わる／直書き0個★
   ['shiki-hyou-kata-no-kuchi.test.mjs','--self-test'],// ★変数に受けて逃げる形も捕まえる／覚書きは数えない★
+  ['dkei6-honban.test.mjs'],                   // ★棚㉝の6か所＝実Excel 26件（多列かつ／多行または／記号／field超過／0件）★
+  ['dkei6-honban.test.mjs','--self-test'],     // ★「まだ」は名指し＋訳つき／合ったら許しを外させる★
   ['dkei-honban.test.mjs'],                    // ★D系12個を 本番の道で 実Excel 21行と 突き合わせ（見出しが 紐付かない 形）★
   ['dkei-honban.test.mjs','--self-test'],      // ★穴の 場所と 直した 印が 字で 在る／見ていない 6か所は 棚★
   ['shiki-kansuu-dsum.test.mjs'],              // ★417個の うち 移した 最初の 1個＝DSUM（実Excel 14／2）★
