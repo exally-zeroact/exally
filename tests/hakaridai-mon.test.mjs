@@ -66,15 +66,16 @@ function 道具ら() {
 
 /* ══ ★免除（★理由つきで 名指し★／黙って 見逃さない）★ ══════════ */
 const 免除 = [
-  { 名: 'osu-wakeru.mjs',
-    訳: '★2026-09-07 の 道具★＝「動く 491個」を 分ける 為の 物。'
-      + '★エンジンは 触ります★（buildEmpty / getCellValue が 在る）が '
-      + '★見るのは 返って きた 物の ★種類★だけ★＝`#NAME?` か 値か だけを 数え、'
-      + '★値そのものは 1つも 使いません★（コードで 確かめた … `v.type` しか 読まない）。'
-      + '⇒ だから ★プラグインの 数も smartRounding も 答えを 変えません★。'
-      + '★本番の 数として 報告して いません★。'
-      + '★2026-09-10 訂正★ … 前は「答えの 値を 出す 道具では ない」とだけ 書いて いて '
-      + '★「エンジンを 呼ばない」と 読める 字★でした。★実際は 呼んで います★＝字を 実物に 合わせました。' },
+  /* ★★osu-wakeru.mjs は 2026-09-15 に 免除から 外しました★★
+     ★前の 訳★ …「見るのは 返って きた 物の 種類だけなので
+             プラグインの 数も smartRounding も 答えを 変えません」
+     ★★これは 間違って いました★★（実測・2026-09-15）
+       本番の 道に 乗せたら ★「誤りしか 返らない」が 71個 → 68個★
+       変わった 3個 … ★ACOTH / ATANH / F.INV★
+       ＝★軽い 建て方だと「誤り」に 見えて いた★
+       ＝★種類だけ 見る 道具でも 建て方で 種類が 変わる★
+     ⇒★★「答えを 使わないから 建て方は 適当で よい」は 成り立ちません★★
+     ⇒★`docs/measured/honban-no-michi.mjs` に 乗せて 免除を 1つ 減らしました★ */
   { 名: 'osu-oufuku.mjs',
     訳: '★2026-09-10 の 道具★＝★エンジンを 1度も 呼びません★。'
       + 'やる事は ★うちの 書き出しの 道（GridXlsx → XlsxIO）で xlsx を 作る★のと '
@@ -218,41 +219,56 @@ T('★★本番の 建て方に smartRounding:false と useArrayArithmetic:true 
   console.log('      … 2つとも 在る');
 });
 
-T('★★道具が 本番と 同じ 本数の プラグインを 積んで いる★★', () => {
+/* ══ ★★本番の 道を 通って いるか★★ ══（2026-09-15 に 強めました）
+     ★前は★ …「道具の 中に 書いて ある 建て方が 本番と 同じか」を 見て いました
+       ＝★写しを 許して いた★。実際 ★同じ 建て方が 6本★ 在りました。
+     ★今は★ …★★`docs/measured/honban-no-michi.mjs` を 通って いるか★★だけ 見ます
+       ＝★自前で 建てて いる 道具が 1本でも 在れば 赤★
+     ★なぜ 強めたか★
+       ★悪い 書き方は 何通りでも 書ける／良い 呼び方は 1つ★
+       （[[feedback_warui_kakikata_wo_sagasu_yori_yoi_yobikata_wo_kazoero]]）
+     ★実際に 出た 害★（2026-09-15・実測）
+       `osu-wakeru.mjs` は ★軽い 建て方★で 建てて いました
+       ⇒★「誤りしか 返らない」が 71個 → 本番の 道で 68個★
+       ⇒★ACOTH / ATANH / F.INV を 「誤り」と 数えて いた★ */
+T('★★道具は 本番の 道（honban-no-michi）を 通って いる★★', () => {
   const 悪い = [];
   for (const t of 道具ら()) {
     if (免除.some((x) => x.名 === t.名)) continue;
-    /* ★数を 書き込んで いる 物は それを 見る／`つなぐ` の 数を 数える★ */
-    const つなぐ数 = (t.字.match(/-plug\.js'\)\)?\s*\n?\s*\.つなぐ|\.つなぐ\(/g) || []).length;
-    const 門が在る = /book\.html[\s\S]{0,400}?(buildEmpty|プラグイン)/.test(t.字)
-      || /本番のプラグイン数|本番と 同じ .*本の プラグイン/.test(t.字);
-    if (つなぐ数 < 要る本数 && !門が在る) {
-      悪い.push(t.名 + '（つなぐ ' + つなぐ数 + '本／本番 ' + 要る本数 + '本・★門も 無い★）');
-    }
+    const 素 = 注記を外す(t.字);
+    if (素.indexOf('honban-no-michi') >= 0) continue;          /* ★通って いる★ */
+    const 自前 = [];
+    if (/\.buildEmpty\s*\(/.test(素)) 自前.push('buildEmpty');
+    if (/-plug\.js/.test(素)) 自前.push('plug を 自前で つなぐ');
+    if (自前.length) 悪い.push(t.名 + '（' + 自前.join('／') + '）');
   }
   if (悪い.length) {
-    throw new Error('★' + 悪い.length + '本が 足りない★\n      ' + 悪い.join('\n      ')
-      + '\n      ⇒★本番に 在る 物が 無い 状態で 押すと ★嘘の 数字★が 出ます★');
+    throw new Error('★' + 悪い.length + '本が 自前で 建てて います★\n      '
+      + 悪い.join('\n      ')
+      + '\n      ⇒★`docs/measured/honban-no-michi.mjs` の `建てる()` を 使って ください★'
+      + '\n      ⇒★違いが 要るなら ★別の 道では なく 口の 引数★ に して ください★'
+      + '\n      ⇒ 2026-09-15 実測 … 軽い 建て方だと ACOTH/ATANH/F.INV を 「誤り」と 数えて いた');
   }
-  console.log('      … 全部 ' + 要る本数 + '本 ／ 免除 ' + 免除.length + '本（理由つき）');
+  console.log('      … 測り台 ' + 道具ら().filter((t) => !免除.some((x) => x.名 === t.名)).length
+    + '本とも 本番の 道を 通って いる ／ 免除 ' + 免除.length + '本（理由つき）');
 });
 
-T('★★道具の 建て方が 本番と 同じ（smartRounding:false）★★', () => {
-  const 悪い = [];
-  for (const t of 道具ら()) {
-    if (免除.some((x) => x.名 === t.名)) continue;
-    const 建て = (/buildEmpty\(\{([\s\S]{0,300}?)\}\)/.exec(t.字) || [])[1];
-    if (!建て) { 悪い.push(t.名 + '（buildEmpty が 無い）'); continue; }
-    const s = 建て.replace(/\s+/g, '');
-    if (s.indexOf('smartRounding:false') < 0) {
-      悪い.push(t.名 + '（★smartRounding が 既定＝エンジンが 勝手に 丸める★）');
-    }
+/* ★★本番の 道 そのものが 本番と 同じか★★（★台は 1本★なので ここだけ 見る） */
+T('★★本番の 道の 建て方が 本番と 同じ（smartRounding:false）★★', () => {
+  const 道 = 注記を外す(fs.readFileSync(path.join(ROOT, 'docs/measured/honban-no-michi.mjs'), 'utf-8'));
+  const 建て = (/buildEmpty\(\{([\s\S]{0,300}?)\}\)/.exec(道) || [])[1];
+  if (!建て) throw new Error('★本番の 道に buildEmpty が 無い★');
+  const x = 建て.replace(/\s+/g, '');
+  for (const 要 of ['smartRounding:false', 'useArrayArithmetic:true']) {
+    if (x.indexOf(要) < 0) throw new Error('★本番の 道に ' + 要 + ' が 無い★'
+      + '＝★803.6538461538445 が 803.65384615 に なります（2026-09-09 実測）★');
   }
-  if (悪い.length) {
-    throw new Error('★' + 悪い.length + '本★\n      ' + 悪い.join('\n      ')
-      + '\n      ⇒★803.6538461538445 が 803.65384615 に なります（2026-09-09 実測）★');
+  /* ★本番の 道が プラグインの 本数を ★書き込んで いない★ 事★
+     ＝★book.html から 数えて いる★（本番が 増えたら 自分で 止まる） */
+  if (道.indexOf('本番のプラグイン数') < 0) {
+    throw new Error('★本番の 道が 本数を book.html から 数えて いない★');
   }
-  console.log('      … 全部 smartRounding:false');
+  console.log('      … 本番の 道 1本を 見た（smartRounding:false／useArrayArithmetic:true／本数は book.html から）');
 });
 
 T('★★`setSheetContent` で 板ごと 入れる 道具は 断りを 書いて いる★★', () => {

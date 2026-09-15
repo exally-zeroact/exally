@@ -7,49 +7,47 @@
  *    ③引数の 形を 17通り 試して ★1つでも★ 当たれば 動く
  *
  *  ★ここでは 同じ 押し方で 押して、★何が 返ったか で 分ける★
+ *
+ *  ★★★この 台の 数は 画面の 数では ありません★★★（2026-09-15 に 書いた）
+ *    ★ここは `setSheetContent` で ★板ごと★ 入れて います★（本番は 1マスずつ）。
+ *    ⇒ 2026-09-10 … 板ごと 入れた せいで 裸の `=LINEST(…)` が ★#VALUE!★ に なり
+ *      ★「本番が 壊れて いる」と 報告する 一歩 手前★まで 行きました。
+ *    ⇒★画面の 事を 言いたい なら ★ブラウザで 押して ください★★
+ *
+ *  ★★建て方を 本番に 寄せました（2026-09-15）★★
+ *    ★前は 軽い 建て方★でした（`buildEmpty({licenseKey})` だけ／プラグイン 7本）。
+ *    訳は「返って きた 物の 種類だけ 見るので 建て方は 答えを 変えない」…
+ *    ★★でも それは 間違って いました★★（実測）
+ *      本番の 道に 乗せたら ★「誤りしか 返らない」が 71個 → 68個★
+ *      変わった 3個 … ★ACOTH ／ ATANH ／ F.INV★
+ *    ⇒★★「答えを 使わないから 建て方は 適当で よい」は 成り立ちません★★
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
 /* ★手元の 絶対の 道を 焼き込まない★（焼き込むと ★手元は 緑・CI だけ 赤★に なる） */
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const require_ = createRequire(path.join(ROOT, 'package.json'));
 
-const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
-const EF = require_(path.join(ROOT, 'exally-formula.js'));
-EF.registerExallyFunctions(HFns);
-const HF0 = HFns.HyperFormula;
-const H = Object.assign(Object.create(HF0), HFns,
-  { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
-for (const n of ['extra', 'nokori', 'kane']) {
-  require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js')));
-}
-require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
-    () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }));
-require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
-    取る: async () => { throw new Error('外へ 出ません'); },
-    聞く: async () => { throw new Error('AI に 聞きません'); },
-    再計算: () => {},
-  });
-let XML部品 = null;
-try {
-  const { JSDOM } = require_('jsdom');
-  const w = new JSDOM('').window;
-  XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
-} catch (e) { XML部品 = null; }
-require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
-require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
-
-const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3' });
-const SID = hf.getSheetId(hf.addSheet('S'));
-EF.initExallyFormula(hf);
+/* ★★本番の 道は 1本★★（2026-09-15）＝`docs/measured/honban-no-michi.mjs`
+   ★前は ここだけ ★軽い 建て方★でした★
+     `buildEmpty({ licenseKey })` だけ（`smartRounding:false` も `useArrayArithmetic` も 無い）
+     プラグインも 7本（complex を つないで いない）
+   ★それでも 答えは 変わりません★＝この 道具は ★返って きた 物の 種類★だけを 見ます
+   ★でも 本番の 道に 乗せます★（2026-09-15・指示役1 の 決め）
+     ★訳★ … ★免除は 増やす ほど 見張りが 弱く なる★／
+           ★測り道具は 本番の 道を 通る★（軽い 建て方だと
+           「本番では 起きる 事」が 起きません） */
+const { 建てる } = await import(pathToFileURL(path.join(ROOT, 'docs/measured/honban-no-michi.mjs')).href);
+const 道 = await 建てる();
+const HFns = 道.HFns;
+const EF = 道.EF;
+const HF0 = 道.HF0;
+const H = 道.H;
+const hf = 道.hf;
+const SID = 道.SID;
 const JS層 = EF._jsComputeFormula;
 
 const 候補 = ['(1)', '()', '(A1:A2,1)', '(1,1)', '(A1:A2)', '(1,1,1)', '("a")', '(A1)', '(1,1,1,1)',

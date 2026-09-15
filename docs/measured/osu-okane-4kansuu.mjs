@@ -16,7 +16,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -24,88 +24,21 @@ const 紙 = path.join(ROOT, 'docs/measured/golden-okane-4kansuu-2026-09-09.tsv')
 const 出す先 = path.join(ROOT, 'docs/measured/golden-okane-4kansuu-awase-2026-09-09.tsv');
 
 const require_ = createRequire(path.join(ROOT, 'package.json'));
-const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
-const EF = require_(path.join(ROOT, 'exally-formula.js'));
-EF.registerExallyFunctions(HFns);
-const HF0 = HFns.HyperFormula;
-const H = Object.assign(Object.create(HF0), HFns,
-  { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
-/* ★★本番が 読む プラグインを ★全部★ つなぐ★★（2026-09-09 に 直した）
-   ★1回目は extra / nokori / kane の 3本しか つないで いなかった★
-   ⇒ 本番（book.html）は ★8本★ 読む。★yosoku を 落として いた★
-   ⇒★本番に 在る 物が 無い 状態で 押して いた＝★嘘の 数字が 出る★
-   ⇒ book.html の `<script src="lib/formula-*-plug.js">` と ★同じ 並び★に した
-   ★ここに 無い 物が book.html に 増えたら 下の 見張りで 赤に なる★ */
-const つなぐ本数 = { 期待: 8, 済: 0 };
-for (const n of ['extra', 'nokori', 'kane']) {
-  require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js')));
-  つなぐ本数.済++;
-}
-/* ★予測（TREND / GROWTH / LOGEST）★＝★これを 落として いた★ */
-require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
-    () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }));
-つなぐ本数.済++;
-/* ★網の 外へ 出る 物は ★出させない★（司さんの 決め）★ */
-require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
-    取る: async () => { throw new Error('外へ 出ません'); },
-    聞く: async () => { throw new Error('AI に 聞きません'); },
-    再計算: () => {},
-  });
-つなぐ本数.済++;
-let XML部品 = null;
-try {
-  const { JSDOM } = require_('jsdom');
-  const w = new JSDOM('').window;
-  XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
-} catch (e) { XML部品 = null; }
-require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
-つなぐ本数.済++;
-require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
-つなぐ本数.済++;
-require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js')));
-つなぐ本数.済++;
-/* ★★book.html が 読む 数と 合うか（★落としたら ここで 止まる★）★★ */
-{
-  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
-  const 本番 = [...html.matchAll(/lib\/(formula-[a-z]+)-plug\.js/g)].map((m) => m[1]);
-  const 数 = new Set(本番).size;
-  if (数 !== つなぐ本数.済) {
-    console.error('★book.html は ' + 数 + '本 読むのに、ここでは ' + つなぐ本数.済 + '本しか つないで いない★');
-    console.error('  本番 … ' + [...new Set(本番)].join(' '));
-    process.exit(2);
-  }
-  console.log('★本番と 同じ ' + 数 + '本の プラグインを つないだ★');
-}
-/* ★★本番と 同じ 建て方に する（2026-09-09 に 直した）★★
-   ★1回目は 既定の まま★でした。本番（book.html:1764）は こう 建てて います
-     { licenseKey, useArrayArithmetic:true, ★smartRounding:false★, maxRows:1048576, maxColumns:18278 }
-   ⇒★smartRounding が 既定（true）だと エンジンが 答えを 勝手に 丸める★
-     803.6538461538445 が ★803.65384615★ に なって いた＝★桁が 落ちる★
-   ⇒★本番に 無い 丸めを 測り台が 足して いた＝嘘の 数字が 出る★ */
-const hf = HF0.buildEmpty({
-  licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false,
-  maxRows: 1048576, maxColumns: 18278,
-});
-{ /* ★本番の 建て方と 食い違ったら 止める★ */
-  const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
-  const m = /buildEmpty\(\{([\s\S]{0,240}?)\}\)/.exec(html);
-  if (!m) { console.error('★book.html の buildEmpty が 読めない★'); process.exit(2); }
-  for (const 要る of ['useArrayArithmetic:true', 'smartRounding:false']) {
-    const [k, v] = 要る.split(':');
-    if (!new RegExp(k + '\s*:\s*' + v).test(m[1].replace(/\s+/g, ''))) {
-      console.error('★本番の buildEmpty に ' + 要る + ' が 無い＝測り台の 建て方を 見直して ください★');
-      process.exit(2);
-    }
-  }
-}
-const SID = hf.getSheetId(hf.addSheet('S'));
-EF.initExallyFormula(hf);
+/* ★★本番の 道は 1本★★（2026-09-15）＝`docs/measured/honban-no-michi.mjs`
+   ★前は この 建て方が ★道具 6本に 写されて いました★（つなぐ行 のべ 35）
+   ★写しが 1本でも 本番と ずれたら 嘘の 数字が 出ます★
+     （2026-09-09〜10 に ★それで 1日に 5回 転んで います★）
+   ★これから 借り物を 外します★＝★自前の 関数 86個の 付け先を 変える★
+     ⇒★建て方が 6本 在ると 必ず 1本 忘れます★ */
+const { 建てる } = await import(pathToFileURL(path.join(ROOT, 'docs/measured/honban-no-michi.mjs')).href);
+const 道 = await 建てる();
+const HFns = 道.HFns;
+const EF = 道.EF;
+const HF0 = 道.HF0;
+const H = 道.H;
+const hf = 道.hf;
+const SID = 道.SID;
+console.log('★本番と 同じ ' + 道.積んだ + '本の プラグインを つないだ★');
 
 /* ══ ★紙を 読む（材料も 答えも）★ ══════════════════════════ */
 const 材料 = {};
