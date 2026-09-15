@@ -33,7 +33,30 @@
  *
  *  使い方:
  *    const 道 = await 建てる();          // { HFns, HF0, H, EF, hf, SID, 積んだ }
- *    道.EF._jsComputeFormula(0, '=SUM(A1:A3)')
+ *    const 後 = 道.EF.convertFormula(式);   // ★★必ず 通す★★（下）
+ *    道.hf.setSheetContent(道.SID, 表);     // ★★材料を 先に 入れる★★（下）
+ *    道.EF._jsComputeFormula(0, 式) ?? 道.hf.getCellValue({ sheet: 道.SID, row, col });
+ *
+ *  ★★本番の 道は 3段＝1段でも 飛ばすと『うちが 負けて いる』向きの 偽の 答えが 出ます★★
+ *    ①★`convertFormula` を 通す★（★飛ばすと 一番 痛い★）
+ *       ここに 在る 物 … JIS→DBCS ／ YEN→DOLLAR ／ LET・LAMBDA の 展開 ／
+ *                        ISREF・AREAS の 書き換え ／
+ *                        ★★裸の `TRUE` `FALSE` → `TRUE()` `FALSE()`★★
+ *       ★実測（2026-09-15）★
+ *         `=IF(TRUE,1,2)`  飛ばす ★#NAME?★ ／ 通す ★1★
+ *         `=AND(TRUE,TRUE)` 飛ばす ★#NAME?★ ／ 通す ★TRUE★
+ *         `=NOT(FALSE)`     飛ばす ★#NAME?★ ／ 通す ★TRUE★
+ *         `=VDB(10000,0,5,3,5,2,TRUE)` 飛ばす ★#NAME?★ ／ 通す ★1382.3999999999996★
+ *       ★★`=SUM(A1:A3)` は 飛ばしても 同じ（6）★★
+ *         ⇒★★だから 前の 見本（`=SUM(A1:A3)`）が 一番 危なかった★★
+ *         ＝★飛ばして いるのに 見本の 上では 何も 起きない★
+ *       ★2026-09-15 経営者1 が これを 踏んで ★11/700★ と 出した（正しくは ★14/700★）
+ *         ⇒★危うく「裸の TRUE が 通らない＝客に 出る 大欠陥」と 出す 所だった★
+ *    ②★材料を 板に 先に 入れる★
+ *       ★飛ばすと JS層（`_jsSet` 27個）が ★空の 板★を 読みます★
+ *       ★実測★ `=DSUM(A1:B5,1,A1:A2)` … 入れる前 ★0★ ／ 入れた後 ★2★（実Excel 2）
+ *    ③★JS層 → エンジン の 順★（JS層が `null` を 返した 時だけ エンジン）
+ *  ⇒★★この 3段を 自分で 書かず `kansuu46-no-dodai.mjs` の `押す()` を 使うのが 安全★★
  */
 import fs from 'node:fs';
 import path from 'node:path';
