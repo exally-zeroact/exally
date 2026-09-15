@@ -75,17 +75,26 @@ console.log('\n' + pass + ' passed, ' + fail + ' failed'
 
 /* ★★自己試験★★ … ★この 紙が 見て いる 穴は 1つだけ★ と ★分母★ を 字で 残す */
 if (process.argv.includes('--self-test')) {
-  const src = fs.readFileSync(path.join(ROOT, 'exally-formula.js'), 'utf8');
+  /* ★★字で 見るのを やめました★★（2026-09-15）
+       ★前は `critFieldIdx<0` が 在るかを 見て いました★
+       ⇒★多列（かつ）を 直した 時 その 字が 消え、★振る舞いは 正しいのに 赤★に なりました★
+       ＝★★見張りが 直しの 形に 縛りを 掛けて いた★★（記憶「見張りは いつも 新で 死ぬ」）
+       ⇒★★直った かどうかは ★答え★で 見る★★ */
   let 出 = 0;
-  const 要 = [
-    ['★穴の 場所★ `_jsDbFunc`', /function\s+_jsDbFunc\s*\(/],
-    ['★直した 印★ `critFieldIdx<0`', /critFieldIdx\s*<\s*0/],
-  ];
-  for (const [札, 型] of 要) {
-    if (型.test(src)) console.log('[self-test] ✓ ' + 札);
-    else { 出++; console.log('[self-test] ✗ ★' + 札 + ' が 見つかりません★'); }
+  const src = fs.readFileSync(path.join(ROOT, 'exally-formula.js'), 'utf8');
+  if (/function\s+_jsDbFunc\s*\(/.test(src)) console.log('[self-test] ✓ ★穴の 場所★ `_jsDbFunc` が 在る');
+  else { 出++; console.log('[self-test] ✗ ★`_jsDbFunc` が 見つかりません★'); }
+
+  /* ★名指しの 1行★＝★この 行が 直しの 証し★（条件の 見出しが 台帳に 無い ⇒ 縛らない） */
+  const 証し = '=DSUM(A1:B5,1,D1:D2)';
+  const 正 = 組.get(証し);
+  if (!正) { 出++; console.log('[self-test] ✗ ★証しの 行が 紙から 消えて います★ … ' + 証し); }
+  else {
+    const r = 押す(台, 証し); 板を空に(台);
+    if (String(r.字) === String(正.実)) console.log('[self-test] ✓ ★証しの 行★ ' + 証し + ' → ' + r.字);
+    else { 出++; console.log('[self-test] ✗ ★証しの 行が 直って いません★ … ' + r.字 + '（' + 正.実 + ' のはず）'); }
   }
-  console.log('[self-test] ★見て いない 6か所（②〜⑦）は 棚 ㉝★＝★実Excel で 測って いません★');
+  console.log('[self-test] ★棚㉝ の 6か所は ★別の 紙★で 見て います★ … tests/dkei6-honban.test.mjs（26行）');
   process.exit(出 ? 1 : 0);
 }
 process.exit(fail ? 1 : 0);
