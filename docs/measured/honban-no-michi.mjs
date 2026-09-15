@@ -60,9 +60,10 @@ export function 本番の建て方() {
 
 /**
  * ★★本番の 道を 建てる★★
- * @param {{XML?:boolean, 外へ出す?:object, EFの道?:string}} 注文
+ * @param {{XML?:boolean, 外へ出す?:object, EFの道?:string, 板の名?:string}} 注文
  *    XML     … `jsdom` が 在れば FILTERXML に 渡す（既定 true／無ければ null の まま）
  *    EFの道  … `exally-formula.js` の 道（既定＝本番の 物／★写しを 押す 道具が 使う★）
+ *    板の名  … 板の 名前（既定 `S`／★`kansuu46` の 紙は `Sheet1` で 取られて います★）
  *    外へ出す … ★既定は「出さない」★（`取る`／`聞く` が 投げる）。
  *               ★本当に 外へ 出す 物を 渡すのは ★お金と 秘密と 相手の 迷惑★が 掛かります★
  */
@@ -80,24 +81,26 @@ export async function 建てる(注文) {
 
   /* ══ ★プラグインを 本番と 同じ 並びで つなぐ★ ══ */
   let 積んだ = 0;
+  /* ★1本ごとの 戻り（いくつ 足したか）★＝★呼ぶ側が 出す 紙に 使う★ */
+  const 積 = [];
   for (const n of ['extra', 'nokori', 'kane']) {
-    require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
-      .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js')));
+    積.push(require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
+      .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js'))));
     積んだ++;
   }
   /* ★予測（TREND / GROWTH / LOGEST）★ */
-  require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
+  積.push(require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
     .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
-      () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }));
+      () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' })));
   積んだ++;
   /* ★網の 外へ 出る 物は ★出させない★（司さんの 決め）★
      ＝★試験で 外へ 出すと お金・秘密・相手の 迷惑の 3つとも 掛かります★ */
-  require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
+  積.push(require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
     .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), 注.外へ出す || {
       取る: async () => { throw new Error('外へ 出ません'); },
       聞く: async () => { throw new Error('AI に 聞きません'); },
       再計算: () => {},
-    });
+    }));
   積んだ++;
   /* ★FILTERXML（`jsdom` が 無ければ null の まま）★ */
   let XML部品 = null;
@@ -108,14 +111,14 @@ export async function 建てる(注文) {
       XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
     } catch (e) { XML部品 = null; }
   }
-  require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
+  積.push(require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品));
   積んだ++;
-  require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
+  積.push(require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null));
   積んだ++;
-  require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js')));
+  積.push(require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
+    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js'))));
   積んだ++;
 
   /* ★★本番と 同じ 本数か（★落としたら ここで 止まる★）★★ */
@@ -141,7 +144,10 @@ export async function 建てる(注文) {
     }
   }
 
-  const SID = hf.getSheetId(hf.addSheet('S'));
+  /* ★板の 名前も 口の 引数に する★（2026-09-15）
+     ＝★`CELL("filename")` の ような 物は ★板の 名前で 答えが 変わる★
+     ＝★違いは 別の 道では なく 口の 引数に する★（指示役1 の 決め） */
+  const SID = hf.getSheetId(hf.addSheet(注.板の名 || 'S'));
   EF.initExallyFormula(hf);
-  return { HFns, HF0, H, EF, hf, SID, 積んだ };
+  return { HFns, HF0, H, EF, hf, SID, 積んだ, 積 };
 }
