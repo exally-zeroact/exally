@@ -38,8 +38,21 @@ if ($数1 -ne 0 -or $数2 -ne 0) {
 }
 
 # ★見る マス★（★osu-oufuku-shinki.mjs の 一覧と 同じ★）
-$見る = @('C1','C2','C3','C4','C5','C6','C7','C8','C9','C10','C11','C12',
-          'C13','C14','C15','C16','C17','C18','C19','C20','C21','C22','C23')
+# ★★見る マスは ★手で 書きません★★（2026-09-16 に 直しました）
+#   ★なぜ★ 前は `@('C1',…,'C23')` と 手で 並べて いました。
+#     ⇒★式を 3本 足したのに 名簿を 直さず、★26本 押して 23本しか 突き合わせて いませんでした★
+#     ⇒★しかも 「全部 合って います」と 緑が 出ました★＝★分母を 出さない 緑は 嘘★
+#   ★同じ 型が 今日 3回目★（PERMUTATIONA ／ RANK.AVG ／ `_xlfn.` 91個）
+#   ⇒★★`osu-oufuku-shinki.mjs` が 書いた 紙から 読みます★★＝★手で 直す 所が 無い★
+$うちの紙 = Join-Path $ここ 'oufuku-shinki-uchi.tsv'
+if (-not (Test-Path $うちの紙)) {
+  Write-Error '★先に `node docs/measured/osu-oufuku-shinki.mjs` を 走らせて ください★'; exit 4
+}
+$見る = @(Get-Content -LiteralPath $うちの紙 -Encoding UTF8 |
+  Where-Object { $_ -and $_ -notmatch '^#' } |
+  ForEach-Object { ($_ -split "`t")[0] })
+if ($見る.Count -lt 1) { Write-Error '★紙から 1本も 読めません★'; exit 4 }
+Write-Host ('★紙から 読んだ マス … ' + $見る.Count + '個★（★手で 並べて いません★）')
 
 $xl = New-Object -ComObject Excel.Application
 try {
