@@ -337,7 +337,28 @@ const FILES = [
   'xlsx-harness/version-scope.test.mjs',    // ★「版対応はここまで」の記述と実装がズレたら赤
   'xlsx-harness/compare.mjs',               // Excelの真値と突合(新規の不一致があれば赤)
   ['xlsx-harness/compare.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
-  ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'] // ★入れ子で壊れる式が増えていないか
+  ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'], // ★入れ子で壊れる式が増えていないか
+  /* ★★ 2026-09-16 … ★下の 5本は どこからも 呼ばれて いませんでした★★
+       名簿（この FILES）にも 無く、`.github/workflows/*.yml` にも 無かった
+       ⇒★★試験の 顔を して 1回も 走って いませんでした★★
+       ★xlfn-morenashi は commit 586d2eb で
+         「試験の 登録も 自動で 通りました（登録漏れ 0件）」と 報告しましたが
+         ★その 報告は 間違い★でした。
+         （`scripts/tests-registered.mjs` は ★playwright の 一覧★だけ 見て おり
+           ★この FILES を 見て いません★＝★別の 物を 数えた 緑★）
+       ⇒★見張り `tests/souname-meibo.test.mjs` を 置きました★
+         （★足す 前に 5本を 名指しで 赤に する 事を 確かめました★）
+
+       ★★ただし `hozon-de-kieru.test.mjs` は ★ここに 入れて は いけません★★
+         ★わざと 赤のまま★と 2026-09-07（commit 20ac3f6）に 決めて あります。
+         ＝「うちで 足した シートは 書き出すと 消える」を ★実測で 固定した 物★
+         訳と 戻す 条件は ★`tests-no-ci.json`★ に 書いて あります。
+         ★私は 1度 ここに 入れて 総なめを 赤に しました★（★自分の 覚書きを 読んで いなかった★）
+         ⇒★見張り `souname-meibo` に ★`tests-no-ci.json` を 読ませました★★ */
+  ['xlfn-morenashi.test.mjs'],       // ★`_xlfn.` の 一覧に 漏れが 無いか（漏れると 実Excel で #NAME?）
+  ['yearfrac-basis1.test.mjs'],      // ★YEARFRAC basis 1 が 実Excel と 合うか
+  ['workflow-dougu-aru.test.mjs'],   // ★見張りが 呼ぶ 道具が repo に 在るか
+  ['souname-meibo.test.mjs']         // ★tests/ の 試験が 1本 残らず 走って いるか
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）

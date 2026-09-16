@@ -21,7 +21,10 @@
  *   → .github/workflows/hosts.yml で 週1(月曜9時JST)＋手動。
  *   ★落ちた時に誰が見るか＝docs/HOSTS.md の「落ちた時に誰が見るか」に1行で書いてある。
  *
- * 使い方: node scripts/check-hosts.mjs        （NGがあれば exit 3）
+ * 使い方: node scripts/check-hosts.mjs
+ *   ★終わり値★ … ★壊れて いる時だけ exit 3★
+ *     ★予定どおりの 宿題（pending）は ★赤に しません★★（2026-09-16 に 分けました）
+ *       ★訳★ 宿題で 赤に して いると ★本物の NG が 入っても 色が 動きません★
  *         node scripts/check-hosts.mjs --json
  *         node scripts/check-hosts.mjs --self-test   ★判定そのものが空振りしていないかを確かめる
  */
@@ -226,10 +229,19 @@ if (process.argv.includes('--self-test')) {
   }
 
   const ngLive = results.live.filter(x => !x.ok);
-  const ngOld = results.old.filter(x => !x.ok);
+  /* ★★「壊れて いる」と 「予定どおりの 宿題」を 分けます★★（2026-09-16）
+       ★前は どちらも exit 3（赤）だった★
+       ⇒★★宿題が 1件 残って いる 間は ずっと 赤★★
+       ⇒★明日「今の 入口 NG 3」に なっても 色は 赤のまま＝★誰も 気づきません★
+       ★同じ 型★ 本番の WebKit が 2日 赤のままだった（その間 本番へ 3回 押して いた）
+       ⇒★★色は 1つの 事だけを 言う★★
+         ・★お客さんに 出る 所が 壊れて いる★ ⇒ ★赤★
+         ・★予定どおりの 宿題★         ⇒ ★緑 ＋ 残り件数を 出す★（★色では 言わない★） */
+  const 宿題 = results.old.filter(x => !x.ok && x.pending);
+  const ngOld = results.old.filter(x => !x.ok && !x.pending);
 
   if (JSON_OUT) {
-    console.log(JSON.stringify({ ngLive: ngLive.length, ngOld: ngOld.length, results }, null, 1));
+    console.log(JSON.stringify({ ngLive: ngLive.length, ngOld: ngOld.length, 宿題: 宿題.length, results }, null, 1));
   } else {
     console.log('\n[check-hosts] 入口の生死と、古い入口の飛び先（docs/HOSTS.md と1対1）\n');
     console.log('■ 今の入口');
@@ -247,10 +259,18 @@ if (process.argv.includes('--self-test')) {
 
     console.log('\n── 実測 ──');
     console.log('  今の入口 OK ' + (results.live.length - ngLive.length) + ' / NG ' + ngLive.length);
-    console.log('  古い入口 OK ' + (results.old.length - ngOld.length) + ' / NG ' + ngOld.length);
+      console.log('  古い入口 OK ' + (results.old.length - ngOld.length - 宿題.length)
+      + ' / ★NG ' + ngOld.length + '★'
+      + ' / 予定どおりの 宿題 ' + 宿題.length + '件（★色には しません★）');
+    宿題.forEach(x => console.log('      ・' + x.name + ' … ' + x.pending));
     console.log('  これから塞ぐ入口 ' + PLANNED.length + '件（★まだ0件も塞いでいない＝予定どおり★）'
       + ' / 先に決める物 ' + BLOCKERS.length + '件');
   }
 
+  /* ★★終わり値は 「お客さんに 出る 所が 壊れて いるか」だけで 決めます★★
+       ★今の 入口 NG★     … お客さんが 今 開けない
+       ★古い 入口 NG★     … お客さんが 古い リンクで 飛べない（★これも 客に 出ます★）
+       ★予定どおりの 宿題★ … ★まだ 塩いで いないだけ★＝★壊れて は いません★
+       ⇒★宿題で 赤に すると ★壊れた 日に 色が 動きません★★ */
   if (ngLive.length || ngOld.length) process.exitCode = 3;
 }
