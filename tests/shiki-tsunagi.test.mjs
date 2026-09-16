@@ -46,7 +46,10 @@ const 同じ = (得, 欲, なぜ) => {
 /* ★この 数は 手で 決めた 物では ありません★＝
    `lib/formula-*-plug.js` の 名簿から 機械で 抜いて 繋いだ 数（extra13+kane22+filterxml1+
    cell1+yosoku10+nokori14 = 61）。★減ったら 黙って 外れた という 事★ */
-const 繋いだ数 = 61;
+/* 2026-09-16 … 61 → ★65★（BESSELI / BESSELJ / BESSELK / BESSELY を 足した）
+     ★覚えた 係数表は 1つも 使って いません★ … lib/bessel.js
+     ★実Excel の 方が 間違って いる 所が 3件 在ります★ … docs/measured/bessel-no-kotae.md */
+const 繋いだ数 = 65;
 
 console.log('\n[shiki-tsunagi] ★自前の 土台に 自前の 関数を 繋ぐ★');
 
