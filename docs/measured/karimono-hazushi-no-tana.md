@@ -2149,6 +2149,87 @@
 ```
 
 
+## 棚58　統計の 一族 50個を 台へ／★土台の 浅さを 4つ 直した★（2026-09-16）
+
+★書いた★ NORM.DIST NORMDIST NORM.INV NORMINV NORM.S.INV NORMSINV LOGINV LOGNORM.INV
+BINOM.DIST BINOMDIST BINOM.DIST.RANGE BINOM.INV CRITBINOM NEGBINOM.DIST NEGBINOMDIST HYPGEOMDIST
+BETA.DIST BETADIST BETA.INV BETAINV GAMMADIST GAMMA.INV GAMMAINV
+CHISQ.INV F.INV FINV T.INV CONFIDENCE CONFIDENCE.NORM CONFIDENCE.T
+CORREL PEARSON RSQ SLOPE INTERCEPT STEYX
+Z.TEST ZTEST CHISQ.TEST CHITEST F.TEST FTEST T.TEST TTEST
+RANK RANK.EQ RANK.AVG PERCENTILE.EXC QUARTILE.EXC FREQUENCY
+
+★★ここからが 大事★★ … ★「12桁目だから 仕方ない」と 書いて いた 物の 半分は
+★実Excel との 探し方の 違いでは なく ★うちの 浅さ★★でした。
+
+| 直した 所 | 何が 悪かったか | 測った 数 |
+| --- | --- | --- |
+| ガンマの対数 | Lanczos g=5、6項 | `GAMMALN(0.5)` の ずれ ★　4.30e-14★ → g=7、10項で ★約 1e-15★ |
+| 補誤差関数 | `1 - 下側` で 尾っぽの 桁が 落ちる | `ZTEST` … 0.9976 を 1 から 引く＝★上の 3桁が 消える★ |
+| 二分で逆 | 止めるのが 1e-13 固定 | ★隣り合う 浮動小数に なるまで 割る★ |
+| 通し 60 | 1900-02-29 が 出せない | `=DAY(60)` 実Excel ★29★ ／ うち 28 |
+
+⇒★★名指しで 「まだ」に して いた 56本が その場で 合いました★★
+（CHIDIST CHISQ.DIST F.DIST FDIST T.DIST T.DIST.2T TDIST GAMMALN …）
+
+★見張りの 欠陥も 2つ 見つけました★
+- 　㐖★紙の 柱を 決め打ちで 読んで いた★
+　　`golden-marume-mae-ato-2026-09-08.tsv` の 3列目は ★前（丸めが 在る）★で、
+　　実Excel は 5列目。★★客に 出て いた 欠陥を 「正」と して 押して いた★★
+　　＝★直した 答えが 赤に なり、欠陥の ままなら 緑★
+　　⇒紙の 柱の 行を 読む／読めない 紙は ★当て推量で 押さず 弾く★（10枚）
+- 　㐗★紙の 誤りは 「負の 大きい 数」★（`.Value2`）
+　　`=AVERAGE("abc")` … 紙 -2146826273 ／ 台 #VALUE! ＝★合って いるのに 赤★
+　　⇒札の 一覧で 揃える
+
+★残った 分の 型は 3つだけ★
+```
+  ①逆引きの 最後の 1～2桁 … 二分で 探す＝実Excel と 探し方が 違う
+  ②詰め方の 最後の 1桁 … 不完全ガンマ／ベータ
+  ③BINOM.DIST.RANGE … ★実Excel は 組み合わせを きっちり 出して いない★
+     `=BINOM.DIST.RANGE(10,0.5,3)` ★　0.11718750000000003★（きっちりは 0.1171875）
+```
+
+## 棚59　字の 日付・時刻を 数に する 道（2026-09-16）
+
+★物差し★ `docs/measured/golden-1900-hidzuke-2026-09-15.tsv`（経営者1 が 2026-09-15 に 測った）
+
+| 式 | 実Excel | うち（前） |
+| --- | --- | --- |
+| `=AVERAGE("1900-01-01")` | ★1★ | 3 |
+| `=AVERAGE("1900-02-29")` | ★60★ | #VALUE! |
+| `=AVERAGE("12:3")` | ★0.502083333333333★ | #VALUE! |
+| `=AVERAGE("0000-01-01")` | ★#VALUE!★ | 3 |
+
+★★同じ 数え方が この repo に 4か所 在り、正しかったのは 1か所だけでした★★
+```
+  lib/shiki-kansuu.js  日から通し   … ★正しい★（-1）
+  lib/shiki-hyou.js    日付の通し番号 … ★+1★
+  lib/formula-soto.js  日から数     … ★+1★
+  lib/formula-kane.js  日から数     … ★+1★
+```
+★見張りは 3か所を 突き合わせて いましたが ★渡して いた 日が 1999年以降★★
+⇒★★「揃って いる」と 「合って いる」は 別★★＝4か所とも 同じだけ 違って いても 緑に なる
+⇒見張りに 1900年の 日と ★紙から 引いた 実Excel の 数★を 入れました
+
+★もう 2か所 残って います★（★直して いません★）
+```
+  lib/grid-xlsx.js  dateSerial … ★直しが 無い★（1900-01-01 → 2）
+    ⇒ book.html の dateSerial と ★対で 見張られて いる★（tests/grid-date.test.mjs）
+    ⇒★片方だけ 直すと 見張りが 赤に なる★＝★客の 画面も 動く＝別の 棚★
+  lib/timeline.js   … 1899-12-30 起点のみ（★未測定★）
+```
+
+★台に 足した 3個★ DATE／DATEVALUE／TIMEVALUE
+★★同じ 字でも 読む 道で 答えが 違います★★（紙に 書いて 在る）
+```
+  `="24:00"` を AVERAGE に  … ★1★      ＝日に 繰り上げる
+  `=TIMEVALUE("24:00")`      … ★0★      ＝★日の 分を 切り捨てる★
+```
+★年が 抜けた 形（"1-2"）は ★今年で 読む★ので ★押して いません★
+　＝★今日に よって 答えが 変わる 物は 紙で 押せない★（未測定と 同じ 扱い）
+
+
 ---
 
 > ★作った 訳★ … 2026-09-14。この 日 ★同じ型の 誤りを 4回★ 踏みました

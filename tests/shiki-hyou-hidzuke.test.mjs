@@ -116,12 +116,42 @@ T('★★通し番号の 出し方が 2か所で 同じ★★（lib/formula-soto
 T('★★通し番号は 3か所とも 同じ★★（shiki-hyou ／ formula-soto ／ formula-kane）', () => {
   const KANE = require_(path.join(ROOT, 'lib/formula-kane.js'));
   const h = H.表();
-  for (const [y, m, d] of [[2024, 1, 15], [2026, 1, 1], [2000, 2, 29], [1999, 12, 31]]) {
+  /* ★★　1900年の 日を 入れて いませんでした★★（2026-09-16）
+       ⇒★ 4か所 全部が 同じだけ 違って いても 緑に なって いた★
+       ⇒★★「揃って いる」と 「合って いる」は 別★★＝実Excel の 数とも 比べます */
+  for (const [y, m, d] of [[2024, 1, 15], [2026, 1, 1], [2000, 2, 29], [1999, 12, 31],
+    [1900, 1, 1], [1900, 2, 28], [1900, 3, 1]]) {
     const 字 = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
     h.打つ('Z1', '=SUM("' + 字 + '")');
     const 三 = [Number(h.字('Z1')), SOTO.日から数(y, m, d), KANE.日から数(y, m, d)];
     if (三[0] !== 三[1] || 三[1] !== 三[2]) {
       throw new Error('★ずれた★ ' + 字 + ' … 土台 ' + 三[0] + ' ／ soto ' + 三[1] + ' ／ kane ' + 三[2]);
+    }
+  }
+});
+
+T('★★実Excel の 数と 合う★★（4か所とも・紙から 引く）', () => {
+  const KANE = require_(path.join(ROOT, 'lib/formula-kane.js'));
+  /* ★物差し★ `docs/measured/golden-1900-hidzuke-2026-09-15.tsv`
+       `=DATE(1900,1,1)`→★1★ `=DATE(1900,2,28)`→★59★ `=DATE(1900,3,1)`→★61★ */
+  const 紙 = path.join(ROOT, 'docs/measured/golden-1900-hidzuke-2026-09-15.tsv');
+  const 行 = fs.readFileSync(紙, 'utf8').split(/\r?\n/);
+  const 引 = (式) => {
+    for (const l of 行) {
+      if (l.startsWith('#')) continue;
+      const c = l.split('\t');
+      if ((c[0] || '').trim() === 式) return (c[1] || '').trim();
+    }
+    throw new Error('★紙に その 式が 無い★: ' + 式);
+  };
+  const h = H.表();
+  for (const [y, m, d] of [[1900, 1, 1], [1900, 2, 28], [1900, 3, 1]]) {
+    const 正 = Number(引('=DATE(' + y + ',' + m + ',' + d + ')'));
+    const 字 = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    h.打つ('Z1', '=SUM("' + 字 + '")');
+    const 四 = [Number(h.字('Z1')), SOTO.日から数(y, m, d), KANE.日から数(y, m, d)];
+    for (const v of 四) {
+      if (v !== 正) throw new Error('★実Excel と 違う★ ' + 字 + ' … 紙 ' + 正 + ' ／ うち ' + 四.join('/'));
     }
   }
 });
