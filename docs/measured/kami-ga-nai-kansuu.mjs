@@ -91,6 +91,26 @@ for (let i = 0; i < 紙もない.length; i += 6) {
   console.log('  ' + 紙もない.slice(i, i + 6).map((s) => s.padEnd(22)).join(''));
 }
 console.log('');
+/* ★★何を 何で 数えたか★★（2026-09-16 に 足しました）
+     ★なぜ★ 私は この 道具の「56個」と
+       `nokori-wo-kansuu-goto-ni-waru.mjs` の「56個（252通り）」を ★混ぜました★。
+     ★★両方 56 ですが ★別の 物を 数えて います★★
+       ・この 道具 ……… ★実Excel 519 の 名簿★で 台に 無い うち ★紙が 在る 物★
+       ・向こうの 道具 … ★紙の 式★に 出て くる 関数の うち 台が 知らない 物
+     ⇒★★司さんに 出る のは ★519 の 名簿で 数えた 数★★★
+       ＝★お客さんが 打てる 関数の 数★
+     ⇒★通り（式の 形）は ★中の 進み具合★★＝★混ぜません★ */
+console.log('');
+console.log('★★何を 何で 数えたか★★');
+console.log('  この 道具の 分母 … ★実Excel 519個の 名簿★'
+  + '（docs/measured/excel-functions-*.txt）');
+console.log('  ⇒★★司さんに 出す 「あと 何個」は この 数★★ … ★' + 台にない.length + '個★');
+console.log('');
+console.log('  ★混ぜて は いけない 数★');
+console.log('    `nokori-wo-kansuu-goto-ni-waru.mjs` の 「◆通り」 … ★紙の 式を 数えた 数★');
+console.log('      ＝★中の 進み具合★（★お客さんが 打てる 関数の 数では ありません★）');
+console.log('    ★2026-09-16 に 私は この 2つを 混ぜました★（どちらも 56 だった）');
+console.log('');
 console.log('★見て いない 事★');
 console.log('  ・★「台が 出せる」は ★名前の 一覧★です★（★正しく 答えるかは 別★）');
 console.log('  ・★「紙に 出て くる」は 式の 中の 名前です★（★答えが 控えて 在るかは 別★）');
