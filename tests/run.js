@@ -362,7 +362,8 @@ const FILES = [
   ['oddf-kirwake.test.mjs'],          // ODDFPRICE の 切り分けで 分かった 事を 守る
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
-  ['gomi-file.test.mjs']            // 書き損じで 出来た ゴミを repo に 置かない
+  ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
+  ['oddf-hasuu-ga-hasuu-denai.test.mjs'] // ★端数が「端数で ない」時は #NUM!
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）
