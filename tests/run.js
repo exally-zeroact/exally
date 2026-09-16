@@ -359,7 +359,9 @@ const FILES = [
   ['yearfrac-basis1.test.mjs'],      // ★YEARFRAC basis 1 が 実Excel と 合うか
   ['workflow-dougu-aru.test.mjs'],   // ★見張りが 呼ぶ 道具が repo に 在るか
   ['souname-meibo.test.mjs'],         // ★tests/ の 試験が 1本 残らず 走って いるか
-  ['oddf-kirwake.test.mjs']          // ODDFPRICE の 切り分けで 分かった 事を 守る
+  ['oddf-kirwake.test.mjs'],          // ODDFPRICE の 切り分けで 分かった 事を 守る
+  ['bessel.test.mjs'],               // BESSELI/J/K/Y
+  ['jitsuexcel-ga-machigai.test.mjs'] // 実Excel が 間違って いるの 逃げ道を 塞ぐ
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）
