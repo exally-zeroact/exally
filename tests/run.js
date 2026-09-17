@@ -367,6 +367,7 @@ const FILES = [
   ['asc-dbcs.test.mjs'],             // ★ASC ／ DBCS★（紙 22行・表は 機械の Unicode から）
   ['lenb.test.mjs'],                 // ★LENB／LEFTB／RIGHTB／MIDB★（紙 12本・外した 1本を 名指し）
   ['textafter.test.mjs'],            // ★TEXTAFTER／TEXTBEFORE★（★逆だった 2本を 一番 上に★）
+  ['aggregate.test.mjs'],            // ★AGGREGATE★（★外した 2本＝選択7・機能19 を 一番 上に★）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
