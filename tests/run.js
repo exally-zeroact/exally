@@ -363,6 +363,7 @@ const FILES = [
   ['oddf-basho.test.mjs'],            // ★新しい 数え方を どこに 当てるか★（A には 当てない）
   ['junretsu.test.mjs'],              // ★PERMUT ／ PERMUTATIONA★（紙 2本・境目は 未測定）
   ['xmatch.test.mjs'],               // ★XMATCH★（紙 12本・字の型紙は 未測定）
+  ['percentrank.test.mjs'],          // ★PERCENTRANK★（紙 6本・有効桁の 切り方は 未測定）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
