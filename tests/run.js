@@ -365,6 +365,7 @@ const FILES = [
   ['xmatch.test.mjs'],               // ★XMATCH★（紙 12本・字の型紙は 未測定）
   ['percentrank.test.mjs'],          // ★PERCENTRANK★（紙 6本・有効桁の 切り方は 未測定）
   ['asc-dbcs.test.mjs'],             // ★ASC ／ DBCS★（紙 22行・表は 機械の Unicode から）
+  ['lenb.test.mjs'],                 // ★LENB／LEFTB／RIGHTB／MIDB★（紙 12本・外した 1本を 名指し）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
