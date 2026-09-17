@@ -361,6 +361,7 @@ const FILES = [
   ['souname-meibo.test.mjs'],         // ★tests/ の 試験が 1本 残らず 走って いるか
   ['oddf-kirwake.test.mjs'],          // ODDFPRICE の 切り分けで 分かった 事を 守る
   ['oddf-basho.test.mjs'],            // ★新しい 数え方を どこに 当てるか★（A には 当てない）
+  ['junretsu.test.mjs'],              // ★PERMUT ／ PERMUTATIONA★（紙 2本・境目は 未測定）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
