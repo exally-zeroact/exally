@@ -19,18 +19,30 @@
 #    ⇒★★見立て … 掴んだ Range の 数が 増えると 消えるのに かかる 時間が 延びる★★
 #      26件 → 59秒 ／ 91件×2窓 → ★300秒 超でも 消えない★
 #
-#  ★★★経営者1 の 注文から 1つ 変えました（★先に 断ります★）★★★
-#    ★注文★ … 「★式 1本だけ★ の 小さい `.ps1` で 4通りを 測る」
-#    ★変えた 訳★ … ★★式 1本では 300秒に ならない かも しれません★★
-#      ＝★問題は「掴んだ Range の 数」だと 見て います★
-#      ＝★1本で 全部 5秒なら ★何も 測れて いません★★
-#    ⇒★★本数も 動かします★★
-#      回0 … ★1本★・今の まま …………★対照（★これが 速ければ 本数が 効いて いる★）
-#      回1 … ★91本★・今の まま ………★これが 300秒に なる はず★
-#      回2 … 91本・＋Range を 1本ずつ `$null`
-#      回3 … 91本・＋`$sh`／`$bk`／`$xl` も `$null`
-#      回4 … 91本・＋`ReleaseComObject` を 掴んだ物ごと ＋ `GC` 2回
-#    ⇒★★1つずつ 足します＝どれが 効いたかを 残す★★（経営者1 の 注文どおり）
+#  ★★★1回目の 測りで 分かった 事（2026-09-18・★これは 2回目★）★★★
+#    ★1回目★ 回0(1本) 60.12 ／ 回1(91本) 60.22 ／ 回2(+Range null) 60.08
+#            ★回3(+sh/bk/xl null) ★9.52★★ ／ 回4(+Release+GC) 60.10
+#    ⇒★★私の 見立て「Range の 数が 効く」は ★外れ★★★（★1本でも 消えません★）
+#    ⇒★効いたのは `$sh = $null; $bk = $null; $xl = $null` ★だけ★★
+#    ⇒★★分からない 事★★ … 回4（Release ＋ GC を 足した）が ★回3 より 遅い★
+#       ㋐揺らぎ ／ ㋑順番 ／ ㋒本当に 逆効果 … ★1点では 割れません★
+#
+#  ★★★2回目の 作り（★経営者1 の 案・私の「逆順」より 強い★）★★★
+#    ★私の 案★ … 回4→回3→回2→回1→回0（逆順 5回）
+#      ★弱い 所★ … ★1回ずつ しか 見ない＝揺らぎ（㋐）が 潰せません★
+#    ★★採った 案★★ … ★★回3 と 回4 だけを 交互に 2回ずつ★★
+#      ①回3 ②回4 ③回3 ④回4
+#    ⇒★★3つとも 分かれます★★
+#      ・回3 が 2回とも 速く 回4 が 2回とも 遅い ⇒★方法★（Release＋GC が 逆効果）
+#      ・後ろに 行くほど 遅い ………………………… ⇒★順番★
+#      ・同じ 条件で バラつく ………………………… ⇒★揺らぎ★（もっと 回数が 要る）
+#    ★回0／回1／回2 は もう 要りません★ … ★60秒で 消えない のを 3回 見ました★
+#    ★秒の 見込み★ … 9.5＋60＋9.5＋60 ＝★約 140秒★
+#
+#  ★★なぜ この 1枠に 値打ちが 在るか（経営者1）★★
+#    ★`Release` と `GC` は 世の中で 一番 よく 言われる 直し★
+#    ⇒★★次の 人は 必ず 足そうと します★★
+#    ⇒★「足すと 遅い」が ★測れて いれば 止められる／測れて いなければ 止められない★★
 #
 #  ★★門★★
 #    ①★式は `=1+1`★（★何も 呼ばない＝測って いるのは 消え方だけ★）
@@ -42,6 +54,9 @@
 #    ⑤★BOM★
 #    ⑥★★司さんの ブックを 開く 字 0件★★（新しい 空の ブックだけ）
 #    ⑦★押した 秒と 消えるまでの 秒を ★別々に★ 書く★
+#    ⑦-2★★各回の ★何番目か★ も 紙に 書く★★（★後から 紙だけで「順番か 方法か」を 割れる 形★）
+#    ⑧★★同じ 待ちを 3回 超えたら 測るのを 止めて ★待ちの 元★を 直す★★
+#        ＝指示役1 の 決め（2026-09-18）。★今回は 7回 超えてから 気づきました★
 #
 #  使い方: pwsh -NoProfile -File docs/measured/hakaru-excel-ga-kienai.ps1
 
@@ -52,13 +67,13 @@ $出 = Join-Path $ここ 'golden-excel-kienai-2026-09-18.tsv'
 function 今のPID { return @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue | ForEach-Object { $_.Id }) }
 
 function 一回測る {
-  param([string]$名, [int]$本数, [bool]$RangeをNull, [bool]$入れ物もNull, [bool]$ReleaseとGC)
+  param([int]$番, [string]$名, [int]$本数, [bool]$RangeをNull, [bool]$入れ物もNull, [bool]$ReleaseとGC)
 
   $数1 = @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count
   $数2 = @(Get-CimInstance Win32_Process -Filter "Name='EXCEL.EXE'" -ErrorAction SilentlyContinue).Count
   if ($数1 -ne 0 -or $数2 -ne 0) {
     Write-Host ('★★' + $名 + ' … Excel が 動いて います（' + $数1 + '／' + $数2 + '）＝測りません★★')
-    return [pscustomobject]@{ 名 = $名; 本数 = $本数; 押し秒 = -1; 消え秒 = -1; 消えた = '(測れず)'; 止めた = 0 }
+    return [pscustomobject]@{ 番 = $番; 名 = $名; 本数 = $本数; 押し秒 = -1; 消え秒 = -1; 消えた = '(測れず)'; 止めた = 0 }
   }
 
   $前PID = 今のPID
@@ -111,10 +126,10 @@ function 一回測る {
 
   $押し秒 = [math]::Round($押し時計.Elapsed.TotalSeconds, 2)
   $消え秒 = [math]::Round($消え時計.Elapsed.TotalSeconds, 2)
-  Write-Host ('  ' + $名.PadRight(34) + ' 本数 ' + ([string]$本数).PadLeft(3) +
+  Write-Host ('  ' + ([string]$番) + '番目 ' + $名.PadRight(26) + ' 本数 ' + ([string]$本数).PadLeft(3) +
     ' ／ 押し ' + ([string]$押し秒).PadLeft(6) + '秒 ／ 消えるまで ' + ([string]$消え秒).PadLeft(6) + '秒 ／ ' +
     $消えた + $(if ($止めた) { ' ／ ★' + $止めた + '個 止めました★' } else { '' }))
-  return [pscustomobject]@{ 名 = $名; 本数 = $本数; 押し秒 = $押し秒; 消え秒 = $消え秒; 消えた = $消えた; 止めた = $止めた }
+  return [pscustomobject]@{ 番 = $番; 名 = $名; 本数 = $本数; 押し秒 = $押し秒; 消え秒 = $消え秒; 消えた = $消えた; 止めた = $止めた }
 }
 
 Write-Host ''
@@ -122,25 +137,26 @@ Write-Host '★★Excel が 終われない 訳を 測ります★★（★1つ�
 Write-Host ''
 
 $結果 = New-Object System.Collections.Generic.List[object]
-$結果.Add((一回測る -名 '回0 対照（1本・今のまま）'          -本数 1  -RangeをNull $false -入れ物もNull $false -ReleaseとGC $false))
-$結果.Add((一回測る -名 '回1 今のまま'                        -本数 91 -RangeをNull $false -入れ物もNull $false -ReleaseとGC $false))
-$結果.Add((一回測る -名 '回2 ＋Range を 1本ずつ null'          -本数 91 -RangeをNull $true  -入れ物もNull $false -ReleaseとGC $false))
-$結果.Add((一回測る -名 '回3 ＋sh/bk/xl も null'               -本数 91 -RangeをNull $true  -入れ物もNull $true  -ReleaseとGC $false))
-$結果.Add((一回測る -名 '回4 ＋Release と GC 2回'              -本数 91 -RangeをNull $true  -入れ物もNull $true  -ReleaseとGC $true))
+$結果.Add((一回測る -番 1 -名 '回3 sh/bk/xl を null'      -本数 91 -RangeをNull $true -入れ物もNull $true -ReleaseとGC $false))
+$結果.Add((一回測る -番 2 -名 '回4 ＋Release と GC 2回'   -本数 91 -RangeをNull $true -入れ物もNull $true -ReleaseとGC $true))
+$結果.Add((一回測る -番 3 -名 '回3 sh/bk/xl を null'      -本数 91 -RangeをNull $true -入れ物もNull $true -ReleaseとGC $false))
+$結果.Add((一回測る -番 4 -名 '回4 ＋Release と GC 2回'   -本数 91 -RangeをNull $true -入れ物もNull $true -ReleaseとGC $true))
 
 $行 = New-Object System.Collections.Generic.List[string]
 $行.Add('# ★Excel が 終われない 訳を 測る★（2026-09-18）')
 $行.Add('#')
 $行.Add('# ★式は =1+1★（何も 呼ばない＝測って いるのは ★消え方だけ★）')
 $行.Add('# ★60秒で 諦める★／★消えなければ 自分が 起こした PID だけ 止める★')
-$行.Add('# ★1つずつ 足す★＝★どれが 効いたかを 残す★')
+$行.Add('# ★★回3 と 回4 だけを 交互に 2回ずつ★★（①回3 ②回4 ③回3 ④回4）')
+$行.Add('#   ★回3 が 2回とも 速い ⇒方法／後ろほど 遅い ⇒順番／バラつく ⇒揺らぎ★')
 $行.Add('#')
 $行.Add('# ★記憶に 在る 数★ 26件 押した 後に ★59秒で 消えた★（2026-09-15）')
-$行.Add('# ★7枠目★ 91本×2窓 ⇒ ★300.2秒 待っても 消えなかった★')
+$行.Add('# ★1回目★ 回0(1本) 60.12 ／ 回1 60.22 ／ 回2 60.08 ／ ★回3 9.52★ ／ 回4 60.10')
+$行.Add('#   ⇒★本数は 効いて いません（1本でも 消えない）＝私の 見立ては 外れ★')
 $行.Add('#')
-$行.Add('# 名' + "`t" + '本数' + "`t" + '押し秒' + "`t" + '消え秒' + "`t" + '消えたか' + "`t" + '止めた個数')
+$行.Add('# ★何番目か★' + "`t" + '名' + "`t" + '本数' + "`t" + '押し秒' + "`t" + '消え秒' + "`t" + '消えたか' + "`t" + '止めた個数')
 foreach ($r in $結果) {
-  $行.Add($r.名 + "`t" + $r.本数 + "`t" + $r.押し秒 + "`t" + $r.消え秒 + "`t" + $r.消えた + "`t" + $r.止めた)
+  $行.Add($r.番 + "`t" + $r.名 + "`t" + $r.本数 + "`t" + $r.押し秒 + "`t" + $r.消え秒 + "`t" + $r.消えた + "`t" + $r.止めた)
 }
 [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
 Write-Host ''
