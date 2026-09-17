@@ -129,6 +129,18 @@ T('★★MIDB(ア&"A",2,2) は 2文字★★（★私の 見込みは 1で 外�
 });
 
 /* ═══ ④ ★隣を 壊して いない★ ═══ */
+/* ★★RIGHTB が ★右から★ 取って いるか★★
+     ★なぜ 要るか★ … 紙の 1本は `LEN(RIGHTB(ア&"A",1))` ＝ 1 だけで
+       ★LEFTB に すり替えても 空白 1文字で ★同じ 1★ に なります★
+       （★わざと 壊したら 赤に ならなかった★）
+     ⇒★半角だけの 字で ★左右を 見分けます★（ASCII は 1バイト＝1文字）
+     ★これは 半分の 話を 使わない ので ★未測定に 踏み込みません★ */
+T('★RIGHTB は 右から 取る★（★LEFTB と 見分ける★）', () => {
+  if (引('RIGHTB', 字('ABC'), 数(1)) !== 'C') throw new Error('RIGHTB("ABC",1) ＝ C');
+  if (引('LEFTB', 字('ABC'), 数(1)) !== 'A') throw new Error('LEFTB("ABC",1) ＝ A');
+  if (引('RIGHTB', 字('ABC'), 数(2)) !== 'BC') throw new Error('RIGHTB("ABC",2) ＝ BC');
+});
+
 T('★隣（LEN・LEFT・RIGHT・MID）が 生きて いる★', () => {
   if (F.呼ぶ('LEN', [字('ABC')], {}).値 !== 3) throw new Error('LEN("ABC") ＝ 3');
   if (F.呼ぶ('LEFT', [字('ABC'), 数(2)], {}).値 !== 'AB') throw new Error('LEFT("ABC",2) ＝ AB');
