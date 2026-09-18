@@ -45,6 +45,23 @@ console.log('\n[souname-meibo] ★tests/ の 試験が 1本 残らず 走って 
 
 /* ★名簿は 写さない＝`tests/run.js` 本人から 読む★ */
 const { FILES } = require_(path.join(ROOT, 'tests/run.js'));
+/* ★★名簿の 形を 先に 見る★★（2026-09-18）
+     ★訳★ ... 名簿の 行末の カンマが ★覚書きの 中に 入る★と その 行は undefined に なります
+     ⇒★★本数は 減らないのに 1本 走りません★★（★黙って 見逃す★）
+     ⇒★2026-09-18 に ★同じ 日に 2回★ 踏みました★
+     ⇒★下の map は undefined で 転びます＝★転ぶ 前に 名指しで 止めます★★ */
+const 形が変 = FILES.map((f, i) => [i, f])
+  .filter(([, f]) => !(Array.isArray(f) ? typeof f[0] === 'string' && f[0] : typeof f === 'string' && f));
+if (形が変.length) {
+  console.log('');
+  console.log('  NG   ★★名簿に 形の 変な 行が ' + 形が変.length + '本★★（★1本 走りません★）');
+  for (const [i, f] of 形が変) {
+    console.log('       ・' + i + '番目 ... ' + JSON.stringify(f)
+      + '（前 ' + JSON.stringify(FILES[i - 1]) + '）');
+  }
+  console.log('       ★行末の カンマが 覚書きの 中に 入って いませんか★');
+  process.exit(1);
+}
 const 名簿 = new Set(FILES.map((f) => (Array.isArray(f) ? f[0] : f).split(/[\\/]/).pop()));
 
 /* ★yml が 直に 呼ぶ 物も 「走って いる」に 数える★ */

@@ -32,6 +32,9 @@
 #        ★訳★ 化けた 時に ★答えが 違うのか 字が 化けたのかが 見分けられません★
 #        ★この 門は 足した その日に ★3本 見つけました★★
 #    ⑪★★新しい 型（null だけ・Release と GC は 足さない）★★
+#    ⑬★★集め漏れ★★ … ★㋐集めた 時／㋑走った 時／㋒紙に 書かれた の 3つを 並べる★
+#        ★紙ごとにも 並べる★（★1紙 落ちても 合計が 合う 事が 在る★）／違えば exit 7
+#        ★指示役1 の 注文（2026-09-18）★ … 機械で 集めた から こそ 1紙 落ちても 気づけない
 #
 #  ★★見込みは 聞く 前に commit 済み★★ … docs/measured/kansuu46/hachiwakume-no-an.md
 #
@@ -204,6 +207,60 @@ if ($外の字.Count -ne 0) {
   foreach ($s in $外の字) { Write-Host ('    ' + $s) }
   exit 6
 }
+
+# ══ ★⑬集め漏れの 門★ ══（2026-09-18・★指示役1 の 注文★）
+#   ★訳★ … ★機械で 集めた から こそ、途中で 1紙 落ちても 気づけません★
+#          ＝「手で 写して いない」は 良い／★集め漏れは 別の 穴★
+#   ⇒★★3つの 数を 並べます★★
+#       ㋐集めた 時 … `toi-atsumeta.txt` の 行数（★今 その場で 読みます★）
+#       ㋑走った 時 … この 道具が 持って いる 紙の 式の 本数
+#       ㋒紙に 書かれた … `hachiwakume-no-an.md` の 決め打ち（下の $紙の本数）
+$紙の本数 = 94
+$紙ごとの本数 = @{ 'junretsu' = 12; 'xmatch' = 12; 'percentrank' = 12; 'asc-dbcs' = 14; 'lenb' = 14; 'textafter' = 14; 'aggregate' = 16 }
+
+$集めた紙 = Join-Path $ここ 'kansuu46/toi-atsumeta.txt'
+$集めた時 = -1
+if (Test-Path $集めた紙) {
+  $集めた時 = @(Get-Content -LiteralPath $集めた紙 -Encoding UTF8 | Where-Object { $_.Trim() -ne '' -and -not $_.StartsWith('#') }).Count
+} else {
+  Write-Host ('★★集めた 紙が 在りません … ' + $集めた紙 + '★★（★数を 並べられません★）')
+}
+$走った時 = $紙の式.Count
+
+Write-Host ''
+Write-Host '★★集め漏れを 数える（3つを 並べる）★★'
+Write-Host ('  ㋐集めた 時（toi-atsumeta.txt の 行数） … ' + $(if ($集めた時 -lt 0) { '★読めません★' } else { [string]$集めた時 + '本' }))
+Write-Host ('  ㋑走った 時（この 道具が 持って いる） … ' + $走った時 + '本')
+Write-Host ('  ㋒紙に 書かれた（見込みの 紙の 決め打ち） … ' + $紙の本数 + '本')
+
+# ★紙ごとにも 並べる★（★1紙 落ちても 合計が 合う 事が 在ります★）
+$紙ごと = @{}
+foreach ($x in $紙の式) {
+  $k = $x.訳 -replace '^\(紙\)', ''
+  if ($紙ごと.ContainsKey($k)) { $紙ごと[$k] = $紙ごと[$k] + 1 } else { $紙ごと[$k] = 1 }
+}
+$紙の違い = New-Object System.Collections.Generic.List[string]
+foreach ($k in ($紙ごとの本数.Keys | Sort-Object)) {
+  $いま = 0
+  if ($紙ごと.ContainsKey($k)) { $いま = $紙ごと[$k] }
+  $しるし = '○'
+  if ($いま -ne $紙ごとの本数[$k]) { $しるし = '★違う★'; $紙の違い.Add($k + ' … ' + $いま + '本（はず ' + $紙ごとの本数[$k] + '本）') }
+  Write-Host ('    ' + $k.PadRight(14) + ' ' + ([string]$いま).PadLeft(3) + '本（はず ' + $紙ごとの本数[$k] + '） ' + $しるし)
+}
+foreach ($k in ($紙ごと.Keys | Sort-Object)) {
+  if (-not $紙ごとの本数.ContainsKey($k)) { $紙の違い.Add('★知らない 紙★ ' + $k + ' … ' + $紙ごと[$k] + '本') }
+}
+# ★★読めないのも 赤★★ … ★測る 道具が 返した「読めません」を 見逃すと 2つしか 並びません★
+if ($集めた時 -lt 0) { $紙の違い.Add('★㋐が 読めません★ … ' + $集めた紙) }
+elseif ($集めた時 -ne $走った時) { $紙の違い.Add('㋐' + $集めた時 + '本 と ㋑' + $走った時 + '本 が 違う') }
+if ($走った時 -ne $紙の本数) { $紙の違い.Add('㋑' + $走った時 + '本 と ㋒' + $紙の本数 + '本 が 違う') }
+if ($紙の違い.Count -ne 0) {
+  Write-Host '★★集め漏れが 在ります★★'
+  foreach ($s in $紙の違い) { Write-Host ('    ' + $s) }
+  exit 7
+}
+Write-Host '  ★3つとも 同じ＝集め漏れ 0★'
+Write-Host ''
 
 # ══ ★②本数の 門★ ══
 $式の本数 = 115
