@@ -130,6 +130,8 @@ function 答になるか(a) {
   return true;
 }
 
+const 出し先 = (process.argv.find((a) => a.startsWith('--出し=')) || '').split('=').slice(1).join('=');
+const 行ごとの出し = [];
 const 問い = [];
 const 紙ごと = [];
 for (const p of 紙たち) {
@@ -196,6 +198,7 @@ for (const q of 問い) {
   } catch (e) { 転 += 1; 外れ.push(q.式 + ' => ★転んだ★ ' + String(e.message).slice(0, 70)); continue; }
   const 字 = (出 === null || 出 === undefined) ? '' : String(出);
   if (字 === '#NAME?') {
+    行ごとの出し.push(q.式 + '\t#NAME?\t' + q.答);
     知らない += 1;
     const m = /^=([A-Z0-9_.]+)\(/.exec(q.式);
     const n = m ? m[1] : '(不明)';
@@ -206,6 +209,7 @@ for (const q of 問い) {
   const 数どうし = /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(q.答) && /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(字);
   const 同 = (字 === q.答)
     || (数どうし && Math.abs(Number(字) - Number(q.答)) <= Math.max(1e-9, Math.abs(Number(q.答)) * 1e-9));
+  行ごとの出し.push(q.式 + '\t' + 字 + '\t' + q.答);
   if (同) {
     合 += 1;
     印(q.式, '合');
@@ -252,4 +256,10 @@ const 並び = [...関数ごと.entries()]
 for (const x of 並び) {
   console.log('    ' + x.n.padEnd(18)
     + String(x.合).padStart(5) + String(x.違).padStart(8) + String(x.無).padStart(10));
+}
+
+if (出し先) {
+  fs.writeFileSync(出し先, 行ごとの出し.join('\n') + '\n', 'utf-8');
+  console.log('');
+  console.log('  ★1行ずつ 出しました ... ' + 出し先 + '（' + 行ごとの出し.length + '行）★');
 }

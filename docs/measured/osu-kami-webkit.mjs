@@ -131,6 +131,7 @@ function 答になるか(a) {
   return true;
 }
 
+const 出し先 = (process.argv.find((a) => a.startsWith('--出し=')) || '').split('=').slice(1).join('=');
 const 問い = [];
 const 紙ごと = [];
 for (const p of 紙たち) {
@@ -270,6 +271,11 @@ try {
   console.log('  ★★合った ' + 合 + ' / ' + 問い.length + '★★ ／ 違った ' + 違
     + ' ／ ★空っぽ ' + 空 + '★ ／ 転んだ ' + 転);
   console.log('  ★合った 割合 ... ' + (問い.length ? (100 * 合 / 問い.length).toFixed(1) : '0') + '%★');
+  if (出し先) {
+    const 行ごと = 問い.map((q, i) => q.式 + '\t' + String((出[i] || {}).値 === undefined ? '(空)' : (出[i] || {}).値) + '\t' + q.答);
+    fs.writeFileSync(出し先, 行ごと.join('\n') + '\n', 'utf-8');
+    console.log('  ★1行ずつ 出しました ... ' + 出し先 + '（' + 行ごと.length + '行）★');
+  }
   console.log('');
   console.log('  ★★★DATE() を 渡すと #VALUE! ... ' + 日付を渡すと + '本★★★'
     + '（★合わない ' + 外れ.length + '本の うち★）');
