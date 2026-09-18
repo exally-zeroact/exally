@@ -32,9 +32,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ここ = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(ここ, '..', '..');
-const { 建てる } = await import(pathToFileURL(path.join(ここ, 'honban-no-michi.mjs')).href);
+const { 建てる, 台に聞く } = await import(pathToFileURL(path.join(ここ, 'honban-no-michi.mjs')).href);
 const 台 = await 建てる();
-const { EF, hf, SID } = 台;
+const { EF, hf, SID, 板 } = 台;   /* ★板＝自前の 計算の 台（★本番の 3段目★） */
 
 const 番地 = (s) => {
   const m = /^([A-Z]+)(\d+)$/.exec(s);
@@ -71,7 +71,18 @@ function 押す(式) {
   try {
     const js = EF._jsComputeFormula(0, 式);
     if (js !== null && js !== undefined) return String(js);
-  } catch (e) { /* ★借り物へ 落とす★ */ }
+  } catch (e) { /* ★台へ 落とす★ */ }
+  /* ★★②台に 聞く★★（2026-09-18・★本番は 3段です★）
+       ＝前は ここが 抜けて いて ★JS層 → 借り物★の 2段でした
+       ＝★「お客さんの 道」と 名乗りながら 本番と 1段 違って いました★
+       ⇒★材料を 台にも 入れてから 聞きます★（★空の 板に 聞くと 0 が 返ります★） */
+  if (板) {
+    try {
+      for (const k of Object.keys(材料)) 板.打つ(k, String(材料[k]));
+      const 台答 = 台に聞く(板, 式);
+      if (台答 !== null) return 台答;
+    } catch (e) { /* ★借り物へ 落とす★ */ }
+  }
   const v = hf.getCellValue({ sheet: SID, row: 式の行, col: 式の列 });
   if (v && v.type) return 赤の名(v.type);
   if (v === null || v === undefined) return '';

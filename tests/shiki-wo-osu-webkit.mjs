@@ -213,6 +213,29 @@ try {
 
   T('★式を 打つ 口が 在る★', await page.evaluate(() => typeof window.setCell === 'function'));
 
+  /* == ★★JS層が 引数の 数違いを 飲み込んで いた 1本★★ ==（2026-09-18）
+       `=MAP(A1:A5,LAMBDA(x,y,x))`（★口が 2つ／MAP は 1つしか 渡さない★）
+         ★実Excel★ ... `#VALUE!`（`golden-kansuu-9kaime-2026-09-18.tsv` 55行目）
+         ★前の うち★ ... `#ERROR!`（★実Excel に 無い 字★／★JS層から★）
+       ⇒★JS層が 答えない ように し、台に 回しました★
+       ★`#ERROR`（`!` 無し）は 借り物から／`#ERROR!`（`!` 有り）は JS層から★ */
+  {
+    const 出 = await page.evaluate(() => {
+      const sh = window.sheets[window.activeSheet];
+      for (let i = 0; i < 5; i++) window.setCell(95 + i, 0, String(i + 1));
+      window.setCell(95, 3, '=MAP(A96:A100,LAMBDA(x,y,x))');
+      if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
+      const c = (sh.data || {})['95,3'];
+      const v = c ? (c.d !== undefined ? c.d : c.v) : '(無い)';
+      return String(v === undefined || v === null ? '' : v);
+    });
+    console.log('  ★=MAP(A96:A100,LAMBDA(x,y,x)) ... "' + 出 + '"（★#VALUE! が 正★）');
+    T('★★引数の 数違いの MAP が 実Excel と 同じ #VALUE!★★（★前は #ERROR!★）',
+      出 === '#VALUE!', '出た "' + 出 + '"');
+    T('★★`#ERROR!`（実Excel に 無い 字）を 出して いない★★',
+      出.indexOf('#ERROR') < 0, '出た "' + 出 + '"');
+  }
+
   /* == ★★台が 知らない 式は 借り物に 落ちるか★★ ==（2026-09-18・㋑⑶）
        ★訳★ … 台に 無い 関数は ★27個★ 残って います。
               落ちる 道が 無いと ★その場で `#NAME?`★ に なり ★今 出て いる 答えが 消えます★

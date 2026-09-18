@@ -988,9 +988,41 @@ function _jsScanCompute(sheet, initial, rangeStr, lambdaFormula) {
   return first!==null ? String(first) : String(initial);
 }
 
+/* ★★かっこの 外の カンマで 割る★★（2026-09-18）
+     ＝`LAMBDA(x,y,x)` を `['x','y','x']` に する
+     ＝★かっこの 中の カンマ（`SUM(1,2)`）では 割りません★ */
+function _topLevelSplit(s) {
+  var 出=[],深=0,頭=0,中の字=null;
+  for(var i=0;i<s.length;i++){
+    var c=s.charAt(i);
+    if(中の字){ if(c===中の字) 中の字=null; continue; }
+    if(c==='"'||c==="'"){ 中の字=c; continue; }
+    if(c==='('||c==='['||c==='{') 深++;
+    else if(c===')'||c===']'||c==='}') 深--;
+    else if(c===','&&深===0){ 出.push(s.slice(頭,i)); 頭=i+1; }
+  }
+  出.push(s.slice(頭));
+  return 出;
+}
+
 // MAP(range, LAMBDA(x, body)) → 全件カンマ区切り
 function _jsMapCompute(sheet, rangeStr, lambdaFormula) {
   if(!_hf) return null;
+  /* ★★引数の 数が 違う LAMBDA を 飲み込んで いました★★（2026-09-18・★お客さんに 出て いた★）
+       `=MAP(A1:A5,LAMBDA(x,y,x))`
+         ★実Excel★ … `#VALUE!`（実測・`golden-kansuu-9kaime-2026-09-18.tsv` 55行目）
+         ★前の うち★ … `#ERROR!`（★実Excel に 無い 字★）
+       ★因★ … 下の ふるいが `([^,)]+)` で ★口を 1つだけ★ 取り、
+              残り `y,x` を ★そのまま 体★に して いました
+              ⇒ `=y,(1)` の ような 式を 借り物に 渡し ⇒ `#ERROR!`
+       ★直し★ … ★口の 数を 数え、1つで なければ JS層は 答えません★（`null`）
+              ⇒★台（`lib/shiki-hyou.js`）が 答えます★＝`#VALUE!`（実Excel と 同じ）
+              ⇒★半分 合う 答えを 出さない★
+       ★`#ERROR!`（`!` 有り）は JS層から／`#ERROR`（`!` 無し）は 借り物から★
+         ＝★字が 1文字 違うだけで 出どころが 違います★（経営者1 の 見つけ物） */
+  var 中=lambdaFormula.replace(/^LAMBDA\s*\(/i,'').replace(/\)\s*$/,'');
+  var 割=_topLevelSplit(中);
+  if(割.length!==2) return null;   /* ★口1つ ＋ 体1つ＝2つ以外は 答えません★ */
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var param=mL[1].trim(),body=mL[2].trim();
