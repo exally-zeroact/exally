@@ -376,7 +376,11 @@ const FILES = [
   ['oddf-hasuu-ga-hasuu-denai.test.mjs'], // ★端数が「端数で ない」時は #NUM!
   ['tsunagu-mon.test.mjs'],          // ★台を 画面に 繋ぐ 手を 止める 門（★繋ぐ 前から 赤★）
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
-  ['kansuu46-9wakume.test.mjs']      // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
+  ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
+  /* ★経営者1 の 1押し★（★私が `git add -A` で 先に commit して しまった★）
+     ⇒★名簿に 足さないと 見張りが 赤の まま★なので ここで 足します
+     ⇒★中身は 1文字も 触って いません★ */
+  ['ramuda-honban.test.mjs']         // ★ラムダの 一族を お客さんの 道で 押す（経営者1）
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）
