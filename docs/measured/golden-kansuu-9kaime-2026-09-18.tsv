@@ -15,10 +15,10 @@
 # ★どの 文字コードか★ ... ANSI 932 ／ ja-JP
 #
 # 番	訳	式	見込み	答え	出る字	=(式)=0	型	合ったか
-49	★★行か 列か（F1:G2 ＝ 1,2／10,20）★★	=BYROW(F1:G2,LAMBDA(r,SUM(r)))	★3★	3	3	False	Double	×
-50	★行なら 3+30★	=SUM(BYROW(F1:G2,LAMBDA(r,SUM(r))))	★33★	33	33	False	Double	×
-51	★列なら 11+22＝33★ ← ★★和では 分かれない★★	=SUM(BYCOL(F1:G2,LAMBDA(c,SUM(c))))	★33★	33	33	False	Double	×
-52	★★左上で 分かれます★★（行なら 3）	=BYCOL(F1:G2,LAMBDA(c,SUM(c)))	★11★	11	11	False	Double	×
+49	★★行か 列か（F1:G2 ＝ 1,2／10,20）★★	=BYROW(F1:G2,LAMBDA(r,SUM(r)))	★3★	3	3	False	Double	○
+50	★行なら 3+30★	=SUM(BYROW(F1:G2,LAMBDA(r,SUM(r))))	★33★	33	33	False	Double	○
+51	★列なら 11+22＝33★ ← ★★和では 分かれない★★	=SUM(BYCOL(F1:G2,LAMBDA(c,SUM(c))))	★33★	33	33	False	Double	○
+52	★★左上で 分かれます★★（行なら 3）	=BYCOL(F1:G2,LAMBDA(c,SUM(c)))	★11★	11	11	False	Double	○
 1	正方で ない	=MDETERM(A1:B5)	#VALUE!	-2146826281	#DIV/0!	-2146826281	Other	×
 2	1×1 は その 値	=MDETERM(A1:A1)	1	1	1	False	Double	○
 3	B3 では ない ... B1:C2 に 誤りは 無い ⇒ ★-1 の はず★	=MDETERM(B1:C2)	#DIV/0!	1	1	False	Double	×
@@ -35,19 +35,19 @@
 14	％を 重ねる	=NUMBERVALUE("50%%")	0.005	0.005	0.005	False	Double	○
 15	前後の 空白	=NUMBERVALUE(" 1.5 ")	1.5	1.5	1.5	False	Double	○
 16	UTF-8 なら %E3	=UNICODE(MID(ENCODEURL(UNICHAR(12354)),2,1))	69（"E"）	69	69	False	Double	×
-17	＋も 逃がす	=ENCODEURL("a+b")	`a%2Bb`	a%2Bb	a%2Bb	False	String	×
-18	負	=FIXED(-1234.567,2)	`-1,234.57`	-1,234.57	-1,234.57	False	String	×
-19	左へ 丸める	=FIXED(1234.567,-2)	`1,200`	1,200	1,200	False	String	×
-20	区切らない	=FIXED(1234.567,2,TRUE)	`1234.57`	1234.57	1234.57	False	String	×
+17	＋も 逃がす	=ENCODEURL("a+b")	`a%2Bb`	a%2Bb	a%2Bb	False	String	○
+18	負	=FIXED(-1234.567,2)	`-1,234.57`	-1,234.57	-1,234.57	False	String	○
+19	左へ 丸める	=FIXED(1234.567,-2)	`1,200`	1,200	1,200	False	String	○
+20	区切らない	=FIXED(1234.567,2,TRUE)	`1234.57`	1234.57	1234.57	False	String	○
 21	★★一番 大事★★ ... 丸括弧かも しれない	=DOLLAR(-1234.567,2)	★`-¥1,234.57`★	¥-1,234.57	¥-1,234.57	False	String	×
-22	左へ 丸める	=DOLLAR(1234.567,-2)	`¥1,200`	¥1,200	¥1,200	False	String	×
-23	きっちり＝引用符	=VALUETOTEXT("a",1)	`"a"`	"a"	"a"	False	String	×
-24	真偽	=VALUETOTEXT(TRUE)	`TRUE`	TRUE	TRUE	False	String	×
-25	★誤りを 字に する★	=VALUETOTEXT(1/0)	`#DIV/0!`	#DIV/0!	#DIV/0!	False	String	×
+22	左へ 丸める	=DOLLAR(1234.567,-2)	`¥1,200`	¥1,200	¥1,200	False	String	○
+23	きっちり＝引用符	=VALUETOTEXT("a",1)	`"a"`	"a"	"a"	False	String	○
+24	真偽	=VALUETOTEXT(TRUE)	`TRUE`	TRUE	TRUE	False	String	○
+25	★誤りを 字に する★	=VALUETOTEXT(1/0)	`#DIV/0!`	#DIV/0!	#DIV/0!	False	String	○
 26	一番 小さい 物より 下	=LOOKUP(0,C1:C5,D1:D5)	#N/A	-2146826246	#N/A	-2146826246	Other	○
 27	一番 大きい 物	=LOOKUP(99,C1:C5,D1:D5)	1	1	1	False	Double	○
 28	★四角の 形（1列）★	=LOOKUP(4,C1:C5)	3	3	3	False	Double	○
-29	★昇順で ない＝決まって いない★	=LOOKUP(4,D1:D5)	★分かりません★	-2146826246	#N/A	-2146826246	Other	×
+29	★昇順で ない＝決まって いない★	=LOOKUP(4,D1:D5)	★分かりません★	-2146826246	#N/A	-2146826246	Other	?
 30	★R1C1 の 書き方★	=INDIRECT("R1C1",FALSE)	1	1	1	False	Double	○
 31	四角の 左上	=INDIRECT("A1:B2")	1	-2146826273	#VALUE!	-2146826273	Other	×
 32	高さ 0	=OFFSET(A1,0,0,0,1)	#REF!	-2146826265	#REF!	-2146826265	Other	○
@@ -56,16 +56,16 @@
 35	★そのまま 打つと 何に なるか★	=LAMBDA(x,x*2)	#CALC!	-2146826238	#CALC!	-2146826273	Other	○
 36	★`式(引数)` の 形★	=LAMBDA(x,x*2)(3)	6	6	6	False	Double	○
 37	★名の台★	=LET(x,1,x+1)	2	2	2	False	Double	○
-38	★★名の台と マスの どちらが 勝つか★★	=LET(A1,5,A1)	★5★	5	5	False	Double	×
+38	★★名の台と マスの どちらが 勝つか★★	=LET(A1,5,A1)	★5★	5	5	False	Double	○
 39	★名を 2つ★	=LET(x,1,y,2,x+y)	3	3	3	False	Double	○
-40	★最後は 式で ないと いけない★	=LET(x,1)	#VALUE!	(★打てません★)	★Excel が 式を 受け付けません★ HRESULT からの例外:0x800A03EC	(★打てません★)	(★打てません★)	(★打てません★)
+40	★最後は 式で ないと いけない★	=LET(x,1)	#VALUE!	(★打てません★)	★Excel が 式を 受け付けません★ HRESULT からの例外:0x800A03EC	(★打てません★)	(★打てません★)	×
 41	溢れの 左上	=MAP(A1:A5,LAMBDA(x,x*2))	2	2	2	False	Double	○
 42	★溢れの 形★	=ROWS(MAP(A1:A5,LAMBDA(x,x*2)))	5	5	5	False	Double	○
 43	★溢れの 形★	=COLUMNS(MAP(A1:A5,LAMBDA(x,x*2)))	1	1	1	False	Double	○
 44	まるごと	=SUM(MAP(A1:A5,LAMBDA(x,x*2)))	30	30	30	False	Double	○
 45	★引数の 順★	=REDUCE(0,A1:A5,LAMBDA(a,b,a+b))	15	15	15	False	Double	○
 46	★a が 溜め・b が 次★の 裏取り	=REDUCE(100,A1:A5,LAMBDA(a,b,a-b))	85	85	85	False	Double	○
-47	★0 を 含むか＝5 か 6 か★	=ROWS(SCAN(0,A1:A5,LAMBDA(a,b,a+b)))	★5★	5	5	False	Double	×
+47	★0 を 含むか＝5 か 6 か★	=ROWS(SCAN(0,A1:A5,LAMBDA(a,b,a+b)))	★5★	5	5	False	Double	○
 48	1+3+6+10+15	=SUM(SCAN(0,A1:A5,LAMBDA(a,b,a+b)))	35	35	35	False	Double	○
 53	左上	=MAKEARRAY(2,3,LAMBDA(r,c,r*c))	1	1	1	False	Double	○
 54	(1+2)×(1+2+3)	=SUM(MAKEARRAY(2,3,LAMBDA(r,c,r*c)))	18	18	18	False	Double	○

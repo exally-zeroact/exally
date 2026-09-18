@@ -1,0 +1,63 @@
+# ★ラムダの 一族を ★お客さんの 道★で 押した★（2026-09-18）
+#
+# ★何を 何で 測ったか★
+#   台 ... docs/measured/honban-no-michi.mjs の 建てる()（book.html と 同じ 8本）
+#   道 ... convertFormula -> _jsComputeFormula -> 借り物
+#   正 ... docs/measured/golden-kansuu-9kaime-2026-09-18.tsv（実Excel・同じ 日）
+#   材料 ... A1:A5=1..5 / C1:C5=1,3,5,7,9 / D1:D5=9,7,5,3,1 / F1:G2=1,2 と 10,20
+#   道具 ... docs/measured/osu-ramuda-honban.mjs
+#
+# ★★24本の うち 合った 8本 ／ 違った 16本★★
+#
+# ★★違いは 4つの 型に 収まります★★
+#   ㋐★入れ子に すると 全部 #NAME?★（8本）
+#      SUM(MAP(..)) ROWS(MAP(..)) COLUMNS(MAP(..)) SUM(SCAN(..)) ROWS(SCAN(..))
+#      SUM(MAKEARRAY(..)) SUM(BYROW(..)) LET(a,2,SUM(MAP(..)))
+#      訳 ... _jsComputeFormula は ★一番 外側の 形★しか 見ません
+#             中に 入った 途端 借り物に 渡り、借り物は MAP を 知りません
+#      ★新しい 名前を 1個も 書かずに 直せます★（＝借り物外しの 35個には 入りません）
+#   ㋑★BYROW / BYCOL が 無い★（4本）... 519中 30個の「名乗らない」に 入って います
+#   ㋒★=LET(A1,5,A1) ... 実Excel 5 ／ うち 1★
+#      ＝★名の台が マスに 負けて います★
+#   ㋓★誤りの 字が 違う★
+#      =LAMBDA(x,x*2)              実 #CALC! ／ うち #NAME?
+#      =MAP(A1:A5,LAMBDA(x,y,x))   実 #VALUE! ／ うち #ERROR!
+#      =LET(f,LAMBDA(x,x*2),f(3))  実 6      ／ うち #ERROR!
+#
+# ★★=LAMBDA(x,x*2)(3) は 今の お客さんの 道では 6 を 返します★★
+#   ＝「式(引数) の 形が 読めない」は ★新しい 台（lib/shiki-hyou.js の 歩く()）の 話★
+#   ⇒★後回しに しても 今より 悪く なりません★
+#   ⇒★但し 台を 繋いだ 日に 6 が #NAME? に 落ちます★＝★繋ぐ 前に 要る★
+#
+# ★見て いない 事★
+#   ・書き出し（lib/xlsx-io.js）と 読み込みの 道は 見て いません
+#   ・溢れの 2つ目 以降は 見て いません（実Excel 側も 左上を 取って います）
+#   ・★材料は 1組だけです★＝★別の 材料で 分かれる かは 見て いません★
+#
+番	式	実Excel	うち	判定
+49	=BYROW(F1:G2,LAMBDA(r,SUM(r)))	3	#NAME?	x
+50	=SUM(BYROW(F1:G2,LAMBDA(r,SUM(r))))	33	#NAME?	x
+51	=SUM(BYCOL(F1:G2,LAMBDA(c,SUM(c))))	33	#NAME?	x
+52	=BYCOL(F1:G2,LAMBDA(c,SUM(c)))	11	#NAME?	x
+35	=LAMBDA(x,x*2)	#CALC!	#NAME?	x
+36	=LAMBDA(x,x*2)(3)	6	6	o
+37	=LET(x,1,x+1)	2	2	o
+38	=LET(A1,5,A1)	5	1	x
+39	=LET(x,1,y,2,x+y)	3	3	o
+40	=LET(x,1)	Excel が 式を 受け付けません HRESULT からの例外:0x800A03EC	#NAME?	x
+41	=MAP(A1:A5,LAMBDA(x,x*2))	2	2	o
+42	=ROWS(MAP(A1:A5,LAMBDA(x,x*2)))	5	#NAME?	x
+43	=COLUMNS(MAP(A1:A5,LAMBDA(x,x*2)))	1	#NAME?	x
+44	=SUM(MAP(A1:A5,LAMBDA(x,x*2)))	30	#NAME?	x
+45	=REDUCE(0,A1:A5,LAMBDA(a,b,a+b))	15	15	o
+46	=REDUCE(100,A1:A5,LAMBDA(a,b,a-b))	85	85	o
+47	=ROWS(SCAN(0,A1:A5,LAMBDA(a,b,a+b)))	5	#NAME?	x
+48	=SUM(SCAN(0,A1:A5,LAMBDA(a,b,a+b)))	35	#NAME?	x
+53	=MAKEARRAY(2,3,LAMBDA(r,c,r*c))	1	1	o
+54	=SUM(MAKEARRAY(2,3,LAMBDA(r,c,r*c)))	18	#NAME?	x
+55	=MAP(A1:A5,LAMBDA(x,y,x))	#VALUE!	#ERROR!	x
+56	=REDUCE(0,A1:A5,LAMBDA(a,a))	#VALUE!	#VALUE!	o
+57	=LET(f,LAMBDA(x,x*2),f(3))	6	#ERROR!	x
+58	=LET(a,2,SUM(MAP(A1:A5,LAMBDA(x,x*a))))	30	#NAME?	x
+
+★ラムダの一族 24本 ... 合った 8 ／ 違った 16★
