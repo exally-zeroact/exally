@@ -93,6 +93,21 @@ const 繋ぐ前 = {
   shiki: 0,
   違う式: ['=PERCENTRANK({1;3;5;7;9},4)', '=AGGREGATE(19,6,{1;2;4;5},1)'],
 };
+/* ══ ★★㋐（読み込むだけ）の 後の 姿★★ ══（2026-09-18・★実測して 固定★）
+     ★★㋐で 答えが 変わったら 赤★★＝★読み込むだけ なのに 変わるのは おかしい★
+     ★`shiki-` は 9本★（`lib/bessel.js` は 名前が 違うので 別に 数えます）
+     ★`hyperformula` は 1本の まま★＝★外すのは また 別の 1押し★
+     ★★なぜ 2つ 持つか★★
+       経営者1 の 門は「`shiki-` が 1本 以上 なら 緑」でした
+       ⇒★★㋐だけで 緑に なります／でも 答えは 1つも 変わって いません★★
+       ⇒★記憶「入れて 落ちないかで 測るな＝引いて 正しい 答えが 出るかで 測れ」★
+       ⇒★だから ★答えの 姿★を 決め打ちに します★ */
+const 読み込んだ後 = {
+  合: 12,
+  違: 2,
+  shiki: 9,
+  hyperformula: 1,
+};
 const 終わりの線か = process.argv.includes('--終わりの線');
 
 function 立てる(root) {
@@ -123,6 +138,24 @@ const 時計 = Date.now();
 const wk = await borrow('shiki-wo-osu', 'webkit');
 const browser = await launch('shiki-wo-osu', wk, {}, 'webkit');
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+
+/* ══ ★★窓の 誤りを 数える★★ ══（2026-09-18・経営者1 の 注文）
+     ★なぜ★ ... ★読み込んだ だけで 投げる 物は ★ここにしか 出ません★★
+       ＝node の 試験は 1件も 出しません（`require` は 通る）
+       ＝2026-09-18 に 私が 直した 3つ（`process.env` / `Bahttext` / `FormulaFilterxml`）は
+         ★全部 ここに 出る 形★でした
+     ★元から 在る 物は 名指しで 許します★（★数で 許すと 新しい 物が 隠れます★） */
+const 許す誤り = [
+  /* ★`<meta viewport>` の 鍵を WebKit が 知らない だけ★＝★計算にも 画面にも 出ません★
+     ＝経営者1 が 本番でも 同じ 1件を 見て います（2026-09-18） */
+  'interactive-widget',
+];
+const 窓の誤り = [];
+page.on('pageerror', (e) => 窓の誤り.push('pageerror: ' + String(e && e.message).slice(0, 120)));
+page.on('console', (m) => {
+  if (m.type() !== 'error') return;
+  窓の誤り.push('console.error: ' + String(m.text()).slice(0, 120));
+});
 const 配信 = 手元か ? await 立てる(ROOT) : null;
 const 住所 = 手元か ? (配信.url + '/book.html') : 口;
 let 開けた = false;
@@ -212,8 +245,20 @@ try {
     T('★★借り物が 間違える 2本が そのまま★★（★繋げば 直る はず★）',
       繋ぐ前.違う式.every((f) => 違名.includes(f)) && 違名.length === 繋ぐ前.違,
       '出た ' + JSON.stringify(違名) + ' ／ 前 ' + JSON.stringify(繋ぐ前.違う式));
-    T('★★shiki- は まだ 0本★★（★繋いだら ここが 赤に なります★）', 読み.shiki === 繋ぐ前.shiki,
-      読み.shiki + '本（前 ' + 繋ぐ前.shiki + '本）');
+    /* ★★㋐が 済んだ 姿★★（2026-09-18）＝★増えても 減っても 赤★ */
+    T('★★`shiki-` が ' + 読み込んだ後.shiki + '本★★（★㋐＝読み込むだけ／減っても 増えても 赤★）',
+      読み.shiki === 読み込んだ後.shiki,
+      読み.shiki + '本（決め打ち ' + 読み込んだ後.shiki + '本 ／ 繋ぐ 前 ' + 繋ぐ前.shiki + '本）');
+    T('★★`hyperformula` は まだ ' + 読み込んだ後.hyperformula + '本★★（★外すのは また 別の 1押し★）',
+      読み.hf === 読み込んだ後.hyperformula,
+      読み.hf + '本');
+    /* ★★窓の 誤り★★（★許した 物を 引いてから 数えます★） */
+    const 新しい誤り = 窓の誤り.filter((s) => !許す誤り.some((k) => s.indexOf(k) >= 0));
+    console.log('  ★窓の 誤り ... 全部 ' + 窓の誤り.length + '件'
+      + ' ／ ★許した 物を 引いて ' + 新しい誤り.length + '件★');
+    for (const s of 窓の誤り) console.log('       ・' + s);
+    T('★★窓の 誤り（新しい 物）が 0件★★（★読み込んだ だけで 投げる 物は ここにしか 出ません★）',
+      新しい誤り.length === 0, 新しい誤り.join('\n       '));
   }
 } catch (e) {
   if (開けた) { fail++; console.log('  NG   ★途中で 止まりました★ ' + String(e.message).slice(0, 120)); }
