@@ -52,11 +52,41 @@ const 紙たち = [
   { 名: 'golden-oddf-nokori5-2026-09-18.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori6-2026-09-18.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori7-2026-09-18.tsv', 式列: 1, 答列: 2 },
+  /* ★★下の 4枚は ★門を 足した その場で 出て きました★★（2026-09-19）
+     ＝★私は 6枚 入れ忘れて いました★（15・16 と この 4枚） */
+  { 名: 'golden-oddf-nokori8-2026-09-18.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori9-2026-09-18.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori10-2026-09-19.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori11-2026-09-19.tsv', 式列: 1, 答列: 2 },
   /* ★2026-09-19 に 私が 取った 紙★ */
   { 名: 'golden-oddf-nokori12-2026-09-19.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori13-2026-09-19.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori14-2026-09-19.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori15-2026-09-19.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori16-2026-09-19.tsv', 式列: 1, 答列: 2 },
 ];
+
+/* ══ ★★門 ── ★紙を 足したのに 名簿に 入れ忘れたら 止める★★ ══
+   ★2026-09-19★ ... ㉔㉕で 取った `nokori15` `nokori16` を ★名簿に 入れ忘れました★
+     ⇒★Exally1 が 「決 2009-05-30 も 外れて いる」と 教えて くれるまで 気づかず★
+     ⇒★私の 274 / 277 は ★分母に 穴が 開いた ままの 数★でした★
+   ★これで 今日 3人目です★（Exally1 の 48本／私の ODDL 4本／これ）
+   ⇒★★覚書に 書くのでは なく 道具に 持たせます★★
+   ⇒★`docs/measured` の `golden-oddf*.tsv` が 名簿に 1枚でも 無ければ ★exit 4★ */
+{
+  const 名簿 = new Set(紙たち.map((p) => p.名));
+  const 落ち = fs.readdirSync(ここ)
+    .filter((f) => /^golden-oddf.*\.tsv$/.test(f))
+    .filter((f) => !名簿.has(f));
+  if (落ち.length) {
+    console.log('');
+    console.log('★★紙が 在るのに 名簿に 入って いません ... ' + 落ち.length + '枚★★');
+    for (const f of 落ち) console.log('    ' + f);
+    console.log('  ⇒★★分母に 穴が 開いた まま 数えては いけません★★');
+    console.log('  ⇒★`紙たち` に 足して ください（★式列 と 答列 を 確かめて★）');
+    process.exit(4);
+  }
+}
 
 const 数 = (y, m, d) => K.日から数(y, m, d);
 /* ★basis を 書かない 形も 在ります★（★ODDL で 私の 分母に 4本の 穴が 開いて いました★）
