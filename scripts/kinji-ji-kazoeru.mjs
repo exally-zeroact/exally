@@ -160,13 +160,22 @@ for (const g of 見る) {
   const ファイル = 集める(g.道, g.拡, !!g.再帰);
   const 合 = {}, 生 = {};
   for (const c of 禁字) { 合[c.字] = 0; 生[c.字] = 0; }
+  /* ★★どの ファイルに 何個 在るかも 覚えます★★（2026-09-18・経営者1 の 注文）
+       ★訳★ ... 上限を 超えた 時 ★どこかを 人が 手で 数えて いました★（★今日 2回★）
+       ⇒★超えた 時だけ ★多い 順に 出します★★
+       ⇒★同じ 木を 2席で 使って いるので ★誰の 書きかけかも すぐ 分かります★★ */
+  const 本ごと = [];
   for (const p of ファイル) {
     const t = fs.readFileSync(p, 'utf-8');
     const k = 覚書きを落とす(t);
+    let 本の合 = 0;
     for (const c of 禁字) {
-      合[c.字] += t.split(c.字).length - 1;
+      const a = t.split(c.字).length - 1;
+      合[c.字] += a;
       生[c.字] += k.split(c.字).length - 1;
+      本の合 += a;
     }
+    if (本の合) 本ごと.push({ 道: path.relative(ROOT, p), 数: 本の合 });
   }
   console.log('  ★' + g.名 + '★（' + ファイル.length + '本）');
   for (const c of 禁字) {
@@ -182,6 +191,21 @@ for (const g of 見る) {
       + (だめ ? '  ★★増えました★★' : '') + (生だめ ? '  ★★生きた 行に 出ました★★' : ''));
   }
   if (禁字.every((c) => !合[c.字])) console.log('    ★0件★');
+  /* ★超えた 時だけ 出どころを 出す★ */
+  const 超えた = 禁字.some((c) => {
+    const 限 = (上限[g.名] || {})[c.字.charCodeAt(0)];
+    return (限 !== undefined && 合[c.字] > 限)
+      || 合[c.字] > 0 && 生[c.字] > ((生きた上限[g.名] === undefined) ? 0 : 生きた上限[g.名]);
+  });
+  if (超えた) {
+    console.log('    ★★出どころ（多い 順に 8本）★★');
+    for (const x of 本ごと.sort((a, b) => b.数 - a.数).slice(0, 8)) {
+      console.log('      ' + String(x.数).padStart(5) + '  ' + x.道);
+    }
+    console.log('      ★★木（ディスク）の 字を 数えて います★★');
+    console.log('        ＝★commit して いない 書きかけも 入ります★');
+    console.log('        ＝★同じ 木を 2席で 使う 時は ★相手の 書きかけで 赤に なります★★');
+  }
 }
 console.log('');
 if (赤) {
