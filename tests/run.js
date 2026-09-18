@@ -374,7 +374,8 @@ const FILES = [
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
   ['oddf-hasuu-ga-hasuu-denai.test.mjs'], // ★端数が「端数で ない」時は #NUM!
-  ['tsunagu-mon.test.mjs']           // ★台を 画面に 繋ぐ 手を 止める 門（★繋ぐ 前から 赤★）
+  ['tsunagu-mon.test.mjs'],          // ★台を 画面に 繋ぐ 手を 止める 門（★繋ぐ 前から 赤★）
+  ['kansuu46-1taba.test.mjs']        // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）
