@@ -49,7 +49,10 @@ const 同じ = (得, 欲, なぜ) => {
 /* 2026-09-16 … 61 → ★65★（BESSELI / BESSELJ / BESSELK / BESSELY を 足した）
      ★覚えた 係数表は 1つも 使って いません★ … lib/bessel.js
      ★実Excel の 方が 間違って いる 所が 3件 在ります★ … docs/measured/bessel-no-kotae.md */
-const 繋いだ数 = 65;
+/* 2026-09-19 ... 65 -> ★67★（ODDLPRICE / ODDLYIELD を 出した）
+     ＝経営者1 の 275本で 外れ 0本／わざと 壊したら 258本 赤
+     ＝★台に 無い 27 → 25★ */
+const 繋いだ数 = 67;
 
 console.log('\n[shiki-tsunagi] ★自前の 土台に 自前の 関数を 繋ぐ★');
 
