@@ -117,6 +117,7 @@ $xl = New-Object -ComObject Excel.Application
 $bk = $null
 $sh = $null
 $c = $null
+$w = $null
 try {
   $xl.Visible = $false
   $xl.DisplayAlerts = $false
@@ -135,7 +136,7 @@ try {
   $土地 = [System.Globalization.CultureInfo]::CurrentCulture.Name
   $行.Add('# ★どの 文字コードか★ ... ANSI ' + $コード + ' ／ ' + $土地)
   $行.Add('#')
-  $行.Add('# 番' + "`t" + '式' + "`t" + '答え' + "`t" + '出る字' + "`t" + '型')
+  $行.Add('# 番' + "`t" + '式' + "`t" + '答え' + "`t" + '出る字' + "`t" + '=(式)=0' + "`t" + '型')
 
   $押し時計 = [Diagnostics.Stopwatch]::StartNew()
   $r = 1
@@ -152,7 +153,13 @@ try {
     $答 = if ($null -eq $v) { '(空)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
     $型 = if ($null -eq $v) { '(空)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
     $字 = [string]$c.Text
-    $行.Add($x.番 + "`t" + $x.式 + "`t" + $答 + "`t" + $字 + "`t" + $型)
+    # ★★2つ目の 窓★★（`monosashi-mado` の 門）
+    #   ★訳★ ... `.Value2` は ★0 で ない 値にも 0 を 返す 事が 在ります★
+    #            ⇒★`=(式)=0` を 別の マスで 取り、真偽と 型を 一緒に 見る★
+    $w = $sh.Range('Z' + $r)
+    $ゼロか = '(★窓2が 打てません★)'
+    try { $w.Formula = '=(' + $x.式.Substring(1) + ')=0'; $ゼロか = [string]$w.Value2 } catch { }
+    $行.Add($x.番 + "`t" + $x.式 + "`t" + $答 + "`t" + $字 + "`t" + $ゼロか + "`t" + $型)
     $r++
   }
   $押し時計.Stop()
@@ -166,6 +173,7 @@ try {
   $bk.Close($false)
 } finally {
   $c = $null
+  $w = $null
   $sh = $null
   $bk = $null
   $xl.Quit()
