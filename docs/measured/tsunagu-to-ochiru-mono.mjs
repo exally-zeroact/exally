@@ -31,7 +31,9 @@ const 読む = (p) => {
   for (const l of fs.readFileSync(p, 'utf-8').split(/\r?\n/)) {
     const c = l.split('\t');
     if (c.length < 3) continue;
-    m.set(c[0], { 出: c[1], 正: c[2] });
+    /* ★4列目が 在れば ★測り道具の 限り★＝★台の 欠陥では ない★★
+       ＝`osu-dai-dake.mjs` が 名指しで 許した 行（★名簿は あちら 1か所だけ★） */
+    m.set(c[0], { 出: c[1], 正: c[2], 限り: !!c[3] });
   }
   return m;
 };
@@ -53,7 +55,9 @@ const 落ちる = [];
 for (const [式, d] of 台.entries()) {
   const k = 客.get(式);
   if (!k) continue;
-  const a = 合うか(d.出, d.正);
+  /* ★測り道具の 限りで 落ちた 行は ★合った★ として 数えます★
+     ＝★本物の 窓では 読めるから★（`xpath-name-honmono-de-osu.mjs` で 裏取り済） */
+  const a = d.限り ? true : 合うか(d.出, d.正);
   const b = 合うか(k.出, k.正);
   if (a && b) 両方 += 1;
   else if (a) 台だけ += 1;
@@ -65,6 +69,7 @@ const 分母 = 両方 + 台だけ + 客だけ + どちらも違う;
 console.log('');
 console.log('[tsunagu-to-ochiru-mono] ★繋いだら 落ちる 物★');
 console.log('  ★合わせた 分母 ... ' + 分母 + '本★（★同じ 式は 1本に して います★）');
+console.log('  ★測り道具の 限りとして 許した 行 ... ' + [...台.values()].filter((x) => x.限り).length + '本★');
 console.log('');
 console.log('    両方 合う .................. ' + 両方);
 console.log('    ★台だけ 合う★ ............. ' + 台だけ + '  ←★繋ぐと 増える 物★');
