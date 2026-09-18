@@ -22,7 +22,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -152,66 +152,81 @@ function 覚書きを落とす(t) {
   return 出;
 }
 
-let 赤 = 0;
-console.log('');
-console.log('[kinji-ji] ★決まりで 禁じられた 字を 数える★（★字で 数えます＝バイトでは ない★）');
-console.log('');
-for (const g of 見る) {
-  const ファイル = 集める(g.道, g.拡, !!g.再帰);
-  const 合 = {}, 生 = {};
-  for (const c of 禁字) { 合[c.字] = 0; 生[c.字] = 0; }
-  /* ★★どの ファイルに 何個 在るかも 覚えます★★（2026-09-18・経営者1 の 注文）
-       ★訳★ ... 上限を 超えた 時 ★どこかを 人が 手で 数えて いました★（★今日 2回★）
-       ⇒★超えた 時だけ ★多い 順に 出します★★
-       ⇒★同じ 木を 2席で 使って いるので ★誰の 書きかけかも すぐ 分かります★★ */
-  const 本ごと = [];
-  for (const p of ファイル) {
-    const t = fs.readFileSync(p, 'utf-8');
-    const k = 覚書きを落とす(t);
-    let 本の合 = 0;
+/* ══ ★★2026-09-19 ... ★数える所を 関数に しました★★★ ══
+ *   ★訳★ ... `tests/kinji-ji.test.mjs` が この 道具を ★別のプロセスで★ 呼んで いました。
+ *          ⇒`scripts/tests-registered.mjs`（★試験は 登録するまで 1本も 走らない★）が
+ *            ★「試験の 一覧を 持つ物」だと 読み違えて★ ★CI を 40回 赤に して いました★。
+ *          ⇒★別のプロセスを 呼ばなければ 読み違えようが ありません★。
+ *   ★返す 物★ ... ★上限を 超えた 件数★（0 なら 緑）
+ *   ★命令の 字から 呼んだ 時は 今まで通り★ ... `node scripts/kinji-ji-kazoeru.mjs` */
+export function 数を数える() {
+  let 赤 = 0;
+  console.log('');
+  console.log('[kinji-ji] ★決まりで 禁じられた 字を 数える★（★字で 数えます＝バイトでは ない★）');
+  console.log('');
+  for (const g of 見る) {
+    const ファイル = 集める(g.道, g.拡, !!g.再帰);
+    const 合 = {}, 生 = {};
+    for (const c of 禁字) { 合[c.字] = 0; 生[c.字] = 0; }
+    /* ★★どの ファイルに 何個 在るかも 覚えます★★（2026-09-18・経営者1 の 注文）
+         ★訳★ ... 上限を 超えた 時 ★どこかを 人が 手で 数えて いました★（★今日 2回★）
+         ⇒★超えた 時だけ ★多い 順に 出します★★
+         ⇒★同じ 木を 2席で 使って いるので ★誰の 書きかけかも すぐ 分かります★★ */
+    const 本ごと = [];
+    for (const p of ファイル) {
+      const t = fs.readFileSync(p, 'utf-8');
+      const k = 覚書きを落とす(t);
+      let 本の合 = 0;
+      for (const c of 禁字) {
+        const a = t.split(c.字).length - 1;
+        合[c.字] += a;
+        生[c.字] += k.split(c.字).length - 1;
+        本の合 += a;
+      }
+      if (本の合) 本ごと.push({ 道: path.relative(ROOT, p), 数: 本の合 });
+    }
+    console.log('  ★' + g.名 + '★（' + ファイル.length + '本）');
     for (const c of 禁字) {
-      const a = t.split(c.字).length - 1;
-      合[c.字] += a;
-      生[c.字] += k.split(c.字).length - 1;
-      本の合 += a;
+      if (!合[c.字] && !生[c.字]) continue;
+      const 限 = (上限[g.名] || {})[c.字.charCodeAt(0)];
+      const だめ = (限 !== undefined && 合[c.字] > 限);
+      const 生限 = (生きた上限[g.名] === undefined) ? 0 : 生きた上限[g.名];
+      const 生だめ = 生[c.字] > 生限;
+      if (だめ || 生だめ) 赤++;
+      console.log('    ' + c.名.padEnd(26)
+        + ' 全部 ' + String(合[c.字]).padStart(5) + '（上限 ' + 限 + '）'
+        + ' ／ ★生きた 行 ' + 生[c.字] + '★（上限 ' + 生限 + '）'
+        + (だめ ? '  ★★増えました★★' : '') + (生だめ ? '  ★★生きた 行に 出ました★★' : ''));
     }
-    if (本の合) 本ごと.push({ 道: path.relative(ROOT, p), 数: 本の合 });
-  }
-  console.log('  ★' + g.名 + '★（' + ファイル.length + '本）');
-  for (const c of 禁字) {
-    if (!合[c.字] && !生[c.字]) continue;
-    const 限 = (上限[g.名] || {})[c.字.charCodeAt(0)];
-    const だめ = (限 !== undefined && 合[c.字] > 限);
-    const 生限 = (生きた上限[g.名] === undefined) ? 0 : 生きた上限[g.名];
-    const 生だめ = 生[c.字] > 生限;
-    if (だめ || 生だめ) 赤++;
-    console.log('    ' + c.名.padEnd(26)
-      + ' 全部 ' + String(合[c.字]).padStart(5) + '（上限 ' + 限 + '）'
-      + ' ／ ★生きた 行 ' + 生[c.字] + '★（上限 ' + 生限 + '）'
-      + (だめ ? '  ★★増えました★★' : '') + (生だめ ? '  ★★生きた 行に 出ました★★' : ''));
-  }
-  if (禁字.every((c) => !合[c.字])) console.log('    ★0件★');
-  /* ★超えた 時だけ 出どころを 出す★ */
-  const 超えた = 禁字.some((c) => {
-    const 限 = (上限[g.名] || {})[c.字.charCodeAt(0)];
-    return (限 !== undefined && 合[c.字] > 限)
-      || 合[c.字] > 0 && 生[c.字] > ((生きた上限[g.名] === undefined) ? 0 : 生きた上限[g.名]);
-  });
-  if (超えた) {
-    console.log('    ★★出どころ（多い 順に 8本）★★');
-    for (const x of 本ごと.sort((a, b) => b.数 - a.数).slice(0, 8)) {
-      console.log('      ' + String(x.数).padStart(5) + '  ' + x.道);
+    if (禁字.every((c) => !合[c.字])) console.log('    ★0件★');
+    /* ★超えた 時だけ 出どころを 出す★ */
+    const 超えた = 禁字.some((c) => {
+      const 限 = (上限[g.名] || {})[c.字.charCodeAt(0)];
+      return (限 !== undefined && 合[c.字] > 限)
+        || 合[c.字] > 0 && 生[c.字] > ((生きた上限[g.名] === undefined) ? 0 : 生きた上限[g.名]);
+    });
+    if (超えた) {
+      console.log('    ★★出どころ（多い 順に 8本）★★');
+      for (const x of 本ごと.sort((a, b) => b.数 - a.数).slice(0, 8)) {
+        console.log('      ' + String(x.数).padStart(5) + '  ' + x.道);
+      }
+      console.log('      ★★木（ディスク）の 字を 数えて います★★');
+      console.log('        ＝★commit して いない 書きかけも 入ります★');
+      console.log('        ＝★同じ 木を 2席で 使う 時は ★相手の 書きかけで 赤に なります★★');
     }
-    console.log('      ★★木（ディスク）の 字を 数えて います★★');
-    console.log('        ＝★commit して いない 書きかけも 入ります★');
-    console.log('        ＝★同じ 木を 2席で 使う 時は ★相手の 書きかけで 赤に なります★★');
   }
+  console.log('');
+  if (赤) {
+    console.log('★★' + 赤 + '件 上限を 超えて います★★');
+    console.log('  ⇒★これから 書く 分は ★ASCII★ に して ください★');
+    console.log('  ⇒★`|` は `...` ／ スマートクォートは `"` `\'`★');
+    return 赤;
+  }
+  console.log('★上限の 中です★（★2026-09-18 の 数を 決め打ちに して います★）');
+  return 0;
 }
-console.log('');
-if (赤) {
-  console.log('★★' + 赤 + '件 上限を 超えて います★★');
-  console.log('  ⇒★これから 書く 分は ★ASCII★ に して ください★');
-  console.log('  ⇒★`|` は `...` ／ スマートクォートは `"` `\'`★');
-  process.exit(1);
+
+/* ★命令の 字から 直に 呼ばれた 時だけ 終わり値を 返す★（★読み込んだだけでは 何も しない★） */
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  process.exit(数を数える() ? 1 : 0);
 }
-console.log('★上限の 中です★（★2026-09-18 の 数を 決め打ちに して います★）');
