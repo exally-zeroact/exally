@@ -47,9 +47,17 @@ const 実Excel = new Set(
      ★記憶★「★読み込む≠登録される★＝『◆個 できる』を module を 読み込んで 数えるな」 */
 const K = require_(path.join(ROOT, 'lib/shiki-kansuu.js'));
 const T = require_(path.join(ROOT, 'lib/shiki-tsunagi.js'));
+const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
+/* ★★板に 書いた 物（先に 計算しない 形）も 数える★★（2026-09-18）
+     ＝LET／LAMBDA は ★木を 知らないと 書けない★ので `lib/shiki-hyou.js` に 在ります
+     ＝★ここが 見て いないと「書いたのに 数が 減らない」に なります★
+     ＝★2026-09-18 に 実際に なりました★（LET を 書いても 35 の まま）
+     ⇒★`tests/tsunagu-mon.test.mjs` と ★同じ 読み方★に 揃えて あります★
+       （★2つの 道具の 数が 合うか★を あちらが 見て います） */
+const 特別名 = H.特別な形 || [];
 const 土台名 = Object.keys(K.表 || {});
 const 皮名 = T.名前たち();
-const 台 = new Set([...土台名, ...皮名].map((x) => String(x).toUpperCase()));
+const 台 = new Set([...土台名, ...皮名, ...特別名].map((x) => String(x).toUpperCase()));
 if (台.size < 300) {
   console.error('★★台が ' + 台.size + '個しか 読めません★★（★読み方が 壊れて います★）');
   console.error('  ★読めない 数で 引き算を すると ★嘘の 一覧★が 出ます★');
@@ -79,7 +87,7 @@ console.log('★★実Excel の 紙が 無い 関数★★（★名簿の 引き
 console.log('');
 console.log('  ★実Excel に 在る★ ……………… ' + 実Excel.size + '個（' + 実道[実道.length - 1] + '）');
 console.log('  ★台が 出せる★ ………………… ' + 台.size + '個'
-  + '（土台 ' + 土台名.length + '個 ＋ 皮 ' + 皮名.length + '個）');
+  + '（土台 ' + 土台名.length + '個 ＋ 皮 ' + 皮名.length + '個 ＋ 板 ' + 特別名.length + '個）');
 console.log('  ★紙に 出て くる★ ……………… ' + 紙.size + '個');
 console.log('');
 console.log('  ★★台に 無い★★ ………………… ' + 台にない.length + '個');

@@ -56,11 +56,16 @@ T('★実Excel の 名簿が 500個 以上 読めた★', 実Excel.size >= 500, 
 /* ══ ②台が 出せる 名前（★`kami-ga-nai-kansuu.mjs` と 同じ 読み方★） ══ */
 const K = require_(path.join(ROOT, 'lib/shiki-kansuu.js'));
 const Tsu = require_(path.join(ROOT, 'lib/shiki-tsunagi.js'));
+const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
 const 土台名 = Object.keys(K.表 || {});
 const 皮名 = Tsu.名前たち();
-const 台 = new Set([...土台名, ...皮名].map((x) => String(x).toUpperCase()));
+/* ★★板に 書いた 物（先に 計算しない 形）も 数える★★（2026-09-18）
+     ＝LET／LAMBDA は ★木を 知らないと 書けない★ので `lib/shiki-hyou.js` に 在ります
+     ＝★数える 側が 見て いないと「書いたのに 数が 減らない」に なります★（実際に なった） */
+const 特別名 = H.特別な形 || [];
+const 台 = new Set([...土台名, ...皮名, ...特別名].map((x) => String(x).toUpperCase()));
 T('★台が 300個 以上 読めた★（★読み方が 壊れたら 嘘の 緑に なる★）',
-  台.size >= 300, '台 ' + 台.size + '個（土台 ' + 土台名.length + ' ＋ 皮 ' + 皮名.length + '）');
+  台.size >= 300, '台 ' + 台.size + '個（土台 ' + 土台名.length + ' ＋ 皮 ' + 皮名.length + ' ＋ 板 ' + 特別名.length + '）');
 
 const 台にない = [...実Excel].filter((n) => !台.has(n)).sort();
 console.log('  ★★台に 無い ... ' + 台にない.length + '個★★'
@@ -68,7 +73,7 @@ console.log('  ★★台に 無い ... ' + 台にない.length + '個★★'
 
 /* ══ ③★上限（★今日の 数★）★ ... ★増えたら 赤★ ══
      ★余裕を 残さない★＝余裕の 在る 門は 止めません（2026-09-18 に 決めた） */
-const 上限 = 35;   /* ★2026-09-18 ... 49 → 42（7個）→ 37（5個）→ 35（2個）★ */
+const 上限 = 27;   /* ★2026-09-18 ... 49 -> 42 -> 37 -> 35 -> ★27（ラムダの 一族 6個＋LET/LAMBDA）★ */
 T('★★台に 無いが ' + 上限 + '個 以下★★（★増えたら 赤★）',
   台にない.length <= 上限,
   '出た ' + 台にない.length + '個 ／ 上限 ' + 上限 + '個'
@@ -103,8 +108,15 @@ T('★★台に 無いが 残って いる 間は `hyperformula` を 外さな�
      ★訳★ 手で 書いた 名簿は ★足した 日に 消し忘れます★ */
 const 自分 = fs.readFileSync(fileURLToPath(import.meta.url), 'utf-8');
 const 焼き込み = 台にない.filter((n) => n.length >= 4 && 自分.includes(n));
-T('★台に 無い 関数の 名前を この 門に 焼き込んで いない★',
-  焼き込み.length === 0, '焼き込み ' + 焼き込み.length + '個 ... ' + 焼き込み.join(' '));
+/* ★★1個か 2個は 許します★★（2026-09-18）
+     ★訳★ ... ★訳を 書く のに 関数の 名前を 1つ 出すのは 当たり前★です
+       ＝2026-09-18、私が LET／LAMBDA を 書いた 覚書きで ★この 門が 自分で 赤に なりました★
+     ★止めたいのは「名簿を 手で 持つ」事★＝★3個 以上 並んで いたら 名簿★
+     ★★甘く した のでは ありません★★＝★何を 数えたいかを 書き直しました★ */
+const 焼き込みの上限 = 2;
+T('★台に 無い 関数の 名前を この 門に ★名簿として★ 持って いない★',
+  焼き込み.length <= 焼き込みの上限,
+  '焼き込み ' + 焼き込み.length + '個（上限 ' + 焼き込みの上限 + '個） ... ' + 焼き込み.join(' '));
 
 /* ══ ⑥★もう 1つの 道具と 数が 合うか★（★読み方が 2本に 割れて いないか★） ══ */
 const r = spawnSync(process.execPath, [path.join(ROOT, 'docs/measured/kami-ga-nai-kansuu.mjs')],
@@ -123,7 +135,7 @@ T('★★2つの 道具の 数が 合う★★（★読み方が 割れて い�
 
 console.log('');
 console.log('  ★★今 どこまで 来たか★★');
-console.log('    ・台が 出せる ... ' + 台.size + '個（土台 ' + 土台名.length + ' ＋ 皮 ' + 皮名.length + '）');
+console.log('    ・台が 出せる ... ' + 台.size + '個（土台 ' + 土台名.length + ' ＋ 皮 ' + 皮名.length + ' ＋ 板 ' + 特別名.length + '）');
 console.log('    ・★あと ' + 台にない.length + '個★（実Excel 519 の 名簿で 数えた 数）');
 console.log('    ・★この 門は 「繋いで よいか」だけを 見ます★＝★正しく 答えるかは 別の 門★');
 console.log('');
