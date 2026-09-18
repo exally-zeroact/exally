@@ -213,6 +213,44 @@ try {
 
   T('★式を 打つ 口が 在る★', await page.evaluate(() => typeof window.setCell === 'function'));
 
+  /* == ★★台の 溢れが マスに 並ぶか★★ ==（2026-09-18・経営者1 の 実測から）
+       `=BYROW(F1:G2,LAMBDA(r,SUM(r)))` ... ★台は 3 と 30 を 出して います★
+         ★前★ ... 溢れは いつも 借り物に 落として いた ⇒ 借り物は BYROW を 知らない ⇒ `#NAME?`
+         ★今★ ... ★借り物が 誤りを 返した 時だけ 台の 溢れを 使います★
+                  ⇒★下がる 事が ありません★（★悪い 方を 良い 方に 換えるだけ★）
+       ★横にも 縦にも 並ぶ かを 両方 見ます★（BYROW は 縦／BYCOL は 横） */
+  {
+    const 出 = await page.evaluate(() => {
+      const sh = window.sheets[window.activeSheet];
+      window.setCell(70, 5, '1'); window.setCell(70, 6, '2');
+      window.setCell(71, 5, '10'); window.setCell(71, 6, '20');
+      window.setCell(70, 8, '=BYROW(F71:G72,LAMBDA(r,SUM(r)))');   /* I71 ... 縦に 3, 30 */
+      window.setCell(73, 8, '=BYCOL(F71:G72,LAMBDA(c,SUM(c)))');   /* I74 ... 横に 11, 22 */
+      window.setCell(75, 8, '=SORT(F71:G71)');                     /* 借り物が 答える 溢れ */
+      if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
+      const 読 = (r, c) => {
+        const x = (sh.data || {})[r + ',' + c];
+        if (!x) return '(無い)';
+        const v = (x.d !== undefined ? x.d : x.v);
+        return (v === undefined || v === null) ? '' : String(v);
+      };
+      return {
+        byrow頭: 読(70, 8), byrow次: 読(71, 8),
+        bycol頭: 読(73, 8), bycol次: 読(73, 9),
+        sort頭: 読(75, 8), sort次: 読(75, 9),
+      };
+    });
+    console.log('  ★BYROW ... "' + 出.byrow頭 + '" / "' + 出.byrow次 + '"（★3 と 30 が 正★）');
+    console.log('  ★BYCOL ... "' + 出.bycol頭 + '" / "' + 出.bycol次 + '"（★11 と 22 が 正★）');
+    console.log('  ★SORT  ... "' + 出.sort頭 + '" / "' + 出.sort次 + '"（★借り物の 溢れ・1 と 2★）');
+    T('★★BYROW の 頭が 3★★（★前は #NAME?★）', 出.byrow頭 === '3', '出た "' + 出.byrow頭 + '"');
+    T('★★BYROW が ★縦に★ 並ぶ（次が 30）★★', 出.byrow次 === '30', '出た "' + 出.byrow次 + '"');
+    T('★★BYCOL の 頭が 11★★', 出.bycol頭 === '11', '出た "' + 出.bycol頭 + '"');
+    T('★★BYCOL が ★横に★ 並ぶ（次が 22）★★', 出.bycol次 === '22', '出た "' + 出.bycol次 + '"');
+    T('★★借り物が 答えられる 溢れは 今まで通り★★（=SORT ⇒ 1 と 2）',
+      出.sort頭 === '1' && 出.sort次 === '2', JSON.stringify(出));
+  }
+
   /* == ★★JS層が 引数の 数違いを 飲み込んで いた 1本★★ ==（2026-09-18）
        `=MAP(A1:A5,LAMBDA(x,y,x))`（★口が 2つ／MAP は 1つしか 渡さない★）
          ★実Excel★ ... `#VALUE!`（`golden-kansuu-9kaime-2026-09-18.tsv` 55行目）

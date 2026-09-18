@@ -2865,6 +2865,11 @@ function _入る字数(w, raw, fmt) {
 }
 
 var 溢れの印 = '_溢れ元';           /* ★このマスは 溢れで 出来た★という 印 */
+/* ★★台の 溢れで 出来た マス★★（2026-09-18・㋑⑶の 続き）
+     ＝★借り物の 溢れとは 別の 印★＝`_古い溢れを消す` は 借り物の 型を 見るので
+       台の 溢れを ★毎回 消して しまいます★
+     ⇒★台の 分は 計算し直す たびに 消して 作り直します★ */
+var 台の溢れの印 = '_台溢れ元';
 var 溢れの上限 = 100000;            /* ★暴走止め★（SEQUENCE(1000000) 等） */
 
 /* ★溢れの 広さを 型で 数える（★借り物の 中は 読まない★）★ */
@@ -2876,6 +2881,63 @@ function _溢れの広さ(sheetIdx, r, c) {
 }
 
 /* ★溢れた 先の マスを 作る★ */
+/* ★台の 値（{型,値}）を 画面の 字に する★
+     ＝★`板.字(名)` と 同じ 決まり★（マスに 入って いない 値には 使えないので ここで 1本） */
+function _台の値を字に(v) {
+  if (!v || typeof v !== 'object') return '';
+  if (v.型 === '空') return '';
+  if (v.型 === '真偽') return v.値 ? 'TRUE' : 'FALSE';
+  if (v.型 === '誤') return String(v.値);
+  return String(v.値);
+}
+/* ★★台の 溢れを マスに 並べる★★（2026-09-18）
+     ★なぜ 要るか★
+       `=BYROW(F1:G2,LAMBDA(r,SUM(r)))` は ★台が 3 と 30 を 出して います★
+       ＝でも ★溢れ★なので 借り物に 落として いました
+       ＝借り物は BYROW を 知らない ⇒★画面は `#NAME?`★（経営者1 の 実測）
+     ★いつ 使うか★
+       ★借り物が 誤りを 返した 時だけ★です
+       ⇒★★これで 下がる 事が ありません★★（★悪い 方を 良い 方に 換えるだけ★）
+       ⇒借り物が 答えられる 溢れ（SORT/UNIQUE/FILTER/SEQUENCE…）は ★今まで通り★
+     ★お客さんが 打った 物は 上書きしません★（`_溢れを写す` と 同じ） */
+function _台の溢れを写す(data, r, c, 溢れ) {
+  if (!溢れ || !溢れ.並び) return 0;
+  var 高 = 溢れ.並び.length;
+  var 幅 = (溢れ.並び[0] || []).length;
+  if (高 * 幅 > 溢れの上限) return 0;
+  var 作った = 0, 元 = r + ',' + c;
+  for (var i = 0; i < 高; i++) {
+    for (var j = 0; j < 幅; j++) {
+      if (i === 0 && j === 0) continue;
+      var k = (r + i) + ',' + (c + j);
+      var s = data[k];
+      if (s && (s.f || (s.v !== undefined && s.v !== ''))) continue;
+      if (!s) s = data[k] = {};
+      var v = (溢れ.並び[i] || [])[j];
+      s.d = _台の値を字に(v);
+      if (v && v.型 === '字') s.d字 = true; else delete s.d字;
+      s[溢れの印] = 元;
+      s[台の溢れの印] = 元;
+      作った++;
+    }
+  }
+  return 作った;
+}
+/* ★台の 溢れで 出来た マスを 消す★（★毎回 作り直します★） */
+function _台の古い溢れを消す(data) {
+  var keys = Object.keys(data), 消す = [];
+  for (var i = 0; i < keys.length; i++) {
+    var s = data[keys[i]];
+    if (!s || !s[台の溢れの印]) continue;
+    delete s.d; delete s.d字; delete s[溢れの印]; delete s[台の溢れの印];
+    var 中身が在る = false;
+    for (var k2 in s) { if (s[k2] !== undefined && s[k2] !== '') { 中身が在る = true; break; } }
+    if (!中身が在る) 消す.push(keys[i]);
+  }
+  for (var m = 0; m < 消す.length; m++) delete data[消す[m]];
+  return 消す.length;
+}
+
 function _溢れを写す(sheetIdx, data, r, c) {
   if (hf.getCellType({sheet:sheetIdx, row:r, col:c}) !== 'ARRAYFORMULA') return 0;
   var 広 = _溢れの広さ(sheetIdx, r, c);
@@ -2982,6 +3044,8 @@ function recalcSheet(sheetIdx, data) {
   _溢れ直しを試す(sheetIdx, data);
   /* ★先に 古い 溢れを 消す★＝式が 短く なった 時に 古い 数が 残らない */
   _古い溢れを消す(sheetIdx, data);
+  /* ★台の 溢れは 毎回 作り直します★（★借り物の 型では 見分けられません★） */
+  if (typeof _台の古い溢れを消す === 'function') _台の古い溢れを消す(data);
   /* ★★台の 板を 画面に 合わせる★★（★1回だけ★・2026-09-18・㋑⑶）
        ★ここは `data` が ★もう 新しい★ 所です★（`setCellFormula` と 違う）
        ⇒★その マスだけ 打ち直す 必要は ありません★ */
@@ -3006,16 +3070,16 @@ function recalcSheet(sheetIdx, data) {
       /* ★★②台に 聞く★★（★借り物より 先★）
            ★上で 合わせて あるので ここでは 聞くだけ★
            ★`#NAME?` と 溢れは 借り物に 回します★ */
-      var 台答 = null;
+      var 台答 = null, 台溢れ = null;
       if (jsResult === null && _板) {
         try {
           var _名 = ShikiItaAwase.冠をつける(_板名, ShikiItaAwase.番地から名(r, c));
           var _値 = _板.値(_名);
-          if (_値 && _値.溢れ !== true
-              && !(_値.型 === '誤' && String(_値.値) === '#NAME?')) {
+          if (_値 && _値.溢れ === true) 台溢れ = _値;   /* ★下で 借り物と 比べます★ */
+          else if (_値 && !(_値.型 === '誤' && String(_値.値) === '#NAME?')) {
             台答 = { 字: _板.字(_名), 字か: (_値.型 === '字') };
           }
-        } catch (e) { 台答 = null; }
+        } catch (e) { 台答 = null; 台溢れ = null; }
       }
       /* ★ここは cell.f[0]==='=' を 通った後＝必ず 式のセル★ */
       cell.d = (jsResult!==null) ? jsResult
@@ -3046,8 +3110,25 @@ function recalcSheet(sheetIdx, data) {
       else delete cell.d字;
       /* ★JS層が 答えた 時は 溢れない★（1つの 値を 返す 段なので）
          ⇒ エンジンが 答えた 時だけ 溢れを 見る */
-      /* ★台が 答えた 時も 溢れません★（溢れは 上で 借り物に 回して います） */
-      if (jsResult === null && 台答 === null) _溢れを写す(sheetIdx, data, r, c);
+      /* ★★台の 溢れは ★借り物が 誤りを 返した 時だけ★ 使います★★（2026-09-18）
+           ⇒★下がる 事が ありません★＝★悪い 方を 良い 方に 換えるだけ★
+           ⇒`=BYROW(F1:G2,LAMBDA(r,SUM(r)))` … 借り物 `#NAME?` ／台 3・30
+           ⇒借り物が 答えられる 溢れ（SORT/UNIQUE/FILTER/SEQUENCE…）は ★今まで通り★ */
+      var 台の溢れを使った = false;
+      if (jsResult === null && 台答 === null && 台溢れ
+          && String(cell.d || '').charAt(0) === '#') {
+        try {
+          var 頭 = (台溢れ.並び[0] || [])[0];
+          cell.d = _台の値を字に(頭);
+          if (頭 && 頭.型 === '字') cell.d字 = true; else delete cell.d字;
+          _台の溢れを写す(data, r, c, 台溢れ);
+          台の溢れを使った = true;
+        } catch (e) { 台の溢れを使った = false; }
+      }
+      /* ★台が 答えた 時は 溢れません★（1つの 値を 返す 段なので） */
+      if (jsResult === null && 台答 === null && !台の溢れを使った) {
+        _溢れを写す(sheetIdx, data, r, c);
+      }
     }
   }
 }
