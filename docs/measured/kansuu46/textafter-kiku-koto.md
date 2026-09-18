@@ -72,9 +72,17 @@
   ★受けて いない 2つ（★一番 大事★）★
     =TEXTAFTER("abc","x",1,0,1)          ★match_end＝1★
     =TEXTBEFORE("abc","x",1,0,1)
-    =TEXTAFTER("abc","x",1,0,0,"なし")   ★if_not_found★
-    =TEXTBEFORE("abc","x",1,0,0,"なし")
-    =TEXTAFTER("a-b","-",9,0,0,"なし")   ★行き過ぎ ＋ if_not_found★
+    =TEXTAFTER("abc","x",1,0,0,UNICHAR(12394)&UNICHAR(12375))   ★if_not_found★
+    =TEXTBEFORE("abc","x",1,0,0,UNICHAR(12394)&UNICHAR(12375))
+    =TEXTAFTER("a-b","-",9,0,0,UNICHAR(12394)&UNICHAR(12375))   ★行き過ぎ ＋ if_not_found★
+
+★★なぜ `UNICHAR(12394)&UNICHAR(12375)`（＝「なし」）と 書くか★★（2026-09-18）
+  ★式の 中に 日本語の 字を 直に 書くと、
+    `.ps1` → PowerShell → COM → 実 Excel の 間で ★化ける 所が 在ります★★
+  ⇒★化けた 時、答えが 違うのか 字が 化けたのかが ★見分けられません★★
+  ⇒★だから 字は ★番号から 作ります★★（★式は ASCII だけに なる★）
+  ★門★ … `toru-kansuu-8kaime.ps1` が ★式に ASCII の 外の 字が 在れば 止まります★
+  ★これで 聞く 事は 変わりません★ … ★if_not_found に 渡した 物が そのまま 返るか★
   ★境目★
     =TEXTAFTER("abc","")                 ★空の 区切り（後ろ）★
     =TEXTAFTER("a-b","-",0)              ★0 番目★
