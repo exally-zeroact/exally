@@ -1,9 +1,12 @@
-/* kansuu46-1taba.test.mjs — ★台に 無かった 49個の 1束目 7個 ＋ 2束目 5個を 紙で 押す★（2026-09-18）
+/* kansuu46-1taba.test.mjs — ★台に 無かった 49個の 1束目 7 ＋ 2束目 5 ＋ 3束目 2を 紙で 押す★（2026-09-18）
  *
- *  ★★足した 12個★★
+ *  ★★足した 14個★★
  *    ★1束目 7個★ MDETERM ／ KURT ／ TRIMMEAN ／ FORECAST ／ FORECAST.LINEAR
  *                ／ NUMBERVALUE ／ ENCODEURL
  *    ★2束目 5個★ FIXED ／ DOLLAR ／ VALUETOTEXT ／ LOOKUP ／ PHONETIC
+ *    ★3束目 2個★ INDIRECT ／ OFFSET
+ *      ⇒★この 2つの 為に `lib/shiki-hyou.js` が ★マスを 読む 口★を 渡すように しました★
+ *        （`所.四角を取る` ／ `所.字から取る`・★読む 口だけ／書く 口は 渡して いません★）
  *
  *  ★★なぜ 別の 紙（この 試験）が 要るか★★
  *    `shiki-kansuu-kami.test.mjs` は ★紙の `#材料` から★ 材料を 取ります。
@@ -52,13 +55,15 @@ const T = (n, よい, 添え) => {
 };
 
 console.log('');
-console.log('[kansuu46-1taba] ★台に 無かった 49個の 1束目 7個 ＋ 2束目 5個★');
+console.log('[kansuu46-1taba] ★台に 無かった 49個の 1束目 7 ＋ 2束目 5 ＋ 3束目 2★');
 
 /* ══ ★足した 分★（★この 名前は 手で 書きます＝「何を 足したか」は 人が 決めた 事★） ══ */
 const 足した = ['MDETERM', 'KURT', 'TRIMMEAN', 'FORECAST', 'FORECAST.LINEAR',
   'NUMBERVALUE', 'ENCODEURL',
   /* ★2束目（2026-09-18）★ */
-  'FIXED', 'DOLLAR', 'VALUETOTEXT', 'LOOKUP', 'PHONETIC'];
+  'FIXED', 'DOLLAR', 'VALUETOTEXT', 'LOOKUP', 'PHONETIC',
+  /* ★3束目（2026-09-18）★ 板に ★マスを 読む 口★を 足して 書けた 2個 */
+  'INDIRECT', 'OFFSET'];
 
 for (const n of 足した) {
   T('★台が ' + n + ' を 知って いる★', typeof (K.表 || {})[n] === 'function');
@@ -84,7 +89,7 @@ for (const l of 行) {
 }
 console.log('  ★紙から 拾った 行 … ' + 組.length + '行★');
 /* ★★本数を 決め打ちに する★★＝★紙から 消えたら 赤★（★黙って 0行に なるのを 止める★） */
-const 行の本数 = 12;   /* ★1束目 7 ＋ 2束目 5★ */
+const 行の本数 = 14;   /* ★1束目 7 ＋ 2束目 5 ＋ 3束目 2★ */
 T('★★拾った 行が ' + 行の本数 + '行★★（★増えても 減っても 赤★）',
   組.length === 行の本数, '拾った ' + 組.length + '行 … ' + 組.map((x) => x.名).join(' '));
 
