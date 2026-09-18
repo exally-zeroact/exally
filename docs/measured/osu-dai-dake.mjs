@@ -37,9 +37,28 @@ import { fileURLToPath } from 'node:url';
 const ここ = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(ここ, '..', '..');
 const require_ = createRequire(path.join(ROOT, 'package.json'));
-const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
+const Tsu = require_(path.join(ROOT, 'lib/shiki-tsunagi.js'));
 require_(path.join(ROOT, 'lib/shiki-kansuu.js'));
-require_(path.join(ROOT, 'lib/shiki-tsunagi.js'));
+
+/* ★★XML を 読む 道具を 渡します★★（2026-09-18・★私が 自分で 踏みました★）
+   `FILTERXML` は 台が ★道具が 無ければ 計算しない★ 作りです
+     （`lib/shiki-tsunagi.js` ... 「半分 合う 答えを 出さない」）
+   ⇒node には `DOMParser` / `XPathResult` が 在りません
+   ⇒★渡さないと 37本 全部 `#VALUE!` に なります★
+   ⇒★私は それを ★「台の 欠陥 22本」★と 数えて 出して しまいました★
+   ⇒★★渡したら 32/37 でした★★（★欠陥は 22本では なく 5本★）
+   ⇒★★node の 台で 出した 数は 画面の 数では ありません★★ */
+try {
+  const { JSDOM } = require_('jsdom');
+  const 窓 = new JSDOM('<!doctype html>').window;
+  Tsu.XML道具を渡す({ DOMParser: 窓.DOMParser, XPathResult: 窓.XPathResult });
+} catch (e) {
+  console.log('  NG   ★jsdom が 入って いません★＝★FILTERXML は 測れません★');
+  console.log('       ★飛ばしません★ ... `npm install` して ください');
+  process.exit(3);
+}
+
+const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
 
 /* ★8枠目・9枠目の 紙の 頭に 書いて ある 材料★（★既定★） */
 const 既定の材料 = [
