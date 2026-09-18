@@ -7,6 +7,23 @@
  *    ⇒★★これまで「マスに 式を 打って 答えを 読む」は ★0本★でした★★
  *    ⇒★node で 出した 数は 画面の 数では ありません★（記憶の 決まり）
  *
+ *  ★★★今 これが 測って いる のは「借り物」です★★★（2026-09-18 実測）
+ *    ★画面の `shiki-` は ★0本★★＝★私が 書いた 台は 1つも 読まれて いません★
+ *    ⇒★★だから ここで 合う 物は ★借り物（HyperFormula ＋ JS層）が 答えて います★★★
+ *    ⇒★★「私が 今日 書いた 13個が お客さんに 届いたか」は ★まだ 0本 測れて いません★★★
+ *
+ *  ★★★繋ぐ 前の 姿（★これを 守ります★）★★★
+ *    ★14本 中 12本 合う／★2本 違う★★
+ *      `=PERCENTRANK({1;3;5;7;9},4)`   … 画面 ★0.5★／★実Excel 0.375★／うちの台 ★0.375★
+ *      `=AGGREGATE(19,6,{1;2;4;5},1)`  … 画面 ★#VALUE!★／★実Excel 1.25★／うちの台 ★1.25★
+ *    ⇒★★借り物が 2本 間違えて います＝★客に 出る 欠陥★★★
+ *    ⇒★★繋げば 直る はずの 2本です★★
+ *
+ *  ★★この 見張りの 使い方★★
+ *    既定 …………… ★繋ぐ 前の 姿と 同じか★（★今は 緑★）
+ *    `--終わりの線` … ★14本 とも 合う ＋ hyperformula 0本★（★今は 赤＝当たり前★）
+ *    ⇒★★繋いだら 既定が 赤に なります＝それが 狙いです★★
+ *
  *  ★★どこを 開くかを 口（引数）で 選べます★★
  *    `--どこ=手元`     … 手元の ファイルを 小さい 配信で 出す（★既定★）
  *    `--どこ=<URL>`    … テスト版／本番 の 住所を そのまま
@@ -65,6 +82,18 @@ const 式たち = [
   { 式: '=AGGREGATE(19,6,{1;2;4;5},1)', 答: '1.25',   訳: '★外した 1本★ 機能19＝EXC' },
 ];
 const 式の本数 = 14;
+
+/* ══ ★★繋ぐ 前の 姿（★2026-09-18 に 実測して 固定★）★★ ══
+     ★枝の 頭★ 172247a ／ ★刻印★ ?v=17fe12a2
+     ★訳★ … ★後から 辻褄を 合わせられない 形に します★
+     ★借り物（HyperFormula ＋ JS層）が 答えた 姿★です */
+const 繋ぐ前 = {
+  合: 12,
+  違: 2,
+  shiki: 0,
+  違う式: ['=PERCENTRANK({1;3;5;7;9},4)', '=AGGREGATE(19,6,{1;2;4;5},1)'],
+};
+const 終わりの線か = process.argv.includes('--終わりの線');
 
 function 立てる(root) {
   const 型 = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -137,9 +166,15 @@ try {
     let 出;
     try {
       出 = await page.evaluate(({ r, f }) => {
+        /* ★★呼び方は 本番と 同じに します★★（2026-09-18 に 間違えました）
+             `recalcSheet` は ★引数 2つ★（`recalcSheet(sheetIdx, data)`）
+             ⇒引数 無しで 呼ぶと `Object.keys(data)` で 転びます
+             ⇒★本番の 呼び方★ … `recalcSheet(activeSheet, sheets[activeSheet].data)`
+               （book.html:2010 ／ 11967 ／ 15830 と 同じ） */
+        const sh = window.sheets[window.activeSheet];
         window.setCell(r, 0, f);
-        if (typeof window.recalcSheet === 'function') window.recalcSheet();
-        const d = (window.sheets[window.activeSheet].data) || {};
+        if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
+        const d = sh.data || {};
         const c = d[r + ',0'];
         if (!c) return { 空: true };
         const v = (c.d !== undefined ? c.d : c.v);
@@ -160,8 +195,26 @@ try {
   for (const s of 外れ.slice(0, 8)) console.log('       ・' + s);
   T('★★空っぽが 0件★★（★0件を 緑に しない★）', 空 === 0, '空っぽ ' + 空 + '件');
   T('★★対照（=SUM(1,2,3)）が 6★★', 合 > 0 && !外れ.some((s) => s.startsWith('=SUM(')));
-  T('★★' + 式たち.length + '本 とも 合う★★', 合 === 式たち.length,
-    '合 ' + 合 + ' ／ 違 ' + 違 + ' ／ 空 ' + 空 + ' ／ 転 ' + 転);
+
+  if (終わりの線か) {
+    /* ★★終わりの 線★★（★今は 赤＝当たり前★） */
+    T('★★' + 式たち.length + '本 とも 合う★★', 合 === 式たち.length,
+      '合 ' + 合 + ' ／ 違 ' + 違 + ' ／ 空 ' + 空 + ' ／ 転 ' + 転);
+    T('★★hyperformula が 0本★★', 読み.hf === 0, 読み.hf + '本');
+    T('★★shiki- が 1本 以上★★', 読み.shiki >= 1, 読み.shiki + '本');
+  } else {
+    /* ★★繋ぐ 前の 姿と 同じか★★（★姿が 変わったら 赤＝それが 狙い★） */
+    T('★★繋ぐ 前の 姿と 同じ（合 ' + 繋ぐ前.合 + ' / ' + 式たち.length + '）★★',
+      合 === 繋ぐ前.合 && 違 === 繋ぐ前.違,
+      '★姿が 変わりました★ 合 ' + 合 + '（前 ' + 繋ぐ前.合 + '）／違 ' + 違 + '（前 ' + 繋ぐ前.違 + '）'
+      + '\n       ⇒★繋いだ 後なら これが 狙いです★／★繋いで いない なら 止まって 訳を 探す★');
+    const 違名 = 外れ.map((s) => s.split(' ⇒ ')[0]);
+    T('★★借り物が 間違える 2本が そのまま★★（★繋げば 直る はず★）',
+      繋ぐ前.違う式.every((f) => 違名.includes(f)) && 違名.length === 繋ぐ前.違,
+      '出た ' + JSON.stringify(違名) + ' ／ 前 ' + JSON.stringify(繋ぐ前.違う式));
+    T('★★shiki- は まだ 0本★★（★繋いだら ここが 赤に なります★）', 読み.shiki === 繋ぐ前.shiki,
+      読み.shiki + '本（前 ' + 繋ぐ前.shiki + '本）');
+  }
 } catch (e) {
   if (開けた) { fail++; console.log('  NG   ★途中で 止まりました★ ' + String(e.message).slice(0, 120)); }
 } finally {
