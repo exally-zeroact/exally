@@ -9,12 +9,14 @@
 # ★★材料の 指紋★★ … ★この 紙は 下の 本を 読んで 取りました★
 #   ★下の どれか 1つでも 変わったら この 紙は 古い★＝`tests/kami-no-zairyou.test.mjs` が 赤に します
 #   ★「取った日」は「走らせた 証し」では ありません★（2026-09-15 に 実際に 起きた）
-# ★材料★	docs/measured/honban-no-michi.mjs	bad268fb34097954
+# ★材料★	docs/measured/honban-no-michi.mjs	f75a57140cdf7411
 # ★材料★	docs/measured/kansuu46-no-dodai.mjs	ac76195a0c8e6d70
 # ★材料★	docs/measured/osu-86-karimono-no-ima.mjs	dc7bd9cc0cf03214
 # ★材料★	docs/measured/zairyou-no-yubimon.mjs	36cf1a2607f2534c
-# ★材料★	exally-formula.js	1ba8ccb5218c2c98
+# ★材料★	exally-formula.js	9dda4f23932df844
 # ★材料★	hyperformula.full.min.js	6685699641037e65
+# ★材料★	lib/bahttext.js	7183ec97cae67895
+# ★材料★	lib/bessel.js	94e0e2f531ef165f
 # ★材料★	lib/formula-cell-plug.js	be6c9d764d9bb11d
 # ★材料★	lib/formula-cell.js	29b49e8dd5616b53
 # ★材料★	lib/formula-complex-plug.js	906c8b26d062cf31
@@ -31,6 +33,16 @@
 # ★材料★	lib/formula-soto.js	b3ff67ad7dc3a3e5
 # ★材料★	lib/formula-yosoku-plug.js	7b458111718fc18f
 # ★材料★	lib/formula-yosoku.js	4a9b28e27b73421d
+# ★材料★	lib/shiki-afure.js	bdd4210548da3ff1
+# ★材料★	lib/shiki-basho.js	37b6c08630fe1aad
+# ★材料★	lib/shiki-hyou.js	c57dcbcae3037c7c
+# ★材料★	lib/shiki-kansuu.js	2a27d6967c72fe72
+# ★材料★	lib/shiki-katachi.js	26e618a2a4f3f211
+# ★材料★	lib/shiki-keisan.js	6d1100a401e9744e
+# ★材料★	lib/shiki-kiru.js	21ea4c9458b0adc3
+# ★材料★	lib/shiki-sansho.js	3aecc5db32732d8d
+# ★材料★	lib/shiki-tsunagi.js	693f340142186993
+# ★材料★	lib/shoshiki.js	01ef4406e431ad65
 # ★材料★	lib/tanni-hyou.js	25c4010a081e1bc6
 関数	式または引数の組	★出どころ★	道	出た字	実 Excel の 答え	判	紙
 ACCRINT	=ACCRINT(DATE(2008,3,1),DATE(2008,8,31),DATE(2008,5,1),0.1,1000,2,0)	★実 Excel★	エンジン	16.666666666666664	16.666666666666664	合う	golden-kane-2026-09-07.tsv
