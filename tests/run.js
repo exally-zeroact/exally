@@ -378,6 +378,7 @@ const FILES = [
   ['ita-awase.test.mjs'],           // ★板の 写しの 門（★わざと 1マス ずらして 赤に なるのを 見せます★）
   ['oddf-susumi.test.mjs'],         // ★保留の 4個（ODDF / ODDL）の 進みを 数で 押さえる★
   ['oddf-susumi.test.mjs', '--self-test'],   // ★自分で 壊して 赤に なるか★
+  ['oddf-nokori.test.mjs'],         // ★ODDF / ODDL の 残りを 実Excel の 50本で 押す★
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
   ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
   ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
