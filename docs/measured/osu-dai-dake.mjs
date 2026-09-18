@@ -73,6 +73,38 @@ const 紙たち = [
        ＝A1:A5 = 1,2,3,4,5 ／ ★B1:B5 = 2,4,6,8,10★
        ＝裏取り ... =FORECAST(6,B1:B5,A1:A5) が 12（★B = 2x でしか 12に ならない★） */
     材料: { B1: 2, B2: 4, B3: 6, B4: 8, B5: 10 } },
+  { 名: 'golden-oddf-2kaime-2026-09-16.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=ODDFPRICE(DATE(2009,7,2),DATE(2013,1,1),DATE(2009,1,1),DATE(2010,1,1),0.06,0.05,100,2,1)',
+           答: '103.09945989078082' } },
+  { 名: 'golden-oddf-3kaime-2026-09-16.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=ODDFPRICE(DATE(2009,1,2),DATE(2013,1,1),DATE(2009,1,1),DATE(2009,7,1),0.06,0.05,100,2,1)',
+           答: '-2146826252' } },
+  { 名: 'golden-oddf-4kaime-2026-09-17.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=ODDFPRICE(DATE(2009,3,1),DATE(2013,1,1),DATE(2009,1,1),DATE(2009,7,1),0,0.05,100,2,0)',
+           答: '-2146826252' } },
+  { 名: 'golden-oddf-5kaime-2026-09-17.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=ODDFPRICE(DATE(2009,3,1),DATE(2013,1,1),DATE(2009,1,1),DATE(2009,7,1),0.06,0.03,100,2,0)',
+           答: '-2146826252' } },
+  /* ★★ここから 下は ★マスを 1つも 指しません★★（材料が 要りません） */
+  { 名: 'kansuu46/golden-kane-2026-09-07.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=ACCRINT(DATE(2008,3,1),DATE(2008,8,31),DATE(2008,5,1),0.1,1000,2,0)',
+           答: '16.666666666666664' } },
+  { 名: 'kansuu46/golden-convert-2026-09-07.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=CONVERT(1,"g","g")', 答: '1' } },
+  { 名: 'kansuu46/golden-convert2-2026-09-07.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=CONVERT(1,"kft","ft")', 答: '#N/A' } },
+  { 名: 'kansuu46/golden-convert3-2026-09-07.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=CONVERT(1,"kBTU","BTU")', 答: '#N/A' } },
+  { 名: 'kansuu46/golden-filterxml-2026-09-07.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=FILTERXML("<a><b>1</b>","//b")', 答: '#VALUE!' } },
+  { 名: 'kansuu46/golden-isomitted-2026-09-08.tsv', 式列: 1, 答列: 2,
+    対照: { 式: '=LAMBDA(x,y,ISOMITTED(y))(1,2)', 答: 'False' } },
+  /* ★★入れなかった 紙と その 訳（★書いて 残します★）★★
+     `kansuu46/golden-cell6` `golden-cell7` ... =CELL("format",A1)
+        ＝★マスに 付いた 表示形式で 答えが 変わります★＝★板では 作れません★
+     `golden-hoyuu-27` ... =A1+A2-0.3 ＝★材料が 要り、1列目が 紙の 名前★
+     `golden-86-karimono`（1,998本）`golden-346`（3,593本）
+        ＝★マス参照が 多く 材料が 要ります★＝★次に 足します★ */
 ];
 
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
@@ -134,6 +166,7 @@ console.log('  ★借り物は 建てて いません★');
 let 合 = 0, 違 = 0, 知らない = 0, 転 = 0;
 const 外れ = [];
 const 知らない名 = new Map();
+const 字違い = [];
 let 今の紙 = null;
 let 板 = null;
 for (const q of 問い) {
@@ -156,11 +189,22 @@ for (const q of 問い) {
     知らない名.set(n, (知らない名.get(n) || 0) + 1);
     continue;
   }
-  const 数どうし = /^-?[\d.eE+]+$/.test(q.答) && /^-?[\d.eE+]+$/.test(字);
+  const 数どうし = /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(q.答) && /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(字);
   const 同 = (字 === q.答)
     || (数どうし && Math.abs(Number(字) - Number(q.答)) <= Math.max(1e-9, Math.abs(Number(q.答)) * 1e-9));
-  if (同) 合 += 1;
-  else { 違 += 1; 外れ.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']'); }
+  if (同) {
+    合 += 1;
+    /* ★★「数は 同じ・書き方が 違う」だけを 数えます★★
+       ★★桁の 数は 数えません★★
+         ＝紙の 列は `.Value2`（17桁）／うちは ★画面に 出る 字★
+         ＝★元から 別の 物なので 比べても 意味が ありません★
+       ⇒★指数の 書き方（1E-10 と 0.0000000001）だけ★を 出します
+         ＝★これは 画面に そのまま 出る 違いです★ */
+    const 指数か = (x) => /[eE][-+]?[0-9]+$/.test(String(x));
+    if (数どうし && 指数か(字) !== 指数か(q.答)) {
+      字違い.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']');
+    }
+  } else { 違 += 1; 外れ.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']'); }
 }
 
 console.log('');
@@ -172,6 +216,11 @@ console.log('  ★★台が 知らない 関数★★');
 for (const [n, c] of [...知らない名.entries()].sort((a, b) => b[1] - a[1])) {
   console.log('    ' + n + ' ... ' + c + '本');
 }
+console.log('');
+console.log('  ★★数は 同じ・★指数の 書き方★が 違う ... ' + 字違い.length + '本★★'
+  + '（★合った に 入れて います／★画面に 出る 違い★です★）');
+for (const s2 of 字違い.slice(0, 6)) console.log('    ・' + s2);
+if (字違い.length > 6) console.log('    ...（残り ' + (字違い.length - 6) + '本）');
 console.log('');
 console.log('  ★★合わない ' + 外れ.length + '本★★');
 for (const s of 外れ) console.log('    ・' + s);
