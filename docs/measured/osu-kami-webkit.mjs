@@ -108,6 +108,13 @@ const 紙たち = [
         ＝★マス参照が 多く 材料が 要ります★＝★次に 足します★ */
 ];
 
+
+/* ══ ★★関数ごとの 数（★どこが 一番 大きいか を 出す★）★★ ══ */
+function 関数名(式) {
+  const m = /^=([A-Z0-9_.]+)\(/.exec(式);
+  return m ? m[1] : '(不明)';
+}
+
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
 
 /* ★実Excel の .Value2 は 誤りを 負の 数で 返します★（記憶の 決まり） */
@@ -238,6 +245,13 @@ try {
 
   let 合 = 0, 違 = 0, 空 = 0, 転 = 0;
   const 外れ = [];
+  const 関数ごと = new Map();
+  let 日付を渡すと = 0;   /* ★`DATE(` が 在り 出たのが #VALUE! の 本数★ */
+  const 印 = (式, どう) => {
+    const n = 関数名(式);
+    if (!関数ごと.has(n)) 関数ごと.set(n, { 合: 0, 違: 0 });
+    関数ごと.get(n)[どう] += 1;
+  };
   for (let i = 0; i < 問い.length; i++) {
     const q = 問い[i];
     const o = 出[i] || {};
@@ -246,16 +260,37 @@ try {
     const 数どうし = /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(q.答) && /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(o.値);
     const 同 = (o.値 === q.答)
       || (数どうし && Math.abs(Number(o.値) - Number(q.答)) <= Math.max(1e-9, Math.abs(Number(q.答)) * 1e-9));
-    if (同) 合 += 1;
-    else { 違 += 1; 外れ.push(q.式 + ' => 出た [' + o.値 + '] ／実Excel [' + q.答 + ']'); }
+    if (同) { 合 += 1; 印(q.式, '合'); }
+    else {
+      違 += 1; 印(q.式, '違');
+      if (q.式.indexOf('DATE(') >= 0 && String(o.値).trim() === '#VALUE!') 日付を渡すと += 1;
+      外れ.push(q.式 + ' => 出た [' + o.値 + '] ／実Excel [' + q.答 + ']'); }
   }
   console.log('');
   console.log('  ★★合った ' + 合 + ' / ' + 問い.length + '★★ ／ 違った ' + 違
     + ' ／ ★空っぽ ' + 空 + '★ ／ 転んだ ' + 転);
   console.log('  ★合った 割合 ... ' + (問い.length ? (100 * 合 / 問い.length).toFixed(1) : '0') + '%★');
   console.log('');
+  console.log('  ★★★DATE() を 渡すと #VALUE! ... ' + 日付を渡すと + '本★★★'
+    + '（★合わない ' + 外れ.length + '本の うち★）');
+  console.log('    ★裏取り★ ... =COUPDAYS(DATE(2008,11,11),DATE(2021,3,1),2,0) ... #VALUE!');
+  console.log('              ... =COUPDAYS(39763,44256,2,0) .................. ★180（合う）★');
+  console.log('    ⇒★★同じ 日・同じ 関数・★渡し方だけ★ 違います★★');
+  console.log('');
+  console.log('  ★★関数ごと ... 合わない 数が 多い 順（上 20）★★');
+  console.log('    関数              合った  合わない');
+  const 並び = [...関数ごと.entries()]
+    .map(([n, v]) => ({ n, ...v }))
+    .filter((x) => x.違 > 0)
+    .sort((a, b) => b.違 - a.違)
+    .slice(0, 20);
+  for (const x of 並び) {
+    console.log('    ' + x.n.padEnd(18) + String(x.合).padStart(5) + String(x.違).padStart(10));
+  }
+  console.log('');
   console.log('  ★★合わない 全部（' + 外れ.length + '本）★★');
-  for (const s of 外れ) console.log('    ・' + s);
+  for (const s of 外れ.slice(0, 40)) console.log('    ・' + s);
+  if (外れ.length > 40) console.log('    ...（★残り ' + (外れ.length - 40) + '本は 切りました★）');
   終わり = 0;
 } finally {
   await browser.close().catch(() => {});

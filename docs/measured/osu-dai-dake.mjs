@@ -107,6 +107,13 @@ const 紙たち = [
         ＝★マス参照が 多く 材料が 要ります★＝★次に 足します★ */
 ];
 
+
+/* ══ ★★関数ごとの 数（★どこが 一番 大きいか を 出す★）★★ ══ */
+function 関数名(式) {
+  const m = /^=([A-Z0-9_.]+)\(/.exec(式);
+  return m ? m[1] : '(不明)';
+}
+
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
 
 /* ★実Excel の .Value2 は 誤りを 負の 数で 返します★（記憶の 決まり） */
@@ -167,6 +174,12 @@ let 合 = 0, 違 = 0, 知らない = 0, 転 = 0;
 const 外れ = [];
 const 知らない名 = new Map();
 const 字違い = [];
+const 関数ごと = new Map();
+const 印 = (式, どう) => {
+  const n = 関数名(式);
+  if (!関数ごと.has(n)) 関数ごと.set(n, { 合: 0, 違: 0, 無: 0 });
+  関数ごと.get(n)[どう] += 1;
+};
 let 今の紙 = null;
 let 板 = null;
 for (const q of 問い) {
@@ -187,6 +200,7 @@ for (const q of 問い) {
     const m = /^=([A-Z0-9_.]+)\(/.exec(q.式);
     const n = m ? m[1] : '(不明)';
     知らない名.set(n, (知らない名.get(n) || 0) + 1);
+    印(q.式, '無');
     continue;
   }
   const 数どうし = /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(q.答) && /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(字);
@@ -194,6 +208,7 @@ for (const q of 問い) {
     || (数どうし && Math.abs(Number(字) - Number(q.答)) <= Math.max(1e-9, Math.abs(Number(q.答)) * 1e-9));
   if (同) {
     合 += 1;
+    印(q.式, '合');
     /* ★★「数は 同じ・書き方が 違う」だけを 数えます★★
        ★★桁の 数は 数えません★★
          ＝紙の 列は `.Value2`（17桁）／うちは ★画面に 出る 字★
@@ -204,7 +219,7 @@ for (const q of 問い) {
     if (数どうし && 指数か(字) !== 指数か(q.答)) {
       字違い.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']');
     }
-  } else { 違 += 1; 外れ.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']'); }
+  } else { 違 += 1; 印(q.式, '違'); 外れ.push(q.式 + ' => 出た [' + 字 + '] ／実Excel [' + q.答 + ']'); }
 }
 
 console.log('');
@@ -224,3 +239,17 @@ if (字違い.length > 6) console.log('    ...（残り ' + (字違い.length - 
 console.log('');
 console.log('  ★★合わない ' + 外れ.length + '本★★');
 for (const s of 外れ) console.log('    ・' + s);
+
+/* ══ ★関数ごと（★合わない 数が 多い 順★・上 20）★ ══ */
+console.log('');
+console.log('  ★★関数ごと ... 合わない 数が 多い 順（上 20）★★');
+console.log('    関数              合った  間違い  知らない');
+const 並び = [...関数ごと.entries()]
+  .map(([n, v]) => ({ n, ...v, 悪: v.違 + v.無 }))
+  .filter((x) => x.悪 > 0)
+  .sort((a, b) => b.悪 - a.悪)
+  .slice(0, 20);
+for (const x of 並び) {
+  console.log('    ' + x.n.padEnd(18)
+    + String(x.合).padStart(5) + String(x.違).padStart(8) + String(x.無).padStart(10));
+}
