@@ -1,7 +1,9 @@
-/* kansuu46-1taba.test.mjs — ★台に 無かった 49個の 1束目（7個）を 紙で 押す★（2026-09-18）
+/* kansuu46-1taba.test.mjs — ★台に 無かった 49個の 1束目 7個 ＋ 2束目 5個を 紙で 押す★（2026-09-18）
  *
- *  ★★足した 7個★★
- *    MDETERM ／ KURT ／ TRIMMEAN ／ FORECAST ／ FORECAST.LINEAR ／ NUMBERVALUE ／ ENCODEURL
+ *  ★★足した 12個★★
+ *    ★1束目 7個★ MDETERM ／ KURT ／ TRIMMEAN ／ FORECAST ／ FORECAST.LINEAR
+ *                ／ NUMBERVALUE ／ ENCODEURL
+ *    ★2束目 5個★ FIXED ／ DOLLAR ／ VALUETOTEXT ／ LOOKUP ／ PHONETIC
  *
  *  ★★なぜ 別の 紙（この 試験）が 要るか★★
  *    `shiki-kansuu-kami.test.mjs` は ★紙の `#材料` から★ 材料を 取ります。
@@ -50,11 +52,13 @@ const T = (n, よい, 添え) => {
 };
 
 console.log('');
-console.log('[kansuu46-1taba] ★台に 無かった 49個の 1束目（7個）★');
+console.log('[kansuu46-1taba] ★台に 無かった 49個の 1束目 7個 ＋ 2束目 5個★');
 
-/* ══ ★足した 7個★（★この 名前は 手で 書きます＝「何を 足したか」は 人が 決めた 事★） ══ */
+/* ══ ★足した 分★（★この 名前は 手で 書きます＝「何を 足したか」は 人が 決めた 事★） ══ */
 const 足した = ['MDETERM', 'KURT', 'TRIMMEAN', 'FORECAST', 'FORECAST.LINEAR',
-  'NUMBERVALUE', 'ENCODEURL'];
+  'NUMBERVALUE', 'ENCODEURL',
+  /* ★2束目（2026-09-18）★ */
+  'FIXED', 'DOLLAR', 'VALUETOTEXT', 'LOOKUP', 'PHONETIC'];
 
 for (const n of 足した) {
   T('★台が ' + n + ' を 知って いる★', typeof (K.表 || {})[n] === 'function');
@@ -80,15 +84,15 @@ for (const l of 行) {
 }
 console.log('  ★紙から 拾った 行 … ' + 組.length + '行★');
 /* ★★本数を 決め打ちに する★★＝★紙から 消えたら 赤★（★黙って 0行に なるのを 止める★） */
-const 行の本数 = 7;
+const 行の本数 = 12;   /* ★1束目 7 ＋ 2束目 5★ */
 T('★★拾った 行が ' + 行の本数 + '行★★（★増えても 減っても 赤★）',
   組.length === 行の本数, '拾った ' + 組.length + '行 … ' + 組.map((x) => x.名).join(' '));
 
-/* ★★7個 とも 1行ずつ 在るか★★（★合計が 合っても 片寄る 事が 在る★） */
+/* ★★足した 分 とも 1行ずつ 在るか★★（★合計が 合っても 片寄る 事が 在る★） */
 const 名ごと = {};
 for (const q of 組) 名ごと[q.名] = (名ごと[q.名] || 0) + 1;
 const 抜け = 足した.filter((n) => !名ごと[n]);
-T('★★7個 とも 紙に 在る★★', 抜け.length === 0, '紙に 無い … ' + 抜け.join(' '));
+T('★★' + 足した.length + '個 とも 紙に 在る★★', 抜け.length === 0, '紙に 無い … ' + 抜け.join(' '));
 
 /* ══ ★材料（★出どころは 頭に 書いた 通り★） ══ */
 function 板を作る() {
@@ -140,7 +144,7 @@ T('★★' + 組.length + '行 とも 紙と 合う★★', 違 === 0, '違っ�
 
 console.log('');
 console.log('  ★★この 試験が 言える 事／言えない 事★★');
-console.log('    ・言える … ★紙に 在る 1行は 合う★（7個 とも）');
+console.log('    ・言える … ★紙に 在る 1行は 合う★（足した ' + 足した.length + '個 とも）');
 console.log('    ・★★言えない … 端（誤り・負・空・長さ違い）★★');
 console.log('      ＝★1つの 関数に つき 紙が 1行しか 在りません★');
 console.log('      ＝★`lib/shiki-kansuu.js` の 各関数の 下に ★未測定★と 書いて あります★');
