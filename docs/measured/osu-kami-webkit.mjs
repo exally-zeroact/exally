@@ -332,6 +332,50 @@ try {
     fs.writeFileSync(出し先, 行ごと.join('\n') + '\n', 'utf-8');
     console.log('  ★1行ずつ 出しました ... ' + 出し先 + '（' + 行ごと.length + '行）★');
   }
+
+  /* ══ ★★1本の 式が 後ろを 止めないか★★（2026-09-18・Exally1 の 注文）
+       ★訳★ ... 借り物が `Value of the formula cell is not computed.` を ★投げます★
+                `recalcSheet` が 受けて いないと ★そこで 繰り返しが 止まり★
+                ★後ろの マスが 全部 古い まま★に なります。
+                ⇒★誤りに ならない／画面も 崩れない／数だけ 違う★
+       ★★私の 分母（紙 2,116本）では 出ません★★
+         ＝1本ずつ 同じ マスに 打って いるから
+         ＝★同じ 板に 2本 並べないと 出ません★
+       ⇒★だから 名指しの 対照を 1組 置きます★ */
+  /* ★★受け止めます★★＝★測る 道具が 測る 相手で 死んでは いけません★
+     （2026-09-18 ... ★この 対照を 足した その日に 私が 死にました★） */
+  let 止める式 = { 投げる: '(押せず)', 次: '(押せず)', その次: '(押せず)', 投げた: null };
+  try {
+    止める式 = await page.evaluate(() => {
+    const sh = window.sheets[window.activeSheet];
+    window.setCell(60, 9, '=CONVERT(,"m","cm")');   /* ★投げる 式★ */
+    window.setCell(61, 9, '=1+1');                  /* ★その 後ろ★ */
+    window.setCell(62, 9, '=SUM(1,2,3)');           /* ★もっと 後ろ★ */
+    if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
+    const 読む = (r) => {
+      const c = (sh.data || {})[r + ',9'];
+      if (!c) return '(マスが 無い)';
+      return String(c.d !== undefined ? c.d : c.v);
+    };
+      return { 投げる: 読む(60), 次: 読む(61), その次: 読む(62), 投げた: null };
+    });
+  } catch (e) {
+    止める式.投げた = String(e.message).slice(0, 120);
+  }
+  const 止まっていない = (止める式.次 === '2' && 止める式.その次 === '6');
+  console.log('');
+  console.log('  ★★1本の 式が 後ろを 止めて いないか★★');
+  console.log('    `=CONVERT(,"m","cm")` ... ' + 止める式.投げる + '（実Excel `#N/A`）');
+  console.log('    その 後ろ `=1+1` ..... ' + 止める式.次 + '（★2 の はず★）');
+  console.log('    もっと 後ろ `=SUM(1,2,3)` ... ' + 止める式.その次 + '（★6 の はず★）');
+  if (止める式.投げた) {
+    console.log('    ★★窓の 中で 投げました★★ ... ' + 止める式.投げた);
+    console.log('    ⇒★★これ 自体が「止まって いる」印です★★');
+  }
+  console.log('    ⇒ ' + (止まっていない
+    ? '★止まって いません★'
+    : '★★止まって います＝後ろの マスが 古い まま です★★'));
+
   console.log('');
   console.log('  ★★窓の 誤り（★新しい 物だけ★） ... ' + 窓の誤り.length + '件★★'
     + '（★読み込んだ だけで 投げる 物は ここにしか 出ません★）');
