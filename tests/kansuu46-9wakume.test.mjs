@@ -4,7 +4,7 @@
  *    2026-09-18、`tests/` の どれからも 名前で 読まれない 紙が ★13枚 810行★
  *    在ると 分かりました。★その うち 3枚は その日 取った 物★です。
  *    ⇒★★「紙を 取る」で 終わりに して いた★★
- *    ⇒★決め★ … ★紙を 取ったら ★同じ commit で★ それを 名前で 読む 試験も 出す★
+ *    ⇒★決め★ ... ★紙を 取ったら ★同じ commit で★ それを 名前で 読む 試験も 出す★
  *
  *  ★★読む 紙★★ `docs/measured/golden-kansuu-9kaime-2026-09-18.tsv`
  *    ＝★実Excel 16.0 build 20326 ／ powershell.exe 5.1 ／ ANSI 932★
@@ -182,7 +182,7 @@ console.log('    ・★台が 知らない 関数の 行（' + 押さない + '�
 console.log('      ＝LAMBDA／MAP／REDUCE／SCAN／BYROW／BYCOL／MAKEARRAY など');
 console.log('      ＝★書いたら ここが 自動で 増えます★');
 console.log('    ・★実Excel が 打てなかった 行（' + 打てない + '行）も 押して いません★');
-console.log('      ＝`=LET(x,1)` … ★誤りの 値では なく「打てない」★＝★5つ目の 型★');
+console.log('      ＝`=LET(x,1)` ... ★誤りの 値では なく「打てない」★＝★5つ目の 型★');
 console.log('    ・★画面では ありません★（台だけ）');
 console.log('');
 console.log('kansuu46-9wakume: ' + pass + ' 緑 / ' + fail + ' 赤');
