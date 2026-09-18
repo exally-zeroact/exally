@@ -213,6 +213,14 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
    ⇒★消えたら 赤に します★（＝許しを 外す） */
 const 元から在る誤り = [
   'Viewport argument key "interactive-widget" not recognized',
+  /* ★2026-09-18 ... ★仮の 配信（preview）だけに 出ます★
+     ＝Vercel が 足す `vercel.live/_next-live/feedback/feedback.js` の 中
+     ＝★本番（exally.vercel.app）には この 行が 在りません★（実測 0件）
+     ★裏取り★ ... `test` 枝（★台を 読み込んで いない★）でも ★同じ 1件★
+       ⇒★★台を 足した せいでは ありません★★
+       ⇒★危うく「㋐が 誤りを 増やした」と 出す 所でした★
+     ＝★うちの 字では ありません★／★お客さんには 出ません★ */
+  "navigator.storage.persisted",
 ];
 const 窓の誤り = [];
 const 元から在る = [];
