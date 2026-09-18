@@ -249,6 +249,55 @@ try {
       出.段.indexOf(':NG') < 0, 出.段);
   }
 
+  /* == ★★2つの 道具が 割れた 7個★★ ==（2026-09-19）
+       ★私の 門（`tsunagu-mon`）★ ... 台に 無い ★25個★（★台が 名前を 持つか★）
+       ★経営者1 の 道具★ ......... 台に 無い ★27個★（★製品が 答えるか★）
+       ★差の 中身★ … ★台は 知って いるのに 向こうの 道具は 「無い」と 言う 7個★
+         BYCOL BYROW LAMBDA LET AREAS BINOM.DIST.RANGE PHONETIC
+       ⇒★★どちらが 正しいかは ★お客さんの 画面★で 決まります★★
+       ⇒★だから ここで 押します★（★名簿の 突き合わせでは 決めない★）
+       ★答えは 実Excel で 確かめた 物だけ 決め打ちに して います★ */
+  {
+    const 出 = await page.evaluate(() => {
+      const sh = window.sheets[window.activeSheet];
+      const 押 = (r, f) => {
+        window.setCell(r, 11, f);
+        return null;
+      };
+      window.setCell(50, 10, '1'); window.setCell(50, 11, '2');
+      window.setCell(51, 10, '10'); window.setCell(51, 11, '20');
+      const 組 = [
+        ['LET', '=LET(x,2,x*3)'],
+        ['LAMBDA', '=LAMBDA(x,x*2)(4)'],
+        ['AREAS', '=AREAS(K51:L52)'],
+        ['BINOM.DIST.RANGE', '=BINOM.DIST.RANGE(10,0.5,3)'],
+        ['PHONETIC', '=PHONETIC(K51)'],
+        ['BYROW', '=BYROW(K51:L52,LAMBDA(r,SUM(r)))'],
+        ['BYCOL', '=BYCOL(K51:L52,LAMBDA(c,SUM(c)))'],
+      ];
+      const 結 = {};
+      for (let i = 0; i < 組.length; i++) {
+        const r = 55 + i;
+        window.setCell(r, 13, 組[i][1]);
+        結[組[i][0]] = null;
+      }
+      if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
+      for (let i = 0; i < 組.length; i++) {
+        const x = (sh.data || {})[(55 + i) + ',13'];
+        const v = x ? (x.d !== undefined ? x.d : x.v) : '(無い)';
+        結[組[i][0]] = (v === undefined || v === null) ? '' : String(v);
+      }
+      return 結;
+    });
+    console.log('  ★2つの 道具が 割れた 7個 ... ' + JSON.stringify(出));
+    const 名前が通らない = Object.keys(出).filter((k) => String(出[k]).indexOf('#NAME?') >= 0);
+    T('★★7個とも お客さんの 画面で `#NAME?` に ならない★★（★台は 知って いる★）',
+      名前が通らない.length === 0, '名前が 通らない ... ' + 名前が通らない.join(' '));
+    T('★★=LET(x,2,x*3) が 6★★', 出.LET === '6', '出た "' + 出.LET + '"');
+    T('★★=LAMBDA(x,x*2)(4) が 8★★', 出.LAMBDA === '8', '出た "' + 出.LAMBDA + '"');
+    T('★★=AREAS(K51:L52) が 1★★', 出.AREAS === '1', '出た "' + 出.AREAS + '"');
+  }
+
   /* == ★★台の 溢れが マスに 並ぶか★★ ==（2026-09-18・経営者1 の 実測から）
        `=BYROW(F1:G2,LAMBDA(r,SUM(r)))` ... ★台は 3 と 30 を 出して います★
          ★前★ ... 溢れは いつも 借り物に 落として いた ⇒ 借り物は BYROW を 知らない ⇒ `#NAME?`
