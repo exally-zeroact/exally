@@ -12,9 +12,20 @@
  *    ③★式が マスを 指して いるか★（A1・$A$1・A1:B2・板!A1）
  *    ⇒★★③が 在って ②が 無い 紙＝押せない 紙★★
  *
+ *  ★★出す 数を 2回 小さく しました★★（2026-09-18・経営者1 の 差し戻し）
+ *    ⑴★最初 … 44枚 11,702行★
+ *    ⑵★突き合わせの 出しを 引いた … 38枚 11,702行★
+ *    ⑶★★頭（`#`）が 1行も 無い 物も 突き合わせの 出しだと 分かった★★
+ *        ＝`mae-ato-*.tsv` の 2列目は 「合った」「こちらだけ誤り」＝★判定★
+ *        ＝★実Excel の 答えでは ありません★
+ *        ⇒★31枚 ★1,680行★★
+ *    ⑷★道具から 名指しされて いる 物を 引いた ⇒ ★1枚 44行★★
+ *  ⇒★★11,702 を そのまま 出して いたら ★分母を 出さない 数★でした★★
+ *    ＝「11,702行が 押せて いない」に 化けます
+ *
  *  ★見て いない 事★
- *    ・★その 紙が 別の 試験で 押されて いるかは 見て いません★
- *      （`kansuu46-1taba.test.mjs` の ように 材料の 出どころを 名指しした 物が 在る）
+ *    ・★名指しされて いても ★その 行を 押して いる★とは 限りません★
+ *    ・★名指しされて いなくても 歩き回る 道具が 読む 事が 在ります★
  *    ・★柱（# 種 ...）が 読めるかは 見て いません★
  *
  *  使い方: node docs/measured/zairyou-ga-nai-kami.mjs
@@ -52,7 +63,15 @@ for (const p of 紙) {
   /* ★突き合わせの 出しは ★紙では ありません★（`shiki-kansuu-kami` も 読んで いません） */
   /* ★逆斜線を 書かない★（★今日 4回 heredoc で 落ちました★）＝名前だけ 見る */
   const 名 = path.basename(p);
-  const 突き = 名.indexOf('-awase-') >= 0 || 名.indexOf('cases-') === 0;
+  /* ★★突き合わせの 出しか★★（2026-09-18）
+       ①名前で 分かる 物 … `-awase-` `cases-`
+       ②★★頭（`#`）が 1行も 無い 物★★
+          ＝★測った 紙は 必ず 頭に 訳を 書いて います★（Excel の 版・材料・柱）
+          ＝★頭が 無い 物は 道具が 吐いた 突き合わせの 出し★
+          ★実物★ `mae-ato-*.tsv` … 2列目が 「合った」「こちらだけ誤り」＝★判定★
+                                    ＝★実Excel の 答えでは ありません★ */
+  const 頭 = 行.some((l) => l.startsWith('#'));
+  const 突き = 名.indexOf('-awase-') >= 0 || 名.indexOf('cases-') === 0 || !頭;
   if (指す > 0) 押せない.push({ 紙: path.relative(ROOT, p), 行: 本.length, 指す: 指す, 突き: 突き });
   else 指さない.push(path.relative(ROOT, p));
 }
@@ -68,6 +87,7 @@ const 突き数 = 押せない.length - 本物.length;
 console.log('    ・★マスを 指す 式が 在る★ ... ' + 押せない.length + '枚');
 console.log('        うち ★★本当の 紙 ' + 本物.length + '枚★★（★押せません★）');
 console.log('        うち 突き合わせの 出し ' + 突き数 + '枚（★元から 紙では ない★）');
+console.log('            ＝名前が -awase- / cases- ／ ★頭（#）が 1行も 無い★');
 console.log('    ・★押せない 行の 合計★ ...... ★' + 本物.reduce((a, x) => a + x.指す, 0) + '行★');
 console.log('    ・マスを 指さない .......... ' + 指さない.length + '枚（★材料が 要らない★）');
 console.log('');
@@ -76,9 +96,62 @@ for (const x of 本物.sort((a, b) => b.指す - a.指す)) {
   console.log('  ' + String(x.指す).padStart(5) + '行が マスを 指す ／ 全 '
     + String(x.行).padStart(5) + '行  ' + x.紙);
 }
+/* ══ ★★引き算★★ ══（2026-09-18・経営者1「11,702 を そのまま 出すな」）
+     ★訳★ … ★私は 自分で「別の 試験で 押されて いるかは 見て いない」と 書いた★
+       ⇒★その まま だと ★11,702行が 押せて いない★ という 数に 化けます★
+       ⇒★★分母を 出さない 数★★＝今日 何度も 潰して きた 型そのもの
+     ★引き方★ … ★`tests/` `scripts/` `docs/measured/` の 道具を 全部 読み、
+                  ★紙の 名前が 名指しで 出て くるか★ を 見る★
+     ★★これも 上限つきの 言い方です★★
+       ・★名指しで 出て いても「その 行を 押して いる」とは 限りません★
+       ・★名指しで 出て いなくても 歩き回る 道具が 読む 事は 在ります★
+       ⇒★だから 出す 数は ★「どの 道具からも 名指しされて いない」★ と 書きます★ */
+const 道具 = [];
+const 道具を歩く = (d) => {
+  if (!fs.existsSync(d)) return;
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) { if (e.name === 'node_modules') continue; 道具を歩く(p); continue; }
+    if (!/\.(mjs|js|cjs|py|ps1|yml|json)$/.test(e.name)) continue;
+    道具.push(p);
+  }
+};
+道具を歩く(path.join(ROOT, 'tests'));
+道具を歩く(path.join(ROOT, 'scripts'));
+道具を歩く(path.join(ROOT, 'docs/measured'));
+道具を歩く(path.join(ROOT, '.github'));
+const 道具の中身 = 道具.map((p) => fs.readFileSync(p, 'utf-8')).join('\n');
+
+const 名指しあり = [], 名指しなし = [];
+for (const x of 本物) {
+  const 名 = path.basename(x.紙);
+  (道具の中身.indexOf(名) >= 0 ? 名指しあり : 名指しなし).push(x);
+}
+console.log('');
+console.log('★★引き算（★道具から 名指しされて いるか★）★★');
+console.log('  ★読んだ 道具★ ................ ' + 道具.length + '本'
+  + '（tests / scripts / docs/measured / .github）');
+console.log('  ★名指しされて いる★ .......... ' + 名指しあり.length + '枚'
+  + '（' + 名指しあり.reduce((a, x) => a + x.指す, 0) + '行）');
+console.log('  ★★名指しされて いない★★ ...... ★★' + 名指しなし.length + '枚★★'
+  + '（★★' + 名指しなし.reduce((a, x) => a + x.指す, 0) + '行★★）');
+console.log('');
+console.log('★★どの 道具からも 名指しされて いない 紙★★');
+for (const x of 名指しなし.sort((a, b) => b.指す - a.指す)) {
+  console.log('  ' + String(x.指す).padStart(5) + '行が マスを 指す ／ 全 '
+    + String(x.行).padStart(5) + '行  ' + x.紙);
+}
+
 console.log('');
 console.log('★★言えない 事★★');
-console.log('  ・★その 紙が 別の 試験で 押されて いるかは 見て いません★');
+console.log('  ・★名指しされて いても ★その 行を 押して いる★とは 限りません★');
 console.log('    ＝`tests/kansuu46-1taba.test.mjs` の ように');
-console.log('      ★材料の 出どころを 名指しして 押して いる 物が 在ります★');
+console.log('      ★材料の 出どころを 名指しして 押して いる 物も 在ります★');
+console.log('  ・★名指しされて いなくても ★歩き回る 道具★が 読む 事が 在ります★');
+console.log('    ＝`shiki-kansuu-kami.test.mjs` は `docs` を 全部 歩きます');
+console.log('      （★但し `#材料` が 無い 紙は ★行を 押しません★★）');
 console.log('  ・★柱（# 種 ...）が 読めるかは 見て いません★');
+console.log('');
+console.log('  ⇒★★だから 出せる 数は 1つだけ★★');
+console.log('    ＝★「`#材料` が 無く、マスを 指し、どの 道具からも 名指しされて いない 紙」★');
+console.log('    ＝★★' + 名指しなし.length + '枚 ／ ' + 名指しなし.reduce((a, x) => a + x.指す, 0) + '行★★');
