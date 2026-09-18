@@ -133,6 +133,17 @@ function 関数名(式) {
   return m ? m[1] : '(不明)';
 }
 
+/* ★★真偽の 字だけ 大小を 揃えてから 比べます★★（2026-09-18・Exally1 の 決め）
+   ★訳★ ... 紙の 列は `.Value2`＝`False` ／ ★画面に 出るのは `FALSE`★
+           ＝★お客さんが 見るのは 画面です★（`.Value2` は 測る 道具の 都合）
+   ⇒★台は `FALSE` の まま★／★突き合わせる 側で 揃えます★
+   ★★真偽だけです★★＝★他の 字の 大小は 揃えません★（★本物の 違いを 隠さない 為★） */
+const 真偽をそろえる = (x) => {
+  const s = String(x).trim();
+  if (/^(TRUE|FALSE)$/i.test(s)) return s.toUpperCase();
+  return s;
+};
+
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
 
 /* ★実Excel の .Value2 は 誤りを 負の 数で 返します★（記憶の 決まり） */
@@ -226,7 +237,7 @@ for (const q of 問い) {
     continue;
   }
   const 数どうし = /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(q.答) && /^[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$/.test(字);
-  const 同 = (字 === q.答)
+  const 同 = (真偽をそろえる(字) === 真偽をそろえる(q.答))
     || (数どうし && Math.abs(Number(字) - Number(q.答)) <= Math.max(1e-9, Math.abs(Number(q.答)) * 1e-9));
   行ごとの出し.push(q.式 + '\t' + 字 + '\t' + q.答);
   if (同) {
