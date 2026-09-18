@@ -95,7 +95,11 @@
     =AGGREGATE(9,3,B1:B5)
     =AGGREGATE(9,5,B1:B5)
   ★隠した 行（★行を 隠して 聞く★）★
-    （行 3 を 隠して）=AGGREGATE(9,1,A1:A5) ／ (9,4,A1:A5) ／ (9,5,A1:A5) ／ (9,7,A1:A5)
+    ★行 3 を 隠して から 押します★（★略さずに 1本ずつ 書きます★）
+    =AGGREGATE(9,1,A1:A5)
+    =AGGREGATE(9,4,A1:A5)
+    =AGGREGATE(9,5,A1:A5)
+    =AGGREGATE(9,7,A1:A5)
   ★入れ子★
     =AGGREGATE(9,0,A1:A5,AGGREGATE(9,0,A1:A5))
     （C1 に =AGGREGATE(9,0,A1:A2) を 置いて）=AGGREGATE(9,0,A1:C5)
