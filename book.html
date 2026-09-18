@@ -3040,12 +3040,19 @@ function _溢れ直しの中身(sheetIdx, data) {
 
 function recalcSheet(sheetIdx, data) {
   if(!hf) return;
+  /* ★★1つの マスで 止まると 後ろの マスが 全部 古い ままに なります★★（2026-09-18）
+       ★実物の ブラウザで 出ました★ … `=CONVERT(,"m","cm")` を 打つと
+         借り物が `Value of the formula cell is not computed.` を ★投げ★、
+         `recalcSheet` が ★そこで 止まって いました★
+       ⇒★誤りに ならない／画面も 崩れない／数だけ 違う★＝★一番 見つけにくい 形★
+       ⇒★★だから 1マスずつ 受け止めます★★（記憶「総なめは 1本ずつ」の 裏） */
   /* ★じゃまが 消えて いれば 溢れ直す★（★先に やる★＝下の 写しが 新しい 値を 見る） */
-  _溢れ直しを試す(sheetIdx, data);
+  try { _溢れ直しを試す(sheetIdx, data); } catch (e) { /* ★止めない★ */ }
   /* ★先に 古い 溢れを 消す★＝式が 短く なった 時に 古い 数が 残らない */
-  _古い溢れを消す(sheetIdx, data);
+  try { _古い溢れを消す(sheetIdx, data); } catch (e) { /* ★止めない★ */ }
   /* ★台の 溢れは 毎回 作り直します★（★借り物の 型では 見分けられません★） */
-  if (typeof _台の古い溢れを消す === 'function') _台の古い溢れを消す(data);
+  try { if (typeof _台の古い溢れを消す === 'function') _台の古い溢れを消す(data); }
+  catch (e) { /* ★止めない★ */ }
   /* ★★台の 板を 画面に 合わせる★★（★1回だけ★・2026-09-18・㋑⑶）
        ★ここは `data` が ★もう 新しい★ 所です★（`setCellFormula` と 違う）
        ⇒★その マスだけ 打ち直す 必要は ありません★ */
@@ -3064,9 +3071,21 @@ function recalcSheet(sheetIdx, data) {
   for(var i=0;i<keys.length;i++){
     var cell = data[keys[i]];
     if(cell.f && cell.f[0]==='='){
+     try {      /* ★★1マスずつ 受け止める★★（★1つで 止まると 後ろが 全部 古く なる★） */
       var parts = keys[i].split(',');
       var r=parseInt(parts[0]),c=parseInt(parts[1]);
-      var jsResult = _jsComputeFormula(sheetIdx, cell.f);
+      /* ★★JS層は 投げる 事が 在ります★★（2026-09-18・★実物の ブラウザで 出ました★）
+           `=CONVERT(,"m","cm")` … 借り物が
+             `Error: Value of the formula cell is not computed.` を 投げます
+           ★前は ここで 受けて いませんでした★
+             ⇒★`recalcSheet` の 繰り返しが 途中で 止まります★
+             ⇒★★その 後ろの マスが 古い ままに なります★★
+             ⇒★誤りに ならない／画面も 崩れない／数だけ 違う★＝★一番 見つけにくい 形★
+           ⇒★投げたら 「JS層は 答えない」と します★＝台に 回ります
+             （台は `#N/A`＝実Excel と 同じ・画面は ★空★でした） */
+      var jsResult = null;
+      try { jsResult = _jsComputeFormula(sheetIdx, cell.f); }
+      catch (e) { jsResult = null; }
       /* ★★②台に 聞く★★（★借り物より 先★）
            ★上で 合わせて あるので ここでは 聞くだけ★
            ★`#NAME?` と 溢れは 借り物に 回します★ */
@@ -3129,6 +3148,15 @@ function recalcSheet(sheetIdx, data) {
       if (jsResult === null && 台答 === null && !台の溢れを使った) {
         _溢れを写す(sheetIdx, data, r, c);
       }
+     } catch (e) {
+      /* ★★このマスは 諦めます／★後ろの マスは 続けます★★★
+           ★黙って 古い 数を 残しません★＝★誤りの 字を 出します★
+           （記憶「黙って 古い数を 見せない」＝手動計算の 印と 同じ 考え） */
+      /* ★`#ERROR!` は ★実Excel に 無い 字★＝★うちの「計算できなかった」印★です★
+           ⇒★お客さんには 見えます★（★黙って 古い 数を 残すより 良い★）
+           ⇒★出たら 直す★＝`tests/shiki-wo-osu-webkit.mjs` が 0件を 見て います */
+      try { cell.d = '#ERROR!'; delete cell.d字; } catch (e2) { /* ★ここでも 止めない★ */ }
+     }
     }
   }
 }

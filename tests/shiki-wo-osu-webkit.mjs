@@ -213,6 +213,42 @@ try {
 
   T('★式を 打つ 口が 在る★', await page.evaluate(() => typeof window.setCell === 'function'));
 
+  /* == ★★JS層が 投げた 時に 後ろの マスが 止まらないか★★ ==（2026-09-18）
+       `=CONVERT(,"m","cm")`（★1つ目の 引数が 空★）
+         ★JS層★ ... 借り物が `Value of the formula cell is not computed.` を ★投げます★
+         ★前★ ... `recalcSheet` が 受けて いなかった
+                 ⇒★繰り返しが 途中で 止まり／後ろの マスが 古い まま★
+                 ⇒★画面は 空★（実Excel は `#N/A`）
+         ★今★ ... ★投げたら 「JS層は 答えない」★ ⇒ 台が `#N/A`
+       ★★後ろの マスも 一緒に 見ます★★＝★止まって いない 事を 数で 出します★ */
+  {
+    const 出 = await page.evaluate(() => {
+      const sh = window.sheets[window.activeSheet];
+      const 段 = [];
+      const 試 = (名, f) => { try { f(); 段.push(名 + ':ok'); } catch (e) { 段.push(名 + ':NG ' + String(e && e.message).slice(0, 80)); } };
+      試('setCell(CONVERT)', () => window.setCell(60, 10, '=CONVERT(,"m","cm")'));
+      試('setCell(2)', () => window.setCell(61, 10, '2'));
+      試('setCell(K62*3)', () => window.setCell(62, 10, '=K62*3'));
+      試('recalcSheet', () => { if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data); });
+      const 読 = (r, c) => {
+        const x = (sh.data || {})[r + ',' + c];
+        if (!x) return '(無い)';
+        const v = (x.d !== undefined ? x.d : x.v);
+        return (v === undefined || v === null) ? '' : String(v);
+      };
+      return { 投げる: 読(60, 10), 後ろ: 読(62, 10), 段: 段.join(' | ') };
+    });
+    console.log('  ★=CONVERT(,"m","cm") ... "' + 出.投げる + '"（★#N/A が 正★）'
+      + ' ／ ★後ろの マス "' + 出.後ろ + '"（★6 が 正★）');
+    console.log('     ★段★ ' + 出.段);
+    T('★★投げる 式が 実Excel と 同じ #N/A★★（★前は 空★）',
+      出.投げる === '#N/A', '出た "' + 出.投げる + '"');
+    T('★★投げても 後ろの マスが 止まらない★★（=K62*3 ⇒ 6）',
+      出.後ろ === '6', '出た "' + 出.後ろ + '"');
+    T('★★どの 段も 投げない★★（★`recalcSheet` が 途中で 止まらない★）',
+      出.段.indexOf(':NG') < 0, 出.段);
+  }
+
   /* == ★★台の 溢れが マスに 並ぶか★★ ==（2026-09-18・経営者1 の 実測から）
        `=BYROW(F1:G2,LAMBDA(r,SUM(r)))` ... ★台は 3 と 30 を 出して います★
          ★前★ ... 溢れは いつも 借り物に 落として いた ⇒ 借り物は BYROW を 知らない ⇒ `#NAME?`
