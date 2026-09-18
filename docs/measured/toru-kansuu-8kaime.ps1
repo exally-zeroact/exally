@@ -32,6 +32,9 @@
 #        ★訳★ 化けた 時に ★答えが 違うのか 字が 化けたのかが 見分けられません★
 #        ★この 門は 足した その日に ★3本 見つけました★★
 #    ⑪★★新しい 型（null だけ・Release と GC は 足さない）★★
+#    ⑭★★貝殻の 版★★ … ★`powershell.exe`（5.1）でないと 止まる（exit 8）★
+#        ★訳★ 5.1 と 7.x は ★同じ 数を 違う 字で 書きます★（今日 黙って 変わった）
+#        ★紙の 頭にも 版と 文字コードを 書きます★
 #    ⑬★★集め漏れ★★ … ★㋐集めた 時／㋑走った 時／㋒紙に 書かれた の 3つを 並べる★
 #        ★紙ごとにも 並べる★（★1紙 落ちても 合計が 合う 事が 在る★）／違えば exit 7
 #        ★指示役1 の 注文（2026-09-18）★ … 機械で 集めた から こそ 1紙 落ちても 気づけない
@@ -46,6 +49,27 @@
 $ErrorActionPreference = 'Stop'
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
 $出 = Join-Path $ここ 'golden-kansuu-8kaime-2026-09-18.tsv'
+
+# ══ ★⑭走らせる 貝殻の 版の 門★ ══（2026-09-18・★決め＝5.1 に 揃える★）
+#   ★★今日 黙って 変わりました★★
+#     7回目 … powershell.exe 5.1 ⇒ 99.776476358001872
+#     8回目 … pwsh 7.6           ⇒ 99.77647635800187
+#     ★double は bit まで 同じ★（4636721562276654862）
+#     ★訳★ `'R'` の 意味が 違う（5.1＝17桁 ／ 7.x＝最短 往復）
+#   ★決め★ … ★★34本の 古い 紙が 5.1 で 取って 在る★★ ⇒★揃って いる 方に 合わせる★
+#     ＝★選ぶ 訳は「正しさ」では なく「揃って いるか」だけ★（数は どちらも 同じ）
+#   ⇒★★門が 無いと また 黙って 変わります★★
+$版 = $PSVersionTable.PSVersion
+Write-Host ('★走らせて いる 貝殻 … PowerShell ' + $版.ToString() + '★')
+if ($版.Major -ne 5) {
+  Write-Host '★★この 道具は `powershell.exe`（5.1）で 走らせて ください★★'
+  Write-Host ('  ★今 … ' + $版.ToString() + '★')
+  Write-Host '  ★訳★ … 5.1 と 7.x は ★同じ 数を 違う 字で 書きます★'
+  Write-Host "         5.1 … 99.776476358001872 ／ 7.x … 99.77647635800187"
+  Write-Host '  ⇒★34本の 古い 紙は 5.1 で 取って 在ります★＝★揃って いる 方に 合わせます★'
+  Write-Host '  ★走らせ方★ powershell.exe -NoProfile -File docs/measured/toru-kansuu-8kaime.ps1'
+  exit 8
+}
 
 $数1 = @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count
 $数2 = @(Get-CimInstance Win32_Process -Filter "Name='EXCEL.EXE'" -ErrorAction SilentlyContinue).Count
@@ -310,6 +334,15 @@ try {
   $行.Add('# ★外へ 出る 6個★ … ★0件★（門で 数えました）')
   $行.Add('#')
   $行.Add('# ★どの Excel か★ … 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
+  $行.Add('#')
+  # ★★測る 道具の 版も 紙に 書く★★（2026-09-18）
+  #   ★訳★ … ★版が 変わると ★同じ 数が 違う 字に なります★★（今日 実際に 起きた）
+  $行.Add('# ★どの 貝殻か★ … PowerShell ' + $版.ToString() + '（★5.1 に 揃える 決め★）')
+  $行.Add('#')
+  # ★★LENB は この パソコンの 文字コードに 縛られます★★（2026-09-18 実測）
+  #   LENB(UNICHAR(8212)) ＝ 1 ／ LENB(UNICHAR(9731)) ＝ 1
+  #   ＝★CP932 に 無い 字は 1バイト★ ⇒★別の パソコンでは 変わり得ます★
+  $行.Add('# ★どの 文字コードか★ … ANSI ' + [System.Text.Encoding]::Default.CodePage + ' ／ OEM ' + [System.Globalization.CultureInfo]::CurrentCulture.Name + '（★LENB/LEFTB/MIDB/RIGHTB は これに 縛られます★）')
   $行.Add('#')
   $行.Add('# 訳' + "`t" + '式' + "`t" + '答え' + "`t" + '出る字' + "`t" + '=(式)=0' + "`t" + '型')
 
