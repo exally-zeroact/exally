@@ -200,6 +200,30 @@ const 時計 = Date.now();
 const wk = await borrow('osu-kami', 'webkit');
 const browser = await launch('osu-kami', wk, {}, 'webkit');
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+
+/* ★★窓の 誤りを 拾います★★（2026-09-18・★繋ぐ 時の 門★）
+   ＝★読み込んだ だけで 投げる 物は ここにしか 出ません★
+     （例）`process.env` を ブラウザで 読む ／ `root.Bahttext` が `undefined`
+   ＝★node では 1件も 出ません★＝★だから 窓で 拾います★ */
+/* ★★元から 在る 誤り（★名指しで 許す★）★★
+   ＝2026-09-18 に ★本番（exally.vercel.app）で 実測★した 1件
+   ＝`<meta name="viewport">` の `interactive-widget` を WebKit が 知らない だけ
+   ＝★計算にも 画面にも 出ません★／★Chrome では 出ません★
+   ⇒★★繋いだ 後に 増えた 誤りだけを 見る 為に 名指しで 除きます★★
+   ⇒★消えたら 赤に します★（＝許しを 外す） */
+const 元から在る誤り = [
+  'Viewport argument key "interactive-widget" not recognized',
+];
+const 窓の誤り = [];
+const 元から在る = [];
+const 誤りを分ける = (s2) => {
+  if (元から在る誤り.some((x) => s2.indexOf(x) >= 0)) 元から在る.push(s2);
+  else 窓の誤り.push(s2);
+};
+page.on('pageerror', (e) => 誤りを分ける('pageerror: ' + String(e.message).slice(0, 160)));
+page.on('console', (m) => {
+  if (m.type() === 'error') 誤りを分ける('console.error: ' + String(m.text()).slice(0, 160));
+});
 const 配信 = 手元か ? await 立てる(ROOT) : null;
 const 住所 = 手元か ? (配信.url + '/book.html') : 口;
 let 終わり = 1;
@@ -224,6 +248,19 @@ try {
     };
   });
   console.log('  ★script src ' + 読み.全 + '本 ／ hyperformula ' + 読み.hf + '本 ／ shiki- ' + 読み.shiki + '本★');
+  /* ★★頁の 大きさと 開くまでの 秒★★（★18本 増えると ここに 出ます★） */
+  const 大きさ = await page.evaluate(() => {
+    const n = performance.getEntriesByType('navigation')[0];
+    const r = performance.getEntriesByType('resource');
+    return {
+      頁: n ? Math.round(n.transferSize || 0) : 0,
+      全部: r.reduce((a, x) => a + (x.transferSize || 0), (n ? (n.transferSize || 0) : 0)),
+      本数: r.length,
+      秒: n ? Math.round(n.loadEventEnd) : 0,
+    };
+  });
+  console.log('  ★頁 ' + 大きさ.頁 + ' バイト ／ 全部で ' + 大きさ.全部 + ' バイト（' + 大きさ.本数 + '本）'
+    + ' ／ 開くまで ' + 大きさ.秒 + ' ミリ秒★');
 
   /* ★★1回で まとめて 押します★★（★紙ごとに 材料を 入れ直します★） */
   const 出 = await page.evaluate(({ 材, 問 }) => {
@@ -287,6 +324,15 @@ try {
     fs.writeFileSync(出し先, 行ごと.join('\n') + '\n', 'utf-8');
     console.log('  ★1行ずつ 出しました ... ' + 出し先 + '（' + 行ごと.length + '行）★');
   }
+  console.log('');
+  console.log('  ★★窓の 誤り（★新しい 物だけ★） ... ' + 窓の誤り.length + '件★★'
+    + '（★読み込んだ だけで 投げる 物は ここにしか 出ません★）');
+  console.log('    ★元から 在る（名指しで 許した） ... ' + 元から在る.length + '件★');
+  if (元から在る.length === 0) {
+    console.log('    ★★許した 物が 1件も 出ませんでした＝許しを 外して ください★★');
+  }
+  for (const e of 窓の誤り.slice(0, 12)) console.log('    ・' + e);
+  if (窓の誤り.length > 12) console.log('    ...（残り ' + (窓の誤り.length - 12) + '件）');
   console.log('');
   console.log('  ★★★DATE() を 渡すと #VALUE! ... ' + 日付を渡すと + '本★★★'
     + '（★合わない ' + 外れ.length + '本の うち★）');
