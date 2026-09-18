@@ -309,6 +309,7 @@ const FILES = [
   ['xlsx-harness/compare.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'], // ★入れ子で壊れる式が増えていないか
   ['xlfn-morenashi.test.mjs'],
+  ['dkei-honban.test.mjs'],
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）
