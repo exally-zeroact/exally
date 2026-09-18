@@ -116,10 +116,15 @@ const 道具を歩く = (d) => {
     道具.push(p);
   }
 };
+/* ★★数える 範囲を `tests/` に 絞りました★★（2026-09-18・経営者1 が 同じ 穴に 落ちかけた）
+     ★前は `scripts/` `docs/measured/` `.github/` も 数えて いました★
+     ⇒★★`docs/measured/kami-no-katachi.md` は ★紙の 目録★です＝★走りません★★★
+       ＝経営者1 が repo 全体で 引いたら「62枚中 61枚が 読まれて いる」と 出た
+       ＝★一番 多く 読んで いたのが その 目録★
+     ⇒★★「名前が 在る」を「押されて いる」と 数えて いました★★
+       ＝★私の ③（紙が 在る ≠ 確かめられる）と 同じ 型★
+     ⇒★走る 物だけ 数える＝`tests/`★ */
 道具を歩く(path.join(ROOT, 'tests'));
-道具を歩く(path.join(ROOT, 'scripts'));
-道具を歩く(path.join(ROOT, 'docs/measured'));
-道具を歩く(path.join(ROOT, '.github'));
 const 道具の中身 = 道具.map((p) => fs.readFileSync(p, 'utf-8')).join('\n');
 
 const 名指しあり = [], 名指しなし = [];
@@ -130,7 +135,7 @@ for (const x of 本物) {
 console.log('');
 console.log('★★引き算（★道具から 名指しされて いるか★）★★');
 console.log('  ★読んだ 道具★ ................ ' + 道具.length + '本'
-  + '（tests / scripts / docs/measured / .github）');
+  + '（★`tests/` だけ＝★走る 物だけ★★）');
 console.log('  ★名指しされて いる★ .......... ' + 名指しあり.length + '枚'
   + '（' + 名指しあり.reduce((a, x) => a + x.指す, 0) + '行）');
 console.log('  ★★名指しされて いない★★ ...... ★★' + 名指しなし.length + '枚★★'
@@ -140,6 +145,43 @@ console.log('★★どの 道具からも 名指しされて いない 紙★★
 for (const x of 名指しなし.sort((a, b) => b.指す - a.指す)) {
   console.log('  ' + String(x.指す).padStart(5) + '行が マスを 指す ／ 全 '
     + String(x.行).padStart(5) + '行  ' + x.紙);
+}
+
+/* ══ ★★もう 1つの 数え方（★経営者1 の 問い★）★★ ══（2026-09-18）
+     ★私の 問い★ … ★押せない 紙★（材料が 要るのに 無い ＋ 誰も 名指ししない）
+     ★経営者1 の 問い★ … ★★宙に 浮いた 紙★★（★`tests/` の どれからも 名指しされない★）
+       ＝★材料が 要るかどうかを 問わない★／★行は `#` で 始まらない 行を 全部 数える★
+     ⇒★★問いが 違うので 数も 違います★★（6枚250行 ／ 19枚1,670行）
+     ⇒★どちらも 出します★＝★「どちらが 正しいか」では なく「何を 数えたか」★ */
+const 浮いた = [];
+const 外した = [];
+for (const p of 紙) {
+  const 名 = path.basename(p);
+  if (道具の中身.indexOf(名) >= 0) continue;
+  /* ★範囲は `docs/measured` だけ★＝`docs` の 直下は ★Excel の 覚書き★（目録・設定・型の 名簿）
+       ＝`docs/excel-objectmodel-*.tsv` は 24,820行 在りますが ★式の 紙では ありません★ */
+  if (path.relative(ROOT, p).indexOf(path.join('docs', 'measured')) !== 0) {
+    外した.push({ 紙: path.relative(ROOT, p), 訳: 'docs/measured の 外（Excel の 覚書き）' });
+    continue;
+  }
+  const 行2 = fs.readFileSync(p, 'utf-8').split(/\r?\n/);
+  const 本2 = 行2.filter((l) => l && !l.startsWith('#'));
+  /* ★突き合わせの 出しは 外す★（上と 同じ 見方＝名前 か 頭が 無い） */
+  const 頭2 = 行2.some((l) => l.startsWith('#'));
+  if (名.indexOf('-awase-') >= 0 || 名.indexOf('cases-') === 0 || !頭2) {
+    外した.push({ 紙: path.relative(ROOT, p), 訳: '突き合わせの 出し（紙では ない）' });
+    continue;
+  }
+  浮いた.push({ 紙: path.relative(ROOT, p), 行: 本2.length });
+}
+console.log('');
+console.log('★★もう 1つの 数え方（★`tests/` の どれからも 名指しされない 紙★）★★');
+console.log('  ★材料が 要るかを 問いません★／★`#` で 始まらない 行を 全部 数えます★');
+console.log('  ★範囲は `docs/measured` だけ★／★突き合わせの 出しは 外します★'
+  + '（外した ' + 外した.length + '枚）');
+console.log('  ★★' + 浮いた.length + '枚 ／ ' + 浮いた.reduce((a, x) => a + x.行, 0) + '行★★');
+for (const x of 浮いた.sort((a, b) => b.行 - a.行)) {
+  console.log('  ' + String(x.行).padStart(6) + '行  ' + x.紙);
 }
 
 console.log('');
