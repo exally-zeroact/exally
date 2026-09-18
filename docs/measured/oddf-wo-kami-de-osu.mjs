@@ -65,6 +65,7 @@ const 紙たち = [
   { 名: 'golden-oddf-nokori15-2026-09-19.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori16-2026-09-19.tsv', 式列: 1, 答列: 2 },
   { 名: 'golden-oddf-nokori17-2026-09-19.tsv', 式列: 1, 答列: 2 },
+  { 名: 'golden-oddf-nokori18-2026-09-19.tsv', 式列: 1, 答列: 2 },
 ];
 
 /* ══ ★★門 ── ★紙を 足したのに 名簿に 入れ忘れたら 止める★★ ══
