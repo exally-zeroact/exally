@@ -41,8 +41,8 @@ const H = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
 require_(path.join(ROOT, 'lib/shiki-kansuu.js'));
 require_(path.join(ROOT, 'lib/shiki-tsunagi.js'));
 
-/* ★8枠目・9枠目の 紙の 頭に 書いて ある 材料★ */
-const 材料 = [
+/* ★8枠目・9枠目の 紙の 頭に 書いて ある 材料★（★既定★） */
+const 既定の材料 = [
   ['A1', 1], ['A2', 2], ['A3', 3], ['A4', 4], ['A5', 5],
   ['B1', 1], ['B2', 2], ['B3', '=1/0'], ['B4', 4], ['B5', 5],
   ['C1', 1], ['C2', 3], ['C3', 5], ['C4', 7], ['C5', 9],
@@ -68,7 +68,11 @@ const 紙たち = [
            答: '97.696364140993609' } },
   { 名: 'golden-oddf-buhin-2026-09-16.tsv', 式列: 3, 答列: 4,
     対照: { 式: '=COUPDAYBS(DATE(2008,11,11),DATE(2021,3,1),2,0)', 答: '70' } },
-  { 名: 'golden-oddf-to-46ko-2026-09-16.tsv', 式列: 2, 答列: 3, 対照: null },
+  { 名: 'golden-oddf-to-46ko-2026-09-16.tsv', 式列: 2, 答列: 3, 対照: null,
+    /* ★★この 紙だけ 材料が 違います★★（出どころ ... kansuu46-no-dodai.mjs の 材料()）
+       ＝A1:A5 = 1,2,3,4,5 ／ ★B1:B5 = 2,4,6,8,10★
+       ＝裏取り ... =FORECAST(6,B1:B5,A1:A5) が 12（★B = 2x でしか 12に ならない★） */
+    材料: { B1: 2, B2: 4, B3: 6, B4: 8, B5: 10 } },
 ];
 
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
@@ -112,7 +116,7 @@ for (const p of 紙たち) {
     if (!式.startsWith('=')) continue;
     if (!答になるか(答)) continue;
     if (誤りの数[答]) 答 = 誤りの数[答];
-    問い.push({ 式, 答 });
+    問い.push({ 紙: p.名, 材料: p.材料 || null, 式, 答 });
     n += 1;
   }
   紙ごと.push(p.名 + ' ... ' + n + '本（式 ' + p.式列 + '列目 ／ 答え ' + p.答列 + '列目'
@@ -125,13 +129,20 @@ console.log('[osu-dai-dake] ★同じ 紙を 自前の 台だけで 押す★');
 console.log('  ★★拾った 式 ... ' + 問い.length + '本★★（★お客さんの 道と 同じ 分母★）');
 console.log('  ★借り物は 建てて いません★');
 
-const 板 = new H.表();
-for (const kv of 材料) 板.打つ(kv[0], kv[1]);
-
+/* ★★紙ごとに 板を 立て直します★★
+   ＝★紙ごとに 材料が 違うから★（★前は 1組で 通して 4本 嘘の 赤を 出しました★） */
 let 合 = 0, 違 = 0, 知らない = 0, 転 = 0;
 const 外れ = [];
 const 知らない名 = new Map();
+let 今の紙 = null;
+let 板 = null;
 for (const q of 問い) {
+  if (q.紙 !== 今の紙) {
+    今の紙 = q.紙;
+    板 = new H.表();
+    for (const kv of 既定の材料) 板.打つ(kv[0], kv[1]);
+    if (q.材料) for (const k of Object.keys(q.材料)) 板.打つ(k, q.材料[k]);
+  }
   let 出;
   try {
     板.打つ('J21', q.式);

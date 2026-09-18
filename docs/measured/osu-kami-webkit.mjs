@@ -42,8 +42,8 @@ const { borrow, launch } = await import(pathToFileURL(path.join(ROOT, 'scripts/_
 const 口 = (process.argv.find((a) => a.startsWith('--どこ=')) || '--どこ=手元').split('=').slice(1).join('=');
 const 手元か = (口 === '手元');
 
-/* ★8枠目・9枠目の 紙の 頭に 書いて ある 材料★ */
-const 材料 = [
+/* ★8枠目・9枠目の 紙の 頭に 書いて ある 材料★（★既定★） */
+const 既定の材料 = [
   ['A1', 1], ['A2', 2], ['A3', 3], ['A4', 4], ['A5', 5],
   ['B1', 1], ['B2', 2], ['B3', '=1/0'], ['B4', 4], ['B5', 5],
   ['C1', 1], ['C2', 3], ['C3', 5], ['C4', 7], ['C5', 9],
@@ -69,7 +69,11 @@ const 紙たち = [
            答: '97.696364140993609' } },
   { 名: 'golden-oddf-buhin-2026-09-16.tsv', 式列: 3, 答列: 4,
     対照: { 式: '=COUPDAYBS(DATE(2008,11,11),DATE(2021,3,1),2,0)', 答: '70' } },
-  { 名: 'golden-oddf-to-46ko-2026-09-16.tsv', 式列: 2, 答列: 3, 対照: null },
+  { 名: 'golden-oddf-to-46ko-2026-09-16.tsv', 式列: 2, 答列: 3, 対照: null,
+    /* ★★この 紙だけ 材料が 違います★★（出どころ ... kansuu46-no-dodai.mjs の 材料()）
+       ＝A1:A5 = 1,2,3,4,5 ／ ★B1:B5 = 2,4,6,8,10★
+       ＝裏取り ... =FORECAST(6,B1:B5,A1:A5) が 12（★B = 2x でしか 12に ならない★） */
+    材料: { B1: 2, B2: 4, B3: 6, B4: 8, B5: 10 } },
 ];
 
 const 裸 = (s) => String(s === undefined ? '' : s).replace(/★/g, '').replace(/`/g, '').trim();
@@ -113,7 +117,7 @@ for (const p of 紙たち) {
     if (!式.startsWith('=')) continue;
     if (!答になるか(答)) continue;
     if (誤りの数[答]) 答 = 誤りの数[答];
-    問い.push({ 紙: p.名, 式, 答 });
+    問い.push({ 紙: p.名, 材料: p.材料 || null, 式, 答 });
     n += 1;
   }
   紙ごと.push(p.名 + ' ... ' + n + '本（式 ' + p.式列 + '列目 ／ 答え ' + p.答列 + '列目'
@@ -170,7 +174,7 @@ try {
   });
   console.log('  ★script src ' + 読み.全 + '本 ／ hyperformula ' + 読み.hf + '本 ／ shiki- ' + 読み.shiki + '本★');
 
-  /* ★★1回で まとめて 押します★★ */
+  /* ★★1回で まとめて 押します★★（★紙ごとに 材料を 入れ直します★） */
   const 出 = await page.evaluate(({ 材, 問 }) => {
     const 番地 = (s) => {
       const m = /^([A-Z]+)(\d+)$/.exec(s);
@@ -179,13 +183,18 @@ try {
       return { r: Number(m[2]) - 1, c: c - 1 };
     };
     const sh = window.sheets[window.activeSheet];
-    for (const kv of 材) { const a = 番地(kv[0]); window.setCell(a.r, a.c, kv[1]); }
+    const 材を入れる = (上書き) => {
+      for (const kv of 材) { const a = 番地(kv[0]); window.setCell(a.r, a.c, kv[1]); }
+      if (上書き) for (const k of Object.keys(上書き)) { const a = 番地(k); window.setCell(a.r, a.c, 上書き[k]); }
+    };
     const 答 = [];
     const 行 = 20;              /* ★材料の 下に 置きます★ */
+    let 今の紙 = null;
     for (let i = 0; i < 問.length; i++) {
+      if (問[i].紙 !== 今の紙) { 今の紙 = 問[i].紙; 材を入れる(問[i].材料); }
       let v;
       try {
-        window.setCell(行, 9, 問[i]);
+        window.setCell(行, 9, 問[i].式);
         if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
         const c = (sh.data || {})[行 + ',9'];
         v = !c ? null : (c.d !== undefined ? c.d : c.v);
@@ -193,7 +202,7 @@ try {
       答.push({ 値: (v === undefined || v === null) ? '' : String(v) });
     }
     return 答;
-  }, { 材: 材料, 問: 問い.map((q) => q.式) });
+  }, { 材: 既定の材料, 問: 問い.map((q) => ({ 紙: q.紙, 材料: q.材料, 式: q.式 })) });
 
   let 合 = 0, 違 = 0, 空 = 0, 転 = 0;
   const 外れ = [];
