@@ -191,8 +191,37 @@ const 数 = F.数える();
 const 理由なし = Object.keys(数.足さない).filter((k) => !String(数.足さない[k]).trim())
   .concat(Object.keys(数.別名で動く || {}).filter((k) => !String(数.別名で動く[k]).trim()));
 言う(理由なし.length === 0, '★足さない／別名で動く 物には 全部 理由が 書いてある★', 理由なし.join(' / '));
-言う(!!数.足さない.LAMBDA && !!数.足さない.PHONETIC,
-  '★作れない 物（LAMBDA・PHONETIC）も 数えている★');
+/* ══ ★★2026-09-19 ... ★LAMBDA と PHONETIC を 名指しで 決め打つのを やめました★★★ ══
+     ★前★ ... 「LAMBDA と PHONETIC が ★足さない 棚に 在る★」を 門に して いた
+     ★何が 起きたか★
+       見張り（kansuu-tana / kansuu-kabaa）が ★2段しか 押して いなかった★ので
+       ★本番では 動いて いる 物を 「動かない」棚に 置いて いました★
+       ⇒2026-09-19 に 見張りを ★3段★（JS層 → 台 → 借り物）に 揃えた
+       ⇒★LAMBDA / BYROW / BYCOL / PHONETIC が 4個とも 動くと 出た★（実測 8/8）
+       ⇒★PHONETIC は 同じ日に 範囲の #VALUE! も 直した★
+       ⇒★4個を 「別名で動く」棚へ 移した★
+     ⇒★★「今 在る 物」を 名前で 決め打った 門は その 物が 動いた 日に 死にます★★
+        ＝経営者1 の ㊲（誰も 打って いない）と 同じ 型
+     ★★どう 書き直したか★★
+       ★名前では なく ★決まり★を 見ます★
+         ⑴どちらかの 棚に ★必ず 居る★（★黙って 消えて いない★）
+         ⑵どの 棚に 居ても ★訳が 書いて ある★
+       ⇒★棚を 移しても 赤に ならない／★消したら 赤に なる★★ */
+{
+  const 棚たち = [数.足さない, 数.別名で動く || {}, 数.形で動く || {}];
+  const 居る = (n) => 棚たち.some((t) => Object.prototype.hasOwnProperty.call(t, n));
+  const 訳 = (n) => {
+    for (const t of 棚たち) if (Object.prototype.hasOwnProperty.call(t, n)) return String(t[n] || '').trim();
+    return '';
+  };
+  const 見る = ['LAMBDA', 'PHONETIC', 'BYROW', 'BYCOL'];
+  const 居ない = 見る.filter((n) => !居る(n));
+  言う(居ない.length === 0,
+    '★★LAMBDA・PHONETIC・BYROW・BYCOL は どれかの 棚に 必ず 居る★★（★黙って 消えて いない★）',
+    居ない.join(' / '));
+  const 訳なし = 見る.filter((n) => 居る(n) && !訳(n));
+  言う(訳なし.length === 0, '★その 4つには 訳が 書いて ある★', 訳なし.join(' / '));
+}
 
 /* ── ★繋ぐ 側★ ── */
 const plug = fs.readFileSync(path.join(ROOT, 'lib/formula-extra-plug.js'), 'utf8');

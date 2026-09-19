@@ -42,17 +42,29 @@ if (!どこ) {
 }
 
 /* ★実Excel の 紙を 読む★（★手で 写しません★） */
-const 紙 = path.join(ここ, 'golden-kobore-zenmasu-2026-09-19.tsv');
-if (!fs.existsSync(紙)) {
-  console.log('★★実Excel の 紙が 在りません ... ' + 紙 + '★★');
+/* ★★2026-09-19 ── ★`golden-kobore-*.tsv` を ★全部★ 読みます★★
+     ＝紙を 足したのに 名簿に 入れ忘れる 穴を 塞ぐ
+       （★同じ 穴を 今日 `oddf-wo-kami-de-osu.mjs` で 6枚 開けました★）
+     ＝★1枚も 見つからなければ exit 3★（★測れない 物を 緑に しない★） */
+const 紙たち = fs.readdirSync(ここ)
+  .filter((f) => /^golden-kobore.*\.tsv$/.test(f))
+  .sort();
+if (紙たち.length === 0) {
+  console.log('★★実Excel の 紙が 1枚も 在りません（golden-kobore*.tsv）★★');
   process.exit(3);
 }
 const 問い = [];
-for (const l of fs.readFileSync(紙, 'utf-8').split(/\r?\n/)) {
-  if (!l || l.startsWith('#')) continue;
-  const c = l.split('\t');
-  if (c.length < 5) continue;
-  問い.push({ 番: c[0], 式: c[1], 行数: Number(c[2]), 列数: Number(c[3]), 正: c[4] });
+for (const fn of 紙たち) {
+  for (const l of fs.readFileSync(path.join(ここ, fn), 'utf-8').split(/\r?\n/)) {
+    if (!l || l.startsWith('#')) continue;
+    const c = l.split('\t');
+    if (c.length < 5) continue;
+    /* ★7列目＝★邪魔の マス★★（`E1` など・無ければ 空）
+       ＝★これを 置かないと ★#SPILL! の 行が 比べ物に なりません★★
+       ＝2026-09-19 に ★私の 道具が 邪魔を 再現せず★ 偽の 外れを 出しました */
+    問い.push({ 紙: fn, 番: c[0], 式: c[1], 行数: Number(c[2]), 列数: Number(c[3]),
+      正: c[4], 邪魔: (c[7] || '').trim() });
+  }
 }
 if (問い.length === 0) { console.log('★紙が 空です★'); process.exit(3); }
 
@@ -76,6 +88,7 @@ p.on('pageerror', (e) => 誤りを分ける('pageerror: ' + String(e.message).sl
 console.log('');
 console.log('[osu-kobore-zenmasu] ★溢れた 先の 全マスを お客さんの 道で 押す★');
 console.log('  ★どこ★ ... ' + どこ);
+console.log('  ★読んだ 紙 ... ' + 紙たち.length + '枚★ ... ' + 紙たち.join(' / '));
 console.log('  ★★問い ... ' + 問い.length + '本★★（★実Excel の 紙から 読みました★）');
 
 const 返 = await p.goto(どこ, { waitUntil: 'load', timeout: 60000 });
@@ -96,6 +109,15 @@ const 出 = await p.evaluate((問) => {
     window.setCell(0, 1, 10); window.setCell(1, 1, 20); window.setCell(2, 1, 30);
     /* ★前の 溢れを 消す★ */
     for (let r = 0; r < 10; r += 1) for (let c = 3; c < 8; c += 1) window.setCell(r, c, '');
+    /* ★★邪魔の マスを 先に 置く★★（★紙が 「E1」と 言って いる 時だけ★） */
+    if (q.邪魔) {
+      const m = /^([A-Z]+)(\d+)$/.exec(q.邪魔);
+      if (m) {
+        let cc = 0;
+        for (const ch of m[1]) cc = cc * 26 + (ch.charCodeAt(0) - 64);
+        window.setCell(Number(m[2]) - 1, cc - 1, 'jama');
+      }
+    }
     let 投げた = null;
     try { window.setCell(0, 3, q.式); } catch (e) { 投げた = String(e.message).slice(0, 80); }
     /* ★★2026-09-19 ── ★これを 呼ばないと 溢れません★★
@@ -127,9 +149,22 @@ await b.close();
 
 /* ★実Excel の 紙は 後ろに 空の 列が 付きます★（D1:H10 を そのまま 書いた ので）
    ⇒★比べる 前に ★両方とも★ 後ろの 空を 落とします★ */
+/* ★★実Excel の 誤りは ★数★で 返ります★★（`.Value2` が COM の 誤り番号）
+   ⇒★比べる 前に ★字★に 直します★
+   ⇒★2026-09-19 ... これを しなかった せいで
+     `#CALC!` と `#SPILL!` の 2本を ★偽の 外れ★に して いました★
+   ⇒★★どちらも 実は 合って いました★★（★特に #SPILL! は 正しく 出て います★） */
+const 誤りの数 = {
+  '-2146826281': '#DIV/0!', '-2146826252': '#NUM!', '-2146826246': '#N/A',
+  '-2146826273': '#VALUE!', '-2146826265': '#REF!', '-2146826259': '#NAME?',
+  '-2146826238': '#CALC!', '-2146826243': '#SPILL!',
+};
 const 揃える = (s) => String(s)
   .split(' / ')
-  .map((行) => 行.replace(/\|+$/, ''))
+  .map((行) => 行.replace(/\|+$/, '')
+    .split('|')
+    .map((x) => (誤りの数[x] !== undefined ? 誤りの数[x] : x))
+    .join('|'))
   .join(' / ');
 
 let 合 = 0;
