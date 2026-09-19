@@ -26,8 +26,17 @@
 #
 #  使い方: powershell.exe -NoProfile -ExecutionPolicy Bypass -File <この道具>
 
+# ★★2026-09-20 足し ── ★`-書ける` ＝ ReadOnly を 外して 開く★★
+#   ★なぜ★ ... ㊷の ⑶（頭を 直したら 下が 追随するか）が 「書き換わらない」で 終わった
+#              ⇒★その訳が ①CSE（並びの 一部は 直せない） なのか
+#                          ②ReadOnly なのか ★切り分けられません★
+#   ⇒★★開く 名前は 1本の まま★★（`%TEMP%\exally-kakidashi.xlsx`）
+#   ⇒★★保存は どちらでも しません★★（`Close($false)`／`SaveAs` は 1文字も 在りません）
+param([switch]$書ける)
+
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$出 = Join-Path $ここ 'golden-kakidashi-excel-2026-09-20.tsv'
+$出 = if ($書ける) { Join-Path $ここ 'golden-kakidashi-excel-kakeru-2026-09-20.tsv' }
+      else { Join-Path $ここ 'golden-kakidashi-excel-2026-09-20.tsv' }
 
 # ══ ★開いて よい ただ 1本★ ══
 $許す名 = 'exally-kakidashi.xlsx'
@@ -62,14 +71,16 @@ $w = $null
 try {
   $xl.Visible = $false
   $xl.DisplayAlerts = $false
-  # ★読むだけ★（`ReadOnly` を 立てる）
-  $bk = $xl.Workbooks.Open($開く, 0, $true)
+  # ★`ReadOnly` を 立てる／外す★（★どちらでも 保存は しません★）
+  $読むだけ = -not $書ける
+  Write-Host ('★開き方 ... ReadOnly=' + $読むだけ + '★（★保存は しません★）')
+  $bk = $xl.Workbooks.Open($開く, 0, $読むだけ)
   $sh = $bk.Sheets.Item(1)
 
   $行 = New-Object System.Collections.Generic.List[string]
   $行.Add('# ★うちが 書き出した .xlsx を 実Excel に 開かせた★（2026-09-20）')
   $行.Add('# ★開いた 物★ ... ' + $開く)
-  $行.Add('# ★読むだけ★（保存して いません）')
+  $行.Add('# ★開き方★ ... ReadOnly=' + $読むだけ + '（★保存して いません★）')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
   $行.Add('# マス' + "`t" + '値' + "`t" + '出る字' + "`t" + '式' + "`t" + '型' + "`t" + '=(マス)=0')
@@ -88,8 +99,84 @@ try {
     $行.Add(('D' + $r) + "`t" + $値 + "`t" + $字 + "`t" + $式 + "`t" + $型 + "`t" + $ゼロか)
   }
 
+  # ══════════════════════════════════════════════════════════════════
+  # ★★㊷ ── ★生きて いるか★ の 決め手★★（2026-09-20 足し）
+  #   Exally1 の 問い ⑶「★頭を 直したら 下が 追随するか★」
+  #     ＝D1 を `=SEQUENCE(2)` に 書き換えたら ★D3 は 消えるか★
+  #   ・★死んだ 値★なら D3 は ★3 の まま 残ります★
+  #   ・★生きた 溢れ★なら D3 は ★空に なります★（㊵の 台本5 と 同じ 形）
+  #   ★保存は しません★（`ReadOnly` の まま 覚えの 中だけで 書き換え／`Close($false)`）
+  # ══════════════════════════════════════════════════════════════════
+  $行.Add('#')
+  $行.Add('# ★★㊷ ── 頭（D1）を =SEQUENCE(2) に 書き換えた 後★★（★保存して いません★）')
+  $行.Add('# マス' + "`t" + '値' + "`t" + '出る字' + "`t" + '式' + "`t" + '型' + "`t" + '溢れの一部か')
+  # ★★2026-09-20 ── ★「投げなかった」を 「書けた」に するな★★
+  #   ＝実測で ★`.Formula2` は 投げずに 何も しません★（並びの 一部だから）
+  #   ⇒★★読み戻して 字が 変わったかで 判じます★★
+  #     （記憶「見張りは 印では なく ★絵が 変わったか★」／「壊したのに 赤に ならない」）
+  $書けたか = '(★書き換えられません★)'
+  $前の字 = [string]$sh.Range('D1').Formula
+  try {
+    $sh.Range('D1').Formula2 = '=SEQUENCE(2)'
+    $後の字 = [string]$sh.Range('D1').Formula
+    if ($後の字 -eq $前の字) {
+      $書けたか = '★投げないが 変わりません★（前 ' + $前の字 + ' ／ 後 ' + $後の字 + '）'
+    } else {
+      $書けたか = 'ok（' + $前の字 + ' ⇒ ' + $後の字 + '）'
+    }
+  } catch { $書けたか = '★投げました★ ' + $_.Exception.Message }
+  $行.Add('# ★頭を 書き換えられたか★ ... ' + $書けたか)
+  if ($書けたか -like 'ok*') {
+    for ($r = 1; $r -le 5; $r++) {
+      $c = $sh.Cells.Item($r, 4)
+      $v = $c.Value2
+      $値 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
+      $型 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
+      $字 = [string]$c.Text
+      $式 = [string]$c.Formula
+      $一部か = '(?)'
+      try { $一部か = [string]$c.HasArray } catch { }
+      $行.Add(('D' + $r) + "`t" + $値 + "`t" + $字 + "`t" + $式 + "`t" + $型 + "`t" + $一部か)
+    }
+  }
+
+  # ══════════════════════════════════════════════════════════════════
+  # ★★㊸ ── ★並び 全体★を 書き換える★★（★切り分けの 2本目★）
+  #   ・昔の CSE は ★一部だけ★は 直せないが ★範囲ごと★なら 直せる
+  #   ⇒★ここが 通れば 「⑶が 動かなかった 訳は ★並びの 一部だから★」★
+  #   ⇒★ここも 通らなければ 「訳は ★ReadOnly★」★（`-書ける` で もう 一度 測る）
+  # ══════════════════════════════════════════════════════════════════
+  $行.Add('#')
+  $行.Add('# ★★㊸ ── 並び 全体（D1:D3）を =SEQUENCE(2) に 書き換えた 後★★')
+  # ★★ここも 読み戻して 判じます★★（★同じ 穴を 2つ 空けない★）
+  $全体 = '(★書き換えられません★)'
+  $前の字2 = [string]$sh.Range('D1').Formula
+  try {
+    $sh.Range('D1:D3').Formula2 = '=SEQUENCE(2)'
+    $後の字2 = [string]$sh.Range('D1').Formula
+    if ($後の字2 -eq $前の字2) {
+      $全体 = '★投げないが 変わりません★（前 ' + $前の字2 + ' ／ 後 ' + $後の字2 + '）'
+    } else {
+      $全体 = 'ok（' + $前の字2 + ' ⇒ ' + $後の字2 + '）'
+    }
+  } catch { $全体 = '★投げました★ ' + $_.Exception.Message }
+  $行.Add('# ★並び 全体を 書き換えられたか★ ... ' + $全体)
+  $行.Add('# マス' + "`t" + '値' + "`t" + '出る字' + "`t" + '式' + "`t" + '型' + "`t" + '溢れの一部か')
+  for ($r = 1; $r -le 5; $r++) {
+    $c = $sh.Cells.Item($r, 4)
+    $v = $c.Value2
+    $値 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
+    $型 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
+    $字 = [string]$c.Text
+    $式 = [string]$c.Formula
+    $一部か = '(?)'
+    try { $一部か = [string]$c.HasArray } catch { }
+    $行.Add(('D' + $r) + "`t" + $値 + "`t" + $字 + "`t" + $式 + "`t" + $型 + "`t" + $一部か)
+  }
+
   [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
   Write-Host ('★書いた ... ' + $出 + '★')
+  # ★★保存しません★★（`$false`＝変更を 捨てる）
   $bk.Close($false)
 } finally {
   $c = $null
