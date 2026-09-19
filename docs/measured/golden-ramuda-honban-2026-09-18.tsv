@@ -33,10 +33,10 @@
 #   ⇒突き合わせの 相手が 居ません（★合わない のでは なく 比べられない★）
 #
 番	式	実Excel	うち	判定
-49	=BYROW(F1:G2,LAMBDA(r,SUM(r)))	3	#NAME?	x
+49	=BYROW(F1:G2,LAMBDA(r,SUM(r)))	3	3	o
 50	=SUM(BYROW(F1:G2,LAMBDA(r,SUM(r))))	33	33	o
 51	=SUM(BYCOL(F1:G2,LAMBDA(c,SUM(c))))	33	33	o
-52	=BYCOL(F1:G2,LAMBDA(c,SUM(c)))	11	#NAME?	x
+52	=BYCOL(F1:G2,LAMBDA(c,SUM(c)))	11	11	o
 35	=LAMBDA(x,x*2)	#CALC!	#CALC!	o
 36	=LAMBDA(x,x*2)(3)	6	6	o
 37	=LET(x,1,x+1)	2	2	o
