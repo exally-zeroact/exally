@@ -11,7 +11,7 @@
  *
  *  ★★実Excel の 側★★ `docs/measured/toru-kobore-zenmasu.ps1`
  *    ⇒ `golden-kobore-zenmasu-2026-09-19.tsv`
- *    ★そこで 分かった 事★ … `.Formula` では ★溢れません★（14本とも 1x1）
+ *    ★そこで 分かった 事★ ... `.Formula` では ★溢れません★（14本とも 1x1）
  *                          ⇒★`.Formula2` が 溢れる 形★
  *
  *  ★★見て いない 事★★
