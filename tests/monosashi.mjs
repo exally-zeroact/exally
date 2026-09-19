@@ -34,6 +34,12 @@ export function 式をほどく(式) {
  *  ・`出` … 数／字／`{誤り:'…'}`
  *  ・`行` … 紙の 1行 { 答, 型 }
  *  ★日付の 字に する のは 呼ぶ側で 済ませてから 渡して ください★ */
+/* ★出した 値を 実Excel の 書き方に する★（真偽だけ。他は そのまま） */
+function 字にする(v) {
+  if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+  return String(v);
+}
+
 export function 答えを見る(出, 行) {
   if (出 && 出.誤り) {
     const 合 = String(行.答) === '#' + 出.誤り + '!' || String(行.答) === '#' + 出.誤り;
@@ -43,5 +49,24 @@ export function 答えを見る(出, 行) {
     const 正 = Number(行.答);
     return { 合: Math.abs(出 - 正) <= Math.max(1e-9, Math.abs(正) * 1e-9), 出: String(出) };
   }
-  return { 合: String(出) === String(行.答), 出: String(出) };
+  /* ★真偽は 実Excel が 画面に 出す 書き方で 比べる★
+     ＝2026-09-14 実測。紙は `TRUE`／うちは JS の `true`。
+       `String(true)` は `true` なので ★合っている 答えを 違うと 言って いた★（REGEXTEST 2本）。
+     ★★逆向きに 壊れない 訳★★＝`字にする()` は ★JS の 真偽値の 時だけ★ 変える。
+       ★文字列は そのまま★＝`=LOWER(TRUE)` の 答え `true`（型 String）は 触らない。
+     ★私は ここで 一度 嘘の 根拠を 書きました★（2026-09-14・経営者1 が 見つけた）＝
+       「答えの 紙に 小文字の true/false は 0行」と 書いたが ★数え方が 壊れて いた★
+       （`grep -E` の `\t` は タブに ならない ⇒ 1件も 当たらず ★偽の 0★）。
+       ★正しく 数え直すと 1142行 在った★（全部 `mae-ato-*` の 記録の 紙＝
+       そこの `false` は ★実Excel では なく うちの 古い 答え★）。
+       ⇒★「0行だから 安全」では なく「文字列は 触らないから 安全」が 正しい★ */
+  /* ★真偽は 大文字小文字を 見ないで 比べる★
+     ＝紙の 書き方が ★1つでは ない★（2026-09-14 実測・docs の tsv 全部）
+       型が Boolean の 368行 … ★`False` 204／`True` 162／`TRUE` 2★
+       ＝`.Value2`（COM）は `True`／画面の 字は `TRUE`。★両方 紙に 在る★
+     ⇒ 片方に 揃えると もう片方が 全部 落ちる ので ★見ない★ */
+  if (typeof 出 === 'boolean') {
+    return { 合: String(行.答).toUpperCase() === (出 ? 'TRUE' : 'FALSE'), 出: 字にする(出) };
+  }
+  return { 合: 字にする(出) === String(行.答), 出: 字にする(出) };
 }

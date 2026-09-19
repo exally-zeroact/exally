@@ -24,6 +24,18 @@
 #      ★同じ 式を Exally に 打たせて 1本ずつ 突き合わせます★
 #
 #  使い方: powershell -File docs/measured/kansuu46/toru-346.ps1
+#          （名簿と 出し先を 変える 時）
+#          pwsh -NoProfile -File docs/measured/kansuu46/toru-346.ps1 `
+#               -名簿 ../mada-hakatte-inai-2026-09-14.txt -出 golden-mada-2026-09-14.tsv
+
+# ★名簿と 出し先は 引数で 変えられます★（2026-09-14 に 足した＝★道具を 複製しない★）
+#   例）pwsh -File toru-346.ps1 -名簿 ../mada-hakatte-inai.txt -出 golden-mada-2026-09-14.tsv
+param(
+  [string]$名簿 = '',
+  [string]$出 = '',
+  [switch]$上書き,
+  [switch]$誤りも残す
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -57,7 +69,15 @@ function 窓２_本当にゼロか($sh, [string]$式) {
 }
 
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$出 = Join-Path $ここ 'golden-346-2026-09-08.tsv'
+if (-not $出) { $出 = Join-Path $ここ 'golden-346-2026-09-08.tsv' }
+elseif (-not [System.IO.Path]::IsPathRooted($出)) { $出 = Join-Path $ここ $出 }
+# ★もう 在る 紙を 黙って 上書きしない★（2026-09-14 に 足した）
+#   訳＝この 紙には 後から ★`#材料` の 行★や 直しが 入って いる 事が 在ります。
+#       走らせ直すと ★その 手入れが 消え★、★取った 日も 黙って 変わります★。
+#   ⇒ わざと 取り直す 時だけ ★-上書き★ を 付ける。
+if ((Test-Path $出) -and -not $上書き) {
+  throw "★もう 在ります★: $出 `n  取り直すなら -上書き を 付けて ください（★前の 紙は 消えます★）"
+}
 
 # ★★2026-09-08 に 足した＝★この 表に 無い 番号は「数」として 紙に 載ってしまう★★
 #   ⇒ 実際に 起きた … =SEQUENCE(0.5) の 答えが ★-2146826238★ の まま 6本 載っていた
@@ -86,10 +106,65 @@ $候補 = @(
   '(D1)', '(D1,D2)', '(D1,2)', '(D1,D2,1)', '(D1,D2,0)',
   '(D1,D2,0.05,0.1,100,2,0)', '(D1,D2,0.05,0.1,2)', '(D1,D2,0.05,100,2)',
   '(TRUE)', '(FALSE)', '(2,TRUE)', '(2,3,TRUE)',
-  '(A1:A5,B1:B5,1)', '(2,3,4,5,6)', '(-2)', '(2.5,1)'
+  '(A1:A5,B1:B5,1)', '(2,3,4,5,6)', '(-2)', '(2.5,1)',
+  # ★2026-09-14 に 足した★＝★まだ 答えを 取って いない 45個★に 当たる 形。
+  #   （今までの 53通りでは VLOOKUP／MATCH／SUBTOTAL／TEXTJOIN／XLOOKUP 等に 当たりません）
+  #   ★どれが 正しいかは 実Excel が 決めます★（人が 決めるのは 候補だけ）
+  '(A1,A1:A5,B1:B5)',            # XLOOKUP／LOOKUP
+  '(A1,A1:B5,2,FALSE)',          # VLOOKUP（完全一致）
+  '(A1,A1:B5,2)',                # HLOOKUP／VLOOKUP（近い一致）
+  '(A1,A1:A5,0)',                # MATCH
+  '(9,A1:A5)',                   # SUBTOTAL（9＝合計）
+  '(",",TRUE,A1:A5)',            # TEXTJOIN
+  '(A1:A5,A1:A5>2)',             # FILTER
+  '(A1:A5,0.5)',                 # PERCENTILE／QUARTILE.EXC（0〜1 の 位置）
+  '(A1:A5,B1:B5,1,1)',           # T.TEST／TTEST
+  '(A1:B5,1,D1:D2)',             # D系（DSUM DGET DAVERAGE …）
+  '(TRUE,1)', '(TRUE,1,2)',      # IFS／IF
+  '(1/0,2)',                     # IFERROR／IFNA
+  '(D1,1)',                      # EDATE／EOMONTH
+  '(0.05,12,100)',               # RATE／PMT／NPER
+  '(0.05,12,100,0,0)',           # RATE（見当つき）
+  '(100,0.05,1,12,0,0)',         # CUMIPMT／CUMPRINC（6つ）
+  '(A1:A5,1,0)',                 # PERCENTRANK ほか
+  # ★2026-09-14 の 1回目で ★呼び方が 見つからなかった 9個★に 当てる 形★
+  #   BINOM.INV CRITBINOM CUMIPMT CUMPRINC DATEDIF DGET NEGBINOM.DIST NEGBINOMDIST RATE
+  '(10,0.5,0.5)',                # BINOM.INV／CRITBINOM（試行・確率・α）
+  '(2,3,0.5)',                   # NEGBINOM.DIST／NEGBINOMDIST（失敗・成功・確率）
+  '(2,3,0.5,TRUE)',              # NEGBINOM.DIST（累積つき）
+  '(0.05,12,100,1,12,0)',        # CUMIPMT／CUMPRINC（利率・期間・現価・始・終・型）
+  '(D1,D2,"D")', '(D1,D2,"M")',  # DATEDIF（日数・月数）
+  '(12,-10,100)',                # RATE（期間・支払・現価）
+  '(12,-10,100,0,0,0.1)',        # RATE（見当つき）
+  '(A1:B5,1,A1:A2)',             # DGET（表・列・条件）
+  '(A1:B5,"A",A1:A2)',           # DGET（列を 名前で）
+  # ★2026-09-15 に 足した★＝★INDEX と MATCH の 決まりを 測る 為★
+  #   （司さんの 実物 1冊で ★のべの 68%★＝★一番 効く 2個★）
+  #   ★今まで の 形では MATCH が 4本しか 当たらず、決まりを 測れませんでした★
+  '(3,A1:A5,0)', '(3,A1:A5,1)', '(3,A1:A5,-1)',   # MATCH … ぴたり／以下で 一番 大きい／以上で 一番 小さい
+  '(0,A1:A5,1)', '(9,A1:A5,0)',                   # 範囲の 外／見つからない
+  '("あ",A1:A5,0)', '(2,B1:B5,0)', '(5,B1:B5,1)', # 字で 探す／別の 列
+  '(A1:A5,3)', '(A1:B5,2,2)',                     # INDEX … 縦だけ／行と 列
+  '(A1:B5,0,2)', '(A1:B5,2,0)',                   # ★0＝まるごと★（列／行）
+  '(A1:A5,6)', '(A1:A5,0)',                       # 外れ／0
+  # 2026-09-15（2回目）… 「見つからない時 どう なるか」を 測る 為に 足した
+  #   1回目は 誤りを 捨てて いたので ★これらは 紙に 1行も 残りませんでした★
+  '(0,A1:A5)',                                    # MATCH … 型を 省いて 見つからない
+  '(A1:A5,-1)', '(A1:B5,6,1)', '(A1:B5,2,3)',     # INDEX … 負／行が 外／列が 外
+  '(3,A1:A5,2)', '(3,A1:A5,"x")'                  # MATCH … 型が 変な 値
 )
 
-$名簿 = Get-Content (Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt') -Encoding UTF8 |
+if (-not $名簿) { $名簿 = Join-Path (Split-Path -Parent $ここ) 'ugoku-tana-mikakunin.txt' }
+elseif (-not [System.IO.Path]::IsPathRooted($名簿)) { $名簿 = Join-Path $ここ $名簿 }
+if (-not (Test-Path $名簿)) { throw "★名簿が 無い★: $名簿" }
+Write-Host "★名簿★ $名簿"
+Write-Host "★出し先★ $出"
+# ★★名前を 分ける★★（2026-09-14 に 踏んだ）
+#   `param([string]$名簿)` に ★並びを 入れると PowerShell が 1本の 字に 潰します★
+#   （`[string]$x = @('A','B')` → `"A B"`）
+#   ⇒ 2026-09-14、45個の 名簿が ★1個の 関数★に なり ★式 0本★で 終わりました。
+#   ⇒★読む 所（道）と 読んだ 物（並び）で 名前を 分ける★
+$関数たち = Get-Content $名簿 -Encoding UTF8 |
   Where-Object { $_ -and -not $_.StartsWith('#') -and -not $_.StartsWith('★') } |
   ForEach-Object { $_ -split '\s+' } | Where-Object { $_ -match '^[A-Z][A-Z0-9._]*$' } |
   Sort-Object -Unique
@@ -114,17 +189,39 @@ $結果 = New-Object System.Collections.ArrayList
 $呼び方あり = 0; $呼び方なし = 0; $本数 = 0
 $見つからない名 = New-Object System.Collections.ArrayList
 $i = 0
-foreach ($f in $名簿) {
+foreach ($f in $関数たち) {
   $i++
-  if ($i % 25 -eq 0) { Write-Host "  … $i / $($名簿.Count)" }
+  # ★進みを こまめに 出す★（2026-09-14 に 直した）
+  #   前は ★25個ごと★＝名簿が 45個だと ★1回しか 出ません★。
+  #   ★殺された 時に「どこまで 測ったか」が 分かる 様に★ 毎回 出す（指示役1 の 注文）。
+  #   ★紙は 書き上がってから 置きます★＝★進みは 画面だけ★（出来かけの 紙を 残さない）
+  Write-Host ("  … {0}/{1} {2}  （ここまで 式 {3}本）" -f $i, $関数たち.Count, $f, $本数)
   $当たり = 0
   foreach ($a in $候補) {
     $式 = '=' + $f + $a
     try {
+      # ★★同じ 道具を 2回 回したら 答えが 1行 違った★★（2026-09-15 実測）
+      #   `=MATCH(3,A1:A5,2)` … 1回目 ★#N/A★ ／ 2回目 ★3★
+      #   ⇒★測り道具が 再現しない＝どちらが 実Excel の 答えか 言えません★
+      #   ⇒ 直し 2つ … ①★前の 式の 跡（溢れ）を 消す★ ②★計算させてから 読む★
+      #     （`.Formula` を 入れただけで 読むと ★前の 値を 読む 事が 在ります★）
+      $ws.Range('H1:Z50').Clear() | Out-Null
       $ws.Range('H1').Formula = $式
+      $xl.CalculateFull()
       $v = $ws.Range('H1').Value2
       if ($null -eq $v) { continue }
-      if ($v -is [int] -and $誤りの番号.ContainsKey([int]$v)) { continue }  # 誤り＝呼び方が 違う
+      # ★誤りは 既定では 捨てます★＝★この 道具は 引数の 形を 総当たりする 物★なので
+      #   ★誤り＝その 形は 呼び方では ない★と 見るのが 元の 狙い。
+      # ★★でも「正しい 誤り」も 在ります★★（2026-09-15 に 踏んだ）
+      #   `=MATCH(9,A1:A5,0)` → ★#N/A★＝★見つからない＝正しい 答え★
+      #   ⇒ `-誤りも残す` を 付けると ★誤りも 紙に 残します★
+      #   ★既定は 今の まま★＝★他の 紙の 数を 動かさない★
+      if ($v -is [int] -and $誤りの番号.ContainsKey([int]$v)) {
+        if (-not $誤りも残す) { continue }
+        [void]$結果.Add(("{0}`t{1}`t{2}`t{3}" -f $f, $式, $誤りの番号[[int]$v], 'error値'))
+        $当たり++; $本数++
+        continue
+      }
       $型 = $v.GetType().Name
       if ($型 -eq 'Object[,]') { continue }                                  # こぼれる 物は 別の 話
       $答 = if ($v -is [double]) { $v.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
@@ -135,8 +232,39 @@ foreach ($f in $名簿) {
   if ($当たり) { $呼び方あり++ } else { $呼び方なし++; [void]$見つからない名.Add($f) }
 }
 
+# ★★材料を 機械が 読める 形で 控える★★（2026-09-14 に 足した）
+#   前は 頭に ★文章でしか★ 書いて いませんでした。
+#   ⇒ 押す 道具が ★空の 表★で 押して ★偽の 負け★が 出ます
+#     （2026-09-14 実測＝`=PRODUCT(A1:A5)` が 0 に なり「土台が 壊れている」と 報告される所だった）
+#   ★値は Excel から 読み返します★＝★私が 計算しません★（日付の 通し番号も そのまま）
+#   形 … `#材料<タブ>マス<タブ>値<タブ>型`（型＝数／字／真偽／式／空）
+$材料の行 = New-Object System.Collections.ArrayList
+foreach ($マス in @('A1','A2','A3','A4','A5','B1','B2','B3','B4','B5','D1','D2')) {
+  $mv = $ws.Range($マス).Value2
+  if ($null -eq $mv) { [void]$材料の行.Add("#材料`t$マス`t`t空"); continue }
+  if ($mv -is [bool]) { [void]$材料の行.Add(("#材料`t{0}`t{1}`t真偽" -f $マス, $(if ($mv) {'TRUE'} else {'FALSE'}))); continue }
+  if ($mv -is [string]) { [void]$材料の行.Add(("#材料`t{0}`t{1}`t字" -f $マス, $mv)); continue }
+  $ms = if ($mv -is [double]) { $mv.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture) } else { [string]$mv }
+  [void]$材料の行.Add(("#材料`t{0}`t{1}`t数" -f $マス, $ms))
+}
+
 $wb.Close($false); $xl.Quit()
 foreach ($o in @($ws, $wb, $xl)) { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($o) | Out-Null }
+
+# ★★Excel が 残って いないか 数える★★（2026-09-15・指示役1 の 注文）
+#   `Quit()` だけでは ★消えない事が 在ります★（2026-09-15 に 1本 残って いて 手で 止めた）
+#   ⇒★止めた 後に 数えて 画面に 出す★＝★次の 回に 持ち越さない★
+#   ★0.8秒では まだ 終わって いない 事が 在ります★（2026-09-15 実測＝0.8秒で 1個／その後 0個）
+#   ⇒★1回 見て 騒がない★＝★10秒まで 待って、それでも 残って いたら 言う★
+[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers()
+$残り = @()
+for ($t = 0; $t -lt 20; $t++) {
+  Start-Sleep -Milliseconds 500
+  $残り = @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue)
+  if ($残り.Count -eq 0) { break }
+}
+if ($残り.Count -eq 0) { Write-Host ('★Excel は 残って いません（0個・' + (($t + 1) * 0.5) + '秒で 消えた）★') }
+else { Write-Host ('★★Excel が ' + $残り.Count + '個 残って います＝10秒 待っても 消えません＝手で 止めて ください★★ … ' + (($残り | ForEach-Object { $_.Id }) -join ' ')) }
 
 $頭 = @(
   "# ★答えを 1度も 確かめていない 関数を 実Excel に 聞いた★",
@@ -146,10 +274,20 @@ $頭 = @(
   "#   ⇒★人が 決めるのは 形の 候補だけ／どれが 正しいかは 実Excel が 決める★",
   "#   ⇒★1本だけだと『当たり前の 答え』で 通ってしまう★ので ★当たった 形は 全部 残す★",
   "# ★材料★ A1:A5=1..5 ／ B1:B5=2,4,6,8,10 ／ D1=2024/1/1 ／ D2=2026/1/1",
-  "# ★数★ 関数 $($名簿.Count)個 ／ 呼び方が 見つかった $呼び方あり 個 ／ 見つからない $呼び方なし 個 ／ 式 $本数 本",
-  "# ★呼び方が 見つからない★ … " + ($見つからない名 -join ' '),
-  "# 関数`t式`t実Excel の 答え`t型"
+  "# ★★式を 打った マス★★ … H1（★どこに 打ったかで 答えが 変わる 式が 在ります★）",
+  "#   ＝実Excel は ★四角を 1つの 値に 詰める 時、式の 行／列と 交わる 所★を 採ります（暗黙の 交わり）",
+  "#   例）`=INDEX(A1:B5,0,2)` は B1:B5（縦）→ ★式の 行＝1★ → B1 → 2",
+  "#      `=INDEX(A1:B5,2,0)` は A2:B2（横）→ ★式の 列＝H★ → A:B と 交わらない → ★#VALUE!★",
+  "#   ⇒★この 紙で 突き合わせる 時は 式を ★1行目・A〜B の 外の 列★に 打って ください★",
+  "# ★★材料（機械が 読む）★★ … `#材料<タブ>マス<タブ>値<タブ>型`（★Excel から 読み返した 値★）",
+  "# ★誤りも 残したか★ … $(if ($誤りも残す) { '★残した（-誤りも残す）＝「正しい 誤り」も 紙に 在ります★' } else { '残して いません（既定）＝誤りを 返す 形は 捨てました' })",
+  "# ★数★ 関数 $($関数たち.Count)個 ／ 呼び方が 見つかった $呼び方あり 個 ／ 見つからない $呼び方なし 個 ／ 式 $本数 本",
+  "# ★呼び方が 見つからない★ … " + ($見つからない名 -join ' ')
 )
-[System.IO.File]::WriteAllText($出, ((($頭 + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
+
+# ★見出しは 必ず 一番 下の # 行★（読む 側が 「最後の # 行」を 見出しと 見る 為）
+#   ⇒ ★材料の 行を 見出しの 前に 挟む★
+$見出し = @("# 関数`t式`t実Excel の 答え`t型")
+[System.IO.File]::WriteAllText($出, ((($頭 + $材料の行 + $見出し + $結果) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
 Write-Host "★書いた … $出★"
-Write-Host "★関数 $($名簿.Count)個 ／ 呼び方あり $呼び方あり 個 ／ なし $呼び方なし 個 ／ ★式 $本数 本★★"
+Write-Host "★関数 $($関数たち.Count)個 ／ 呼び方あり $呼び方あり 個 ／ なし $呼び方なし 個 ／ ★式 $本数 本★★"

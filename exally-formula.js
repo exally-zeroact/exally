@@ -809,7 +809,39 @@ function _jsAmorlinc(cost,date_purchased,first_period,salvage,period,rate){retur
 function _jsGestep(num,step){return num>=(step||0)?1:0;}
 
 // --- データベース ---
-function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!_hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(_hf.getCellValue({sheet:_hfSid(sheet),row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);if(fieldIdx<0)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]);var critField=_hf.getCellValue({sheet:_hfSid(sheet),row:cs.r,col:cs.c});var critVal=_hf.getCellValue({sheet:_hfSid(sheet),row:cs.r+1,col:cs.c});var critFieldIdx=headers.indexOf(critField);/* ★条件の 見出しが 台帳の 見出しと 紐付かない 時★ … 実 Excel は ★その 条件を 効かせない★（＝全部 数える） ★前は `indexOf` の ★-1★ を そのまま 足して ★範囲の 外（列 -1）を 読んで★ 1件も 当たらなかった ★実測★ `=DSUM(A1:B5,1,D1:D2)` … 前 ★0★ ／ 実 Excel ★14★（tests/dkei-honban.test.mjs の 21行） ★直したのは ここだけ★＝★製品と 台は まだ 6か所 違います（棚 ㉝・実測して いません）★ */var results=[];for(var r=s.r+1;r<=e.r;r++){if(critFieldIdx<0||String(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+critFieldIdx}))===String(critVal)){results.push(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';if(func==='PROD')return nums.reduce(function(a,b){return a*b;},1);if(func==='GET')return results.length===1?results[0]:'#NUM!';if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
+/* ★条件の マス 1つに 実の 値が 当てはまるか★（2026-09-15）
+   ★実 Excel の 実測★（tests/dkei6-honban.test.mjs の 26行）
+     `>3`  … 4,5 ⇒ ★9★ ／ `<>2` … 3,4,5 ⇒ ★12★ ／ `>=3` … 3,4,5 ⇒ ★12★
+   ★前は 字どうしの `===` だけ★＝`'>3'` が どの マスとも 合わず ★0★ を 返して いた
+   ★空の 条件は 縛らない★（実測 … 条件の マスが 空 ⇒ ★14★＝全部 足す） */
+function _jsDbAtehamaru(v,c){
+  if(c===null||c===undefined||c==='')return true;
+  if(typeof c==='string'){
+    var m=/^(>=|<=|<>|>|<|=)([\s\S]*)$/.exec(c);
+    if(m){
+      var r=m[2].trim(),rn=Number(r),vn=Number(v);
+      var 数どうし=(r!==''&&isFinite(rn)&&typeof v==='number');
+      var d=数どうし?(vn-rn):String(v).localeCompare(r);
+      if(m[1]==='>')return d>0;
+      if(m[1]==='<')return d<0;
+      if(m[1]==='>=')return d>=0;
+      if(m[1]==='<=')return d<=0;
+      if(m[1]==='<>')return d!==0;
+      return d===0;
+    }
+  }
+  return String(v)===String(c);
+}
+function _jsDbFunc(func,sheet,dbRange,field,criteriaRange){if(!_hf)return'#VALUE!';var m=dbRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!m)return'#VALUE!';var s=_toRC(m[1]),e=_toRC(m[2]);var headers=[];for(var c=s.c;c<=e.c;c++)headers.push(_hf.getCellValue({sheet:_hfSid(sheet),row:s.r,col:c}));var fieldIdx=typeof field==='number'?field-1:headers.indexOf(field);/* ★field が 台帳の 列数より 大きい／0／負★ … 実 Excel は ★#VALUE!★ ★前は 門が `<0` だけで、5 を 渡すと ★台帳の 外の 列★を 読んで ★0★ を 返して いた ★実測★ `=DSUM(A1:B5,5,F1:F2)` … 前 ★0★ ／実 Excel ★#VALUE!★（tests/dkei6-honban.test.mjs の 26行） */if(fieldIdx<0||fieldIdx>=headers.length)return'#VALUE!';var cm=criteriaRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/i);if(!cm)return'#VALUE!';var cs=_toRC(cm[1]),ce=_toRC(cm[2]);/* ★条件は ★1列とは 限りません★★（2026-09-15・実 Excel の 実測） ★横に 並んだ 列は ★かつ★★ … `F1=1 G1=2 / F2=2 G2=4` ⇒ A=2 ★かつ★ B=4 ⇒ ★2★ `F2=2 G2=99` … 片方 外れ ⇒ ★0★（★前は 1列目しか 見ず 2 を 返して いた★） ★見出しが 台帳に 無い 列は 縛らない★（`G1=99` … ⇒ ★2★） */var 条列=[];for(var cc=cs.c;cc<=ce.c;cc++){var h=_hf.getCellValue({sheet:_hfSid(sheet),row:cs.r,col:cc});条列.push({先:headers.indexOf(h),列:cc});}/* ★★D系の 条件の 決め（2026-09-15・実 Excel 26行で 測って 直した）★★
+     紙 `docs/measured/kansuu46/golden-dkei6-kane3-2026-09-15.tsv`（16.0 build 20326）
+     見張り `tests/dkei6-honban.test.mjs`（★27 passed / 0 failed★）
+   ①★横に 並んだ 列は ★かつ★★（前は 1列目しか 見て いなかった）
+   ②★縦に 並んだ 行は ★または★★（前は 2行目しか 見て いなかった）
+   ③★見出しが 台帳に 無い 列は ★縛らない★★（前は -1 を 足して 範囲の 外を 読んで いた）
+   ④★空の マスも 縛らない★
+   ⑤★条件の 行が 無ければ 全部 採る★
+   ★台（`lib/shiki-kansuu.js` の `D系の値たち`）と ★同じ 向き★に 揃えて あります★
+     ＝★作る道が 2本 在る時は 両方 直せ★ */var results=[];for(var r=s.r+1;r<=e.r;r++){/* ★縦に 並んだ 行は ★または★★（2026-09-15・実 Excel の 実測） `F1=1 / F2=2 / F3=3` … A=2 ★または★ A=3 ⇒ ★5★ ★前は `cs.r+1`（2行目）しか 見ず ★2★ を 返して いた★ ★条件の 行が 無ければ 全部 採る★（＝見出しだけ の 四角） */var 合うか=(ce.r<=cs.r);for(var cr=cs.r+1;cr<=ce.r&&!合うか;cr++){var 全部=true;for(var k=0;k<条列.length&&全部;k++){if(条列[k].先<0)continue;var 条値=_hf.getCellValue({sheet:_hfSid(sheet),row:cr,col:条列[k].列});if(条値===null||条値===undefined||条値==='')continue;if(!_jsDbAtehamaru(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+条列[k].先}),条値))全部=false;}if(全部)合うか=true;}if(合うか){results.push(_hf.getCellValue({sheet:_hfSid(sheet),row:r,col:s.c+fieldIdx}));}}var nums=results.filter(function(v){return typeof v==='number';});if(func==='SUM')return nums.reduce(function(a,b){return a+b;},0);if(func==='AVG')return nums.length?nums.reduce(function(a,b){return a+b;})/nums.length:'#DIV/0!';if(func==='CNT')return nums.length;if(func==='CNTA')return results.filter(function(v){return v!==null&&v!==undefined;}).length;if(func==='MAX')return nums.length?Math.max.apply(null,nums):'#NUM!';if(func==='MIN')return nums.length?Math.min.apply(null,nums):'#NUM!';/* ★DPRODUCT は 0件の 時 ★0★★（実 Excel・実測） ★前は `reduce` の 元が 1 なので ★1★ を 返して いた★ ＝`=DPRODUCT(A1:B5,1,F1:F2)` 0件 … 前 ★1★ ／実 Excel ★0★ ★掛け算の 元は 1 なのに 0 を 返す★＝★当て推量では 出ない 形★（PRODUCT も 同じ） */if(func==='PROD')return nums.length?nums.reduce(function(a,b){return a*b;},1):0;/* ★DGET は 0件と 2件以上で ★誤りが 違います★（実 Excel・実測） 0件 … ★#VALUE!★ ／ 2件以上 … ★#NUM!★ ★前は どちらも #NUM!★（`=DGET(A1:B5,1,F1:F2)` 0件 … 前 #NUM! ／実 Excel #VALUE!） */if(func==='GET')return results.length===1?results[0]:(results.length===0?'#VALUE!':'#NUM!');if(func==='STD'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1));}if(func==='STDP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return Math.sqrt(nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n);}if(func==='VAR'){var n=nums.length;if(n<2)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/(n-1);}if(func==='VARP'){var n=nums.length;if(!n)return'#DIV/0!';var mean=nums.reduce(function(a,b){return a+b;})/n;return nums.reduce(function(a,v){return a+Math.pow(v-mean,2);},0)/n;}return'#VALUE!';}
 
 // --- Web ---
 // ENCODEURL。★JSの encodeURIComponent は ! ' ( ) * ~ を素通しするが、Excelはこれらも変換する。
@@ -956,9 +988,41 @@ function _jsScanCompute(sheet, initial, rangeStr, lambdaFormula) {
   return first!==null ? String(first) : String(initial);
 }
 
+/* ★★かっこの 外の カンマで 割る★★（2026-09-18）
+     ＝`LAMBDA(x,y,x)` を `['x','y','x']` に する
+     ＝★かっこの 中の カンマ（`SUM(1,2)`）では 割りません★ */
+function _topLevelSplit(s) {
+  var 出=[],深=0,頭=0,中の字=null;
+  for(var i=0;i<s.length;i++){
+    var c=s.charAt(i);
+    if(中の字){ if(c===中の字) 中の字=null; continue; }
+    if(c==='"'||c==="'"){ 中の字=c; continue; }
+    if(c==='('||c==='['||c==='{') 深++;
+    else if(c===')'||c===']'||c==='}') 深--;
+    else if(c===','&&深===0){ 出.push(s.slice(頭,i)); 頭=i+1; }
+  }
+  出.push(s.slice(頭));
+  return 出;
+}
+
 // MAP(range, LAMBDA(x, body)) → 全件カンマ区切り
 function _jsMapCompute(sheet, rangeStr, lambdaFormula) {
   if(!_hf) return null;
+  /* ★★引数の 数が 違う LAMBDA を 飲み込んで いました★★（2026-09-18・★お客さんに 出て いた★）
+       `=MAP(A1:A5,LAMBDA(x,y,x))`
+         ★実Excel★ … `#VALUE!`（実測・`golden-kansuu-9kaime-2026-09-18.tsv` 55行目）
+         ★前の うち★ … `#ERROR!`（★実Excel に 無い 字★）
+       ★因★ … 下の ふるいが `([^,)]+)` で ★口を 1つだけ★ 取り、
+              残り `y,x` を ★そのまま 体★に して いました
+              ⇒ `=y,(1)` の ような 式を 借り物に 渡し ⇒ `#ERROR!`
+       ★直し★ … ★口の 数を 数え、1つで なければ JS層は 答えません★（`null`）
+              ⇒★台（`lib/shiki-hyou.js`）が 答えます★＝`#VALUE!`（実Excel と 同じ）
+              ⇒★半分 合う 答えを 出さない★
+       ★`#ERROR!`（`!` 有り）は JS層から／`#ERROR`（`!` 無し）は 借り物から★
+         ＝★字が 1文字 違うだけで 出どころが 違います★（経営者1 の 見つけ物） */
+  var 中=lambdaFormula.replace(/^LAMBDA\s*\(/i,'').replace(/\)\s*$/,'');
+  var 割=_topLevelSplit(中);
+  if(割.length!==2) return null;   /* ★口1つ ＋ 体1つ＝2つ以外は 答えません★ */
   var mL=lambdaFormula.match(/^LAMBDA\s*\(([^,)]+)\s*,\s*(.+)\)$/is);
   if(!mL) return '#VALUE!';
   var param=mL[1].trim(),body=mL[2].trim();

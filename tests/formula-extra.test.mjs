@@ -85,7 +85,14 @@ console.log('★足りない 関数（答えは 実Excel の 実測）★');
 言う(平(F.切り出す(表, -1, null, false)) === '5,6', '★TAKE(A1:B3,-1) ＝ 5,6★（尻から）');
 言う(平(F.切り出す(表, 1, null, true)) === '3,4,5,6', '★DROP(A1:B3,1) ＝ 3,4,5,6★');
 言う(平(F.切り出す(表, 0, 1, true)) === '2,4,6', '★DROP(A1:B3,0,1) ＝ 2,4,6★');
-言う(誤り(F.切り出す(表, 9, null, true)) === 'VALUE', '★全部 落としたら #VALUE!★');
+/* ★★#VALUE! では なく #CALC! でした★★（2026-09-15・実Excel の 実測 6本）
+     `=DROP(A1:A5,5)` `=DROP(A1:A5,6)` `=DROP(A1:A5,45294)`
+     `=TAKE(A1:A5,0)` `=TAKE(A1:A5,0.5)` `=TAKE(A1:A5,-0.5)`
+   ★紙★ `docs/measured/kansuu46/golden-346-2026-09-08.tsv`
+   ★★この 行は 実Excel に 聞かずに 書いて ありました★★
+     ＝`tests/shiki-kansuu-kami.test.mjs`（紙 60枚で 押す 台）が 見つけました
+   ⇒★`#CALC!` は「空の 表に なった」時／`#VALUE!` は「渡し方が 悪い」時★＝★別の 誤り★ */
+言う(誤り(F.切り出す(表, 9, null, true)) === 'CALC', '★全部 落としたら #CALC!★（実Excel 実測）');
 
 /* ── CHOOSECOLS / CHOOSEROWS ── */
 言う(平(F.選び出す(表, [2], true)) === '2,4,6', '★CHOOSECOLS(A1:B3,2) ＝ 2,4,6★');

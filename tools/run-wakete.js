@@ -47,7 +47,24 @@ const 書く = (o) => fs.writeFileSync(記録, JSON.stringify(o, null, 1) + '\n'
 
 /* ══ ★始め★ ══ */
 if (引数[0] === '--hajime') {
+  /* ★★掛ける 前に 刻印を 見る★★（2026-09-14 に 足した）
+     ★同じ日に 2度 踏みました★＝`lib/*.js` を 直したのに `?v=` を 貼り直さず、
+     ★総なめの 1本目（stamp.test.mjs）で 落ちる★＝★12分割を 全部 やり直し★。
+     ★「覚えて おく」では 3度目が 来ます★（指示役1 2026-09-14）ので ★道具に 入れます★。
+     ⇒ 貼り直しが 要る なら ★ここで 止める★（走らせてから 気づくより 安い） */
+  try {
+    execFileSync(process.execPath,
+      [path.join(__dirname, '..', 'scripts', 'stamp-build.mjs'), '--check'],
+      { cwd: path.join(__dirname, '..'), stdio: 'pipe' });
+  } catch (e) {
+    console.error('');
+    console.error('★★刻印が 古いです＝総なめを 始めません★★');
+    console.error('  ⇒ `node scripts/stamp-build.mjs` を 走らせて から もう一度');
+    console.error('  （JS/CSS を 直したら 毎回。★総なめの 1本目で どうせ 落ちます★）');
+    process.exit(1);
+  }
   書く({ 走った: {}, 落ちた: [], 始め: new Date().toISOString() });
+  console.log('★刻印は 最新★（掛ける 前に 見ました）');
   console.log('★記録を 消して 始めました★（一覧 ' + 全部 + '本）');
   process.exit(0);
 }

@@ -29,7 +29,33 @@ const 同じ = (名, 出, 期待) => ok(名 + '  ＝ ' + JSON.stringify(期待),
 /* ══ 実Excel の 答えを 読む（★repo に 在る★） ══════════════ */
 const 金 = fs.readFileSync(path.join(ROOT, 'docs/measured/golden-2026-09-06.tsv'), 'utf8')
   .split(/\r?\n/).filter(Boolean).slice(1)
+  .filter((l) => !l.startsWith('#'))                 /* ★# の行は 答えでは ない★ */
   .map((l) => { const a = l.split('\t'); return { 関数: a[0], 式: a[1], 答: a[2] }; });
+
+/* ★材料は 紙から 読む★＝ここで 手で 書かない（写し間違いを 無くす）
+   ★前は ここに 手で 書いて 在りました★ … const A = [[1],[4],[3],[2]] など。
+   ⇒ 同じ 材料を 別の 道具が もう一度 写す事に なり、★写し間違えれば 紙は 緑・本番は 赤★。
+   ⇒ 2026-09-14 に `docs/measured/golden-2026-09-06.tsv` へ 移した。★紙が 正本★。 */
+const 材料 = {};
+for (const l of fs.readFileSync(path.join(ROOT, 'docs/measured/golden-2026-09-06.tsv'), 'utf8').split(/\r?\n/)) {
+  if (!l.startsWith('#材料')) continue;
+  const a = l.split('\t');
+  if (a.length >= 3) 材料[a[1].trim()] = Number(a[2]);
+}
+const 四角 = (左上, 右下) => {
+  const m = /^([A-Z])(\d+)$/.exec(左上), n = /^([A-Z])(\d+)$/.exec(右下);
+  const 出 = [];
+  for (let r = +m[2]; r <= +n[2]; r++) {
+    const 段 = [];
+    for (let c = m[1].charCodeAt(0); c <= n[1].charCodeAt(0); c++) {
+      const 名 = String.fromCharCode(c) + r;
+      if (!(名 in 材料)) throw new Error('★紙に 材料が 無い★: ' + 名);
+      段.push(材料[名]);
+    }
+    出.push(段);
+  }
+  return 出;
+};
 const 答 = (式) => { const r = 金.find((x) => x.式 === 式); if (!r) throw new Error('★紙に その式が 無い★: ' + 式); return r.答; };
 
 if (process.argv.includes('--self-test')) {
@@ -66,15 +92,15 @@ console.log('\n[③ 正規表現の 3つ]');
 同じ('REGEXREPLACE', F.正規で入れ替える('abc123', '[0-9]+', '#'), 答('=REGEXREPLACE("abc123","[0-9]+","#")'));
 
 console.log('\n[④ 別の 列で 並べる]');
-const A = [[1], [4], [3], [2]], B = [[9], [7], [8], [6]];
+const A = 四角('A1', 'A4'), B = 四角('B1', 'B4');   /* ★紙から 読む★（手で 書かない） */
 同じ('SORTBY 小さい順の 1つ目', F.別の列で並べる(A, B, 1)[0][0], 答('=INDEX(SORTBY(A1:A4,B1:B4,1),1,1)'));
 同じ('SORTBY 大きい順の 1つ目', F.別の列で並べる(A, B, -1)[0][0], 答('=INDEX(SORTBY(A1:A4,B1:B4,-1),1,1)'));
 
 console.log('\n[⑤ 行列]');
 同じ('MUNIT(3) の (1,1)', F.単位行列(3)[0][0], 答('=INDEX(MUNIT(3),1,1)'));
 同じ('MUNIT(3) の (1,2)', F.単位行列(3)[0][1], 答('=INDEX(MUNIT(3),1,2)'));
-同じ('MINVERSE の (1,1)', F.逆行列([[4, 7], [2, 6]])[0][0], 答('=INDEX(MINVERSE(D1:E2),1,1)'));
-同じ('MINVERSE の (1,2)', F.逆行列([[4, 7], [2, 6]])[0][1], 答('=INDEX(MINVERSE(D1:E2),1,2)'));
+同じ('MINVERSE の (1,1)', F.逆行列(四角('D1', 'E2'))[0][0], 答('=INDEX(MINVERSE(D1:E2),1,1)'));
+同じ('MINVERSE の (1,2)', F.逆行列(四角('D1', 'E2'))[0][1], 答('=INDEX(MINVERSE(D1:E2),1,2)'));
 
 console.log('\n[⑥ 順位の 割合]');
 同じ('PERCENTRANK.INC', F.順位の割合(A, 3, undefined, true), 答('=PERCENTRANK.INC(A1:A4,3)'));
@@ -82,7 +108,7 @@ console.log('\n[⑥ 順位の 割合]');
 ok('★3桁で ★切り捨て★（四捨五入では ない）', String(F.順位の割合(A, 3, undefined, true)) === '0.666');
 
 console.log('\n[⑦ 確率]');
-同じ('PROB(値,確率,2,3)', F.確率(A, [[0.1], [0.2], [0.3], [0.4]], 2, 3), 答('=PROB(A1:A4,F1:F4,2,3)'));
+同じ('PROB(値,確率,2,3)', F.確率(A, 四角('F1', 'F4'), 2, 3), 答('=PROB(A1:A4,F1:F4,2,3)'));
 
 console.log('\n[⑧ かたまりの 数]');
 同じ('AREAS 1つ', F.かたまりの数([1]), 答('=AREAS(A1:B3)'));

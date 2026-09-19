@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
 /* ★手元の 絶対の 道を 焼き込まない★ */
@@ -42,65 +42,15 @@ function 本番のプラグイン数() {
   const html = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf-8');
   return new Set([...html.matchAll(/lib\/(formula-[a-z]+)-plug\.js/g)].map((m) => m[1])).size;
 }
-function 台を作る(式ファイル) {
-  const require_ = createRequire(path.join(ROOT, 'package.json'));
-  const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
-  const EF = require_(式ファイル);
-  EF.registerExallyFunctions(HFns);
-  const HF0 = HFns.HyperFormula;
-  const H = Object.assign(Object.create(HF0), HFns,
-    { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
-  let 積んだ = 0;
-  for (const n of ['extra', 'nokori', 'kane']) {
-    require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
-      .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js')));
-    積んだ++;
-  }
-  require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
-      () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' }));
-  積んだ++;
-  /* ★網の 外へ 出る 物は 出させない（司さんの 決め）★ */
-  require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
-      取る: async () => { throw new Error('外へ 出ません'); },
-      聞く: async () => { throw new Error('AI に 聞きません'); },
-      再計算: () => {},
-    });
-  積んだ++;
-  let XML部品 = null;
-  try {
-    const { JSDOM } = require_('jsdom');
-    const w = new JSDOM('').window;
-    XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
-  } catch (e) { XML部品 = null; }
-  require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品);
-  積んだ++;
-  require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null);
-  積んだ++;
-  require_(path.join(ROOT, 'lib/formula-complex-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-complex.js')));
-  積んだ++;
-  const 要る = 本番のプラグイン数();
-  if (積んだ !== 要る) {
-    console.error('★book.html は ' + 要る + '本 読むのに、測り台は ' + 積んだ + '本しか 積んで いない★');
-    process.exit(2);
-  }
-  /* ★★本番と 同じ 建て方に する（2026-09-10）★★
-     本番（book.html:1764）は
-       { licenseKey, useArrayArithmetic:true, ★smartRounding:false★, maxRows, maxColumns }
-     ⇒★既定（true）だと エンジンが 答えを 勝手に 丸める★
-       803.6538461538445 が ★803.65384615★ に なって いた（2026-09-09 実測）
-     ⇒ 見張り `tests/hakaridai-mon.test.mjs` が これを 赤に します */
-  const hf = HF0.buildEmpty({
-    licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false,
-    maxRows: 1048576, maxColumns: 18278,
-  });
-  const SID = hf.getSheetId(hf.addSheet('S'));
-  EF.initExallyFormula(hf);
-  return { hf, SID, 押す: EF._jsComputeFormula, 変換: EF.convertFormula, 積んだ };
+/* ★★本番の 道は 1本★★（2026-09-15）＝`docs/measured/honban-no-michi.mjs`
+   ★この 道具は 丸めの 前後を 比べる★ので
+   ★どの `exally-formula.js` を 読むか★を ★口の 引数★で 渡します
+   （★別の 建て方を 作らない★＝指示役1 の 決め） */
+async function 台を作る(式ファイル) {
+  const { 建てる } = await import(pathToFileURL(path.join(ROOT, 'docs/measured/honban-no-michi.mjs')).href);
+  const 道 = await 建てる({ EFの道: 式ファイル });
+  return { hf: 道.hf, SID: 道.SID,
+    押す: 道.EF._jsComputeFormula, 変換: 道.EF.convertFormula, 積んだ: 道.積んだ };
 }
 
 /* ══ ★★材料も 正解も ★紙から 読む★（★私が 書き写さない★）★★ ══════
@@ -233,8 +183,8 @@ if (前の字 === null) {
 const 仮置き = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'marume-')), 'exally-formula.js');
 fs.writeFileSync(仮置き, 前の字);
 
-const 前台 = 台を作る(仮置き);
-const 後台 = 台を作る(path.join(ROOT, 'exally-formula.js'));
+const 前台 = await 台を作る(仮置き);
+const 後台 = await 台を作る(path.join(ROOT, 'exally-formula.js'));
 
 /* ★★JS層で 止めず エンジンまで 通す（2026-09-10 に 直した）★★
    ★前は JS層が null を 返した 時点で 諦めて いました★

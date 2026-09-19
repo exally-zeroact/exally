@@ -31,8 +31,31 @@ const 借り物 = /\.min\.js$|hyperformula|xlsx\.full/;
    ⇒ ★直に 走らせた 時だけ 引数を 見る★ */
 const 走らせた道 = String(process.argv[1] || '').split(path.sep).join('/');
 const 直に = 走らせた道.endsWith('tools/unused-param.mjs');
-const 既定 = ['book.html', 'hub.html', ...fs.readdirSync(path.join(ROOT, 'lib'))
-  .filter((f) => f.endsWith('.js')).map((f) => 'lib/' + f)].filter((f) => !借り物.test(f));
+/* ★★見る 範囲を 実物の 画面から 取る★★（2026-09-18・★門の 穴を 塞いだ★）
+     ★前は `book.html` `hub.html` ＋ `lib/*.js` だけ★でした
+     ⇒★`exally-formula.js` は ★repo の 根★に 在り 範囲の 外でした★
+     ⇒`lib/named-ranges.js` の `開く(式, シート)` が
+       `exally-formula.js:1221` で `window.名前の箱.開く(f, シート)` と ★毎回 呼ばれて いる★のに
+       ★「どこからも 呼ばれない」と 誤報★して いました（経営者1 が 実物を 引いて 見つけた）
+     ⇒★★名簿を 手で 持たず 画面の `script src` から 取ります★★
+       ＝★画面が 読む 物は 全部 見る★＝★置き場所で 漏れません★
+     ★記憶「見張りは 見る 範囲を 先に 数えて 書く」★ */
+const 画面 = ['book.html', 'hub.html'];
+const 画面が読むjs = new Set();
+for (const h of 画面) {
+  const p = path.join(ROOT, h);
+  if (!fs.existsSync(p)) continue;
+  for (const m of fs.readFileSync(p, 'utf8').matchAll(/<script[^>]+src="([^"]+)"/g)) {
+    const s = m[1].split('?')[0];
+    if (/^https?:/.test(s)) continue;
+    if (!s.endsWith('.js')) continue;
+    if (!fs.existsSync(path.join(ROOT, s))) continue;
+    画面が読むjs.add(s);
+  }
+}
+const 既定 = [...画面, ...fs.readdirSync(path.join(ROOT, 'lib'))
+  .filter((f) => f.endsWith('.js')).map((f) => 'lib/' + f),
+  ...画面が読むjs].filter((f, i, a) => a.indexOf(f) === i).filter((f) => !借り物.test(f));
 const 的 = (直に && process.argv.slice(2).length) ? process.argv.slice(2) : 既定;
 
 /* ★注記外しは 自前で 書かない★＝★共通の 部品を 使う★

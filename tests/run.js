@@ -20,6 +20,36 @@ const FILES = [
   ['shiki-hyou.test.mjs'],                     // ★本体＝表を持ち 依存を追い 変わった所だけ直す（借り物の 55.2%）★
   ['shiki-sashikomi.test.mjs'],                // ★行/列の 入れ消しで 式が 追従する＝実Excel 17通り★
   ['shiki-afure.test.mjs'],                    // ★溢れ＝1つの式が 何マスにも 広がる（実Excel 16通り）★
+  ['shiki-tsunagi.test.mjs'],                  // ★自前の 土台に 自前の 61個を 繋ぐ 皮（借り物を 1行も 通さない）★
+  ['shiki-tsunagi.test.mjs', '--self-test'],   // ★皮を 外したら 赤に なるか／形を 潰したら 潰れるか★
+  ['shiki-hyou-afure.test.mjs'],               // ★本体が 溢れ（こぼれ）を 置ける＝実Excel 16通り（土台⑤）★
+  ['shiki-hyou-afure.test.mjs', '--self-test'],// ★材料を 変えたら 答えも 変わるか／紙に 無い 式を 押して いないか★
+  ['shiki-hyou-omosa.test.mjs'],               // ★表が 大きく なっても N の 2乗に ならない（2026-09-14 に 2乗だった）★
+  ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
+  ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208…）★
+  ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
+  ['shiki-hyou-hishigata.test.mjs'],           // ★菱形の頼りで古い答えが残らない（実物 37/176本→0/0）★
+  ['shiki-hyou-hishigata.test.mjs','--self-test'],// ★輪を壊していない／棚に直す前の数が在る★
+  ['kami-no-zairyou.test.mjs'],                // ★紙が 古いまま 置かれるのを 止める（材料の指紋）★
+  ['kami-no-zairyou.test.mjs','--self-test'],  // ★1バイト変わったら気づく／合う指紋は通す／消えた材料★
+  ['shiki-hyou-itamatagi.test.mjs'],           // ★板またぎ＝菱形・輪・無い板・裸のA1はその式の板★
+  ['shiki-hyou-itamatagi.test.mjs','--self-test'],// ★下見の数が紙に在る★
+  ['shiki-hyou-kata-no-kuchi.test.mjs'],       // ★型つきの口＝置いた事が 見ている式に 伝わる／直書き0個★
+  ['shiki-hyou-kata-no-kuchi.test.mjs','--self-test'],// ★変数に受けて逃げる形も捕まえる／覚書きは数えない★
+  ['dkei6-honban.test.mjs'],                   // ★棚㉝の6か所＝実Excel 26件（多列かつ／多行または／記号／field超過／0件）★
+  ['dkei6-honban.test.mjs','--self-test'],     // ★「まだ」は名指し＋訳つき／合ったら許しを外させる★
+  ['dkei-honban.test.mjs'],                    // ★D系12個を 本番の道で 実Excel 21行と 突き合わせ（見出しが 紐付かない 形）★
+  ['dkei-honban.test.mjs','--self-test'],      // ★穴の 場所と 直した 印が 字で 在る／見ていない 6か所は 棚★
+  ['shiki-kansuu-kami.test.mjs'],              // ★台が知る87個を 手元の紙60枚で 押す（632行）＝書くたび 自動で増える★
+  ['shiki-kansuu-kami.test.mjs','--self-test'],// ★押した行が0なら赤／「まだ」は名指し16件・訳つき★
+  ['shiki-kansuu-dkei.test.mjs'],              // ★D系12個を台へ＝実Excel 21行＋17行（0件の決めが 関数ごとに 違う）★
+  ['shiki-kansuu-dkei.test.mjs','--self-test'],// ★台が知るD系を 呼んで数える（12/12）★
+  ['shiki-kansuu-dsum.test.mjs'],              // ★417個の うち 移した 最初の 1個＝DSUM（実Excel 14／2）★
+  ['shiki-kansuu-dsum.test.mjs','--self-test'],// ★DSUMを 外したら 5本とも 赤に なるか★（★土台が 在る 今は 素通り＝記録★）
+  ['shiki-sagasu.test.mjs'],                   // ★INDEX と MATCH＝実物の のべ 68%（実Excel 193本と 突き合わせ）★
+  ['shiki-sagasu.test.mjs', '--self-test'],    // ★見つからない時／転け方 2種／打つマスで 変わる／型1は 二分探索★
+  ['shoshiki.test.mjs'],                       // ★書式の台＝TEXT も 画面も 同じ 台（実Excel 192行と 一致）★
+  ['shoshiki.test.mjs', '--self-test'],        // ★時の隣の m は 分／-0 を 出さない／1900年の起点 2つ／曜日は 割り算★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★
@@ -308,8 +338,54 @@ const FILES = [
   'xlsx-harness/compare.mjs',               // Excelの真値と突合(新規の不一致があれば赤)
   ['xlsx-harness/compare.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'], // ★入れ子で壊れる式が増えていないか
-  ['xlfn-morenashi.test.mjs'],
-  ['dkei-honban.test.mjs'],
+  /* ★★ 2026-09-16 … ★下の 5本は どこからも 呼ばれて いませんでした★★
+       名簿（この FILES）にも 無く、`.github/workflows/*.yml` にも 無かった
+       ⇒★★試験の 顔を して 1回も 走って いませんでした★★
+       ★xlfn-morenashi は commit 586d2eb で
+         「試験の 登録も 自動で 通りました（登録漏れ 0件）」と 報告しましたが
+         ★その 報告は 間違い★でした。
+         （`scripts/tests-registered.mjs` は ★playwright の 一覧★だけ 見て おり
+           ★この FILES を 見て いません★＝★別の 物を 数えた 緑★）
+       ⇒★見張り `tests/souname-meibo.test.mjs` を 置きました★
+         （★足す 前に 5本を 名指しで 赤に する 事を 確かめました★）
+
+       ★★ただし `hozon-de-kieru.test.mjs` は ★ここに 入れて は いけません★★
+         ★わざと 赤のまま★と 2026-09-07（commit 20ac3f6）に 決めて あります。
+         ＝「うちで 足した シートは 書き出すと 消える」を ★実測で 固定した 物★
+         訳と 戻す 条件は ★`tests-no-ci.json`★ に 書いて あります。
+         ★私は 1度 ここに 入れて 総なめを 赤に しました★（★自分の 覚書きを 読んで いなかった★）
+         ⇒★見張り `souname-meibo` に ★`tests-no-ci.json` を 読ませました★★ */
+  ['xlfn-morenashi.test.mjs'],       // ★`_xlfn.` の 一覧に 漏れが 無いか（漏れると 実Excel で #NAME?）
+  ['yearfrac-basis1.test.mjs'],      // ★YEARFRAC basis 1 が 実Excel と 合うか
+  ['workflow-dougu-aru.test.mjs'],   // ★見張りが 呼ぶ 道具が repo に 在るか
+  ['souname-meibo.test.mjs'],         // ★tests/ の 試験が 1本 残らず 走って いるか
+  ['oddf-kirwake.test.mjs'],          // ODDFPRICE の 切り分けで 分かった 事を 守る
+  ['oddf-basho.test.mjs'],            // ★新しい 数え方を どこに 当てるか★（A には 当てない）
+  ['junretsu.test.mjs'],              // ★PERMUT ／ PERMUTATIONA★（紙 2本・境目は 未測定）
+  ['xmatch.test.mjs'],               // ★XMATCH★（紙 12本・字の型紙は 未測定）
+  ['percentrank.test.mjs'],          // ★PERCENTRANK★（紙 6本・有効桁の 切り方は 未測定）
+  ['asc-dbcs.test.mjs'],             // ★ASC ／ DBCS★（紙 22行・表は 機械の Unicode から）
+  ['lenb.test.mjs'],                 // ★LENB／LEFTB／RIGHTB／MIDB★（紙 12本・外した 1本を 名指し）
+  ['textafter.test.mjs'],            // ★TEXTAFTER／TEXTBEFORE★（★逆だった 2本を 一番 上に★）
+  ['aggregate.test.mjs'],            // ★AGGREGATE★（★外した 2本＝選択7・機能19 を 一番 上に★）
+  ['shiki-wo-osu-webkit.mjs'],       // ★実UIで 式を 打って 読む★（★繋ぐ 前の 姿を 守る★）
+  ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
+  ['bessel.test.mjs'],               // BESSELI/J/K/Y
+  ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
+  ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
+  ['oddf-hasuu-ga-hasuu-denai.test.mjs'], // ★端数が「端数で ない」時は #NUM!
+  ['tsunagu-mon.test.mjs'],          // ★台を 画面に 繋ぐ 手を 止める 門（★繋ぐ 前から 赤★）
+  ['ita-awase.test.mjs'],           // ★板の 写しの 門（★わざと 1マス ずらして 赤に なるのを 見せます★）
+  ['oddf-susumi.test.mjs'],         // ★保留の 4個（ODDF / ODDL）の 進みを 数で 押さえる★
+  ['oddf-susumi.test.mjs', '--self-test'],   // ★自分で 壊して 赤に なるか★
+  ['oddf-nokori.test.mjs'],         // ★ODDF / ODDL の 残りを 実Excel の 50本で 押す★
+  ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
+  ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
+  ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
+  /* ★経営者1 の 1押し★（★私が `git add -A` で 先に commit して しまった★）
+     ⇒★名簿に 足さないと 見張りが 赤の まま★なので ここで 足します
+     ⇒★中身は 1文字も 触って いません★ */
+  ['ramuda-honban.test.mjs']         // ★ラムダの 一族を お客さんの 道で 押す（経営者1）
 ];
 
 /* ★直に叩いた時だけ 走る★（2026-08-29）

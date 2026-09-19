@@ -21,47 +21,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ここ = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(ここ, '..', '..', '..');
 const require_ = createRequire(path.join(ROOT, 'package.json'));
 
-const HFns = require_(path.join(ROOT, 'hyperformula.full.min.js'));
-const EF = require_(path.join(ROOT, 'exally-formula.js'));
-const 積1 = EF.registerExallyFunctions(HFns) === true;
-const HF0 = HFns.HyperFormula;
-const H = Object.assign(Object.create(HF0), HFns,
-  { registerFunctionPlugin: HF0.registerFunctionPlugin.bind(HF0) });
-/* ★本番と 同じ 物を 積む★（片方 忘れると 全部 #NAME? に なって ★偽の 赤★） */
-const 積 = [];
-for (const n of ['extra', 'nokori', 'kane']) {
-  積.push(require_(path.join(ROOT, 'lib/formula-' + n + '-plug.js'))
-    .つなぐ(H, require_(path.join(ROOT, 'lib/formula-' + n + '.js'))));
-}
-積.push(require_(path.join(ROOT, 'lib/formula-yosoku-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-yosoku.js')),
-    () => ({ シート数: 1, 版: 'Exally', 台: 'win', OS: '', 左上: '$A$1' })));
-積.push(require_(path.join(ROOT, 'lib/formula-soto-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-soto.js')), {
-    取る: async () => { throw new Error('外へ 出ません'); },
-    聞く: async () => { throw new Error('AI に 聞きません'); },
-    再計算: () => {},
-  }));
-let XML部品 = null;
-try {
-  const { JSDOM } = require_('jsdom');
-  const w = new JSDOM('').window;
-  XML部品 = { DOMParser: w.DOMParser, XPathResult: w.XPathResult };
-} catch (e) { XML部品 = null; }
-積.push(require_(path.join(ROOT, 'lib/formula-filterxml-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-filterxml.js')), () => XML部品));
-積.push(require_(path.join(ROOT, 'lib/formula-cell-plug.js'))
-  .つなぐ(H, require_(path.join(ROOT, 'lib/formula-cell.js')), null));
-
-const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
-const SID = hf.getSheetId(hf.addSheet('Sheet1'));
-EF.initExallyFormula(hf);
+/* ★★本番の 道は 1本★★（2026-09-15）＝`docs/measured/honban-no-michi.mjs`
+   ★前は この 道具も 自前で 建てて いました★（★写し 8本目★）
+   ★しかも プラグインは ★7本★だけでした★
+     （本番は 8本／★`complex`（IM系 21個を 包む）が 抜けて いた★）
+   ⇒★寄せた 事で IM系も 本番と 同じ に なります★
+   ★板の 名前は `Sheet1`★＝★実 Excel を 測った 時と 同じ★（口の 引数） */
+const 道 = await import(pathToFileURL(path.join(ROOT, 'docs/measured/honban-no-michi.mjs')).href);
+const 土台 = await import(pathToFileURL(path.join(ROOT, 'docs/measured/kansuu46-no-dodai.mjs')).href);
+const 台 = await 道.建てる({ 板の名: 'Sheet1' });
+const EF = 台.EF;
+const hf = 台.hf;
+const SID = 台.SID;
+const 積1 = true;
+const 積 = 台.積;
 
 const 赤の名 = (t) => ({
   NA: '#N/A', DIV_BY_ZERO: '#DIV/0!', VALUE: '#VALUE!', NUM: '#NUM!',
@@ -69,31 +48,24 @@ const 赤の名 = (t) => ({
 }[t] || ('#' + t));
 
 /* ★実Excel を 測った 時と 同じ 材料★ */
-function 土台() {
-  const 表 = [];
-  for (let r = 0; r < 6; r++) 表.push([null, null, null, null, null, null, null, null]);
-  表[0][0] = 1; 表[1][0] = 2; 表[2][0] = 3; 表[3][0] = 4; 表[4][0] = 5;
-  表[0][1] = 2; 表[1][1] = 4; 表[2][1] = 6; 表[3][1] = 8; 表[4][1] = 10;
-  表[0][3] = '=DATE(2024,1,1)';
-  表[1][3] = '=DATE(2026,1,1)';
-  return 表;
-}
+/* ★★材料と 置き場と 押し方は 共通の 本★★（2026-09-15）
+     `docs/measured/kansuu46-no-dodai.mjs`
+   ★前は ここに 書いて ありました★（★実 Excel を 測った 時と 同じ 材料★）
+   ⇒★別の 道具が 同じ 紙を 押す 時 ★材料を 自分で 決めて しまいました★
+     （2026-09-15：`=IMSUM(A1:A5)` うち 24／実 Excel 15＝★材料が 違う★
+       ⇒★928本が「合わない」と 出た★＝★偽の 負け★）
+   ⇒★★材料を 1か所に しました★★ */
 function 押す(式) {
-  let 後;
-  try { 後 = EF.convertFormula(式); } catch (e) { return '★書き換えで 例外★'; }
-  try {
+  const r = 土台.押す(台, 式);
+  if (r.道 === 'JS層') {
+    /* ★この 道具は JS層の 戻りを そのまま 使って いました★ */
     const js = EF._jsComputeFormula(0, 式);
-    if (js !== null && js !== undefined) return js;
-  } catch (e) { /* JS層が 投げた＝engine へ */ }
-  try {
-    const 表 = 土台();
-    表[0][7] = 後;
-    hf.setSheetContent(SID, 表);
-    const v = hf.getCellValue({ sheet: SID, row: 0, col: 7 });
-    if (v && v.type) return 赤の名(v.type);
-    return v;
-  } catch (e) { return '★engine で 例外★'; }
+    return js;
+  }
+  if (r.字 === '★投げた★') return '★engine で 例外★';
+  return r.字;
 }
+
 
 const 金 = fs.readFileSync(path.join(ここ, 'golden-346-2026-09-08.tsv'), 'utf-8')
   .split('\n').filter((l) => l && !l.startsWith('#'))

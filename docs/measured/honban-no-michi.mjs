@@ -82,6 +82,30 @@ export function 本番の建て方() {
 }
 
 /**
+ * ★★台に 1マス 聞く★★（★`book.html` の `_台に聞く` と ★同じ 混ぜ方★）
+ *   ★使わない 時★
+ *     ・`#NAME?` ... 台が 知らない（★借り物に 落とす★）
+ *     ・溢れ     ... 1つの 式が 何マスにも 広がる（★並べるのは 借り物の 側★）
+ *   ⇒★どちらも `null` を 返します★＝★半分 合う 答えを 出さない★
+ *   ★★`book.html` と ここで 2か所に 同じ 決まりが 在ります★★
+ *     ⇒★片方を 直したら もう 片方も 直して ください★
+ *     ⇒`tests/tsunagu-mon.test.mjs` が ★両方に 落とす道が 在るか★を 見ます
+ * @returns {string|null} 台の 答え（字）／答えられなければ null
+ */
+export function 台に聞く(板, 式) {
+  if (!板) return null;
+  if (!式 || String(式).charAt(0) !== '=') return null;
+  try {
+    板.打つ('ZZ9999', String(式));
+    const v = 板.値('ZZ9999');
+    if (!v) return null;
+    if (v.溢れ === true) return null;
+    if (v.型 === '誤' && String(v.値) === '#NAME?') return null;
+    return 板.字('ZZ9999');
+  } catch (e) { return null; }
+}
+
+/**
  * ★★本番の 道を 建てる★★
  * @param {{XML?:boolean, 外へ出す?:object, EFの道?:string, 板の名?:string}} 注文
  *    XML     … `jsdom` が 在れば FILTERXML に 渡す（既定 true／無ければ null の まま）
@@ -172,5 +196,18 @@ export async function 建てる(注文) {
      ＝★違いは 別の 道では なく 口の 引数に する★（指示役1 の 決め） */
   const SID = hf.getSheetId(hf.addSheet(注.板の名 || 'S'));
   EF.initExallyFormula(hf);
-  return { HFns, HF0, H, EF, hf, SID, 積んだ, 積 };
+  /* ★★台（自前の 計算）も 建てます★★（2026-09-18・㋑⑶の 後）
+       ★本番の 道は ★3段★に なりました★
+         ①JS層（`_jsComputeFormula`） → ②★台★（`lib/shiki-hyou.js`） → ③借り物
+       ＝`book.html:setCellFormula` ／ `book.html:recalcSheet` の 2か所（実物）
+       ★★この 段を 飛ばすと 「うちが 負けて いる」向きの 偽の 答えが 出ます★★
+         ＝この 紙の 頭に 書いて ある 事が ★そのまま 起きました★
+         ＝`osu-ramuda-honban.mjs` が `#ERROR!` を 出し、実物は `#VALUE!` でした
+       ★台を 使うかは 呼ぶ側が 決めます★＝★古い 道具を 黙って 変えない★ */
+  let 板 = null;
+  try {
+    const SH = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
+    板 = SH.表();
+  } catch (e) { 板 = null; }
+  return { HFns, HF0, H, EF, hf, SID, 積んだ, 積, 板 };
 }
