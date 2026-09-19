@@ -86,6 +86,7 @@ const 実紙道 = path.join(ROOT, 'docs/measured/golden-jitsu-excel-no-shirushi-
 const 実紙 = fs.existsSync(実紙道) ? fs.readFileSync(実紙道, 'utf-8') : '';
 const 実が付ける = new Set();
 const 実が裸 = new Set();
+const 溢れる = new Set();   /* ★`cm` が 在る＝溢れる★＝割れると 表が 丸ごと 消える */
 const 除いた = new Set();   /* ★黙って 除かない★＝下で 名前を 出します */
 for (const 行 of 実紙.split(/\r?\n/)) {
   if (!行 || 行.startsWith('#')) continue;
@@ -107,7 +108,12 @@ for (const 行 of 実紙.split(/\r?\n/)) {
     continue;
   }
   const 頭 = /^_xlfn\.(?:_xlws\.)?([A-Z][A-Z0-9_.]*)\s*\(/.exec(式);
-  if (頭) { 実が付ける.add(頭[1]); continue; }
+  if (頭) {
+    実が付ける.add(頭[1]);
+    /* ★紙の 2列目が `cm` の 有無★＝★重さが 違います★ */
+    if ((行.split('	')[1] || '').indexOf('在') >= 0) 溢れる.add(頭[1]);
+    continue;
+  }
   const 裸 = /^([A-Z][A-Z0-9_.]*)\s*\(/.exec(式);
   if (裸) 実が裸.add(裸[1]);
 }
@@ -131,7 +137,15 @@ T('★★実Excel が `_xlfn.` を 付けた 名前が 一覧に 全部 在る�
   const 無 = [...実が付ける].filter((n) => 一覧.indexOf(n) < 0);
   if (無.length) {
     throw new Error('★' + 無.length + '個 漏れて いる★ ＝ ' + 無.join(' ')
-      + '／★この まま 書き出すと 相手の Excel で #NAME?＝表が 丸ごと 消えます★');
+      + '／★この まま 書き出すと 相手の Excel で #NAME? に なります★'
+      /* ★重さを 分けて 出します★（2026-09-20）
+           溢れる 物 ＝ ★表が 丸ごと 消えます★（WRAPROWS / WRAPCOLS / MODE.MULT）
+           溢れない 物 ＝ ★その マスだけ★（FORMULATEXT）
+         ★門の 字が 大げさを 間違えると 次の 人が 読み違えます★ */
+      + (無.some((n) => 溢れる.has(n))
+         ? '／★溢れる 物が 入って います＝表が 丸ごと 消えます★ '
+           + 無.filter((n) => 溢れる.has(n)).join(' ')
+         : '／★どれも 溢れません＝その マスだけ★'));
   }
 });
 
@@ -149,8 +163,10 @@ T('★一覧が 黙って 痩せて いない★', () => {
        ＝★実Excel で #NAME? に なる のを 実測して から 足しました★
        ＝紙 `golden-wrap-excel-2026-09-20.tsv`
      ★2026-09-20★ 132 → ★133★（`MODE.MULT` を 足した）
-       ＝★この 門が 自分で 見つけました★（紙が 増えた 瞬間 赤に なった） */
-  const 期待 = 133;
+       ＝★この 門が 自分で 見つけました★（紙が 増えた 瞬間 赤に なった）
+     ★2026-09-20★ 133 → ★134★（`FORMULATEXT` を 足した）
+       ＝★この 門が 自分で 見つけた ★２回目★★ */
+  const 期待 = 134;
   if (一覧.length !== 期待) {
     throw new Error('★一覧が ' + 一覧.length + '個★（' + 期待 + '個の はず）'
       + '／足したなら ここも 直す');
