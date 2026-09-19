@@ -1,0 +1,34 @@
+# ★実Excel 自身が 溢れる 式に 付ける 印★（51・52）（2026-09-20）
+# ★読むだけ★（1バイトも 書いて いません）
+# ★作った 物★ ... docs/measured/tsukuru-jitsu-excel-kobore-6shurui.ps1
+#                docs/measured/tsukuru-jitsu-excel-meibo-ni-nai-11.ps1
+# ★実Excel★ ... 版 16.0 ／ build 20326（作った 道具が 出して います）
+# ★判じは ここでは しません★＝実Excel が 書いた 字を そのまま 写すだけ
+#
+# ═══ ★51(SEQUENCE ほか 7本)★ ... exally-jitsu-excel-kobore.xlsx（9850 バイト）═══
+# ★cm= の 数★ 6 ／ ★t="array" の 数★ 6
+# マス	cm	ref	実Excel が 書いた 式
+C1	在り	C1:C3	_xlfn.SEQUENCE(3)
+E1	在り	E1:E3	_xlfn._xlws.SORT(A1:A3)
+G1	在り	G1:G3	_xlfn.UNIQUE(A1:A3)
+I1	在り	I1:I2	_xlfn._xlws.FILTER(A1:A3,A1:A3>1)
+K1	在り	K1:M1	TRANSPOSE(A1:A3)
+A10	在り	A10:C11	_xlfn.MAKEARRAY(2,3,_xlfn.LAMBDA(_xlpm.r,_xlpm.c,_xlpm.r*_xlpm.c))
+A15	無し	(無し)	SUM(A1:A3)
+# ★式が 在る マス ... 7個★
+#
+# ═══ ★52(名簿に無い 11本)★ ... exally-jitsu-excel-meibo11.xlsx（10385 バイト）═══
+# ★cm= の 数★ 11 ／ ★t="array" の 数★ 11
+# マス	cm	ref	実Excel が 書いた 式
+C1	在り	C1:E2	_xlfn.WRAPROWS(A1:A6,3)
+C5	在り	C5:D7	_xlfn.WRAPCOLS(A1:A6,3)
+C9	在り	C9:E9	TRANSPOSE(A1:A3)
+C12	在り	C12:D13	_xlfn.MAKEARRAY(2,2,_xlfn.LAMBDA(_xlpm.r,_xlpm.c,_xlpm.r*_xlpm.c))
+C16	在り	C16:C18	_xlfn.BYROW(A1:A3,_xlfn.LAMBDA(_xlpm.x,SUM(_xlpm.x)))
+C20	在り	C20	_xlfn.BYCOL(A1:A3,_xlfn.LAMBDA(_xlpm.x,SUM(_xlpm.x)))
+C24	在り	C24:C26	_xlfn.SCAN(0,A1:A3,_xlfn.LAMBDA(_xlpm.a,_xlpm.b,_xlpm.a+_xlpm.b))
+C28	在り	C28:C30	_xlfn.MAP(A1:A3,_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2))
+C32	在り	C32	_xlfn.REDUCE(0,A1:A3,_xlfn.LAMBDA(_xlpm.a,_xlpm.b,_xlpm.a+_xlpm.b))
+C36	在り	C36:D39	_xlfn.GROUPBY(A1:A3,A1:A3,_xleta.SUM)
+C40	在り	C40:G44	_xlfn.PIVOTBY(A1:A3,A1:A3,A1:A3,_xleta.SUM)
+# ★式が 在る マス ... 11個★
