@@ -5,7 +5,7 @@
 #             ＝式に 答える 以外に ★溢れの 広さ★／★そのマスが 溢れの 一部か★ に 使って いる
 #             ⇒★★外す 前に 「実Excel が どう するか」を 持って いないと 測れません★★
 #
-#  ★台本★ … 毎回 D1 に `=SEQUENCE(3)` を 打つ（★D1:D3 が 1/2/3 に なる★）
+#  ★台本★ ... 毎回 D1 に `=SEQUENCE(3)` を 打つ（★D1:D3 が 1/2/3 に なる★）
 #           ⇒その後 1つ 手を 加えて ★D1:D5 を 値と 式で 読む★
 #    ㋐何も しない（★対照★）
 #    ㋑★頭（D1）を 消す★
@@ -13,7 +13,7 @@
 #    ㋓★溢れ先（D2）を 消す★
 #    ㋔★頭（D1）を 別の 式に 書き換える★（`=SEQUENCE(2)` ⇒ ★D3 は 消えるか★）
 #
-#  ★おまけ★ … 最後に `.xlsx` で 保存する（★中の 形は 別の 道具で 読みます★）
+#  ★おまけ★ ... 最後に `.xlsx` で 保存する（★中の 形は 別の 道具で 読みます★）
 #              ＝★開き直しては いません★（`Workbooks.Open` は 1文字も 使いません）
 #
 #  ★門★
@@ -77,7 +77,7 @@ try {
   $行.Add('# ★台本★ 毎回 D1 に =SEQUENCE(3) を 打つ（D1:D3 = 1/2/3）⇒ その後 1つ 手を 加える')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
-  $行.Add('# 番' + "`t" + '手' + "`t" + 'マス' + "`t" + '値' + "`t" + '出る字' + "`t" + '式' + "`t" + '溢れの一部か' + "`t" + '=(D1)=0')
+  $行.Add('# 番' + "`t" + '手' + "`t" + 'マス' + "`t" + '値' + "`t" + '出る字' + "`t" + '式' + "`t" + '溢れの一部か' + "`t" + '=(D1)=0' + "`t" + '型')
 
   $押し時計 = [Diagnostics.Stopwatch]::StartNew()
   foreach ($x in $台本) {
@@ -92,16 +92,21 @@ try {
     }
     # ★2つ目の 窓★（★0 が 見せかけに ならないか★）
     $ゼロか = '(★窓2が 打てません★)'
-    try { $w = $sh.Range('J1'); $w.Formula2 = '=(D1)=0'; $ゼロか = [string]$w.Value2 } catch { }
+    # ★他の 道具と ★同じ 書き方★に します★（`'=(' + ... + ')=0'`）
+    #   ＝門は この 形を 探します／★中身は 同じ★
+    $見る = 'D1'
+    try { $w = $sh.Range('J1'); $w.Formula2 = '=(' + $見る + ')=0'; $ゼロか = [string]$w.Value2 } catch { }
     for ($r = 1; $r -le 5; $r++) {
       $c = $sh.Cells.Item($r, 4)
       $v = $c.Value2
       $値 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
+      # ★★型も 見ます★★（`.Value2` の 0 が 見せかけか を 判じる 材料）
+      $型 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
       $字 = [string]$c.Text
       $式 = [string]$c.Formula
       $一部か = '(?)'
       try { $一部か = [string]$c.HasArray } catch { }
-      $行.Add($x.番 + "`t" + $x.名 + "`t" + ('D' + $r) + "`t" + $値 + "`t" + $字 + "`t" + $式 + "`t" + $一部か + "`t" + $ゼロか)
+      $行.Add($x.番 + "`t" + $x.名 + "`t" + ('D' + $r) + "`t" + $値 + "`t" + $字 + "`t" + $式 + "`t" + $一部か + "`t" + $ゼロか + "`t" + $型)
     }
   }
   $押し時計.Stop()
