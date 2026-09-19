@@ -369,6 +369,7 @@ const FILES = [
   ['textafter.test.mjs'],            // ★TEXTAFTER／TEXTBEFORE★（★逆だった 2本を 一番 上に★）
   ['aggregate.test.mjs'],            // ★AGGREGATE★（★外した 2本＝選択7・機能19 を 一番 上に★）
   ['shiki-wo-osu-webkit.mjs'],       // ★実UIで 式を 打って 読む★（★繋ぐ 前の 姿を 守る★）
+  ['kobore-kakidashi-webkit.mjs'],  // ★画面で 溢れを 打って 本番の 道で 書き出す★（★お客さんの 道★・2026-09-20）
   ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
@@ -381,6 +382,8 @@ const FILES = [
   ['oddf-nokori.test.mjs'],         // ★ODDF / ODDL の 残りを 実Excel の 50本で 押す★
   ['phonetic-ramuda.test.mjs'],     // ★PHONETIC と 裸の LAMBDA を 実Excel の 6本で 押す★（2026-09-19）
   ['kobore-zenmasu.test.mjs'],      // ★溢れた先の 全マスを 実Excel の 14本で 押す★（2026-09-19）
+  ['kobore-kakidashi.test.mjs'],   // ★溢れを xlsx へ 書き出す時に ref= と cm="1" を 運べて いるか★（2026-09-20）
+  ['kobore-kakidashi.test.mjs', '--self-test'],   // ★印を 消すと 赤に なるか★
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
   ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
   ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
