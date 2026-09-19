@@ -369,6 +369,7 @@ const FILES = [
   ['textafter.test.mjs'],            // ★TEXTAFTER／TEXTBEFORE★（★逆だった 2本を 一番 上に★）
   ['aggregate.test.mjs'],            // ★AGGREGATE★（★外した 2本＝選択7・機能19 を 一番 上に★）
   ['shiki-wo-osu-webkit.mjs'],       // ★実UIで 式を 打って 読む★（★繋ぐ 前の 姿を 守る★）
+  ['kobore-kakidashi-webkit.mjs'],  // ★画面で 溢れを 打って 本番の 道で 書き出す★（★お客さんの 道★・2026-09-20）
   ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
