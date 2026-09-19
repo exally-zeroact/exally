@@ -70,6 +70,12 @@ function zipから取る(buf, 欲しい) {
 const 読む物 = [
   { 札: '51(SEQUENCE ほか 7本)', 名: 'exally-jitsu-excel-kobore.xlsx' },
   { 札: '52(名簿に無い 11本)', 名: 'exally-jitsu-excel-meibo11.xlsx' },
+  /* ★★2026-09-20 足し ── 55（分母から 漏れて いた 45個の 残り 21個）★★
+     ＝Exally1 が 「09-16 の 分母 396個に ★45個 漏れて いた★」と 数えた 残り
+     ＝★21個 とも 台が 持って いる＝お客さんが 打てます★
+     ⇒★この 紙が そのまま 門（tests/xlfn-morenashi.test.mjs）の 分母に なります★
+       ＝★足した 分だけ 門が 見る 範囲も 増えます★（Exally1 が 偽の 1行で 実測済み） */
+  { 札: '55(残り 21本)', 名: 'exally-jitsu-excel-nokori21.xlsx' },
 ];
 
 const 行 = [];

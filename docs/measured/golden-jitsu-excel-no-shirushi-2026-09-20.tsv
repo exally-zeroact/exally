@@ -32,3 +32,29 @@ C32	在り	C32	_xlfn.REDUCE(0,A1:A3,_xlfn.LAMBDA(_xlpm.a,_xlpm.b,_xlpm.a+_xlpm.b
 C36	在り	C36:D39	_xlfn.GROUPBY(A1:A3,A1:A3,_xleta.SUM)
 C40	在り	C40:G44	_xlfn.PIVOTBY(A1:A3,A1:A3,A1:A3,_xleta.SUM)
 # ★式が 在る マス ... 11個★
+#
+# ═══ ★55(残り 21本)★ ... exally-jitsu-excel-nokori21.xlsx（10291 バイト）═══
+# ★cm= の 数★ 2 ／ ★t="array" の 数★ 2
+# マス	cm	ref	実Excel が 書いた 式
+H1	無し	(無し)	ASC("ABC")
+H4	無し	(無し)	AVERAGEIFS(A1:A6,A1:A6,">2")
+H7	無し	(無し)	BAHTTEXT(15)
+H10	無し	(無し)	DBCS("ABC")
+H13	無し	(無し)	DOLLAR(1234.567,2)
+H16	無し	(無し)	FIXED(1234.567,1)
+H19	無し	(無し)	FORECAST(4,B1:B3,A1:A3)
+H22	在り	H22	INDIRECT("A1")
+H25	無し	(無し)	KURT(A1:A6)
+H28	無し	(無し)	LEFTB("ABC",2)
+H31	無し	(無し)	LENB("ABC")
+H34	無し	(無し)	LOOKUP(2,A1:A6)
+H37	無し	(無し)	MDETERM(E1:F2)
+H40	無し	(無し)	MIDB("ABC",1,2)
+H43	在り	H43:H44	_xlfn.MODE.MULT(A1:A6)
+H46	無し	(無し)	OFFSET(A1,1,0)
+H49	無し	(無し)	PERCENTRANK(A1:A6,3)
+H52	無し	(無し)	PERMUT(5,2)
+H55	無し	(無し)	PHONETIC(A1)
+H58	無し	(無し)	RIGHTB("ABC",2)
+H61	無し	(無し)	TRIMMEAN(A1:A6,0.2)
+# ★式が 在る マス ... 21個★
