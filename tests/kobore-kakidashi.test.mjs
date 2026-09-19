@@ -10,8 +10,8 @@
  *  ★正しい 形★（実Excel が 作った xlsx を ほどいて 数えた 形と 同じ）
  *        <c r="A1" cm="1"><f t="array" ref="A1:A3">_xlfn.SEQUENCE(3)</f><v>1</v></c>
  *        <c r="A2"><v>2</v></c>
- *    ・`ref=`  … 溢れの 範囲（SheetJS には `F` で 渡す）
- *    ・`cm="1"`… ★動く並び(dynamic array)の 印★（SheetJS には `D` で 渡す）
+ *    ・`ref=`  ＝ 溢れの 範囲（SheetJS には `F` で 渡す）
+ *    ・`cm="1"`＝ ★動く並び(dynamic array)の 印★（SheetJS には `D` で 渡す）
  *                 `xl/metadata.xml` は SheetJS が いつも 書いて います（904B・
  *                 `dynamicArrayProperties fDynamic="1"` 在り）。
  *
@@ -22,7 +22,7 @@
  *    ・`xl/metadata.xml` が 包みに 入って いる
  *
  *  使い方: node tests/kobore-kakidashi.test.mjs
- *          node tests/kobore-kakidashi.test.mjs --self-test  … わざと壊して赤になるか
+ *          node tests/kobore-kakidashi.test.mjs --self-test  ＝ わざと壊して赤になるか
  */
 import path from 'node:path';
 import zlib from 'node:zlib';
