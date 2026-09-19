@@ -99,7 +99,30 @@ export function 台に聞く(板, 式) {
     板.打つ('ZZ9999', String(式));
     const v = 板.値('ZZ9999');
     if (!v) return null;
-    if (v.溢れ === true) return null;
+    /* ══ ★★2026-09-19 ... ★溢れを null に して いた のを やめました★★★ ══
+         ★前★ ... `if (v.溢れ === true) return null;`
+                ＝★溢れは 借り物へ★ という ★昔の `book.html` の 写し★
+         ★今の 本番（`book.html:recalcSheet`）★
+           ①JS層が 答えたら それ
+           ②台が 答えたら それ
+           ③★台が 溢れ かつ 借り物が 誤り（`#` で 始まる）なら ★台の 溢れを 使う★★
+           ④でなければ 借り物の 溢れ
+         ⇒★★道具が 本番より 1段 古く なって いました★★
+         ⇒★何が 起きたか★
+           `=MAP(A1:A5,LAMBDA(x,x*2))` … ★台は 2 を 出して います★
+           でも ここで null を 返す ので 借り物へ 落ち、
+           ★借り物は MAP を 知らない ⇒ `#NAME?`★
+           ⇒`tests/ramuda-honban.test.mjs` が ★CI で 赤★（2026-09-19）
+         ⇒★★「台が 悪い」のでは なく ★測り道具が 本番と 違った★★★
+         ⇒記憶「★台が 違うと 言う 前に 測り道具が その式を 押せるかを 見る★」
+         ★★左上だけ 返します★★（この 道具は 1マスの 字を 返す 約束）
+           ＝溢れた先は `docs/measured/osu-kobore-zenmasu.mjs` が 見ます */
+    if (v.溢れ === true) {
+      const 頭 = (v.並び && v.並び[0]) ? v.並び[0][0] : null;
+      if (頭 === null || 頭 === undefined) return null;
+      if (頭 && 頭.型 === '誤' && String(頭.値) === '#NAME?') return null;
+      return (頭 && 頭.値 !== undefined) ? String(頭.値) : String(頭);
+    }
     if (v.型 === '誤' && String(v.値) === '#NAME?') return null;
     return 板.字('ZZ9999');
   } catch (e) { return null; }
