@@ -29,6 +29,15 @@ kou(t=str・今のまま)	A4	True	False	False	=ISERROR(A4) / =ISTEXT(A4) / =ISNU
 kou(t=str・今のまま)	A5	True	False	False	=ISERROR(A5) / =ISTEXT(A5) / =ISNUMBER(A5)
 kou(t=str・今のまま)	A6	False	False	True	=ISERROR(A6) / =ISTEXT(A6) / =ISNUMBER(A6)
 #
+# ★★2つ目の 窓★★（★上の 読みの 後に 打って います★）
+# マス	値	型	=(マス)=0
+A1	-2146826281	Other	-2146826281
+A2	-2146826246	Other	-2146826246
+A3	-2146826259	Other	-2146826259
+A4	-2146826273	Other	-2146826273
+A5	-2146826252	Other	-2146826252
+A6	3	Double	False
+#
 # ═══ ★★otsu(t=e・直した物)★★ ... exally-ayamari-ato.xlsx（16149 バイト）═══
 # ★★①開いた 瞬間★★（★まだ 何も 打って いません★）
 # 札	マス	値	出る字	式	型
@@ -54,3 +63,12 @@ otsu(t=e・直した物)	A3	True	False	False	=ISERROR(A3) / =ISTEXT(A3) / =ISNUM
 otsu(t=e・直した物)	A4	True	False	False	=ISERROR(A4) / =ISTEXT(A4) / =ISNUMBER(A4)
 otsu(t=e・直した物)	A5	True	False	False	=ISERROR(A5) / =ISTEXT(A5) / =ISNUMBER(A5)
 otsu(t=e・直した物)	A6	False	False	True	=ISERROR(A6) / =ISTEXT(A6) / =ISNUMBER(A6)
+#
+# ★★2つ目の 窓★★（★上の 読みの 後に 打って います★）
+# マス	値	型	=(マス)=0
+A1	-2146826281	Other	-2146826281
+A2	-2146826246	Other	-2146826246
+A3	-2146826259	Other	-2146826259
+A4	-2146826273	Other	-2146826273
+A5	-2146826252	Other	-2146826252
+A6	3	Double	False

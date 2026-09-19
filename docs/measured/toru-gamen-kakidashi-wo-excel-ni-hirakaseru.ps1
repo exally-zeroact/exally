@@ -148,6 +148,28 @@ try {
     }
   }
 
+  $窓行 = 40
+    # ═══ ★★2つ目の 窓★★（★`=(マス)=0` の 真偽と 型を 一緒に 取る★）═══
+    #   ★なぜ★ ... `.Value2` の 「0」は ★本物の 0★ とも ★空★ とも ★誤りの 番号★ とも
+    #              区別が 付きません（記憶「意味の 無い 数は 一番 見つけにくい」）
+    #   ⇒★別の 口（式）で もう 一度 0 かを 訊いて 型と 並べます★
+    #   ★この 窓は ★上の 読みが 済んだ 後★に 打ちます★
+    #     ＝式を 打つと 計算し直しが 起きる ので ★「開いた 瞬間」を 汚さない★
+    $行.Add('#')
+    $行.Add('# ★★2つ目の 窓★★（★上の 読みの 後に 打って います★）')
+    $行.Add('# マス' + "`t" + '値' + "`t" + '型' + "`t" + '=(マス)=0')
+    foreach ($ma2 in @('D1','D2','D3','F1','G1','H1','A20','B20','C20','A21','A10')) {
+      $c = $sh.Range($ma2)
+      $v = $c.Value2
+      $値 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
+      $型 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
+      $ゼロか = '(★窓2が 打てません★)'
+      # ★他の 道具と ★同じ 書き方★（`'=(' + マス + ')=0'`）★
+      try { $w = $sh.Range('N' + $窓行); $w.Formula2 = '=(' + $ma2 + ')=0'; $ゼロか = [string]$w.Value2 } catch { }
+      $窓行 = $窓行 + 1
+      $行.Add($ma2 + "`t" + $値 + "`t" + $型 + "`t" + $ゼロか)
+    }
+
   [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
   Write-Host ('★書いた ... ' + $出 + '★')
   # ★★保存しません★★

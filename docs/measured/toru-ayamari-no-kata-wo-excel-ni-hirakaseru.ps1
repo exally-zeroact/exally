@@ -1,4 +1,4 @@
-﻿﻿﻿﻿# toru-ayamari-no-kata-wo-excel-ni-hirakaseru.ps1
+﻿# toru-ayamari-no-kata-wo-excel-ni-hirakaseru.ps1
 #   -- ★誤りの 型（`t="str"` と `t="e"`）を 実Excel に 開かせて 比べる★（㊻）（2026-09-20）
 #
 #  ★★なぜ 要るか★★
@@ -122,7 +122,7 @@ try {
     for ($r = 1; $r -le 6; $r++) {
       # ★★2026-09-20 ── ★PowerShell は `,` が `+` より 強く 結び付きます★★
       #   ＝括弧を 付けないと ★3本が 1本に 繋がって 個数 1★ に なります（実測）
-      #     `@('=ISERROR(A' + $r + ')', '=ISTEXT(A' + $r + ')', …)`
+      #     `@('=ISERROR(A' + $r + ')', '=ISTEXT(A' + $r + ')', ほか)`
       #       ⇒ 個数 1 ／ 中身 `=ISERROR(A1) =ISTEXT(A1) =ISNUMBER(A1)`
       #   ⇒★しかも その 式は Excel で ★比べ算の 連なり★に なり ★6行 全部 True★ を 返します★
       #     ＝★投げない／空に ならない／もっともらしい 嘘★＝一番 見つけにくい 形
@@ -141,13 +141,35 @@ try {
       for ($k = 0; $k -lt 3; $k++) {
         $w = $sh.Cells.Item(19 + $r, 3 + $k)
         $v2 = $w.Value2
-        # ★5.1 は `if` を 式として 渡せません★（$答.Add((if …)) は 落ちます）
+        # ★5.1 は `if` を 式として 渡せません★（$答.Add((if ～)) は 落ちます）
         $x2 = '(kara)'
         if ($null -ne $v2) { $x2 = [string]$v2 }
         $答.Add($x2)
         $窓式.Add([string]$w.Formula)
       }
       $行.Add($x.札 + "`t" + ('A' + $r) + "`t" + $答[0] + "`t" + $答[1] + "`t" + $答[2] + "`t" + ($窓式 -join ' / '))
+    }
+
+    $窓行 = 40
+    # ═══ ★★2つ目の 窓★★（★`=(マス)=0` の 真偽と 型を 一緒に 取る★）═══
+    #   ★なぜ★ ... `.Value2` の 「0」は ★本物の 0★ とも ★空★ とも ★誤りの 番号★ とも
+    #              区別が 付きません（記憶「意味の 無い 数は 一番 見つけにくい」）
+    #   ⇒★別の 口（式）で もう 一度 0 かを 訊いて 型と 並べます★
+    #   ★この 窓は ★上の 読みが 済んだ 後★に 打ちます★
+    #     ＝式を 打つと 計算し直しが 起きる ので ★「開いた 瞬間」を 汚さない★
+    $行.Add('#')
+    $行.Add('# ★★2つ目の 窓★★（★上の 読みの 後に 打って います★）')
+    $行.Add('# マス' + "`t" + '値' + "`t" + '型' + "`t" + '=(マス)=0')
+    foreach ($ma2 in @('A1','A2','A3','A4','A5','A6')) {
+      $c = $sh.Range($ma2)
+      $v = $c.Value2
+      $値 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { $v.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$v }
+      $型 = if ($null -eq $v) { '(kara)' } elseif ($v -is [double]) { 'Double' } elseif ($v -is [string]) { 'String' } elseif ($v -is [bool]) { 'Boolean' } else { 'Other' }
+      $ゼロか = '(★窓2が 打てません★)'
+      # ★他の 道具と ★同じ 書き方★（`'=(' + マス + ')=0'`）★
+      try { $w = $sh.Range('H' + $窓行); $w.Formula2 = '=(' + $ma2 + ')=0'; $ゼロか = [string]$w.Value2 } catch { }
+      $窓行 = $窓行 + 1
+      $行.Add($ma2 + "`t" + $値 + "`t" + $型 + "`t" + $ゼロか)
     }
 
     $bk.Close($false)

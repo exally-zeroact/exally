@@ -78,3 +78,17 @@
 # ★koborenai ... A10 を =SUM(1,3) に★ ⇒ ok（★変わりました★）
 4	koborenai	A10	4	4	=SUM(1,3)	Double	False
 4	koborenai	B10	(kara)			(kara)	False
+#
+# ★★2つ目の 窓★★（★上の 読みの 後に 打って います★）
+# マス	値	型	=(マス)=0
+D1	1	Double	False
+D2	2	Double	False
+D3	(kara)	(kara)	True
+F1	1	Double	False
+G1	2	Double	False
+H1	(kara)	(kara)	True
+A20	1	Double	False
+B20	2	Double	False
+C20	(kara)	(kara)	True
+A21	(kara)	(kara)	True
+A10	4	Double	False
