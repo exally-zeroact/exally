@@ -76,6 +76,11 @@ const 読む物 = [
      ⇒★この 紙が そのまま 門（tests/xlfn-morenashi.test.mjs）の 分母に なります★
        ＝★足した 分だけ 門が 見る 範囲も 増えます★（Exally1 が 偽の 1行で 実測済み） */
   { 札: '55(残り 21本)', 名: 'exally-jitsu-excel-nokori21.xlsx' },
+  /* ★★2026-09-20 足し ── 58（名簿に 「在る」16個＝★付け過ぎ★を 探す）★★
+     ＝今まで 探して いたのは ★付け忘れ★（WRAPROWS / WRAPCOLS / MODE.MULT）
+     ＝★逆も 壊れます★＝`_xlfn.` を 付け過ぎると 実Excel が 読めない（TRANSPOSE で 実測）
+     ⇒★名簿に 在る 物が 本当に 要るかを 聞いた 事が 在りませんでした★ */
+  { 札: '58(名簿に在る 16本)', 名: 'exally-jitsu-excel-meibo16.xlsx' },
 ];
 
 const 行 = [];

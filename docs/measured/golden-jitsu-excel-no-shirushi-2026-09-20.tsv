@@ -58,3 +58,24 @@ H55	無し	(無し)	PHONETIC(A1)
 H58	無し	(無し)	RIGHTB("ABC",2)
 H61	無し	(無し)	TRIMMEAN(A1:A6,0.2)
 # ★式が 在る マス ... 21個★
+#
+# ═══ ★58(名簿に在る 16本)★ ... exally-jitsu-excel-meibo16.xlsx（10242 バイト）═══
+# ★cm= の 数★ 7 ／ ★t="array" の 数★ 7
+# マス	cm	ref	実Excel が 書いた 式
+H1	無し	(無し)	_xlfn.ARRAYTOTEXT(A1:A3)
+H7	在り	H7:H8	_xlfn.CHOOSECOLS(E1:F2,1)
+H13	在り	H13:I13	_xlfn.CHOOSEROWS(E1:F2,1)
+H19	在り	H19:H23	_xlfn.DROP(A1:A6,1)
+H25	在り	H25:H27	_xlfn.EXPAND(A1:A2,3,1,0)
+H31	在り	H31:H32	_xlfn.TAKE(A1:A6,2)
+H37	在り	H37:H40	_xlfn.TOCOL(E1:F2)
+H43	在り	H43:K43	_xlfn.TOROW(E1:F2)
+H49	無し	(無し)	_xlfn.AGGREGATE(1,0,A1:A6)
+H55	無し	(無し)	_xlfn.ENCODEURL("a b")
+H61	無し	(無し)	_xlfn.NUMBERVALUE("1.5")
+H67	無し	(無し)	_xlfn.PERMUTATIONA(5,2)
+H73	無し	(無し)	_xlfn.TEXTAFTER("a-b","-")
+H79	無し	(無し)	_xlfn.TEXTBEFORE("a-b","-")
+H85	無し	(無し)	_xlfn.VALUETOTEXT(A1)
+H91	無し	(無し)	_xlfn.XMATCH(2,A1:A6)
+# ★式が 在る マス ... 16個★
