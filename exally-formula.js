@@ -1508,7 +1508,29 @@ function _jsComputeFormula(sheet, v) {
        （`lib/formula-yosoku.js` の `直線の係数()` が ★表として★ 返す）
        ⇒★関所に 残すと「JS層に 段が 在る」と 読まれる★ */
     BINOM:1,FREQUENCY:1,
-    REDUCE:1,SCAN:1,MAP:1,MAKEARRAY:1,ISOMITTED:1};
+    /* == 2026-09-19 ... SCAN / MAP / MAKEARRAY を ここから 外しました ==
+         ★何が 起きて いたか★
+           この 段（JS層）は ★エンジンより 先★に 答えます（記憶「Exally の 式は 2階建て」）。
+           SCAN / MAP / MAKEARRAY は ここで ★先頭値だけ★ を 返して いました
+           ⇒★★溢れる 式なのに 1マスしか 出ません★★
+           ⇒経営者1 が 本番で 実測 ... 実Excel `6 / 2 / 4` ／ うち ★1x1（6 だけ）★
+         ★なぜ 今まで 出なかったか★
+           ★分母が 溢れの ★左上しか★ 見て いなかった★（`osu-dai-dake.mjs` 自身の 断り）
+         ★BYROW / BYCOL は ここに 居ませんでした★
+           ⇒★だから あの 2つだけ 溢れて いました★
+           ⇒★同じ LAMBDA の 一族で 割れて いた 訳が これです★
+         ★外して 良いと 決めた 訳（★測って から★）★
+           ⑴台が ★同じ 答えを 出す★ ... 紙で ★8 / 8★
+              MAP 2 ／ MAP(引数2つ) #VALUE! ／ SCAN 1 ／ MAKEARRAY(2,3) 1
+              ／ MAKEARRAY(2,2) 1 ／ REDUCE 15 ／ BYROW 3 ／ BYCOL 11
+           ⑵台の ★溢れた 先★が 実Excel と 同じ ... ★14 / 14★
+              （`docs/measured/golden-kobore-zenmasu-2026-09-19.tsv`）
+           ⇒★左上は 1本も 変わらず、★溢れた 先が 出る ように なります★★
+         ★REDUCE と ISOMITTED は 残します★ ... ★溢れません★（1つの 値を 返す）
+         ★下の 段（mScan / mMap / mMkarr）も 一緒に 消しました★
+           ＝関所から 外した のに 段を 残すと `js-sou-sekisho` が
+             ★「関所を 通らない 段が 在る」と 赤に します★（★門が 正しい★） */
+    REDUCE:1,ISOMITTED:1};
   if(!_jsSet[_fnBase]) return null; // JS非対象 → HFへ
 
   var f = v.slice(1).trim().toUpperCase();
@@ -1552,17 +1574,13 @@ function _jsComputeFormula(sheet, v) {
   var mReduce=fOrig.match(/^REDUCE\s*\(([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
   if(mReduce){var reduceInit=parseFloat(mReduce[1].trim())||0;var reduceR=_jsReduceCompute(sheet,reduceInit,mReduce[2],mReduce[3]);if(reduceR!==null)return reduceR;}
 
-  // SCAN(initial, range, LAMBDA(...))
-  var mScan=fOrig.match(/^SCAN\s*\(([^,]+)\s*,\s*([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
-  if(mScan){var scanInit=parseFloat(mScan[1].trim())||0;var scanR=_jsScanCompute(sheet,scanInit,mScan[2],mScan[3]);if(scanR!==null)return scanR;}
-
-  // MAP(range, LAMBDA(...))
-  var mMap=fOrig.match(/^MAP\s*\(([A-Z]+\d+:[A-Z]+\d+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
-  if(mMap){var mapR=_jsMapCompute(sheet,mMap[1],mMap[2]);if(mapR!==null)return mapR;}
-
-  // MAKEARRAY(rows, cols, LAMBDA(...))
-  var mMkarr=fOrig.match(/^MAKEARRAY\s*\(([0-9]+)\s*,\s*([0-9]+)\s*,\s*(LAMBDA\s*\(.+\))\s*\)$/is);
-  if(mMkarr){var mkR=_jsMakearrayCompute(sheet,parseInt(mMkarr[1]),parseInt(mMkarr[2]),mMkarr[3]);if(mkR!==null)return mkR;}
+  /* == 2026-09-19 ... SCAN / MAP / MAKEARRAY の 段を 消しました ==
+       ★訳は 上の 関所（_jsSet）の 注に 書いて あります★
+       ＝★溢れる 式を ここで 1マスに 潰して いました★
+       ⇒★台（lib/shiki-hyou.js）が 溢れごと 出します★
+       ★中の 関数（_jsScanCompute / _jsMapCompute / _jsMakearrayCompute）は 残して います★
+         ＝`__test` の 口から 試験が 呼んで います（★口を 黙って 消さない★）
+         ＝★お客さんの 道からは もう 呼ばれません★ */
 
   /* ★★ISOMITTED … ★『空の マス』と『省かれた 引数』は 別物★★（2026-09-08 実Excel 実測）
      ★前は こう だった★ `_getSingleVal` が null なら true
