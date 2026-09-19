@@ -141,6 +141,11 @@ try {
   if ($欠け -ne 0) { Write-Host ('★★飾りが ' + $欠け + '個 欠けて います★★'); exit 5 }
   $出来た = $true
 } finally {
+  # ★★2026-09-20 ── ★図形の 持ち手も 手放す★★
+  #   ＝`$かたち`（`Shapes.AddShape` が 返す 物）を $null に して いなかった ので
+  #     ★Excel が 120秒 では 消えませんでした★（3本目で 実際に 出ました）
+  #   ⇒記憶「実Excel を COM＝5.1 かつ ★掴んだ物 全部 $null★ の 2つ 揃った 時だけ 消える」
+  $かたち = $null
   $sh = $null
   if ($null -ne $bk) { $bk.Close($false) }
   $bk = $null
