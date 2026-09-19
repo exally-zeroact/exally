@@ -1,4 +1,4 @@
-﻿# toru-kobore-fusagi-wo-excel-ni-hirakaseru.ps1
+﻿﻿# toru-kobore-fusagi-wo-excel-ni-hirakaseru.ps1
 #   -- ★塞がれた 溢れ（#SPILL!）を 書き出した 物を 実Excel に 開かせる★（㊺）（2026-09-20）
 #
 #  ★★なぜ 要るか★★
@@ -32,7 +32,10 @@
 #  使い方: powershell.exe -NoProfile -ExecutionPolicy Bypass -File <この道具>
 
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$出 = Join-Path $ここ 'golden-kobore-fusagi-excel-2026-09-20.tsv'
+# ★★2026-09-20 ── ★同じ 名前の ファイルの 「直す 前」と 「直した 後」を 別の 紙に します★★
+#   ＝`%TEMP%` の 名は 1本の まま（門を 緩めない）／★紙が 上書きされると 前が 消えます★
+#   ⇒`-mae-`（`cm` 無し）／`-ato-`（`cm="1" ref="D1:D1"` 付き）
+$出 = Join-Path $ここ 'golden-kobore-fusagi-excel-ato-2026-09-20.tsv'
 
 $許す名 = 'exally-kakidashi-spill.xlsx'
 $開く = Join-Path $env:TEMP $許す名
@@ -65,7 +68,8 @@ try {
   $行.Add('# ★読むだけ★（保存して いません）')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
-  $行.Add('# ★生の 字★ D1 `<c r="D1" t="str"><f>_xlfn.SEQUENCE(3)</f><v>#SPILL!</v></c>`')
+  $行.Add('# ★生の 字★ D1 `<c r="D1" t="str" cm="1"><f t="array" ref="D1:D1">_xlfn.SEQUENCE(3)</f><v>#SPILL!</v></c>`')
+  $行.Add('# ★前（-mae- の 紙）★ D1 は `cm` も `ref` も 無く ⇒ ★値 1（Double）★ でした')
   $行.Add('# ★生の 字★ F1 `<c r="F1" cm="1"><f t="array" ref="F1:F3">_xlfn.SEQUENCE(3)</f><v>1</v></c>`')
 
   # ═══ ★★①開いた 瞬間（★まだ 1字も 書いて いません★）★★ ═══
