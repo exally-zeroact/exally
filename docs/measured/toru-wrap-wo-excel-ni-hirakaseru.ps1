@@ -11,7 +11,13 @@
 #    ⇒★★「打てて 計算できて 書き出せて、相手の Excel で 割れる」形★★
 #    ⇒★但し 「#NAME? に なる」は ★見立て★でした＝★ここで 割ります★
 #
-#  ★★開く 物★★ `%TEMP%\exally-kakidashi-wrap.xlsx`（★1本の 名★）
+#  ★★2026-09-20 足し ── ★前と 後を ★同じ 道具・同じ 1回★で 比べます★★
+#    ・`exally-kakidashi-wrap.xlsx`  ... ★直す 前★（裸）
+#    ・`exally-kakidashi-wrap2.xlsx` ... ★直した 後★（`_xlfn.` 付き）
+#    ⇒★引数は 取りません＝この 2本しか 開けません★（★門を 緩めない★）
+#    ⇒★記憶「入れて 落ちないかで 測るな＝引いて 正しい 答えが 出るかで 測る」★
+#
+#  ★★開く 物★★ `%TEMP%\exally-kakidashi-wrap.xlsx` ほか 1本（★字で 書いた 2本だけ★）
 #    16,705B ／ sha256 19fad67d915cf5288aca00d6cb4726824ce90f38f706fc2637945fd52606de11
 #    ★お客さんの 道★で 作った 物（画面で 打つ ⇒ 本番の 書き出しの 2行）
 #    ★生の 字（私が 読みました）★
@@ -45,15 +51,20 @@
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
 $出 = Join-Path $ここ 'golden-wrap-excel-2026-09-20.tsv'
 
-$許す名 = 'exally-kakidashi-wrap.xlsx'
-$開く = Join-Path $env:TEMP $許す名
+$二本 = @(
+  @{ 札 = 'mae(hadaka)';  名 = 'exally-kakidashi-wrap.xlsx' },
+  @{ 札 = 'ato(_xlfn.)'; 名 = 'exally-kakidashi-wrap2.xlsx' }
+)
+if ($二本.Count -ne 2) { exit 4 }
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
 if ($版.Major -ne 5) { Write-Host '★★powershell.exe（5.1）で 走らせて ください★★'; exit 8 }
-if ((Split-Path $開く -Leaf) -ne $許す名) { Write-Host '★★開いて よい ファイルは 1本だけです★★'; exit 7 }
-if (-not (Test-Path $開く)) { Write-Host ('★★在りません ... ' + $開く + '★★'); exit 6 }
-Write-Host ('★開く 物 ... ' + $開く + '（' + (Get-Item $開く).Length + ' バイト）★')
+foreach ($x in $二本) {
+  $p = Join-Path $env:TEMP $x.名
+  if (-not (Test-Path $p)) { Write-Host ('★★在りません ... ' + $p + '★★'); exit 6 }
+  Write-Host ('★開く 物 ... ' + $p + '（' + (Get-Item $p).Length + ' バイト）★')
+}
 
 $数1 = @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count
 $数2 = @(Get-CimInstance Win32_Process -Filter "Name='EXCEL.EXE'" -ErrorAction SilentlyContinue).Count
@@ -72,18 +83,21 @@ $bk = $null; $sh = $null; $c = $null; $w = $null
 try {
   $xl.Visible = $false
   $xl.DisplayAlerts = $false
-  $bk = $xl.Workbooks.Open($開く, 0, $true)
-  $sh = $bk.Sheets.Item(1)
-
   $行 = New-Object System.Collections.Generic.List[string]
   $行.Add('# ★WRAPROWS / WRAPCOLS を 裸で 書き出した 物を 実Excel に 開かせた★（53）（2026-09-20）')
-  $行.Add('# ★開いた 物★ ... ' + $開く + '（' + (Get-Item $開く).Length + ' バイト）')
-  $行.Add('# ★読むだけ★（保存して いません）')
+  $行.Add('# ★読むだけ★（保存して いません）／★開けるのは 字で 書いた 2本だけ★')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
   $行.Add('# ★生の 字★ C1 `WRAPROWS(A1:A6,3)`（裸・ref=C1:E2）／C5 `WRAPCOLS(A1:A6,3)`（裸・ref=C5:D7）')
   $行.Add('# ★対照★   G1 `_xlfn.SEQUENCE(3)`（付く）／I1 `TRANSPOSE(A1:A3)`（裸が 正しい）／A10 `SUM(A1:A6)`')
   $行.Add('# ★実Excel 自身は★ `_xlfn.WRAPROWS` と 書きます（51・52 で 実測）')
+
+  foreach ($ほん in $二本) {
+  $p = Join-Path $env:TEMP $ほん.名
+  $bk = $xl.Workbooks.Open($p, 0, $true)
+  $sh = $bk.Sheets.Item(1)
+  $行.Add('#')
+  $行.Add('# ═══ ★★' + $ほん.札 + '★★ ... ' + $ほん.名 + '（' + (Get-Item $p).Length + ' バイト）═══')
 
   # ═══ ★★①開いた 瞬間★★ ═══
   $行.Add('#')
@@ -148,11 +162,13 @@ try {
     $行.Add($ma2 + "`t" + $値 + "`t" + $型 + "`t" + $ゼロか)
   }
 
-  [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
-  Write-Host ('★書いた ... ' + $出 + '★')
-  # ★★保存しません★★
   $bk.Close($false)
   $bk = $null
+  $sh = $null
+  }
+
+  [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
+  Write-Host ('★書いた ... ' + $出 + '★')
 } finally {
   # ★★掴んだ物 全部 $null★★
   $c = $null; $w = $null; $sh = $null
