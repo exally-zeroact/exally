@@ -168,6 +168,14 @@ const 候補 = ['(1)', '()', '(A1:A2,1)', '(1,1)', '(A1:A2)', '(1,1,1)', '("a")'
   '(A1:B2,1,A1:A2)', '(A1:A2,A1:A2)',
   '(A1:A2,LAMBDA(v,v*2))', '(0,A1:A2,LAMBDA(a,b,a+b))', '(2,2,LAMBDA(r,c,r*c))',
   '(x,2,x*3)', '(x,x+1)', '("<a><b>1</b></a>","//b")'];
+/* ★台を 建てる★（★読めなければ null＝今まで通り 2段で 押す／黙って 緑に しない★） */
+let 板 = null;
+try {
+  const SH = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
+  板 = SH.表();
+  板.打つ('A1', 1); 板.打つ('A2', 2); 板.打つ('A3', 3);
+} catch (e) { 板 = null; }
+
 function 押す(f) {
   for (const a of 候補) {
     const 式 = '=' + f + a;
@@ -180,7 +188,25 @@ function 押す(f) {
            ⇒★でも 直す★＝★いつか 火が つく 罠★を 残さない */
       try { if (JS層(0, 式) !== null) return true; } catch (e) { /* 数えない */ }
     }
-    /* ②engine */
+    /* ══ ★★2026-09-19 ... ★台の 段を 足しました★★★ ══
+         ★訳★ ... 本番の 道は ★3段★です
+             ①JS層（`_jsComputeFormula`） → ②★台★（`lib/shiki-hyou.js`） → ③借り物
+           ＝`book.html:recalcSheet` の 実物
+         ★この 門は ①と ③しか 押して いませんでした★
+         ⇒`docs/measured/honban-no-michi.mjs` の 断り
+           「★この 段を 飛ばすと 『うちが 負けて いる』向きの 偽の 答えが 出ます★」
+         ⇒★実際に 起きて いました★ ... BYROW / BYCOL / LAMBDA / PHONETIC を
+           ★「動かない」と 読んで いた★（★本番では 動いて います★）
+         ⇒★★門を 甘く したのでは ありません＝★見る 範囲★を 本番に 揃えました★★ */
+    if (板) {
+      try {
+        板.打つ('ZZ9990', 式);
+        const _v = 板.値('ZZ9990');
+        if (_v && _v.溢れ === true) return true;
+        if (_v && !(_v.型 === '誤' && String(_v.値) === '#NAME?')) return true;
+      } catch (e) { /* ★投げただけでは「動く」と 数えない★ */ }
+    }
+    /* ③engine（借り物） */
     let 後; try { 後 = EF.convertFormula(式); } catch (e) { continue; }
     try {
       hf.setSheetContent(SID, [[1, 3], [2, 4], [後]]);
