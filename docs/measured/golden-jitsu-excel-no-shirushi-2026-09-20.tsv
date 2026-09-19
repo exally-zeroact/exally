@@ -79,3 +79,15 @@ H79	無し	(無し)	_xlfn.TEXTBEFORE("a-b","-")
 H85	無し	(無し)	_xlfn.VALUETOTEXT(A1)
 H91	無し	(無し)	_xlfn.XMATCH(2,A1:A6)
 # ★式が 在る マス ... 16個★
+#
+# ═══ ★59(抜き取り 6本)★ ... exally-jitsu-excel-nukitori6.xlsx（9210 バイト）═══
+# ★cm= の 数★ 0 ／ ★t="array" の 数★ 0
+# マス	cm	ref	実Excel が 書いた 式
+B1	無し	(無し)	SUM(A1:A3)
+H1	無し	(無し)	_xlfn.FORMULATEXT(B1)
+H7	無し	(無し)	SUMPRODUCT(A1:A3,A1:A3)
+H13	無し	(無し)	CONCATENATE("a","b")
+H19	無し	(無し)	_xlfn.XLOOKUP(2,A1:A6,A1:A6)
+H25	無し	(無し)	_xlfn.XOR(TRUE,FALSE)
+H31	無し	(無し)	_xlfn.SHEET()
+# ★式が 在る マス ... 7個★
