@@ -1,0 +1,11 @@
+# ★うちが 書き出した .xlsx を 実Excel に 開かせた★（2026-09-20）
+# ★開いた 物★ ... C:\Users\zeroa\AppData\Local\Temp\exally-kakidashi.xlsx
+# ★読むだけ★（保存して いません）
+# ★どの Excel か★ ... 版 16.0 ／ build 20326
+# ★どの 貝殻か★ ... PowerShell 5.1.26100.9278
+# マス	値	出る字	式	型	=(マス)=0
+D1	1	1	=SEQUENCE(3)	Double	False
+D2	2	2	2	Double	False
+D3	3	3	3	Double	False
+D4	(kara)			(kara)	True
+D5	(kara)			(kara)	True
