@@ -41,16 +41,38 @@ console.log('');
 console.log('[kobore-zenmasu] 溢れた先の 全マスが 実Excel と 同じか');
 
 const 紙の道 = path.join(ROOT, 'docs/measured/golden-kobore-zenmasu-2026-09-19.tsv');
+/* ★★2026-09-19 ... ★経営者1 が 物差しを 広げました（14本 -> 34本）★★★
+     `golden-kobore-hirogeru-2026-09-19.tsv` ... ★20本★
+       横 1x4 ／ 縦 4x1 ／ 四角 3x3 ／ 天地 3x2 ／ ★字を 返す MAP★
+       ★FILTER（当てはまる 物 なし ⇒ #CALC!）★
+       ★★SEQUENCE(2,2) の 溢れ先を 塞いだ 時（#SPILL!）★★ ＋ 塞がない 時（対照）
+     ⇒★「直った」と 言える 分母を 先に 作って もらいました★ */
+const 広げた道 = path.join(ROOT, 'docs/measured/golden-kobore-hirogeru-2026-09-19.tsv');
 T('★紙が 在る★', fs.existsSync(紙の道), 紙の道);
+T('★広げた 紙も 在る★', fs.existsSync(広げた道), 広げた道);
 
 const NL = String.fromCharCode(10), TAB = String.fromCharCode(9);
-const 行たち = fs.readFileSync(紙の道, 'utf-8').split(NL)
-  .filter((l) => l && l.charAt(0) !== '#')
-  .map((l) => l.split(TAB))
-  .filter((p) => p[1] && p[1].charAt(0) === '=')
-  .map((p) => ({ 式: p[1], 行数: Number(p[2]), 列数: Number(p[3]), 並び: p[4] }));
+/* ★★実Excel の 誤りは 「数」で 返ります★★（★字と 比べると 合って いる 物を 外れに します★）
+     ＝経営者1 も 私も 同じ日に ここで 偽の 外れを 出しました */
+const 誤りの数 = {
+  '-2146826238': '#CALC!', '-2146826243': '#SPILL!', '-2146826273': '#VALUE!',
+  '-2146826281': '#DIV/0!', '-2146826246': '#N/A', '-2146826259': '#NAME?',
+  '-2146826252': '#NUM!', '-2146826265': '#REF!', '-2146826288': '#NULL!',
+};
+const 正を直す = (t) => String(t).split('|')
+  .map((x) => (誤りの数[x] !== undefined ? 誤りの数[x] : x)).join('|');
 
-T('★★紙の 分母が 14本★★（★形が 変わったら 赤★）', 行たち.length === 14, '今 ' + 行たち.length + '本');
+function 紙を読む(道, 邪魔列) {
+  return fs.readFileSync(道, 'utf-8').split(NL)
+    .filter((l) => l && l.charAt(0) !== '#')
+    .map((l) => l.split(TAB))
+    .filter((p) => p[1] && p[1].charAt(0) === '=')
+    .map((p) => ({ 式: p[1], 行数: Number(p[2]), 列数: Number(p[3]), 並び: 正を直す(p[4]),
+      邪魔: (邪魔列 !== null && p[邪魔列]) ? p[邪魔列].trim() : '' }));
+}
+const 行たち = 紙を読む(紙の道, null).concat(紙を読む(広げた道, 7));
+
+T('★★紙の 分母が 34本★★（★形が 変わったら 赤★）', 行たち.length === 34, '今 ' + 行たち.length + '本');
 
 const SH = require_(path.join(ROOT, 'lib/shiki-hyou.js'));
 const 板 = SH.表();
@@ -104,7 +126,18 @@ T('★★本番の 1段目（JS層）に 手が 届く★★（★届かない�
     生きて, 訳);
 }
 
-function 押す(式) {
+function 押す(式, 邪魔, 列数) {
+  /* ★材料を 毎回 置き直します★（★前の 溢れが 残ると 偽の 外れ★） */
+  板.打つ('A1', 3); 板.打つ('A2', 1); 板.打つ('A3', 2);
+  板.打つ('B1', 10); 板.打つ('B2', 20); 板.打つ('B3', 30);
+  /* ★★邪魔が 在る 時は ★その 隣★に 置きます★★（離すと 塞がらない＝偽の 外れ） */
+  if (邪魔) {
+    板.打つ(邪魔, 'jama');
+    板.打つ('D1', 式);
+    const 横 = [];
+    for (let k = 0; k < 列数; k++) 横.push(String(板.字(String.fromCharCode(68 + k) + '1')));
+    return { 行数: 1, 列数: 列数, 並び: 横.concat(['', '', '', '']).slice(0, 5).join('|') };
+  }
   /* ★①JS層★ ... 答えたら ★1つの 値★＝★溢れません★ */
   if (typeof JS層 === 'function') {
     let j = null;
@@ -127,13 +160,13 @@ function 押す(式) {
 
 const 外れ = [];
 for (const r of 行たち) {
-  const 出 = 押す(r.式);
+  const 出 = 押す(r.式, r.邪魔, r.列数);
   if (出.行数 !== r.行数 || 出.列数 !== r.列数 || 出.並び !== r.並び) {
     外れ.push(r.式 + '\n         実Excel ' + r.行数 + 'x' + r.列数 + ' ... ' + r.並び
       + '\n         台      ' + 出.行数 + 'x' + 出.列数 + ' ... ' + 出.並び);
   }
 }
-T('★★14本 とも 溢れた先まで 実Excel と 同じ★★（★減っても 増えても 赤★）',
+T('★★34本 とも 溢れた先まで 実Excel と 同じ★★（★減っても 増えても 赤★）',
   外れ.length === 0, 外れ.join('\n       '));
 
 /* ★★溢れる 形が 本当に 溢れて いるか★★（★1x1 に 潰れて いないか★） */
@@ -144,7 +177,7 @@ T('★★14本 とも 溢れた先まで 実Excel と 同じ★★（★減っ�
   for (const r of 行たち) {
     if (!溢れる頭.some((h) => r.式.indexOf(h) === 0)) continue;
     if (r.行数 === 1 && r.列数 === 1) continue;        /* ★紙の 方が 1x1 なら 潰れて いない★ */
-    const 出 = 押す(r.式);
+    const 出 = 押す(r.式, r.邪魔, r.列数);
     if (出.行数 === 1 && 出.列数 === 1) 潰れた.push(r.式);
   }
   T('★★溢れる頭の 式が 1x1 に 潰れて いない★★（★JS層が 先に 答えると 潰れます★）',
@@ -156,7 +189,7 @@ T('★★14本 とも 溢れた先まで 実Excel と 同じ★★（★減っ�
   let 見つけた = 0;
   for (const r of 行たち) {
     const にせ = (r.式.indexOf('=MAP(') === 0) ? { ...r, 並び: 'X||||' } : r;
-    const 出 = 押す(にせ.式);
+    const 出 = 押す(にせ.式, にせ.邪魔, にせ.列数);
     if (出.並び !== にせ.並び) 見つけた++;
   }
   const MAPの数 = 行たち.filter((r) => r.式.indexOf('=MAP(') === 0).length;
