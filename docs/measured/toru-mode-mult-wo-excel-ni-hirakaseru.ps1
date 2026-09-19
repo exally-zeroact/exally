@@ -9,11 +9,10 @@
 #    ⇒★足したら 通るか は 開くまで 言えません★
 #      ＝記憶「★入れて 落ちないかで 測るな＝引いて 正しい 答えが 出るかで 測る★」
 #
-#  ★★断り（★先に 書きます★）★★
-#    ★今回は 「直した 後」しか 在りません★（WRAPROWS は 前後 2本 置けました）
-#    ⇒★「前は 割れて いた」は ★測って いません★＝見立てです★
-#    ⇒但し ★対照が 4つ 在ります★ので
-#      「直した 物が 通る」と「元から 通る 物が 下がって いない」は 言えます
+#  ★★2026-09-20 足し ── ★前（裸）も 置かれました★★
+#    `exally-kakidashi-mode0.xlsx` ... ★裸★（名簿から 一時的に 外して 作った 物）
+#    `exally-kakidashi-mode.xlsx`  ... ★`_xlfn.` 付き★
+#    ⇒★これで 3個目も 「前 割れて 後 通る」が 立ちます★
 #
 #  ★★開く 物★★ `%TEMP%\exally-kakidashi-mode.xlsx`（★1本の 名★）
 #    16,471B ／ sha256 7c031eac743c7a4712b5555ad7baddeacead5994ba807ca9d4c7b953939988f7
@@ -43,10 +42,13 @@
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
 $出 = Join-Path $ここ 'golden-mode-mult-excel-2026-09-20.tsv'
 
+# ★★2026-09-20 足し ── ★前（裸）も 置かれた ので 2本立てに します★★
+#   ＝★同じ 道具・同じ 1回で 比べる★（別々に 測ると 「道具が 変わった」が 混ざる）
 $二本 = @(
+  @{ 札 = 'mae(hadaka)';           名 = 'exally-kakidashi-mode0.xlsx' },
   @{ 札 = 'ato(_xlfn. wo tashita)'; 名 = 'exally-kakidashi-mode.xlsx' }
 )
-if ($二本.Count -ne 1) { exit 4 }
+if ($二本.Count -ne 2) { exit 4 }
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
