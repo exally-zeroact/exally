@@ -28,7 +28,11 @@ param(
   [string]$前 = '',
   [string]$後 = '',
   [string]$前の印 = '',
-  [string]$後の印 = ''
+  [string]$後の印 = '',
+  [string]$見るマス = '',      # ★材料ごとに 違う★（カンマ区切り）
+  [string]$繋げた = 'A5',      # ★繋げた マスの 左上★
+  [string]$塗り = 'B1',        # ★塗った マス★
+  [string]$線 = 'B2'           # ★線を 引いた マス★
 )
 
 $版 = $PSVersionTable.PSVersion
@@ -66,7 +70,23 @@ Write-Host ('★走らせる 直前の Excel ... ' + $数1 + '個 ／ ' + $数2 
 if ($数1 -ne 0 -or $数2 -ne 0) { Write-Host '★★Excel が 動いて います＝走らせません★★'; exit 3 }
 
 # ★見る マス★（★元の 材料の 中身は `tsukuru-tameshi-hiraku3-kazari-to-kobore3.ps1` に 書いて あります★）
-$見るマス = 'A1', 'A2', 'A3', 'B1', 'C1', 'C2', 'C3', 'D1', 'D5', 'E1', 'A5', 'A10', 'B10', 'C10'
+# ★★材料ごとに 見る 所が 違います★★（2026-09-22 に 踏みました）
+#   グラフ入りの 材料を ★飾り入りの 材料の マス★で 測って いました。
+#   ⇒`繋げた A5`＝False／`塗り B1`＝白／`線 B2`＝2 ... ★どれも 飾りの 無い マス★
+#   ⇒★前後 とも 同じ なので 緑に なります★＝★何も 守って いない 緑★
+#   ⇒記憶「★掃く 窓は 押す前に 隙間を 計算して から 置く★」
+$既定の見るマス = 'A1,A2,A3,B1,C1,C2,C3,D1,D5,E1,A5,A10,B10,C10'
+# ★★2026-09-22 ── ★`param` で `[string]` と 書いた 変数は ★後から 配列を 入れても 文字に 戻ります★★★
+#   `$見るマス = @(...)` と 書いたのに ★中身は 1本の 長い 文字★に なり、
+#   `Range('A1,B1,...')` を 引いて ★COM が 投げました★（0x800A03EC）。
+#   ⇒★型の 縛りは その 変数に ずっと 付いて 回ります★
+#   ⇒★別の 名前（縛りの 無い 物）に 入れます★
+$マス指定 = $見るマス
+if (-not $マス指定) { $マス指定 = $既定の見るマス }
+$マス達 = @($マス指定.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+if ($マス達.Count -lt 2) { Write-Host ('★★見る マスが ' + $マス達.Count + '個＝割れて いません★★'); exit 6 }
+Write-Host ('★見る マス★ ' + ($マス達 -join ' ') + '（' + $マス達.Count + '個）')
+Write-Host ('★飾りを 見る 所★ 繋げた ' + $繋げた + ' ／ 塗り ' + $塗り + ' ／ 線 ' + $線)
 
 $結果 = @{}
 $開けた = 0
@@ -89,6 +109,10 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
       for ($i = 1; $i -le [int]$bk.Sheets.Count; $i++) { $出.板 += [string]$bk.Sheets.Item($i).Name }
       $sh = $bk.Sheets.Item(1)
       $出.図形 = [int]$sh.Shapes.Count
+      # ★★グラフも Shapes に 入ります★★＝★分けずに 「図形 N個」と 書くと 嘘★
+      $出.グラフ = 0
+      try { $出.グラフ = [int]$sh.ChartObjects().Count } catch { $出.グラフ = -1 }
+      $出.判子 = $出.図形 - $出.グラフ
       # ══ ★★1つの 窓だけで 「0」を 取らない★★ ══（`tests/monosashi-mado.test.mjs`）
       #   `.Value2` は ★0で ない 値に 0 を 返します★（実Excel の 見せ方の 側）
       #     `=0.1+0.2-0.3` ... `.Value2` ★0★ ／ `=(式)=0` ★False★
@@ -99,7 +123,7 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
       #       ③★型★（`-is [double]` ／ `-is [string]` ／ 空）
       #   ★打つ 先は 材料の 外★（BZ1000）＝★材料の マスには 1文字も 書きません★
       #   ★保存しません★（`Close($false)`）ので ★ファイルは 1バイトも 変わりません★
-      foreach ($m in $見るマス) {
+      foreach ($m in $マス達) {
         $c = $sh.Range($m)
         $v = $c.Value2
         $出.値[$m] = if ($null -eq $v) { '(kara)' } else { [string]$v }
@@ -120,9 +144,9 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
       }
       # ★打った 所を 片づけます★（★材料の 外だが 残さない★）
       $sh.Range('BZ1000').ClearContents() | Out-Null
-      $出.繋げた = [string]$sh.Range('A5').MergeCells
-      $出.塗り = [int]$sh.Range('B1').Interior.Color
-      $出.線 = [int]$sh.Range('B2').Borders.Item(9).Weight
+      $出.繋げた = [string]$sh.Range($繋げた).MergeCells
+      $出.塗り = [int]$sh.Range($塗り).Interior.Color
+      $出.線 = [int]$sh.Range($線).Borders.Item(9).Weight
       # ★足した 板の 中身★
       if ([int]$bk.Sheets.Count -ge 2) {
         $s2 = $bk.Sheets.Item(2)
@@ -146,8 +170,8 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
   if ($投げた) { Write-Host ('  ★★投げました★★ ' + $投げた) }
   else {
     Write-Host ('  板 ....... ' + ($出.板 -join ' / '))
-    Write-Host ('  図形 ..... ' + $出.図形 + '個')
-    Write-Host ('  繋げた A5  ' + $出.繋げた + ' ／ 塗り B1 ' + $出.塗り + ' ／ 線 B2 ' + $出.線)
+    Write-Host ('  図形 ..... ' + $出.図形 + '個（グラフ ' + $出.グラフ + ' ／ 判子 ' + $出.判子 + '）')
+    Write-Host ('  繋げた ' + $繋げた + ' ' + $出.繋げた + ' ／ 塗り ' + $塗り + ' ' + $出.塗り + ' ／ 線 ' + $線 + ' ' + $出.線)
     if ($出.ContainsKey('板2A1')) { Write-Host ('  2枚目 ... A1=' + $出.板2A1 + ' ／ B1=' + $出.板2B1) }
   }
 }
@@ -167,11 +191,13 @@ $見 = {
 & $見 '①2枚目が 在る' $結果['mae'].板.Count $結果['ato'].板.Count 2
 & $見 '①2枚目 A1' '-' $結果['ato'].板2A1 '123'
 & $見 '①2枚目 B1' '-' $結果['ato'].板2B1 'tashita'
-& $見 '②図形の 数' $結果['mae'].図形 $結果['ato'].図形 'onaji'
-& $見 '②繋げた マス A5' $結果['mae'].繋げた $結果['ato'].繋げた 'onaji'
-& $見 '②塗り B1' $結果['mae'].塗り $結果['ato'].塗り 'onaji'
-& $見 '②線 B2' $結果['mae'].線 $結果['ato'].線 'onaji'
-foreach ($m in $見るマス) {
+& $見 '②図形の 数（全部）' $結果['mae'].図形 $結果['ato'].図形 'onaji'
+& $見 '②うち グラフ' $結果['mae'].グラフ $結果['ato'].グラフ 'onaji'
+& $見 '②うち 判子' $結果['mae'].判子 $結果['ato'].判子 'onaji'
+& $見 ('②繋げた マス ' + $繋げた) $結果['mae'].繋げた $結果['ato'].繋げた 'onaji'
+& $見 ('②塗り ' + $塗り) $結果['mae'].塗り $結果['ato'].塗り 'onaji'
+& $見 ('②線 ' + $線) $結果['mae'].線 $結果['ato'].線 'onaji'
+foreach ($m in $マス達) {
   & $見 ('③値 ' + $m) $結果['mae'].値[$m] $結果['ato'].値[$m] 'onaji'
   # ★★値だけ 揃っても 「同じ」では ありません★★
   #   ＝★前後 とも 空なら 0 対 0 で 揃って 見えます★（★偽の 緑★）

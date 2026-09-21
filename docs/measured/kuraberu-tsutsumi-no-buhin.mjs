@@ -70,6 +70,29 @@ if (!前道 || !後道) {
 for (const d of [前道, 後道]) {
   if (!fs.existsSync(d)) { console.log('★在りません★ ... ' + d); process.exit(3); }
 }
+/* ══ ★★材料の 印を 先に 突き合わせます★★ ══（2026-09-22）
+     ★`%TEMP%` の 名は 上書きされます★。実際に `exally-tashita-ita.xlsx` の 中身が
+     ★別の 材料の 物に 入れ替わって いました★（気づかずに 測って いました）。
+     ⇒★違う 材料どうしを 並べると ★相手の 直しの せいに 見える 嘘の 赤★が 出ます★
+     ⇒`--前の印` / `--後の印` に sha256 を 渡すと ★合わない なら 走りません★
+     ⇒★渡されて いない 時は 「見て いません」と 出します★（★黙って 通さない★） */
+const 印を取る = (b) => require_('node:crypto').createHash('sha256').update(b).digest('hex');
+const 印引数 = (な) => {
+  const i = process.argv.indexOf(な);
+  return i > 0 ? String(process.argv[i + 1] || '').toLowerCase() : '';
+};
+{
+  const ま1 = 印引数('--前の印'), ま2 = 印引数('--後の印');
+  if (ま1 || ま2) {
+    const h1 = 印を取る(fs.readFileSync(前道)), h2 = 印を取る(fs.readFileSync(後道));
+    if (ま1 && h1 !== ま1) { console.log('★★前の 材料が 違います★★ 待ち ' + ま1 + ' ／ 実物 ' + h1); process.exit(2); }
+    if (ま2 && h2 !== ま2) { console.log('★★後の 材料が 違います★★ 待ち ' + ま2 + ' ／ 実物 ' + h2); process.exit(2); }
+    console.log('★印は 渡された 物と 合って います★');
+  } else {
+    console.log('★★印を 渡されて いません＝すり替わりを 見て いません★★');
+  }
+}
+
 const 前 = 包みを開く(fs.readFileSync(前道));
 const 後 = 包みを開く(fs.readFileSync(後道));
 if (!前 || !後) { console.log('★包みが ほどけません★'); process.exit(4); }
