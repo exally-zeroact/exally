@@ -151,6 +151,20 @@ try {
         };
       }()),
       シートの鍵: Object.keys(sh),
+      /* ★★板が 2枚 以上の 時に 「どの 板に 出たか」を 見ます★★（2026-09-21）
+           ＝`.xlsb` の 板の 名前 ⇒ 部品名 を 引き違えると
+             ★判子が 別の 板に 出ます★（★消えるのでは なく ずれる★） */
+      板たち: (window.sheets || []).map(function (x) {
+        return { 名: x.name,
+          A1: (x.data && x.data['0,0']) ? String(x.data['0,0'].d) : '',
+          図形: (x.objects || []).map(function (o) { return o.名 + '/' + (o.種類 || '?'); }) };
+      }),
+      当て方: (function () {
+        try {
+          var c = (window.BookOpen && window.BookOpen.current) ? window.BookOpen.current() : null;
+          return c ? (c.図形の当て方 || '(空)') : '(開いて いない)';
+        } catch (e) { return '(取れない)'; }
+      }()),
     };
   });
 
@@ -170,6 +184,11 @@ try {
   console.log('    繋げた  = ' + ま(出.merges));
   console.log('    図形    = ' + ま(出.図形));
   console.log('    シートの 鍵 = ' + (出.シートの鍵 || []).join(' '));
+  console.log('    ★板の 当て方★ = ' + 出.当て方);
+  (出.板たち || []).forEach(function (x, i) {
+    console.log('    板' + (i + 1) + ' 名=' + x.名 + ' A1=' + x.A1
+      + ' 図形=' + (x.図形.length ? x.図形.join(',') : '(無し)'));
+  });
 
   /* ★★飾りごとに 届いたか★★（★1つずつ 名指し★） */
   const A1 = 出.A1 || {}, B1 = 出.B1 || {}, B2 = 出.B2 || {}, A3 = 出.A3 || {};

@@ -127,7 +127,8 @@
            ★★.xlsb は まだ です★★＝★包みの 中が 別物★（未対応と 書いて おきます） */
       var 飾り表 = null;
       var 図形表 = null;
-      var 図形の並び = null;   /* ★`.xlsb` は 名前では なく 並びの 番号で 持ちます★ */
+      var 図形の並び = null;   /* ★名前で 引けなかった 時だけ 使います★ */
+      var 図形の当て方 = '';    /* ★どちらで 読んだかを 残します★ */
       if ((kind === 'xlsx' || kind === 'xlsm') && root.XlsxKazari && root.XlsxEdit) {
         pre = pre.then(function () {
           return root.XlsxEdit.open(bytes).then(function (book) {
@@ -193,33 +194,39 @@
       if (kind === 'xlsb' && root.XlsxZukei && root.ZipSurgeon) {
         pre = pre.then(function () {
           var z2 = root.ZipSurgeon.read(bytes);
-          var 板たち = z2.names().filter(function (n) {
-            return n.indexOf('xl/worksheets/sheet') === 0 && n.indexOf('.bin') === n.length - 4;
-          }).sort(function (a, b) {
-            var f = function (x) { return parseInt(String(x).replace(/[^0-9]/g, ''), 10) || 0; };
-            return f(a) - f(b);
-          });
-          var 表 = {}, 鎖 = Promise.resolve();
-          板たち.forEach(function (道, i) {
-            鎖 = 鎖.then(function () {
-              var 名 = 道.split('/').pop();
-              var relsの道 = 'xl/worksheets/_rels/' + 名 + '.rels';
-              if (!z2.has(relsの道)) return null;
-              return z2.text(relsの道).then(function (r) {
-                /* ★板は 2進なので 字を 渡しません★＝`Type` で 解かせます */
-                var 部 = root.XlsxZukei.図形の部品名('', r, 道);
-                if (!部 || !z2.has(部)) return null;
-                return z2.text(部).then(function (d) {
-                  var 図 = root.XlsxZukei.読む(d);
-                  if (図.length) 表[i] = 図;   /* ★並びの 番号で 持ちます★ */
+          /* ★★板の 名前 ⇒ 部品名は 「引いて」 出します★★（2026-09-21）
+               `workbook.bin` の 並び ⇒ `rId` ⇒ `xl/_rels/workbook.bin.rels` ⇒ 部品名
+               ＝`lib/xlsb-edit.js` の `板たち()`（★BIFF12 を 歩く 道具は 前から 在りました★）
+             ★★なぜ 並びで 当てないか★★
+               経営者1 が 板 2枚の `.xlsb` を 2本 作りました（並びを 入れ替えた 物も）。
+               ⇒★Excel が 作り直した 物では 番号が 並びに 付いて 来て いました★
+               ⇒★★つまり その 2本では 「番号当て」でも 通って しまいます★★
+               ⇒★だから あの 材料では 番号当ての 良し悪しは 割れません★
+               ⇒それでも やめます＝★「たまたま 合って いる」と 「引いて いる」は 別★
+               ⇒★他の 道具（LibreOffice・古い Excel・板を 消した 後）は 未測定★
+             ★引けない 時は 並びに 戻します★＝★開かなく なる 方が ずっと 悪い★ */
+          var 名で引く = null;
+          var しまう = function (出) {
+            if (!出) return;
+            if (Object.keys(出.名表).length) 図形表 = 出.名表;
+            if (Object.keys(出.並表).length) 図形の並び = 出.並表;
+            図形の当て方 = 出.当て方;
+          };
+          try {
+            if (root.XlsbEdit && typeof root.XlsbEdit.板たち === 'function'
+                && z2.has('xl/workbook.bin') && z2.has('xl/_rels/workbook.bin.rels')) {
+              return z2.bytes('xl/workbook.bin').then(function (wbb) {
+                return z2.text('xl/_rels/workbook.bin.rels').then(function (rx) {
+                  名で引く = root.XlsbEdit.板たち(wbb, rx);
+                  return 図形を集める(z2, 名で引く).then(しまう);
                 });
-              }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
-            });
-          });
-          return 鎖.then(function () { 図形の並び = 表; }).catch(function (e) {
-            図形の並び = null;
-            if (root.console) root.console.warn('[Exally] .xlsb の 図形を 読めませんでした', e);
-          });
+              });
+            }
+          } catch (e) { /* ★引けない 時は 下へ★ */ }
+          return 図形を集める(z2, null).then(しまう);
+        }).catch(function (e) {
+          図形表 = 図形表 || null;
+          if (root.console) root.console.warn('[Exally] .xlsb の 図形を 読めませんでした', e);
         });
       }
       var マクロ = null;
@@ -235,13 +242,55 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方); });
       });
     });
   }
 
+  /** ★★`.xlsb` の 図形を 集める★★（2026-09-21）
+   *    `板たち` が 引けた ⇒ ★板の 名前★ で 持ちます（`図形表`）
+   *    引けなかった ⇒ ★並びの 番号★ で 持ちます（`図形の並び`・前の やり方）
+   *    ★どちらで 読んだかを 画面の 言づてに 出します★＝★黙って 落ちない★ */
+  function 図形を集める(z2, 名で引く) {
+    var 板たち;
+    if (名で引く && 名で引く.length) {
+      板たち = 名で引く.map(function (x) { return { 鍵: x.名, 道: x.部品, 名で: true }; });
+    } else {
+      板たち = z2.names().filter(function (n) {
+        return n.indexOf('xl/worksheets/sheet') === 0 && n.indexOf('.bin') === n.length - 4;
+      }).sort(function (a, b) {
+        var f = function (x) { return parseInt(String(x).replace(/[^0-9]/g, ''), 10) || 0; };
+        return f(a) - f(b);
+      }).map(function (道, i) { return { 鍵: i, 道: 道, 名で: false }; });
+    }
+    var 名表 = {}, 並表 = {}, 鎖 = Promise.resolve();
+    板たち.forEach(function (板) {
+      鎖 = 鎖.then(function () {
+        var 名 = 板.道.split('/').pop();
+        var relsの道 = 'xl/worksheets/_rels/' + 名 + '.rels';
+        if (!z2.has(relsの道)) return null;
+        return z2.text(relsの道).then(function (r) {
+          /* ★板は 2進なので 字を 渡しません★＝`Type` で 解かせます */
+          var 部 = root.XlsxZukei.図形の部品名('', r, 板.道);
+          if (!部 || !z2.has(部)) return null;
+          return z2.text(部).then(function (d) {
+            var 図 = root.XlsxZukei.読む(d);
+            if (!図.length) return;
+            if (板.名で) 名表[板.鍵] = 図; else 並表[板.鍵] = 図;
+          });
+        }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
+      });
+    });
+    /* ★★外の 入れ物を 触りません★★＝★返して 呼んだ 側に 入れさせます★
+         ＝この 道具は `openFile` の 外に 在るので 中の 変数が 見えません
+         ＝★見えないのに 書くと 黙って 窓（global）を 作ります★ */
+    return 鎖.then(function () {
+      return { 名表: 名表, 並表: 並表, 当て方: 名で引く ? '名前' : '並び' };
+    });
+  }
+
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
@@ -278,6 +327,16 @@
            が起きる（実物14シート・2万セルで実際に起きた 2026-08-09）。 */
         base: base,
         tableRefs: trStats,        // ★何本 直したか（見張りと報告が読む。画面には出さない）
+        /* ★★`.xlsb` の 板を どちらで 当てたか★★（2026-09-21）
+             '名前' ＝ `workbook.bin` の 並び ⇒ rId ⇒ rels ⇒ 部品名 を ★引いた★
+             '並び' ＝ 引けなかったので ★番号で 当てた★（前の やり方）
+             ''     ＝ `.xlsb` では ない／図形を 読んで いない
+           ★★なぜ 残すか★★
+             経営者1「★あなたの 側で どちらを 読んで いるかを 字で 見せて ください★」
+             ＝★板の 並びを 入れ替えた 材料でも Excel が 番号を 付け直す ので★
+               ★★答えが 合って いても どちらで 読んだかは 分かりません★★
+             ⇒★だから 道具の 側に 書き残します★ */
+        図形の当て方: 図形の当て方 || '',
       };
       return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null,
         表の断り: tr断り || [] };

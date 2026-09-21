@@ -45,6 +45,28 @@ const T = (n, f) => {
   catch (e) { fail++; console.log('  NG   ' + n + NL + '       ' + e.message); }
 };
 
+/* ★★2進の まま ほどく★★（`.bin` は 字に すると 壊れます）
+     ＝2026-09-21 に ここで 1回 踏みました＝`workbook.bin` を 字で 渡して
+       `板たち()` が `null` を 返し ★門が 4本 赤★に なりました。
+     ＝★本番の 穴では なく 門の 穴★でした。 */
+function ほどく生(buf) {
+  const 出 = {};
+  let p = 0;
+  while (p + 30 <= buf.length) {
+    if (buf.readUInt32LE(p) !== 0x04034b50) break;
+    const 方 = buf.readUInt16LE(p + 8);
+    const 圧 = buf.readUInt32LE(p + 18);
+    const n = buf.readUInt16LE(p + 26);
+    const x = buf.readUInt16LE(p + 28);
+    const 名 = buf.toString('utf8', p + 30, p + 30 + n);
+    const 頭 = p + 30 + n + x;
+    const 体 = buf.slice(頭, 頭 + 圧);
+    出[名] = 方 === 8 ? zlib.inflateRawSync(体) : 体;
+    p = 頭 + 圧;
+  }
+  return 出;
+}
+
 function ほどく(buf) {
   const 出 = {};
   let p = 0;
@@ -230,6 +252,92 @@ T('★★`r:id` の 道でも 型の 道でも 同じ 答え★★（★.xlsx �
     部品['xl/worksheets/_rels/sheet1.xml.rels'], 'xl/worksheets/sheet1.xml');
   if (あ !== い) throw new Error('★r:id ' + あ + ' ／ 型 ' + い + '★');
 });
+
+/* ══ ★★板が 2枚 以上の `.xlsb` で 判子が 正しい 板に 行くか★★ ══（2026-09-21）
+     ★★なぜ 要るか★★
+       `.xlsb` の 板の 名前 ⇒ 部品名 を 引き違えると
+       ★判子が 別の 板に 出ます★（★消えるのでは なく ずれる★）。
+       ＝★1枚の 材料では 絶対に 割れません★
+     ★★経営者1 の 断り（大事）★★
+       「★Excel が 作り直した 物では 番号が 並びに 付いて 来る★」
+       ⇒★★この 2本では 「番号当て」でも 同じ 答えに なります★★
+       ⇒★だから 答えが 合う だけでは 「引いて いる」証しに なりません★
+       ⇒★★`板たち()` が 返す `rId` を 字で 見ます★★＝★引いた 証し★
+     ★材料★ ... 経営者1 が 実Excel で 作った 作り物 2本
+       `ita2mai.xlsb`        1枚目 Ita1 ／ 2枚目 Ita2
+       `ita2mai-irekae.xlsb` ★1枚目 Ita2 ／ 2枚目 Ita1★（並びを 入れ替えた 物） */
+const XE = require_(path.join(ROOT, 'lib/xlsb-edit.js'));
+const 二枚 = [
+  { 名: 'ita2mai.xlsb', 大: 10866,
+    sha: '366f296220b9ce885a72fdfc74a08ec1140cb37d6d60427976cec421ff9fc87a',
+    待つ: [{ 名: 'Ita1', rId: 'rId1', 部品: 'xl/worksheets/sheet1.bin', 判子: 'hanko1', 形: '四角' },
+           { 名: 'Ita2', rId: 'rId2', 部品: 'xl/worksheets/sheet2.bin', 判子: 'hanko2', 形: '丸' }] },
+  { 名: 'ita2mai-irekae.xlsb', 大: 10870,
+    sha: 'c1551aea4e9c2414ad498233c7d284df7393df3bc914659612178e6362eadd48',
+    待つ: [{ 名: 'Ita2', rId: 'rId1', 部品: 'xl/worksheets/sheet1.bin', 判子: 'hanko2', 形: '丸' },
+           { 名: 'Ita1', rId: 'rId2', 部品: 'xl/worksheets/sheet2.bin', 判子: 'hanko1', 形: '四角' }] },
+];
+
+for (const 本 of 二枚) {
+  const 道 = path.join(ROOT, 'tests/fixtures/' + 本.名);
+  const 中身 = fs.existsSync(道) ? fs.readFileSync(道) : null;
+  T('★' + 本.名 + ' が 在る（空振りして いない）★', () => {
+    if (!中身) throw new Error('★材料が 無い★ ' + 道);
+    if (中身.length !== 本.大) throw new Error('★大きさが ' + 中身.length + '★');
+    const h = crypto.createHash('sha256').update(中身).digest('hex');
+    if (h !== 本.sha) throw new Error('★入れ替わって います★ ' + h);
+  });
+  if (!中身) continue;
+  const 生 = ほどく生(中身);
+  const 部 = ほどく(中身);
+  /* ★`workbook.bin` は 2進の まま 渡します★（字に すると 読めません） */
+  const 板 = XE.板たち(生['xl/workbook.bin'], 部['xl/_rels/workbook.bin.rels']);
+  T('★★' + 本.名 + ' ＝ 板の 名前 ⇒ rId ⇒ 部品名 を 引けて いる★★', () => {
+    if (!板) throw new Error('★引けません（null）★');
+    if (板.length !== 本.待つ.length) throw new Error('★' + 板.length + '枚★');
+    for (let i = 0; i < 板.length; i++) {
+      const あ = 板[i], い = 本.待つ[i];
+      if (あ.名 !== い.名) throw new Error('★板' + (i + 1) + ' の 名が ' + あ.名 + '★（' + い.名 + ' の はず）');
+      if (あ.rId !== い.rId) throw new Error('★板' + (i + 1) + ' の rId が ' + あ.rId + '★（' + い.rId + ' の はず）');
+      if (あ.部品 !== い.部品) throw new Error('★板' + (i + 1) + ' の 部品が ' + あ.部品 + '★');
+    }
+  });
+  T('★★' + 本.名 + ' ＝ 判子が 正しい 板に 行く★★', () => {
+    if (!板) throw new Error('★板を 引けません★');
+    for (let i = 0; i < 板.length; i++) {
+      const 名 = 板[i].部品.split('/').pop();
+      const r = 部['xl/worksheets/_rels/' + 名 + '.rels'];
+      if (!r) throw new Error('★' + 名 + ' の rels が 無い★');
+      const 絵 = Z.図形の部品名('', r, 板[i].部品);
+      if (!絵 || !部[絵]) throw new Error('★図形の 部品名が ' + 絵 + '★');
+      const 図 = Z.読む(部[絵]);
+      if (図.length !== 1) throw new Error('★板' + (i + 1) + ' の 図形が ' + 図.length + '個★');
+      if (図[0].名 !== 本.待つ[i].判子) {
+        throw new Error('★★板' + (i + 1) + '（' + 板[i].名 + '）に ' + 図[0].名
+          + ' が 出ました★★（' + 本.待つ[i].判子 + ' の はず）★判子が 別の 板に ずれて います★');
+      }
+      if (図[0].種類 !== 本.待つ[i].形) {
+        throw new Error('★板' + (i + 1) + ' の 形が ' + 図[0].種類 + '★（' + 本.待つ[i].形 + ' の はず）');
+      }
+    }
+  });
+}
+
+/* ★★入れ替えた 本で 「並び当て」なら どう なるかを 出します★★
+     ＝★経営者1 の 断り（どちらでも 同じ 答えに なる）を 実物で 確かめる★
+     ＝★同じなら 「割れない」と 書く／違えば 「割れる」と 書く★ */
+{
+  const 道 = path.join(ROOT, 'tests/fixtures/ita2mai-irekae.xlsb');
+  if (fs.existsSync(道)) {
+    const 生 = ほどく生(fs.readFileSync(道));
+    const 部 = ほどく(fs.readFileSync(道));
+    const 板 = XE.板たち(生['xl/workbook.bin'], 部['xl/_rels/workbook.bin.rels']) || [];
+    const 並び = ['xl/worksheets/sheet1.bin', 'xl/worksheets/sheet2.bin'];
+    const 同じ = 板.length === 2 && 板[0].部品 === 並び[0] && 板[1].部品 === 並び[1];
+    console.log('      ＝ 入れ替えた 本で 「引く」と 「並び」の 答えは '
+      + (同じ ? '★同じ★（この 材料では 割れません）' : '★違う★（割れます）'));
+  }
+}
 
 console.log('');
 console.log('  ★見て いない 事★');
