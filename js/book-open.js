@@ -109,6 +109,43 @@
       }
       /* ★マクロ(VBA)は 開いた時に 読んでおく★（★読むだけ・動かさない★・AIは0回）
          ★読めなくても 画面は そのまま動く★＝読めない時は「未測定」と言う（0本と言わない） */
+      /* ★★マスの 飾り（太字・字の色・塗り・罫線）を ★自前で★ 読む★★（2026-09-21）
+           ★★なぜ 要るか★★
+             実Excel が 作った 飾り付きの ファイルを お客さんの 道で 開いて 数えたら
+             ★届いた 7 / 13★ でした（`golden-kazari-gamen-made-2026-09-21.tsv`）。
+             ★太字・字の色・罫線2つ・塗り★ が 画面に 出て いませんでした。
+           ★★なぜ 借り物では 駄目か★★（2026-09-21 実測）
+             `cellStyles: true` を 付けても
+               ・`c.s` は ★塗りだけ★
+               ・`wb.Styles.Borders` は ★10個 とも `{}`★（★罫線が 空★）
+               ・マスが どの `cellXf` を 指すかの ★番号を 捨てます★
+           ★★板の 名前から 部品名を 出す 所は 在る 物を 使います★★
+             `XlsxEdit.open()` が `xl/workbook.xml` と rels を 読んで
+             `{ name, part }` を 作って います＝★新しく 書きません★
+           ★★読めなくても 画面は そのまま 動きます★★
+             ＝飾りが 付かないだけ（★前と 同じ★）。★開かなく なる 方が ずっと 悪い★
+           ★★.xlsb は まだ です★★＝★包みの 中が 別物★（未対応と 書いて おきます） */
+      var 飾り表 = null;
+      if ((kind === 'xlsx' || kind === 'xlsm') && root.XlsxKazari && root.XlsxEdit) {
+        pre = pre.then(function () {
+          return root.XlsxEdit.open(bytes).then(function (book) {
+            return book.zip.text('xl/styles.xml').then(function (型の字) {
+              var 表 = {}, 鎖 = Promise.resolve();
+              book.sheets.forEach(function (板) {
+                鎖 = 鎖.then(function () {
+                  return book.zip.text(板.part).then(function (xml) {
+                    表[板.name] = root.XlsxKazari.読む(xml, 型の字);
+                  }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
+                });
+              });
+              return 鎖.then(function () { 飾り表 = 表; });
+            });
+          }).catch(function (e) {
+            飾り表 = null;
+            if (root.console) root.console.warn('[Exally] 飾りを 読めませんでした', e);
+          });
+        });
+      }
       var マクロ = null;
       if (hasVba && root.Vba && root.ZipSurgeon) {
         pre = pre.then(function () {
@@ -122,18 +159,18 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表); });
       });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
       既定の字体 = (wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0]) ? wb.Styles.Fonts[0] : null;
-      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null); });
+      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null, 飾り表 ? 飾り表[nm] : null); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
          ★計算し直した瞬間に 46043 と食い違い、全部「変わった」ことになる★
@@ -332,7 +369,18 @@
     return 0;
   }
 
-  function sheetToGrid(ws, name, tableFixes, 字体) {
+  /** ★飾りを マスに 写す★（★在る 物だけ★＝空の 鍵を 増やさない） */
+  function 飾りを写す(cell, 飾) {
+    if (!cell || !飾) return;
+    if (飾.bold) cell.bold = true;
+    if (飾.italic) cell.italic = true;
+    if (飾.underline) cell.underline = true;
+    if (飾.color) cell.color = 飾.color;
+    if (飾.bgColor) cell.bgColor = 飾.bgColor;
+    if (飾.border) cell.border = 飾.border;
+  }
+
+  function sheetToGrid(ws, name, tableFixes, 字体, 飾り) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
@@ -405,8 +453,31 @@
           if (t !== undefined && t !== null && t !== '') cell.d = t;
         } catch (e) { /* 作れなければ数のまま出す */ }
       }
+      /* ★飾りを 付ける★（`lib/xlsx-kazari.js` が 作った 物）
+           ★台が 前から 持って いる 名前に 合わせて います★
+           ＝`bold` / `italic` / `underline` / `color` / `bgColor` / `border`
+           ＝★画面の 描き手を 1行も 変えずに 出ます★ */
+      var 飾 = 飾り ? 飾り[a] : null;
+      if (飾) 飾りを写す(cell, 飾);
       data[rc.r + ',' + rc.c] = cell;
     });
+    /* ══ ★★中身が 空でも 飾りだけ 在る マス★★ ══（2026-09-21）
+         ★実Excel の `BorderAround` は 空の マスにも 罫線を 付けます★
+         ⇒`<c r="B3" s="4"/>`（値も 式も 無い）
+         ⇒借り物は `sheetStubs: false` で ★この マスを 丸ごと 捨てます★
+         ⇒★上の 回では 1つも 拾えません★＝★四角の 下の 辺が 消えます★
+         ⇒★だから ここで 入れ直します★ */
+    if (飾り) {
+      Object.keys(飾り).forEach(function (a) {
+        var rc2;
+        try { rc2 = X.utils.decode_cell(a); } catch (e) { return; }
+        var k2 = rc2.r + ',' + rc2.c;
+        if (data[k2]) return;
+        var 空 = { v: '', f: '', d: '' };
+        飾りを写す(空, 飾り[a]);
+        data[k2] = 空;
+      });
+    }
     /* ══ ★★結合した マスを 読む★★（2026-09-11）══════════════════════════
        ★前は 1組も 読んで いませんでした★（`!merges` を 一度も 見て いない）
        ⇒ 実Excel で ★G1:H1★ と 2マス分 に 広げて ある 所を 1マス分と して 扱い、

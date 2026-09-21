@@ -203,6 +203,42 @@ try {
   console.log('  ★★但し これは 「台に 在るか」です★★');
   console.log('    ＝★描いて いるか は 下の 絵を 見て ください★');
 
+  /* ══ ★★画素の 色を 測る★★ ══（2026-09-21）
+       ★「印が 付いたか」では なく 「絵が 変わったか」★（記憶の 決まり）
+       ⇒キャンバスから ★そのマスの 真ん中の 色★ を 読みます。
+       ★待ってから 撮ります★＝知らせの 札が 消えるのを 待つ（札は 絵に 写ります） */
+  await page.waitForFunction(() => {
+    const t = document.querySelectorAll('.toast, #toast');
+    for (const x of t) { if (x.offsetParent !== null) return false; }
+    return true;
+  }, { timeout: 15000 }).catch(() => {});
+
+  const 画素 = await page.evaluate(() => {
+    const cv = document.getElementById('grid-canvas');
+    if (!cv) return '(キャンバスが 無い)';
+    const g = cv.getContext('2d');
+    /* ★画面の 点と キャンバスの 点は 倍率が 違います★（Retina 等）
+         ★clientWidth が 0 の 時は 測れません★＝★1 と 決めつけません★ */
+    if (!cv.clientWidth || !cv.width) return '(キャンバスの 大きさが 取れない) w=' + cv.width + ' cw=' + cv.clientWidth;
+    const 倍 = cv.width / cv.clientWidth;
+    const 読 = (r, c) => {
+      if (typeof window.colX !== 'function') return '(colX が 無い)';
+      const x = window.colX(c) + window.cW(c) / 2;
+      const y = window.rowY(r) + window.rH(r) / 2;
+      const d = g.getImageData(Math.round(x * 倍), Math.round(y * 倍), 1, 1).data;
+      const h = (n) => ('0' + n.toString(16).toUpperCase()).slice(-2);
+      return '#' + h(d[0]) + h(d[1]) + h(d[2]);
+    };
+    return { A1: 読(0, 0), B1: 読(0, 1), C1: 読(0, 2), A4: 読(3, 0), D1: 読(0, 3) };
+  });
+  console.log('');
+  console.log('  ★★画素の 色★★（★マスの 真ん中★）');
+  console.log('    B1（黄の はず #FFFF00） = ' + (画素 && 画素.B1));
+  console.log('    A1（塗り 無し）          = ' + (画素 && 画素.A1));
+  console.log('    C1（塗り 無し）          = ' + (画素 && 画素.C1));
+  console.log('    D1（塗り 無し・対照）    = ' + (画素 && 画素.D1));
+  console.log('    A4（飾り 無し・対照）    = ' + (画素 && 画素.A4));
+
   const 絵 = path.join(TEMP, 'exally-kazari-gamen.png');
   await page.screenshot({ path: 絵, fullPage: false });
   const 絵中 = fs.readFileSync(絵);

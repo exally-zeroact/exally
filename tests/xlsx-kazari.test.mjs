@@ -1,0 +1,210 @@
+/* xlsx-kazari.test.mjs — ★マスの 飾りを 自前で 読めて いるか★（2026-09-21）
+ *
+ *  ★★なぜ 要るか★★
+ *    実Excel が 作った 飾り付きの ファイルを お客さんの 道で 開いて 数えたら
+ *    ★届いた 7 / 13★ でした（`docs/measured/golden-kazari-gamen-made-2026-09-21.tsv`）。
+ *    ★太字・字の色・罫線2つ・塗り★ が ★画面に 1つも 出て いませんでした★。
+ *    因 ＝ ★借り物（SheetJS 0.20.3）が 飾りを 捨てる★（同じ日 実測）
+ *          `wb.Styles.Borders` は ★10個 とも `{}`★／マスの `cellXf` の 番号も 捨てる
+ *    ⇒`lib/xlsx-kazari.js` で ★生の `xl/styles.xml` を 自前で 読みます★
+ *
+ *  ★★物差し★★
+ *    `tests/fixtures/kazari-hiraku3.xlsx`（11725B）
+ *    sha256 cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b
+ *    ★実Excel（16.0 build 20326）が COM で 作った 物★
+ *    作り方 `docs/measured/tsukuru-tameshi-hiraku3-kazari-to-kobore3.ps1`
+ *    ★入って いるのは 作り物の 数だけ★（3 / 1 / 0.25 / abc / kazari no tame no musubi）
+ *      ＝★司さんの 商売の 中身は 1文字も 在りません★
+ *
+ *  ★★待つ 物★★（上の ps1 の 92〜101行目 が そのまま 元）
+ *    `A1:C3` の 周り ＝ `BorderAround(1, 3)`（LineStyle 1 / Weight 3 ＝ medium）
+ *    `B2` の 下       ＝ LineStyle 1 / Weight 4（＝ thick）
+ *    `B1` の 塗り     ＝ Interior.Color 65535（＝黄 `#FFFF00`）
+ *    `A1` の 字       ＝ Bold ／ Color 255（＝赤 `#FF0000`）
+ *
+ *  ★★包みは 自前で ほどきます★★
+ *    借り物に 読ませると「借り物が どう 読んだか」しか 分かりません。
+ *
+ *  使い方: node tests/xlsx-kazari.test.mjs
+ *          node tests/xlsx-kazari.test.mjs --self-test
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import zlib from 'node:zlib';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(path.join(ROOT, 'package.json'));
+const K = require_(path.join(ROOT, 'lib/xlsx-kazari.js'));
+
+let pass = 0, fail = 0;
+const NL = String.fromCharCode(10);
+const T = (n, f) => {
+  try { f(); pass++; console.log('  ok   ' + n); }
+  catch (e) { fail++; console.log('  NG   ' + n + NL + '       ' + e.message); }
+};
+
+/* ★包みを ほどく★（局所ヘッダを 順に 舐めて 生の字を 見る） */
+function ほどく(buf) {
+  const 出 = {};
+  let p = 0;
+  while (p + 30 <= buf.length) {
+    if (buf.readUInt32LE(p) !== 0x04034b50) break;
+    const 方 = buf.readUInt16LE(p + 8);
+    const 圧 = buf.readUInt32LE(p + 18);
+    const n = buf.readUInt16LE(p + 26);
+    const x = buf.readUInt16LE(p + 28);
+    const 名 = buf.toString('utf8', p + 30, p + 30 + n);
+    const 頭 = p + 30 + n + x;
+    const 体 = buf.slice(頭, 頭 + 圧);
+    出[名] = 方 === 8 ? zlib.inflateRawSync(体).toString('utf8') : 体.toString('utf8');
+    p = 頭 + 圧;
+  }
+  return 出;
+}
+
+const 材料道 = path.join(ROOT, 'tests/fixtures/kazari-hiraku3.xlsx');
+const 中 = fs.existsSync(材料道) ? fs.readFileSync(材料道) : null;
+
+console.log('');
+console.log('[xlsx-kazari] ★マスの 飾りを 自前で 読めて いるか★');
+
+T('★材料が 在る（空振りして いない）★', () => {
+  if (!中) throw new Error('★材料が 無い★ ' + 材料道);
+  if (中.length !== 11725) throw new Error('★大きさが 違う★ ' + 中.length + 'B（11725B の はず）');
+  const h = crypto.createHash('sha256').update(中).digest('hex');
+  if (h !== 'cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b') {
+    throw new Error('★材料が 入れ替わって います★ sha256=' + h);
+  }
+});
+
+const 部品 = 中 ? ほどく(中) : {};
+T('★包みが ほどけた（styles と sheet が 在る）★', () => {
+  if (!部品['xl/styles.xml']) throw new Error('★xl/styles.xml が 無い★');
+  if (!部品['xl/worksheets/sheet1.xml']) throw new Error('★xl/worksheets/sheet1.xml が 無い★');
+});
+
+const 飾り = 中 ? K.読む(部品['xl/worksheets/sheet1.xml'], 部品['xl/styles.xml']) : {};
+console.log('      ＝ 飾りの 在る マス ' + Object.keys(飾り).length + '個 ／ '
+  + Object.keys(飾り).join(' '));
+
+T('★★字（A1）が 太字で 赤★★', () => {
+  const a = 飾り.A1 || {};
+  if (a.bold !== true) throw new Error('★太字が 付いて いない★ ' + JSON.stringify(a));
+  if (a.color !== '#FF0000') throw new Error('★色が ' + a.color + '★（#FF0000 の はず）');
+});
+
+T('★★塗り（B1）が 黄★★', () => {
+  const b = 飾り.B1 || {};
+  if (b.bgColor !== '#FFFF00') throw new Error('★塗りが ' + b.bgColor + '★（#FFFF00 の はず）');
+});
+
+/* ★★`BorderAround(A1:C3)` は ★周りの 9マスに 散ります★★
+     ＝角の マスは 2辺、辺の マスは 1辺。★真ん中（B2）には 外枠が 付きません★
+     ⇒★1マスだけ 見ると 「読めて いる」と 言えません★ */
+T('★★A1:C3 の 周りの 罫線が 9マスに 正しく 散って いる★★', () => {
+  const 待つ = {
+    A1: { top: 2, left: 2 }, B1: { top: 2 }, C1: { top: 2, right: 2 },
+    A2: { left: 2 }, C2: { right: 2 },
+    A3: { bottom: 2, left: 2 }, B3: { bottom: 2 }, C3: { bottom: 2, right: 2 },
+  };
+  for (const ま of Object.keys(待つ)) {
+    const 出 = (飾り[ま] || {}).border || {};
+    const あ = JSON.stringify(待つ[ま]);
+    const い = JSON.stringify(出);
+    if (あ !== い) throw new Error('★' + ま + '★ 待つ ' + あ + ' ／ 出た ' + い);
+  }
+});
+
+T('★★B2 の 下の 罫線（thick）が 在る★★（★真ん中の マス★）', () => {
+  const b = (飾り.B2 || {}).border || {};
+  if (b.bottom !== 2) throw new Error('★B2 の 下が ' + b.bottom + '★（2 の はず）／' + JSON.stringify(b));
+  if (b.top || b.left || b.right) {
+    throw new Error('★B2 に 外枠が 付いて います★ ' + JSON.stringify(b)
+      + '／★BorderAround は 真ん中には 付きません★');
+  }
+});
+
+T('★飾りの 無い マスは 入れない（空の 物を 増やさない）★', () => {
+  for (const ま of ['D1', 'E1', 'A10', 'A5']) {
+    if (飾り[ま]) throw new Error('★' + ま + ' に 飾りが 付いた★ ' + JSON.stringify(飾り[ま]));
+  }
+});
+
+/* ══ ★★道具の 一つずつ★★ ══（★口を 名指しで 押す★） */
+T('★色にする ＝ 8桁は 頭の 2桁を 落とす／6桁は そのまま／他は null★', () => {
+  const 組 = [['FFFF0000', '#FF0000'], ['FFFF00', '#FFFF00'], ['00FFFF00', '#FFFF00'],
+    ['', null], ['XYZ', null], ['FFGG0000', null], ['12345', null]];
+  for (const [入, 待] of 組) {
+    const 出 = K.色にする(入);
+    if (出 !== 待) throw new Error('★' + JSON.stringify(入) + ' → ' + JSON.stringify(出)
+      + '★（' + JSON.stringify(待) + ' の はず）');
+  }
+});
+
+T('★太さ ＝ none と 空は 0／medium thick double は 2／thin hair は 1★', () => {
+  const 組 = [['', 0], ['none', 0], ['medium', 2], ['thick', 2], ['double', 2],
+    ['thin', 1], ['hair', 1], ['dotted', 1], ['mediumDashed', 2]];
+  for (const [入, 待] of 組) {
+    const 出 = K.太さ(入);
+    if (出 !== 待) throw new Error('★' + 入 + ' → ' + 出 + '★（' + 待 + ' の はず）');
+  }
+});
+
+T('★マスの型番 ＝ `<c r="A1" s="7">` から A1→7 を 取る★', () => {
+  const 番 = K.マスの型番(部品['xl/worksheets/sheet1.xml']);
+  if (番.A1 !== 7) throw new Error('★A1 の 型番が ' + 番.A1 + '★（7 の はず）');
+  if (番.B1 !== 8) throw new Error('★B1 の 型番が ' + 番.B1 + '★（8 の はず）');
+  if (番.D1 !== undefined) throw new Error('★D1 に `s=` は 無い はず★ ' + 番.D1);
+});
+
+console.log('');
+console.log('  ★見て いない 事★');
+console.log('    ・★画面に 描いて いるかは ここでは 測って いません★');
+console.log('      ＝`docs/measured/hakaru-kazari-ga-gamen-made-todoku-ka.mjs`（画素まで 測る）');
+console.log('    ・テーマの 色／番号の 色（`indexed`）は ★読んで いません★');
+console.log('    ・斜めの 罫線は ★台に 持ち方が 有りません★');
+console.log('    ・`.xlsb` は ★まだ★（包みの 中が 別物）');
+console.log('xlsx-kazari: ' + pass + ' 緑 / ' + fail + ' 赤');
+
+if (process.argv.includes('--self-test')) {
+  console.log('');
+  console.log('--self-test: ★わざと壊して 赤に なるか★（★lib は 1字も 触りません★）');
+  const 板 = 部品['xl/worksheets/sheet1.xml'];
+  const 型 = 部品['xl/styles.xml'];
+  /* ★★壊し方の 表★★＝★元の 字を 書き換えて 押します★
+       ★1つずつ 別の 所を 壊します★＝1か所で 全部 赤に なる 門は 弱い
+       ★直すのは 字の 写しだけ★＝`lib` も 材料の ファイルも 触りません */
+  const 壊し方 = [
+    { 名: '`<b/>` を 抜く（太字が 消える はず）',
+      型: (x) => x.replace(new RegExp('<b/>', 'g'), ''),
+      見る: (k) => !(k.A1 || {}).bold },
+    { 名: '赤の 字を 緑に する（色が 変わる はず）',
+      型: (x) => x.replace(new RegExp('FFFF0000', 'g'), 'FF00FF00'),
+      見る: (k) => (k.A1 || {}).color === '#00FF00' },
+    { 名: 'medium を none に する（罫線が 消える はず）',
+      型: (x) => x.replace(new RegExp('style="medium"', 'g'), 'style="none"'),
+      見る: (k) => !(k.A1 || {}).border },
+    { 名: 'solid を none に する（塗りが 消える はず）',
+      型: (x) => x.replace(new RegExp('patternType="solid"', 'g'), 'patternType="none"'),
+      見る: (k) => !(k.B1 || {}).bgColor },
+    { 名: 'マスの 型番を 全部 0 に する（飾りが 0個に なる はず）',
+      板: (x) => x.replace(new RegExp('s="[1-9]"', 'g'), 's="0"'),
+      見る: (k) => Object.keys(k).length === 0 },
+  ];
+  let 悪 = 0;
+  for (const こ of 壊し方) {
+    const 板2 = こ.板 ? こ.板(板) : 板;
+    const 型2 = こ.型 ? こ.型(型) : 型;
+    if (板2 === 板 && 型2 === 型) {
+      console.log('  NG   ★1字も 変わって いません★ ' + こ.名);
+      悪++; continue;
+    }
+    if (こ.見る(K.読む(板2, 型2))) console.log('  ok   ' + こ.名);
+    else { console.log('  NG   ★壊したのに 同じ 答え★ ' + こ.名); 悪++; }
+  }
+  process.exit(悪 ? 1 : 0);
+}
+process.exit(fail ? 1 : 0);
