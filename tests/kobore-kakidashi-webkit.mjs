@@ -127,6 +127,21 @@ try {
     window.setCell(0, 5, '=SEQUENCE(1,3)');
     window.setCell(19, 0, '=SEQUENCE(2,3)');
     window.setCell(9, 0, '=SUM(1,2)');
+    /* ★★2026-09-21 ＝ ★今日 溢れる ように した 3つの 道★を 画面でも 押します★★
+         ★なぜ★ ... `SEQUENCE` は ★前から 溢れて いた★ 物です。
+           今日 足した 3つの 道は ★1本も 画面で 押して いませんでした★。
+         ★材料★ J1=100 ／ J2=`=1+1` ／ J3=3
+           ＝★J2 だけ 式★に して あります。`ISFORMULA` が 本当に
+             ★打って ある 字★を 見て いるなら ★FALSE / TRUE / FALSE★ が 出ます。
+         ★置き場★（★押す 前に 隙間を 数えました★・どれも 縦3・列を 1つ 空ける）
+           J(9)=材料 ／ K(10)=空 ／ L(11)=LEN ／ M=空 ／ N(13)=ISFORMULA ／ O=空 ／ P(15)=ROW
+           ＝D/F/G/H（1〜3行）・A10・A20:C21 の どれとも 重なりません */
+    window.setCell(0, 9, '100');
+    window.setCell(1, 9, '=1+1');
+    window.setCell(2, 9, '3');
+    window.setCell(0, 11, '=LEN(J1:J3)');        /* ★値★を 1マスずつ 渡す 道 */
+    window.setCell(0, 13, '=ISFORMULA(J1:J3)');  /* ★場所★を 1マスずつ 渡す 道 */
+    window.setCell(0, 15, '=ROW(J1:J3)');        /* ★形★の ぶんだけ 溢れる 道 */
     if (typeof window.recalcSheet === 'function') window.recalcSheet(window.activeSheet, sh.data);
     const 読 = (r, c) => {
       const x = (sh.data || {})[r + ',' + c];
@@ -138,6 +153,9 @@ try {
       F1: 読(0, 5), G1: 読(0, 6), H1: 読(0, 7),
       A20: 読(19, 0), B21: 読(20, 1),
       A10: 読(9, 0),
+      L1: 読(0, 11), L2: 読(1, 11), L3: 読(2, 11),
+      N1: 読(0, 13), N2: 読(1, 13), N3: 読(2, 13),
+      P1: 読(0, 15), P2: 読(1, 15), P3: 読(2, 15),
     };
   });
 
@@ -170,9 +188,39 @@ try {
   T('★⑥ 包みが ほどけた★', Object.keys(中).length > 0 && s.length > 0,
     '部品 ' + Object.keys(中).length + '本 / sheet ' + s.length + 'B');
 
+  /* ══ ★★属性の ★並び★に 頼りません★★ ══（2026-09-21 ここで 1回 踏みました）
+       ★何が 起きたか★
+         前は `<c r="N1" cm="1">` と ★続けて 書いて ある事★を 当てに して いました。
+         ⇒`ISFORMULA` は ★真偽★を 返すので SheetJS が 間に `t="b"` を 入れます:
+             `<c r="N1" t="b" cm="1"><f t="array" ref="N1:N3">…`
+         ⇒★書き出しは 正しいのに 門だけが 赤に なりました★
+         ⇒★★これは 逆も 起きます★★＝★飾りが 1つ 増えた 日に 黙って 緑の まま 割れる★
+       ★直し★ ... ★そのマスを 丸ごと 切り出して から 中を 探します★（並び順を 見ない）
+       ★`indexOf` で 切ります★＝★逆斜線の 逃がしが 途中で 落ちる★のを 避ける為
+         （2026-09-21 に 同じ 型で 8回 踏んで います） */
+  const マスを切る = (a) => {
+    const あ = '<c r=' + JSON.stringify(a);
+    let k = s.indexOf(あ + ' ');
+    if (k < 0) k = s.indexOf(あ + '>');
+    if (k < 0) return null;
+    const e = s.indexOf('</c>', k);
+    return e < 0 ? s.slice(k) : s.slice(k, e + 4);
+  };
+  /* ★溢れの 範囲★ ... ★`cm="1"` と `t="array"` の 両方が 要ります★
+       （`cm` だけ＝動く並びの 印だけ／`ref` だけ＝昔の CSE 配列） */
   const 取る = (a) => {
-    const m = s.match(new RegExp('<c r="' + a + '" cm="1"><f t="array" ref="([^"]+)">'));
-    return m ? m[1] : null;
+    const c = マスを切る(a);
+    if (!c) return null;
+    if (c.indexOf('cm=' + JSON.stringify('1')) < 0) return null;
+    if (c.indexOf('t=' + JSON.stringify('array')) < 0) return null;
+    const あ = 'ref=' + JSON.stringify('').charAt(0);
+    const i = c.indexOf('ref=');
+    if (i < 0) return null;
+    const j = c.indexOf(JSON.stringify('').charAt(0), i + 4);
+    if (j < 0) return null;
+    const k = c.indexOf(JSON.stringify('').charAt(0), j + 1);
+    if (k < 0) return null;
+    return c.slice(j + 1, k);
   };
   T('★⑦ 縦3 が ref="D1:D3" ＋ cm="1"★', 取る('D1') === 'D1:D3', 'D1 の ref=' + 取る('D1'));
   T('★⑧ 横3 が ref="F1:H1"★', 取る('F1') === 'F1:H1', 'F1 の ref=' + 取る('F1'));
@@ -183,6 +231,31 @@ try {
   T('★⑪ xl/metadata.xml が 入って いる★',
     !!中['xl/metadata.xml'] && 中['xl/metadata.xml'].indexOf('dynamicArrayProperties') >= 0);
   T('★⑫ 頭の 式に _xlfn. が 付いて いる★', s.indexOf('_xlfn.SEQUENCE(3)') >= 0);
+
+  /* ══ ★★2026-09-21 ＝ 今日 溢れる ように した 3つの 道★★ ══
+       ★★数だけ 見ません＝中身も 見ます★★
+         2026-09-21 に `ISFORMULA` が ★3マスに 溢れて いるのに 中身は 全部 `#VALUE!`★
+         でした。★数だけ 見る 門は これを 緑で 通します★。
+       ★値★ LEN ／ ★場所★ ISFORMULA ／ ★形★ ROW（どれも 別の 道です） */
+  const 中身 = (a, b, c) => [a, b, c].map((x) => (x ? String(x.d) : '(無)')).join(' / ');
+  T('★⑬ 値の 道（LEN）が 画面でも 溢れる ref="L1:L3"★',
+    取る('L1') === 'L1:L3', 'L1 の ref=' + 取る('L1'));
+  T('★⑭ 値の 道の ★中身★（3 / 1 / 1）★',
+    印.L1 && String(印.L1.d) === '3' && String(印.L2.d) === '1' && String(印.L3.d) === '1',
+    'L=' + 中身(印.L1, 印.L2, 印.L3));
+  T('★⑮ 場所の 道（ISFORMULA）が 画面でも 溢れる ref="N1:N3"★',
+    取る('N1') === 'N1:N3', 'N1 の ref=' + 取る('N1'));
+  T('★★⑯ 場所の 道の ★中身★（FALSE / TRUE / FALSE）★★',
+    印.N1 && String(印.N1.d).toUpperCase() === 'FALSE'
+      && 印.N2 && String(印.N2.d).toUpperCase() === 'TRUE'
+      && 印.N3 && String(印.N3.d).toUpperCase() === 'FALSE',
+    'N=' + 中身(印.N1, 印.N2, 印.N3)
+      + '（★J2 だけ 式（=1+1）なので 真ん中だけ TRUE の はず★'
+      + '／★全部 #VALUE! なら 値だけ 渡して います★）');
+  T('★⑰ 形の 道（ROW）が 画面でも 溢れる ref="P1:P3" ／ 中身 1 / 2 / 3★',
+    取る('P1') === 'P1:P3' && 印.P1 && String(印.P1.d) === '1'
+      && 印.P2 && String(印.P2.d) === '2' && 印.P3 && String(印.P3.d) === '3',
+    'P1 の ref=' + 取る('P1') + ' 中身=' + 中身(印.P1, 印.P2, 印.P3));
 
   if (実物を置く) {
     const out = path.join(process.env.TEMP || process.env.TMP || '.', 'exally-kakidashi-gamen.xlsx');
