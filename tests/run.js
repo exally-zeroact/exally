@@ -388,6 +388,8 @@ const FILES = [
   ['kobore-fusagi.test.mjs', '--self-test'],   // ★#SPILL! 以外に 付けたら 赤か★
   ['kobore-nakami.test.mjs'],       // ★溢れた 先の ★中身★を 実Excel の 紙と 突き合わせる★（2026-09-21）
   ['kobore-nakami.test.mjs', '--self-test'],   // ★紙の 中身を 変えると 赤か★
+  ['kobore-basho.test.mjs'],        // ★場所を 見る 関数と ROW/COLUMN の 向き★（2026-09-21）
+  ['kobore-basho.test.mjs', '--self-test'],    // ★A2 を 式で 無くすと 変わるか★
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
   ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
   ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
