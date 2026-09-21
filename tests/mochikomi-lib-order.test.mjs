@@ -109,6 +109,25 @@ console.log('  mochikomi.html ... ' + 画.length + '本');
   assert.equal(/<input(?![^>]*type="file")/.test(mk), false, 'file 以外の 入力欄が 在ります');
 });
 
+見る('★★この 画面は 計算させない（★式の 台を 1つも 持たない★）★★', () => {
+  /* ★★2026-09-21 ── ★これは 決めです★（Exally1 に 訊かれて 私が 決めました）★★
+       ア② は「★持ち込んだ 物を 見て、そのまま 返す★」所です。
+       ★値打ちは 「元の ファイルを 1バイトも 触らない」事★。
+       ⇒★計算させると 答えが 書き換わる 恐れが 在ります★
+         ＝借り物の 計算が 実Excel と 1マスでも 違えば、
+           ★お客さんの ファイルの 答えが 黙って 変わって 返ります★
+         ＝★それは この 画面の 値打ちを 壊します★
+       ⇒★だから 計算の 口を 1つも 置きません★
+       ★★直したい 人は `book.html` へ★★（そちらは 計算します＝★道を 分けるのが 役目★）
+       ★戻す 条件★ ... この 画面で 直せる ように する と 決めた 時。
+                      ★その時は 「1バイトも 触らない」を 先に 取り下げる 事★ */
+  const 計算の口 = ['initFormulaEngine', 'loadSheetIntoEngine', 'recalcSheet', 'HyperFormula'];
+  const 在る = 計算の口.filter((n) => mk.indexOf(n) >= 0 || よむ('js/mochikomi.js').indexOf(n) >= 0);
+  assert.deepEqual(在る, [],
+    '★計算の 口が 入りました★ ... ' + 在る.join(' / ')
+    + '＝この 画面は 計算させない 決めです。直すなら 先に 上の 覚書きを 読んで ください。');
+});
+
 見る('★ログインの 扉が 在る★', () => {
   assert.ok(/id="app"[^>]*hidden/.test(mk), '`#app` が hidden で ありません');
   assert.ok(/#app\[hidden\]\{display:none/.test(mk), '`[hidden]` の 一行が 在りません');
