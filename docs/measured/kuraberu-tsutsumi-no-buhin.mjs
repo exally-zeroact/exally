@@ -145,6 +145,49 @@ const 宣言が古い = 消える予定.filter((x) => 減.indexOf(x) < 0);
 出す('★中身が 変わった 部品★', 変, (x) => x.な + '  ' + x.前 + 'B ⇒ ' + x.後 + 'B');
 console.log('★中身が 同じ 部品★ ' + 同.length + '本'
   + (詰め違い.length ? '（うち ★詰め方だけ 違う★ ' + 詰め違い.length + '本）' : ''));
+/* ══ ★★`.xlsb` の 「字の マス」を 数えます★★ ══（2026-09-22）
+     ★`.xlsb` に 足した 板は 今 ★数しか 書けません★★（`sharedStrings.bin` を 触れない）
+     ⇒★字を 打った つもりの マスは 黙って 落ちます★
+     ⇒★落ちるのは 狙い通りですが 「落ちた」事が 見えないと 嘘に なります★
+     ⇒★増えた `.bin` の 板に 字の マス（記録 7）が 何本 在るかを 出します★
+       ＝0本なら ★字は 1つも 入って いません★と はっきり 言う
+     ★記録の 番号★ ... 2 ＝数の マス ／ 7 ＝字の マス（★実測・85 の 紙★） */
+function 記録に割る(b) {
+  const 出 = [];
+  let p = 0;
+  const 継ぐ = (q, 最大) => {
+    let v = 0;
+    for (let i = 0; i < 最大; i += 1) {
+      const c = b[q + i];
+      v |= (c & 0x7f) << (7 * i);
+      if ((c & 0x80) === 0) return [v >>> 0, i + 1];
+    }
+    return null;
+  };
+  while (p < b.length) {
+    const 番 = 継ぐ(p, 2); if (!番) break;
+    const 長 = 継ぐ(p + 番[1], 4); if (!長) break;
+    const h = p + 番[1] + 長[1];
+    if (h + 長[0] > b.length) break;
+    出.push(番[0]);
+    p = h + 長[0];
+  }
+  return 出;
+}
+const 足した板 = 増.filter((x) => /^xl\/worksheets\/sheet\d+\.bin$/.test(x));
+if (足した板.length) {
+  console.log('');
+  console.log('★★足した 板の 中身（`.xlsb`）★★');
+  for (const な of 足した板) {
+    const 並 = 記録に割る(後.get(な).中身);
+    const 数 = 並.filter((n) => n === 2).length;
+    const 字 = 並.filter((n) => n === 7).length;
+    console.log('  ' + な + ' ... 記録 ' + 並.length + '本 ／ ★数の マス ' + 数
+      + '本★ ／ ★字の マス ' + 字 + '本★'
+      + (字 === 0 ? '（★字は 1つも 入って いません★）' : ''));
+  }
+}
+
 console.log('');
 console.log('★★この 道具は 「開けるか」を 見て いません★★');
 console.log('  ⇒実Excel が 投げないかは `toru-jitsu-excel-ga-shuufuku-shita-ka.ps1`（93）で 見ます');
