@@ -52,7 +52,7 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
   $xl = New-Object -ComObject Excel.Application
   $bk = $null; $sh = $null
   $投げた = ''
-  $出 = @{ 投げた = ''; 板 = @(); 図形 = 0; 値 = @{}; 繋げた = ''; 塗り = 0; 線 = 0 }
+  $出 = @{ 投げた = ''; 板 = @(); 図形 = 0; 値 = @{}; 零 = @{}; 型 = @{}; 繋げた = ''; 塗り = 0; 線 = 0 }
   try {
     $xl.Visible = $false
     $xl.DisplayAlerts = $false
@@ -64,11 +64,37 @@ foreach ($組 in @(@('mae', $前), @('ato', $後))) {
       for ($i = 1; $i -le [int]$bk.Sheets.Count; $i++) { $出.板 += [string]$bk.Sheets.Item($i).Name }
       $sh = $bk.Sheets.Item(1)
       $出.図形 = [int]$sh.Shapes.Count
+      # ══ ★★1つの 窓だけで 「0」を 取らない★★ ══（`tests/monosashi-mado.test.mjs`）
+      #   `.Value2` は ★0で ない 値に 0 を 返します★（実Excel の 見せ方の 側）
+      #     `=0.1+0.2-0.3` ... `.Value2` ★0★ ／ `=(式)=0` ★False★
+      #   さらに ★字の "0"★ も 同じ 顔を します（`=DEC2BIN(0.5)`）
+      #   ⇒★3つの 窓で 取ります★
+      #       ①`.Value2`
+      #       ②★`=(そのマス)=0` の 真偽★（★本当に 0 か★）
+      #       ③★型★（`-is [double]` ／ `-is [string]` ／ 空）
+      #   ★打つ 先は 材料の 外★（BZ1000）＝★材料の マスには 1文字も 書きません★
+      #   ★保存しません★（`Close($false)`）ので ★ファイルは 1バイトも 変わりません★
       foreach ($m in $見るマス) {
         $c = $sh.Range($m)
         $v = $c.Value2
         $出.値[$m] = if ($null -eq $v) { '(kara)' } else { [string]$v }
+        # ★②2つ目の 窓★
+        $窓 = '(hakarenai)'
+        try {
+          $sh.Range('BZ1000').Formula2 = '=(' + $m + ')=0'
+          $窓 = [string]$sh.Range('BZ1000').Value2
+        } catch { $窓 = '(utenai)' }
+        $出.零[$m] = $窓
+        # ★③型★（★字の "0" と 数の 0 を 分ける★）
+        $型 = '(kara)'
+        if ($v -is [double]) { $型 = 'Double' }
+        elseif ($v -is [string]) { $型 = 'String' }
+        elseif ($v -is [bool]) { $型 = 'Bool' }
+        elseif ($null -ne $v) { $型 = $v.GetType().Name }
+        $出.型[$m] = $型
       }
+      # ★打った 所を 片づけます★（★材料の 外だが 残さない★）
+      $sh.Range('BZ1000').ClearContents() | Out-Null
       $出.繋げた = [string]$sh.Range('A5').MergeCells
       $出.塗り = [int]$sh.Range('B1').Interior.Color
       $出.線 = [int]$sh.Range('B2').Borders.Item(9).Weight
@@ -120,7 +146,14 @@ $見 = {
 & $見 '②繋げた マス A5' $結果['mae'].繋げた $結果['ato'].繋げた 'onaji'
 & $見 '②塗り B1' $結果['mae'].塗り $結果['ato'].塗り 'onaji'
 & $見 '②線 B2' $結果['mae'].線 $結果['ato'].線 'onaji'
-foreach ($m in $見るマス) { & $見 ('③値 ' + $m) $結果['mae'].値[$m] $結果['ato'].値[$m] 'onaji' }
+foreach ($m in $見るマス) {
+  & $見 ('③値 ' + $m) $結果['mae'].値[$m] $結果['ato'].値[$m] 'onaji'
+  # ★★値だけ 揃っても 「同じ」では ありません★★
+  #   ＝★前後 とも 空なら 0 対 0 で 揃って 見えます★（★偽の 緑★）
+  #   ⇒★2つ目の 窓と 型も 並べます★
+  & $見 ('③零 ' + $m) $結果['mae'].零[$m] $結果['ato'].零[$m] 'onaji'
+  & $見 ('③型 ' + $m) $結果['mae'].型[$m] $結果['ato'].型[$m] 'onaji'
+}
 & $見 '④投げなかった' '(なし)' $結果['ato'].投げた ''
 & $見 '⑦1枚目の 名' $結果['mae'].板[0] $結果['ato'].板[0] 'onaji'
 

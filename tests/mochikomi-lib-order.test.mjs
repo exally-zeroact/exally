@@ -118,18 +118,51 @@ console.log('  mochikomi.html ... ' + 画.length + '本');
 if (process.argv.includes('--self-test')) {
   console.log('');
   console.log('[mochikomi-lib-order --self-test] ★わざと 壊して 赤に なるか★');
-  const 壊し = [
-    ['①順を 入れ替える', () => 部分列か(本, 画.slice().reverse())],
-    ['②1本 抜く', () => 本.filter((x) => x !== 本[2]).length === 本.length],
-    ['③SheetJS を 後ろへ', () => 部分列か(本, 画.filter((x) => x !== 本[0]).concat(本[0]))],
+  /* ★★2026-09-21 ── 1回目は ★実物を 1文字も 壊して いません★でした★★
+       並びの 配列を 手で 作り替えて `部分列か` に 渡しただけ＝★台の 試験★で、
+       ★`mochikomi.html` が 壊れても 気づけません★。
+       （`tests/name-vs-body.test.mjs` が ★「壊して いないのに そう 名乗る」★と 赤に しました）
+     ⇒★実物の 字を 書き換えた 写しで 同じ 検査を 走らせます★（ディスクは 触りません）
+     ⇒`tests/hon-no-nakami.test.mjs` の 自己試験と ★同じ やり方★に 揃えました */
+  /* ★逆斜線を 1文字も 使いません★（heredoc や 便りで ★落ちます★＝記憶の 決まり）
+       ⇒正規表現を 使わず `indexOf` と `slice` で 切ります */
+  function 一行を取る(h, 名) {
+    const a = h.indexOf('<script src="' + 名);
+    if (a < 0) throw new Error('見つかりません ... ' + 名);
+    const b = h.indexOf('</script>', a) + 9;
+    return h.slice(a, b);
+  }
+  const 壊し方 = [
+    ['①`<script>` を 1本 抜く', (h) => {
+      const 行 = 一行を取る(h, 'lib/table-refs.js');
+      return h.split(行).join('');
+    }],
+    ['②SheetJS を 後ろへ 回す', (h) => {
+      const 行 = 一行を取る(h, 'lib/xlsx.full.min.js');
+      const 先 = 一行を取る(h, 'js/book-open.js');
+      const 改 = String.fromCharCode(10);   /* ★逆斜線を 書かない★ */
+      return h.split(行).join('').split(先).join(行 + 改 + 先);
+    }],
+    ['③2本の 前後を 入れ替える', (h) => {
+      const a = 一行を取る(h, 'lib/xlsx-io.js');
+      const b = 一行を取る(h, 'lib/zip-surgeon.js');
+      return h.split(a).join('@A@').split(b).join(a).split('@A@').join(b);
+    }],
   ];
   let 鳴 = 0;
-  for (const [名, する] of 壊し) {
-    const 通った = する();
-    console.log((通った ? '  ★赤★ ' : '  ok   ') + 名 + (通った ? ' ... ★壊しても 通ります★' : ' ... 壊したら 通らなく なりました'));
-    if (!通った) 鳴 += 1;
+  for (const [名, 壊す] of 壊し方) {
+    /* ★先に 壊して いない 実物で 通る事を 見ます★（通らないなら 検査が 壊れて います） */
+    assert.ok(部分列か(本, 画面の順(mk)), '壊す 前に 通りません＝検査が 壊れて います');
+    const 壊れ = 壊す(mk);
+    assert.notEqual(壊れ, mk, '★1文字も 壊れて いません★ ... ' + 名);
+    const 画2 = 画面の順(壊れ);
+    const 無い = 本.filter((x) => 画2.indexOf(x) < 0);
+    const 赤に = (無い.length > 0) || !部分列か(本, 画2);
+    console.log((赤に ? '  ok   ' : '  ★赤★ ') + 名
+      + (赤に ? ' ... 壊したら 赤に なりました' : ' ... ★壊しても 緑の ままです★'));
+    if (赤に) 鳴 += 1;
   }
-  if (鳴 !== 壊し.length) { console.log('★★自己確認が 通りません★★'); process.exit(1); }
+  if (鳴 !== 壊し方.length) { console.log('★★自己確認が 通りません★★'); process.exit(1); }
 }
 
 console.log('');
