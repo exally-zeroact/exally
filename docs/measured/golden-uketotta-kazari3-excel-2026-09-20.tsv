@@ -33,6 +33,19 @@ A1(客が直した)	42	42	ok
 表示の形(B1)	# を 含む	#,##0	ok
 表示の形(A3)	% を 含む	0.0%	ok
 図形の名	hanko	hanko	ok
+#
+# ★★図形の 位置と 大きさ★★（単位＝ポイント）
+# 見た物	数
+図形 Left	449.375
+図形 Top	20
+図形 Width	60
+図形 Height	60
+図形 Rotation	0
+図形 AutoShapeType	1
+図形 Placement	1
+図形 塗り Color	8544277
+図形 線 Color	3351556
+図形 線 Weight	1.5
 # ★★欠け 0個★★
 #
 # ★★②マスの 中身★★
