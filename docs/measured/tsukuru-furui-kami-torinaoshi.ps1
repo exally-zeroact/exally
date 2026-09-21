@@ -58,18 +58,38 @@
 #  使い方: powershell.exe -NoProfile -ExecutionPolicy Bypass -File <この道具>
 
 $ここ = Split-Path -Parent $MyInvocation.MyCommand.Path
-$紙 = Join-Path $ここ 'kansuu46\golden-346-2026-09-08.tsv'
-$出 = Join-Path $ここ 'golden-furui-kami-torinaoshi-2026-09-21.tsv'
+# ★★2026-09-21 足し ── ★1枚 だけでは 分母に なりません★★
+#   ＝`golden-346` 以外の 紙にも ★範囲を 渡す 式が 5,392本★ 在りました
+#   ⇒★`kansuu46` の 紙を ★全部★ 読みます★（★自分で 作った 紙は 除く★）
+$紙たち = @(Get-ChildItem (Join-Path $ここ 'kansuu46') -Filter '*.tsv' | Where-Object { $_.Name -notlike '*nijigen-formula2*' } | Sort-Object Name)
+# ★★2026-09-21 ── ★出し先を 分けました★★
+#   ＝35枚に 広げた 数は ★まだ 信じられません★（材料を 書いて いない 紙が 26枚）
+#   ⇒★信じられない 紙を 物差しに させない★＝★柱に `実Excel` と 書きません★
+#   ⇒★実際に 1回 物差しに されて 試験が 6本 赤に なりました★（2026-09-21）
+$出 = Join-Path $ここ 'golden-furui-kami-zenmai-WIP-2026-09-21.tsv'
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
 if ($版.Major -ne 5) { Write-Host '★★powershell.exe（5.1）で 走らせて ください★★'; exit 8 }
-if (-not (Test-Path $紙)) { Write-Host ('★★紙が 在りません ... ' + $紙 + '★★'); exit 6 }
+if ($紙たち.Count -eq 0) { Write-Host '★★紙が 1枚も 在りません★★'; exit 6 }
+Write-Host ('★読む 紙 ... ' + $紙たち.Count + '枚★')
 
 $外へ出る = 'WEBSERVICE', 'STOCKHISTORY', 'TRANSLATE', 'DETECTLANGUAGE', 'IMAGE', 'RTD'
 $問い = New-Object System.Collections.Generic.List[object]
 $外した = 0
-foreach ($l in [System.IO.File]::ReadAllLines($紙)) {
+# ★★2026-09-21 ── ★紙ごとに 材料が 違います★★
+#   ＝`golden-tana-12-13` は ★C1:C4 = 10,8,6,4★ を 使う
+#   ⇒★1つの 盤面で 全部 打つと ★偽の 違い★が 出ます★（1回目 188本 と 出た）
+#   ⇒★紙の `#材料` を その 紙の 分だけ 使います★
+$材料 = @{}
+foreach ($かみ in $紙たち) {
+$材料[$かみ.Name] = New-Object System.Collections.Generic.List[object]
+foreach ($l in [System.IO.File]::ReadAllLines($かみ.FullName)) {
+  if ($l.StartsWith('#材料')) {
+    $z = $l.Split("`t")
+    if ($z.Count -ge 3) { $材料[$かみ.Name].Add(@{ マス = $z[1]; 値 = $z[2] }) }
+    continue
+  }
   if ($l -eq '' -or $l.StartsWith('#')) { continue }
   $c = $l.Split("`t")
   if ($c.Count -lt 3) { continue }
@@ -81,7 +101,8 @@ foreach ($l in [System.IO.File]::ReadAllLines($紙)) {
   foreach ($n in $外へ出る) { if ($f.ToUpper().Contains($n)) { $わるい = $true } }
   foreach ($ch in $f.ToCharArray()) { if ([int]$ch -gt 127) { $わるい = $true } }
   if ($わるい) { $外した++; continue }
-  $問い.Add(@{ 名 = $c[0]; 式 = $f; 昔 = $c[2] })
+  $問い.Add(@{ 名 = $c[0]; 式 = $f; 昔 = $c[2]; 紙 = $かみ.Name })
+}
 }
 Write-Host ('★紙から 取った 式 ... ' + $問い.Count + '本★（★外した ' + $外した + '本★）')
 if ($問い.Count -eq 0) { Write-Host '★★1本も 在りません★★'; exit 5 }
@@ -100,18 +121,13 @@ try {
   $xl.ScreenUpdating = $false
   $bk = $xl.Workbooks.Add()
   $sh = $bk.Sheets.Item(1)
-  for ($r = 1; $r -le 5; $r++) {
-    $sh.Cells.Item($r, 1).Value2 = $r
-    $sh.Cells.Item($r, 2).Value2 = ($r * 2)
-  }
-  $sh.Range('D1').Value2 = [datetime]'2024-01-01'
-  $sh.Range('D2').Value2 = [datetime]'2026-01-01'
 
   $行 = New-Object System.Collections.Generic.List[string]
   $行.Add('# ★古い 紙（2026-09-08）を 今の 道（Formula2）で 打ち直した★（67）（2026-09-21）')
-  $行.Add('# ★元の 紙★ ... docs/measured/kansuu46/golden-346-2026-09-08.tsv')
+  $行.Add('# ★元の 紙★ ... docs/measured/kansuu46 の tsv を ★全部★（自分で 作った 紙は 除く）')
   $行.Add('# ★★元の 紙は `.Formula`（むかしの みち＝溢れない）で 取られて います★★（kansuu46 の 道具 21本とも）')
-  $行.Add('# ★盤面★ A1:A5=1,2,3,4,5 ／ B1:B5=2,4,6,8,10 ／ D1=2024/1/1 ／ D2=2026/1/1')
+  $行.Add('# ★★盤面★★ ... ★紙ごとに その 紙の `#材料` を 使います★（1つの 盤面では 打ちません）')
+  $行.Add('#   ＝`golden-tana-12-13` は C1:C4=10,8,6,4 を 使う＝★1つの 盤面だと 偽の 違いが 出ます★')
   $行.Add('# ★置き場★ H列・行1 から 10行 おき')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
@@ -134,12 +150,21 @@ try {
   # ★D1 D2 は 日付＝★値で 控えます★（古い 紙と 同じ 形）
   $行.Add('#材料' + "`t" + 'D1' + "`t" + [string]$sh.Range('D1').Value2)
   $行.Add('#材料' + "`t" + 'D2' + "`t" + [string]$sh.Range('D2').Value2)
-  $行.Add('# 名前' + "`t" + '式' + "`t" + '昔の 答え' + "`t" + '実Excel（今の 道＝Formula2）' + "`t" + '埋まった数' + "`t" + '判じ')
+  $行.Add('# 紙' + "`t" + '名前' + "`t" + '式' + "`t" + '昔の 答え' + "`t" + '今の 道（Formula2・まだ 信じられない）' + "`t" + '埋まった数' + "`t" + '判じ')
 
   $時計 = [Diagnostics.Stopwatch]::StartNew()
   $行数 = 1
-  $同じ = 0; $違う = 0; $溢れた = 0; $打てない = 0
+  $同じ = 0; $違う = 0; $溢れた = 0; $打てない = 0; $材料なし = 0
+  $今の紙 = ''
   foreach ($q in $問い) {
+    # ★★紙が 変わったら 盤面を 置き直します★★
+    if ($q.紙 -ne $今の紙) {
+      $今の紙 = $q.紙
+      $sh.Range('A1:F60').ClearContents() | Out-Null
+      $ざ = $材料[$今の紙]
+      if ($null -eq $ざ -or $ざ.Count -eq 0) { $材料なし++ }
+      else { foreach ($z in $ざ) { try { $sh.Range($z.マス).Value2 = $z.値 } catch { } } }
+    }
     $ma = 'H' + $行数
     $判 = ''
     $今 = ''
@@ -161,13 +186,15 @@ try {
       if ($埋 -gt 1) { $溢れた++ }
       if ($今 -eq $q.昔) { $同じ++; $判 = 'onaji' } else { $違う++; $判 = '★chigau★' }
     }
-    $行.Add($q.名 + "`t" + $q.式 + "`t" + $q.昔 + "`t" + $今 + "`t" + $埋 + "`t" + $判)
+    $行.Add($q.紙 + "`t" + $q.名 + "`t" + $q.式 + "`t" + $q.昔 + "`t" + $今 + "`t" + $埋 + "`t" + $判)
     $行数 = $行数 + 10
   }
   $時計.Stop()
 
   # ══ ★対照★ ══
-  $sh.Range('A300').Formula2 = '=SUM(A1:A5)'
+  # ★★対照は 盤面に 頼らない 形に します★★
+  #   ＝1回目は `=SUM(A1:A5)` に して ★最後の 紙の 材料に 引きずられて 赤★に なりました
+  $sh.Range('A300').Formula2 = '=SUM(1,2,3,4,5)'
   $sh.Range('C300').Formula2 = '=SEQUENCE(2)'
   $t1 = [string]$sh.Range('A300').Value2
   $t2 = [string]$sh.Range('C301').Value2
@@ -181,6 +208,7 @@ try {
   $行.Add('#   ★★昔と 違う★★ .. ' + $違う + '本')
   $行.Add('#   ★★溢れた★★ ..... ' + $溢れた + '本（★2マス 以上＝昔の 紙は 1マス目しか 見て いない★）')
   $行.Add('#   打てない .......... ' + $打てない + '本')
+  $行.Add('#   ★材料が 書いて いない 紙 ... ' + $材料なし + '枚★（★その 紙は 前の 盤面の まま＝数を 信じない★）')
   $行.Add('#   ★対照★ SUM(A1:A5)=' + $t1 + '（待つ 15）／SEQUENCE(2) の 2マス目=' + $t2 + '（待つ 2）⇒ ' + $対照ok + '/2')
   $行.Add('#   かかった 秒 ....... ' + [math]::Round($時計.Elapsed.TotalSeconds, 1))
 
@@ -191,6 +219,7 @@ try {
   Write-Host ('  ★★昔と 違う ... ' + $違う + '本★★')
   Write-Host ('  ★★溢れた ..... ' + $溢れた + '本★★')
   Write-Host ('  打てない ..... ' + $打てない + '本')
+  Write-Host ('  ★材料が 無い 紙 ... ' + $材料なし + '枚★')
   Write-Host ('★対照 ok ... ' + $対照ok + ' / 2★ ／ 秒 ' + [math]::Round($時計.Elapsed.TotalSeconds, 1))
   Write-Host ('★書いた ... ' + $出 + '★')
   $bk.Close($false)
