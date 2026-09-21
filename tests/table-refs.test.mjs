@@ -241,7 +241,32 @@ async function testProductionPath(page) {
   }
   if (!ok(typeof win.BookOpen !== 'undefined', 'BookOpen が載った')) return;
   if (!ok(typeof win.TableRefs !== 'undefined', '★TableRefs が載った')) return;
-  if (!ok(typeof win.initFormulaEngine === 'function' && typeof win.loadSheetIntoEngine === 'function',
+  /* ══ ★★計算の 口を 持たない 画面★★ ══（2026-09-21）
+       ★★理由つきで 名指し★★（★黙って 除きません★）
+       `mochikomi.html` ... ★持ち込んだ ファイルを 見て 保存する 画面★（ア②）
+         ★★わざと 計算させません★★（経営者1 の 決め・2026-09-21）
+         ★訳★ この 画面の 値打ちは ★元の ファイルを 1バイトも 触らない★ 事。
+           計算させると ★答えが 書き換わる 恐れ★ が 在ります
+           ＝借り物の 計算が 実Excel と ★1マスでも★ 違えば
+             ★お客さんの ファイルの 答えが 黙って 変わって 返ります★
+           ⇒★直したい 人は `book.html` へ★（そちらは 計算します＝道を 分ける）
+       ★★向こう側にも 門が 在ります★★
+         `tests/mochikomi-lib-order.test.mjs` が
+         `initFormulaEngine` / `loadSheetIntoEngine` / `recalcSheet` / `HyperFormula` を
+         ★1つでも 入れたら 赤★ に します（経営者1 が 割って 確かめ済み）
+         ⇒★ここで 除いても 「入れ放題」には なりません★
+       ★★戻す 条件★★ ... ★この 画面で 直せる ように すると 決めた 時★
+         ＝★その時は 「1バイトも 触らない」を 先に 取り下げる 事★ */
+  const 計算させない画面 = { 'mochikomi.html': 1 };
+  if (計算させない画面[page]) {
+    /* ★★ここで 止めます★★（2026-09-21）
+         ＝この 後の 段は ★計算の 口を 呼びます★（`win.initFormulaEngine(...)`）
+         ＝★止めないと 「口が 無い」と 数えた 直後に その 口を 呼んで 落ちます★
+         ＝★2026-09-21 実際に そう なりました★ */
+    return ok(typeof win.initFormulaEngine !== 'function' && typeof win.loadSheetIntoEngine !== 'function',
+      '★★' + page + ' は 計算の 口を 持たない★★（★わざと★・元の ファイルを 触らない為）'
+      + '／★口が 出来たら 赤に します★');
+  } else if (!ok(typeof win.initFormulaEngine === 'function' && typeof win.loadSheetIntoEngine === 'function',
     '★' + page + ' に計算する側へ流す口がある（initFormulaEngine / loadSheetIntoEngine）')) return;
 
   const bytes = fs.readFileSync(path.join(FIX, 'table-refs-sample.xlsb'));
@@ -302,7 +327,22 @@ function testWiring(pages, opens) {
            ⇒★それが 怖い 方です★（記憶「飾りの 字に 頼った 門は 黙って 割れる」）
          ★★直し★★ ＝ `_loadScript('...')` の 所だけ 見ます。
          ★守る 中身は 同じ★＝★table-refs を book-open より 先に 読む★ */
-    const 読む所 = (名) => t.indexOf("_loadScript('" + 名 + "'");
+    /* ★★読み込み方は 2通り 在ります★★（2026-09-21 ここで 1回 踏みました）
+         ①`_loadScript('lib/...')` ... `book.html`（押した 時に 読む）
+         ②`<script src="lib/...">` ... `mochikomi.html`（頭で 読む）
+       ★私は ①だけ 見る 形に 締めました★（注に 名前を 書いただけで 赤に なる のを 直す為）
+       ⇒経営者1 の 新しい 画面が ②だった ので ★3本 赤に なりました★
+       ⇒★★本番の 穴では なく 門の 見る 範囲の 話です★★
+       ⇒★どちらの 読み方でも 数えます★（★順だけ 見る★＝守る 中身は 同じ）
+       ★注の 中の 名前には 当たりません★＝`_loadScript('` か `src="` が 前に 要ります */
+    const 読む所 = (名) => {
+      const あ = t.indexOf("_loadScript('" + 名 + "'");
+      /* ★閉じ引用符まで 探すと `?v=...` が 付いた 時に 外れます★
+         ＝★前から 一致★で 探します（2026-09-21 ここで 1回 外しました） */
+      const い = t.indexOf('src=' + JSON.stringify(名).slice(0, -1));
+      const み = [あ, い].filter((x) => x >= 0);
+      return み.length ? Math.min(...み) : -1;
+    };
     const iTable = 読む所('lib/table-refs.js');
     const iOpen = 読む所('js/book-open.js');
     ok(iTable > 0, p + ' が lib/table-refs.js を ★読み込んで★ いる');
