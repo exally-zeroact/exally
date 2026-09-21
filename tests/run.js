@@ -307,6 +307,8 @@ const FILES = [
   ['hairanai.test.mjs', '--self-test'],   //   ＝うちで足したシートは消える。黙って消さない
   'hon-no-nakami.test.mjs',               // ★持ち込んだ本に 何が 組まれているかを 数えて 言う（09-21・司さんの ア②）
   ['hon-no-nakami.test.mjs', '--self-test'], //   ＝★「マクロが 無い」と「読めなかった」を 混ぜない★
+  'mochikomi-lib-order.test.mjs',         // ★持ち込み画面と book.html で 読む順が ずれていないか（09-21）
+  ['mochikomi-lib-order.test.mjs', '--self-test'], //   ＝★同じ順が 2か所に 在る＝片方だけ直すと 黙って壊れる★
   'prompt-file.test.mjs',                 // ★AIの頭は prompt/ から／台帳とずれたら赤（2026-09-05）
   ['prompt-file.test.mjs', '--self-test'],//   ＝手書き22個のうち17個が間違っていた
   'betsumei-zenbu.test.mjs',              // ★打てば動く別名を機械で全部出して台帳と突き合わせる（09-06 指示役）
