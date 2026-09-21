@@ -127,6 +127,7 @@
            ★★.xlsb は まだ です★★＝★包みの 中が 別物★（未対応と 書いて おきます） */
       var 飾り表 = null;
       var 図形表 = null;
+      var 図形の並び = null;   /* ★`.xlsb` は 名前では なく 並びの 番号で 持ちます★ */
       if ((kind === 'xlsx' || kind === 'xlsm') && root.XlsxKazari && root.XlsxEdit) {
         pre = pre.then(function () {
           return root.XlsxEdit.open(bytes).then(function (book) {
@@ -172,6 +173,55 @@
           });
         });
       }
+      /* ══ ★★`.xlsb` の 図形★★ ══（2026-09-21）
+           ★★なぜ 別の 道が 要るか★★
+             `.xlsb` の 包みの 中は ほとんど `.bin` ですが、
+             ★`xl/drawings/drawing1.xml` は XML の まま 残ります★（経営者1 の 実測・09-21）
+             ⇒★図形は `.xlsb` でも 同じ 道具で 読めます★
+           ★★但し 2つ 違います★★（2026-09-21 実測）
+             ①板（`sheet1.bin`）が 2進＝`<drawing r:id=>` を ★字として 探せません★
+               ⇒`lib/xlsx-zukei.js` が ★rels の `Type` で 解きます★
+             ②`XlsxEdit.open()` は `xl/workbook.xml` を 読むので ★使えません★
+               ⇒★包みを 直に 見ます★（`ZipSurgeon`）
+           ★★板の 名前 → 部品名は 「並び」で 当てて います★★
+             ＝★この repo が 前から そうして います★（`saveXlsb`・同じ ファイルの 下の 方）
+               「workbook.bin を 読まずに、開いた時の 並びで 対応させる」
+             ＝★★板が 2枚 以上 在る `.xlsb` で これが 合うかは 未測定★★
+             ⇒★合わないと 判子が 別の 板に 出ます★（★消えるのでは なく ずれる★）
+           ★★マスの 飾りは `.xlsb` では まだです★★＝`xl/styles.bin`（2進）
+           ★読めなくても 画面は そのまま 動きます★ */
+      if (kind === 'xlsb' && root.XlsxZukei && root.ZipSurgeon) {
+        pre = pre.then(function () {
+          var z2 = root.ZipSurgeon.read(bytes);
+          var 板たち = z2.names().filter(function (n) {
+            return n.indexOf('xl/worksheets/sheet') === 0 && n.indexOf('.bin') === n.length - 4;
+          }).sort(function (a, b) {
+            var f = function (x) { return parseInt(String(x).replace(/[^0-9]/g, ''), 10) || 0; };
+            return f(a) - f(b);
+          });
+          var 表 = {}, 鎖 = Promise.resolve();
+          板たち.forEach(function (道, i) {
+            鎖 = 鎖.then(function () {
+              var 名 = 道.split('/').pop();
+              var relsの道 = 'xl/worksheets/_rels/' + 名 + '.rels';
+              if (!z2.has(relsの道)) return null;
+              return z2.text(relsの道).then(function (r) {
+                /* ★板は 2進なので 字を 渡しません★＝`Type` で 解かせます */
+                var 部 = root.XlsxZukei.図形の部品名('', r, 道);
+                if (!部 || !z2.has(部)) return null;
+                return z2.text(部).then(function (d) {
+                  var 図 = root.XlsxZukei.読む(d);
+                  if (図.length) 表[i] = 図;   /* ★並びの 番号で 持ちます★ */
+                });
+              }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
+            });
+          });
+          return 鎖.then(function () { 図形の並び = 表; }).catch(function (e) {
+            図形の並び = null;
+            if (root.console) root.console.warn('[Exally] .xlsb の 図形を 読めませんでした', e);
+          });
+        });
+      }
       var マクロ = null;
       if (hasVba && root.Vba && root.ZipSurgeon) {
         pre = pre.then(function () {
@@ -185,18 +235,24 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び); });
       });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
       既定の字体 = (wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0]) ? wb.Styles.Fonts[0] : null;
-      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null, 飾り表 ? 飾り表[nm] : null, 図形表 ? 図形表[nm] : null); });
+      var out = wb.SheetNames.map(function (nm, i) {
+        /* ★`.xlsx` は 名前で／`.xlsb` は 並びで★（上の 注を 見て ください） */
+        var 図 = 図形表 ? 図形表[nm] : null;
+        if (!図 && 図形の並び) 図 = 図形の並び[i];
+        return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null,
+          飾り表 ? 飾り表[nm] : null, 図 || null);
+      });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
          ★計算し直した瞬間に 46043 と食い違い、全部「変わった」ことになる★

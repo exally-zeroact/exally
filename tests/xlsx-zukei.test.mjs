@@ -167,11 +167,79 @@ T('★字で 書いた 色（srgbClr）なら 使う★', () => {
   }
 });
 
+/* ══ ★★`.xlsb` でも 読めるか★★ ══（2026-09-21）
+     ★★なぜ 要るか★★
+       ★司さんの 実物は `.xlsb`★ です。
+       `.xlsb` の 包みの 中は ほとんど `.bin` ですが、
+       ★`xl/drawings/drawing1.xml` だけは XML の まま 残ります★（経営者1 の 実測・09-21）。
+     ★★但し 板は 2進です★★（`xl/worksheets/sheet1.bin`）
+       ⇒`<drawing r:id=>` を ★字として 探せません★
+       ⇒★rels の `Type` で 解きます★（`lib/xlsx-zukei.js`）
+     ★材料★ `tests/fixtures/kazari-hiraku3.xlsb`（経営者1 が 実Excel で 作った 作り物） */
+const b材料道 = path.join(ROOT, 'tests/fixtures/kazari-hiraku3.xlsb');
+const b中 = fs.existsSync(b材料道) ? fs.readFileSync(b材料道) : null;
+
+T('★.xlsb の 材料が 在る（空振りして いない）★', () => {
+  if (!b中) throw new Error('★材料が 無い★ ' + b材料道);
+  const h = crypto.createHash('sha256').update(b中).digest('hex');
+  if (h !== 'b21b67cac5c53ae7653e4a03c138ccca11c5abd360d9668dc10f381a20942430') {
+    throw new Error('★材料が 入れ替わって います★ sha256=' + h);
+  }
+});
+
+const b部品 = b中 ? ほどく(b中) : {};
+T('★★.xlsb の 板は 2進・図形は XML の まま★★（★ここが 肝★）', () => {
+  if (!b部品['xl/worksheets/sheet1.bin']) throw new Error('★sheet1.bin が 無い★');
+  if (!b部品['xl/drawings/drawing1.xml']) throw new Error('★drawing1.xml が 無い★');
+  if (b部品['xl/worksheets/sheet1.xml']) throw new Error('★sheet1.xml が 在る★（.xlsb の はず）');
+  if (b部品['xl/styles.xml']) throw new Error('★styles.xml が 在る★（.xlsb は styles.bin の はず）');
+});
+
+/* ★★板の 字を 渡しません★★＝★2進なので 渡せません★（`Type` で 解けるか を 見ます） */
+const b部品名 = b中 ? Z.図形の部品名('',
+  b部品['xl/worksheets/_rels/sheet1.bin.rels'], 'xl/worksheets/sheet1.bin') : null;
+
+T('★★板が 2進でも `Type` で 図形に 辿り着ける★★', () => {
+  if (b部品名 !== 'xl/drawings/drawing1.xml') {
+    throw new Error('★部品名が ' + b部品名 + '★（xl/drawings/drawing1.xml の はず）');
+  }
+});
+
+const b図 = b部品名 && b部品[b部品名] ? Z.読む(b部品[b部品名]) : [];
+const b場 = b図.length ? Z.場所を決める(b図[0], { 0: 245 }, 72, {}, 24) : {};
+console.log('      ＝ .xlsb の 図形 ' + b図.length + '個 ／ x=' + b場.x + ' y=' + b場.y);
+
+T('★★.xlsb の 図形も 実Excel と 1点 以内★★（★xlsx と 同じ 数★）', () => {
+  if (b図.length !== 1) throw new Error('★' + b図.length + '個★（1個 の はず）');
+  if (b図[0].名 !== 'hanko') throw new Error('★名が ' + b図[0].名 + '★');
+  if (b図[0].w !== 80 || b図[0].h !== 80) {
+    throw new Error('★大きさが ' + b図[0].w + 'x' + b図[0].h + '★（80x80 の はず）');
+  }
+  if (Math.abs(b場.x - 点(449.375)) > 1) {
+    throw new Error('★x が ' + b場.x + '★（' + 点(449.375).toFixed(2) + ' の はず）');
+  }
+  if (Math.abs(b場.y - 点(20)) > 1) {
+    throw new Error('★y が ' + b場.y + '★（' + 点(20).toFixed(2) + ' の はず）');
+  }
+});
+
+T('★★`r:id` の 道でも 型の 道でも 同じ 答え★★（★.xlsx で 割ります★）', () => {
+  const あ = Z.図形の部品名(部品['xl/worksheets/sheet1.xml'],
+    部品['xl/worksheets/_rels/sheet1.xml.rels'], 'xl/worksheets/sheet1.xml');
+  const い = Z.図形の部品名('',
+    部品['xl/worksheets/_rels/sheet1.xml.rels'], 'xl/worksheets/sheet1.xml');
+  if (あ !== い) throw new Error('★r:id ' + あ + ' ／ 型 ' + い + '★');
+});
+
 console.log('');
 console.log('  ★見て いない 事★');
 console.log('    ・★色は 付けて いません★＝テーマの 色が 決め打ちに できるかは ★未測定★');
 console.log('    ・`oneCellAnchor` / `absoluteAnchor` は ★まだ★（この 材料に 在りません）');
 console.log('    ・図形の 中の 字／線の 太さ／回転の 見た目は ★未測定★');
+console.log('    ・★★`.xlsb` の マスの 飾りは まだ★★＝`xl/styles.bin`（2進）');
+console.log('      ＝お客さんの 道で 測ると ★.xlsb は 8 / 13★（図形は 出ます）');
+console.log('    ・★★.xlsb の 板の 名前は 「並び」で 当てて います★★');
+console.log('      ＝★板が 2枚 以上 在る `.xlsb` で 合うかは 未測定★');
 console.log('    ・★画面に 描いて いるかは ここでは 測って いません★');
 console.log('      ＝`docs/measured/hakaru-kazari-ga-gamen-made-todoku-ka.mjs`');
 console.log('xlsx-zukei: ' + pass + ' 緑 / ' + fail + ' 赤');
