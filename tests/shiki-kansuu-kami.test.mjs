@@ -1316,8 +1316,46 @@ let 材料が要る行 = 0, 材料無しでも押した紙 = 0;
 
 let 借り物の紙 = 0, 柱が読めない紙 = 0, 名が分からない行 = 0, 出る字の紙 = 0;
 const まだ合った = new Set(), まだ外れた = new Set();
+/* ══ ★★新しい 道の 測りが 昔の 道の 測りを 上書きする★★ ══（2026-09-21）
+     ★なぜ 要るか★
+       `.Formula`（昔の 道）は ★溢れません★＝暗黙の 交わりで 1マス。
+       `Formula2`（今の 道）は ★溢れます★。
+       ⇒★同じ 式でも 取った 道で 答えが 変わります★
+       ⇒実測（経営者1・2026-09-21）812本 中 ★３本★ が 変わった
+            `=ISERR(A1:B5)`    昔 True  ⇒ ★今 False★（10マス）
+            `=ISERROR(A1:B5)`  昔 True  ⇒ ★今 False★（10マス）
+            `=ISNUMBER(A1:B5)` 昔 False ⇒ ★今 True★（10マス）
+     ★どう するか★
+       ・昔の 道の 紙は ★1文字も 触りません★（昔の 答えも 残す）
+       ・★紙が `chigau` と 書いた 行だけ★ 昔の 紙の 行を 押しません
+       ・★押さなかった 数は 下で 出します★（黙って 減らさない）
+     ★外した 手 3つ（全部 実測で 割れました）★
+       ㅁ「Formula2」の 字だけ ⇒ 昔の 紙も 拾い ★押す 数が 434 ⇒ 43★
+       ㅂ「昔の 道」を 除く ⇒ 新しい 紙も 除かれ ★式 11本★
+       ㅃ式を 全部 上書き ⇒ ★押す 数が 434 ⇒ 417★（緑の まま 減る）
+       ⇒★今は 柱の 字（`実Excel（今の 道`）と `chigau` の 2つで 絞ります★ */
+const 今の道の式 = new Set();
+for (const p of 紙たち) {
+  const 字 = 字を読む(p);
+  if (字.indexOf('実Excel（今の 道') < 0) continue;
+  /* ★逆斜線を 1文字も 使いません★＝改行も タブも 番号で 組みます
+       （2026-09-21 に 同じ 所で 5回 落ちました） */
+  for (const l0 of 字.split(String.fromCharCode(10))) {
+    const l = l0.replace(String.fromCharCode(13), '');
+    if (!l || l.startsWith('#')) continue;
+    const 欄 = l.split(String.fromCharCode(9)).map((z) => String(z).trim());
+    /* ★紙は `★chigau★` と 飾り付きで 書きます★＝配列の 完全一致では 当たりません */
+    if (!欄.some((z) => z.indexOf('chigau') >= 0)) continue;
+    for (const x of 欄) {
+      if (x.startsWith('=')) { 今の道の式.add(x); break; }
+    }
+  }
+}
+let 昔の道で飛ばした = 0;
+console.log('  ＝ ★新しい 道が 上書きする 式★ ' + 今の道の式.size + '本');
 for (const p of 紙たち) {
   const 行たち = 字を読む(p).split(/\r?\n/);
+  const 昔の道か = 字を読む(p).indexOf('昔の 道') >= 0;
   /* ★★答えが 実Excel で ない 紙は 押しません★★（2026-09-16）
        `golden-86-karimono-*.tsv` は ★借り物の 今の 答え★を 焼いた 紙で、
        言えるのは「★外す前と 同じか★」だけ＝★正しいかは 言えません★。
@@ -1400,6 +1438,8 @@ for (const p of 紙たち) {
     let 全部知る = true;
     for (const x of 中) if (!台が知る.has(x)) { 全部知る = false; break; }
     if (!全部知る) { 飛ばした++; continue; }
+    /* ★昔の 道の 紙で、新しい 道が 答えを 上書きする 式は 押さない★ */
+    if (昔の道か && 今の道の式.has(String(式).trim())) { 昔の道で飛ばした++; continue; }
     組.push({ 名, 式, 実: c[実列] });
   }
   if (!組.length) continue;

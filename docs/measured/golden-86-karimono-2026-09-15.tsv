@@ -37,7 +37,7 @@
 # ★材料★	lib/shiki-afure.js	bdd4210548da3ff1
 # ★材料★	lib/shiki-basho.js	37b6c08630fe1aad
 # ★材料★	lib/shiki-hyou.js	c57dcbcae3037c7c
-# ★材料★	lib/shiki-kansuu.js	457bcf74f47feae2
+# ★材料★	lib/shiki-kansuu.js	d11e85e5faa8fe3b
 # ★材料★	lib/shiki-katachi.js	26e618a2a4f3f211
 # ★材料★	lib/shiki-keisan.js	6d1100a401e9744e
 # ★材料★	lib/shiki-kiru.js	21ea4c9458b0adc3
@@ -1703,6 +1703,7 @@ IMPRODUCT	=IMPRODUCT(A1:A5,B1:B5,1)	★実 Excel★	エンジン	460800	460800	�
 IMPRODUCT	=IMPRODUCT(2,3,4,5,6)	★実 Excel★	エンジン	720	720	合う	golden-346-2026-09-08.tsv
 IMPRODUCT	=IMPRODUCT(-2)	★実 Excel★	エンジン	-2	-2	合う	golden-346-2026-09-08.tsv
 IMPRODUCT	=IMPRODUCT(2.5,1)	★実 Excel★	エンジン	2.5	2.5	合う	golden-346-2026-09-08.tsv
+IMPRODUCT	=IMPRODUCT(A1:B5)	★実 Excel★	エンジン	460800	460800	合う	golden-346-nijigen-formula2-2026-09-21.tsv
 IMSEC	=IMSEC(A1)	★実 Excel★	エンジン	1.85081571768093	1.85081571768093	合う	golden-346-2026-09-08.tsv
 IMSEC	=IMSEC(A2)	★実 Excel★	エンジン	-2.40299796172238	-2.40299796172238	合う	golden-346-2026-09-08.tsv
 IMSEC	=IMSEC(2)	★実 Excel★	エンジン	-2.40299796172238	-2.40299796172238	合う	golden-346-2026-09-08.tsv
@@ -1779,6 +1780,7 @@ IMSUM	=IMSUM(A1:A5,B1:B5,1)	★実 Excel★	エンジン	46	46	合う	golden-346
 IMSUM	=IMSUM(2,3,4,5,6)	★実 Excel★	エンジン	20	20	合う	golden-346-2026-09-08.tsv
 IMSUM	=IMSUM(-2)	★実 Excel★	エンジン	-2	-2	合う	golden-346-2026-09-08.tsv
 IMSUM	=IMSUM(2.5,1)	★実 Excel★	エンジン	3.5	3.5	合う	golden-346-2026-09-08.tsv
+IMSUM	=IMSUM(A1:B5)	★実 Excel★	エンジン	45	45	合う	golden-346-nijigen-formula2-2026-09-21.tsv
 IMTAN	=IMTAN(A1)	★実 Excel★	エンジン	1.5574077246549	1.5574077246549	合う	golden-346-2026-09-08.tsv
 IMTAN	=IMTAN(A2)	★実 Excel★	エンジン	-2.18503986326152	-2.18503986326152	合う	golden-346-2026-09-08.tsv
 IMTAN	=IMTAN(2)	★実 Excel★	エンジン	-2.18503986326152	-2.18503986326152	合う	golden-346-2026-09-08.tsv
@@ -1826,6 +1828,7 @@ LINEST	=LINEST(2,3,TRUE)	★実 Excel★	エンジン	0	0	合う	golden-346-2026
 LINEST	=LINEST(A1:A5,B1:B5,1)	★実 Excel★	エンジン	#VALUE!	0.49999999999999994	★合わない★	golden-346-2026-09-08.tsv
 LINEST	=LINEST(-2)	★実 Excel★	エンジン	0	0	合う	golden-346-2026-09-08.tsv
 LINEST	=LINEST(2.5,1)	★実 Excel★	エンジン	0	0	合う	golden-346-2026-09-08.tsv
+LINEST	=LINEST(A1:B5)	★実 Excel★	エンジン	#VALUE!	0.81818181818181823	★合わない★	golden-346-nijigen-formula2-2026-09-21.tsv
 LOGEST	=INDEX(LOGEST({2;4;8;16;32;64},{1;2;3;4;5;6}),1,1)	★実 Excel★	エンジン	1.9999999999999996	2	合う	golden-yosoku-2026-09-07.tsv
 LOGEST	=INDEX(LOGEST({2;4;8;16;32;64},{1;2;3;4;5;6}),1,2)	★実 Excel★	エンジン	1.0000000000000013	0.9999999999999996	合う	golden-yosoku-2026-09-07.tsv
 LOGEST	=INDEX(LOGEST({3;5;6;10;10;14},{1;2;3;4;5;6}),1,1)	★実 Excel★	エンジン	1.3418794562745833	1.3418794562745837	合う	golden-yosoku-2026-09-07.tsv
