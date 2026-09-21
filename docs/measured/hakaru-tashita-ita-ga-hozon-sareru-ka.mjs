@@ -126,7 +126,16 @@ try {
   if (出.だめ) throw new Error(出.だめ);
 
   const 中 = Buffer.from(出.中);
-  const 置き場 = path.join(TEMP, 'exally-tashita-ita.xlsx');
+  /* ★★出す 先の 名前は 材料から 作ります★★（2026-09-22）
+       ★★ここで 1回 踏みました★★
+         前は ★材料が 何でも 同じ 名前★ で 書いて いました。
+         ⇒2本目（グラフ入り）を 測った 時に ★1本目を 上書き★ しました。
+         ⇒経営者1 が ★1組目 対 2組目の 出力★ を 並べかけました
+         ⇒★★そのままなら 「値が 違う」と 嘘の 赤が 出ます★★
+         ⇒★しかも その 赤は 私の 直しの せいに 見えます★
+       ⇒★材料の 名前を 付けて 分けます★（`exally-tashita-<材料の名>.xlsx`） */
+  const もとの名 = path.basename(材料).replace(/\.[^.]+$/, '');
+  const 置き場 = path.join(TEMP, 'exally-tashita-' + もとの名 + '.xlsx');
   fs.writeFileSync(置き場, 中);
   console.log('');
   console.log('  ★★出た ファイル★★ ' + 置き場);
