@@ -32,6 +32,29 @@
  *
  *  使い方: node tests/shiki-kansuu-kami.test.mjs
  *          node tests/shiki-kansuu-kami.test.mjs --self-test
+ *
+ *  ★★★2026-09-21 追記＝★この 台が 守って いる 物の 中に ★昔の 道★の 答えが 在ります★★★
+ *    ★どの 3本か★
+ *      `=ISERR(A1:B5)`    紙 ★True★ ／ `=ISERROR(A1:B5)` 紙 ★True★
+ *      `=ISNUMBER(A1:B5)` 紙 ★False★
+ *      （紙 `docs/measured/kansuu46/golden-346-2026-09-08.tsv`）
+ *    ★でも 今日 実Excel で 打ち直したら 違いました★（2026-09-21・経営者1）
+ *      `=ISNUMBER(A1:B5)` ⇒ ★10マス（5行 x 2列）全部 TRUE★
+ *      `=ISERR(A1:B5)`    ⇒ ★10マス 全部 FALSE★
+ *      `=ISERROR(A1:B5)`  ⇒ ★10マス 全部 FALSE★
+ *      （紙 `docs/measured/golden-jitsu-excel-2jigen-2026-09-21.tsv`）
+ *    ★★因★★ ... `kansuu46/` の 道具 21本は ★1本も `Formula2` を 使って いません★
+ *      ＝`.Formula`（★昔の 道★）は ★溢れません★＝★暗黙の 交わりで 1マス★
+ *      ⇒★09-08 の 紙は 「昔の 道で 打った 時の 答え」★です
+ *      ⇒★★だから この 3本は ★昔の 道を 守って います★★★
+ *    ★今 どう して いるか★
+ *      `lib/shiki-kansuu.js` の `見分け` は ★1次元だけ 溢れさせ／2次元は 今まで通り★
+ *      ⇒★この 3本が 緑の ままなのは ★わざと★です★
+ *      ⇒★2次元を 直す 時は ★この 3本が 赤に なります★＝★その 時 紙を 取り直す★
+ *    ★数★ `docs/measured` の `.ps1` 114本 ... `Formula2` 32本 ／ `.Formula` ★83本★
+ *      ⇒★83本 全部が 悪い訳では 在りません★（溢れない 式なら どちらでも 同じ）
+ *      ⇒★悪いのは 「範囲を 渡す 式」を `.Formula` で 取った 紙★
+ *      ⇒★どれが それかは ★未測定★★
  */
 import fs from 'node:fs';
 import path from 'node:path';
