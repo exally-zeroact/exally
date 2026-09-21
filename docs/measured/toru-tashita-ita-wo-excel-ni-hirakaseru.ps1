@@ -24,15 +24,40 @@
 #
 #  使い方: powershell.exe -NoProfile -ExecutionPolicy Bypass -File <この道具>
 
+param(
+  [string]$前 = '',
+  [string]$後 = '',
+  [string]$前の印 = '',
+  [string]$後の印 = ''
+)
+
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
 if ($版.Major -ne 5) { Write-Host '★★powershell.exe（5.1）で 走らせて ください★★'; exit 8 }
 
-$前 = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'tests\fixtures\kazari-hiraku3.xlsx'
-$後 = Join-Path $env:TEMP 'exally-tashita-ita.xlsx'
+# ★★材料は 選べます★★（★手元の 決め打ちを 焼き込まない★＝記憶の 決まり）
+#   既定は 1組目（飾り 8種＋溢れ 3種）。グラフ入りは `-前`/`-後` で 渡します。
+$repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+if (-not $前) { $前 = Join-Path $repo ('tests' + [string][char]92 + 'fixtures' + [string][char]92 + 'kazari-hiraku3.xlsx') }
+if (-not $後) { $後 = Join-Path $env:TEMP 'exally-tashita-ita.xlsx' }
 foreach ($f in $前, $後) {
   if (-not (Test-Path -LiteralPath $f)) { Write-Host ('★★在りません★★ ' + $f); exit 4 }
   Write-Host ('★見る★ ' + $f + ' ／ ' + (Get-Item $f).Length + ' バイト ／ sha256 ' + (Get-FileHash $f -Algorithm SHA256).Hash.ToLower())
+}
+
+# ══ ★★材料の 印を 先に 突き合わせます★★ ══（2026-09-22 に 踏みました）
+#   `%TEMP%` の 名は ★上書きされます★。実際に
+#   `exally-tashita-ita.xlsx` の 中身が ★グラフの 物に 入れ替わって いました★
+#   ⇒★気づかずに 走らせると 別の 材料どうしを 比べて ★嘘の 赤★が 出ます★
+#   ⇒★渡された 印と 合わない なら 走りません★（`-前の印` / `-後の印`）
+if ($前の印 -or $後の印) {
+  $h1 = (Get-FileHash $前 -Algorithm SHA256).Hash.ToLower()
+  $h2 = (Get-FileHash $後 -Algorithm SHA256).Hash.ToLower()
+  if ($前の印 -and $h1 -ne $前の印.ToLower()) { Write-Host ('★★前の 材料が 違います★★ 待ち ' + $前の印 + ' ／ 実物 ' + $h1); exit 2 }
+  if ($後の印 -and $h2 -ne $後の印.ToLower()) { Write-Host ('★★後の 材料が 違います★★ 待ち ' + $後の印 + ' ／ 実物 ' + $h2); exit 2 }
+  Write-Host '★印は 渡された 物と 合って います★'
+} else {
+  Write-Host '★★印を 渡されて いません＝すり替わりを 見て いません★★'
 }
 
 $数1 = @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count

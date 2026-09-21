@@ -58,7 +58,9 @@ console.log('★立てました★ ' + 元URL);
      ★手元の 絶対パスを 焼き込みません★（記憶の 決まり）＝★別の 木で 走らせても 動く★ */
 const ck = await borrow('mochikomi', 'chromium');
 const browser = await launch('mochikomi', ck, {}, 'chromium');
-const page = await browser.newPage({ viewport: { width: 1000, height: 900 } });
+/* ★落ちて くる ファイルを 受け取る には 先に 言って おく 必要が 在ります★
+     ＝ を 立てないと ★押しても 何も 来ません★（2026-09-22 踏みました） */
+const page = await browser.newPage({ viewport: { width: 1000, height: 900 }, acceptDownloads: true });
 const 言づて = [], 落ち = [];
 page.on('console', (m) => { if (m.type() === 'error') 言づて.push(m.text()); });
 page.on('pageerror', (e) => 落ち.push(String(e && e.message ? e.message : e)));
@@ -141,6 +143,44 @@ console.log('');
 見る('★保存が 押せる★', 出.保存できる);
 見る('★落ちて いない★', 落ち.length === 0, 落ち.slice(0, 3).join(' / '));
 見る('★言づての 赤が 無い★', 言づて.length === 0, 言づて.slice(0, 3).join(' / '));
+
+/* ══ ★★「1バイトも 変えません」を ★押して★ 数えます★★ ══（2026-09-22）
+     ★画面に 大きさを 並べて 出す 形には して ありましたが、
+       ★実際に 押して 測って いませんでした★＝★言っただけ★です。
+     ⇒★お客さんの 道で 押します★（`#hozon` を click）
+     ⇒落ちて くる バイト列を 受け取り、★元の ファイルと 1バイトずつ 突き合わせ★ */
+const 落ち先 = path.join(TEMP, 'exally-mochikomi-otoshi');
+fs.mkdirSync(落ち先, { recursive: true });
+let 出たファイル = null;
+/* ★★押してから 「来たか」を 見るのでは 遅い★★（2026-09-22 踏みました）
+     ＝`page.on('download')` は 後から 呼ばれるので、★押した 直後に 数えると まだ 空★です。
+     ⇒★押すのと 同時に 待つ★（`waitForEvent` と `click` を 並べる） */
+const [落ちた] = await Promise.all([
+  page.waitForEvent('download', { timeout: 60000 }).catch(() => null),
+  page.click('#hozon'),
+]);
+if (落ちた) {
+  const さき = path.join(落ち先, 落ちた.suggestedFilename());
+  try { await 落ちた.saveAs(さき); 出たファイル = さき; }
+  catch (e) { 落ち.push('落とせません ' + e.message); }
+}
+await page.waitForFunction(() => {
+  const e = document.getElementById('hozon-kekka');
+  return e && !e.hidden;
+}, { timeout: 60000 }).catch(() => {});
+const 保存の字 = await page.evaluate(() => (document.getElementById('hozon-kekka') || {}).textContent || '');
+console.log('');
+console.log('★保存を 押した 後★ ' + 保存の字);
+if (出たファイル && fs.existsSync(出たファイル)) {
+  const も = fs.readFileSync(元);
+  const で = fs.readFileSync(出たファイル);
+  const 同 = も.length === で.length && も.equals(で);
+  console.log('  元 ' + も.length + 'B ／ 出た ' + で.length + 'B');
+  見る('★★出た ファイルが 元と 1バイトも 違わない★★', 同,
+    (同 ? '同じ' : '★違います★ 差 ' + (で.length - も.length) + 'B'));
+} else {
+  見る('★ファイルが 落ちて きた★', false, '★落ちて きません★（押しても 出て いない）');
+}
 
 const 絵 = path.join(TEMP, 'exally-mochikomi.png');
 await page.screenshot({ path: 絵, fullPage: false });
