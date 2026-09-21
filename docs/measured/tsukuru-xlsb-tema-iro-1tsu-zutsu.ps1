@@ -84,6 +84,14 @@ try {
 
   if (Test-Path $出す先) { Remove-Item $出す先 -Force }
   $bk.SaveAs($出す先, 50)
+  # ★★2026-09-21 ── ★`.xlsx` でも 同じ 物を 出します★★
+  #   Exally1「`.xlsx` の `styles.xml` は `<color theme="4"/>` と ★番号しか 書いて いない★」
+  #   ⇒★同じ 盤面を 2つの 形で 保存して 突き合わせます★
+  #     ＝★形が 違う なら 書き分けが 要ります★
+  $出す先2 = Join-Path $env:TEMP 'exally-tema-iro.xlsx'
+  if ((Split-Path $出す先2 -Leaf) -ne 'exally-tema-iro.xlsx') { exit 7 }
+  if (Test-Path $出す先2) { Remove-Item $出す先2 -Force }
+  $bk.SaveAs($出す先2, 51)
   $bk.Close($false); $sh = $null; $bk = $null
 } finally {
   $sh = $null
@@ -107,3 +115,9 @@ $x = Get-Item $出す先
 Write-Host ''
 Write-Host ('★★作りました★★ ... ' + $出す先)
 Write-Host ('  ★大きさ★ ' + $x.Length + ' バイト ／ ★sha256★ ' + (Get-FileHash $出す先 -Algorithm SHA256).Hash.ToLower())
+$出す先2 = Join-Path $env:TEMP 'exally-tema-iro.xlsx'
+if (Test-Path $出す先2) {
+  $x2 = Get-Item $出す先2
+  Write-Host ('★★作りました（xlsx）★★ ... ' + $出す先2)
+  Write-Host ('  ★大きさ★ ' + $x2.Length + ' バイト ／ ★sha256★ ' + (Get-FileHash $出す先2 -Algorithm SHA256).Hash.ToLower())
+} else { Write-Host '★★xlsx が 出来て いません★★'; exit 5 }
