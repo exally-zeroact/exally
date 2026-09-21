@@ -11,7 +11,11 @@
 # ★材料★ ... `%TEMP%\exally-tameshi-hiraku3.xlsx`（11725B）
 #   sha256 cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b
 #   ★実Excel が COM で 作った 物★（`tsukuru-tameshi-hiraku3-kazari-to-kobore3.ps1`）
-#   ★repo には 入れて いません★（`.gitignore`）⇒★だから これは 見張りでは なく 測り道具★
+#   ★★2026-09-21 に repo へ 入れました★★ ＝ `tests/fixtures/kazari-hiraku3.xlsx`
+#     ＝★中身は 作り物の 数だけ★（3 / 1 / 0.25 / abc / kazari no tame no musubi）
+#     ＝★司さんの 商売の 中身は 1文字も 在りません★
+#     ⇒★だから 見張りに できました★（`tests/xlsx-kazari.test.mjs` `tests/xlsx-zukei.test.mjs`）
+#     ⇒★`%TEMP%` の 物は 消えます★＝紙だけ 残しても 次の 人は 再現できません
 # ★どの ブラウザか★ ... WebKit（playwright）／1280x800
 # ★絵★ ... `%TEMP%\exally-kazari-gamen.png`（109796B）
 #   sha256 8bec466a79fd4b16f7658f0014003df7397a9278ec85364789bbc5792f72a4b9
@@ -26,7 +30,7 @@
 罫線(A1 の 周り)	cell.border	★届かない★	★見えない★	同上
 罫線(B2 の 下 太さ4)	cell.border	★届かない★	★見えない★	同上
 塗り(B1) 黄	cell.bgColor	★届かない★	★見えない★	同上
-図形(判子) 1つ	sheets[i].objects	★届かない★	★見えない★	xl/drawings/ を 誰も 読んで いない
+図形(判子) 1つ	sheets[i].objects	★届かない★	★見えない★	lib/xlsx-zukei.js で 直した（下の 「直した 後」を 見て ください）
 表示の形(B1) #,##0	cell.numFmt	届いた	見える（4）	―
 表示の形(A3) 0.0%	cell.numFmt	届いた	見える（25.0%）	―
 繋げたマス(A5:C5)	cell.mergeEnd	届いた	―（★未確認★）	―
@@ -64,3 +68,29 @@
 #   ・★行の 高さ★は 材料に 入って いません（`rowH` は 空）
 #   ・★字の 大きさ・書体★は この 材料では 変えて いません
 #   ・★実Excel の 絵と 並べて 比べて いません★（実Excel の 画面の 写しが 無い）
+#
+# ★★★直した 後（同じ 日・2026-09-21）★★★
+#   ★届いた 7 / 13★ ⇒ ★★13 / 13★★
+#   ①★太字・字の色・罫線・塗り★ ＝ `lib/xlsx-kazari.js`（生の `xl/styles.xml` を 自前で 読む）
+#     ＝借り物は ★塗りしか くれません★（`Borders` は 10個 とも `{}`）
+#   ②★図形（判子）★ ＝ `lib/xlsx-zukei.js`（`xl/drawings/drawing1.xml` を 自前で 読む）
+#     ＝★★場所は `xfrm` では なく `twoCellAnchor` から 出します★★
+#       `xfrm` ＝ 4064000 EMU ＝ ★320pt★（置いた 時の 古い 数）
+#       実Excel ＝ ★449.375pt★（`Placement 1` ＋ A列を 30 に 広げた 後）
+#       うちの 出した 数 ＝ ★x 600点 / y 27点★（実Excel ＝ 599.17 / 26.67）★差 1点 未満★
+#     ＝★往復の 穴では ありません★（元の ファイルでも 449.375・経営者1 が 09-21 に 実測）
+#
+# ★★絵でも 確かめました★★（★数が 緑でも 絵を 開いて 見るまで OK に しない★）
+#   A1 が 赤い 太字 ／ A1:C3 の 枠 ／ B2 の 下の 太線 ／ B1 が 黄 ／ ★判子が 出て いる★
+#   ★画素も 測りました★ ＝ B1 の 真ん中 ★#FFFF00★ ／ 対照 C1・D1・A4 ＝ #FFFFFF
+#
+# ★★まだ 出来て いない 事★★
+#   ・★図形の 色★ ＝ この 判子は ★テーマの 色★（`<a:schemeClr val="accent1"/>`）
+#     ⇒★テーマの 色を 決め打ちに できるかは 未測定★（経営者1・09-21）
+#     ⇒★当て推量で 色を 作らず★ Exally の 既定の 色で 出して います
+#     ⇒`<a:srgbClr val="FF0000"/>` の ように ★字で 書いて あれば 使います★
+#   ・★マスの 飾りの テーマの 色★ も 同じ（付けません）
+#   ・`oneCellAnchor` / `absoluteAnchor` は ★まだ★
+#   ・図形の 中の 字 ／ 線の 太さ ／ 回転の 見た目 は ★未測定★
+#   ・★★`.xlsb` は まだ★★（包みの 中が 別物）＝★司さんの 実物は これ★
+#   ・★繋げたマスが 絵で 繋がって 見えるか★ は ★未確認★

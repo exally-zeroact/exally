@@ -126,6 +126,7 @@
              ＝飾りが 付かないだけ（★前と 同じ★）。★開かなく なる 方が ずっと 悪い★
            ★★.xlsb は まだ です★★＝★包みの 中が 別物★（未対応と 書いて おきます） */
       var 飾り表 = null;
+      var 図形表 = null;
       if ((kind === 'xlsx' || kind === 'xlsm') && root.XlsxKazari && root.XlsxEdit) {
         pre = pre.then(function () {
           return root.XlsxEdit.open(bytes).then(function (book) {
@@ -139,6 +140,31 @@
                 });
               });
               return 鎖.then(function () { 飾り表 = 表; });
+            }).then(function () {
+              /* ★★図形（判子）も 読みます★★（2026-09-21）
+                   ★借り物は 図形を くれません★＝`xl/drawings/` を 読む 所が 1つも 無かった
+                   ★板ごとの 図形は rels で 解きます★＝★並び順で 当てません★ */
+              if (!root.XlsxZukei) return null;
+              var 表2 = {}, 鎖2 = Promise.resolve();
+              book.sheets.forEach(function (板) {
+                鎖2 = 鎖2.then(function () {
+                  var rels = 板.part.split('/');
+                  var 名 = rels.pop();
+                  var relsの道 = rels.join('/') + '/_rels/' + 名 + '.rels';
+                  if (!book.zip.has(relsの道)) return null;
+                  return book.zip.text(板.part).then(function (xml) {
+                    return book.zip.text(relsの道).then(function (r) {
+                      var 部 = root.XlsxZukei.図形の部品名(xml, r, 板.part);
+                      if (!部 || !book.zip.has(部)) return null;
+                      return book.zip.text(部).then(function (d) {
+                        var 図 = root.XlsxZukei.読む(d);
+                        if (図.length) 表2[板.name] = 図;
+                      });
+                    });
+                  }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
+                });
+              });
+              return 鎖2.then(function () { 図形表 = 表2; });
             });
           }).catch(function (e) {
             飾り表 = null;
@@ -159,18 +185,18 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表); });
       });
     });
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
       既定の字体 = (wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0]) ? wb.Styles.Fonts[0] : null;
-      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null, 飾り表 ? 飾り表[nm] : null); });
+      var out = wb.SheetNames.map(function (nm) { return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null, 飾り表 ? 飾り表[nm] : null, 図形表 ? 図形表[nm] : null); });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
          ★計算し直した瞬間に 46043 と食い違い、全部「変わった」ことになる★
@@ -380,7 +406,7 @@
     if (飾.border) cell.border = 飾.border;
   }
 
-  function sheetToGrid(ws, name, tableFixes, 字体, 飾り) {
+  function sheetToGrid(ws, name, tableFixes, 字体, 飾り, 図形) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
@@ -548,7 +574,16 @@
       }
     }
 
-    return { name: name, data: data, colW: colW, 既定の列幅: 標準の点,
+    /* ★★図形（判子）を 台に 載せる★★（2026-09-21）
+         ★場所は `xfrm` では なく ★マスと ずれ★ から 出します★
+         ＝`xfrm` は ★置いた 時の 古い 数★（この 材料では 320pt／実Excel は 449.375pt）
+         ＝★往復の 穴では ありません★（元の ファイルでも 449.375・経営者1 の 実測）
+         ⇒★うちの 列幅で 解くので そのまま 合います★ */
+    var objects = [];
+    if (図形 && 図形.length && root.XlsxZukei) {
+      objects = root.XlsxZukei.台に載せる形(図形, colW, 標準の点, {}, 24);
+    }
+    return { name: name, data: data, colW: colW, 既定の列幅: 標準の点, objects: objects,
       /* ★その ブックの 既定の 字体★＝画面も 同じ 字で 描く
          ⇒ 同じ 幅に 入る 桁数が 実Excel と 揃う（うちの 字は 細くて 多く 入って いた） */
       既定の字体名: (既定の字体 && 既定の字体.name) ? 既定の字体.name : '',
