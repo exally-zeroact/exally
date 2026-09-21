@@ -135,7 +135,11 @@ try {
          ⇒★しかも その 赤は 私の 直しの せいに 見えます★
        ⇒★材料の 名前を 付けて 分けます★（`exally-tashita-<材料の名>.xlsx`） */
   const もとの名 = path.basename(材料).replace(/\.[^.]+$/, '');
-  const 置き場 = path.join(TEMP, 'exally-tashita-' + もとの名 + '.xlsx');
+  /* ★出す 先の 拡張子も 材料に 合わせます★（2026-09-22）
+       ＝`.xlsb` を 測ったのに `.xlsx` の 名で 置いて いました
+       ＝★中身は 正しいのに 名前が 嘘★＝★次に 開く 人が 迷います★ */
+  const もとの拡張子 = path.extname(材料) || '.xlsx';
+  const 置き場 = path.join(TEMP, 'exally-tashita-' + もとの名 + もとの拡張子);
   fs.writeFileSync(置き場, 中);
   console.log('');
   console.log('  ★★出た ファイル★★ ' + 置き場);

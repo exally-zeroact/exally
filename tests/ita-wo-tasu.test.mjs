@@ -166,6 +166,69 @@ await 待('★2枚 続けて 足しても 番号が ぶつからない★', asyn
   if (!z.has(a.部品) || !z.has(b.部品)) throw new Error('★2枚とも 入って いません★');
 });
 
+/* ══ ★★`.xlsb` も 板を 足せる★★ ══（2026-09-22）
+     ★司さんの 実物は この 形★。`.xlsx` とは 別の 道（2進）。
+     ★★数しか 書けません★★＝字の マスは `sharedStrings.bin` を 指す
+     ★実Excel で 数えて もらいました★（経営者1・★赤 0件★）
+       `Open` が 投げない ／ 判子 そのまま ／ ★溢れが 3組 とも 生きて いる★ */
+const XB = require_(path.join(ROOT, 'lib/xlsb-edit.js'));
+const b材料道 = path.join(ROOT, 'tests/fixtures/kazari-hiraku3.xlsb');
+const b中 = fs.existsSync(b材料道) ? fs.readFileSync(b材料道) : null;
+
+await 待('★.xlsb の 材料が 在る★', async () => {
+  if (!b中) throw new Error('★材料が 無い★ ' + b材料道);
+  const h = crypto.createHash('sha256').update(b中).digest('hex');
+  if (h !== 'b21b67cac5c53ae7653e4a03c138ccca11c5abd360d9668dc10f381a20942430') {
+    throw new Error('★材料が 入れ替わって います★ ' + h);
+  }
+});
+
+await 待('★★.xlsb に 板を 足すと 元の 部品が 1つも 減らない★★', async () => {
+  const z = Z.read(new Uint8Array(b中));
+  const 前の名 = z.names().slice();
+  const 見本 = XB.parse(await z.bytes('xl/worksheets/sheet1.bin'), XB.SHAPE.sheet).recs;
+  const 足 = await XB.xlsb板を足す(z, 見本, 'Tashita', { A1: { v: 123, t: 'n' } });
+  const r = await z.build();
+  const z2 = Z.read(r.bytes);
+  const 無 = 前の名.filter((n) => !z2.has(n));
+  if (無.length) throw new Error('★' + 無.length + '本 消えました★ ' + 無.join(' '));
+  if (!z2.has(足.部品)) throw new Error('★足した 板が 無い★ ' + 足.部品);
+  /* ★★`xl/metadata.bin` は 1バイトも 触らない★★＝★触ると 溢れが 壊れます★ */
+  if (z2.has('xl/metadata.bin')) {
+    const a2 = await z.bytes('xl/metadata.bin');
+    const b2 = await z2.bytes('xl/metadata.bin');
+    if (a2.length !== b2.length) throw new Error('★metadata.bin の 大きさが 変わりました★');
+  }
+});
+
+await 待('★★.xlsb の 板を 名前で 引ける（番号当てでは ない）★★', async () => {
+  const z = Z.read(new Uint8Array(b中));
+  const 見本 = XB.parse(await z.bytes('xl/worksheets/sheet1.bin'), XB.SHAPE.sheet).recs;
+  await XB.xlsb板を足す(z, 見本, 'Tashita', { A1: { v: 123, t: 'n' } });
+  const r = await z.build();
+  const z2 = Z.read(r.bytes);
+  const 板 = XB.板たち(await z2.bytes('xl/workbook.bin'),
+    await z2.text('xl/_rels/workbook.bin.rels'));
+  if (!板 || 板.length !== 2) throw new Error('★' + (板 ? 板.length : 0) + '枚★');
+  if (板[1].名 !== 'Tashita') throw new Error('★2枚目が ' + 板[1].名 + '★');
+});
+
+await 待('★★RK＝縮めた 数が 読み戻せる★★（3 / 1 / 0.25 / 123 / 2.5）', async () => {
+  const 組 = [3, 1, 0.25, 123, 2.5, -7, 0];
+  const RK = (u) => {
+    const 百 = (u & 1) !== 0, 整 = (u & 2) !== 0;
+    if (整) return (百 ? ((u | 0) >> 2) / 100 : ((u | 0) >> 2));
+    const bb = new ArrayBuffer(8), dv = new DataView(bb);
+    dv.setUint32(4, (u & 0xFFFFFFFC) >>> 0, true);
+    const v = dv.getFloat64(0, true);
+    return 百 ? v / 100 : v;
+  };
+  for (const n of 組) {
+    const 出 = RK(XB.RKにする(n));
+    if (Math.abs(出 - n) > 1e-9) throw new Error('★' + n + ' ⇒ ' + 出 + '★');
+  }
+});
+
 console.log('');
 console.log('  ★見て いない 事★');
 console.log('    ・★実Excel が 開くかは 測れません★（COM が 要る＝経営者1 の 持ち場）');

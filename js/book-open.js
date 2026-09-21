@@ -855,6 +855,45 @@
         return parseInt(a.replace(/\D+/g, ''), 10) - parseInt(b.replace(/\D+/g, ''), 10);
       });
     var chain = Promise.resolve(), touched = [];
+    /* ══ ★★うちで 足した 板も 書き出します★★ ══（2026-09-22）
+         司さん「★全部 保存しろや★」（ア）＝★司さんの 実物は この 形★
+         `.xlsx` の 側は 2026-09-21 に 直しました。こちらは ★別の 道★
+           ＝`workbook.bin` も `sheetN.bin` も 2進
+         ★★実Excel で 数えて もらいました★★（経営者1・2026-09-22・★赤 0件★）
+           `Open` が ★投げない★ ／ 判子 1つ そのまま ／
+           ★溢れが 3組 とも 生きて いる★ ／ 元の 板の 値 19マス とも 同じ
+         ★★数しか 書けません★★
+           ＝字の マスは `sharedStrings.bin` を 指します
+           ＝足すと ★元の 板が 指す 番号が ずれる 恐れ★
+           ⇒★字の マスは 「入りません」と 言い続けます★（`lib/hairanai.js`）
+         ★`xl/metadata.bin` は 1バイトも 触りません★（★触ると 溢れが 壊れます★） */
+    if (typeof E.xlsb板を足す === 'function') {
+      var 見本 = null;
+      sheets.forEach(function (sh) {
+        if (opened.sheetNames.indexOf(sh.name) >= 0) return;   /* 元に 在る 板は 下で 直す */
+        chain = chain.then(function () {
+          /* ★見え方と 行の 頭を 元の 板から 写す為に 1枚目を 見本に します★
+             ＝★当て推量で 作らない★ */
+          var 先 = 見本 ? Promise.resolve(見本) : zip.bytes(parts[0]).then(function (b0) {
+            var r0 = E.parse(b0 instanceof Uint8Array ? b0 : new Uint8Array(b0), E.SHAPE.sheet);
+            見本 = r0.ok ? r0.recs : [];
+            return 見本;
+          });
+          return 先.then(function (み) {
+            var 数だけ = {}, ch = changedCells(sh);
+            Object.keys(ch).forEach(function (k) {
+              var p2 = k.split(','), val = ch[k];
+              if (typeof val !== 'number' && (val === '' || isNaN(Number(val)))) return;
+              数だけ[X.utils.encode_cell({ r: parseInt(p2[0], 10), c: parseInt(p2[1], 10) })] =
+                { v: Number(val), t: 'n' };
+            });
+            return E.xlsb板を足す(zip, み, sh.name, 数だけ).then(function (足) {
+              touched.push(足.部品);
+            });
+          });
+        });
+      });
+    }
     sheets.forEach(function (sh) {
       var i = opened.sheetNames.indexOf(sh.name);
       if (i < 0 || !parts[i]) return;
