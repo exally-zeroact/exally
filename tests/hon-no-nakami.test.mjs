@@ -44,7 +44,7 @@ const 板 = [{
 console.log('[hon-no-nakami] ★持ち込んだ 本の 中身を 数える★');
 
 見る('★関数を 数える（字の 中は 数えない）★', () => {
-  const d = H.数える({ 形: 'xlsx', sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
+  const d = H.本の中身を数える({ 形: 'xlsx', sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
   assert.equal(d.関数.測った, true);
   const 表 = {};
   d.関数.一覧.forEach((x) => { 表[x.名] = x.数; });
@@ -55,8 +55,8 @@ console.log('[hon-no-nakami] ★持ち込んだ 本の 中身を 数える★');
 });
 
 見る('★★マクロ「無い」と「読めない」を 混ぜない★★', () => {
-  const 無 = H.数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
-  const 読 = H.数える({
+  const 無 = H.本の中身を数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
+  const 読 = H.本の中身を数える({
     sheets: 板, 関数を拾う: E.functionsIn,
     マクロの読み: { ok: false, モジュール: [], なぜ: '入れ物が 読めませんでした' },
   });
@@ -70,7 +70,7 @@ console.log('[hon-no-nakami] ★持ち込んだ 本の 中身を 数える★');
 });
 
 見る('★関数を 読む 台を 渡さなければ「数えていません」と 言う★', () => {
-  const d = H.数える({ sheets: 板, マクロの読み: null });          /* ★拾う を 渡さない★ */
+  const d = H.本の中身を数える({ sheets: 板, マクロの読み: null });          /* ★拾う を 渡さない★ */
   assert.equal(d.関数.測った, false);
   assert.equal(d.関数.種類, 0);
   assert.match(H.一文(d), /数えていません/);
@@ -78,13 +78,13 @@ console.log('[hon-no-nakami] ★持ち込んだ 本の 中身を 数える★');
 });
 
 見る('★式が 1つも 無い 本★', () => {
-  const d = H.数える({ sheets: [{ name: 'S', data: { '0,0': { v: 1 } } }], 関数を拾う: E.functionsIn, マクロの読み: null });
+  const d = H.本の中身を数える({ sheets: [{ name: 'S', data: { '0,0': { v: 1 } } }], 関数を拾う: E.functionsIn, マクロの読み: null });
   assert.equal(d.関数.測った, true);
   assert.match(H.一文(d), /式は 1つも ありません/);
 });
 
 見る('★マクロが 読めた 時は 本数と 手続きを 出す★', () => {
-  const d = H.数える({
+  const d = H.本の中身を数える({
     sheets: 板, 関数を拾う: E.functionsIn,
     マクロの読み: { ok: true, モジュール: [{}, {}], なぜ: '' },
     マクロの見立て: { 本数: 1, 手続き: [{ 名: 'Macro1', 分類: ['写す'], 行数: 12 }] },
@@ -98,14 +98,14 @@ console.log('[hon-no-nakami] ★持ち込んだ 本の 中身を 数える★');
 });
 
 見る('★板の 数は 渡した 板の 数★', () => {
-  const d = H.数える({ sheets: [{ name: 'a', data: {} }, { name: 'b', data: {} }], 関数を拾う: E.functionsIn, マクロの読み: null });
+  const d = H.本の中身を数える({ sheets: [{ name: 'a', data: {} }, { name: 'b', data: {} }], 関数を拾う: E.functionsIn, マクロの読み: null });
   assert.equal(d.板, 2);
   assert.match(H.一文(d), /板が 2枚/);
 });
 
 /* ══ ★★自己確認＝わざと 壊して 赤に なるか★★ ══
      ★★2026-09-21 ── 1回 目は ★口先だけの ok★を 書いて いました★★
-       外から `H.関数を数える` を 差し替えても、`数える` は ★台の 中の 物★を 呼ぶので
+       外から `H.関数を数える` を 差し替えても、`本の中身を数える` は ★台の 中の 物★を 呼ぶので
        ★1文字も 壊れて いないのに ok と 出て いました★
      ⇒★台の 字そのものを 書き換えた 写しを 作って 走らせます★（ディスクは 触りません） */
 if (process.argv.includes('--self-test')) {
@@ -132,14 +132,14 @@ if (process.argv.includes('--self-test')) {
       "出.push('マクロは 入っていますが 読めませんでした');",
       "出.push('マクロは ありません');",
       (X) => {
-        const d = X.数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: { ok: false, モジュール: [], なぜ: 'x' } });
+        const d = X.本の中身を数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: { ok: false, モジュール: [], なぜ: 'x' } });
         assert.doesNotMatch(X.一文(d), /ありません/);
       }],
     ['②未測定を「0件」に 化けさせる',
       "return { 測った: false, 種類: 0, 数: 0, 式の在るマス: 0, 一覧: [] };",
       "return { 測った: true, 種類: 0, 数: 0, 式の在るマス: 0, 一覧: [] };",
       (X) => {
-        const d = X.数える({ sheets: 板, マクロの読み: null });   /* ★拾う を 渡さない★ */
+        const d = X.本の中身を数える({ sheets: 板, マクロの読み: null });   /* ★拾う を 渡さない★ */
         assert.equal(d.関数.測った, false);
         assert.match(X.一文(d), /数えていません/);
       }],
@@ -147,7 +147,7 @@ if (process.argv.includes('--self-test')) {
       "if (!c || typeof c.f !== 'string' || c.f.charAt(0) !== '=') return;",
       "if (!c || typeof c.f !== 'string') return;",
       (X) => {
-        const d = X.数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
+        const d = X.本の中身を数える({ sheets: 板, 関数を拾う: E.functionsIn, マクロの読み: null });
         assert.equal(d.関数.式の在るマス, 3);
       }],
   ];
