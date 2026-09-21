@@ -780,9 +780,22 @@
   }
 
   /** ブック全体で1つでも変わったか（★0件なら元のバイト列をそのまま返す★） */
+  /* ══ ★★「変わった」に 板が 増えた事も 入れます★★ ══（2026-09-21）
+       ★★何が 起きて いたか★★
+         `saveOpened()` は 1つも 変わって いなければ
+         ★元の バイト列を そのまま 返します★（作り直さないのが 一番 安全・良い 決め）。
+         ⇒でも ここが ★元に 在る 板しか 見て いません★でした
+           （`indexOf(...) < 0` なら ★飛ばす★）
+         ⇒★★板を 足しただけ では 「変わって いない」★★ に なり、
+           ★出た ファイルが 元と 1バイトも 同じ★ でした（2026-09-21 実測・sha256 一致）
+         ⇒★板を 足す 所を 直しても ここが 通さなければ 出ません★
+       ★★記憶「作る道が 2本 在る時は 両方 直せ」の 形です★★
+         ＝`saveXlsxLike()` を 直しただけでは 足りませんでした。
+       ★消えた 板は ここでは 見て いません★
+         ＝★今の 道は 板を 消せません★（消すのは 別の 話） */
   function anyChanged(sheets) {
     for (var i = 0; i < sheets.length; i++) {
-      if (opened.sheetNames.indexOf(sheets[i].name) < 0) continue;
+      if (opened.sheetNames.indexOf(sheets[i].name) < 0) return true;   /* ★足した 板★ */
       if (Object.keys(changedCells(sheets[i])).length) return true;
     }
     return false;
@@ -804,8 +817,26 @@
   function saveXlsxLike(sheets) {
     return root.XlsxEdit.open(opened.bytes).then(function (book) {
       var chain = Promise.resolve();
+      /* ★★うちで 足した 板も 書き出します★★（2026-09-21）
+           司さん「★全部 保存しろや、断る 理由が なんか あるんか★」（ア）
+           ★前は ここで 「元に無いシートは触らない」と 返して いました★
+           ⇒`lib/hairanai.js` が 「入りません」と 数えて 言う 物の 因
+           ⇒★「出来ない から」では ありません★＝足りないのは 口 だけ でした
+         ★★足す 順に 気を 付けます★★
+           ★先に 板を 足してから 値を 入れます★＝足す 前に 値を 入れると 行き先が 無い
+         ★★元の 板の 値は 今まで 通り★★＝★触って いない 部品は 1バイトも 変わりません★
+           （2026-09-21 実測 … 部品 14本 ⇒ 15本／★減った 0本★／
+             変わった 3本＝[Content_Types].xml・rels・workbook.xml だけ／
+             ★判子も 飾りも 入った 11本は 中身が 同じ★） */
       sheets.forEach(function (sh) {
-        if (opened.sheetNames.indexOf(sh.name) < 0) return;      // 元に無いシートは触らない
+        if (opened.sheetNames.indexOf(sh.name) >= 0) return;    // 元に在る板は 下で 直す
+        if (typeof root.XlsxEdit.板を足す !== 'function') return;
+        chain = chain.then(function () {
+          root.XlsxEdit.板を足す(book, sh.name, collectValues(sh));
+        });
+      });
+      sheets.forEach(function (sh) {
+        if (opened.sheetNames.indexOf(sh.name) < 0) return;      // 足した 板は 上で 入れた
         chain = chain.then(function () {
           return root.XlsxEdit.setValues(book, sh.name, collectValues(sh));
         });
