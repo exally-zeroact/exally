@@ -59,7 +59,7 @@ $見る = @(
 )
 
 $xl = New-Object -ComObject Excel.Application
-$bk = $null; $sh = $null; $c = $null
+$bk = $null; $sh = $null; $c = $null; $w2 = $null
 try {
   $xl.Visible = $false
   $xl.DisplayAlerts = $false
@@ -68,7 +68,7 @@ try {
   $行.Add('# ★読むだけ★（保存して いません）／★開けるのは 字で 書いた 2本だけ★')
   $行.Add('# ★どの Excel か★ ... 版 ' + $xl.Version + ' ／ build ' + $xl.Build)
   $行.Add('# ★2本目は `xl/theme/theme1.xml` の accent1 だけ FF0000 に した 写し★（他は 同じ）')
-  $行.Add('# 紙' + "`t" + '見た物' + "`t" + 'RGB' + "`t" + 'テーマ番号' + "`t" + '濃さ' + "`t" + '色の番号')
+  $行.Add('# 紙' + "`t" + '見た物' + "`t" + 'RGB' + "`t" + 'テーマ番号' + "`t" + '濃さ' + "`t" + '色の番号' + "`t" + '型' + "`t" + '=(マス)=0')
   foreach ($x in $二本) {
     $p = Join-Path $env:TEMP $x.名
     $bk = $xl.Workbooks.Open($p, 0, $true)
@@ -81,6 +81,7 @@ try {
     try { $テ = [string]$bk.Theme.ThemeColorScheme.Colors(5).RGB } catch { $テ = '★投げました★ ' + $_.Exception.Message }
     $行.Add($x.札 + "`t" + '★ブックの テーマ accent1★' + "`t" + $テ + "`t" + '' + "`t" + '' + "`t" + '')
     Write-Host ('  ' + $x.札.PadRight(20) + ' ★ブックの accent1★ ' + $テ)
+    $窓行 = 40
     foreach ($m in $見る) {
       $c = $sh.Range($m.マス)
       if ($m.何 -eq 'nuri') {
@@ -94,7 +95,16 @@ try {
         $ti = [string]$c.Font.TintAndShade
         $ci = [string]$c.Font.ColorIndex
       }
-      $行.Add($x.札 + "`t" + $m.札 + "`t" + $rgb + "`t" + $tem + "`t" + $ti + "`t" + $ci)
+      # ══ ★★2つ目の 窓★★（★`=(マス)=0` の 真偽と ★型★ を 一緒に 取る★）══
+      #   ★なぜ★ ... `.Value2` の 「0」は ★本物の 0★ とも ★空★ とも ★誤りの 番号★ とも
+      #              区別が 付きません（記憶「意味の 無い 数は 一番 見つけにくい」）
+      #   ★置き場★ ... Z列（★色を 見る マスは B列＝ぶつかりません★）
+      $v0 = $c.Value2
+      $型 = if ($null -eq $v0) { '(kara)' } elseif ($v0 -is [double]) { 'Double' } elseif ($v0 -is [string]) { 'String' } elseif ($v0 -is [bool]) { 'Boolean' } else { 'Other' }
+      $ゼロか = '(★窓2が 打てません★)'
+      try { $w2 = $sh.Range('Z' + $窓行); $w2.Formula2 = '=(' + $m.マス + ')=0'; $ゼロか = [string]$w2.Value2 } catch { }
+      $窓行 = $窓行 + 1
+      $行.Add($x.札 + "`t" + $m.札 + "`t" + $rgb + "`t" + $tem + "`t" + $ti + "`t" + $ci + "`t" + $型 + "`t" + $ゼロか)
       Write-Host ('  ' + $x.札.PadRight(20) + ' ' + $m.札.PadRight(24) + ' RGB ' + $rgb)
       $c = $null
     }
@@ -105,7 +115,7 @@ try {
   [System.IO.File]::WriteAllText($出, ($行 -join "`n") + "`n", (New-Object System.Text.UTF8Encoding($false)))
   Write-Host ('★書いた ... ' + $出 + '★')
 } finally {
-  $c = $null; $sh = $null
+  $w2 = $null; $c = $null; $sh = $null
   if ($null -ne $bk) { $bk.Close($false) }
   $bk = $null
   $xl.Quit()
