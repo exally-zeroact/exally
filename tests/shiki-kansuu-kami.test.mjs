@@ -1176,9 +1176,26 @@ const 字を読む = (p) => fs.readFileSync(p, 'utf8').replace(/^﻿/, '');
 
 /* ── ★紙を 集める★（手で 選ばない） ── */
 const 紙たち = [];
+const 読まない紙 = [];   /* ★自分で 「答えの 紙では ない」と 名乗った 紙★ */
 for (const d of [path.join(ROOT, 'docs/measured'), path.join(ROOT, 'docs/measured/kansuu46')]) {
   for (const f of fs.readdirSync(d).filter((x) => /^golden-.*\.tsv$/.test(x))) {
     if (f.startsWith('golden-jitsubutsu')) continue;   /* ★司さんの 実物は 別の 決め★ */
+    /* ══ ★★「答えの 紙では ない」と 名乗って いる 紙は 読みません★★ ══（2026-09-21）
+         ★★何が 起きたか★★
+           経営者1 が `golden-jitsu-excel-yoko-soroe-2026-09-21.tsv` を 足しました。
+           ＝★横の 揃えを 測った 紙★で、1列目は `=TRUE()`、2列目は ★左の 余りの 点数★。
+           ⇒この 門は それを ★式と 答え★ と 読み、
+             「`=TRUE()` の 答えは 73 の はず」と ★赤に しました★。
+           ⇒★★本番の 穴では ありません＝門の 見る 範囲の 話です★★
+         ★★名前で 除きません★★
+           ＝`golden-jitsu-excel-yoko-soroe-` と 決め打ちすると
+             ★次に 同じ 形の 紙が 来た 日に また 赤に なります★。
+           ⇒★紙が 自分で 名乗る★ 形に します。
+         ★★名乗り方★★ ＝ 紙の 頭に この 1行を 書く
+           `# ★この紙は 式の 答えの 紙では ありません★`
+         ★読まない 紙は 名前を 出します★＝★黙って 減らさない★ */
+    const 頭 = fs.readFileSync(path.join(d, f), 'utf8').slice(0, 4000);
+    if (頭.indexOf('この紙は 式の 答えの 紙では ありません') >= 0) { 読まない紙.push(f); continue; }
     紙たち.push(path.join(d, f));
   }
 }
@@ -1191,6 +1208,10 @@ const T2 = (n, f) => {
 
 console.log('\n[shiki-kansuu-kami] ★台が 知る 関数を 手元の 紙 全部で 押す★');
 console.log('  … ★台が 知る★ ' + 台が知る.size + '個 ／ ★紙★ ' + 紙たち.length + '枚');
+if (読まない紙.length) {
+  console.log('  ★読まない 紙★ ' + 読まない紙.length + '枚（自分で 名乗って います）＝ '
+    + 読まない紙.join(' '));
+}
 
 /* ★★道具が 空振りして いないか★★（★0件を 根拠に しない★） */
 T2('★紙を 1枚でも 読んで いる★', () => {

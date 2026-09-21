@@ -291,10 +291,25 @@ function testWiring(pages, opens) {
   console.log('      ── 実測 ── 画面 ' + pages.length + '枚を見て、受け取り口を読んでいるのは ' + opens.length + '枚: ' + (opens.join(',') || '（無し）'));
   for (const p of opens) {
     const t = fs.readFileSync(path.join(ROOT, p), 'utf8');
-    const iTable = t.indexOf('lib/table-refs.js');
-    const iOpen = t.indexOf('js/book-open.js');
-    ok(iTable > 0, p + ' が lib/table-refs.js を読んでいる');
-    ok(iTable > 0 && iTable < iOpen, '★' + p + ' は table-refs.js を book-open.js より先に読む（後だと呼べない）');
+    /* ══ ★★「名前が 出て くる 所」では なく 「読み込む 所」を 見ます★★ ══（2026-09-21）
+         ★★何が 起きたか★★
+           前は `t.indexOf('js/book-open.js')` ＝ ★ファイルの 中で 最初に 出て くる 所★。
+           ⇒2026-09-21 に `book.html` の ★注（コメント）★ に
+             `js/book-open.js` と 書いた だけで ★門が 赤に なりました★
+             （注は 2843行目／読み込みは 18638行目）
+           ⇒★★読み込む 順は 1つも 変わって いません★★＝★嘘の 赤★
+         ★★逆も 起きます★★＝★注に 先に 書けば 順を 入れ替えても 緑の まま★
+           ⇒★それが 怖い 方です★（記憶「飾りの 字に 頼った 門は 黙って 割れる」）
+         ★★直し★★ ＝ `_loadScript('...')` の 所だけ 見ます。
+         ★守る 中身は 同じ★＝★table-refs を book-open より 先に 読む★ */
+    const 読む所 = (名) => t.indexOf("_loadScript('" + 名 + "'");
+    const iTable = 読む所('lib/table-refs.js');
+    const iOpen = 読む所('js/book-open.js');
+    ok(iTable > 0, p + ' が lib/table-refs.js を ★読み込んで★ いる');
+    ok(iOpen > 0, p + ' が js/book-open.js を ★読み込んで★ いる');
+    ok(iTable > 0 && iOpen > 0 && iTable < iOpen,
+      '★' + p + ' は table-refs.js を book-open.js より先に読む（後だと呼べない）'
+      + '／★読み込む 所で 数えて います★（table-refs ' + iTable + ' / book-open ' + iOpen + '）');
   }
   const open = fs.readFileSync(path.join(ROOT, 'js', 'book-open.js'), 'utf8');
   ok(/TableRefs\.resolve\(/.test(open), '★book-open.js が TableRefs.resolve を呼んでいる');
