@@ -1,4 +1,4 @@
-﻿# toru-jitsu-excel-ga-shuufuku-shita-ka.ps1
+﻿﻿# toru-jitsu-excel-ga-shuufuku-shita-ka.ps1
 #   -- ★「実Excel が 修復しました」を 機械で 拾えるか★（93）（2026-09-21）
 #
 #  ★★なぜ★★
@@ -82,12 +82,36 @@ function 写して細工($名, $する) {
   [IO.Compression.ZipFile]::ExtractToDirectory($先, $tmp)
   & $する $tmp
   Remove-Item $先 -Force
-  [IO.Compression.ZipFile]::CreateFromDirectory($tmp, $先)
+  # ★★2026-09-21 ── `CreateFromDirectory` は ★名前に 逆斜線を 使います★★（.NET Framework）
+  #   ⇒`xl\styles.xml` に なり ★zip の 決まり（斜線）と 違います★
+  #   ⇒前後を 突き合わせると ★全部の 部品が 「増えた」に 見えました★
+  #   ⇒さらに ★実Excel が 投げた 因が 「壊れ」か 「名前」か 分けられなく なります★
+  #   ⇒★自分で 1本ずつ 入れ、名前は 斜線に 直します★
+  $z = [IO.Compression.ZipFile]::Open($先, 'Create')
+  try {
+    foreach ($f in Get-ChildItem -LiteralPath $tmp -Recurse -File) {
+      # ★逆斜線を 1文字も 書きません★（heredoc や 便りで ★落ちます★＝記憶の 決まり）
+      #   ⇒2026-09-21 に ここで 落ちて `.Replace('', '/')` に なり、
+      #     ★空の 包み（22バイト）★が 4本 出来ました。
+      $逆 = [string][char]92
+      $な = $f.FullName.Substring($tmp.Length + 1).Replace($逆, '/')
+      $e = $z.CreateEntry($な)
+      $w = $e.Open()
+      $bytes = [IO.File]::ReadAllBytes($f.FullName)
+      $w.Write($bytes, 0, $bytes.Length)
+      $w.Close()
+    }
+  } finally { $z.Dispose() }
   return $先
 }
 
+# ★★★⓪が 一番 大事です★★★
+#   ★壊さずに ★詰め直しただけ★ の 物★
+#   ＝これが 投げるなら ★投げた 因は 「壊れ」では なく 「詰め直し」★＝★測りが 嘘に なります★
+#   ⇒2026-09-21 に ★これを 置かずに 測り、危うく 嘘の 答えを 出す 所でした★
 $品 = @()
-$品 += @{ 札 = '①きれい';              道 = $元 }
+$品 += @{ 札 = '①きれい（Excel が 書いた まま）'; 道 = $元 }
+$品 += @{ 札 = '⓪詰め直しただけ（壊さない）';     道 = (写して細工 'tsumenaoshi.xlsx' { param($d) }) }
 # ★★2026-09-21 ── ★`[Content_Types].xml` の 角括弧は PowerShell では ワイルドカード★★
 #   `Remove-Item (Join-Path $d '[Content_Types].xml')` は ★文字の 集まり★と 読まれ、
 #   ★何にも 当たらず 黙って 何も しません★（投げません）。
@@ -108,8 +132,8 @@ $品 += @{ 札 = '④在りもしない 板を 足す'; 道 = (写して細工 '
     $s = [IO.File]::ReadAllText($f)
     [IO.File]::WriteAllText($f, $s.Replace('</sheets>', '<sheet name="Nai" sheetId="9" r:id="rId99"/></sheets>'))
   }) }
-Write-Host ('★作った 包み★ ' + $品.Count + '本（決め打ち 4本）')
-if ($品.Count -ne 4) { exit 4 }
+Write-Host ('★作った 包み★ ' + $品.Count + '本（決め打ち 5本）')
+if ($品.Count -ne 5) { exit 4 }
 
 # ── ★1本ずつ 開かせて 見える 物を 全部 書き出します★
 $走った = 0
@@ -155,5 +179,5 @@ foreach ($x in $品) {
   $走った++
 }
 Write-Host ''
-Write-Host ('★走った 数★ ' + $走った + ' / 4')
-if ($走った -ne 4) { exit 4 }
+Write-Host ('★走った 数★ ' + $走った + ' / 5')
+if ($走った -ne 5) { exit 4 }
