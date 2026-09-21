@@ -8,7 +8,7 @@
 # ★古い 紙は 1文字も 触って いません★（昔の 道の 答えも 残す）
 # ★どの Excel か★ ... 版 16.0 ／ build 20326
 # ★どの 貝殻か★ ... PowerShell 5.1.26100.9278
-# 名前	式	昔の 答え	今の 答え	型	=(マス)=0	埋まった数	判じ	中身（|で マス／ / で 行）
+# 名前	式	昔の 答え	実Excel（今の 道＝Formula2）	型	=(マス)=0	埋まった数	判じ	中身（|で マス／ / で 行）
 AVEDEV	=AVEDEV(A1:B5)	2.2	2.2	Double	False	1	onaji	2.2
 AVEDEV	=AVEDEV(A1:B5,2,FALSE)	2.2500000000000004	2.2500000000000004	Double	False	1	onaji	2.25
 AVERAGE	=AVERAGE(A1:B5)	4.5	4.5	Double	False	1	onaji	4.5
@@ -99,4 +99,4 @@ XOR	=XOR(A1:B5,2,FALSE)	True	True	Boolean	False	1	onaji	TRUE
 #   ★★溢れた★★ ..... 16本（★2マス 以上＝昔の 紙は 1マス目しか 見て いない★）
 #   打てない .......... 0本
 #   ★対照★ SUM(A1:A5)=15（待つ 15）／SEQUENCE(2) の 2マス目=2（待つ 2）⇒ 2/2
-#   かかった 秒 ....... 10.8
+#   かかった 秒 ....... 11.1
