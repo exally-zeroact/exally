@@ -140,6 +140,40 @@ try {
        ＝★中身は 正しいのに 名前が 嘘★＝★次に 開く 人が 迷います★ */
   const もとの拡張子 = path.extname(材料) || '.xlsx';
   const 置き場 = path.join(TEMP, 'exally-tashita-' + もとの名 + もとの拡張子);
+
+  /* ══ ★★名前と 中身が 合って いるか★★ ══（2026-09-22）
+       ★★なぜ 要るか★★
+         印（sha256）は ★中身の すり替わり★ を 捕まえますが、
+         ★★名前の 嘘は 捕まえません★★（★中身が 同じ なら 印も 同じ★）。
+         ⇒2026-09-22 に 実際に 通り抜けました
+           `exally-tashita-kazari-hiraku3.`xlsx`` の 中身が ★`.xlsb`★
+           ＝経営者1 が ★中身の 形（板が .bin か .xml か）を 見て★ 見つけました
+         ⇒★そのまま なら 「.xlsx の 測り」として 紙に 残る 所でした★
+       ★だから 出す 前に 自分で 数えます★＝★合わなければ 止めます★ */
+  var 板の形 = '';
+  {
+    let q = 0;
+    while (q + 30 <= 中.length) {
+      if (中.readUInt32LE(q) !== 0x04034b50) break;
+      const z = 中.readUInt32LE(q + 18);
+      const n2 = 中.readUInt16LE(q + 26);
+      const x2 = 中.readUInt16LE(q + 28);
+      const nm = 中.toString('utf8', q + 30, q + 30 + n2);
+      if (nm.indexOf('xl/worksheets/sheet') === 0) {
+        if (nm.slice(-4) === '.bin') { 板の形 = 'bin'; break; }
+        if (nm.slice(-4) === '.xml') { 板の形 = 'xml'; break; }
+      }
+      q = q + 30 + n2 + x2 + z;
+    }
+  }
+  const 名の形 = (もとの拡張子.toLowerCase() === '.xlsb') ? 'bin' : 'xml';
+  if (板の形 && 板の形 !== 名の形) {
+    throw new Error('★★名前と 中身が 合いません★★'
+      + '／名前 ' + もとの拡張子 + '（' + 名の形 + '）／中身 ' + 板の形
+      + '／★印では 捕まりません★（中身が 同じ なら 印も 同じ）');
+  }
+  console.log('      ＝ 名前と 中身 ' + もとの拡張子 + ' / 板は ' + (板の形 || '(見つからず)')
+    + ' ⇒ ★合い★');
   fs.writeFileSync(置き場, 中);
   console.log('');
   console.log('  ★★出た ファイル★★ ' + 置き場);

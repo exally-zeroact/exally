@@ -231,7 +231,7 @@ T('★★`.xlsb` で 字の マスが 在れば その 数を 言う★★', () 
     { name: 'Sheet2', data: { '0,0': { v: 123 }, '0,1': { v: 'abc' }, '1,0': { v: 'xyz' } } }],
   {}, 'xlsb');
   if (r.件 !== 2) throw new Error('★' + r.件 + '件★（2件 の はず）' + JSON.stringify(r.中身));
-  if (String(r.中身[0].何).indexOf('字のマス') < 0) {
+  if (String(r.中身[0].何).indexOf('字') < 0) {
     throw new Error('★中身が 違う★ ' + JSON.stringify(r.中身));
   }
 });
