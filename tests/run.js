@@ -396,6 +396,8 @@ const FILES = [
   ['xlsx-kazari.test.mjs', '--self-test'],     // ★styles.xml を 5通り 壊して 赤に なるか★
   ['xlsx-zukei.test.mjs'],          // ★図形（判子）を 自前で 読む★（2026-09-21）
   ['xlsx-zukei.test.mjs', '--self-test'],      // ★drawing1.xml を 5通り 壊して 赤に なるか★
+  ['zip-tasu.test.mjs'],            // ★包みに 部品を 足せるか★（ア＝全部 保存する・2026-09-21）
+  ['zip-tasu.test.mjs', '--self-test'],        // ★足さない/消す/書き換えるで 数が 動くか★
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
   ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
   ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
