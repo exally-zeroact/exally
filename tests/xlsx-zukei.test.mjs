@@ -113,7 +113,7 @@ T('★★rels から 図形の 部品名を 解けて いる★★（★並び�
   }
 });
 
-const 図たち = 部品名 && 部品[部品名] ? Z.読む(部品[部品名]) : [];
+const 図たち = 部品名 && 部品[部品名] ? Z.図形を読む(部品[部品名]) : [];
 console.log('      ＝ 読んだ 図形 ' + 図たち.length + '個 ／ ' + JSON.stringify(図たち));
 
 T('★図形が 1つ 読めた（名前は hanko）★', () => {
@@ -172,18 +172,41 @@ T('★台に 載せる 形（`sheets[i].objects` と 同じ）が 出る★', ()
 });
 
 /* ★★色は 付けません★★（★当て推量で 色を 作らない★） */
-T('★★テーマの 色は 付けない★★（★未測定だから★）', () => {
-  if (図たち[0].塗り) {
-    throw new Error('★塗りが ' + 図たち[0].塗り + ' と 付いて います★'
-      + '／★この 図形は `<a:schemeClr val="accent1"/>`＝テーマの 色です★'
-      + '／★テーマの 色を 決め打ちに できるかは 未測定★（経営者1・2026-09-21）');
+/* ══ ★★テーマの 色★★ ══（2026-09-21）
+     この 判子は `<a:fillRef idx="1"><a:schemeClr val="accent1"/>` ＝ ★テーマの 色★
+     ＝実Excel に 聞くと 塗り ＝ COM 8544277 ＝ ★#156082★（経営者1・09-21）
+     ＝`xl/theme/theme1.xml` の accent1 と 同じ
+     ★★テーマを 渡さない 時は 付けません★★＝★当て推量で 色を 作らない★ */
+const KZ = require_(path.join(ROOT, 'lib/xlsx-kazari.js'));
+const テーマ = KZ.テーマを読む(部品['xl/theme/theme1.xml']);
+
+T('★テーマを 渡さない 時は 色を 付けない★', () => {
+  const 無 = Z.図形を読む(部品[部品名]);
+  if (無[0] && 無[0].塗り) throw new Error('★塗りが ' + 無[0].塗り + ' と 付いて います★');
+});
+
+T('★★テーマを 渡すと 判子の 塗りが 実Excel と 合う★★（#156082）', () => {
+  const 有 = Z.図形を読む(部品[部品名], テーマ);
+  if (!有.length) throw new Error('★図形が 0個★');
+  if (有[0].塗り !== '#156082') {
+    throw new Error('★塗りが ' + 有[0].塗り + '★（#156082 の はず）'
+      + '／★実Excel の COM 8544277 と 同じ 色です★');
   }
 });
 
+T('★★`lib/xlsx-kazari.js` と テーマの 並びが 同じ★★（★2か所に 書いて います★）', () => {
+  const a = (KZ.テーマの並び || []).join(',');
+  const b = (Z.テーマの並び || []).join(',');
+  if (!a || a !== b) {
+    throw new Error('★並びが 違います★'
+      + '／kazari ' + a + '／zukei ' + b
+      + '／★片方を 直したら もう片方も 直して ください★');
+  }
+});
 T('★字で 書いた 色（srgbClr）なら 使う★', () => {
   const 作 = 部品[部品名].split('<a:prstGeom').join(
     '<a:solidFill><a:srgbClr val="FF0000"/></a:solidFill><a:prstGeom');
-  const 出 = Z.読む(作);
+  const 出 = Z.図形を読む(作);
   if (!出.length || 出[0].塗り !== '#FF0000') {
     throw new Error('★塗りが ' + (出[0] || {}).塗り + '★（#FF0000 の はず）');
   }
@@ -227,7 +250,7 @@ T('★★板が 2進でも `Type` で 図形に 辿り着ける★★', () => {
   }
 });
 
-const b図 = b部品名 && b部品[b部品名] ? Z.読む(b部品[b部品名]) : [];
+const b図 = b部品名 && b部品[b部品名] ? Z.図形を読む(b部品[b部品名]) : [];
 const b場 = b図.length ? Z.場所を決める(b図[0], { 0: 245 }, 72, {}, 24) : {};
 console.log('      ＝ .xlsb の 図形 ' + b図.length + '個 ／ x=' + b場.x + ' y=' + b場.y);
 
@@ -310,7 +333,7 @@ for (const 本 of 二枚) {
       if (!r) throw new Error('★' + 名 + ' の rels が 無い★');
       const 絵 = Z.図形の部品名('', r, 板[i].部品);
       if (!絵 || !部[絵]) throw new Error('★図形の 部品名が ' + 絵 + '★');
-      const 図 = Z.読む(部[絵]);
+      const 図 = Z.図形を読む(部[絵]);
       if (図.length !== 1) throw new Error('★板' + (i + 1) + ' の 図形が ' + 図.length + '個★');
       if (図[0].名 !== 本.待つ[i].判子) {
         throw new Error('★★板' + (i + 1) + '（' + 板[i].名 + '）に ' + 図[0].名
@@ -380,7 +403,7 @@ if (process.argv.includes('--self-test')) {
   for (const こ of 壊し方) {
     const 絵2 = こ.絵(絵);
     if (絵2 === 絵) { console.log('  NG   ★1字も 変わって いません★ ' + こ.名); 悪++; continue; }
-    if (こ.見る(Z.読む(絵2))) console.log('  ok   ' + こ.名);
+    if (こ.見る(Z.図形を読む(絵2))) console.log('  ok   ' + こ.名);
     else { console.log('  NG   ★壊したのに 同じ 答え★ ' + こ.名); 悪++; }
   }
   /* ★rels を 壊すと 部品名が 出ない はず★ */

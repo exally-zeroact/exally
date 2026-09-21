@@ -132,12 +132,22 @@
       if ((kind === 'xlsx' || kind === 'xlsm') && root.XlsxKazari && root.XlsxEdit) {
         pre = pre.then(function () {
           return root.XlsxEdit.open(bytes).then(function (book) {
+            /* ★★テーマの 色は `xl/theme/theme1.xml` に 在ります★★（2026-09-21）
+                 ＝`.xlsx` の `styles.xml` は ★番号しか 書いて いません★（`<color theme="4"/>`）
+                 ＝`.xlsb` は 番号と 実際の 色の 両方を 持ちます（形が 違う）
+               ★無くても 動きます★＝テーマの 色が 付かないだけ（前と 同じ） */
+            var テーマの字 = '';
+            var 先 = book.zip.has('xl/theme/theme1.xml')
+              ? book.zip.text('xl/theme/theme1.xml').then(function (x) { テーマの字 = x; })
+                  .catch(function () { テーマの字 = ''; })
+              : Promise.resolve();
+            return 先.then(function () {
             return book.zip.text('xl/styles.xml').then(function (型の字) {
               var 表 = {}, 鎖 = Promise.resolve();
               book.sheets.forEach(function (板) {
                 鎖 = 鎖.then(function () {
                   return book.zip.text(板.part).then(function (xml) {
-                    表[板.name] = root.XlsxKazari.読む(xml, 型の字);
+                    表[板.name] = root.XlsxKazari.飾りを読む(xml, 型の字, テーマの字);
                   }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
                 });
               });
@@ -159,7 +169,8 @@
                       var 部 = root.XlsxZukei.図形の部品名(xml, r, 板.part);
                       if (!部 || !book.zip.has(部)) return null;
                       return book.zip.text(部).then(function (d) {
-                        var 図 = root.XlsxZukei.読む(d);
+                        var 図 = root.XlsxZukei.図形を読む(d, root.XlsxKazari
+                          ? root.XlsxKazari.テーマを読む(テーマの字) : null);
                         if (図.length) 表2[板.name] = 図;
                       });
                     });
@@ -167,6 +178,7 @@
                 });
               });
               return 鎖2.then(function () { 図形表 = 表2; });
+            });
             });
           }).catch(function (e) {
             飾り表 = null;
@@ -274,7 +286,7 @@
           var 部 = root.XlsxZukei.図形の部品名('', r, 板.道);
           if (!部 || !z2.has(部)) return null;
           return z2.text(部).then(function (d) {
-            var 図 = root.XlsxZukei.読む(d);
+            var 図 = root.XlsxZukei.図形を読む(d);
             if (!図.length) return;
             if (板.名で) 名表[板.鍵] = 図; else 並表[板.鍵] = 図;
           });

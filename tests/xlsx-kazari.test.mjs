@@ -86,7 +86,7 @@ T('★包みが ほどけた（styles と sheet が 在る）★', () => {
   if (!部品['xl/worksheets/sheet1.xml']) throw new Error('★xl/worksheets/sheet1.xml が 無い★');
 });
 
-const 飾り = 中 ? K.読む(部品['xl/worksheets/sheet1.xml'], 部品['xl/styles.xml']) : {};
+const 飾り = 中 ? K.飾りを読む(部品['xl/worksheets/sheet1.xml'], 部品['xl/styles.xml']) : {};
 console.log('      ＝ 飾りの 在る マス ' + Object.keys(飾り).length + '個 ／ '
   + Object.keys(飾り).join(' '));
 
@@ -160,11 +160,55 @@ T('★マスの型番 ＝ `<c r="A1" s="7">` から A1→7 を 取る★', () =>
   if (番.D1 !== undefined) throw new Error('★D1 に `s=` は 無い はず★ ' + 番.D1);
 });
 
+/* ══ ★★テーマの 色★★ ══（2026-09-21）
+     `.xlsx` の `styles.xml` は `<color theme="4"/>` ＝ ★番号しか 書いて いません★
+     ⇒`xl/theme/theme1.xml` を 引かないと 色が 出ません。
+     ★★番号と 紙の 並びは 同じでは ありません★★（経営者1 が 実Excel に 聞いた 物）
+       0 ⇒ lt1（白）／ 1 ⇒ dk1（黒）／ 2 ⇒ lt2 ／ 3 ⇒ dk2
+       ＝★0と1、2と3が 入れ替わって います★
+     ⇒★紙を 上から 数えると 白黒が 逆に なります★＝★ここを 門で 押さえます★ */
+const テーマ = K.テーマを読む(部品['xl/theme/theme1.xml']);
+console.log('      ＝ テーマの 色 ' + Object.keys(テーマ).length + '個 ／ 0=' + テーマ[0]
+  + ' 1=' + テーマ[1] + ' 4=' + テーマ[4]);
+
+T('★★テーマの 色が 実Excel と 合う★★（★0と1が 入れ替わる 所★）', () => {
+  const 待つ = { 0: '#FFFFFF', 1: '#000000', 2: '#E8E8E8', 3: '#0E2841',
+    4: '#156082', 5: '#E97132', 6: '#196B24', 7: '#0F9ED5', 8: '#A02B93', 9: '#4EA72E' };
+  for (const n of Object.keys(待つ)) {
+    if (テーマ[n] !== 待つ[n]) {
+      throw new Error('★番号 ' + n + ' が ' + テーマ[n] + '★（' + 待つ[n] + ' の はず）');
+    }
+  }
+});
+
+T('★★0番と 1番を 取り違えて いない★★（★紙の 並びは dk1 が 先★）', () => {
+  const 字 = 部品['xl/theme/theme1.xml'];
+  const i1 = 字.indexOf('<a:dk1>'), i2 = 字.indexOf('<a:lt1>');
+  if (!(i1 >= 0 && i2 >= 0 && i1 < i2)) {
+    throw new Error('★紙の 並びが 違います★ dk1=' + i1 + ' lt1=' + i2);
+  }
+  if (テーマ[0] !== '#FFFFFF') {
+    throw new Error('★番号 0 が ' + テーマ[0] + '★／★紙の 1番目（lt1・白）の はず★'
+      + '／★上から 数えると 黒に なります★');
+  }
+});
+
+T('★テーマが 無ければ テーマの 色は 付けない（当て推量で 黒を 入れない）★', () => {
+  const 無 = K.飾りを読む(部品['xl/worksheets/sheet1.xml'], 部品['xl/styles.xml']);
+  const 有 = K.飾りを読む(部品['xl/worksheets/sheet1.xml'], 部品['xl/styles.xml'], 部品['xl/theme/theme1.xml']);
+  if (JSON.stringify(無.A1) !== JSON.stringify(有.A1)) {
+    throw new Error('★A1 が テーマの 有無で 変わりました★／A1 は 字で 書いた 赤の はず');
+  }
+});
+
 console.log('');
 console.log('  ★見て いない 事★');
 console.log('    ・★画面に 描いて いるかは ここでは 測って いません★');
 console.log('      ＝`docs/measured/hakaru-kazari-ga-gamen-made-todoku-ka.mjs`（画素まで 測る）');
-console.log('    ・テーマの 色／番号の 色（`indexed`）は ★読んで いません★');
+console.log('    ・★★濃さ（tint）は 未測定★★＝`<color theme="4" tint="-0.5"/>`');
+console.log('      ＝★元の 色だけ 出します★（色味は 合う／明るさが ずれる）');
+console.log('    ・番号の 色（`indexed`）は ★読んで いません★');
+console.log('    ・テーマを ★別の テーマに 変えた 時★ は 未測定');
 console.log('    ・斜めの 罫線は ★台に 持ち方が 有りません★');
 console.log('    ・`.xlsb` は ★まだ★（包みの 中が 別物）');
 console.log('xlsx-kazari: ' + pass + ' 緑 / ' + fail + ' 赤');
@@ -202,7 +246,7 @@ if (process.argv.includes('--self-test')) {
       console.log('  NG   ★1字も 変わって いません★ ' + こ.名);
       悪++; continue;
     }
-    if (こ.見る(K.読む(板2, 型2))) console.log('  ok   ' + こ.名);
+    if (こ.見る(K.飾りを読む(板2, 型2))) console.log('  ok   ' + こ.名);
     else { console.log('  NG   ★壊したのに 同じ 答え★ ' + こ.名); 悪++; }
   }
   process.exit(悪 ? 1 : 0);
