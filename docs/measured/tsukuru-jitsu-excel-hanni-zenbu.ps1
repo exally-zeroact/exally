@@ -116,7 +116,25 @@ try {
   $行.Add('# ★どの 貝殻か★ ... PowerShell ' + $版.ToString())
   $行.Add('# ★印（_xlfn. 等）は 外して 打って います★＝実Excel が 自分で 付けます')
   $行.Add('# ★読む★ ... 頭の マスから 6行 x 6列')
-  $行.Add('# 式' + "`t" + '埋まった数' + "`t" + '中身（|で マス／ / で 行）')
+  # ══ ★★`#材料` を 書きます★★（★これが 無いと 試験は 1行も 押しません★）
+  $行.Add('#材料' + "`t" + 'A1' + "`t" + '1')
+  $行.Add('#材料' + "`t" + 'A2' + "`t" + '2')
+  $行.Add('#材料' + "`t" + 'A3' + "`t" + '2')
+  $行.Add('#材料' + "`t" + 'A4' + "`t" + '3')
+  $行.Add('#材料' + "`t" + 'A5' + "`t" + '3')
+  $行.Add('#材料' + "`t" + 'A6' + "`t" + '4')
+  $行.Add('#材料' + "`t" + 'B1' + "`t" + '10')
+  $行.Add('#材料' + "`t" + 'B2' + "`t" + '20')
+  $行.Add('#材料' + "`t" + 'B3' + "`t" + '30')
+  $行.Add('#材料' + "`t" + 'D1' + "`t" + 'abc')
+  $行.Add('#材料' + "`t" + 'E1' + "`t" + '1')
+  $行.Add('#材料' + "`t" + 'F1' + "`t" + '2')
+  $行.Add('#材料' + "`t" + 'E2' + "`t" + '3')
+  $行.Add('#材料' + "`t" + 'F2' + "`t" + '4')
+  $行.Add('#材料' + "`t" + 'A20' + "`t" + '5')
+  $行.Add('#材料' + "`t" + 'A22' + "`t" + 'abc')
+  $行.Add('# ★A21 は 式（=1+1）なので 材料に 書いて いません★＝ISFORMULA の 行は 押されない')
+  $行.Add('# 式' + "`t" + '実Excel（今の 道＝Formula2）' + "`t" + '埋まった数' + "`t" + '中身（|で マス／ / で 行）')
 
   $時計 = [Diagnostics.Stopwatch]::StartNew()
   $行数 = 1
@@ -140,11 +158,23 @@ try {
         $c2 = $sh.Cells.Item($行数 + $r, 8 + $k)
         $v = $c2.Value2
         if ($null -eq $v) { $一行.Add('') }
-        else { $埋++; $からの行 = $false; $一行.Add([string]$c2.Text) }
+        else {
+          $埋++; $からの行 = $false
+          # ★★2026-09-21 ── ★`.Text` は 桁を 丸めます★★
+          #   ＝`-0.41615`（5桁）／`1.313035`（7桁）＝★桁が 一定で 在りません★
+          #   ⇒Exally1 が `COS` `COT` `COTH` `RADIANS` の 4本を
+          #     ★「揃えても 違う」★として 分けられませんでした
+          #   ⇒★数は `R`（全桁）／数で ない 物は 出る字★
+          if ($v -is [double]) { $一行.Add($v.ToString('R', [Globalization.CultureInfo]::InvariantCulture)) }
+          else { $一行.Add([string]$c2.Text) }
+        }
       }
       if (-not $からの行) { $並.Add(($一行 -join '|').TrimEnd('|')) }
     }
-    $行.Add($f + "`t" + $埋 + "`t" + ($並 -join ' / ') + $投げた)
+    # ★★物差しの 列＝頭の マスの 答え★★（★全桁★）
+    $あたま = $sh.Range($ma).Value2
+    $答 = if ($null -eq $あたま) { '(kara)' } elseif ($あたま -is [double]) { $あたま.ToString('R', [Globalization.CultureInfo]::InvariantCulture) } else { [string]$sh.Range($ma).Text }
+    $行.Add($f + "`t" + $答 + "`t" + $埋 + "`t" + ($並 -join ' / ') + $投げた)
     $行数 = $行数 + 10
   }
   $時計.Stop()
