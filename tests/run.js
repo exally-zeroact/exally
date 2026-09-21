@@ -386,6 +386,8 @@ const FILES = [
   ['kobore-kakidashi.test.mjs', '--self-test'],   // ★印を 消すと 赤に なるか★
   ['kobore-fusagi.test.mjs'],      // ★塞がれた 溢れ(#SPILL!)を 書き出す時★（★付けないと 実Excel で 黙って 1 に なる★・2026-09-20）
   ['kobore-fusagi.test.mjs', '--self-test'],   // ★#SPILL! 以外に 付けたら 赤か★
+  ['kobore-nakami.test.mjs'],       // ★溢れた 先の ★中身★を 実Excel の 紙と 突き合わせる★（2026-09-21）
+  ['kobore-nakami.test.mjs', '--self-test'],   // ★紙の 中身を 変えると 赤か★
   ['kansuu46-1taba.test.mjs'],       // ★台に 無かった 49個の 1束目（7個）を 紙で 押す
   ['kansuu46-9wakume.test.mjs'],     // ★9枠目の 紙で 押す（★紙と 同じ commit で 出す★）
   ['kansuu46-8wakume.test.mjs'],     // ★8枠目の 紙で 押す（★紙は 在ったが 押されて いなかった★）
