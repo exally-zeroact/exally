@@ -118,11 +118,44 @@ const 出す = (札, 並び, 書き) => {
   if (並び.length > 40) console.log('    ...（あと ' + (並び.length - 40) + '本）');
 };
 出す('増えた 部品', 増, (x) => x + '  ' + 後.get(x).中身.length + 'B');
-出す('★減った 部品★', 減, (x) => x + '  ' + 前.get(x).中身.length + 'B');
+/* ══ ★★「わざと 消した 物」の 扱い★★ ══（2026-09-22・Exally1 の 問い）
+     ★彼の 言い分★「消して 良い 物を 道具に 教えると ★本当に 消えた 時も 通る★」
+     ⇒★その通りです★。だから ★道具に 覚えさせません★。
+     ★でも 「人が 毎回 見る」も 門では ありません★（人は 見落とします）
+     ⇒★★その 場で 名指しして 宣言する★★ 形に しました
+         `--消える予定 xl/worksheets/binaryIndex1.bin`
+       ・★宣言した 物★ ... 「★わざと 消した★」と 出す（赤に しない）
+       ・★宣言して いない 物★ ... ★今まで 通り 赤★
+       ・★宣言したのに 消えて いない★ ... ★これも 赤★（★宣言が 古い★のを 見つける）
+     ⇒★覚えさせない／黙って 通さない／宣言は 命令の 字に 残る★ */
+const 消える予定 = (() => {
+  const 出 = [];
+  for (let i = 0; i < process.argv.length; i += 1) {
+    if (process.argv[i] === '--消える予定') 出.push(String(process.argv[i + 1] || ''));
+  }
+  return 出.filter(Boolean);
+})();
+const わざと = 減.filter((x) => 消える予定.indexOf(x) >= 0);
+const 本当に減った = 減.filter((x) => 消える予定.indexOf(x) < 0);
+const 宣言が古い = 消える予定.filter((x) => 減.indexOf(x) < 0);
+
+出す('★わざと 消した 部品（宣言あり）★', わざと, (x) => x + '  ' + 前.get(x).中身.length + 'B');
+出す('★★宣言して いないのに 減った 部品★★', 本当に減った, (x) => x + '  ' + 前.get(x).中身.length + 'B');
+出す('★★消える予定なのに 残って いる（宣言が 古い）★★', 宣言が古い, (x) => x);
 出す('★中身が 変わった 部品★', 変, (x) => x.な + '  ' + x.前 + 'B ⇒ ' + x.後 + 'B');
 console.log('★中身が 同じ 部品★ ' + 同.length + '本'
   + (詰め違い.length ? '（うち ★詰め方だけ 違う★ ' + 詰め違い.length + '本）' : ''));
 console.log('');
 console.log('★★この 道具は 「開けるか」を 見て いません★★');
 console.log('  ⇒実Excel が 投げないかは `toru-jitsu-excel-ga-shuufuku-shita-ka.ps1`（93）で 見ます');
-if (減.length) { console.log(''); console.log('★★減った 部品が 在ります★★'); process.exit(1); }
+if (本当に減った.length) {
+  console.log('');
+  console.log('★★宣言して いない 部品が 減りました★★');
+  console.log('  ⇒わざとなら `--消える予定 <名>` と ★命令の 字に 書いて ください★');
+  process.exit(1);
+}
+if (宣言が古い.length) {
+  console.log('');
+  console.log('★★消える予定と 言われた 物が 残って います＝宣言が 古いです★★');
+  process.exit(1);
+}
