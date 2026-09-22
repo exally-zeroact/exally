@@ -144,6 +144,41 @@ function 作る(直した数, 波及数) {
     出.indexOf('あなたが 直した所 1か所') === 0, 出);
 }
 
+{
+  /* ══ ★★「うち 別のシートが N か所」★★ ══（2026-09-22）
+       経営者1 が 実Excel で 割った 中身（`f876f43`）
+         `4月!C4` 1 ⇒ 99 で つられて 4か所。★半分の 2か所が 別の 板★。
+       ⇒★同じ 板だけ 見て いたら 「2か所」と 言う 所でした★
+       ★★板ごとの 数は 先頭3行では なく 全部から 数える★★
+         ＝`rows` は 先頭3行だけ ⇒★行から 数えたら また 嘘に なります★ */
+  const ch1 = { '0,0': 99, '3,4': 99000 };                 /* 4月 ... 人 1 ／ つられ 1 */
+  const ch2 = { '3,1': 186000, '6,1': 527000 };            /* まとめ ... ★全部 つられ★ */
+  const p = DiffPreview.build({
+    sheets: [{ name: '4月', data: {} }, { name: 'まとめ', data: {} }],
+    changedCells: (sh) => (sh.name === '4月' ? ch1 : ch2),
+    base: { '4月|0,0': 1, '4月|3,4': 1000, 'まとめ|3,1': 88000, 'まとめ|6,1': 429000 },
+    edited: { '4月|0,0': { beforeF: null } }, format: (v) => String(v),
+  });
+  const 出 = DiffPreview.文(p);
+  console.log('      ── 実測 ── ' + 出 + '（つられ ' + p.spreadCount
+    + ' / うち 別の板 ' + p.otherSheetCount + '）');
+  T('★つられた 3か所の うち 別のシートが 2か所★（実Excel の 割りと 同じ 形）',
+    出 === '4月!A1 を 1 から 99 に しました。つられて 3か所が 変わります（うち 別のシートが 2か所）', 出);
+}
+{
+  /* ★別の 板が 0の 時は 言わない★＝★字を 長くする 分の 値打ちが 無い★ */
+  const ch = { '0,0': 99, '3,4': 99000 };
+  const p = DiffPreview.build({
+    sheets: [{ name: '4月', data: {} }],
+    changedCells: () => ch, base: { '4月|0,0': 1, '4月|3,4': 1000 },
+    edited: { '4月|0,0': { beforeF: null } }, format: (v) => String(v),
+  });
+  const 出 = DiffPreview.文(p);
+  console.log('      ── 実測 ── ' + 出 + '（うち 別の板 ' + p.otherSheetCount + '）');
+  T('★別のシートが 0の 時は 付けない★（0か所 と 書かない）',
+    出 === '4月!A1 を 1 から 99 に しました。つられて 1か所が 変わります', 出);
+}
+
 /* ══════ ② 絵（本物の webkit・お客さんの 道） ══════ */
 console.log('\n★② 絵（本物の webkit で 開いて 保存の 窓を 出す）★');
 
@@ -201,9 +236,18 @@ try {
     const d = document.querySelector('#diffBody details.diffKuwashiku');
     const sm = d && d.querySelector('summary');
     const 中 = d ? Array.prototype.filter.call(d.children, (x) => x.tagName !== 'SUMMARY') : [];
+    const nk = document.getElementById('diffNakami');
+    const みな = [...document.querySelectorAll('#diffBody details.diffKuwashiku')];
+    const 中みな = みな.map((x) => Array.prototype.filter
+      .call(x.children, (y) => y.tagName !== 'SUMMARY').reduce((t, y) => t + 高(y), 0));
     return {
       文: bun ? bun.textContent : '(diffBun が 無い)',
       文の高さ: 高(bun),
+      中身の文: nk ? nk.textContent : '(diffNakami が 無い)',
+      中身の文の高さ: 高(nk),
+      畳みの数: みな.length,
+      見出したち: みな.map((x) => (x.querySelector('summary') || {}).textContent || ''),
+      畳みの中みな: 中みな,
       畳みが在る: !!d,
       open: d ? d.open : null,
       summaryの高さ: 高(sm),
@@ -234,6 +278,26 @@ try {
     畳んだ時.中の数 > 0 && 畳んだ時.中の高さ === 0,
     '中 ' + 畳んだ時.中の数 + '個 合計 ' + 畳んだ時.中の高さ + 'px');
 
+  /* ══ ★★何が 組まれて いるか★★══（2026-09-22・司さんの ア の 後半）
+       「★どんな 関数や マクロが 組まれてるかは 簡潔に 文に して ドロップダウンで 詳しく★」
+       ★★台は 作り直して いません★★＝`lib/hon-no-nakami.js`（経営者1 の 物）を 呼ぶだけ */
+  console.log('      ── 実測 ── 中身の文「' + 畳んだ時.中身の文 + '」（高さ '
+    + 畳んだ時.中身の文の高さ + 'px）／ 畳み ' + 畳んだ時.畳みの数 + '個 '
+    + 畳んだ時.見出したち.join(' / ') + ' ／ 畳んだ 中 ' + 畳んだ時.畳みの中みな.join(',') + 'px');
+
+  T('★何が 組まれて いるかの 1文が 出ている★（板の 枚数・関数・マクロ）',
+    畳んだ時.中身の文の高さ > 0 && /板が \d+枚/.test(畳んだ時.中身の文)
+      && /関数|式は/.test(畳んだ時.中身の文) && /マクロ/.test(畳んだ時.中身の文),
+    '高さ ' + 畳んだ時.中身の文の高さ + 'px ／ 字「' + 畳んだ時.中身の文 + '」');
+
+  T('★ドロップダウンは 3つ★（どこを触ったか ／ 関数 ／ マクロ）',
+    畳んだ時.畳みの数 === 3, '出た ' + 畳んだ時.畳みの数 + '個: ' + 畳んだ時.見出したち.join(' / '));
+
+  T('★★3つとも 畳んだ 中身が 高さ 0★★（1つでも 開いていたら 赤）',
+    畳んだ時.畳みの中みな.length === 3
+      && 畳んだ時.畳みの中みな.every((x) => x === 0),
+    畳んだ時.畳みの中みな.join(' / ') + 'px');
+
   /* ★開けたら 出る★（畳んだ ままで 中身が 死んで いないか） */
   const 開けた時 = await page.evaluate(() => {
     const d = document.querySelector('#diffBody details.diffKuwashiku');
@@ -253,9 +317,64 @@ try {
   /* ★[やめる] を 押す★＝★1本も 書き出さない★ */
   await page.evaluate(() => { document.getElementById('diffCancel').click(); });
   await page.evaluate(() => window.__保存);
+  const 窓が閉じた1 = await page.evaluate(() =>
+    document.getElementById('diffOverlay').style.display !== 'flex');
+  T('[やめる] で 窓が 閉じる（★1本も 書き出さない★）', 窓が閉じた1);
+
+  /* ══ ★★マクロ入りの 本でも 言えるか★★ ══（2026-09-22）
+       ★★ここまでの 材料は マクロが 0本★★＝「マクロは ありません」しか 出て いません。
+       ⇒「マクロが 在る 時に 本数を 言えるか」は ★別に 測らないと 分かりません★。
+       ⇒`tests/fixtures/vba-sample.xlsm` で もう 1回 通します。
+       ★同じ 画面を 使い回します★＝お客さんも 続けて 2冊 開きます。 */
+  const 材料2 = path.join(ROOT, 'tests/fixtures/vba-sample.xlsm');
+  if (!fs.existsSync(材料2)) throw new Error('★材料が 有りません★ ' + 材料2);
+  await page.setInputFiles('#bookFileInput', 材料2);
+  await page.waitForFunction(() => {
+    const c = window.BookOpen && window.BookOpen.current();
+    return !!(c && String(c.name || '').indexOf('vba-sample') >= 0);
+  }, { timeout: 60000 });
+  /* ★誰も 使って いない マスに 打つ★（元の 式を 触らない） */
+  await page.evaluate(() => { window.setCell(50, 10, '1'); });
+  await page.evaluate(() => {
+    window.FileOut = { deliver: () => Promise.reject(new Error('★書き出しては いけません★')) };
+    window.__保存2 = window.saveOpenedBook();
+  });
+  await page.waitForFunction(() => {
+    const ov = document.getElementById('diffOverlay');
+    return !!ov && ov.style.display === 'flex';
+  }, { timeout: 60000 });
+  const マクロ本 = await page.evaluate(() => {
+    const 高 = (el) => (el ? Math.round(el.getBoundingClientRect().height) : -1);
+    const みな = [...document.querySelectorAll('#diffBody details.diffKuwashiku')];
+    const マ = みな.find((x) => /マクロ/.test((x.querySelector('summary') || {}).textContent || ''));
+    return {
+      中身の文: (document.getElementById('diffNakami') || {}).textContent || '',
+      畳みの数: みな.length,
+      マクロの見出し: マ ? (マ.querySelector('summary') || {}).textContent : '(無い)',
+      マクロの行: マ ? マ.querySelectorAll('div > div').length : -1,
+      畳んだ高さ: みな.map((x) => Array.prototype.filter
+        .call(x.children, (y) => y.tagName !== 'SUMMARY').reduce((t, y) => t + 高(y), 0)),
+    };
+  });
+  console.log('      ── 実測 ── .xlsm 中身の文「' + マクロ本.中身の文 + '」／ 畳み '
+    + マクロ本.畳みの数 + '個 ／ ' + マクロ本.マクロの見出し
+    + ' ／ 畳んだ 高さ ' + マクロ本.畳んだ高さ.join(',') + 'px');
+
+  T('★★マクロ入りの 本で 本数を 言える★★（「ありません」で 済ませない）',
+    /マクロが [0-9]+本/.test(マクロ本.中身の文), マクロ本.中身の文);
+
+  T('★マクロの ドロップダウンに 中身が 在る★（0件で 畳みだけ 出さない）',
+    マクロ本.マクロの行 > 0, マクロ本.マクロの見出し + ' 行 ' + マクロ本.マクロの行);
+
+  T('★マクロ入りでも 畳みは 全部 高さ 0★',
+    マクロ本.畳んだ高さ.length > 0 && マクロ本.畳んだ高さ.every((x) => x === 0),
+    マクロ本.畳んだ高さ.join(' / ') + 'px');
+
+  await page.evaluate(() => { document.getElementById('diffCancel').click(); });
+  await page.evaluate(() => window.__保存2);
   const 窓が閉じた = await page.evaluate(() =>
     document.getElementById('diffOverlay').style.display !== 'flex');
-  T('[やめる] で 窓が 閉じる（★1本も 書き出さない★）', 窓が閉じた);
+  T('2冊目でも [やめる] で 窓が 閉じる（★2冊 続けて 開いても 1本も 書き出さない★）', 窓が閉じた);
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});
