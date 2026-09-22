@@ -182,6 +182,28 @@ if (出たファイル && fs.existsSync(出たファイル)) {
   見る('★ファイルが 落ちて きた★', false, '★落ちて きません★（押しても 出て いない）');
 }
 
+/* ══ ★★畳みは 「印」では なく ★高さ★ で 数えます★★ ══（2026-09-22）
+     ＝`open` 属性が 無くても ★中の 部品が 自分で `display` を 持つと 見えたまま★
+     ＝記憶「★見た目の 見張りは 印(class)が 付いたかで 緑に するな★」
+     ⇒★畳んだ 時 中身の 高さが 0★／★開けたら 0より 大きい★ を 数えます */
+const 畳み = await page.evaluate(() => {
+  const ds = [...document.querySelectorAll('#kuwashiku details')];
+  const 高さ = (d) => [...d.children].filter((e) => e.tagName !== 'SUMMARY')
+    .reduce((a, e) => a + e.getBoundingClientRect().height, 0);
+  const 閉 = ds.map((d) => ({ 見出し: (d.querySelector('summary') || {}).textContent || '', 高: 高さ(d) }));
+  ds.forEach((d) => { d.open = true; });
+  const 開 = ds.map((d) => 高さ(d));
+  ds.forEach((d) => { d.open = false; });
+  return { 閉, 開 };
+});
+console.log('');
+console.log('★畳みの 高さ★');
+畳み.閉.forEach((x, i) => console.log('  ' + x.見出し + ' ... 畳んだ ' + Math.round(x.高) + 'px ／ 開けた ' + Math.round(畳み.開[i]) + 'px'));
+見る('★★畳んだら 中身の 高さが 0★★', 畳み.閉.every((x) => x.高 === 0),
+  '畳んだ 時の 高さ ' + 畳み.閉.map((x) => Math.round(x.高)).join(' / '));
+見る('★開けたら 高さが 出る★', 畳み.開.some((h) => h > 0),
+  '開けた 時の 高さ ' + 畳み.開.map((h) => Math.round(h)).join(' / '));
+
 const 絵 = path.join(TEMP, 'exally-mochikomi.png');
 await page.screenshot({ path: 絵, fullPage: false });
 const st = fs.statSync(絵);
