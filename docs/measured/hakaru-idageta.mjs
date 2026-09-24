@@ -88,17 +88,45 @@ try {
         const ss = window.sheets || [];
         let 板 = ss.length, マス = 0;
         for (let i = 0; i < ss.length; i++) マス += Object.keys((ss[i] || {}).data || {}).length;
-        return 板 + '枚 / ' + マス + 'マス';
+        /* ★★どこまで 進んだかを 段で 出す★★（2026-09-25）
+             ①台を 読む（`_ensureXlsx`）･･･ `XLSX` `XlsxIO` `BookOpen` が 揃ったか
+             ②本を 読む（`BookOpen.openFile`）･･･ `isOpened()`
+             ③知らせ ･･･ ★「開けませんでした」が 出て いれば それは 止まりでは なく 断り★
+           ⇒★止まって いる 段が 分かれば 直す 所が 決まります★ */
+        const 台 = ['XLSX', 'XlsxIO', 'ZipSurgeon', 'XlsxEdit', 'XlsbEdit', 'XlsbJitai',
+          'TableRefs', 'XlsxKazari', 'XlsxZukei', 'DiffPreview', 'BookOpen']
+          .filter((k) => !window[k]);
+        let 知らせ = '';
+        document.querySelectorAll('div,span').forEach((el) => {
+          const t = (el.textContent || '');
+          if (t.indexOf('開けませんでした') >= 0 && t.length < 200) 知らせ = t.slice(0, 120);
+        });
+        return 板 + '枚 / ' + マス + 'マス'
+          + ' ／ 揃って いない 台 ' + (台.length ? 台.join(',') : '0本')
+          + ' ／ 開いた ' + (window.BookOpen && window.BookOpen.isOpened ? window.BookOpen.isOpened() : '(口なし)')
+          + (知らせ ? ' ／ ★知らせ「' + 知らせ + '」★' : '');
       });
       console.log('    [' + Math.round((Date.now() - 始) / 1000) + '秒] ' + n);
     } catch (e) { /* 読めない 時は 黙る（落とさない） */ }
   }, 20000);
   await page.setInputFiles('#bookFileInput', 材料);
+  /* ★★「開けませんでした」が 出たら すぐ 止めます★★（2026-09-25 ここで 1回 踏みました）
+       私は 880秒 待ち続けて 「★アプリが 止まって いる★」と 報告する 所でした。
+       実際は ★20秒の 時点で 画面は もう 断って いました★
+         「開けませんでした：The object can not be found here.」
+       ⇒★★止まって いたのは アプリでは なく 私の 測り道具★★。
+       ⇒★『何も 起きない』と 『断られた のに 見て いない』は 別★。 */
   await page.waitForFunction(() => {
     const ss = window.sheets || [];
     for (let i = 0; i < ss.length; i++) {
       if (ss[i] && ss[i].data && Object.keys(ss[i].data).length > 0) return true;
     }
+    let 断り = '';
+    document.querySelectorAll('div,span').forEach((el) => {
+      const t = (el.textContent || '');
+      if (t.indexOf('開けませんでした') >= 0 && t.length < 200) 断り = t.slice(0, 160);
+    });
+    if (断り) throw new Error(断り);
     return false;
   }, null, { timeout: 900000 });
   clearInterval(見張り);
