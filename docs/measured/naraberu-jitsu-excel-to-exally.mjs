@@ -92,7 +92,7 @@ try {
   await page.waitForFunction(() => {
     const sh = (window.sheets || [])[window.activeSheet || 0];
     return !!(sh && sh.data && Object.keys(sh.data).length > 3);
-  }, { timeout: 60000 }).catch(() => {});
+  }, null, { timeout: 60000 }).catch(() => {});
   /* ★★選んだ 印を 外します★★（2026-09-21）
        ＝実Excel の 絵には ★選んだ 印が 入って いません★（経営者1 の 道具）
        ⇒うちの 絵にだけ ★青い 枠と 水色の 塗り★ が 入ると 並べた 時に 嘘に なります
@@ -120,7 +120,7 @@ try {
     const t = document.querySelectorAll('.toast, #toast');
     for (const x of t) { if (x.offsetParent !== null) return false; }
     return true;
-  }, { timeout: 20000 }).catch(() => {});
+  }, null, { timeout: 20000 }).catch(() => {});
 
   const 出 = await page.evaluate(async (実の道) => {
     const cv = document.getElementById('grid-canvas');

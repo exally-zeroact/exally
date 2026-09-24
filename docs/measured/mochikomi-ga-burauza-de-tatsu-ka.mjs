@@ -113,7 +113,7 @@ await 入.setInputFiles(元);
 await page.waitForFunction(() => {
   const k = document.getElementById('kekka');
   return k && !k.hidden;
-}, { timeout: 60000 }).catch(() => {});
+}, null, { timeout: 60000 }).catch(() => {});
 
 const 出 = await page.evaluate(() => {
   const t = (id) => (document.getElementById(id) || {}).textContent || '';
@@ -167,7 +167,7 @@ if (落ちた) {
 await page.waitForFunction(() => {
   const e = document.getElementById('hozon-kekka');
   return e && !e.hidden;
-}, { timeout: 60000 }).catch(() => {});
+}, null, { timeout: 60000 }).catch(() => {});
 const 保存の字 = await page.evaluate(() => (document.getElementById('hozon-kekka') || {}).textContent || '');
 console.log('');
 console.log('★保存を 押した 後★ ' + 保存の字);

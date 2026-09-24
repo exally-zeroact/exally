@@ -93,7 +93,7 @@ console.log('  ★★問い ... ' + 問い.length + '本★★（★実Excel の
 
 const 返 = await p.goto(どこ, { waitUntil: 'load', timeout: 60000 });
 console.log('  ★返事★ ... ' + (返 ? 返.status() : '(無し)'));
-await p.waitForFunction(() => typeof window.setCell === 'function', { timeout: 30000 });
+await p.waitForFunction(() => typeof window.setCell === 'function', null, { timeout: 30000 });
 
 const 出 = await p.evaluate((問) => {
   const 読む = (r, c) => {

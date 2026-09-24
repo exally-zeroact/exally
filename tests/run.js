@@ -375,6 +375,8 @@ const FILES = [
   ['shiki-wo-osu-webkit.mjs'],       // ★実UIで 式を 打って 読む★（★繋ぐ 前の 姿を 守る★）
   ['kobore-kakidashi-webkit.mjs'],  // ★画面で 溢れを 打って 本番の 道で 書き出す★（★お客さんの 道★・2026-09-20）
   ['doko-wo-sawatta-bun-webkit.mjs'], // ★どこを 触ったか＝1文 ＋ 畳んだ 詳しく★（★畳みは 高さで 数える★・2026-09-22）
+  ['machi-no-kime.test.mjs'],        // ★待ちの 決めが 効いて いるか★（2つ目は 引数・決めは 3つ目／2026-09-24）
+  ['machi-no-kime.test.mjs', '--self-test'], //   ＝★30秒で 黙って 落ちる＝遅い本を「開けない本」と 言い間違える★
   ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ

@@ -75,17 +75,23 @@ try {
   });
 
   await page.setInputFiles('#bookFileInput', 材料);
-  await page.waitForFunction(() => {
-    const sh = window.sheets && window.sheets[window.activeSheet];
-    return !!(sh && sh.data && Object.keys(sh.data).length > 0);
   /* ★★2026-09-24 ── ★時間の 指定が 渡って いませんでした★★（経営者1 が 実物で 割りました）
-       `page.waitForFunction(関数, 引数, 決め)` の ★2つ目は 「関数に 渡す 引数」★です。
-       `waitForFunction(関数, { timeout: 300000 })` と 書くと
+       この 待ちは ★（関数, 引数, 決め）の 3つ★ を 取ります。★2つ目は 「関数に 渡す 引数」★です。
+       2つ目の 席に 決めを 置くと
+       （★ここに 呼び名を 字で 書きません★＝★`tests/machi-no-kime.test.mjs` が 拾って しまう★）
        ★`{timeout:300000}` は 関数の 引数に なり、決めは 既定（30秒）★に なります。
        ⇒司さんの 実物（404 KB・板 15枚・マクロ入り）は ★30秒では 開き終わらず★
          `Timeout 30000ms exceeded` で 落ちました（★5分 待った つもりが 30秒★）。
        ⇒★`null` を 挟んで 3つ目に 渡します★
-       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました */
+       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました
+       ★★私(Exally1)が 実物で 割り直しました★★＝★人の 言を 根拠に しない★
+         2つ目に 決め ........ ★30,006 ms★（`Timeout 30000ms exceeded`）
+         null を 挟んで 3つ目 .. ★ 1,009 ms★（`Timeout 1000ms exceeded`）
+       ⇒★★同じ 書き方が 10本・18か所 在りました★★＝全部 直し、
+         ★`tests/machi-no-kime.test.mjs`★ で 増えないように しました。 */
+  await page.waitForFunction(() => {
+    const sh = window.sheets && window.sheets[window.activeSheet];
+    return !!(sh && sh.data && Object.keys(sh.data).length > 0);
   }, null, { timeout: 300000 });
   const 開いた = await page.evaluate(() => {
     const t = performance.now() - window.__t0;
@@ -133,17 +139,23 @@ try {
     window.__t1 = performance.now();
     window.__保存 = window.saveOpenedBook();
   });
-  await page.waitForFunction(() => {
-    const ov = document.getElementById('diffOverlay');
-    return !!ov && ov.style.display === 'flex';
   /* ★★2026-09-24 ── ★時間の 指定が 渡って いませんでした★★（経営者1 が 実物で 割りました）
-       `page.waitForFunction(関数, 引数, 決め)` の ★2つ目は 「関数に 渡す 引数」★です。
-       `waitForFunction(関数, { timeout: 300000 })` と 書くと
+       この 待ちは ★（関数, 引数, 決め）の 3つ★ を 取ります。★2つ目は 「関数に 渡す 引数」★です。
+       2つ目の 席に 決めを 置くと
+       （★ここに 呼び名を 字で 書きません★＝★`tests/machi-no-kime.test.mjs` が 拾って しまう★）
        ★`{timeout:300000}` は 関数の 引数に なり、決めは 既定（30秒）★に なります。
        ⇒司さんの 実物（404 KB・板 15枚・マクロ入り）は ★30秒では 開き終わらず★
          `Timeout 30000ms exceeded` で 落ちました（★5分 待った つもりが 30秒★）。
        ⇒★`null` を 挟んで 3つ目に 渡します★
-       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました */
+       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました
+       ★★私(Exally1)が 実物で 割り直しました★★＝★人の 言を 根拠に しない★
+         2つ目に 決め ........ ★30,006 ms★（`Timeout 30000ms exceeded`）
+         null を 挟んで 3つ目 .. ★ 1,009 ms★（`Timeout 1000ms exceeded`）
+       ⇒★★同じ 書き方が 10本・18か所 在りました★★＝全部 直し、
+         ★`tests/machi-no-kime.test.mjs`★ で 増えないように しました。 */
+  await page.waitForFunction(() => {
+    const ov = document.getElementById('diffOverlay');
+    return !!ov && ov.style.display === 'flex';
   }, null, { timeout: 300000 });
   const 窓 = await page.evaluate(() => ({
     秒: performance.now() - window.__t1,

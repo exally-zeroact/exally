@@ -119,7 +119,7 @@ try {
   await page.waitForFunction(() => {
     const sh = window.sheets && window.sheets[window.activeSheet];
     return !!(sh && sh.data && Object.keys(sh.data).length > 3);
-  }, { timeout: 60000 }).catch(() => {});
+  }, null, { timeout: 60000 }).catch(() => {});
 
   const 出 = await page.evaluate(() => {
     const sh = (window.sheets || [])[window.activeSheet || 0] || {};
@@ -230,7 +230,7 @@ try {
     const t = document.querySelectorAll('.toast, #toast');
     for (const x of t) { if (x.offsetParent !== null) return false; }
     return true;
-  }, { timeout: 15000 }).catch(() => {});
+  }, null, { timeout: 15000 }).catch(() => {});
 
   const 画素 = await page.evaluate(() => {
     const cv = document.getElementById('grid-canvas');

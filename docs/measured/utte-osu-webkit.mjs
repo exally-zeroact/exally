@@ -101,7 +101,7 @@ console.log('  ★どこ★ ... ' + どこ);
 
 const 返事 = await p.goto(どこ, { waitUntil: 'load', timeout: 60000 });
 console.log('  ★返事★ ... ' + (返事 ? 返事.status() : '(無し)'));
-await p.waitForFunction(() => typeof window.getCell === 'function', { timeout: 30000 });
+await p.waitForFunction(() => typeof window.getCell === 'function', null, { timeout: 30000 });
 
 /* ★★ログインの 覆いを どける★★
    ＝`osu-kami-webkit.mjs` と ★同じ 手★（★お客さんは ここで ログインします★）
@@ -114,7 +114,7 @@ await p.evaluate(() => {
 await p.waitForFunction(() => {
   const c = document.getElementById('grid-canvas');
   return c && c.getBoundingClientRect().width > 100;
-}, { timeout: 30000 });
+}, null, { timeout: 30000 });
 
 /* ①canvas を クリック（★お客さんと 同じ★） */
 await p.click('#grid-canvas');

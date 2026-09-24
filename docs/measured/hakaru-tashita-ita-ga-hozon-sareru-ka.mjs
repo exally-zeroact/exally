@@ -83,7 +83,7 @@ try {
   await page.waitForFunction(() => {
     const sh = (window.sheets || [])[window.activeSheet || 0];
     return !!(sh && sh.data && Object.keys(sh.data).length > 3);
-  }, { timeout: 60000 }).catch(() => {});
+  }, null, { timeout: 60000 }).catch(() => {});
 
   const 前 = await page.evaluate(() => (window.sheets || []).map((s) => s.name));
   console.log('      ＝ 開いた 板 ' + 前.length + '枚 ／ ' + 前.join(' '));

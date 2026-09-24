@@ -206,7 +206,7 @@ try {
   await page.waitForFunction(() => {
     const sh = window.sheets && window.sheets[window.activeSheet];
     return !!(sh && sh.data && Object.keys(sh.data).length > 3);
-  }, { timeout: 60000 });
+  }, null, { timeout: 60000 });
 
   /* ★1マス 打つ★（★台の 口＝`setCell`★。字を 打つ 真似では ありません） */
   const 打てた = await page.evaluate(() => {
@@ -227,7 +227,7 @@ try {
   await page.waitForFunction(() => {
     const ov = document.getElementById('diffOverlay');
     return !!ov && ov.style.display === 'flex';
-  }, { timeout: 60000 });
+  }, null, { timeout: 60000 });
 
   /* ★畳んだ ままの 姿を 測る★（★触る 前★） */
   const 畳んだ時 = await page.evaluate(() => {
@@ -332,7 +332,7 @@ try {
   await page.waitForFunction(() => {
     const c = window.BookOpen && window.BookOpen.current();
     return !!(c && String(c.name || '').indexOf('vba-sample') >= 0);
-  }, { timeout: 60000 });
+  }, null, { timeout: 60000 });
   /* ★誰も 使って いない マスに 打つ★（元の 式を 触らない） */
   await page.evaluate(() => { window.setCell(50, 10, '1'); });
   await page.evaluate(() => {
@@ -342,7 +342,7 @@ try {
   await page.waitForFunction(() => {
     const ov = document.getElementById('diffOverlay');
     return !!ov && ov.style.display === 'flex';
-  }, { timeout: 60000 });
+  }, null, { timeout: 60000 });
   const マクロ本 = await page.evaluate(() => {
     const 高 = (el) => (el ? Math.round(el.getBoundingClientRect().height) : -1);
     const みな = [...document.querySelectorAll('#diffBody details.diffKuwashiku')];
