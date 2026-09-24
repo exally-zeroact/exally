@@ -375,6 +375,8 @@ const FILES = [
   ['shiki-wo-osu-webkit.mjs'],       // ★実UIで 式を 打って 読む★（★繋ぐ 前の 姿を 守る★）
   ['kobore-kakidashi-webkit.mjs'],  // ★画面で 溢れを 打って 本番の 道で 書き出す★（★お客さんの 道★・2026-09-20）
   ['doko-wo-sawatta-bun-webkit.mjs'], // ★どこを 触ったか＝1文 ＋ 畳んだ 詳しく★（★畳みは 高さで 数える★・2026-09-22）
+  ['oboeru-nakara-banchi.test.mjs'],  // ★覚えた 番地を 誰も 書き換えないか★（59.5秒→32.1秒の 前提・2026-09-25）
+  ['oboeru-nakara-banchi.test.mjs', '--self-test'], //   ＝★書き換えると 狂うのは 書き換えた 所では ない★
   ['yomenakatta-webkit.mjs'],        // ★ファイルを 読めなかったら 読み直す★（OneDrive で 24回中 15回 断られる・2026-09-25）
   ['mikire-webkit.mjs'],             // ★字は 隣が 空なら はみ出す（実Excel と 同じ）★（★絵で 数える★・2026-09-24）
   ['machi-no-kime.test.mjs'],        // ★待ちの 決めが 効いて いるか★（2つ目は 引数・決めは 3つ目／2026-09-24）
