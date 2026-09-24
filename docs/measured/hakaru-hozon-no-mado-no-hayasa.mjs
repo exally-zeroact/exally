@@ -78,7 +78,15 @@ try {
   await page.waitForFunction(() => {
     const sh = window.sheets && window.sheets[window.activeSheet];
     return !!(sh && sh.data && Object.keys(sh.data).length > 0);
-  }, { timeout: 300000 });
+  /* ★★2026-09-24 ── ★時間の 指定が 渡って いませんでした★★（経営者1 が 実物で 割りました）
+       `page.waitForFunction(関数, 引数, 決め)` の ★2つ目は 「関数に 渡す 引数」★です。
+       `waitForFunction(関数, { timeout: 300000 })` と 書くと
+       ★`{timeout:300000}` は 関数の 引数に なり、決めは 既定（30秒）★に なります。
+       ⇒司さんの 実物（404 KB・板 15枚・マクロ入り）は ★30秒では 開き終わらず★
+         `Timeout 30000ms exceeded` で 落ちました（★5分 待った つもりが 30秒★）。
+       ⇒★`null` を 挟んで 3つ目に 渡します★
+       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました */
+  }, null, { timeout: 300000 });
   const 開いた = await page.evaluate(() => {
     const t = performance.now() - window.__t0;
     let 式 = 0, マス = 0;
@@ -128,7 +136,15 @@ try {
   await page.waitForFunction(() => {
     const ov = document.getElementById('diffOverlay');
     return !!ov && ov.style.display === 'flex';
-  }, { timeout: 300000 });
+  /* ★★2026-09-24 ── ★時間の 指定が 渡って いませんでした★★（経営者1 が 実物で 割りました）
+       `page.waitForFunction(関数, 引数, 決め)` の ★2つ目は 「関数に 渡す 引数」★です。
+       `waitForFunction(関数, { timeout: 300000 })` と 書くと
+       ★`{timeout:300000}` は 関数の 引数に なり、決めは 既定（30秒）★に なります。
+       ⇒司さんの 実物（404 KB・板 15枚・マクロ入り）は ★30秒では 開き終わらず★
+         `Timeout 30000ms exceeded` で 落ちました（★5分 待った つもりが 30秒★）。
+       ⇒★`null` を 挟んで 3つ目に 渡します★
+       ★証し★ ... 字には 300000 と 書いて あるのに 出しは ★30000ms★ と 言いました */
+  }, null, { timeout: 300000 });
   const 窓 = await page.evaluate(() => ({
     秒: performance.now() - window.__t1,
     打った行: window.__uchi,
