@@ -7,11 +7,17 @@
  *    ⇒★覚えて おくだけで 59,471 ms → 32,078 ms（54%）★（向こうの 実測・chromium）
  *    ⇒★入れるのは 私の 持ち場★なので ★私の 台でも 前後を 測ります★。
  *
- *  ★★測り方（向こうの 決めに 合わせます）★★
- *    ・★1回目を 物差しに しない★（★毎回 1回目が 一番 遅い★＝台が 温まって いない）
- *    ・★3回以上 回して 中ほどで 比べる★
- *    ・★同じ 台で 前後★（webkit 同士／chromium 同士）
- *    ・★揺れ幅より 小さい 差を 「効いた」と 言わない★
+ *  ★★測り方の 決め 6つ★★（経営者1 と 2人で 決めました）
+ *    ①★1回目を 物差しに しない★（★毎回 1回目が 一番 遅い★＝台が 温まって いない）
+ *    ②★3回以上 回して 中ほどで 比べる★
+ *    ③★同じ 台で 前後★（webkit 同士／chromium 同士）
+ *    ④★★同じ 時間帯で 前後★★（2026-09-25・★私が 危うく 外す 所でした★）
+ *        ＝同じ 木・同じ 材料でも ★22.4秒の 回と 24.4秒の 回★ が 在りました。
+ *        ＝別の 時間帯の 数と 比べて 「遅く なった」と 読みかけました。
+ *    ⑤★揺れ幅より 小さい 差を 「効いた」と 言わない★
+ *    ⑥★★前と 後を 交互に 回す★★（経営者1 の 足し）
+ *        ＝★時間帯の ずれを 2つで 分け合えます★＝★④を 機械が 守ります★
+ *        ⇒`--木 <前の木> --木 <後の木>` で ★1回ずつ 交互に★ 回します。
  *
  *  ★★どこを 測るか★★
  *    `#bookFileInput` に 渡してから ★どれか 1枚でも 中身が 入るまで★。
@@ -22,6 +28,8 @@
  *
  *  走らせ方:
  *    node docs/measured/hakaru-hiraku-hayasa.mjs <材料> [--回 3] [--台 webkit|chromium] [--札 なまえ]
+ *    node docs/measured/hakaru-hiraku-hayasa.mjs <材料> --回 3 --木 <前の木> --木 <後の木>
+ *      ⇒★交互に 回して 2つの 中ほどを 並べます★
  */
 import path from 'node:path'; import http from 'node:http'; import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -40,6 +48,10 @@ const 材料 = 引.find((x) => x.charAt(0) !== '-' && 引[引.indexOf(x) - 1] !=
 const 回 = Number(取る('--回', '3'));
 const 台 = 取る('--台', 'webkit');
 const 札 = 取る('--札', '(札なし)');
+/* ★★木を 2つ 渡せます★★＝★交互に 回して 時間帯の ずれを 分け合う★ */
+const 木たち = [];
+for (let i = 0; i < 引.length; i++) if (引[i] === '--木' && 引[i + 1]) 木たち.push(引[i + 1]);
+if (!木たち.length) 木たち.push(ROOT);
 
 function 立てる(root) {
   const 型 = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -63,17 +75,28 @@ console.log('★本が 開くまでの 秒★  札 ' + 札 + ' ／ 台 ' + 台 +
 console.log('  材料 ... ' + path.basename(材料) + '（' + fs.statSync(材料).size.toLocaleString() + ' バイト）');
 console.log('  ★`lib/shiki-hyou.js` の 印★ sha256 ' + 本の印);
 
+for (const k of 木たち) {
+  if (!fs.existsSync(path.join(k, 'book.html'))) {
+    console.log('★木に `book.html` が 有りません★ ' + k); process.exit(1);
+  }
+  console.log('  木 ' + k + ' ／ `lib/shiki-hyou.js` の 印 sha256 '
+    + crypto.createHash('sha256').update(fs.readFileSync(path.join(k, 'lib/shiki-hyou.js')))
+      .digest('hex').slice(0, 16));
+}
+
 const 種 = await borrow('hiraku-hayasa', 台);
 const browser = await launch('hiraku-hayasa', 種, {}, 台);
-const 配信 = await 立てる(ROOT);
-const 出た = [];
+const 配信たち = [];
+for (const k of 木たち) 配信たち.push(await 立てる(k));
+const 出た = 木たち.map(() => []);
 let マス = 0, 板 = 0;
 
 try {
   for (let i = 0; i < 回; i++) {
+  for (let t = 0; t < 木たち.length; t++) {          /* ★交互に 回す★ */
     const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
     try {
-      await page.goto(配信.url + '/book.html', { waitUntil: 'load', timeout: 180000 });
+      await page.goto(配信たち[t].url + '/book.html', { waitUntil: 'load', timeout: 180000 });
       await page.evaluate(() => {
         document.body.classList.remove('exally-locked');
         const ov = document.getElementById('loginOv');
@@ -98,24 +121,42 @@ try {
         for (let k = 0; k < ss.length; k++) m += Object.keys((ss[k] || {}).data || {}).length;
         return { 秒: performance.now() - window.__t0, マス: m, 板: ss.length };
       });
-      出た.push(Math.round(n.秒)); マス = n.マス; 板 = n.板;
-      console.log('    ' + (i + 1) + '回目 ... ' + Math.round(n.秒).toLocaleString() + ' ms'
+      出た[t].push(Math.round(n.秒)); マス = n.マス; 板 = n.板;
+      console.log('    ' + (i + 1) + '回目 ／ 木' + (t + 1) + ' ... '
+        + Math.round(n.秒).toLocaleString() + ' ms'
         + (i === 0 ? '  ★1回目は 物差しに しません★（台が 温まって いない）' : ''));
     } finally {
       await page.close().catch(() => {});
     }
   }
+  }
 } finally {
   await browser.close().catch(() => {});
-  配信.閉じる();
+  for (const h of 配信たち) h.閉じる();
 }
 
-const 並 = 出た.slice().sort((a, b) => a - b);
-const 中 = 並[Math.floor(並.length / 2)];
 console.log('');
 console.log('  板 ' + 板 + '枚 ／ マス ' + マス.toLocaleString());
-console.log('  ★中ほど ' + 中.toLocaleString() + ' ms★'
-  + ' ／ 一番速い ' + 並[0].toLocaleString()
-  + ' ／ 一番遅い ' + 並[並.length - 1].toLocaleString()
-  + ' ／ ★揺れ幅 ' + (並[並.length - 1] - 並[0]).toLocaleString() + ' ms★');
+const 中ほど = [];
+for (let t = 0; t < 木たち.length; t++) {
+  const 並 = 出た[t].slice().sort((a, b) => a - b);
+  中ほど.push(並[Math.floor(並.length / 2)]);
+  console.log('  木' + (t + 1) + ' ' + 木たち[t]);
+  console.log('    ★中ほど ' + 中ほど[t].toLocaleString() + ' ms★'
+    + ' ／ 一番速い ' + 並[0].toLocaleString()
+    + ' ／ 一番遅い ' + 並[並.length - 1].toLocaleString()
+    + ' ／ ★揺れ幅 ' + (並[並.length - 1] - 並[0]).toLocaleString() + ' ms★');
+}
+if (木たち.length === 2) {
+  const 差 = 中ほど[0] - 中ほど[1];
+  const 幅 = Math.max(
+    Math.max.apply(null, 出た[0]) - Math.min.apply(null, 出た[0]),
+    Math.max.apply(null, 出た[1]) - Math.min.apply(null, 出た[1]));
+  console.log('');
+  console.log('  ★差 ' + 差.toLocaleString() + ' ms★'
+    + ' ／ ★一番 大きい 揺れ幅 ' + 幅.toLocaleString() + ' ms★');
+  console.log('  ⇒' + (Math.abs(差) > 幅
+    ? '★★揺れ幅より 大きい＝本物の 差です★★'
+    : '★★揺れ幅の 中＝差が 在るとは 言えません★★'));
+}
 console.log('  ★揺れ幅より 小さい 差を 「効いた」と 言いません★');
