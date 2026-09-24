@@ -18751,6 +18751,15 @@ function _ensureXlsx(){
     .then(function(){ return _loadScript('lib/xlsx-zukei.js' + v); })
     .then(function(){ return _loadScript('lib/diff-preview.js' + v); })
     .then(function(){ return _loadScript('js/book-open.js' + v); });
+  /* ★★断られた 覚えを 残しません★★（2026-09-25）
+       上の `if (_xlsxLoading) return _xlsxLoading;` は ★1度 作った 約束を 使い回します★。
+       ⇒1度 断られると ★その 断りが ずっと 返り続けます★
+       ⇒★★ネットが 直っても 画面を 開き直すまで 二度と 開けません★★
+       ⇒★断られたら 覚えを 捨てます★＝次に 押した 時は もう一度 読みに 行く
+       ★自分が 覚えさせた 物だけ 捨てます★＝後から 別の 約束に なって いたら 触らない */
+  (function (約束) {
+    約束.catch(function () { if (_xlsxLoading === 約束) _xlsxLoading = null; });
+  }(_xlsxLoading));
   return _xlsxLoading;
 }
 
@@ -19915,10 +19924,49 @@ function onPickBookFile(el){
   el.value = '';                      // 同じファイルをもう一度選べるようにする
   if (f) openBookFile(f);
 }
+/* ══ ★★ファイルを 読めなかった 時（2026-09-25）★★ ══
+     ★★実測（お客さんの 道・実物）★★
+       同じ 本の 2つの 写しで 数えました:
+         `OneDrive` の 下 ....... ★24回中 15回 断られる★（私 10中6・経営者1 9/14）
+         `OneDrive` の 外 ....... ★13回中 0回★（私 3中0・経営者1 0/7）
+       断りの 字 ... `The object can not be found here.`（webkit）
+                     `The I/O read operation failed.`（chromium）
+       ＝どちらも ★選んだ 後に ファイルの 実体が 変わった★ 時に ブラウザが 出す 物。
+     ★★因は 断定しません★★
+       測ったのは ★「OneDrive の 下か 外か」だけ★ です。
+       ★「同期中だから」は まだ 測って いません★（経営者1 の 指摘）。
+       ⇒★★お客さんに 見せる 言葉に 因を 書きません★★＝
+         嘘の 因を 見せると ★直しようが 無く なります★。
+     ★★何を するか★★
+       ⑴★もう 2回 読み直す★（合わせて 3回）＝★断りは すぐ 返る★ ので 待たせません
+       ⑵それでも 駄目なら ★日本語で 「もう一度 押して ください」★
+       ⑶★読むだけ★＝1バイトも 書きません（やり直しても 元の ファイルは 変わりません） */
+function _ファイルを読めなかったか(err) {
+  if (!err) return false;
+  var 名 = String(err.name || '');
+  if (名 === 'NotFoundError' || 名 === 'NotReadableError') return true;
+  var 字 = String(err.message || err);
+  /* ★台が 読めない(``を読み込めません``)は ここに 入れません★＝別の 話（読み直しても 同じ） */
+  return /can ?not be found|cannot be found|I\/O read|could not be read/i.test(字);
+}
+/** ★★読めなかったら 読み直す★★（★回数は 決めて 出す★＝残り 2回） */
+function _本を読み直しながら開く(file, 残り) {
+  return BookOpen.openFile(file).catch(function (err) {
+    if (残り > 0 && _ファイルを読めなかったか(err)) {
+      _読み直した回数++;
+      return new Promise(function (r) { setTimeout(r, 300); })
+        .then(function () { return _本を読み直しながら開く(file, 残り - 1); });
+    }
+    throw err;
+  });
+}
+var _読み直した回数 = 0;   /* ★測る 為に 数える★（画面には 出しません） */
+
 function openBookFile(file){
   showToast('読み込んでいます…', 1200);
+  _読み直した回数 = 0;
   return _ensureXlsx().then(function(){
-    return BookOpen.openFile(file);
+    return _本を読み直しながら開く(file, 2);   /* ★合わせて 3回まで★ */
   }).then(function(res){
     sheets = res.sheets;
     /* ★マクロが入っているかは 提案でも使う★（開いた時に こちらから 代わりの道を言う） */
@@ -19988,7 +20036,15 @@ function openBookFile(file){
     開いた知らせは済んだ('開いた');
   }).catch(function(err){
     _開いた知らせ = null;   /* ★開けなかった時は ためた物を 捨てる（後で 混ざって出ない）★ */
-    showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
+    /* ★★英語の 断りを お客さんに 見せません★★（2026-09-25）
+         `The object can not be found here.` は ★ブラウザの 言葉★ です。
+         ⇒★読めなかった 時だけ 日本語に します★（★因は 書きません★）。
+         ⇒それ以外の 断り（壊れた 本 など）は ★今まで 通り そのまま 出します★ */
+    if (_ファイルを読めなかったか(err)) {
+      showToast('ファイルを読めませんでした。もう一度 押して ください。', 6000, 'warn');
+    } else {
+      showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
+    }
   });
 }
 (function(){
