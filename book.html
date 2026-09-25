@@ -20354,9 +20354,18 @@ function saveOpenedBook(){
      「開いたシートだけ計算する」ので、まとめのシートを開かずに保存すると
      ★他のシートを参照している合計が古いまま出る★（実際に 88,000 のままだった）。
      開く時に全部やると固まるが、★保存は1回きりなので ここで全部やる★。 */
+  /* ══ ★★但し 1マスも 打って いない お客さんには 計算し直しません★★ ══（2026-09-25）
+       上の 訳（まとめの 合計が 古いまま）は ★お客さんが 直した 後の 話★ です。
+       1回も 打って いない 本は ★保存された 答えが 実Excel 自身の 物★ なので
+       計算し直すと ★うちの 答えで 上書きして 実Excel から 遠ざかります★。
+         ＝経営者1 の 実測 ･･･ ★開いた だけの 画面は 654個中 654個 実Excel と 同じ★
+         ＝計算し直すと ★2,911個 違う★
+       ⇒★1打ちでも あれば 旗は 下りて いる ので いつも通り 全部 計算します★
+       ⇒★つまり 上の 訳は 1つも 壊して いません★
+       ★測り★ docs/measured/hakaru-fuda-wo-osu-to-kotae-ga-kawaru-ka.mjs --保存 */
   for (var i = 0; i < sheets.length; i++) {
     loadSheetIntoEngine(i);      // ★まだ開いていないシートは ここで流して控えも取り直す★
-    if (typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
+    if (!_開いた直後は計算しない && typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
   }
   /* ★ここで書き込まない。まず「何を書き込むか」を見せる（方針ver.6 の②）★
      ★数える場所は1か所★＝窓も書き込みも BookOpen.changedCells を使う。数え直さない。
