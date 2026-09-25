@@ -73,10 +73,11 @@ try {
   await page.waitForTimeout(600);
 
   const 板の数 = await page.evaluate(() => (window.sheets || []).length);
-  const 合 = { 式: 0, 書式あり: 0, 書式なし: 0, 隠さなかった0: 0 };
+  const 合 = { 式: 0, 書式あり: 0, 書式なし: 0, 隠さなかった0: 0, 式にREF: 0 };
+  const REF本 = [];
   const 書式ごと = {};
   const 残り0 = [];
-  const 描 = { 見た: 0, 生にカンマ: 0, 描きにカンマ: 0, 生と描きが違う: 0, 見本: [] };
+  const 描 = { 見た: 0, 生にカンマ: 0, 描きにカンマ: 0, 生と描きが違う: 0, 見本: [], 画面が0: 0, 零本: [] };
 
   for (let i = 0; i < 板の数; i++) {
     await page.evaluate((n) => { window.switchSheet(n); }, i);
@@ -84,14 +85,15 @@ try {
     const 出 = await page.evaluate(() => {
       const sh = window.sheets[window.activeSheet];
       const d = sh.data || {};
-      const 数 = { 式: 0, 書式あり: 0, 書式なし: 0, 隠さなかった0: 0 };
+      const 数 = { 式: 0, 書式あり: 0, 書式なし: 0, 隠さなかった0: 0, 式にREF: 0 };
       const 書 = {};
       const 残 = [];
+      const 残REF = [];
       /* ★★「画面に 出る 字」は 描く 時に 作られます★★（2026-09-25）
            `_字の元` は ★書式を 掛ける 前の 値★ です。
            画面は `fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt))` を 描きます。
            ⇒★どちらを 取るかで 「カンマが 無い」に なるか 変わります★ */
-      const 描 = { 見た: 0, 生にカンマ: 0, 描きにカンマ: 0, 生と描きが違う: 0, 見本: [] };
+      const 描 = { 見た: 0, 生にカンマ: 0, 描きにカンマ: 0, 生と描きが違う: 0, 見本: [], 画面が0: 0, 零本: [] };
       for (const k in d) {
         const cell = d[k];
         if (!cell || cell.merged) continue;
@@ -117,7 +119,36 @@ try {
               生: 生.replace(/[0-9]/g, '9'), 描き: 描き.replace(/[0-9]/g, '9'), 書式: cell.numFmt || '(無し)',
             });
           }
+          /* ★★画面が 「0」に 見える のに 隠れて いない マス★★（2026-09-25）
+               経営者1 の 実測 ... 実Excel は 空・うちは `0 円` `0.00時間` `¥0` ＝★47個★
+               ⇒`Number(raw)===0` では 拾えて いない＝★raw が ぴったり 0 では ない★ かも
+               ⇒★raw の 形と 書式と 板を 数えます★（★中身は 9 に 伏せます★） */
+          const 数だけ = 描き.replace(/[^0-9.\-]/g, '');
+          if (描き !== '' && 数だけ !== '' && Number(数だけ) === 0
+              && !window._ゼロを隠すか(cell, r0)) {
+            描.画面が0++;
+            if (描.零本.length < 10) 描.零本.push({
+              板: sh.name, 隠す板: !!sh.ゼロを隠す,
+              raw形: 生.replace(/[0-9]/g, '9'), raw長: 生.length,
+              画面: 描き.replace(/[0-9]/g, '9'),
+              書式: cell.numFmt || '(無し)',
+              ぴったり0: Number(生) === 0,
+            });
+          }
         } catch (e) { /* 1マス 読めなくても 続ける */ }
+        /* ★★式の 中に `#REF!` が 在る マス★★（2026-09-25）
+             経営者1 の 実測 ... ★実Excel が `#REF!`・うちは 数 ＝ 68個★
+             ⇒★数が 出る＝お客さんは 間違いに 気付けません★＝一番 重い
+             ⇒★式の 字に `#REF!` が 在るか★ を 先に 数えます */
+        if (String(cell.f).indexOf('#REF!') >= 0) {
+          数.式にREF++;
+          if (残REF.length < 8) 残REF.push({
+            板: sh.name, 印: k,
+            式形: String(cell.f).replace(/[0-9]/g, '9').slice(0, 60),
+            画面: String(window._答えは字か(cell) ? window._字の元(cell)
+              : window.fmtForDisplay(window._字の元(cell), cell.numFmt, 30)).replace(/[0-9]/g, '9').slice(0, 20),
+          });
+        }
         /* ★中の 字が 0 なのに 隠れなかった マス★ */
         const raw = window._字の元(cell);
         const s = String(raw === undefined || raw === null ? '' : raw).trim();
@@ -137,15 +168,19 @@ try {
           }
         }
       }
-      return { 数, 書, 残, 描き: 描 };
+      return { 数, 書, 残, 残REF, 描き: 描 };
     });
     合.式 += 出.数.式; 合.書式あり += 出.数.書式あり;
     合.書式なし += 出.数.書式なし; 合.隠さなかった0 += 出.数.隠さなかった0;
     for (const k of Object.keys(出.書)) 書式ごと[k] = (書式ごと[k] || 0) + 出.書[k];
     残り0.push(...出.残);
+    合.式にREF += 出.数.式にREF;
+    if (REF本.length < 8) REF本.push(...出.残REF.slice(0, 3));
     描.見た += 出.描き.見た; 描.生にカンマ += 出.描き.生にカンマ;
     描.描きにカンマ += 出.描き.描きにカンマ; 描.生と描きが違う += 出.描き.生と描きが違う;
     if (描.見本.length < 6) 描.見本.push(...出.描き.見本.slice(0, 2));
+    描.画面が0 += 出.描き.画面が0;
+    if (描.零本.length < 10) 描.零本.push(...出.描き.零本.slice(0, 3));
   }
 
   console.log('');
@@ -166,6 +201,16 @@ try {
       + ' 隠す板 ' + String(x.隠す板).padEnd(6) + ' vの型 ' + x.vの型 + '/空' + x.vが空
       + ' 書式 ' + x.書式);
   }
+  console.log('');
+  console.log('★★式の 字に `#REF!` が 在る ... ' + 合.式にREF + '個★★');
+  for (const x of REF本) console.log('    ' + String(x.板).slice(0,8).padEnd(9) + ' ' + String(x.印).padEnd(10)
+    + ' 画面 ' + String(x.画面).padEnd(14) + ' 式形 ' + x.式形);
+  console.log('');
+  console.log('★★画面が 0 に 見える のに 隠れて いない ... ' + 描.画面が0 + '個★★');
+  for (const x of 描.零本) console.log('    ' + String(x.板).slice(0,8).padEnd(9)
+    + ' 隠す板 ' + String(x.隠す板).padEnd(6) + ' raw形 ' + String(x.raw形).padEnd(20)
+    + ' 長さ ' + String(x.raw長).padStart(3) + ' ぴったり0 ' + String(x.ぴったり0).padEnd(6)
+    + ' 画面 ' + String(x.画面).padEnd(12) + ' 書式 ' + x.書式);
   console.log('');
   console.log('★★『書式を 掛ける 前』と『画面に 出る 字』★★');
   console.log('    見た 式 .............. ' + 描.見た.toLocaleString());
