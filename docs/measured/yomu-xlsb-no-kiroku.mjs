@@ -178,11 +178,23 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
 
   if (生 > 0) {
     console.log('');
-    console.log('★★頭から ' + 生 + '本の 生の 字★★');
+    /* ★1本ぶんを 何バイトまで 出すか★（★既定は 全部★／`--字 N` で 抑えられます） */
+    const 上限 = process.argv.includes('--字')
+      ? Number(process.argv[process.argv.indexOf('--字') + 1]) : 1e9;
+    console.log('★★頭から ' + 生 + '本の 生の 字★★'
+      + (上限 < 1e9 ? '（1本 ' + 上限 + 'バイトまで）' : '（★1バイトも 切りません★）'));
     for (const r of 記録.slice(0, 生)) {
       console.log('  位置 ' + String(r.位置).padStart(6) + ' 番号 ' + String(r.番号).padStart(5)
         + ' 長さ ' + String(r.長さ).padStart(5) + ' ｜ '
-        + r.中身.slice(0, 24).toString('hex').replace(/(..)/g, '$1 ').trim());
+        /* ★★2026-09-25＝ここで 24バイトで 切って いました★★
+             ＝記録 157 は ★26バイト★／★最後の 2バイトを 誰も 見て いませんでした★
+             ＝`Iteration` と `PrecisionAsDisplayed` を 「変わらない」と 出しかけました
+             ⇒★決まった 字数で 切りません★（記憶「見張りを決まった字数で切るな」）
+             ⇒★切る 時は ★切ったと 書きます★★ */
+        + (r.中身.length > 上限
+          ? r.中身.slice(0, 上限).toString('hex').replace(/(..)/g, '$1 ').trim()
+            + ' ★...ここで 切りました（全 ' + r.中身.length + 'バイトの うち ' + 上限 + '）★'
+          : r.中身.toString('hex').replace(/(..)/g, '$1 ').trim()));
     }
   }
 }

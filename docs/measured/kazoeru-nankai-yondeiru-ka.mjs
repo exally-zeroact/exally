@@ -26,13 +26,29 @@ import { fileURLToPath } from 'node:url';
 import { borrow, launch } from '../../scripts/_borrow-playwright.mjs';
 
 const ここ = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(ここ, '..', '..');
+/* ★★どの 木を 測るか★★（2026-09-25・追記）
+     ★なぜ 要るか★
+       ★道具は 私の 木に 在り、測りたい 字は 相手の 木に 在る★事が 在ります
+       （09-25 Exally1 の 直しは `origin/karimono-hazushi-dodai5` に 在り main に 無い）
+     ⇒★`--元 <置き場>` で ★配る 木★を 指せる ように しました★
+     ⇒★指さない 時は 今までと 同じ（道具の 木）★
+     ★出しに 必ず どの 木を 測ったかを 書きます★＝[[feedback_doko_wo_kazoeta_ka_mo_kaku]] */
+const ROOT = process.argv.includes('--元')
+  ? path.resolve(process.argv[process.argv.indexOf('--元') + 1])
+  : path.join(ここ, '..', '..');
 const 材料 = process.argv[2];
 const 秒 = process.argv.includes('--秒') ? Number(process.argv[process.argv.indexOf('--秒') + 1]) : 300;
 if (!材料 || !fs.existsSync(材料)) { console.log('★材料が 在りません★'); process.exit(3); }
 const 中 = fs.readFileSync(材料);
 console.log('★材料★ ' + path.basename(材料) + '（' + 中.length.toLocaleString() + ' バイト）');
 console.log('  sha256 ' + crypto.createHash('sha256').update(中).digest('hex'));
+console.log('★★測る 木★★ ' + ROOT);
+try {
+  const { execSync } = await import('node:child_process');
+  const h = execSync('git -C "' + ROOT + '" rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+  const d = execSync('git -C "' + ROOT + '" status --porcelain', { encoding: 'utf8' }).trim();
+  console.log('  ★印★ ' + h + (d ? '（★手元に 未commit が ' + d.split('\n').length + '本 在ります★）' : '（手元は 綺麗）'));
+} catch (e) { console.log('  ★印を 読めません ... ' + e.message + '★'); }
 
 /* ── ★数取りを 挟む★（★1つずつ しか 無い 事を 先に 確かめます★） ── */
 const 表の道 = path.join(ROOT, 'lib', 'shiki-hyou.js');
@@ -48,12 +64,28 @@ const 元字 = fs.readFileSync(表の道, 'utf8');
                  ＝★この 回の 秒数を 「速さ」の 数に 使っては いけません★ */
 const 種類 = [
   { 名: '名から番地', 印: 'function 名から番地(名) {', 引: '名' },
+  /* ★`読む揃った名で` に 来る 鍵が ★何種類★ 在るか★
+       ＝★鍵を 字から 番地に 変える★かを 決める 材料
+       ＝種類が マスの 数に 近いなら ★字を 作る 意味が 無い★ */
+  { 名: '読む揃った名で', 印: 'function 読む揃った名で(', 引: 'n' },
+  /* ★2026-09-25・Exally1 の 問い★
+       「★同じ 四角を 「式ごと」では なく 「四角ごと」に 1回 読む★」が 効くか
+       ⇒★別々の 四角が 何種類 在るか★ で 決まります
+       ・種類が 呼び出しに 近い ⇒★同じ 四角は 1回ずつしか 来て いない＝効きません★
+       ・種類が うんと 少ない ⇒★同じ 四角を 何度も 読んで いる＝効きます★
+       ★鍵は 左と 右の 名★（★中身は 出しません＝種類の 数だけ 出します★） */
+  { 名: '四角を読む', 印: 'function 四角を読む(左, 右, 通り道) {', 引: '左 + ":" + 右' },
 ];
 const 挟む = [
   { 名: '名から番地', 印: 'function 名から番地(名) {' },
   { 名: '読む',       印: 'function 読む(名, 通り道) {' },
   { 名: '揃える',     印: 'function 揃える(' },
   { 名: '番地から名', 印: 'function 番地から名(行, 列, 板) {' },
+  /* ★2026-09-25・`49ca1fb` で 出来た 新しい 1位★（CPUの記録 29.2%）
+       ＝`四角を読む` の 輪の 中が ここに 直接 入る ように なった
+       ＝★`中身[n]` を ★字の 鍵★で 引いて いる★所 */
+  { 名: '読む揃った名で', 印: 'function 読む揃った名で(' },
+  { 名: '四角を読む', 印: 'function 四角を読む(左, 右, 通り道) {' },
 ];
 let 表の字 = 元字;
 for (const x of 種類) {
