@@ -83,7 +83,10 @@
           字体待ち = Promise.race([字体を読む(_zip), 遅い]).catch(function () { return null; });
         } catch (e) { 字体待ち = Promise.resolve(null); }
       }
-      return 字体待ち.then(function (字体表) {
+      return 字体待ち.then(function (読んだ物) {
+      /* ★★2つ 受け取ります★★（2026-09-25 から 「ゼロを 隠すか」も 一緒に 来ます） */
+      var 字体表 = (読んだ物 && 読んだ物.字体) ? 読んだ物.字体 : null;
+      var ゼロ表 = (読んだ物 && 読んだ物.ゼロ) ? 読んだ物.ゼロ : null;
       var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
 
       /* ★表の名前での参照（Table[列名]）を、実際のA1範囲に直す★（2026-08-18）
@@ -137,16 +140,45 @@
                  ＝`.xlsb` は 番号と 実際の 色の 両方を 持ちます（形が 違う）
                ★無くても 動きます★＝テーマの 色が 付かないだけ（前と 同じ） */
             var テーマの字 = '';
+            /* ★★外の `ゼロ表` に 入れます★★（2026-09-25 ここで 1回 踏みました）
+                 はじめ ここで `var ゼロ表 = {}` と 書いたら
+                 ⇒★この 関数の 中だけの 別物★ に なり、
+                   `finish(..., ゼロ表)` に 渡るのは ★`.xlsb` の 方の 変数★ でした。
+                 ⇒★落ちません／印が いつも false に なるだけ★＝★一番 見つけにくい 形★。
+                 ⇒★絵の 点で 数える 試験が 捕まえました★（板の 印 2枚とも false） */
+            ゼロ表 = ゼロ表 || {};   /* ★板の 名前 → ゼロを 隠すか★ */
             var 先 = book.zip.has('xl/theme/theme1.xml')
               ? book.zip.text('xl/theme/theme1.xml').then(function (x) { テーマの字 = x; })
                   .catch(function () { テーマの字 = ''; })
               : Promise.resolve();
             return 先.then(function () {
             return book.zip.text('xl/styles.xml').then(function (型の字) {
-              var 表 = {}, 鎖 = Promise.resolve();
+              var 表 = {}, 鎖 = Promise.resolve();   /* ゼロ表 は 上で 作って います */
               book.sheets.forEach(function (板) {
                 鎖 = 鎖.then(function () {
                   return book.zip.text(板.part).then(function (xml) {
+                    /* ★★ゼロの 印を 先に 読みます★★（2026-09-25 ここで 1回 踏みました）
+                         はじめ 飾りの 後ろに 置いたら ★1度も 動きませんでした★。
+                         ⇒`飾りを読む` が 断ると 下の `.catch` が 飲み込み、
+                           ★その後ろの 行に 来ません★。
+                         ⇒★落ちません／印が いつも false に なるだけ★＝★一番 見つけにくい 形★。
+                         ⇒★軽くて 断らない 方を 先に 置きます★ */
+                    /* ★★ゼロを 隠す 板か★★（2026-09-25）
+                         `.xlsx` は 字で 書いて あります ... `<sheetView `showZeros="0"` ほか>`
+                         ★Excel は 「出す」時は この 札を 書きません★
+                         ⇒★札が 在って 0/false の 時だけ 隠す★
+                         ⇒★札が 無い＝出す★（★分からない では ない★） */
+                    /* ★★`<sheetViews>` と `<sheetView>` は 別物★★（2026-09-25 ここで 1回 踏みました）
+                         はじめ `xml.indexOf('<sheetView')` で 探したら
+                         ⇒★先に 在る `<sheetViews>`（複数形の 箱）に 当たりました★
+                         ⇒札を 探す 所が ``<sheetViews>`` だけに なり ★いつも 「出す」★。
+                         ⇒★落ちません／印が いつも false に なるだけ★＝★一番 見つけにくい 形★。
+                       ⇒★名の 後ろが 空白か `/` か `>` の 物だけを 拾います★ */
+                    var m0 = /<sheetView[\s/>][^>]*>/.exec(xml);
+                    if (m0) {
+                      var m = /showZeros\s*=\s*"([^"]*)"/.exec(m0[0]);
+                      ゼロ表[板.name] = !!(m && (m[1] === '0' || m[1] === 'false'));
+                    }
                     表[板.name] = root.XlsxKazari.飾りを読む(xml, 型の字, テーマの字);
                   }).catch(function () { /* ★1枚 読めなくても 他は 出す★ */ });
                 });
@@ -254,7 +286,7 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表); });
       });
     });
   }
@@ -302,7 +334,7 @@
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方) {
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
@@ -312,7 +344,7 @@
         var 図 = 図形表 ? 図形表[nm] : null;
         if (!図 && 図形の並び) 図 = 図形の並び[i];
         return sheetToGrid(wb.Sheets[nm], nm, trFixes, 字体表 ? 字体表[nm] : null,
-          飾り表 ? 飾り表[nm] : null, 図 || null);
+          飾り表 ? 飾り表[nm] : null, 図 || null, (ゼロ表 && ゼロ表[nm]) || false);
       });
       /* ★控えは「見せている文字」ではなく「元の生の値」から作る★（2026-08-09）
          画面用に 46043 を "1/21(水)" にして見せているので、その文字を控えにすると
@@ -365,7 +397,8 @@
     });
   }
 
-  /** ★.xlsb の「板ごと・マスごとの 字体」を 読む★ … { 板の名前: { 'r,c': {pt,名} } }
+  /** ★.xlsb の「板ごと・マスごとの 字体」と「ゼロを 隠すか」を 読む★
+   *  返り ･･･ { 字体: { 板の名前: { 'r,c': {pt,名} } }, ゼロ: { 板の名前: true/false } }
    *  ★読めなければ null★＝断って 元のまま（勝手に 直さない） */
   function 字体を読む(z) {
     var XE = root.XlsbEdit, JT = root.XlsbJitai;
@@ -381,7 +414,7 @@
       for (var i = 0; i < 三つ[2].length; i++) 字 += String.fromCharCode(三つ[2][i]);
       var 対応 = JT.板とファイル(wp.recs, 字);
       if (!対応) return null;
-      var 名ら = Object.keys(対応), 仕事 = [], 出 = {};
+      var 名ら = Object.keys(対応), 仕事 = [], 出 = {}, ゼロ = {};
       for (var k = 0; k < 名ら.length; k++) {
         (function (名) {
           仕事.push(袋から(z, 対応[名]).then(function (sb) {
@@ -390,11 +423,16 @@
             if (!p2.ok) return;
             var 表 = JT.板の字体(sp.recs, p2.recs);
             if (表) 出[名] = 表;
+            /* ★★同じ 記録を 歩く ついでに 「ゼロを 隠すか」も 読みます★★（2026-09-25）
+                 ★2度 歩きません★＝ここは もう 板の 記録を 開いて います */
+            var ゼ = JT.ゼロを隠すか(p2.recs);
+            if (ゼ !== null) ゼロ[名] = ゼ;
           }, function () { /* 1枚 読めなくても 他は 使う */ }));
         })(名ら[k]);
       }
       return Promise.all(仕事).then(function () {
-        return Object.keys(出).length ? 出 : null;
+        if (!Object.keys(出).length && !Object.keys(ゼロ).length) return null;
+        return { 字体: 出, ゼロ: ゼロ };
       });
     }, function () { return null; });
   }
@@ -533,7 +571,7 @@
     if (飾.border) cell.border = 飾.border;
   }
 
-  function sheetToGrid(ws, name, tableFixes, 字体, 飾り, 図形) {
+  function sheetToGrid(ws, name, tableFixes, 字体, 飾り, 図形, ゼロを隠す) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
     Object.keys(ws).forEach(function (a) {
@@ -711,6 +749,11 @@
       objects = root.XlsxZukei.台に載せる形(図形, colW, 標準の点, {}, 24);
     }
     return { name: name, data: data, colW: colW, 既定の列幅: 標準の点, objects: objects,
+      /* ★★ゼロを 隠す 板か★★（2026-09-25）
+           経営者1 の 実測 ... 表示が 実Excel と 違う 9,163個の うち
+           ★6,743個（74%）が 「Excel は 空・うちは `0`」★
+           ＝★計算の 間違いでは なく 板の 設定を 読んで いなかった★ */
+      ゼロを隠す: !!ゼロを隠す,
       /* ★その ブックの 既定の 字体★＝画面も 同じ 字で 描く
          ⇒ 同じ 幅に 入る 桁数が 実Excel と 揃う（うちの 字は 細くて 多く 入って いた） */
       既定の字体名: (既定の字体 && 既定の字体.name) ? 既定の字体.name : '',
