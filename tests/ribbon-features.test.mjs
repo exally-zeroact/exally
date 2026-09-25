@@ -59,15 +59,31 @@ ok('★描く所が 数式を表示 を 見ている★', /window\.数式を表�
 console.log('\n[③ 再計算＝全シート／このシートだけ]');
 {
   const 呼んだ = [];
-  const f = new Function('sheets', 'activeSheet', 'recalcSheet', 'render', 'updateBar',
-    抜く('すべて再計算') + '\n' + 抜く('このシートを再計算')
+  /* ★★`_控えを取り直す` を 足しました★★（2026-09-25）
+       ＝計算し直した 後に 控えを 取り直す 所（★1マス 打って 窓に 3044 と 出た 件★）
+       ＝★偽物を 置かずに 本物を 取り出します★（置くと 消えた 日に 気づけない）
+       ＝★呼ばれた 事も 数えます★＝★取り直しを 外したら 赤に なる★ */
+  const 取り直した = [];
+  const f = new Function('sheets', 'activeSheet', 'recalcSheet', 'render', 'updateBar', 'BookOpen', '_editedCells',
+    抜く('すべて再計算') + '\n' + 抜く('このシートを再計算') + '\n' + 抜く('_控えを取り直す')
     + '\nreturn { 全: すべて再計算, 今: このシートを再計算 };');
   const api = f([{ data: {} }, { data: {} }, { data: {} }], 1,
-    function (i) { 呼んだ.push(i); }, function () {}, function () {});
+    function (i) { 呼んだ.push(i); }, function () {}, function () {},
+    { rebaseSheet: function (sh) { 取り直した.push(sh); } }, {});
   呼んだ.length = 0; api.全();
   ok('★すべて再計算＝3シート とも 呼ぶ★', JSON.stringify(呼んだ) === '[0,1,2]', JSON.stringify(呼んだ));
   呼んだ.length = 0; api.今();
   ok('★このシートだけ＝今の1つ★', JSON.stringify(呼んだ) === '[1]', JSON.stringify(呼んだ));
+  /* ══ ★★ここで 控えを 取り直しては いけません★★ ══（2026-09-25 1回 入れて 外しました）
+       入れたら `tests/diff-preview.test.mjs` が 赤に なりました:
+         ＝★つられて 変わった 分まで 消える★
+         ＝別の 板の 合計が ★古いまま 保存される★（88,000 の 例）
+       ⇒控えを 取り直すのは ★「お客さんが 1マスも 打って いない 間」だけ★
+       ⇒その 所は `setCell` の 控え取り（`_baselineTaken`）です
+       ⇒★だから ここでは 「呼ばれない」事が 正しい★ */
+  取り直した.length = 0; api.全();
+  ok('★★すべて再計算では 控えを 取り直さない★★（★つられた 分を 消さない★）',
+    取り直した.length === 0, String(取り直した.length));
 }
 
 console.log('\n[④ ズーム＝100%に 戻す・行き過ぎない]');
