@@ -53,6 +53,17 @@ const 本 = 素[0];
 const 番地たち = 素.slice(1);
 const 取る = (名, 既定) => { const i = 引数.indexOf('--' + 名); return i >= 0 ? 引数[i + 1] : 既定; };
 const 台 = 取る('台', 'webkit');
+/* ★`--まとめだけ` ･･･ 1つずつ 出さない（★自分で 数える のを やめる＝道具に 出させる★）★ */
+const まとめだけ = 引数.indexOf('--まとめだけ') >= 0;
+/* ══ ★★`--打ってから` ･･･ 1マス 打って 計算させた 後で 数えます★★ ══（2026-09-25）
+     ★★なぜ★★
+       `lib/table-refs.js` は 消された 表を `#REF!` に 置き換えて います。
+       ⇒★台に 渡る 式には `#REF!` が 在る（69個の うち 67個）★
+       ⇒★なのに 画面は 数を 出す＝計算して いない から 保存値を 出して いる★
+       ⇒★★では 計算させたら 実Excel と 同じ `#REF!` に なるのか★★
+     ＝★打つのは 画面の `setCell`＝お客さんの 1打ち目と 同じ 道★
+     ＝★遠い 空きマスに 打ちます（元の 数を 触りません・保存しません）★ */
+const 打ってから = 引数.indexOf('--打ってから') >= 0;
 if (!本 || !fs.existsSync(本)) { console.log('★本が 在りません★ ' + 本); process.exit(2); }
 /* ★★`--板 <名>` ･･･ その 板の 式の マスを 全部 見ます★★（2026-09-25）
      ＝★4個だけでは 分母が 小さい★＝★板 まるごとで 数えられる ように します★ */
@@ -137,6 +148,15 @@ try {
     if (見る番地 === null) { console.log('  ★★板が 在りません★★ ' + 板まるごと); process.exit(8); }
     console.log('  ★--板 ' + 板まるごと + '★ ... 式の マス ★' + 見る番地.length.toLocaleString() + '個★');
   }
+  if (打ってから) {
+    const 無2 = await page.evaluate(() => (typeof window.setCell === 'function' ? [] : ['setCell']));
+    if (無2.length) { console.log('  ★★測れません★★ 在りません ... setCell'); process.exit(8); }
+    const t0 = Date.now();
+    await page.evaluate(() => { window.setCell(900, 30, '1'); });
+    await page.waitForTimeout(1500);
+    console.log('  ★1マス 打って 計算させた★ ... ' + (Date.now() - t0).toLocaleString() + ' ms');
+  }
+
   const 出 = await page.evaluate(([番地たち, 誤りの印]) => {
     const 型を見る = (x) => {
       if (x === undefined) return '無し';
@@ -195,6 +215,13 @@ try {
         vの型: 型を見る(cell.v),
         画面の型: 型を見る(画面),
         書式が在るか: !!cell.numFmt,
+        /* ★★直した 後の 式に `#REF!` が 在るか★★（2026-09-25）
+             `lib/table-refs.js` は ★消された 表（id = 0xFFFFFFFF）を `#REF!` に 置き換えます★
+             （断りに `給料3!B75 =INDEX(#REF!, MATCH(...))` と 名指しで 書いて あります）
+             ⇒★台に 渡る 式には `#REF!` が 在る★
+             ⇒★それでも 画面が 数を 出すのは 「計算しない」から★＝★保存値を 出して いる★
+             ⇒★だから ここを 数えれば 「計算しない」との 関わりが 決まります★ */
+        式にREF: f.indexOf('#REF!') >= 0,
         指す行の一番小さい: 行たち.length ? Math.min.apply(null, 行たち) : null,
         指す行の一番大きい: 行たち.length ? Math.max.apply(null, 行たち) : null,
       };
@@ -203,7 +230,7 @@ try {
 
   console.log('');
   /* ★板 まるごとの 時は 1つずつ 出しません（★出しを 溢れさせない★）★ */
-  ((板まるごと || 全部見る) ? [] : 出).forEach((x) => {
+  ((板まるごと || 全部見る || まとめだけ) ? [] : 出).forEach((x) => {
     console.log('  ══ ' + x.番地 + ' ══');
     if (x.出来ず) { console.log('    ' + x.出来ず); return; }
     console.log('    式か ................... ' + (x.式か ? '★式★（' + x.式の長さ + '字）' : '定数'));
@@ -212,6 +239,7 @@ try {
     console.log('    `v` の 型 .............. ' + x.vの型);
     console.log('    ★画面が 出す 字★ ......... ' + x.画面の型);
     console.log('    書式が 在るか .......... ' + (x.書式が在るか ? '在る' : '無い'));
+    console.log('    ★直した 後の 式に `#REF!` が 在るか★ ... ' + (x.式にREF ? '★在る★' : '無い'));
     console.log('    ★式が 指す 行（Excel の 数え方）★ ... '
       + (x.指す行の一番小さい === null ? '（無し）'
         : x.指す行の一番小さい + '行 〜 ' + x.指す行の一番大きい + '行'));
@@ -225,6 +253,12 @@ try {
        ⇒★「本の 答え」と 「画面の 字」が 同じ 型か を いつも 出します★ */
   const 見た = 出.filter((x) => !x.出来ず);
   const 同じ = 見た.filter((x) => x.保存の答えの型 === x.画面の型).length;
+  /* ★板 まるごと・全部の 時も この 数は 出します★ */
+  {
+    const 見た2 = 出.filter((x) => !x.出来ず);
+    const REF = 見た2.filter((x) => x.式にREF).length;
+    console.log('  ★直した 後の 式に `#REF!` が 在る★ ... ★' + REF + '個 / ' + 見た2.length + '個★');
+  }
   console.log('  ★book-open の 答えと 画面の 字が 同じ 型★ ... ★' + 同じ + '個 / ' + 見た.length + '個★'
     + (見た.length && 同じ === 見た.length ? '  ★★＝画面は book-open の 答えを そのまま 出して います★★' : ''));
   if (見た.length && 同じ === 見た.length) {

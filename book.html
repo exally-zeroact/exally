@@ -2868,7 +2868,15 @@ function _ゼロを隠すか(cell, raw) {
   if (typeof cell.書式前の数 === 'number') return cell.書式前の数 === 0;
   var 字 = String(raw).trim();
   if (字 === '') return false;
-  var n = Number(字);
+  /* ══ ★★字から 読む 時は 書式の 飾りを 外します★★ ══（2026-09-25）
+       ＝★`0 円` `0.00時間` `¥0` は どれも `Number()` が NaN です★
+       ＝★計算し直した 後は `書式前の数` が 無い ので ここに 落ちます★
+       ⇒★数に なる 字だけ 残して 読みます★
+       ⇒`0:00`（真夜中）も 0 に なります＝★実Excel も 値が 0 なので 隠します★
+       ⇒★答えが 字の マスは 上の `_答えは字か` で もう 外れて います★ */
+  var 裸 = 字.replace(/[^0-9.eE+-]/g, '');
+  if (裸 === '') return false;
+  var n = Number(裸);
   return isFinite(n) && n === 0;
 }
 
@@ -3228,6 +3236,13 @@ function recalcSheet(sheetIdx, data) {
         } catch (e) { 台答 = null; 台溢れ = null; }
       }
       /* ★ここは cell.f[0]==='=' を 通った後＝必ず 式のセル★ */
+      /* ══ ★★計算し直したら 「書式を 掛ける 前の 数」は 捨てます★★ ══（2026-09-25）
+           `js/book-open.js` が 付けた `書式前の数` は ★本に 保存されて いた 答え★ です。
+           ここで 答えが 変わる ので ★そのまま 残すと 古い 数で 0 か 判じます★。
+           ⇒★保存値 0 だが 計算し直すと 5 の マスを 「0」と 見て 隠す★ 事に なります。
+           ⇒★だから 捨てます★＝`_ゼロを隠すか` は 下の 字の 読み方に 落ちます。
+           ★見張り★ tests/zero-wo-kakusu-webkit.mjs（★打ってから も 見ます★） */
+      if (cell.書式前の数 !== undefined) delete cell.書式前の数;
       cell.d = (jsResult!==null) ? jsResult
              : (台答 !== null) ? 台答.字
              : _hfGetDisplay(sheetIdx, r, c, true);
