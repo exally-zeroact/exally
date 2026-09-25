@@ -168,9 +168,21 @@ try {
         const w = window.cW(+String(k).split(',')[1]);
         画面 = String(window.fmtForDisplay(raw, cell.numFmt, window._入る字数(w, raw, cell.numFmt)));
       }
+      /* ══ ★★式が 指して いる 行の 幅（数だけ）★★ ══（2026-09-25）
+           経営者1 の 69個の うち ★66個は 74〜79行（0から）の べた塗り★でした。
+           外の 3個は ★SUM / SUM / SUBTOTAL★＝★範囲を まとめる 関数★。
+           ⇒★その 範囲が 壊れた 66個を 含むなら 訳は 1つで 足ります★
+           ⇒★出すのは 行の 番号だけ＝式の 字も 値も 出しません★ */
       /* ★関数の 名前だけ 拾います★＝番地・数・字は 1つも 出しません */
       const 名 = [];
       const f = typeof cell.f === 'string' ? cell.f : '';
+      const 行たち = [];
+      {
+        const re2 = new RegExp('[A-Z]+\\$?([0-9]+)', 'g');
+        let m2;
+        while ((m2 = re2.exec(f))) 行たち.push(parseInt(m2[1], 10));
+      }
+
       const re = /([A-Z][A-Z0-9._]*)\s*\(/g;
       let m;
       while ((m = re.exec(f))) if (名.indexOf(m[1]) < 0) 名.push(m[1]);
@@ -183,6 +195,8 @@ try {
         vの型: 型を見る(cell.v),
         画面の型: 型を見る(画面),
         書式が在るか: !!cell.numFmt,
+        指す行の一番小さい: 行たち.length ? Math.min.apply(null, 行たち) : null,
+        指す行の一番大きい: 行たち.length ? Math.max.apply(null, 行たち) : null,
       };
     });
   }, [見る番地, 誤りの印]);
@@ -198,6 +212,9 @@ try {
     console.log('    `v` の 型 .............. ' + x.vの型);
     console.log('    ★画面が 出す 字★ ......... ' + x.画面の型);
     console.log('    書式が 在るか .......... ' + (x.書式が在るか ? '在る' : '無い'));
+    console.log('    ★式が 指す 行（Excel の 数え方）★ ... '
+      + (x.指す行の一番小さい === null ? '（無し）'
+        : x.指す行の一番小さい + '行 〜 ' + x.指す行の一番大きい + '行'));
   });
 
   const 誤り = 出.filter((x) => !x.出来ず && String(x.画面の型).slice(0, 2) === '誤り').length;

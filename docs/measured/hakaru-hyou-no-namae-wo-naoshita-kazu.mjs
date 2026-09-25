@@ -30,7 +30,7 @@ import { borrow, launch } from '../../scripts/_borrow-playwright.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const 引数 = process.argv.slice(2);
-const 札の値 = ['台'];
+const 札の値 = ['台', '番地表'];
 const 素 = (() => {
   const 出 = [];
   for (let i = 0; i < 引数.length; i++) {
@@ -43,7 +43,25 @@ const 素 = (() => {
 const 本 = 素[0];
 const 見る番地 = [];
 for (let i = 0; i < 引数.length; i++) if (引数[i] === '--番地' && 引数[i + 1]) 見る番地.push(引数[i + 1]);
+/* ★★`--番地表 <紙>` ･･･ 1行 1番地（★4個では 分母が 小さすぎる★）★★ */
+{
+  const 紙 = 取る0('番地表', null);
+  if (紙) {
+    if (!fs.existsSync(紙)) { console.log('★番地表が 在りません★ ' + 紙); process.exit(2); }
+    io読み(紙).forEach((x) => 見る番地.push(x));
+  }
+}
 const 取る = (名, 既定) => { const i = 引数.indexOf('--' + 名); return i >= 0 ? 引数[i + 1] : 既定; };
+function 取る0(名, 既定) { const i = 引数.indexOf('--' + 名); return i >= 0 ? 引数[i + 1] : 既定; }
+function io読み(紙) {
+  /* ★逆斜線を 1つも 書きません★＝★便りや heredoc で 落ちて 別の 物に なる★
+       （2026-09-25 ここで 1回 踏んだ ･･･ `\r` が 本物の CR に なって 正規表現が 割れた） */
+  const 改行 = String.fromCharCode(10);
+  const 戻り = String.fromCharCode(13);
+  return fs.readFileSync(紙, "utf8").split(改行)
+    .map((x) => x.split(戻り).join("").trim())
+    .filter((x) => x && x.indexOf("|") > 0);
+}
 const 台 = 取る('台', 'webkit');
 if (!本 || !fs.existsSync(本)) { console.log('★本が 在りません★ ' + 本); process.exit(2); }
 
@@ -148,18 +166,38 @@ try {
   if (出.重なり && 出.重なり.length) {
     console.log('');
     console.log('  ══ ★渡した 番地が 直されて いるか★ ══');
-    出.重なり.forEach((x) => {
-      console.log('    ' + x.番地 + ' ... ' + (x.直された ? '★直された★' : '直されて いない'));
-    });
+    /* ★20個を 超えたら 1つずつ 出しません（★出しを 溢れさせない★）★ */
+    if (出.重なり.length <= 20) {
+      出.重なり.forEach((x) => {
+        console.log('    ' + x.番地 + ' ... ' + (x.直された ? '★直された★' : '直されて いない'));
+      });
+    } else {
+      const 外 = 出.重なり.filter((x) => !x.直された);
+      console.log('    ★直されて いない 番地★ ... ' + 外.length + '個'
+        + (外.length ? '  ' + 外.map((x) => x.番地).slice(0, 20).join(' / ') : ''));
+      const 行ごと = {};
+      出.重なり.filter((x) => x.直された).forEach((x) => {
+        const 行 = x.番地.split('|')[0] + '|' + String(x.番地.split('|')[1]).split(',')[0] + '行';
+        行ごと[行] = (行ごと[行] || 0) + 1;
+      });
+      console.log('    ★直された 番地（行ごと）★');
+      Object.keys(行ごと).forEach((k) => console.log('      ' + k + ' ... ' + 行ごと[k] + '個'));
+    }
     const 何個 = 出.重なり.filter((x) => x.直された).length;
     console.log('    ★' + 何個 + '個 / ' + 出.重なり.length + '個 が 直された マス★');
+    /* ══ ★★「半分」と 言うのは 66/69 でも 0/69 でも 同じ 字に なります★★ ══（2026-09-25 1回 踏んだ）
+         ⇒★割合を 出して 段で 言い分けます★（★分母は いつも 隣に 置きます★） */
+    const 割 = 出.重なり.length ? Math.round((何個 / 出.重なり.length) * 1000) / 10 : 0;
+    console.log('    ⇒★' + 割 + '%★ が 直した 中');
     if (何個 === 出.重なり.length) {
-      console.log('    ⇒★★経営者1 の 見立て（直しが 効きすぎ）と 合って います★★');
+      console.log('    ⇒★★全部＝経営者1 の 見立て（直しが 効きすぎ）で 説明できます★★');
     } else if (何個 === 0) {
-      console.log('    ⇒★★経営者1 の 見立ては 外れです＝この 番地は 直して いません★★');
-      console.log('      ＝★別の 所で 数に なって います★');
+      console.log('    ⇒★★1つも 在りません＝経営者1 の 見立ては 外れです★★');
+    } else if (割 >= 90) {
+      console.log('    ⇒★★大半＝経営者1 の 見立てで 説明できます★★');
+      console.log('      ＝★但し 残り ' + (出.重なり.length - 何個) + '個は 別の 訳です★（★0個に しない★）');
     } else {
-      console.log('    ⇒★半分です＝1つの 訳では 説明できません★');
+      console.log('    ⇒★訳が 2つ 以上 在ります＝1つでは 説明できません★');
     }
   }
   console.log('  ★式の 字も 値も 1つも 出して いません★（数と 番地だけ）');
