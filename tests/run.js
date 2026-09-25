@@ -25,6 +25,7 @@ const FILES = [
   ['shiki-hyou-afure.test.mjs'],               // ★本体が 溢れ（こぼれ）を 置ける＝実Excel 16通り（土台⑤）★
   ['shiki-hyou-afure.test.mjs', '--self-test'],// ★材料を 変えたら 答えも 変わるか／紙に 無い 式を 押して いないか★
   ['shiki-hyou-omosa.test.mjs'],               // ★表が 大きく なっても N の 2乗に ならない（2026-09-14 に 2乗だった）★
+  ['shiki-hyou-sakuin.test.mjs'],  // ★在る マスの 索引が いつも 合って いるか★（空の マスを 5,700万回 訊いて いた・2026-09-26）
   ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
   ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208･･･）★
   ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
