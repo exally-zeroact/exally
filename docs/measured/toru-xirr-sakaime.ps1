@@ -1,4 +1,4 @@
-# toru-xirr-sakaime.ps1 — ★XIRR が どこで #NUM! に なるかを 実Excel に 聞く★（2026-09-09）
+﻿# toru-xirr-sakaime.ps1 — ★XIRR が どこで #NUM! に なるかを 実Excel に 聞く★（2026-09-09）
 #
 #  ★★なぜ★★
 #    実Excel が ★#NUM!★ を 返す 組で、うちは ★数を 返して います★

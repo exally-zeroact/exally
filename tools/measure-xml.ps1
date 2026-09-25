@@ -1,4 +1,4 @@
-# measure-xml.ps1 — ★開発タブ（XML の 対応付け・入出力／コントロール）★ 2026-08-30
+﻿# measure-xml.ps1 — ★開発タブ（XML の 対応付け・入出力／コントロール）★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-xml.ps1
 

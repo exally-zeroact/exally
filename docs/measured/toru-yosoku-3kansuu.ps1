@@ -1,4 +1,4 @@
-# toru-yosoku-3kansuu.ps1 — ★LOGEST / TREND / GROWTH を 実Excel に 聞く★（2026-09-09）
+﻿# toru-yosoku-3kansuu.ps1 — ★LOGEST / TREND / GROWTH を 実Excel に 聞く★（2026-09-09）
 #
 #  ★★なぜ★★
 #    LINEST で ★x が 2本以上（重回帰）の 時に 静かに 違う 答え★を 出して いた。

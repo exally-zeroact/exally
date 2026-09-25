@@ -1,4 +1,4 @@
-# measure-insert.ps1 — ★挿入タブ（チェックボックス・SmartArt・アイコン・数式・タイムライン）★ 2026-08-30
+﻿# measure-insert.ps1 — ★挿入タブ（チェックボックス・SmartArt・アイコン・数式・タイムライン）★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-insert.ps1
 

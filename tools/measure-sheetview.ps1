@@ -1,4 +1,4 @@
-# measure-sheetview.ps1 — ★シート ビュー／ユーザー設定のビュー／窓の名前★ 2026-08-30
+﻿# measure-sheetview.ps1 — ★シート ビュー／ユーザー設定のビュー／窓の名前★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-sheetview.ps1
 

@@ -1,4 +1,4 @@
-# ★そろえ方の 番号★を 1つずつ 実Excel で 測る（読むだけ）
+﻿# ★そろえ方の 番号★を 1つずつ 実Excel で 測る（読むだけ）
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)

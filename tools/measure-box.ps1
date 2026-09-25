@@ -1,4 +1,4 @@
-# 箱ひげ図の 既定を ★保存した中身★から 読む（COMの性質が読めなかったため）
+﻿# 箱ひげ図の 既定を ★保存した中身★から 読む（COMの性質が読めなかったため）
 $ErrorActionPreference='Stop'
 $out = $args[0]
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false

@@ -1,4 +1,4 @@
-# 実Excelのリボンを UI Automation で歩いて、タブ→グループ→ボタンを「並び順のまま」取る。
+﻿# 実Excelのリボンを UI Automation で歩いて、タブ→グループ→ボタンを「並び順のまま」取る。
 # 読むだけ。ブックは新規・保存しない。
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName UIAutomationClient

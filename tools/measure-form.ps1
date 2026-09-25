@@ -1,4 +1,4 @@
-# 「フォーム」（データ入力フォーム）の 中身を 測る（読むだけ）
+﻿# 「フォーム」（データ入力フォーム）の 中身を 測る（読むだけ）
 # ★COM から 窓の 中は 読めない★ので、ShowDataForm が 何を 相手に するかだけ 確かめる。
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
