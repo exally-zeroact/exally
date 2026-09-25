@@ -87,6 +87,7 @@
       /* ★★2つ 受け取ります★★（2026-09-25 から 「ゼロを 隠すか」も 一緒に 来ます） */
       var 字体表 = (読んだ物 && 読んだ物.字体) ? 読んだ物.字体 : null;
       var ゼロ表 = (読んだ物 && 読んだ物.ゼロ) ? 読んだ物.ゼロ : null;
+      var 全部計算の印 = (読んだ物 && 読んだ物.全部計算 !== undefined) ? 読んだ物.全部計算 : null;
       var wb = root.XLSX.read(bytes, { type: 'array', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
 
       /* ★表の名前での参照（Table[列名]）を、実際のA1範囲に直す★（2026-08-18）
@@ -147,10 +148,20 @@
                  ⇒★落ちません／印が いつも false に なるだけ★＝★一番 見つけにくい 形★。
                  ⇒★絵の 点で 数える 試験が 捕まえました★（板の 印 2枚とも false） */
             ゼロ表 = ゼロ表 || {};   /* ★板の 名前 → ゼロを 隠すか★ */
-            var 先 = book.zip.has('xl/theme/theme1.xml')
+            /* ★★`.xlsx` の 「開いたら 全部 計算しろ」★★（2026-09-25）
+                 `xl/workbook.xml` の `<calcPr `fullCalcOnLoad="1"` />`
+                 ★札が 無い＝立って いない★（Excel は 立って いる 時だけ 書きます） */
+            var 先0 = book.zip.has('xl/workbook.xml')
+              ? book.zip.text('xl/workbook.xml').then(function (wx) {
+                  var m0 = /<calcPr[\s/>][^>]*>/.exec(wx);
+                  if (m0) 全部計算の印 = /fullCalcOnLoad\s*=\s*"(1|true)"/.test(m0[0]);
+                  else 全部計算の印 = false;
+                }).catch(function () { /* ★読めない 時は 触らない★ */ })
+              : Promise.resolve();
+            var 先 = 先0.then(function () { return book.zip.has('xl/theme/theme1.xml')
               ? book.zip.text('xl/theme/theme1.xml').then(function (x) { テーマの字 = x; })
                   .catch(function () { テーマの字 = ''; })
-              : Promise.resolve();
+              : Promise.resolve(); });
             return 先.then(function () {
             return book.zip.text('xl/styles.xml').then(function (型の字) {
               var 表 = {}, 鎖 = Promise.resolve();   /* ゼロ表 は 上で 作って います */
@@ -286,7 +297,7 @@
           });
         });
       }
-      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表); });
+      return pre.then(function () { return finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表, 全部計算の印); });
       });
     });
   }
@@ -334,7 +345,64 @@
   }
 
   /** 読み終わった物をグリッドの形にして、控え(base)を作る */
-  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表) {
+  /* ══ ★★開いた 直後に 計算が 要るか★★ ══（2026-09-25）
+       ★★なぜ★★
+         司さんの 実物は 開くのに ★23秒★。★読み込みは 1〜2%★ で
+         ★残りは 「開いた 直後の 計算」★（経営者1 の CPU の 記録）。
+         ★実Excel は 保存済みの 答えを 持って いて、開いた だけでは 計算しません★。
+         ⇒★だから 「計算する 理由が 1つも 無い 本」は 計算しません★
+         ⇒★★これは 「Excel と 同じに する」事です★★（司さんの 決め イ）
+       ★★理由が 在る 場合（経営者1 が 挙げて 数えた）★★
+         ㋐★開いた 日で 答えが 変わる 関数★（TODAY NOW RAND OFFSET INDIRECT CELL INFO ･･･）
+         ㋑★式は 在るのに 答えが 保存されて いない マス★
+         ㋓★「開いたら 全部 計算しろ」の 印★
+         ⇒★司さんの 実物は ㋐0個 ㋑0個 ㋓立って いない★（★2人が 別々の 道具で 読んだ★）
+       ★★1つでも 当たれば 計算します★★＝★迷ったら 計算する 側に 倒す★
+         ＝★印が 読めなかった 時（`null`）も 計算します★
+         ＝★速さより 答えが 大事★
+
+       ══ ★★数えたが わざと 名簿に 入れて いない 関数が 4つ 在ります★★ ══（2026-09-25）
+         ★`WEBSERVICE` ／ `STOCKHISTORY` ／ `TRANSLATE` ／ `DETECTLANGUAGE`★
+         （`lib/formula-soto.js:148` が 持って いる ★外へ 出る 関数★・経営者1 が 数えました）
+         ★実Excel では この 4つも 「開いた 日で 答えが 変わる」側です★
+         ⇒だから ㋐に 入れるのが 「Excel と 同じ」に 見えます。
+         ★★それでも 入れて いません＝これは 速さの 話では なく 守りの 話です★★
+           `lib/formula-soto.js` の 頭に こう 書いて あります:
+             「もらった `.xlsx` の 式は ★式のまま★ 入る＝★開いた だけで 走る★」
+             「★画面から 直に 外へ 出さない／行き先は うちが 決める★」
+           ⇒★㋐に 足すと 「知らない 人の 本を 開いた だけで 外へ 出る」に なります★
+           ⇒★今の 「計算しない」は それを 止めて います★（★ついでに 止まっただけ★）
+         ★★だから 決めるのは 司さんです★★（★「誰が 開けるか」が 変わる 事は 先に 訊く★）
+           選べる 形 3つ（★どれも まだ 決まって いません★）
+             ⑴㋐に 4つ 足す ......... Excel と 同じ 振る舞い／★但し 外へ 出る★
+             ⑵足さない（★今これ★） ... 守りは 固い／★答えは 古いまま★
+             ⑶4つが 在る 本だけ 訊く ... お客さんに 決めさせる（経営者1 の 推し）
+         ★★但し 他の 理由（㋐㋑㋓）で 計算する 本では この 4つも 走ります★★
+           ＝★私が 塞いだ のでは ありません＝前から そうでした★ */
+  var 日で変わる関数 = /\b(TODAY|NOW|RAND|RANDBETWEEN|RANDARRAY|OFFSET|INDIRECT|CELL|INFO)\s*\(/i;
+  function 開いた直後に計算が要るか(板たち, 全部計算の印) {
+    var 訳 = { 日で変わる: 0, 答えが無い: 0, 全部計算の印: 全部計算の印, 式: 0 };
+    for (var i = 0; i < 板たち.length; i++) {
+      var d = (板たち[i] && 板たち[i].data) || {};
+      for (var k in d) {
+        var c = d[k];
+        if (!c || typeof c.f !== 'string' || c.f.charAt(0) !== '=') continue;
+        訳.式++;
+        if (日で変わる関数.test(c.f)) 訳.日で変わる++;
+      }
+      /* ★★「答えが 無い」は 板が 数えた 物を 使います★★（2026-09-25 ここで 1回 踏みました）
+           はじめ `c.d === ''` で 数えたら ★2,255個★ 出ました。
+           ＝`=IFERROR(･･･,"")` の 答えは ★空の 字＝立派な 答え★ です。
+           ＝経営者1 が 実Excel で 数えた ㋑は ★0個★。
+           ⇒★`sheetToGrid` が 「`c.v` が 無い（undefined/null）」時だけ 数えて います★
+           ⇒★これを 直すまで 「計算しない」は 1度も 効いて いませんでした★ */
+      訳.答えが無い += (板たち[i] && 板たち[i].答えが無い数) || 0;
+    }
+    訳.要る = !!(訳.日で変わる || 訳.答えが無い || 全部計算の印 !== false);
+    return 訳;
+  }
+
+  function finish(bytes, kind, wb, file, trFixes, trStats, hasVba, マクロ, tr断り, 字体表, 飾り表, 図形表, 図形の並び, 図形の当て方, ゼロ表, 全部計算の印) {
       /* ★その本の 既定の 字体を 覚える★＝列の 幅を 点に 直すのに 要る
          （SheetJS は `wb.Styles.Fonts[0]` に 入れる … 実測 2026-09-11
            {"sz":11,"name":"游ゴシック",...}） */
@@ -382,7 +450,8 @@
              ⇒★だから 道具の 側に 書き残します★ */
         図形の当て方: 図形の当て方 || '',
       };
-      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null,
+      var 計算の訳 = 開いた直後に計算が要るか(out, 全部計算の印);
+      return { kind: kind, sheets: out, opened: opened, hasVba: !!hasVba, マクロ: マクロ || null, 計算の訳: 計算の訳,
         表の断り: tr断り || [] };
   }
 
@@ -412,6 +481,11 @@
       if (!sp.ok || !wp.ok) return null;
       var 字 = '';
       for (var i = 0; i < 三つ[2].length; i++) 字 += String.fromCharCode(三つ[2][i]);
+      /* ★★「開いたら 全部 計算しろ」の 印★★（2026-09-25）
+           ＝`workbook.bin` の 記録157 の 26バイト目 ビット0
+           ＝★実Excel で 作った 7冊の 差で 決めました★（`lib/xlsb-jitai.js` の 断り）
+           ⇒★立って いなければ 開いた 直後に 計算する 理由は ありません★ */
+      var 全部計算 = JT.開いたら全部計算するか(wp.recs);
       var 対応 = JT.板とファイル(wp.recs, 字);
       if (!対応) return null;
       var 名ら = Object.keys(対応), 仕事 = [], 出 = {}, ゼロ = {};
@@ -431,8 +505,8 @@
         })(名ら[k]);
       }
       return Promise.all(仕事).then(function () {
-        if (!Object.keys(出).length && !Object.keys(ゼロ).length) return null;
-        return { 字体: 出, ゼロ: ゼロ };
+        if (!Object.keys(出).length && !Object.keys(ゼロ).length && 全部計算 === null) return null;
+        return { 字体: 出, ゼロ: ゼロ, 全部計算: 全部計算 };
       });
     }, function () { return null; });
   }
@@ -574,6 +648,7 @@
   function sheetToGrid(ws, name, tableFixes, 字体, 飾り, 図形, ゼロを隠す) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
+    var 答えが無い数 = 0;   /* ★式は 在るのに 答えが 保存されて いない マス★ */
     Object.keys(ws).forEach(function (a) {
       if (a.charAt(0) === '!') return;
       var c = ws[a], rc = X.utils.decode_cell(a);
@@ -582,6 +657,13 @@
         var fixed = fixes[name + '|' + rc.r + ',' + rc.c];
         cell.f = fixed !== undefined ? fixed : ('=' + c.f);
         cell.d = c.v !== undefined && c.v !== null ? c.v : '';   // ★ファイルの答え（キャッシュ）をそのまま出す★
+        /* ★★「答えが 無い」と 「答えが 空の 字」は 別物★★（2026-09-25 ここで 1回 踏みました）
+             `=IFERROR(･･･,"")` の 答えは ★空の 字★＝★立派な 答え★ です。
+             `cell.d === ''` で 数えたら ★2,255個★ 出て、
+             ★『答えが 保存されて いない』の 数が 嘘に なりました★
+             ⇒経営者1 の 実測は ★0個★（実Excel で 数えた）
+             ⇒★`c.v` が 無い（undefined / null）時だけ 数えます★ */
+        if (c.v === undefined || c.v === null) 答えが無い数++;
       } else if (c.F && 溢れの先か(c, rc)) {
         /* ══ ★★Excel が 書き込んだ「広がった 先の 答え」★★（2026-09-11）══════
            ★実物で 測った 事★（docs/measured/toru-excel-kara.ps1 で 作った ファイルを
@@ -754,6 +836,7 @@
            ★6,743個（74%）が 「Excel は 空・うちは `0`」★
            ＝★計算の 間違いでは なく 板の 設定を 読んで いなかった★ */
       ゼロを隠す: !!ゼロを隠す,
+      答えが無い数: 答えが無い数,
       /* ★その ブックの 既定の 字体★＝画面も 同じ 字で 描く
          ⇒ 同じ 幅に 入る 桁数が 実Excel と 揃う（うちの 字は 細くて 多く 入って いた） */
       既定の字体名: (既定の字体 && 既定の字体.name) ? 既定の字体.name : '',

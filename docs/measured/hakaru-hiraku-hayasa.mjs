@@ -53,7 +53,14 @@ const 木たち = [];
 for (let i = 0; i < 引.length; i++) if (引[i] === '--木' && 引[i + 1]) 木たち.push(引[i + 1]);
 if (!木たち.length) 木たち.push(ROOT);
 
-function 立てる(root) {
+function 立てる(root0) {
+  /* ★★道を 揃えます★★（2026-09-25 ここで 1回 踏みました）
+       `--木` に `C:/Users/...`（斜線）を 渡すと
+       `path.join` が 作る `C:\Users\...`（逆斜線）と ★頭が 合いません★。
+       ⇒`f.startsWith(root)` が いつも 偽 ⇒★全部 404★
+       ⇒画面は 出るが `#bookFileInput` が 無い ⇒★『30秒 待って 見つからない』★
+       ⇒★落ちる ので まだ 良い★（黙って 別の 物を 測るより ずっと 良い） */
+  const root = path.resolve(root0);
   const 型 = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
     '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
     '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
@@ -96,6 +103,15 @@ try {
   for (let t = 0; t < 木たち.length; t++) {          /* ★交互に 回す★ */
     const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
     try {
+      /* ★★「効いて いるか」を 画面の 声で 確かめます★★（2026-09-25）
+           ＝★差が 出ない 時に 「効かなかった」と 「そもそも 効いて いない」は 別★
+           ＝記憶「壊したのに 赤に ならない は まず 壊れて いるかを 見る」 */
+      page.on('console', (m) => {
+        const t2 = String(m.text());
+        if (t2.indexOf('[Exally] 開いた') >= 0 || t2.indexOf('[Exally] 計算を') >= 0) {
+          console.log('      [木' + (t + 1) + 'の 声] ' + t2.slice(0, 160));
+        }
+      });
       await page.goto(配信たち[t].url + '/book.html', { waitUntil: 'load', timeout: 180000 });
       await page.evaluate(() => {
         document.body.classList.remove('exally-locked');
