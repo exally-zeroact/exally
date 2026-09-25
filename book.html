@@ -10657,11 +10657,27 @@ function setCell(r,c,v,noUndo){
   /* ★★お客さんが 1マスでも 打ったら いつも通りに 戻します★★（2026-09-25）
        ＝★止めて いるのは 「開いた 直後」だけ★
        ＝★打った 後に 計算しないのは 別の 話（それは しません）★ */
-  _計算を始める('打った');
+  /* ══ ★★控えを 取る 間は まだ 「計算しない」の ままに します★★ ══（2026-09-25）
+       ★★測った 事★★
+         この 下の 繰り返し（板 15枚を 台に 流す）で ★1打ち目に 23.7秒 画面が 固まって いました★
+         （`docs/measured/hakaru-1uchi-me-no-machi.mjs` ･･･ ★絵は 1枚しか 出ません★）
+       ★★なぜ 23.7秒 も かかるか★★
+         `loadSheetIntoEngine` は 流した 後に ★その 板を 計算し直します★。
+         ⇒★15枚 全部を 計算し直して いました★（87%が `lib/shiki-hyou.js`）
+       ★★そして その 計算し直しは 「要らない」 どころか 「悪い」★★
+         ＝★保存された 答えは 実Excel 自身が 書いた 物★
+         ＝★うちが 計算し直すと 2,911個 違って いました★（経営者1 の 実測）
+         ⇒★上書きすると 実Excel から 遠ざかります★
+       ★★だから 控えを 取る 間は 旗を 立てた ままに します★★
+         ＝流すのは する（★台が 他の 板の 式を 知らないと 打った 時に 直せない★）
+         ＝★計算し直しは しない★
+         ⇒その 後で 旗を 下ろす ので ★打った マスの つられる 所は いつも通り 直ります★
+       ★見張り★ tests/hiraita-toki-keisan-webkit.mjs（★1マス 打つと 999 → 20★） */
   if (!_baselineTaken && typeof BookOpen !== 'undefined' && BookOpen.isOpened()) {
     _baselineTaken = true;
     for (var _bi = 0; _bi < sheets.length; _bi++) loadSheetIntoEngine(_bi);
   }
+  _計算を始める('打った');
   // 全角→半角正規化（日本語IMEキーボード対応）
   if(v && typeof v==='string'){
     v = v.replace(/[！-～]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
