@@ -21,6 +21,7 @@
 import path from 'node:path'; import http from 'node:http'; import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { borrow, launch } from '../../scripts/_borrow-playwright.mjs';
+import { 道を確かめる, 道の字, 効いた数を出す } from './_gamen-no-michi.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const 引 = process.argv.slice(2);
@@ -74,6 +75,12 @@ try {
   }, null, { timeout: 900000 });
   await page.waitForTimeout(600);
 
+  /* ★★決め（2026-09-25・2人で 決めました）★★
+       ★画面の 事を 測る 時は 画面の 関数を 呼ぶ。真似ない★
+       ⇒★要る 関数が 1つでも 無ければ 数を 出さずに 止まります★ */
+  await 道を確かめる(page);
+
+  let 隠した数 = 0;
   for (const 所 of 場所) {
     const 割 = String(所).split('|');
     const 板名 = 割[0], 印 = 割[1];
@@ -113,10 +120,13 @@ try {
       + ' ／ vの型 ' + 出.vの型 + '(空' + 出.vが空 + ')');
     console.log('    生の 形 ... ' + 出.生形 + '（長さ ' + 出.生長 + '／ぴったり0 ' + 出.ぴったり0 + '）');
     console.log('    書式 ..... ' + 出.書式 + ' ／ 列の 幅 ' + 出.幅);
+    if (出.隠すと判じた) 隠した数++;
     console.log('    ★隠すと 判じた ... ' + 出.隠すと判じた + '★');
     console.log('    ★画面の 形 ....... ' + 出.画面形 + '★');
     if (出.式形) console.log('    式の 形 ... ' + 出.式形);
   }
+  console.log('');
+  効いた数を出す('隠すと 判じた', 隠した数, 場所.length);
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});

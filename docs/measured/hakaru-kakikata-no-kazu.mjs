@@ -23,6 +23,7 @@
 import path from 'node:path'; import http from 'node:http'; import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { borrow, launch } from '../../scripts/_borrow-playwright.mjs';
+import { 道を確かめる, 効いた数を出す } from './_gamen-no-michi.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const 材料 = process.argv[2] || path.join(ROOT, 'tests/fixtures/cross-sheet-sample.xlsb');
@@ -72,6 +73,10 @@ try {
   }, null, { timeout: 900000 });
   await page.waitForTimeout(600);
 
+  /* ★★決め（2026-09-25・2人で 決めました）★★
+       ★要る 関数が 1つでも 無ければ 数を 出さずに 止まります★ */
+  await 道を確かめる(page);
+
   const 板の数 = await page.evaluate(() => (window.sheets || []).length);
   const 合 = { 式: 0, 書式あり: 0, 書式なし: 0, 隠さなかった0: 0, 式にREF: 0 };
   const REF本 = [];
@@ -80,6 +85,7 @@ try {
   const 描 = { 見た: 0, 生にカンマ: 0, 描きにカンマ: 0, 生と描きが違う: 0, 見本: [], 画面が0: 0, 零本: [] };
 
   for (let i = 0; i < 板の数; i++) {
+    /* ★板を 開く★＝`activeSheet` の 代入だけでは 台に 流れません */
     await page.evaluate((n) => { window.switchSheet(n); }, i);
     await page.waitForTimeout(60);
     const 出 = await page.evaluate(() => {
@@ -184,6 +190,9 @@ try {
   }
 
   console.log('');
+  効いた数を出す('書式が 付いて いる', 合.書式あり, 合.式);
+  効いた数を出す('画面が 0 に 見えるのに 隠れて いない', 描.画面が0, 描.見た);
+  効いた数を出す('式の 字に `#REF!` が 在る', 合.式にREF, 合.式);
   console.log('★式の マス ' + 合.式.toLocaleString() + '個★（板 ' + 板の数 + '枚）');
   console.log('  ★書式が 付いて いる ... ' + 合.書式あり.toLocaleString() + '個★');
   console.log('  ★書式が 無い（General 扱い）... ' + 合.書式なし.toLocaleString() + '個★');
