@@ -2842,8 +2842,25 @@ function _ゼロを隠すか(cell, raw) {
        ＝`=TEXT(0,"0")` や 打ち込んだ 「0」は ★実Excel では 消えません★。
        ＝実Excel が 隠すのは ★値が 数の 0★ の マスだけ。
        ⇒★`cell.v` の 型で 見ます★（字は 字の まま 出す） */
-  var v = (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') ? cell.v : raw;
-  return typeof v === 'number' && v === 0;
+  /* ★★式の マスは 「数」では 来ません★★（2026-09-25 経営者1 が 数で 出しました）
+       ★実測★ ... 式 13,544個 とも `_字の元` が 返すのは ★字★（`{"string": 13544}`）
+         `js/book-open.js:580` ... 式の マスは `v` が ★空の 字★／答えは `d` に 入る
+       ⇒前の 形（`typeof v === 'number'`）は 式の マスで ★いつも false★
+       ⇒★★中の 字が 0 の 式 6,752個 の うち 隠したのは 0個★★でした
+       ⇒★落ちません／絵の 点を 数える 試験も 捕まえませんでした★
+         ＝私の 見本が ★「数を 持った マス」だけ★ だったから（★式の 0 が 無かった★）
+       ★★だから 2つに 分けます★★
+         ・★定数の マス★ ... `cell.v` の 型で 見る（字の 「0」を 隠さない 為）
+         ・★式の マス★ ..... `cell.f` が 在る ⇒ 答えの 字を 数に 読む
+       ★`=TEXT(0,"0")` の ような 「答えが 字」の 式は 上の `_答えは字か` で 外れて います★ */
+  var v = (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') ? cell.v : null;
+  if (typeof v === 'number') return v === 0;          /* ★定数の 数★ */
+  if (v !== null) return false;                       /* ★定数の 字（「0」も 出す）★ */
+  if (!(cell && cell.f)) return false;                /* ★式でも 定数でも ない★ */
+  var 字 = String(raw).trim();
+  if (字 === '') return false;
+  var n = Number(字);
+  return isFinite(n) && n === 0;
 }
 
 function _字の元(cell) {
