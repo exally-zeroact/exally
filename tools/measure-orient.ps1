@@ -1,4 +1,4 @@
-# ★系列を 縦に取るか 横に取るか★ を 実Excel で 測る（読むだけ）
+﻿# ★系列を 縦に取るか 横に取るか★ を 実Excel で 測る（読むだけ）
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)

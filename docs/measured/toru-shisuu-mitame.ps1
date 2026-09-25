@@ -1,4 +1,4 @@
-# toru-shisuu-mitame.ps1 — ★実Excel が 指数を ★どう 出すか★を 実Excel に 聞く★（2026-09-10）
+﻿# toru-shisuu-mitame.ps1 — ★実Excel が 指数を ★どう 出すか★を 実Excel に 聞く★（2026-09-10）
 #
 #  ★★なぜ★★
 #    #62 で ★指数の 字が 打てるように★ なりました（前は `=1.64E-14` が #ERROR）。

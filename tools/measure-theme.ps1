@@ -1,4 +1,4 @@
-# measure-theme.ps1 — ★テーマ（配色・フォント・効果）と 背景・ふりがな★ 2026-08-30
+﻿# measure-theme.ps1 — ★テーマ（配色・フォント・効果）と 背景・ふりがな★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-theme.ps1
 

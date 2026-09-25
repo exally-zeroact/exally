@@ -57,7 +57,7 @@ try {
   await page.waitForFunction(() => {
     const s = window.sheets && window.sheets[window.activeSheet];
     return s && s.data && Object.keys(s.data).length > 3;
-  }, { timeout: 60000 });
+  }, null, { timeout: 60000 });
   await page.waitForTimeout(1200);
 
   const 表 = await page.evaluate(() => {

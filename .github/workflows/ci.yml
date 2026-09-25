@@ -3,6 +3,16 @@ name: CI
 # Exally（ハブ・台帳・集計・ブック）を回す。
 # ★2026-09-05★ 給与(kyuyo/)は Exally から 外した＝給与は Rakunally（司さんの決め）。
 #  ・統合前の2リポジトリのCIを【そのまま並べた】もの。実行方式も内容も変えていない。
+# ★★2026-09-21 ── 司さん「★お金かからんようにしろや★」★★
+#   ＝押し直すと ★前の 回が 止まらず 走り続けて いました★
+#   ＝2026-09-20 の 1日で ★15分 ぶんが 丸ごと 無駄★（実測）
+#   ⇒★同じ 枝の 古い 回は 止める★
+#   ★main は 止めません★（`github.ref` を 群れの 名に 入れる ので
+#     main の 回と 枝の 回は 別の 群れ＝main は 最後まで 走ります）
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]

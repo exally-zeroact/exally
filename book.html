@@ -580,6 +580,19 @@ font-family:'Noto Sans JP',sans-serif;
 .hairanai{background:#FFF6E5;border:1px solid #E8B54D;border-left:4px solid #E8B54D;
   border-radius:8px;padding:10px 12px;margin-bottom:12px;
   color:#5A4110;font-size:12px;line-height:1.7;white-space:normal;word-break:break-word;}
+/* ★★どこを 触ったか＝1文 ＋ ドロップダウンで 詳しく★★（2026-09-22・司さんの ア）
+     「★どこを 触ったかは 簡潔に 文に して ドロップダウンで 詳しく★」
+   ★★畳んだ 中身は 自分で 消します★★＝ブラウザ既定の
+     `details:not([open]) > *:not(summary){display:none}` は ★弱い決まり★で、
+     中の 部品が 自分で display を 持つと ★畳んだのに 見えたまま★ に なります
+     （2026-09-08 Rakunally の 請求書で 実測＝open=false なのに 幅358×高49）*/
+.diffBun{font-size:13px;color:#333333;margin-top:8px;line-height:1.7;font-weight:700;}
+.diffKuwashiku > summary{cursor:pointer;color:#2E7D54;font-size:13px;font-weight:700;
+  list-style:none;padding:6px 0;user-select:none;}
+.diffKuwashiku > summary::-webkit-details-marker{display:none;}
+.diffKuwashiku > summary::before{content:'▸ ';}
+.diffKuwashiku[open] > summary::before{content:'▾ ';}
+.diffKuwashiku:not([open]) > *:not(summary){display:none;}
 .ai-msg-user{text-align:right;margin-bottom:6px;clear:both;}
 .ai-msg-user .ai-bubble{background:#3D9E72;color:#fff;border-radius:8px 8px 2px 8px;padding:4px 7px;display:inline-block;max-width:85%;font-size:11px;user-select:text;}
 .ai-msg-ai{text-align:left;margin-bottom:8px;clear:both;}
@@ -1476,37 +1489,37 @@ background:#FFE066 !important;
 }
 </style>
 
-<script src="hyperformula.full.min.js?v=fe6e1bd4"></script>
+<script src="hyperformula.full.min.js?v=59c8e82d"></script>
 <!-- ★BAHTTEXT（タイ語の 金額）★ 2026-09-04＝答えは 実Excel に 116通り 打たせて 合わせた -->
-<script src="lib/bahttext.js?v=fe6e1bd4"></script>
-<script src="lib/formula-extra.js?v=fe6e1bd4"></script>
-<script src="lib/formula-extra-plug.js?v=fe6e1bd4"></script>
+<script src="lib/bahttext.js?v=59c8e82d"></script>
+<script src="lib/formula-extra.js?v=59c8e82d"></script>
+<script src="lib/formula-extra-plug.js?v=59c8e82d"></script>
 <!-- ★書き出す ファイルに「入らない 物」を 数えて 言う（2026-09-06 実測）★
      ＝うちで 足した シート等は 元の zip に 入らない。★黙って 消さない★ -->
-<script src="lib/hairanai.js?v=fe6e1bd4"></script>
+<script src="lib/hairanai.js?v=59c8e82d"></script>
 <!-- ★実Excel に 在って まだ 動かなかった 関数（2026-09-06）★
      一覧の 出どころ＝docs/measured/exally-missing-2026-09-06.txt（測って 出た 物） -->
-<script src="lib/formula-nokori.js?v=fe6e1bd4"></script>
-<script src="lib/formula-nokori-plug.js?v=fe6e1bd4"></script>
-<script src="lib/formula-kane.js?v=fe6e1bd4"></script>
-<script src="lib/formula-kane-plug.js?v=fe6e1bd4"></script>
-<script src="lib/tanni-hyou.js?v=fe6e1bd4"></script>
-<script src="lib/formula-yosoku.js?v=fe6e1bd4"></script>
-<script src="lib/formula-yosoku-plug.js?v=fe6e1bd4"></script>
-<script src="lib/formula-soto.js?v=fe6e1bd4"></script>
-<script src="lib/formula-soto-plug.js?v=fe6e1bd4"></script>
-<script src="lib/formula-filterxml.js?v=fe6e1bd4"></script>
-<script src="lib/formula-filterxml-plug.js?v=fe6e1bd4"></script>
-<script src="lib/formula-cell.js?v=fe6e1bd4"></script>
-<script src="lib/formula-cell-plug.js?v=fe6e1bd4"></script>
-<script src="lib/formula-complex.js?v=fe6e1bd4"></script>
-<script src="lib/formula-complex-plug.js?v=fe6e1bd4"></script>
+<script src="lib/formula-nokori.js?v=59c8e82d"></script>
+<script src="lib/formula-nokori-plug.js?v=59c8e82d"></script>
+<script src="lib/formula-kane.js?v=59c8e82d"></script>
+<script src="lib/formula-kane-plug.js?v=59c8e82d"></script>
+<script src="lib/tanni-hyou.js?v=59c8e82d"></script>
+<script src="lib/formula-yosoku.js?v=59c8e82d"></script>
+<script src="lib/formula-yosoku-plug.js?v=59c8e82d"></script>
+<script src="lib/formula-soto.js?v=59c8e82d"></script>
+<script src="lib/formula-soto-plug.js?v=59c8e82d"></script>
+<script src="lib/formula-filterxml.js?v=59c8e82d"></script>
+<script src="lib/formula-filterxml-plug.js?v=59c8e82d"></script>
+<script src="lib/formula-cell.js?v=59c8e82d"></script>
+<script src="lib/formula-cell-plug.js?v=59c8e82d"></script>
+<script src="lib/formula-complex.js?v=59c8e82d"></script>
+<script src="lib/formula-complex-plug.js?v=59c8e82d"></script>
 
 <!-- ★書式の 字を 読んで 数を 字に する 台★（2026-09-15）
      ★TEXT() も 画面も ここを 呼びます★＝★2か所で 解かない★
      ★実物 16,536マスで 今の 字と 1マスも 違わない★事を 測って から 入れました
      ★15桁の 丸めは この 台の 中★＝★呼ぶ側が 忘れられません★ -->
-<script src="lib/shoshiki.js?v=fe6e1bd4"></script>
+<script src="lib/shoshiki.js?v=59c8e82d"></script>
 
 <!-- ══ ★★自前の 台（借り物外し）★★ ══（2026-09-18・★㋐＝読み込むだけ★）
      ★★今は ★窓に 居るだけ★です★★＝★計算は まだ 借り物（HyperFormula）が して います★
@@ -1531,102 +1544,108 @@ background:#FFE066 !important;
        ⇒★どれも node の `require` では 通ります★＝★ブラウザでしか 出ません★
 
      ★`lib/bessel.js` は ★ここで 初めて 入ります★★（皮が `root.Bessel` を 読む） -->
-<script src="lib/bessel.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-keisan.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-kiru.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-katachi.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-sansho.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-afure.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-basho.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-kansuu.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-tsunagi.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-hyou.js?v=fe6e1bd4"></script>
-<script src="lib/shiki-ita-awase.js?v=fe6e1bd4"></script>
+<script src="lib/bessel.js?v=59c8e82d"></script>
+<script src="lib/shiki-keisan.js?v=59c8e82d"></script>
+<script src="lib/shiki-kiru.js?v=59c8e82d"></script>
+<script src="lib/shiki-katachi.js?v=59c8e82d"></script>
+<script src="lib/shiki-sansho.js?v=59c8e82d"></script>
+<script src="lib/shiki-afure.js?v=59c8e82d"></script>
+<script src="lib/shiki-basho.js?v=59c8e82d"></script>
+<script src="lib/shiki-kansuu.js?v=59c8e82d"></script>
+<script src="lib/shiki-tsunagi.js?v=59c8e82d"></script>
+<script src="lib/shiki-hyou.js?v=59c8e82d"></script>
+<script src="lib/shiki-ita-awase.js?v=59c8e82d"></script>
 
-<script src="exally-formula.js?v=fe6e1bd4"></script>
+<script src="exally-formula.js?v=59c8e82d"></script>
 <!-- グリッド→xlsx の変換と「落ちる物」の警告(純関数・軽い)。SheetJS本体(930KB)と lib/xlsx-io.js は
      初回の「Excelに書き出す」で初めて読み込む＝グリッドの表示を重くしない -->
-<script src="js/file-out.js?v=fe6e1bd4"></script>
+<script src="js/file-out.js?v=59c8e82d"></script>
 <!-- ★打ち込んだ文字の解釈（1,234 を数にする）。★計算側も書き出し側も この1本を呼ぶ★
      grid-xlsx.js より先に読む（grid-xlsx.js が読み込み時に掴む） -->
-<script src="lib/typed-value.js?v=fe6e1bd4"></script>
-<script src="lib/grid-xlsx.js?v=fe6e1bd4"></script>
+<script src="lib/typed-value.js?v=59c8e82d"></script>
+<script src="lib/grid-xlsx.js?v=59c8e82d"></script>
   <!-- ★式の中の参照を「カーソルの位置で」直せるようにする★
        2026-08-06 司さんが実機で踏んだ: 「=B1+30」の B1 を直そうと A1 を触ると
        「=B1+30A1」になり ★B1 を直す手段が無かった★。テスト線では直っていたが
        ★本番には運ばれていなかった★（2026-08-18 差を数えて見つけた）。 -->
-  <script src="lib/grid-refedit.js?v=fe6e1bd4"></script>
-<script src="lib/autosum.js?v=fe6e1bd4"></script>
-<script src="lib/grid-sort.js?v=fe6e1bd4"></script>
-<script src="lib/grid-filter.js?v=fe6e1bd4"></script>
-<script src="lib/grid-find.js?v=fe6e1bd4"></script>
-<script src="lib/grid-print.js?v=fe6e1bd4"></script>
-<script src="lib/ai-reason.js?v=fe6e1bd4"></script>
-<script src="lib/menu-place.js?v=fe6e1bd4"></script>
-<script src="lib/grid-stats.js?v=fe6e1bd4"></script>
-<script src="lib/grid-valid.js?v=fe6e1bd4"></script>
-<script src="lib/cond-format.js?v=fe6e1bd4"></script>
-<script src="lib/ref-graph.js?v=fe6e1bd4"></script>
-<script src="lib/shindan.js?v=fe6e1bd4"></script>
+  <script src="lib/grid-refedit.js?v=59c8e82d"></script>
+<script src="lib/autosum.js?v=59c8e82d"></script>
+<script src="lib/grid-sort.js?v=59c8e82d"></script>
+<script src="lib/grid-filter.js?v=59c8e82d"></script>
+<script src="lib/grid-find.js?v=59c8e82d"></script>
+<script src="lib/grid-print.js?v=59c8e82d"></script>
+<script src="lib/ai-reason.js?v=59c8e82d"></script>
+<script src="lib/menu-place.js?v=59c8e82d"></script>
+<script src="lib/grid-stats.js?v=59c8e82d"></script>
+<script src="lib/grid-valid.js?v=59c8e82d"></script>
+<script src="lib/cond-format.js?v=59c8e82d"></script>
+<script src="lib/ref-graph.js?v=59c8e82d"></script>
+<script src="lib/shindan.js?v=59c8e82d"></script>
 <!-- ★マクロ（VBA）を 読む・見立てる★＝E2診断の中に入れる（読むだけ・動かさない・AIは0回） -->
-<script src="lib/vba.js?v=fe6e1bd4"></script>
-<script src="lib/vba-mikata.js?v=fe6e1bd4"></script>
-<script src="lib/vba-tejun.js?v=fe6e1bd4"></script>
-<script src="lib/rireki.js?v=fe6e1bd4"></script>
-<script src="lib/ai-genkai.js?v=fe6e1bd4"></script>
-<script src="lib/chizu.js?v=fe6e1bd4"></script>
-<script src="lib/horu.js?v=fe6e1bd4"></script>
-<script src="lib/excel-version.js?v=fe6e1bd4"></script>
-<script src="lib/teian.js?v=fe6e1bd4"></script>
-<script src="lib/kikan.js?v=fe6e1bd4"></script>
-<script src="lib/recipe.js?v=fe6e1bd4"></script>
-<script src="lib/kirikae.js?v=fe6e1bd4"></script>
-<script src="js/recipe-store.js?v=fe6e1bd4"></script>
-<script src="js/rireki-store.js?v=fe6e1bd4"></script>
-<script src="lib/excel-version.js?v=fe6e1bd4"></script>
+<script src="lib/vba.js?v=59c8e82d"></script>
+<script src="lib/vba-mikata.js?v=59c8e82d"></script>
+<script src="lib/vba-tejun.js?v=59c8e82d"></script>
+<script src="lib/rireki.js?v=59c8e82d"></script>
+<script src="lib/ai-genkai.js?v=59c8e82d"></script>
+<script src="lib/chizu.js?v=59c8e82d"></script>
+<script src="lib/horu.js?v=59c8e82d"></script>
+<script src="lib/excel-version.js?v=59c8e82d"></script>
+<script src="lib/teian.js?v=59c8e82d"></script>
+<script src="lib/kikan.js?v=59c8e82d"></script>
+<script src="lib/recipe.js?v=59c8e82d"></script>
+<script src="lib/kirikae.js?v=59c8e82d"></script>
+<script src="js/recipe-store.js?v=59c8e82d"></script>
+<script src="js/rireki-store.js?v=59c8e82d"></script>
+<script src="lib/excel-version.js?v=59c8e82d"></script>
+<!-- ★★本に 何が 組まれて いるかを 数える 台★★（2026-09-22・司さんの ア）
+     「★どんな 関数や マクロが 組まれてるかは 簡潔に 文に して ドロップダウンで 詳しく★」
+     ★★作り直して いません★★＝`mochikomi.html` が 先に 使って いる 台を そのまま 呼びます
+       （経営者1 が 書いた 物・2026-09-22 に 本人へ 訊いて ★「呼ぶだけに して ください」★）
+     ★材料は もう 上で 読んで います★＝`vba.js` / `vba-mikata.js` / `excel-version.js` -->
+<script src="lib/hon-no-nakami.js?v=59c8e82d"></script>
 <!-- ★リボン（Excelと同じ配置・見せ方は うちの物）★ 2026-08-29 -->
-<link rel="stylesheet" href="lib/ribbon.css?v=fe6e1bd4">
-<script src="lib/named-ranges.js?v=fe6e1bd4"></script>
-<script src="lib/cell-styles.js?v=fe6e1bd4"></script>
-<script src="lib/chart.js?v=fe6e1bd4"></script>
-<script src="lib/sparkline.js?v=fe6e1bd4"></script>
-<script src="lib/table.js?v=fe6e1bd4"></script>
-<script src="lib/flash-fill.js?v=fe6e1bd4"></script>
-<script src="lib/pivot.js?v=fe6e1bd4"></script>
-<script src="lib/csv-in.js?v=fe6e1bd4"></script>
-<script src="lib/objects.js?v=fe6e1bd4"></script>
-<script src="lib/ink.js?v=fe6e1bd4"></script>
-<script src="lib/view-mode.js?v=fe6e1bd4"></script>
-<script src="lib/sheet-view.js?v=fe6e1bd4"></script>
-<script src="lib/theme.js?v=fe6e1bd4"></script>
-<script src="lib/diagram.js?v=fe6e1bd4"></script>
-<script src="lib/adv-filter.js?v=fe6e1bd4"></script>
-<script src="lib/connections.js?v=fe6e1bd4"></script>
-<script src="lib/review.js?v=fe6e1bd4"></script>
-<script src="lib/xml-map.js?v=fe6e1bd4"></script>
-<script src="lib/ink-shape.js?v=fe6e1bd4"></script>
-<script src="lib/jp-map.js?v=fe6e1bd4"></script>
-<script src="lib/timeline.js?v=fe6e1bd4"></script>
-<script src="lib/model3d.js?v=fe6e1bd4"></script>
-<script src="lib/data-model.js?v=fe6e1bd4"></script>
-<script src="lib/symbols.js?v=fe6e1bd4"></script>
-<script src="lib/view-extras.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-spec.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-label.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-scope.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-actions.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-keys.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-keytips.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon-launcher.js?v=fe6e1bd4"></script>
-<script src="lib/ctx-menu.js?v=fe6e1bd4"></script>
-<script src="lib/header-footer.js?v=fe6e1bd4"></script>
-<script src="lib/ribbon.js?v=fe6e1bd4"></script>
+<link rel="stylesheet" href="lib/ribbon.css?v=59c8e82d">
+<script src="lib/named-ranges.js?v=59c8e82d"></script>
+<script src="lib/cell-styles.js?v=59c8e82d"></script>
+<script src="lib/chart.js?v=59c8e82d"></script>
+<script src="lib/sparkline.js?v=59c8e82d"></script>
+<script src="lib/table.js?v=59c8e82d"></script>
+<script src="lib/flash-fill.js?v=59c8e82d"></script>
+<script src="lib/pivot.js?v=59c8e82d"></script>
+<script src="lib/csv-in.js?v=59c8e82d"></script>
+<script src="lib/objects.js?v=59c8e82d"></script>
+<script src="lib/ink.js?v=59c8e82d"></script>
+<script src="lib/view-mode.js?v=59c8e82d"></script>
+<script src="lib/sheet-view.js?v=59c8e82d"></script>
+<script src="lib/theme.js?v=59c8e82d"></script>
+<script src="lib/diagram.js?v=59c8e82d"></script>
+<script src="lib/adv-filter.js?v=59c8e82d"></script>
+<script src="lib/connections.js?v=59c8e82d"></script>
+<script src="lib/review.js?v=59c8e82d"></script>
+<script src="lib/xml-map.js?v=59c8e82d"></script>
+<script src="lib/ink-shape.js?v=59c8e82d"></script>
+<script src="lib/jp-map.js?v=59c8e82d"></script>
+<script src="lib/timeline.js?v=59c8e82d"></script>
+<script src="lib/model3d.js?v=59c8e82d"></script>
+<script src="lib/data-model.js?v=59c8e82d"></script>
+<script src="lib/symbols.js?v=59c8e82d"></script>
+<script src="lib/view-extras.js?v=59c8e82d"></script>
+<script src="lib/ribbon-spec.js?v=59c8e82d"></script>
+<script src="lib/ribbon-label.js?v=59c8e82d"></script>
+<script src="lib/ribbon-scope.js?v=59c8e82d"></script>
+<script src="lib/ribbon-actions.js?v=59c8e82d"></script>
+<script src="lib/ribbon-keys.js?v=59c8e82d"></script>
+<script src="lib/ribbon-keytips.js?v=59c8e82d"></script>
+<script src="lib/ribbon-launcher.js?v=59c8e82d"></script>
+<script src="lib/ctx-menu.js?v=59c8e82d"></script>
+<script src="lib/header-footer.js?v=59c8e82d"></script>
+<script src="lib/ribbon.js?v=59c8e82d"></script>
 <!-- ★ログイン（hub.html と同じ4本・新しく作った物は0）★ 2026-08-23
      ここを掛けるまで ★誰の回数か 数えられない＝上限が掛けられない★（指示役 2026-08-23） -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
-<script src="js/supa-config.js?v=fe6e1bd4"></script>
-<script src="js/exally-login.js?v=fe6e1bd4"></script>
-<script src="js/auth.js?v=fe6e1bd4"></script>
+<script src="js/supa-config.js?v=59c8e82d"></script>
+<script src="js/exally-login.js?v=59c8e82d"></script>
+<script src="js/auth.js?v=59c8e82d"></script>
 
 <script>
 /* ===== canvas-formula-engine.js (inlined) ===== */
@@ -2784,6 +2803,38 @@ function _マスの字大の札(cell) {
   var 板 = sheets[activeSheet];
   return (cell && cell.fontSize) || (板 && 板.既定の字大) || 11;
 }
+/* ★★本の 既定の 字（`ctx.font` に 入れる 形）★★（2026-09-26）
+     ＝★`General` の 桁を 決める 物差し★（★そのマスの 字では ない★）
+     ＝Excel の 列の 幅は ★「標準の 字で 何文字 入るか」★ で 決まって います
+     ＝実物で 裏 ... `.ColumnWidth 6.81` ／ `.Width 44.25点`
+       ⇒44.25 ÷ 6.81 ＝ ★6.50点/字★ ⇒ × 96/72 ＝ ★8.67ドット★
+       ⇒★経営者1 が 実Excel から 出した 8.67 と 一致★
+     ★数を 決め打ちせず 本の 既定の 字から 出します★
+     ★見張り★ tests/hyou-no-kihon-no-ji-webkit.mjs */
+/* ★★物差し専用の canvas★★（2026-09-26）
+     ★★なぜ 別に 持つか（★2回 間違えました★）★★
+       ⑴初めは `一文字` の 所だけ 既定の 字に した ⇒ ★詰め直しが そのマスの 字で 測り直す★
+       ⑵次に `_入る字数` の 頭で `ctx.font` を 替えた ⇒ ★それでも 効かない★
+          ⇒因 ... ★`fmtForDisplay` の 中で `ctx.font` が 元に 戻されて います★
+          ⇒★★＝「借りた 筆の 設定」は 他人が 書き換えます★★
+       ⇒★だから 物差しは 自分の canvas を 1枚 持ちます★
+       ⇒★描く 筆（`ctx`）は 1文字も 触りません★ */
+var _物差しctx = null;
+function _物差しの筆() {
+  if (!_物差しctx) {
+    try { _物差しctx = document.createElement('canvas').getContext('2d'); }
+    catch (e) { _物差しctx = null; }
+  }
+  if (_物差しctx) _物差しctx.font = _既定の字体の字(scale);
+  return _物差しctx;
+}
+function _既定の字体の字(倍) {
+  var 板 = sheets[activeSheet];
+  var 名 = (板 && 板.既定の字体名) ? 板.既定の字体名 : '游ゴシック';
+  var 大 = (板 && 板.既定の字大) ? 板.既定の字大 : 11;
+  var px = Math.max(1, Math.round(大 * 96 / 72 * (倍 || 1)));
+  return px + 'px "' + 名 + '","Yu Gothic","Noto Sans JP",sans-serif';
+}
 function _マスの字大(cell) {
   var 板 = sheets[activeSheet];
   /* ★新しい ブックも 実Excel と 同じ★＝游ゴシック 11pt（2026-09-11 司さんの 決め） */
@@ -2795,6 +2846,70 @@ function _マスの書体(cell) {
   if (cell && cell.fontName) return '"' + cell.fontName + '","Noto Sans JP",sans-serif';
   var 既定名 = (板 && 板.既定の字体名) ? 板.既定の字体名 : '游ゴシック';
   return '"' + 既定名 + '","Yu Gothic","Noto Sans JP",sans-serif';
+}
+
+/* ══ ★★ゼロを 隠す 板では 0 を 描かない★★ ══（2026-09-25）
+     ★★何が 在ったか（経営者1 の 実測・物差しは 実Excel）★★
+       表示が 実Excel と 違う ... ★9,163個★（式 15,799個 中 58%）
+       その うち ★6,743個（74%）が 「Excel は 空・うちは `0`」★
+       ⇒`ActiveWindow.DisplayZeros` を 板ごとに 読むと ★15枚中 13枚が False★
+       ⇒★★計算の 間違いでは ありません＝板の 設定を 読んで いませんでした★★
+     ★★印は 実物の バイトで 確かめました★★（`lib/xlsb-jitai.js` の 断りを 見る）
+       `.xlsb` ･･･ 板の 記録 番号137 の 先頭バイト ★ビット4★
+                 立って いる 板 ＝ ★13・14 の 2枚★（経営者1 の COM と 1対1）
+       `.xlsx` ･･･ `<sheetView `showZeros="0"`>`（★札が 無い＝出す★）
+     ★★隠さない 物★★
+       ・★字の 「0」★（`=TEXT(0,"0")` の ような 物）
+         ＝実Excel も ★値が 0 の マスだけ★ 隠します
+       ・空の マス（元から 何も 無い）
+     ⇒★判じる 所は ここ 1本だけ★＝★ふつうの マスと 結合した マスの 両方が 呼びます★
+       （記憶「作る道が 2本 在る時は 両方 直せ」） */
+function _ゼロを隠すか(cell, raw) {
+  var 板 = sheets[activeSheet];
+  if (!板 || !板.ゼロを隠す) return false;
+  if (raw === '' || raw === null || raw === undefined) return false;
+  if (_答えは字か(cell)) return false;          /* ★打った 答えが 字の 時★ */
+  /* ★★「値が 数の 0」だけ 隠します★★（2026-09-25 ここで 1回 踏みました）
+       はじめ `Number(raw)` で 判じたら ★字の 「0」も 消えました★。
+       ＝`=TEXT(0,"0")` や 打ち込んだ 「0」は ★実Excel では 消えません★。
+       ＝実Excel が 隠すのは ★値が 数の 0★ の マスだけ。
+       ⇒★`cell.v` の 型で 見ます★（字は 字の まま 出す） */
+  /* ★★式の マスは 「数」では 来ません★★（2026-09-25 経営者1 が 数で 出しました）
+       ★実測★ ... 式 13,544個 とも `_字の元` が 返すのは ★字★（`{"string": 13544}`）
+         `js/book-open.js:580` ... 式の マスは `v` が ★空の 字★／答えは `d` に 入る
+       ⇒前の 形（`typeof v === 'number'`）は 式の マスで ★いつも false★
+       ⇒★★中の 字が 0 の 式 6,752個 の うち 隠したのは 0個★★でした
+       ⇒★落ちません／絵の 点を 数える 試験も 捕まえませんでした★
+         ＝私の 見本が ★「数を 持った マス」だけ★ だったから（★式の 0 が 無かった★）
+       ★★だから 2つに 分けます★★
+         ・★定数の マス★ ... `cell.v` の 型で 見る（字の 「0」を 隠さない 為）
+         ・★式の マス★ ..... `cell.f` が 在る ⇒ 答えの 字を 数に 読む
+       ★`=TEXT(0,"0")` の ような 「答えが 字」の 式は 上の `_答えは字か` で 外れて います★ */
+  var v = (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') ? cell.v : null;
+  if (typeof v === 'number') return v === 0;          /* ★定数の 数★ */
+  if (v !== null) return false;                       /* ★定数の 字（「0」も 出す）★ */
+  if (!(cell && cell.f)) return false;                /* ★式でも 定数でも ない★ */
+  /* ══ ★★書式を 掛ける 前の 数が 在れば それを 見ます★★ ══（2026-09-25）
+       ★★なぜ 字を 読み直さないか★★
+         `js/book-open.js` が 書式を 掛けると 答えは ★字★ に なります。
+         ⇒★書式に 字が 1つでも 混じると `Number()` が NaN に なります★
+            `#,##0" 円"` ⇒ 「0 円」 ／ `0.00"時間"` ⇒ 「0.00時間」 ／ `"¥"#,##0` ⇒ 「¥0 」
+         ⇒★3つ とも 0 なのに 隠せて いませんでした★（経営者1 の 実測 47個）
+       ⇒★★だから 元の 数を 見ます★★（`書式前の数` ＝ 数の 時だけ 付きます）
+       ★古い 本（この 印が 無い 物）は 下の 字の 読み直しに 落ちます★ */
+  if (typeof cell.書式前の数 === 'number') return cell.書式前の数 === 0;
+  var 字 = String(raw).trim();
+  if (字 === '') return false;
+  /* ══ ★★字から 読む 時は 書式の 飾りを 外します★★ ══（2026-09-25）
+       ＝★`0 円` `0.00時間` `¥0` は どれも `Number()` が NaN です★
+       ＝★計算し直した 後は `書式前の数` が 無い ので ここに 落ちます★
+       ⇒★数に なる 字だけ 残して 読みます★
+       ⇒`0:00`（真夜中）も 0 に なります＝★実Excel も 値が 0 なので 隠します★
+       ⇒★答えが 字の マスは 上の `_答えは字か` で もう 外れて います★ */
+  var 裸 = 字.replace(/[^0-9.eE+-]/g, '');
+  if (裸 === '') return false;
+  var n = Number(裸);
+  return isFinite(n) && n === 0;
 }
 
 function _字の元(cell) {
@@ -2811,6 +2926,58 @@ var _打った答えは字か = false;
 
 function _答えは字か(cell) {
   return !!(cell && cell.d字);
+}
+
+/* ══ ★★横の 揃え方の 既定★★ ══（2026-09-21）
+     ★★なぜ 要るか★★
+       実Excel の 絵と 並べて 初めて 見えました
+       （`docs/measured/e/jitsu-excel-kazari3-2026-09-21.png`・経営者1 が 撮った 物）
+       ★実Excel は 数を 右に 寄せます★。うちは ★全部 左★ でした。
+       ⇒`var align = cell.align || 'left'` ＝ ★既定が いつも 左★
+       ⇒★★数が 13/13 でも 絵を 並べるまで 分かりませんでした★★
+     ★★実測した 事★★（上の 絵）
+       数（3 / 4 / 25.0% / 1 2 3 / 4 5 6）... ★右★
+       字（abc / abc! / kazari no tame no musubi）... ★左★
+     ★★真偽と 誤りは 中央★★（2026-09-21 経営者1 が 実Excel で 実測）
+       紙 `docs/measured/golden-jitsu-excel-yoko-soroe-2026-09-21.tsv`
+       数 123 ... ★右★（左の 余り 176／右の 余り 5）
+       字 abc ... ★左★（0／181）
+       `=TRUE()` `=FALSE()` ... ★中央★（73/78・68/71）
+       `=1/0` `=NOSUCHFN()` ... ★中央★（58/65・52/57）
+       `=DATE(2024,1,1)` ... ★右★（99/5）
+       ★★設定を 見ても 分かりません★★
+         `HorizontalAlignment` は ★8つ とも 1（General）★ でした
+         ⇒★絵に して 字の 点の 左右の 余りを 数えた 物★です
+     ★★まだ 測って いない 事★★（★だから 触りません★）
+       ・縦の 揃え ／ 折り返し ／ 回転
+       ・★書式を 付けた 真偽・誤り★ ／ 列の 幅を 変えた 時
+       ・★繋げた マスの 中の 寄り★
+     ★お客さんが 自分で 選んだ 揃えは そのまま★（`cell.align` が 在れば そちら） */
+function _既定の横揃え(cell) {
+  if (!cell) return 'left';
+  if (_答えは字か(cell)) return 'left';            /* ★式の 答えが 字★ */
+  var d = cell.d;
+  if (d !== undefined && d !== null && d !== '') {
+    var t = String(d);
+    if (t.charAt(0) === '#') return 'center';      /* ★誤り＝中央★（実測） */
+    var u = t.toUpperCase();
+    if (u === 'TRUE' || u === 'FALSE') return 'center';  /* ★真偽＝中央★（実測） */
+    if (cell.f) return 'right';                    /* 式で 字で ない ⇒ 数 */
+  }
+  /* ★★溢れた 先の マスは `v` を 持ちません★★（2026-09-21 実測）
+       `js/book-open.js` は 溢れた 先を `cell.d` だけに して `cell.v` を 空に します。
+       ⇒`typeof cell.v === 'number'` が false ⇒ ★左の まま★ でした。
+       ⇒実Excel の 絵と 並べて 見つけました
+         （C1 の 1 は 右／C2 C3 の 2 3 が 左＝★同じ 列で 揃いが 割れて いた★）
+       ⇒★溢れの 印が 在る マスは 式の 答え★＝お客さんが 打った 字では ありません
+       ⇒★だから `d` が 数として 読めるなら 数と 見ます★
+     ★打った 字とは 区別して います★＝印が 無い マスには この 道を 通しません
+       （`123` と 打った 字は 左の まま＝実Excel も そう） */
+  if (cell[溢れの印] || cell[台の溢れの印]) {
+    var e = String(cell.d === undefined || cell.d === null ? '' : cell.d).trim();
+    if (e !== '' && isFinite(Number(e))) return 'right';
+  }
+  return (typeof cell.v === 'number') ? 'right' : 'left';
 }
 
 /* ★幅が 足りない 時の `#####`（2026-09-11）★
@@ -2842,17 +3009,49 @@ function _数が入らないか(raw, display, w) {
 }
 
 function _入る字数(w, raw, fmt) {
+  /* ★★この 関数の 中は まるごと 「本の 既定の 字」で 測ります★★（2026-09-26）
+       ★1回 間違えました★ ... 初めは `一文字` の 所だけ 既定の 字に しました
+         ⇒★効きませんでした★（見張りで 実測＝桁が 1つも 変わらない）
+         ⇒因 ... ★下の `測る()` が そのマスの 字で 測り直す★
+         ⇒★始めの 見当だけ 直しても 詰め直しで 元に 戻ります★
+       ⇒★だから 頭で 字を 替えて 尻で 必ず 戻します★
+       ★描く 字は 変えません★ */
   try {
     var 使える = w - マスの余白;
     if (!(使える > 0)) return 1;
-    var 一文字 = ctx.measureText('0').width;
+    /* ★物差しは 自分の canvas★＝`ctx` を 触りません（上の 断りを 見て ください） */
+    var 物 = _物差しの筆();
+    if (!物) return GEN_枠;
+    /* ══ ★★1文字ぶんの 幅は 「本の 既定の 字」で 測ります★★ ══（2026-09-26）
+         ★★何が 起きて いたか（経営者1 の 実測・実Excel を 物差しに）★★
+           実物の 1マス（`General`・列の 幅 59・★そのマスの 字は 9ポイント★）
+             実Excel ... ★7字★（`19705.6`）
+             うち ..... ★9字★（`19705.567`）
+           ★列の 幅は 1つも ずれて いません★（44.25点 × 96/72 ＝ 59 ＝ `cW(7)`）
+           ⇒★違うのは 1文字ぶんの 幅★ ... 実Excel 8.67 ／ うち 6.56★
+         ★★訳★★
+           Excel の 列の 幅は ★「標準の 字で 何文字 入るか」★ で 決まって います。
+           ＝★物差しは 本の 既定の 字＝そのマスの 字では ありません★
+           ＝実物で 裏が 取れます … `.ColumnWidth 6.81` ／ `.Width 44.25点`
+             ⇒44.25 ÷ 6.81 ＝ ★6.50点/字★ ⇒ × 96/72 ＝ ★8.67ドット★
+             ⇒★経営者1 が 実Excel から 出した 8.67 と 一致★
+           ⇒★★だから 数を 決め打ちせず 本の 既定の 字から 出します★★
+         ★★変わるのは この 1マスだけ★★（経営者1 の 実測）
+           「標準」書式の マス ★2,082個（式 554 ＋ 式でない 1,528）★ を 数えて
+           1字の幅を 8.0〜9.0 の どれに しても ★変わるのは 1マスだけ★
+           ⇒★合って いる 分を 壊しません★
+         ★桁を 決める 時だけ 使います★＝★描く 字の 大きさは 変えません★
+         ★見張り★ tests/hyou-no-kihon-no-ji.test.mjs */
+    var 一文字 = 物.measureText('0').width;
     if (!(一文字 > 0)) return GEN_枠;
     var n = Math.floor(使える / 一文字);
     if (n < 1) n = 1;
     if (n > GEN_枠) n = GEN_枠;
     var 測る = function (k) {
       var t = fmtForDisplay(raw, fmt, k);
-      return ctx.measureText(String(t)).width;
+      /* ★毎回 字を 入れ直します★＝`fmtForDisplay` が 何かを 触っても 効かない ように */
+      物.font = _既定の字体の字(scale);
+      return 物.measureText(String(t)).width;
     };
     /* ★入るなら 増やす（★上限 GEN_枠★）★ */
     var 回 = 0;
@@ -3038,7 +3237,16 @@ function _溢れ直しの中身(sheetIdx, data) {
   return 直した;
 }
 
-function recalcSheet(sheetIdx, data) {
+/* ★★`合わせ済み` ･･･ 呼ぶ 側で もう 台を 合わせて ある★★（2026-09-25）
+     ★★測った 数（司さんの 実物・webkit・3回・中ほど）★★
+       `recalcSheet` を 板 15枚に 呼ぶと ★22,616 ms★
+       ★その うち 計算し直した マスは 0個★（空の 「だけ」を 渡して 測りました）
+       `_台を全部合わせる` を 外すと ★1,609 ms★（＝★21,007 ms が これ★）
+     因 ＝ `_台を全部合わせる` は ★中で 15枚 ぜんぶ 合わせます★
+          それを `recalcSheet` が ★板ごとに 呼びます★
+          ⇒★★15 × 15 ＝ 225回 合わせて いました（要るのは 1回）★★
+     ⇒★束で 回す 所は 先に 1回 合わせて これを 渡します★ */
+function recalcSheet(sheetIdx, data, 合わせ済み) {
   if(!hf) return;
   /* ★★1つの マスで 止まると 後ろの マスが 全部 古い ままに なります★★（2026-09-18）
        ★実物の ブラウザで 出ました★ … `=CONVERT(,"m","cm")` を 打つと
@@ -3061,7 +3269,7 @@ function recalcSheet(sheetIdx, data) {
     if (typeof ShikiItaAwase !== 'undefined' && typeof _台の板を得る === 'function') {
       _板 = _台の板を得る();
       if (_板) {
-        _台を全部合わせる(_板);
+        if (!合わせ済み) _台を全部合わせる(_板);
         _板名 = _台の板名(sheetIdx);
         _板.板(_板名);                  /* ★今 いる 紙★ */
       }
@@ -3101,6 +3309,13 @@ function recalcSheet(sheetIdx, data) {
         } catch (e) { 台答 = null; 台溢れ = null; }
       }
       /* ★ここは cell.f[0]==='=' を 通った後＝必ず 式のセル★ */
+      /* ══ ★★計算し直したら 「書式を 掛ける 前の 数」は 捨てます★★ ══（2026-09-25）
+           `js/book-open.js` が 付けた `書式前の数` は ★本に 保存されて いた 答え★ です。
+           ここで 答えが 変わる ので ★そのまま 残すと 古い 数で 0 か 判じます★。
+           ⇒★保存値 0 だが 計算し直すと 5 の マスを 「0」と 見て 隠す★ 事に なります。
+           ⇒★だから 捨てます★＝`_ゼロを隠すか` は 下の 字の 読み方に 落ちます。
+           ★見張り★ tests/zero-wo-kakusu-webkit.mjs（★打ってから も 見ます★） */
+      if (cell.書式前の数 !== undefined) delete cell.書式前の数;
       cell.d = (jsResult!==null) ? jsResult
              : (台答 !== null) ? 台答.字
              : _hfGetDisplay(sheetIdx, r, c, true);
@@ -7075,7 +7290,7 @@ function _renderPass() {
     ctx.fillStyle=cell.bgColor||C_CELL_BG;
     ctx.fillRect(x,y,w,h);
     var raw=_字の元(cell);
-    if(raw){
+    if(raw && !_ゼロを隠すか(cell, raw)){   /* ★結合した マスも 同じ 1本で 判じます★ */
       /* ★★結合した マスも ふつうの マスと 同じ 道を 通す（2026-09-10）★★
          ★前は `String(raw)` で 生の 値を そのまま 出して いました★
            =1/3               ふつう 0.333333333 ／ ★結合 0.3333333333333333★
@@ -7105,7 +7320,7 @@ function _renderPass() {
       if (!_答えは字か(cell) && _数が入らないか(raw, display, w)) display = _井桁で埋める(w);   /* ★書式付きも 同じ（2026-09-11）★ */
       ctx.fillStyle=cell.color||C_CELL_TXT;
       ctx.textBaseline='middle';
-      var align=cell.align||'left';
+      var align=cell.align||_既定の横揃え(cell);   /* ★既定は 実Excel に 合わせる（数＝右）★ */
       /* ★上下の位置（valign）★ 2026-08-29＝リボンの『上揃え/上下中央/下揃え』が 効く様に した。
          それまで y+h/2 の 決め打ちで、★押しても 何も 変わらない ボタン★に なる所だった。
          ★既定は 中央★＝実Excel 16.0（日本語版）で 実測した。
@@ -7218,6 +7433,69 @@ function コメントの印を描く(r, c, x, y, w){
   return 1;
 }
 
+/* ══ ★★字は 隣が 空なら はみ出す（実Excel と 同じ）★★ ══（2026-09-24）
+     ★★司さんの 言葉★★
+       「★読み込んだ ファイル 見切れとん とかも 自動で 調整しろ★」
+       「★は？ Excel内で 見切れてない とこが 見切れとるけん いよんやろが★」
+     ⇒★Excel から 外れろ では ない★＝★Excel に 合って いない＝不具合★。
+
+     ★★何が 起きて いたか（実測 2026-09-24）★★
+       司さんの 実物（板 15枚・19,254マス）を お客さんの 道で 開いて 数えた:
+         ★字が 切れて いる 171マス★ ／ ★★その 171マス とも 右隣が 空★★
+       ＝★実Excel なら 1つ 残らず はみ出して 全部 見えて いる 所★。
+
+     ★★因★★ ... 描く 前に ★マスの 四角で 必ず 切って いた★
+       `ctx.rect(x+1,y,w-2,h); ctx.clip();`
+       ＝すぐ 下の 行に 「★文字は はみ出す（実Excel と 同じ）★」と 書いて あるのに、
+         ★★その 上の 切り取りが 先に 効いて いました★★。
+       ＝★覚書きは 正しく、字が そう なって いなかった★。
+
+     ★★実Excel の 決まり★★（はみ出す 向きは ★揃え★ で 変わる）
+       左ぞろえ ... ★右へ★ はみ出す（右隣が 空の 間だけ）
+       右ぞろえ ... ★左へ★ はみ出す
+       中央 ....... ★両方へ★
+       ★★はみ出さない 物★★
+         ・★数★（入らなければ `####`＝この 関数を 通りません）
+         ・★折り返し(wrap)を 付けた マス★＝Excel も 行を 増やして 収めます
+         ・★結合した マス★＝もう 広がって います
+     ★隣に 何か 在れば そこで 止めます★＝★重ねて 描きません★
+ */
+function _はみ出せる範囲(r, c, x, w, align, 字幅, 数か, cell) {
+  var 箱 = { x: x, w: w };
+  if (数か) return 箱;                       /* ★数は `####` に する＝はみ出さない★ */
+  if (cell.wrap) return 箱;                  /* ★折り返しは 行を 増やす★ */
+  if (cell.mergeEnd || cell.merged) return 箱;
+  if (!(字幅 > w - マスの余白)) return 箱;   /* ★入って いる＝はみ出す 必要が 無い★ */
+  var 空か = function (rr, cc) {
+    if (cc < 0) return false;
+    var 隣 = getCell(rr, cc);
+    if (!隣) return true;
+    if (隣.merged || 隣.mergeEnd) return false;
+    var v = 隣.v, d = 隣.d;
+    return (v === undefined || v === null || v === '')
+        && (d === undefined || d === null || d === '');
+  };
+  /* ★右へ★ */
+  if (align !== 'right') {
+    var cc = c + 1;
+    while (箱.w - マスの余白 < 字幅 && 空か(r, cc) && colX(cc) < wrapW) {
+      var ww = cW(cc);
+      if (!(ww > 0)) break;
+      箱.w += ww; cc++;
+    }
+  }
+  /* ★左へ★ */
+  if (align === 'right' || align === 'center') {
+    var c2 = c - 1;
+    while (箱.w - マスの余白 < 字幅 && 空か(r, c2) && c2 >= 0) {
+      var w2 = cW(c2);
+      if (!(w2 > 0)) break;
+      箱.x -= w2; 箱.w += w2; c2--;
+    }
+  }
+  return 箱;
+}
+
 function drawText(r,c){
   var x=colX(c),y=rowY(r),w=cW(c),h=rH(r);
   /* ★隠れている行・列には 字を 描かない★
@@ -7257,6 +7535,7 @@ function drawText(r,c){
      ★数を 持たない マス（式の 答え など）は 今まで 通り d★ */
   var raw = _字の元(cell);
   if(!raw) return;
+  if (_ゼロを隠すか(cell, raw)) return;   /* ★ゼロを 隠す 板＝実Excel と 同じく 何も 描かない★ */
   /* ★★字を 作る 前に 字体を 決める（2026-09-11）★★
      ★幅を 字数に 直すには ★今の 字で「0」1文字の 幅を 測る★ 必要が 在ります★
      ⇒ 前は ★字を 作った 後★に `ctx.font` を 決めて いたので、
@@ -7305,7 +7584,7 @@ function drawText(r,c){
   }
 
   // 文字揃え
-  var align = cell.align||'left';
+  var align = cell.align||_既定の横揃え(cell);   /* ★既定は 実Excel に 合わせる（数＝右）★ */
 
   ctx.textBaseline='middle';
   ctx.save();
@@ -7313,7 +7592,21 @@ function drawText(r,c){
      （2026-08-30 実ブラウザで 「売上」の 字に ▼ が 重なって 読めなかった）
      ★DOMに 在る≠読める★ */
   var _印の幅 = 表の見出しか(r,c) ? (見出しの印の場所(x,y,w,h).w + 6) : 0;
-  ctx.rect(x+1,y,Math.max(1,w-2-_印の幅),h); ctx.clip();
+  /* ★★切り取る 四角は 「マス」では なく 「はみ出せる 範囲」★★（2026-09-24）
+       ★入って いれば これまでと 1点も 変わりません★（同じ 四角が 返ります）。
+       ★入らない 字だけ★ 右（左）の 空いた マスまで 伸びます。 */
+  var _数か = !_答えは字か(cell) && _数が入らないか(raw, display, w);
+  var _箱 = _はみ出せる範囲(r, c, x, w, align, ctx.measureText(String(display)).width,
+    (typeof raw === 'number') || _数か, cell);
+  /* ★★`beginPath()` を 先に 呼びます★★（2026-09-24 ここで 1つ 見つけました）
+       `ctx.rect()` は ★今の 道に 足す★ 物で、`clip()` は ★道 全部の 足し合わせ★ で 切ります。
+       ⇒前の 描き物（コメントの 印 など）の 道が 残って いると
+         ★★切り取る 形が その時々で 変わります★★（＝★切れたり 切れなかったり★）。
+       ⇒実際 2026-09-24 に 小さい 材料では はみ出し、
+         司さんの 実物では ★171マスが 切れて★ いました。
+       ⇒★道を 空に してから 四角を 置きます★＝★いつも 同じ 形で 切る★ */
+  ctx.beginPath();
+  ctx.rect(_箱.x+1,y,Math.max(1,_箱.w-2-_印の幅),h); ctx.clip();
   /* ★文字の 向き（ホーム→配置→方向）★＝実Excelの 数と 同じ（0/45/-45/90/-90/縦書き）
      回した後は ★真ん中ぞろえ★で 描く（回すと 左ぞろえは 意味を なさない）。 */
   var _向き = cell.向き;
@@ -9619,6 +9912,15 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:18px 20px 12px;border-bottom:1px solid #D4EDE1;">
       <div style="font-size:16px;font-weight:700;color:#2E7D54;">書き出す前に確かめてください</div>
       <div id="diffHead" style="font-size:13px;color:#333333;margin-top:6px;line-height:1.6;"></div>
+      <!-- ★★どこを 触ったかを 1文で★★（2026-09-22）
+           ＝`DiffPreview.文(plan)` が 作ります（言葉は ★lib の 1か所だけ★）
+           ＝「計算!A1 を 3 から 42 に しました」＝★マスと 前後の 値★
+           ⇒★実Excel で そのまま 突き合わせられる 形★（経営者1 の 注文・09-21） -->
+      <div id="diffBun" class="diffBun"></div>
+      <!-- ★★何が 組まれて いるかを 1文で★★（2026-09-22）
+           ＝`HonNoNakami.一文(数)`＝「板が N枚／関数が N種類（N回）／マクロが N本」
+           ★「分かりません」を 飲み込みません★＝読めて いない 物は そう 書きます -->
+      <div id="diffNakami" class="diffBun" style="font-weight:400;"></div>
       <!-- ★書き出す名前を先に出す（全アプリの決まり）。既定は開いた時と同じ名前。
            同じ名前だと ★書き出し先で元と並ぶ★ので、名前を見せて迷わせない。
            ★直せるようにするのは次のコミット（今回は出すだけ）★ -->
@@ -10449,10 +10751,56 @@ function setCell(r,c,v,noUndo){
          ★計算シートしか見ずに直すと 6か所（売上表!E1 = 1,298,210 のまま）★
        ＝ #ERROR は出ない。★合計が古いまま黙って保存される★（527,000→186,000 と同じ型）
      ★触る前に控えを取る★のが唯一の直し方。開くだけなら今までどおり軽いまま。 */
+  /* ★★お客さんが 1マスでも 打ったら いつも通りに 戻します★★（2026-09-25）
+       ＝★止めて いるのは 「開いた 直後」だけ★
+       ＝★打った 後に 計算しないのは 別の 話（それは しません）★ */
+  /* ══ ★★控えを 取る 間は まだ 「計算しない」の ままに します★★ ══（2026-09-25）
+       ★★測った 事★★
+         この 下の 繰り返し（板 15枚を 台に 流す）で ★1打ち目に 23.7秒 画面が 固まって いました★
+         （`docs/measured/hakaru-1uchi-me-no-machi.mjs` ･･･ ★絵は 1枚しか 出ません★）
+       ★★なぜ 23.7秒 も かかるか★★
+         `loadSheetIntoEngine` は 流した 後に ★その 板を 計算し直します★。
+         ⇒★15枚 全部を 計算し直して いました★（87%が `lib/shiki-hyou.js`）
+       ★★そして その 計算し直しは 「要らない」 どころか 「悪い」★★
+         ＝★保存された 答えは 実Excel 自身が 書いた 物★
+         ＝★うちが 計算し直すと 2,911個 違って いました★（経営者1 の 実測）
+         ⇒★上書きすると 実Excel から 遠ざかります★
+       ★★だから 控えを 取る 間は 旗を 立てた ままに します★★
+         ＝流すのは する（★台が 他の 板の 式を 知らないと 打った 時に 直せない★）
+         ＝★計算し直しは しない★
+         ⇒その 後で 旗を 下ろす ので ★打った マスの つられる 所は いつも通り 直ります★
+       ★見張り★ tests/hiraita-toki-keisan-webkit.mjs（★1マス 打つと 999 → 20★） */
   if (!_baselineTaken && typeof BookOpen !== 'undefined' && BookOpen.isOpened()) {
     _baselineTaken = true;
     for (var _bi = 0; _bi < sheets.length; _bi++) loadSheetIntoEngine(_bi);
+    /* ══ ★★ここで 1回だけ 台を 合わせて 全部 計算し 控えを 取り直します★★ ══（2026-09-25）
+         ★★なぜ 要るか（★実物で 出ました★）★★
+           控えは ★「うちの 台から 見た 今の ファイル」★ で なければ なりません。
+           開いた 直後に 計算しなく なった ので 控えが ★「本に 保存された 値」★ に なり、
+           ⇒1打ち目の 後に 計算すると ★うちの 答えが 全部 「客が 変えた」に 数えられました★
+           ⇒★窓に 「この3044か所を直して 書き出す」と 出ました★（実際に 書くのは 1個）
+           ⇒`.xlsx` では ★本当に 81個 書き込まれました★（見張りで 実測）
+         ★★「計算の 後で 毎回 取り直す」では 駄目です★★
+           ＝★つられて 変わった 分まで 消えます★
+           ＝別の 板の 合計が ★古いまま 保存されます★（`tests/diff-preview.test.mjs` が 捕まえました）
+         ⇒★★だから 「打つ 前に 1回」だけ 取り直します★★
+           ＝★ここは まだ 旗が 立って いて お客さんは 1マスも 打って いません★
+           ＝この 後 `_計算を始める('打った')` で 旗が 下ります
+         ★★台を 合わせるのは 1回だけ★★＝★225回 → 1回（21秒の 正体）★
+         ★見張り★ tests/mado-no-kazu-to-kaita-kazu-webkit.mjs ／ tests/diff-preview.test.mjs */
+    var _合わせた = false;
+    try {
+      if (typeof ShikiItaAwase !== 'undefined' && typeof _台の板を得る === 'function') {
+        var _先板 = _台の板を得る();
+        if (_先板) { _台を全部合わせる(_先板); _合わせた = true; }
+      }
+    } catch (e) { _合わせた = false; }
+    for (var _bj = 0; _bj < sheets.length; _bj++) {
+      if (typeof recalcSheet === 'function' && sheets[_bj]) recalcSheet(_bj, sheets[_bj].data, _合わせた);
+    }
+    _控えを取り直す();
   }
+  _計算を始める('打った');
   // 全角→半角正規化（日本語IMEキーボード対応）
   if(v && typeof v==='string'){
     v = v.replace(/[！-～]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
@@ -12238,12 +12586,26 @@ function 数式の表示を切り替える(){
 /* ★再計算★（Excel F9＝すべて／Shift+F9＝このシート）*/
 function すべて再計算(){
   for(var i=0;i<sheets.length;i++) recalcSheet(i, sheets[i].data);
+
   if(typeof 計算していない印 === 'function') 計算していない印(false);
   render(); updateBar();
   if(typeof ウォッチを描く === 'function') ウォッチを描く();
 }
+/* ══ ★★計算し直した 後は 控えを 取り直す★★ ══（2026-09-25）
+     ★取り直さないと うちの 答えが 全部 「客が 変えた」に 数えられます★
+     実測 ･･･ ★1マス 打っただけで 窓に 「3044か所」と 出ました★（実際に 書き込まれたのは 1個）
+     ★`_editedCells` ＝ お客さんが 打った マス＝★ここは 残します★
+     ★見張り★ tests/mado-no-kazu-to-kaita-kazu-webkit.mjs */
+function _控えを取り直す(){
+  /* ★板を 選ぶ 口は 作りません★＝★呼ぶ 所が 1つ しか 無い★
+     （2026-09-25 `だけ` を 足したら `unused-param` が ★誰からも 渡されない 口★ と 赤に しました。
+       ★天井は 上げず 口を 外しました★） */
+  if (typeof BookOpen === 'undefined' || !BookOpen.rebaseSheet) return;
+  for (var _ri = 0; _ri < sheets.length; _ri++) BookOpen.rebaseSheet(sheets[_ri], _editedCells);
+}
 function このシートを再計算(){
   recalcSheet(activeSheet, sheets[activeSheet].data);
+
   render(); updateBar();
 }
 
@@ -17244,7 +17606,13 @@ function switchSheet(idx){
      他のシートを直した結果がこのシートの合計に効いてくる。やらないと
      ★開いた時の古い合計が そのまま残る★（4月を直して まとめへ戻ると 429,000 のままだった）。
      ここでは控えを取り直さない＝客の操作で変わった分は「変わった」と数えて保存に載せる。 */
-  if (typeof recalcSheet === 'function' && sheets[idx]) recalcSheet(idx, sheets[idx].data);
+  /* ★開いた 直後で 理由が 無ければ 計算しません★（`_開いた直後は計算しない` の 断りを 見る） */
+  if (!_開いた直後は計算しない && typeof recalcSheet === 'function' && sheets[idx]) recalcSheet(idx, sheets[idx].data);
+  /* ★★計算し直した 後は 控えを 取り直します★★（2026-09-25）
+       ＝★取り直さないと うちの 答えが 全部 「客が 変えた」に 数えられます★
+       ＝実測 ･･･ ★1マス 打っただけで 窓に 「3044か所」と 出ました★（実際は 1個）
+       ＝★`_editedCells` ＝ お客さんが 打った マス＝ここは 残します★ */
+
   updateBar(); render();
   /* ★シートを変えたら 切り替えの帯も 作り直す★（人▼・月▼は そのシートの表から作る）
      ＝作り直さないと ★前のシートの人が 並んだまま★になる。 */
@@ -18586,8 +18954,23 @@ function _ensureXlsx(){
        実物の式 11,669本が 1本残らず #ERROR になる（2026-08-18 実測）。
        ★zip-surgeon より後・book-open.js より前★（book-open.js がこれを呼ぶ） */
     .then(function(){ return _loadScript('lib/table-refs.js' + v); })
+    /* ★マスの 飾り（太字・字の色・塗り・罫線）を 自前で 読む★（2026-09-21）
+       ＝借り物は ★塗りしか くれません★（`Borders` は 10個 とも `{}`）
+       ★zip-surgeon / xlsx-edit より 後・book-open.js より 前★（book-open.js が 呼ぶ） */
+    .then(function(){ return _loadScript('lib/xlsx-kazari.js' + v); })
+    /* ★図形（判子）を 自前で 読む★（2026-09-21）＝借り物は 図形を くれません */
+    .then(function(){ return _loadScript('lib/xlsx-zukei.js' + v); })
     .then(function(){ return _loadScript('lib/diff-preview.js' + v); })
     .then(function(){ return _loadScript('js/book-open.js' + v); });
+  /* ★★断られた 覚えを 残しません★★（2026-09-25）
+       上の `if (_xlsxLoading) return _xlsxLoading;` は ★1度 作った 約束を 使い回します★。
+       ⇒1度 断られると ★その 断りが ずっと 返り続けます★
+       ⇒★★ネットが 直っても 画面を 開き直すまで 二度と 開けません★★
+       ⇒★断られたら 覚えを 捨てます★＝次に 押した 時は もう一度 読みに 行く
+       ★自分が 覚えさせた 物だけ 捨てます★＝後から 別の 約束に なって いたら 触らない */
+  (function (約束) {
+    約束.catch(function () { if (_xlsxLoading === 約束) _xlsxLoading = null; });
+  }(_xlsxLoading));
   return _xlsxLoading;
 }
 
@@ -19691,14 +20074,46 @@ function _pushSheetToEngine(idx, pushed){
   var deps = _sheetsReferencedBy(idx);
   for(var i=0;i<deps.length;i++) _pushSheetToEngine(deps[i], pushed);
 }
+/* ══ ★★開いた 直後は 計算しない（理由が 1つも 無い 本だけ）★★ ══（2026-09-25）
+     ★★なぜ★★
+       司さんの 実物は 開くのに ★23秒★。★読み込みは 1〜2%★
+       ★残りは 「開いた 直後の 計算」★（経営者1 の CPU の 記録・87%が `lib/shiki-hyou.js`）
+       ★実Excel は 保存済みの 答えを 持って いて、開いた だけでは 計算しません★
+       ⇒★★「計算する 理由が 1つも 無い 本」は 計算しません★★
+       ⇒★これは 「Excel と 同じに する」事です★（司さんの 決め イ）
+     ★★理由（`js/book-open.js` が 数えて 渡します）★★
+       ㋐開いた 日で 答えが 変わる 関数（TODAY NOW RAND OFFSET INDIRECT CELL INFO ･･･）
+       ㋑式は 在るのに 答えが 保存されて いない マス
+       ㋓「開いたら 全部 計算しろ」の 印（`.xlsb` 記録157 の 26バイト目 ビット0）
+       ⇒★1つでも 当たれば 計算します★／★印が 読めなかった 時も 計算します★
+       ⇒★速さより 答えが 大事★
+     ★★止めるのは 「開いた 直後」だけ★★
+       ＝★お客さんが 1マスでも 打った ら すぐ いつも通りに 戻ります★
+       ＝★打った 後に 計算しないのは 別の 話（それは しません）★
+     ★★正直に 書きます★★
+       ＝★重い 仕事が 消える のでは なく 「最初の 1打ち」に 移ります★
+       ＝★見るだけの お客さんは まるごと 速く なります★
+       ＝★すぐ 打つ お客さんは 待つ 所が 変わるだけ★ */
+var _開いた直後は計算しない = false;
+function _計算を始める(なぜ){
+  if(!_開いた直後は計算しない) return;
+  _開いた直後は計算しない = false;
+  if(window.console) window.console.log('[Exally] 計算を 始めます（' + (なぜ||'') + '）');
+}
+
 function loadSheetIntoEngine(idx){
   if(!hf || _engineLoaded[idx]) return;
   var pushed = [];
   _pushSheetToEngine(idx, pushed);
   /* ★流した物を全部 計算し直してから控えを取り直す★
      参照先が後から入るので、先に流したシートも計算し直す必要がある。 */
-  for(var i=0;i<pushed.length;i++){
-    if (typeof recalcSheet === 'function') recalcSheet(pushed[i], sheets[pushed[i]].data);
+  /* ★開いた 直後で 理由が 無ければ 計算しません★（上の 断りを 見て ください）
+     ＝★流すのは します★（台が 中身を 知って いないと 打った 時に 直せない）
+     ＝★止めるのは 「計算し直し」だけ★ */
+  if(!_開いた直後は計算しない){
+    for(var i=0;i<pushed.length;i++){
+      if (typeof recalcSheet === 'function') recalcSheet(pushed[i], sheets[pushed[i]].data);
+    }
   }
   for(i=0;i<pushed.length;i++){
     if (typeof BookOpen !== 'undefined' && BookOpen.rebaseSheet) BookOpen.rebaseSheet(sheets[pushed[i]]);
@@ -19752,10 +20167,49 @@ function onPickBookFile(el){
   el.value = '';                      // 同じファイルをもう一度選べるようにする
   if (f) openBookFile(f);
 }
+/* ══ ★★ファイルを 読めなかった 時（2026-09-25）★★ ══
+     ★★実測（お客さんの 道・実物）★★
+       同じ 本の 2つの 写しで 数えました:
+         `OneDrive` の 下 ....... ★24回中 15回 断られる★（私 10中6・経営者1 9/14）
+         `OneDrive` の 外 ....... ★13回中 0回★（私 3中0・経営者1 0/7）
+       断りの 字 ... `The object can not be found here.`（webkit）
+                     `The I/O read operation failed.`（chromium）
+       ＝どちらも ★選んだ 後に ファイルの 実体が 変わった★ 時に ブラウザが 出す 物。
+     ★★因は 断定しません★★
+       測ったのは ★「OneDrive の 下か 外か」だけ★ です。
+       ★「同期中だから」は まだ 測って いません★（経営者1 の 指摘）。
+       ⇒★★お客さんに 見せる 言葉に 因を 書きません★★＝
+         嘘の 因を 見せると ★直しようが 無く なります★。
+     ★★何を するか★★
+       ⑴★もう 2回 読み直す★（合わせて 3回）＝★断りは すぐ 返る★ ので 待たせません
+       ⑵それでも 駄目なら ★日本語で 「もう一度 押して ください」★
+       ⑶★読むだけ★＝1バイトも 書きません（やり直しても 元の ファイルは 変わりません） */
+function _ファイルを読めなかったか(err) {
+  if (!err) return false;
+  var 名 = String(err.name || '');
+  if (名 === 'NotFoundError' || 名 === 'NotReadableError') return true;
+  var 字 = String(err.message || err);
+  /* ★台が 読めない(``を読み込めません``)は ここに 入れません★＝別の 話（読み直しても 同じ） */
+  return /can ?not be found|cannot be found|I\/O read|could not be read/i.test(字);
+}
+/** ★★読めなかったら 読み直す★★（★回数は 決めて 出す★＝残り 2回） */
+function _本を読み直しながら開く(file, 残り) {
+  return BookOpen.openFile(file).catch(function (err) {
+    if (残り > 0 && _ファイルを読めなかったか(err)) {
+      _読み直した回数++;
+      return new Promise(function (r) { setTimeout(r, 300); })
+        .then(function () { return _本を読み直しながら開く(file, 残り - 1); });
+    }
+    throw err;
+  });
+}
+var _読み直した回数 = 0;   /* ★測る 為に 数える★（画面には 出しません） */
+
 function openBookFile(file){
   showToast('読み込んでいます…', 1200);
+  _読み直した回数 = 0;
   return _ensureXlsx().then(function(){
-    return BookOpen.openFile(file);
+    return _本を読み直しながら開く(file, 2);   /* ★合わせて 3回まで★ */
   }).then(function(res){
     sheets = res.sheets;
     /* ★マクロが入っているかは 提案でも使う★（開いた時に こちらから 代わりの道を言う） */
@@ -19765,6 +20219,34 @@ function openBookFile(file){
     控えへ写す((BookOpen.current() || {}).name || '（名前なし）', _editedCells, 0);
     _editedCells = {};   // ★別のファイルを開いたら 前のファイルの「直した所」を持ち越さない★
     _baselineTaken = false;
+    /* ★★開いた 直後に 計算が 要るか★★（`js/book-open.js` が 数えて 渡します）
+         ㋐日で 変わる 関数 ／ ㋑答えが 保存されて いない 式 ／ ㋓「全部 計算しろ」の 印
+         ⇒★1つでも 当たれば 計算します★／★分からない 時も 計算します★ */
+    var _訳 = res.計算の訳 || null;
+    _開いた直後は計算しない = !!(_訳 && _訳.要る === false);
+    if (window.console && _訳) {
+      window.console.log('[Exally] 開いた 直後の 計算 ... '
+        + (_開いた直後は計算しない ? '★しません★' : 'します')
+        + '（式 ' + _訳.式 + '本 ／ 日で変わる ' + _訳.日で変わる
+        + ' ／ 答えが無い ' + _訳.答えが無い
+        + ' ／ 全部計算の印 ' + _訳.全部計算の印
+        + ' ／ 外へ出る ' + _訳.外へ出る + '）');
+    }
+    /* ══ ★★外へ 出る 関数が 在る 本だけ お客さんに 訊きます★★ ══（2026-09-26）
+         ★★なぜ★★
+           `lib/formula-soto.js` の 頭 ･･･「もらった `.xlsx` の 式は ★式のまま★ 入る
+             ＝★開いた だけで 走る★」
+           ⇒★知らない 人の 本を 開いた だけで 外へ 通信します★
+           ⇒司さん 09-25「★おすすめで 直せ★」／経営者1 の 推し ⑶
+         ★★決め★★
+           ・★4つが 0個の 本では 何も 出しません★（★司さんの 実物は 0個★）
+           ・★1個でも 在れば 訊きます★／★答えるまで 出しません★
+           ・★断られたら `#N/A` に なります★（`lib/formula-soto-plug.js` の 門）
+         ★見張り★ tests/soto-wo-kiku-webkit.mjs */
+    if (window.FormulaSotoPlug && typeof FormulaSotoPlug.外へ出すを忘れる === 'function') {
+      FormulaSotoPlug.外へ出すを忘れる();   /* ★本を 開き直したら また 訊きます★ */
+    }
+    if (_訳 && _訳.外へ出る > 0) _外へ出してよいか訊く(_訳.外へ出る);
     selR1=selC1=selR2=selC2=0;
     _engineLoaded = {};
     // ★計算する側を作り直す（シートの名前と数が変わるため）★
@@ -19825,7 +20307,15 @@ function openBookFile(file){
     開いた知らせは済んだ('開いた');
   }).catch(function(err){
     _開いた知らせ = null;   /* ★開けなかった時は ためた物を 捨てる（後で 混ざって出ない）★ */
-    showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
+    /* ★★英語の 断りを お客さんに 見せません★★（2026-09-25）
+         `The object can not be found here.` は ★ブラウザの 言葉★ です。
+         ⇒★読めなかった 時だけ 日本語に します★（★因は 書きません★）。
+         ⇒それ以外の 断り（壊れた 本 など）は ★今まで 通り そのまま 出します★ */
+    if (_ファイルを読めなかったか(err)) {
+      showToast('ファイルを読めませんでした。もう一度 押して ください。', 6000, 'warn');
+    } else {
+      showToast('開けませんでした：' + ((err && err.message) || err), 5000, 'warn');
+    }
   });
 }
 (function(){
@@ -19884,6 +20374,130 @@ function _浮かぶ物を数える(){
   }
   return 出;
 }
+/** ★★本に 何が 組まれて いるかを 数える★★（2026-09-22・司さんの ア）
+ *  ★★自前で 解きません★★＝`lib/hon-no-nakami.js` に 渡すだけ
+ *    関数 ... `ExcelVersion.functionsIn`（式 ⇒ 関数名）
+ *    マクロ ... `_マクロ`（`BookOpen.openFile` が 読んだ 物を そのまま 持って います）
+ *  ★★`null` と `{ok:false}` を 混ぜません★★
+ *    `null`      ＝★本に マクロの 部品が 無い★（「ありません」と 言い切れる）
+ *    `{ok:false}` ＝★入って いるが 読めなかった★（「ありません」と 言っては いけない）
+ *  ★★ここの 取り出しは いま 2か所に 在ります★★（`js/mochikomi.js:76` と ここ）
+ *    ⇒★片方だけ 直すと 黙って ずれます★。台へ 移すよう 経営者1 に 頼んで あります。
+ *  ★台が 無ければ 何も 出しません★＝★「0本」と 嘘を 言わない★
+ */
+function _本の中身を数えた物(){
+  if (typeof HonNoNakami === 'undefined' || !HonNoNakami) return null;
+  var 読み = null, 見立て = null;
+  if (_マクロ) {
+    読み = _マクロ.読み || _マクロ;
+    見立て = _マクロ.見立て || null;
+  }
+  return HonNoNakami.本の中身を数える({
+    形: ((BookOpen.current() || {}).kind) || '',
+    sheets: sheets,
+    関数を拾う: (window.ExcelVersion && window.ExcelVersion.functionsIn) || null,
+    マクロの読み: 読み,
+    マクロの見立て: 見立て
+  });
+}
+/* ══ ★★外へ 出して よいかを 訊く 窓★★ ══（2026-09-26）
+     ★新しい 窓は 作りません★＝★保存の 窓（`diffOverlay`）を 使い回します★
+       （★作る前に 探せ＝押せる 窓が もう 1つ 在りました★）
+     ★★字は はっきり 書きます★★＝★「外へ 出ます」と 言わずに 訊かない★
+     ★答えるまで 出しません★＝門は `lib/formula-soto-plug.js` の `頼む` に 1か所 */
+function _外へ出してよいか訊く(何個){
+  var ov = document.getElementById('diffOverlay');
+  var head = document.getElementById('diffHead');
+  var body = document.getElementById('diffBody');
+  var go = document.getElementById('diffGo');
+  var cancel = document.getElementById('diffCancel');
+  if (!ov || !head || !body || !go || !cancel) return;   /* ★窓が 無ければ 訊きません＝出しません★ */
+  head.textContent = 'この本には 外へ つながる 式が ' + 何個 + 'か所 あります';
+  /* ★印（`data-yakusoku`）＝台帳 `lib/yakusoku-daicho.js` の `soto-kiku`★
+       ＝★お客さんに 約束して いる 字だから 印を 付けます★ */
+  body.innerHTML = '<div class="diffBun" data-yakusoku="soto-kiku">'
+    + '<b>計算すると インターネットへ つなぎます。</b>'
+    + 'WEBSERVICE ／ STOCKHISTORY ／ TRANSLATE ／ DETECTLANGUAGE の 4つです。<br>'
+    + 'つなぐと <b>この本の 中身が 相手に 届く 事は ありません</b>'
+    + '（住所は 式に 直に 書いた 字だけを 使います）。<br>'
+    + 'ただし <b>つないだ 事は 相手に 分かります</b>。<br><br>'
+    + '<span data-yakusoku="soto-kiku">つながないと その ' + 何個 + 'か所は <b>#N/A</b> に なります。</span>'
+    + '他の 所は そのまま 計算します。'
+    + '</div>';
+  go.textContent = 'つないで よい';
+  cancel.textContent = 'つながない';
+  var 済 = false;
+  function 決める(よいか){
+    if (済) return;
+    済 = true;
+    try {
+      if (window.FormulaSotoPlug && typeof FormulaSotoPlug.外へ出す === 'function') {
+        FormulaSotoPlug.外へ出す(よいか);
+        /* ★「よい」に なったら 止めた 覚えを 消して 取りに 行ける ように します★ */
+        if (よいか && typeof FormulaSotoPlug.覚えを消す === 'function') FormulaSotoPlug.覚えを消す();
+      }
+    } catch (e) { /* ★止めない★ */ }
+    ov.classList.remove('open');
+    ov.style.display = 'none';
+    go.onclick = null; cancel.onclick = null; ov.onclick = null;
+    /* ★★`typeof` で 守りません★★＝`notify` は 必ず 在る 物です
+         ＝守ると ★無い 日に 黙って 素通り★ します（見張り `tests/no-silent-optional.test.mjs`）
+         ＝`REQUIRED_FNS` にも 入って います（起動時に 数えます） */
+    {
+      notify(よいか
+        ? '<span class="toast-h">外へ つなぎます</span>' + 何個 + 'か所の 式が インターネットへ つなぎます。'
+        : '<span class="toast-h">外へ つなぎません</span><span data-yakusoku="soto-kiku">' + 何個 + 'か所は #N/A に なります（他は そのまま）。</span>',
+        4000);
+    }
+    /* ══ ★★「よい」に なったら その 式を 打ち直して 起こします★★ ══（2026-09-26）
+         ★★なぜ 計算し直すだけでは 効かないか（★探って 分かりました★）★★
+           台（HyperFormula）は ★前の 答えを 覚えて います★。
+           `isVolatile: true` を 付けても ★`recalcSheet` は 覚えを 読むだけ★ でした。
+           ⇒★許しを true に して 計算し直しても 答えは `#N/A` の まま★（実測）
+           ⇒★同じ 式を もう一度 打つと 台が 起きます★（実測＝覚えが 1件 増えた）
+         ⇒★★だから その 4つの 式だけ 打ち直します★★
+         ★打ち直すのは 「外へ 出る 式」だけ★＝★他の 式は 触りません★
+         ★見張り★ tests/soto-wo-kiku-webkit.mjs（★網の 口で 数えます★） */
+    if (よいか) {
+      var _外の名 = /\b(WEBSERVICE|STOCKHISTORY|TRANSLATE|DETECTLANGUAGE)\s*\(/i;
+      /* ★★上の 行の `\b` が 本物の バックスペース（0x08）に なって いました★★（2026-09-26）
+           ＝道具から 書いた 時に 逆斜線が 落ちて `/\x08(WEBSERVICE|...)/` に なって いた
+           ＝★`test()` が いつも false★＝★0個 打ち直した★＝★誤りも 出ない★
+           ⇒★だから `String(正規表現)` を 出して 「ためし」まで 出して 見つけました★
+           ⇒記憶「逆斜線の 逃がしは heredoc でも 便りでも 落ちる」＝★今日 3回目★ */
+      var _起こした = 0, _見た = 0;
+      try {
+        for (var _si = 0; _si < sheets.length; _si++) {
+          var _d = sheets[_si] && sheets[_si].data;
+          if (!_d) continue;
+          for (var _k in _d) {
+            var _c = _d[_k];
+            if (!_c || typeof _c.f !== 'string' || !_c.f) continue;
+            _見た++;
+            if (!_外の名.test(_c.f)) continue;
+            var _rc = _k.split(',');
+            if (hf && typeof _hfSid === 'function') {
+              hf.setCellContents({ sheet: _hfSid(_si), row: parseInt(_rc[0], 10), col: parseInt(_rc[1], 10) }, _c.f);
+              _起こした++;
+            }
+          }
+        }
+      } catch (e3) {
+        /* ★★黙って 飲みません★★＝★飲むと 「0個」の 訳が 分からなく なります★
+             （2026-09-26 ここで 1回 踏みました＝`catch` が 訳を 消して いました） */
+        if (window.console) window.console.warn('[Exally] 外へ 出る 式を 起こせません', e3 && e3.message);
+      }
+      if (window.console) window.console.log('[Exally] 外へ 出る 式を ' + _起こした + '個 打ち直しました'
+        + '（板 ' + sheets.length + '枚 ／ 見た 式 ' + _見た + '本）');
+      if (typeof すべて再計算 === 'function') { try { すべて再計算(); } catch (e2) { /* ★止めない★ */ } }
+    }
+  }
+  go.onclick = function(){ 決める(true); };
+  cancel.onclick = function(){ 決める(false); };
+  ov.onclick = function(e){ if (e.target === ov) 決める(false); };   /* ★外を 押したら つながない★ */
+  ov.style.display = '';
+  ov.classList.add('open');
+}
 function _askBeforeWrite(plan, fileName){
   return new Promise(function(resolve){
     var ov = document.getElementById('diffOverlay');
@@ -19892,6 +20506,11 @@ function _askBeforeWrite(plan, fileName){
     var go = document.getElementById('diffGo');
     var cancel = document.getElementById('diffCancel');
     head.textContent = DiffPreview.headline(plan, fileName);
+    /* ★★1文は lib に 訊きます★★＝画面で 作らない（言葉の 置き場は 1つ）
+       ★`typeof` で 守りません★＝無ければ 黙って 出なくなるのが 一番 見つけにくい */
+    document.getElementById('diffBun').textContent = DiffPreview.文(plan);
+    var 中身 = _本の中身を数えた物();
+    document.getElementById('diffNakami').textContent = 中身 ? HonNoNakami.一文(中身) : '';
     /* ★書き出す名前は「開いた時と同じ名前」が既定★（Excelの流儀に近い）。
         ★推奨の名前を作らない★＝中身から作ると 元のファイルと結び付かなくなる
         （請求書や明細とは事情が違う。2026-08-18 裁定）。
@@ -19923,13 +20542,48 @@ function _askBeforeWrite(plan, fileName){
        ・★「入りません」と はっきり★（「触っていません」では 通じない）
        ・★出来ない事の 横に 今 出来る事を 1行★
        ★typeof で 守らない★＝無ければ 黙って 出なくなる（一番 見つけにくい） */
+    /* ★★4つ目に 形を 渡します★★（2026-09-21）
+         ＝`.xlsx` / `.xlsm` は ★足した 板が 入る ように なりました★
+         ＝`.xlsb` は ★まだ★（`saveXlsb` は 別の 道）
+         ⇒★渡さないと 入る 物を 「入りません」と 言います★
+       ★★注は 呼び出しの 外に 書きます★★（2026-09-21 ここで 1回 踏みました）
+         ＝引数の 間に 注を 入れたら `tests/unused-param.test.mjs` が
+           ★「4つ 受けるのに 3つしか 渡して いない」と 誤報★ しました。
+         ＝あの 門は ★呼び出しの 字を 読んで 引数を 数えます★
+       ★★この 直しは 1度 消えました★★（2026-09-21）
+         ＝刻印の ぶつかりを `git checkout --ours` で 解いた 時に
+           ★この commit の book.html の 直しごと 落ちました★。
+         ＝★`unused-param` が 「4つ 受けるのに 3つ」と 言って 気づきました★ */
     var 入らない = Hairanai.入らない物を数える(
-      ((BookOpen.current() || {}).sheetNames) || [], sheets, _浮かぶ物を数える());
+      ((BookOpen.current() || {}).sheetNames) || [], sheets, _浮かぶ物を数える(),
+      ((BookOpen.current() || {}).kind) || '');
+    /* ★★詳しくは 畳みます★★（2026-09-22・司さんの ア）
+       ＝上に 1文、★ドロップダウンの 中に 1マスずつ★
+       ★★「入りません」は 畳みの 外★★＝★消える 事より 黙って 消える 方が 重い★
+         （2026-09-06 の 裁定②）⇒★開かないと 見えない 所に 置きません★ */
+    var 詳しく = '<details class="diffKuwashiku"><summary>詳しく（1マスずつ）</summary>'
+      + html + '</details>';
+    /* ★★何が 組まれて いるかも 同じ 畳みで★★（2026-09-22）
+         ＝`HonNoNakami.詳しく(数)` は ★行の 並びだけ★ を 返します（絵は こちらで 作る）
+         ＝★0件の 時も 畳みを 出します★＝★注に 「なぜ 0か」が 入って いる★
+           （「関数 0件」と 「数えて いない」は ★別物★・注で 分けて あります） */
+    if (中身) {
+      var 並び = HonNoNakami.詳しく(中身);
+      for (var n = 0; n < 並び.length; n++) {
+        var 段 = 並び[n], 行 = 段.行 || [];
+        詳しく += '<details class="diffKuwashiku"><summary>'
+          + _esc(段.見出し) + '（' + 行.length + '件）</summary>'
+          + (段.注 ? '<div style="color:#6B8F7D;padding:2px 0 6px;">' + _esc(段.注) + '</div>' : '')
+          + '<div>' + 行.map(function (x) {
+            return '<div style="padding-left:14px;">' + _esc(String(x)) + '</div>';
+          }).join('') + '</div></details>';
+      }
+    }
     if (入らない.件) {
       body.innerHTML = '<div class="hairanai">'
-        + _esc(Hairanai.言葉(入らない)).replace(/\n/g, '<br>') + '</div>' + html;
+        + _esc(Hairanai.言葉(入らない)).replace(/\n/g, '<br>') + '</div>' + 詳しく;
     } else {
-      body.innerHTML = html;
+      body.innerHTML = 詳しく;
     }
     go.textContent = DiffPreview.goLabel(plan);   // ★言葉は lib の1か所だけ★
     ov.style.display = 'flex';
@@ -19956,10 +20610,24 @@ function saveOpenedBook(){
      「開いたシートだけ計算する」ので、まとめのシートを開かずに保存すると
      ★他のシートを参照している合計が古いまま出る★（実際に 88,000 のままだった）。
      開く時に全部やると固まるが、★保存は1回きりなので ここで全部やる★。 */
+  /* ══ ★★但し 1マスも 打って いない お客さんには 計算し直しません★★ ══（2026-09-25）
+       上の 訳（まとめの 合計が 古いまま）は ★お客さんが 直した 後の 話★ です。
+       1回も 打って いない 本は ★保存された 答えが 実Excel 自身の 物★ なので
+       計算し直すと ★うちの 答えで 上書きして 実Excel から 遠ざかります★。
+         ＝経営者1 の 実測 ･･･ ★開いた だけの 画面は 654個中 654個 実Excel と 同じ★
+         ＝計算し直すと ★2,911個 違う★
+       ⇒★1打ちでも あれば 旗は 下りて いる ので いつも通り 全部 計算します★
+       ⇒★つまり 上の 訳は 1つも 壊して いません★
+       ★測り★ docs/measured/hakaru-fuda-wo-osu-to-kotae-ga-kawaru-ka.mjs --保存 */
   for (var i = 0; i < sheets.length; i++) {
     loadSheetIntoEngine(i);      // ★まだ開いていないシートは ここで流して控えも取り直す★
-    if (typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
+    if (!_開いた直後は計算しない && typeof recalcSheet === 'function') recalcSheet(i, sheets[i].data);
   }
+  /* ★★計算し直した 後は 控えを 取り直します★★（2026-09-25）
+       ＝★取り直さないと うちの 答えが 全部 「客が 変えた」に 数えられます★
+       ＝実測 ･･･ ★1マス 打っただけで 窓に 「3044か所」と 出ました★（実際は 1個）
+       ＝★`_editedCells` ＝ お客さんが 打った マス＝ここは 残します★ */
+
   /* ★ここで書き込まない。まず「何を書き込むか」を見せる（方針ver.6 の②）★
      ★数える場所は1か所★＝窓も書き込みも BookOpen.changedCells を使う。数え直さない。
      ★終わりまでの約束を返す★（返さないと「押した後どうなったか」を機械で確かめられない。
@@ -20004,8 +20672,17 @@ function saveOpenedBook(){
           どこ: (plan.rows || []).slice(0, 5).map(function(x){ return { 場所: x.where || x.場所 || '', 前: x.before, 後: x.after }; }) },
         outName, 0);
       _editedCells = {};                     // ★写してから「直した所」を空にする★
+      /* ══ ★★触れなかった 所が 在れば お客さんに 言います★★ ══（2026-09-25・経営者1 の ④）
+           ＝★答えが 字の 式（記録8）は 書き換えられません★
+           ＝★黙って いると お客さんは 「全部 直った」と 思います★
+           ＝記憶「ボタンの『出せます』と 押した後の 門は 同じ物を 見る」の 家
+           ⇒★何個 触れなかったか と 「Excel で 開くと 直る」を 書きます★ */
+      var 触れず = (res && res.触れなかった数) || 0;
+      var 触れず文 = 触れず ? '<span class="toast-n">★' + 触れず + 'か所は 形が 違う ので 触って いません'
+        + '（答えが 字の 式）。★Excel で 開くと 直ります★（開いたら 計算する 印を 立てました）</span>' : '';
       showToast('<span class="toast-h">' + plan.total + 'か所 直して 書き出しました</span>'
         + '<b>元のファイルは変わっていません</b>。同じ名前で1本 書き出しました。'
+        + 触れず文
         + '罫線・判子・グラフ・結合・列幅は触っていません。値だけ書き換えました。'
         + (log ? '<span class="toast-n">詰め方: 圧縮' + log.compressed + ' / 無圧縮' + log.stored
                  + (log.why ? '（' + log.why + '）' : '') + '</span>' : ''), 5000);
@@ -20216,6 +20893,13 @@ var REQUIRED_FNS = [
   'updateActionBtn', 'updateFormulaDisplay', 'updateMultiSelectBar',
   'initFormulaEngine', 'extractRefs', 'rebuildSheetTabs', 'switchSheet', 'loadSheetIntoEngine', 'quoteSheetRefs',
   'recalcSheet', 'convertFormula', 'forDisplay', 'fmtForDisplay', 'applyNumFmt', 'cfFormatAt',
+  /* ★★2026-09-26 に 足した★★＝★どちらも 「無かったら 壊れて いる」物です★
+       `_hfSid` ･･･ ★板の 番号を 台に 渡す 口★（無いと 外へ 出る 式を 起こせない）
+       ★`showToast` は 入れません★＝`window.showToast = notify` の 形で
+         ★この 見張りは `function 名` を 探す ので 「実体が 無い」と 出ます★
+       ⇒★だから 私の 側を `notify` に 直しました★（★在る 物を 呼ぶ★）
+       ⇒★`typeof` で 黙って 素通りさせません★（見張り `tests/no-silent-optional.test.mjs`） */
+  '_hfSid',
   /* ★お客さんの Excel の 版★ … 無いと AIへ 版が 届かず ★全員 365 扱い★に 戻る（2026-09-05） */
   'getBookVer',
   // exally-formula.js が持っている物（★読み込みに失敗したら計算そのものが動かない★）

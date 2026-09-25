@@ -156,6 +156,29 @@ try {
   try { if ($sh.Shapes.Count -ge 1) { $図名 = [string]$sh.Shapes.Item(1).Name } } catch { }
   $判3 = 'ok'; if ($図名 -ne 'hanko') { $判3 = '★違う★'; $欠け++ }
   $行.Add('図形の名' + "`t" + 'hanko' + "`t" + $図名 + "`t" + $判3)
+  # ══ ★★2026-09-21 足し ── ★図形の 位置と 大きさ★★ ══
+  #   ＝Exally1 が 「イ（実Excel と 全く 同じ 表示）」で ★判子を 画面に 出す★ 為に
+  #     ★これだけ 先に 要る★と 言って きた 物（Left / Top / Width / Height）
+  #   ★単位は ポイント★（1ポイント＝1/72インチ）＝★実Excel が そう 返します★
+  #   ★待つ 数は 書きません★＝★作った 時の 数を そのまま 写す 物★だから
+  #     （`tsukuru-tameshi-hiraku3-kazari-to-kobore3.ps1` は 320,20,60,60 で 置いて います）
+  $行.Add('#')
+  $行.Add('# ★★図形の 位置と 大きさ★★（単位＝ポイント）')
+  $行.Add('# 見た物' + "`t" + '数')
+  try {
+    $か = $sh.Shapes.Item(1)
+    $行.Add('図形 Left' + "`t" + [string]$か.Left)
+    $行.Add('図形 Top' + "`t" + [string]$か.Top)
+    $行.Add('図形 Width' + "`t" + [string]$か.Width)
+    $行.Add('図形 Height' + "`t" + [string]$か.Height)
+    $行.Add('図形 Rotation' + "`t" + [string]$か.Rotation)
+    $行.Add('図形 AutoShapeType' + "`t" + [string]$か.AutoShapeType)
+    $行.Add('図形 Placement' + "`t" + [string]$か.Placement)
+    $行.Add('図形 塗り Color' + "`t" + [string]$か.Fill.ForeColor.RGB)
+    $行.Add('図形 線 Color' + "`t" + [string]$か.Line.ForeColor.RGB)
+    $行.Add('図形 線 Weight' + "`t" + [string]$か.Line.Weight)
+    $か = $null
+  } catch { $行.Add('# ★★図形を 読めません★★ ' + $_.Exception.Message) }
   $行.Add('# ★★欠け ' + $欠け + '個★★')
 
   # ═══ ★★②マスの 中身★★ ═══

@@ -1,4 +1,4 @@
-# measure-review2.ps1 — ★校閲タブ（文章校正・アクセシビリティ・翻訳・変更内容・共有・インク）★ 2026-08-30
+﻿# measure-review2.ps1 — ★校閲タブ（文章校正・アクセシビリティ・翻訳・変更内容・共有・インク）★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-review2.ps1
 

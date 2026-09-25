@@ -1,4 +1,4 @@
-# 「記号と特殊文字」の 特殊文字タブに 何が 並ぶかを 実Excel の 一覧から 測る（読むだけ）
+﻿# 「記号と特殊文字」の 特殊文字タブに 何が 並ぶかを 実Excel の 一覧から 測る（読むだけ）
 # ★COM から この一覧は 読めない★ので、代わりに ★AutoCorrect の 置き換え表★（実物）を 見る。
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false

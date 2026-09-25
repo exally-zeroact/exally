@@ -1,4 +1,4 @@
-# ★実Excel に BAHTTEXT の 答えを 出させる★（読むだけ・新規ブック・保存しない）
+﻿# ★実Excel に BAHTTEXT の 答えを 出させる★（読むだけ・新規ブック・保存しない）
 #   ★自分で 考えた 規則で 作らない★＝実物の 答えを 台帳に する
 param([string]$Out)
 $ErrorActionPreference='Stop'
