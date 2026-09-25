@@ -1007,6 +1007,7 @@
         return parseInt(a.replace(/\D+/g, ''), 10) - parseInt(b.replace(/\D+/g, ''), 10);
       });
     var chain = Promise.resolve(), touched = [];
+    var 触れなかった数 = 0;   /* ★答えが 字の 式（記録 8）＝触れない マスの 数★ */
     /* ══ ★★うちで 足した 板も 書き出します★★ ══（2026-09-22）
          司さん「★全部 保存しろや★」（ア）＝★司さんの 実物は この 形★
          `.xlsx` の 側は 2026-09-21 に 直しました。こちらは ★別の 道★
@@ -1060,13 +1061,52 @@
           if (!Object.keys(cells).length) return;
           var ed = E.editSheet(bin, cells);
           if (!ed.ok) throw new Error('このファイルは直せません（' + sh.name + '：' + ed.why + '）');
+          /* ★★答えが 字の 式（記録 8）は 触れません★★（2026-09-25）
+               ＝★前は ここで 本 1冊 まるごと 出ませんでした★
+               ＝実測（経営者1・お客さんの 道）･･･ ★入力値を 1つ 直すと 書き出せない★
+                 帯 ･･･「この数式セルの答えの形は まだ直せません（記録 8）」
+                 ⇒★本番と 同じ 木でも 同じ＝元から です★
+               ⇒★今は 触らずに 数えて 先へ 進みます★
+               ⇒★★触れなかった 物が 在れば 下で 「開いたら 全部 計算しろ」の 印を 立てます★★ */
+          if (ed.触れなかった && ed.触れなかった.length) {
+            触れなかった数 += ed.触れなかった.length;
+          }
           zip.replace(parts[i], ed.bytes);
           touched.push(parts[i]);
         });
       });
     });
     return chain.then(function () {
-      if (!touched.length) return zip.build();
+      /* ★触れなかった 数も 呼ぶ 側へ 渡します★＝★お客さんに 言う 為★ */
+      function 数を添える(出) {
+        if (出 && typeof 出 === 'object' && !(出 instanceof Uint8Array)) 出.触れなかった数 = 触れなかった数;
+        return 出;
+      }
+      if (!touched.length) return Promise.resolve(zip.build()).then(数を添える);
+      /* ══ ★★触れなかった 式が 在れば 実Excel に 計算し直させます★★ ══（2026-09-25）
+           ＝★触れなかった マスの 答えは 古いまま 残ります★
+           ⇒★印を 立てて おけば 開いた 時に 直ります★
+           ＝印は `workbook.bin` の 記録157 の 26バイト目 ビット0
+           ＝★経営者1 が 実Excel で 7冊 作って 決めた 所★（読む 側は `lib/xlsb-jitai.js`）
+           ★立てられない 時は 黙って 進みます★＝★本が 出ない より 良い★
+             ⇒但し ★何個 触れなかったかは 下で 言います★ */
+      /* ★何個 触れなかったかを 声に 出します★＝★後から 数えられる ように★
+         （見張りが この 声を 読んで 「印を 立てるべきか」を 決めます） */
+      if (root.console) {
+        root.console.log('[Exally] 触れなかった 式 ' + 触れなかった数 + '個'
+          + '（答えが 字の 式＝記録8 は 書き換えられません）');
+      }
+      var 印を立てる = Promise.resolve();
+      if (触れなかった数 > 0 && typeof E.全部計算の印を立てる === 'function') {
+        var wbName = zip.names().filter(function (n) { return /^xl[/]workbook[.]bin$/.test(n); })[0];
+        if (wbName) {
+          印を立てる = zip.bytes(wbName).then(function (wbb) {
+            var 出 = E.全部計算の印を立てる(wbb instanceof Uint8Array ? wbb : new Uint8Array(wbb));
+            if (出 && 出.ok && 出.bytes) { zip.replace(wbName, 出.bytes); touched.push(wbName); }
+          }).catch(function () { /* ★立てられなくても 本は 出します★ */ });
+        }
+      }
+      return 印を立てる.then(function () {
       /* ★binaryIndex は「何バイト目に何がある」の索引。長さが変わると嘘になるので外す。
          ★部品を消すだけでは足りない。rels と [Content_Types].xml の参照も外す★ */
       return zip.text('[Content_Types].xml').then(function (ct) {
@@ -1077,8 +1117,9 @@
           var r = E.dropBinaryIndex(zip, ct, got);
           zip.replaceText('[Content_Types].xml', r.contentTypes);
           Object.keys(r.rels).forEach(function (n) { zip.replaceText(n, r.rels[n]); });
-          return zip.build();
+          return Promise.resolve(zip.build()).then(数を添える);
         });
+      });
       });
     });
   }

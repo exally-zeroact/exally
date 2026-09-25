@@ -380,6 +380,7 @@ const FILES = [
   ['zero-wo-kakusu-webkit.mjs'],     // ★ゼロを 隠す 板では 0 を 描かない★（実Excel と 違う 9,163個の うち 6,743個・2026-09-25）
   ['hiraita-toki-keisan-webkit.mjs'],  // ★理由が 1つも 無い 本は 開いた 直後に 計算しない★（23.7秒 → 1.7秒・2026-09-25）
   ['mado-no-kazu-to-kaita-kazu-webkit.mjs'],  // ★窓に 出る 数と 本当に 書き込まれた 数が 合うか★（1マス→窓3044の 実物・2026-09-25）
+  ['naoshite-hozon-webkit.mjs'],  // ★お客さんが 入力値を 直して 書き出せるか★（記録8 で 1冊 出なかった・2026-09-25）
   ['yomenakatta-webkit.mjs'],        // ★ファイルを 読めなかったら 読み直す★（OneDrive で 24回中 15回 断られる・2026-09-25）
   ['mikire-webkit.mjs'],             // ★字は 隣が 空なら はみ出す（実Excel と 同じ）★（★絵で 数える★・2026-09-24）
   ['machi-no-kime.test.mjs'],        // ★待ちの 決めが 効いて いるか★（2つ目は 引数・決めは 3つ目／2026-09-24）
