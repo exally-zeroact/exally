@@ -26,7 +26,7 @@ const FILES = [
   ['shiki-hyou-afure.test.mjs', '--self-test'],// ★材料を 変えたら 答えも 変わるか／紙に 無い 式を 押して いないか★
   ['shiki-hyou-omosa.test.mjs'],               // ★表が 大きく なっても N の 2乗に ならない（2026-09-14 に 2乗だった）★
   ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
-  ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208…）★
+  ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208･･･）★
   ['shiki-hyou-hidzuke.test.mjs', '--self-test'],// ★1900年は 未測定と 書いて 在るか／時刻の 割合★
   ['shiki-hyou-hishigata.test.mjs'],           // ★菱形の頼りで古い答えが残らない（実物 37/176本→0/0）★
   ['shiki-hyou-hishigata.test.mjs','--self-test'],// ★輪を壊していない／棚に直す前の数が在る★
@@ -101,7 +101,7 @@ const FILES = [
   ['data-tab2.test.mjs', '--self-test'],     /* ★統合／アウトライン(実測 段2・1段で隠れる)／スライサー(見た目は未測定)★ */
   ['forecast.test.mjs', '--self-test'],      /* ★予測シート＝実測(傾き20・切片80・7つ目220)と 同じ／点検／メモ★ */
   ['automation.test.mjs', '--self-test'],    /* ★自動化＝Officeスクリプトの見本と同じ中身を うちの道具で（10項目）★ */
-  ['csv-in.test.mjs', '--self-test'],        /* ★CSV読み込み＝実測どおり（"…"の中のカンマ・""・中の改行）／化けたらShift_JIS★ */
+  ['csv-in.test.mjs', '--self-test'],        /* ★CSV読み込み＝実測どおり（"･･･"の中のカンマ・""・中の改行）／化けたらShift_JIS★ */
   ['objects.test.mjs', '--self-test'],       /* ★浮かぶ物（画像・図形・テキスト）＝形の番号と重なりは実測・色は写さない★ */
   ['ink.test.mjs', '--self-test'],           /* ★描画（手書き）＝ペンの色と太さは 正本の 項目名どおり／線もシートの座標★ */
   ['arrange.test.mjs', '--self-test'],
@@ -342,7 +342,7 @@ const FILES = [
   'xlsx-harness/compare.mjs',               // Excelの真値と突合(新規の不一致があれば赤)
   ['xlsx-harness/compare.mjs', '--self-test'], // ★わざと壊して赤になるかの自己確認
   ['xlsx-harness/nesting-audit.mjs', '--probe', '--check'], // ★入れ子で壊れる式が増えていないか
-  /* ★★ 2026-09-16 … ★下の 5本は どこからも 呼ばれて いませんでした★★
+  /* ★★ 2026-09-16 ･･･ ★下の 5本は どこからも 呼ばれて いませんでした★★
        名簿（この FILES）にも 無く、`.github/workflows/*.yml` にも 無かった
        ⇒★★試験の 顔を して 1回も 走って いませんでした★★
        ★xlfn-morenashi は commit 586d2eb で
@@ -381,6 +381,7 @@ const FILES = [
   ['hiraita-toki-keisan-webkit.mjs'],  // ★理由が 1つも 無い 本は 開いた 直後に 計算しない★（23.7秒 → 1.7秒・2026-09-25）
   ['mado-no-kazu-to-kaita-kazu-webkit.mjs'],  // ★窓に 出る 数と 本当に 書き込まれた 数が 合うか★（1マス→窓3044の 実物・2026-09-25）
   ['naoshite-hozon-webkit.mjs'],  // ★お客さんが 入力値を 直して 書き出せるか★（記録8 で 1冊 出なかった・2026-09-25）
+  ['akimasu-ni-utsu-webkit.mjs'],  // ★空いて いる マスに 打って 書き出せるか★（行ごと 無い 所で 1冊も 出なかった・2026-09-26）
   ['yomenakatta-webkit.mjs'],        // ★ファイルを 読めなかったら 読み直す★（OneDrive で 24回中 15回 断られる・2026-09-25）
   ['mikire-webkit.mjs'],             // ★字は 隣が 空なら はみ出す（実Excel と 同じ）★（★絵で 数える★・2026-09-24）
   ['machi-no-kime.test.mjs'],        // ★待ちの 決めが 効いて いるか★（2つ目は 引数・決めは 3つ目／2026-09-24）
@@ -445,7 +446,7 @@ for (const f of FILES) {
     ng++;
     const 印 = e && e.signal ? ('★中で殺された(signal=' + e.signal + ')★＝新しい壊れではない可能性')
       : ('自分で ' + (e && e.status !== undefined && e.status !== null ? e.status : '?') + ' を返した');
-    console.log('  ★落ちた★ ' + file + (args.length ? ' ' + args.join(' ') : '') + ' … ' + 印);
+    console.log('  ★落ちた★ ' + file + (args.length ? ' ' + args.join(' ') : '') + ' ･･･ ' + 印);
     失敗一覧.push(file + (args.length ? ' ' + args.join(' ') : '') + '（' + 印 + '）');
   }
 }
