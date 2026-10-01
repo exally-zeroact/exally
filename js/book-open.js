@@ -657,6 +657,13 @@
     if (飾.border) cell.border = 飾.border;
   }
 
+  /* ★借り物が 渡す 誤りの 答えを 字に★（`w` が 無い 時は 番号から・Excel の 誤りの 番号） */
+  var 誤りの番号 = { 0: '#NULL!', 7: '#DIV/0!', 15: '#VALUE!', 23: '#REF!', 29: '#NAME?',
+    36: '#NUM!', 42: '#N/A', 43: '#GETTING_DATA' };
+  function 誤りの字(c) {
+    if (typeof c.w === 'string' && c.w.charAt(0) === '#') return c.w;
+    return 誤りの番号[c.v] || '#N/A';
+  }
   function sheetToGrid(ws, name, tableFixes, 字体, 飾り, 図形, ゼロを隠す) {
 
     var data = {}, X = root.XLSX, fixes = tableFixes || {};
@@ -669,6 +676,15 @@
         var fixed = fixes[name + '|' + rc.r + ',' + rc.c];
         cell.f = fixed !== undefined ? fixed : ('=' + c.f);
         cell.d = c.v !== undefined && c.v !== null ? c.v : '';   // ★ファイルの答え（キャッシュ）をそのまま出す★
+        /* ══ ★★答えが 誤りで 保存された 式は 誤りの 字で 持ちます★★ ══（2026-10-02）
+             ★借り物は ★`t:'e'`・`v`＝誤りの 番号（#REF! なら 23）・`w`＝'#REF!'★ で 渡します★
+             ★前は `v` を そのまま 持ち ⇒ ★数の 23★ ⇒ 下で ★書式を 掛けて 数の 字★ に して いました★
+             ★実物で 出ました★ … 司さんの 本の ★記録11（答えが 誤り）69個 とも #REF!（0x17）★
+               ＝★実Excel は 開いた だけで #REF! を 出す／うちは 数★（経営者 実測 69個・10-02）
+               ＝★計算の 話では ありません★（実Excel は 計算して いない・保存された 答えが #REF!）
+             ⇒★字は 計算し直した 時と 同じ 形（'#REF!' の 字）★＝1打ち目の 後と 揃います
+             ★見張り★ tests/hozon-no-ayamari-wo-yomu-webkit.mjs */
+        if (c.t === 'e') cell.d = 誤りの字(c);
         /* ★★「答えが 無い」と 「答えが 空の 字」は 別物★★（2026-09-25 ここで 1回 踏みました）
              `=IFERROR(･･･,"")` の 答えは ★空の 字★＝★立派な 答え★ です。
              `cell.d === ''` で 数えたら ★2,255個★ 出て、
@@ -696,6 +712,7 @@
              前は「全部 #SPILL!」だったので ★どちらでも 出ません★が、
              ★出なく なる 物が 在る事は 書いて おきます★ */
         cell.d = c.v !== undefined && c.v !== null ? c.v : '';
+        if (c.t === 'e') cell.d = 誤りの字(c);   /* ★上の 式の 道と 同じ★（道が 2本） */
         cell[溢れの印] = 溢れの元の場所(c.F);
       } else {
         cell.v = c.v !== undefined && c.v !== null ? c.v : '';
