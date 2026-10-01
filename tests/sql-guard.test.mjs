@@ -118,6 +118,48 @@ for (const [名, sql] of 通したい) {
   ok('通る: ' + 名, g.ok, g.reasons.join(' / '));
 }
 
+/* ═══ ③-b ★字を 読めているか★（2026-10-02・門が 盲目に なる 穴）═══════════
+ *  ★ダイコメの 席が 09-29 に 同じ門で 見つけた 穴が Exally にも 開いていた★（Exally1 が 直す前に 当てて 確かめた＝①②とも 通った）
+ *  ★見張りを 書く 時の 罠★＝穴1 は ★後ろに もう1つ ' が 無いと 食われない★（無いと 直す前でも 止まり 緑に なる） */
+console.log('\n[③-b 字を 読めているか（門が 盲目に なる 穴）]');
+const 盲目 = [
+  ['★穴1 ドル引用の中の \' で 次の文が消える（他の部屋を 書き換え）★',
+    "create table exally.dk_note (a text default $q$it's$q$);\nupdate daikou.meisai set amount = 0;\ncomment on table exally.dk_note is 'ok';"],
+  ['★穴1 同じ形で 自分の部屋を 書き換え★',
+    "create table exally.dk_note (a text default $q$it's$q$);\nupdate exally.recipe set na = 'x';\ncomment on table exally.dk_note is 'ok';"],
+  ['★穴2 引用した名前で 他の部屋に 列を足す＋select★', 'alter table "public"."meisai" add column hack int;\nselect 1;'],
+  ['★穴2 引用した名前で 他の部屋に 列を足す＋exally の棚★', 'create table exally.a (id int);\nalter table "public"."meisai" add column hack int;'],
+  ['★穴3 コメントの中の ドル印で 間の文が消える★',
+    'create table exally.a (id int);\n-- $x$\nupdate daikou.meisai set amount = 0;\n-- $x$\nselect 1;'],
+  ['★穴4 grant の 権限名落としが ; を越えて 次の文を食う★',
+    'grant r to u;\nupdate daikou.meisai set a = 0 where x;\ncreate index i on exally.a (x);'],
+  ['★E 文字列の 逃がした \' で 次の文が消える★',
+    "comment on table exally.a is E'it\\'s';\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is 'ok';"],
+  ['★別名つきの update★', 'update exally.recipe r set na = \'x\';'],
+  ['★select で 他の部屋を 複製（into）★', 'select * into exally.kopi from daikou.meisai;'],
+  ['★create table … as select（他の部屋を 複製）★', 'create table exally.kopi as select * from daikou.meisai;'],
+  ['★役(ロール)を 配る★', 'grant service_role to anon;'],
+  ['★RLS を 切る★', 'alter table exally.recipe disable row level security;'],
+  ['★閉じていない ドル引用★', 'create table exally.a (id int); do $x$ begin update exally.recipe set na = 1;'],
+  ['★閉じていない 文字列★', "comment on table exally.a is 'abc;\nupdate exally.recipe set na = 1;"],
+  ['★merge で 書き換え★', 'merge into exally.recipe r using exally.a s on r.id = s.id when matched then delete;'],
+  ['★引用名の 大文字で 他の部屋★', 'create table "KYUYO".x (a int);'],
+];
+for (const [名, sql] of 盲目) {
+  const g = guard(sql, { prefix: 'exally.' });
+  ok('止まる: ' + 名, !g.ok, '★通してしまった★ tables=' + g.tables.join(','));
+}
+const 盲目でも通す = [
+  ['ドル引用の 既定値で 棚を作る（自分の部屋）', "create table exally.dk_note (a text default $q$it's$q$);"],
+  ['引用した名前で 自分の部屋に 棚を作る', 'create table "exally"."b" (id int);'],
+  ['E 文字列の 覚書', "comment on table exally.a is E'it\\'s';"],
+  ['入れ子の ブロックコメント', '/* 外 /* 中 */ まだ外 */ create table exally.c (id int);'],
+];
+for (const [名, sql] of 盲目でも通す) {
+  const g = guard(sql, { prefix: 'exally.' });
+  ok('通る: ' + 名, g.ok, g.reasons.join(' / '));
+}
+
 /* ═══ ④ 部品ごと ═══════════════════════════════════════════ */
 console.log('\n[④ 部品ごと]');
 ok('★部屋つきで 棚を拾う★',
