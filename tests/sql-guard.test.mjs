@@ -135,6 +135,11 @@ const 盲目 = [
     'grant r to u;\nupdate daikou.meisai set a = 0 where x;\ncreate index i on exally.a (x);'],
   ['★E 文字列の 逃がした \' で 次の文が消える★',
     "comment on table exally.a is E'it\\'s';\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is 'ok';"],
+  /* ★ダイコメの 門で 素通りしていた 形（10-02 ダイコメの席が 測った）★ */
+  ['★文字列の中の $x$ で 次の文が消える★',
+    "comment on table exally.a is '$x$';\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is '$x$';"],
+  ['★引用名の中の $x$ で 次の文が消える★',
+    'create table exally."$x$" (id int);\nupdate daikou.meisai set amount = 0;\ncreate table exally."$x$" (id int);'],
   ['★別名つきの update★', 'update exally.recipe r set na = \'x\';'],
   ['★select で 他の部屋を 複製（into）★', 'select * into exally.kopi from daikou.meisai;'],
   ['★create table … as select（他の部屋を 複製）★', 'create table exally.kopi as select * from daikou.meisai;'],
