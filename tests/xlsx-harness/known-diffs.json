@@ -15,7 +15,8 @@
     "r19_bare_array_2026-08-02": "R19解決。素の =SORT(範囲) / =UNIQUE / =FILTER が #VALUE!(Cell range not allowed) になっていた原因は、配列を返すプラグイン関数が【出力の大きさを HyperFormula に申告していなかった】こと(arraySizeMethod)。★スパイクで実測: 申告を足すと通り、しかも隣のセルへ正しく展開(スピル)される。展開先に既にデータがある場合は HF が #SPILL! を返して既存データを守る(Excelと同じ)。版上げ・別ライブラリ・自前展開はいずれも不要だった。併せて col() が空配列で TypeError を投げていたのを修正(実Excelの =SORT(空範囲) は 0)。ケース9件を新設(素の形6件＋TRIM/DATE/EOMONTHの素の形3件)。一致 362→371。",
     "a_lite_2026-08-02": "(a-lite)実装。lib/excel-version.js を新設し、『その式は相手のExcelで動くか』を警告するようにした。★止めない・警告だけ・セル番地つき。出す場所は2つ: 式を書いた時(setCellFormula経由) と Excel書き出しの直前。①Excelにそもそも無い関数23個は【版に関係なく常時】警告(365の客でも #NAME? になるため。★こちらが本体) ②公式の版マーカーがある関数は選んだ版に連動(登録済みは14個)。★版マーカーが無い関数は『どの版にもある』扱い＝誤警告を出さない方に倒す。Mac/Onlineは365扱い。実測: Excel365ではハーネスの全373ケースで警告0件(誤警告ゼロ)。同期ガード tests/excel-version.test.mjs が、関数の本数が分類時点(412個)から変わったらCIを赤にする。★わざと表から抜く/本数をずらす の3通りで実際に赤くなることを確認済み。併せて『保存時に※版は影響しませんの1行を出す』暫定対処は廃止(役目が終わったため)。",
     "cleanup_2026-08-02": "本番の掃除。削除済み5枚の残骸12本を本番(abcc812)とstagingの両方から削除し、絶対パス3件(hub.htmlの/kyuyo/・chat.htmlの/・kyuyo/index.htmlの/)を相対に直した。★tests/no-duplicate-libs.test.mjs を新設＝同じ名前の.jsが配信物に2箇所以上あったら赤。法定データ(社保/最賃/雇用保険/所得税/賞与/割増/年末調整/住民税)は【例外を認めず】無条件で赤。★テスト先行で、掃除の前に実際に赤くなることを確認してから消した。その時 auth.js も引っかかったが js/auth.js(ハブ)と kyuyo/js/auth.js(給与)は名前が同じだけの別物なので理由つきで例外に載せた。本番の実配信で12本とも404・絶対パス0件・全アセット98件で200以外0件を確認。",
-    "wave3_p3_2026-08-02": "第3波P3。MODE/TRIMMEAN/PERCENTRANK/KURT/INTERCEPT/FORECAST(+.LINEAR)/IRR/PERMUT/PERMUTATIONA/MDETERM/GESTEP(+MODE.SNGL) を _jsSet から HFプラグインへ。★この11関数は【ケースが1件も無かった】ので真値から作った(32件・素の形と入れ子の両方)。一致 371→403 / 入れ子で壊れる式 16→5。★旧実装は IRR と KURT の答えを小数4桁で丸めていた(実測: IRR 0.1532 vs 実Excel 0.15322137877181552)。プラグインでは丸めない＝そこも直った。★xlfn-coverage と excel-version の同期ガードが両方とも発火した。実Excelに聞き直した結果、PERMUTATIONA だけ _xlfn. が要ると判明(他10個は不要)。登録関数は 412→425 に増えたので本数の記録も更新。実Excelで書き出しブック再計算 399/403(差4件は既存の file_roundtrip_known)。"
+    "wave3_p3_2026-08-02": "第3波P3。MODE/TRIMMEAN/PERCENTRANK/KURT/INTERCEPT/FORECAST(+.LINEAR)/IRR/PERMUT/PERMUTATIONA/MDETERM/GESTEP(+MODE.SNGL) を _jsSet から HFプラグインへ。★この11関数は【ケースが1件も無かった】ので真値から作った(32件・素の形と入れ子の両方)。一致 371→403 / 入れ子で壊れる式 16→5。★旧実装は IRR と KURT の答えを小数4桁で丸めていた(実測: IRR 0.1532 vs 実Excel 0.15322137877181552)。プラグインでは丸めない＝そこも直った。★xlfn-coverage と excel-version の同期ガードが両方とも発火した。実Excelに聞き直した結果、PERMUTATIONA だけ _xlfn. が要ると判明(他10個は不要)。登録関数は 412→425 に増えたので本数の記録も更新。実Excelで書き出しブック再計算 399/403(差4件は既存の file_roundtrip_known)。",
+    "cleanup_2026-10-02": "★台帳から2件を外した（期限の引き直しではない）。INPUT_typed_comma（1,234→1234 n）と INPUT_typed_datelike（2026-07-31→46234 n）は compare.mjs の『入力の型』で 2件とも 一致（f0f1feb の木で実測）。直った後も台帳に残り、期限 2026-09-30 で 総なめを赤にしていた＝★台帳に載っているのに一致している物を外せと言う門が無い★（別件）"
   },
   "roots": {
     "R11_input_parse": "セルに打ち込んだ『桁区切り付きの数』『日付に見える文字』を、Excel は数値/日付に解釈するがグリッドは文字列のまま持つ",
@@ -114,28 +115,6 @@
     "version_upgrade_finding": "HyperFormula 3.3.0 を実際に入れて全ケースを回した結果: 一致243/既知2/新規0 は変わらず(良くも悪くもならない)、入れ子の壊れは 38→33 に減る。ただし★SUMPRODUCT の配列演算は 2.6.1 / 2.7.1 / 3.3.0 のどれでも直らない(実測)。版上げは SUMPRODUCT の解決にはならない"
   },
   "diffs": [
-    {
-      "id": "INPUT_typed_comma",
-      "func": "(入力)",
-      "root": "R11_input_parse",
-      "class": "A",
-      "due": "2026-09-30",
-      "money_impact": true,
-      "exally": "1,234",
-      "excel365": "1234",
-      "note": "『1,234』と打っても数値にならない=以降の合計に入らない。グリッドの入力処理(book.html)側の話なので関数プラグインでは直らない"
-    },
-    {
-      "id": "INPUT_typed_datelike",
-      "func": "(入力)",
-      "root": "R11_input_parse",
-      "class": "A",
-      "due": "2026-09-30",
-      "money_impact": false,
-      "exally": "2026-07-31",
-      "excel365": "46234",
-      "note": "『2026-07-31』と打っても日付にならない=日付計算に使えない"
-    },
     {
       "id": "TEXT_era_wareki",
       "func": "TEXT",
