@@ -140,6 +140,11 @@ const 盲目 = [
     "comment on table exally.a is '$x$';\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is '$x$';"],
   ['★引用名の中の $x$ で 次の文が消える★',
     'create table exally."$x$" (id int);\nupdate daikou.meisai set amount = 0;\ncreate table exally."$x$" (id int);'],
+  /* ★英字 以外の タグ（10-02 ダイコメの席が 知らせ・Exally でも 通るのを 当てて 確かめた）★ */
+  ['★$あ$ の タグで 次の文が消える★',
+    "comment on table exally.a is $あ$ ' $あ$;\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is $あ$ ' $あ$;"],
+  ['★$é$ の タグで 次の文が消える★',
+    "comment on table exally.a is $é$ ' $é$;\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is $é$ ' $é$;"],
   ['★別名つきの update★', 'update exally.recipe r set na = \'x\';'],
   ['★select で 他の部屋を 複製（into）★', 'select * into exally.kopi from daikou.meisai;'],
   ['★create table … as select（他の部屋を 複製）★', 'create table exally.kopi as select * from daikou.meisai;'],
@@ -159,6 +164,7 @@ const 盲目でも通す = [
   ['引用した名前で 自分の部屋に 棚を作る', 'create table "exally"."b" (id int);'],
   ['E 文字列の 覚書', "comment on table exally.a is E'it\\'s';"],
   ['入れ子の ブロックコメント', '/* 外 /* 中 */ まだ外 */ create table exally.c (id int);'],
+  ['$あ$ の タグの 覚書（正しい 使い方）', "comment on table exally.a is $あ$it's$あ$;"],
 ];
 for (const [名, sql] of 盲目でも通す) {
   const g = guard(sql, { prefix: 'exally.' });
