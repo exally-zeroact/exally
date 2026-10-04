@@ -103,7 +103,32 @@ const ws = {};
 /* ★字の "1e-7" の マス★（経営者の 叩き⑴）＝★台の 道に 乗らない★ こと（乗れば `[s]` で "0" に なる） */
 const 字の行 = 組.length;
 ws[XLSX.utils.encode_cell({ r: 字の行, c: 0 })] = { t: 's', v: '1e-7', z: '[s]' };
-ws['!ref'] = 'A1:A' + (組.length + 1);
+/* ★★組 J（10-04 夕・経営者の 真値）★★ 字の マスは 書式に 関わらず 字の まま
+     `'1e-7`（字として 打った）と `="1e-7"`（答えが 字の 式）× [s]・[h]:mm:ss・ge.m.d・0.00・General
+     ⇒ 実Excel は ★10組とも 「1e-7」★ ／ ★空の 字★は 空 */
+const 組J = [];
+{
+  const L = fs.readFileSync(path.join(ROOT, 'docs/measured/golden-sel-shoshiki-ji-to-sakaime-2026-10-04.tsv'), 'utf8')
+    .split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
+  const 頭 = L.shift().split('\t');
+  const i組 = 頭.indexOf('組'), i式 = 頭.indexOf('値の式'), i書 = 頭.indexOf('渡した書式(Local)'), i字 = 頭.indexOf('画面の字(.Text)');
+  for (const l of L) {
+    const c = l.split('\t');
+    if (c[i組] !== 'J') continue;
+    組J.push({ 式: c[i式], 書: c[i書] === 'General' ? 'General' : c[i書], 字: c[i字] });
+  }
+}
+if (組J.length !== 10) { console.log('★組 J が 10組で ない★ ' + 組J.length); process.exit(8); }
+const J頭 = 字の行 + 1;
+組J.forEach((x, k) => {
+  const 式か = x.式.charAt(0) === '=';
+  ws[XLSX.utils.encode_cell({ r: J頭 + k, c: 0 })] = 式か
+    ? { t: 's', v: '1e-7', f: '"1e-7"', z: x.書 }
+    : { t: 's', v: '1e-7', z: x.書 };
+});
+const 空の行 = J頭 + 組J.length;
+ws[XLSX.utils.encode_cell({ r: 空の行, c: 0 })] = { t: 's', v: '', z: '0.00' };
+ws['!ref'] = 'A1:A' + (空の行 + 1);
 ws['!cols'] = [{ wch: 60 }];
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, 'あ');
@@ -163,11 +188,34 @@ try {
     const sh = window.sheets[window.activeSheet];
     const cell = sh.data[r + ',0'];
     const raw = window._字の元(cell);
-    return { 型: typeof raw, 画面: String(window.fmtForDisplay(raw, cell.numFmt, 30)) };
+    /* ★画面の 道の 順に★（`_答えは字か` が 先・10-04 夕 に 揃えた） */
+    const 字か = window._答えは字か(cell);
+    return { 型: typeof raw, 字か: 字か, 画面: 字か ? String(raw) : String(window.fmtForDisplay(raw, cell.numFmt, 30)) };
   }, 字の行);
-  console.log('      ── 実測 ── 字の "1e-7"（[s]）... 型 ' + 字の出.型 + ' ／ 画面 ' + JSON.stringify(字の出.画面));
+  console.log('      ── 実測 ── 字の "1e-7"（[s]）... 型 ' + 字の出.型 + ' ／ 字か ' + 字の出.字か + ' ／ 画面 ' + JSON.stringify(字の出.画面));
   T('★字の "1e-7" は 台の 道に 乗らない★（台なら "0"）', 字の出.型 === 'string' && 字の出.画面 !== '0',
     JSON.stringify(字の出));
+  /* ★★組 J＝字の マスの 画面の 字（画面の 関数の 道）★★ */
+  const J出 = await page.evaluate(([頭, n, 空]) => {
+    const sh = window.sheets[window.activeSheet];
+    const 作る = (r) => {
+      const cell = sh.data[r + ',0'];
+      if (!cell) return '(マス無し)';
+      const raw = window._字の元(cell);
+      if (window._ゼロを隠すか(cell, raw)) return '';
+      if (window._答えは字か(cell)) return String(raw == null ? '' : raw);
+      return String(window.fmtForDisplay(raw, cell.numFmt, window._入る字数(window.cW(0), raw, cell.numFmt)));
+    };
+    const 出 = [];
+    for (let k = 0; k < n; k++) 出.push(作る(頭 + k));
+    return { J: 出, 空: 作る(空) };
+  }, [J頭, 組J.length, 空の行]);
+  const J違 = [];
+  組J.forEach((x, k) => { if (J出.J[k] !== x.字) J違.push(x.式 + ' ' + x.書 + ' 画面=' + JSON.stringify(J出.J[k]) + ' 実Excel=' + JSON.stringify(x.字)); });
+  console.log('      ── 実測 ── 組 J（字の マス）... 見た ' + 組J.length + ' ／ 合った ' + (組J.length - J違.length) + ' ／ 空の 字 ' + JSON.stringify(J出.空));
+  J違.forEach((s) => console.log('         ' + s));
+  T('★★字の マスは 字の まま（組 J ' + (組J.length - J違.length) + '/' + 組J.length + '）★★', J違.length === 0, J違.length + '組 違う');
+  T('★空の 字の マスは 空★', J出.空 === '', JSON.stringify(J出.空));
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});
