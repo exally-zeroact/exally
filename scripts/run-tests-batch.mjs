@@ -48,8 +48,9 @@ if (回で && 始 && 終) {
   束の道 = path.join(回の置き場(), '束-' + 始 + '-' + 終 + '.json');
   if (fs.existsSync(束の道)) fs.unlinkSync(束の道);   /* ★古い 記録を 先に 消す★ */
   始めた = new Date().toISOString();
-  前の木 = 木を取る(ROOT);
 }
+/* ★木は いつも 前と 後に 取る★（10-04・経営者の 気づき＝束の 出しだけ 見る 人には 汚れが 見えなかった） */
+if (始 && 終) 前の木 = 木を取る(ROOT);
 if (!始 || !終) {
   console.log('★試験は 全部で ' + 一覧.length + '本★（tests/run.js 本人から 読んだ）');
   console.log('  例: node scripts/run-tests-batch.mjs 1 61');
@@ -91,12 +92,19 @@ for (let i = 始 - 1; i < Math.min(終, 一覧.length); i++) {
 const 頼んだ = Math.min(終, 一覧.length) - (始 - 1);
 console.log((始) + '〜' + Math.min(終, 一覧.length) + '本目 … ★赤 ' + 赤 + '件★'
   + '（★頼んだ ' + 頼んだ + '本 ／ 走らせた ' + 走った + '本 ／ 緑 ' + 緑 + '本★）');
+/* ★★木の 汚れを 束の 出しにも 出す★★（10-04・経営者の 気づき）
+     前は ★束の 出しは 木を 判じず★「赤 0件」と 言い、汚れを 赤と 言うのは まとめ だけ だった
+     ⇒★`--回` の 時は 汚れなら 束も 赤（exit 1）★／`--回` 無しは 出す だけ（手元で 作りかけを 試す 時の 為） */
+const 後の木 = 木を取る(ROOT);
+const 木の字 = (s) => (s ? '★汚れ★' : '空');
+console.log('   木：前 ' + 木の字(前の木) + ' ／ 後 ' + 木の字(後の木)
+  + ((前の木 || 後の木) ? (回 ? '  ⇒★木が 汚れて いる＝この 束は 赤★' : '  ⇒（--回 無し＝判じない）') : ''));
 /* ★走り切った ここで だけ 記録を 書く★（別名に 書いて 最後に 名前を 変える） */
 if (回) {
   const 記録 = {
     名札: 回.名札, 頭: 頭を取る(ROOT), 名簿の指紋: 名簿の指紋(FILES), 名簿: 一覧.length,
     始: 始, 終: Math.min(終, 一覧.length), 頼んだ: 頼んだ, 走らせた: 走った, 緑: 緑, 赤: 落ちた,
-    始めた: 始めた, 終えた: new Date().toISOString(), 前の木: 前の木, 後の木: 木を取る(ROOT),
+    始めた: 始めた, 終えた: new Date().toISOString(), 前の木: 前の木, 後の木: 後の木,
   };
   const 仮 = 束の道 + '.' + crypto.randomBytes(4).toString('hex') + '.kaki';
   fs.writeFileSync(仮, JSON.stringify(記録, null, 1));
@@ -107,4 +115,4 @@ if (走った !== 頼んだ) {
   process.exit(1);
 }
 for (const s of 落ちた) console.log('   ・' + s);
-process.exit(赤 ? 1 : 0);
+process.exit((赤 || (回 && (前の木 || 後の木))) ? 1 : 0);
