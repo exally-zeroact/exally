@@ -79,6 +79,32 @@ T('★★②実Excel の 点と 合う（★1点も ずれない★）★★', (
   console.log('      … ファイルに 幅が 在る 列は 実Excel と ★ぴったり★');
 });
 
+T('★★②-2 機械の 字体が 違っても（「0」が 10点＝Linux の WebKit の 形）列の 点は 実Excel と 同じ★★', () => {
+  /* ★★2026-10-04 夜★★ 一字の幅を ★お客さんの 機械で 測って★ いたので、
+       Linux の WebKit では 標準の 列が 74→93点 ⇒ #### が 出ず 桁が 多く 出た（kakareta-ji の 7組）。
+     ⇒ 表に 在る 字体（游ゴシック 11＝8）は 機械で 測らない。ここでは ★機械が「0」を 10.2点と 測る★ 場を 作って 開く
+     ★見本の 既定の 字体は 游ゴシック 11★（下で 確かめる＝本番は 開く 時に これを 渡す） */
+  const 測り = { 回: 0 };
+  const 場 = { XLSX: require_(path.join(ROOT, 'lib/xlsx.full.min.js')),
+    document: { createElement: () => ({ getContext: () => ({ font: '', measureText: () => { 測り.回++; return { width: 10.2 }; } }) }) } };
+  new Function('self', 開く元)(場);
+  const wb = 場.XLSX.read(fs.readFileSync(見本), { type: 'buffer', cellFormula: true, cellNF: true, sheetStubs: false, cellStyles: true });
+  const 既定 = wb.Styles && wb.Styles.Fonts && wb.Styles.Fonts[0];
+  if (!既定 || 既定.name !== '游ゴシック' || Number(既定.sz) !== 11) throw new Error('★見本の 既定の 字体が 游ゴシック 11 で ない★ ' + JSON.stringify(既定));
+  const 板 = 場.BookOpen.sheetToGrid(wb.Sheets[wb.SheetNames[0]], wb.SheetNames[0], {});
+  const 違い = [];
+  let 見た = 0;
+  for (const r of 実) {
+    const 出た = 板.colW[r.列 - 1];
+    if (出た === undefined) continue;
+    見た++;
+    if (Math.abs(出た - r.点) > 0.5) 違い.push('列' + r.列 + ' 実Excel ' + r.点 + '点 ／ うち ' + 出た + '点');
+  }
+  if (見た < 5) throw new Error('★比べた 列が ' + 見た + '本★（空振り）');
+  if (違い.length) throw new Error('★機械の 字体で 列が 動いた★ ' + 違い.length + '本  ' + 違い.join(' ／ '));
+  console.log('      ... 機械の「0」が 10.2点でも ' + 見た + '列 とも 実Excel と 同じ（機械で 測った 回数 ' + 測り.回 + '）');
+});
+
 T('★★③SheetJS の `wpx` を 使って いない（★1字 14点と 思い込んで いる★）★★', () => {
   const 動く = 注記を外す(開く元);
   if (/col\.wpx/.test(動く)) {
