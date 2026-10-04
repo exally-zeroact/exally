@@ -451,7 +451,9 @@ function runSelfTest(base) {
 
   // 4) 区分Aの期限を空にする → 台帳の検査で赤
   const k4 = clone(base.known);
-  const a4 = k4.diffs.find(d => d.class === 'A');
+  /* ★台帳の中身に依存させない★（2026-10-02 区分Aを全部直したら ここが落ちた＝[2] と同じ形にする） */
+  let a4 = k4.diffs.find(d => d.class === 'A');
+  if (!a4) { a4 = { id: 'SELFTEST_CLASS_A', func: '(self-test)', root: 'self-test', class: 'A', due: '2999-12-31', note: 'self-test' }; k4.diffs.push(a4); }
   delete a4.due;
   const r4 = evaluate({ ...base, known: k4 });
   line(`\n[おまけ] 区分Aの期限(due)を空にする (${a4.id})`);
