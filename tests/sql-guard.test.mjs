@@ -147,7 +147,7 @@ const 盲目 = [
     "comment on table exally.a is $é$ ' $é$;\nupdate daikou.meisai set amount = 0;\ncomment on table exally.a is $é$ ' $é$;"],
   ['★別名つきの update★', 'update exally.recipe r set na = \'x\';'],
   ['★select で 他の部屋を 複製（into）★', 'select * into exally.kopi from daikou.meisai;'],
-  ['★create table … as select（他の部屋を 複製）★', 'create table exally.kopi as select * from daikou.meisai;'],
+  ['★create table ... as select（他の部屋を 複製）★', 'create table exally.kopi as select * from daikou.meisai;'],
   ['★役(ロール)を 配る★', 'grant service_role to anon;'],
   ['★RLS を 切る★', 'alter table exally.recipe disable row level security;'],
   ['★閉じていない ドル引用★', 'create table exally.a (id int); do $x$ begin update exally.recipe set na = 1;'],

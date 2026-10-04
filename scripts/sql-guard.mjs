@@ -41,7 +41,7 @@
 //   ★読みで 見つけた 穴（ダイコメの 直しにも 残っていそうな 物・Exally1）★
 //     ③ コメントの 中に ドル引用の 印 ⇒ `-- $x$` ～ `-- $x$` の 間の 文が 「文字列」として 消える
 //        ⇒★剥がしは 左から 1字ずつ 読む 1回の 読みに した★（出てきた 順に 扱う＝PG と 同じ 読み方）
-//     ④ `grant … on` の 権限名を 落とす 所が ★`;` を 越えて 次の 文を 食う★
+//     ④ `grant ... on` の 権限名を 落とす 所が ★`;` を 越えて 次の 文を 食う★
 //          grant r to u; update daikou.meisai set a = 0 where x; create index i on exally.a (x);
 //        ⇒★1文の 中だけ★ に した
 //   ★白名簿★＝`;` で 1文ずつ に 分け、★下の ALLOW の 形に 頭から 当たらなければ 赤★
@@ -75,7 +75,7 @@ function 読む(sql) {
       出 += ' '; i = j; continue;
     }
     if (c === "'") {
-      /* ★E'…' は 逆斜線で ' を 逃がせる★ */
+      /* ★E'...' は 逆斜線で ' を 逃がせる★ */
       const E = /[eE]/.test(s.charAt(i - 1)) && !/[\w]/.test(s.charAt(i - 2));
       let j = i + 1, 閉 = false;
       while (j < s.length) {
@@ -141,7 +141,7 @@ const DANGER = [
   { name: 'drop', re: /\bdrop\s+(table|policy|column|index|schema|view|function|trigger|type|database|role)\b/i },
   { name: 'truncate', re: /\btruncate\s+(?:table\s+)?[a-z_"]/i },
   { name: 'delete', re: /\bdelete\s+from\b/i },
-  /* ★別名つきの update も★（ダイコメ 09-26＝`update 棚 k set …` が すり抜けた） */
+  /* ★別名つきの update も★（ダイコメ 09-26＝`update 棚 k set ...` が すり抜けた） */
   { name: 'update', re: /\bupdate\s+(?:only\s+)?[a-z_][\w.]*(?:\s+(?:as\s+)?[a-z_]\w*)?\s+set\b/i },
   { name: 'merge', re: /\bmerge\s+into\b/i },
   { name: 'trigger-rule', re: /\bcreate\s+(or\s+replace\s+)?(constraint\s+)?(trigger|rule)\b/i },
@@ -245,7 +245,7 @@ export function splitStatements(sql) {
 const ALLOW = [
   { name: '読むだけ(select)', re: /^(with\s|select\s|table\s|show\s|explain\s)/i,
     mi: (b) => (/\binto\b/i.test(b) ? '読むだけの select に into が 入っている（棚が 作られる）' : null) },
-  /* ★`(` を 必ず 要る★＝`create table x as select …`（他の 部屋の 中身を 複製）を 許さない */
+  /* ★`(` を 必ず 要る★＝`create table x as select ...`（他の 部屋の 中身を 複製）を 許さない */
   { name: '棚を 足す', re: /^create\s+(?:unlogged\s+)?table\s+(?:if\s+not\s+exists\s+)?[\w.]+\s*\(/i },
   { name: '索引を 張る', re: /^create\s+(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?[\w]+\s+on\s+/i },
   { name: '列/決まりを 足す・RLS を 入れる',
@@ -257,7 +257,7 @@ const ALLOW = [
   { name: '鍵を 配る(grant)', re: /^grant\s+/i,
     mi: (b) => (/\bon\b/i.test(b) ? null : '役(ロール)を 配ろうとしている（誰が 開けるかが 変わる＝先に 司さんに 訊く）') },
   { name: '鍵を 減らす(revoke)', re: /^revoke\s+/i },
-  /* ★`do $$ … $$` は 中身を checkDoBlocks が 読む★（ここは 形だけ） */
+  /* ★`do $$ ... $$` は 中身を checkDoBlocks が 読む★（ここは 形だけ） */
   { name: 'do の 塊', re: /^do\s+\$do\$(?:\s+language\s+plpgsql)?$/i },
 ];
 
@@ -274,7 +274,7 @@ export function guard(sql, opts) {
   /* ── ① ★白名簿＝1文ずつ★（ここが 本体） ── */
   for (const bun of splitStatements(sql)) {
     const a = ALLOW.find((x) => x.re.test(bun));
-    if (!a) { reasons.push('★許した形に 無い文★: ' + (bun.length > 70 ? bun.slice(0, 70) + '…' : bun)); continue; }
+    if (!a) { reasons.push('★許した形に 無い文★: ' + (bun.length > 70 ? bun.slice(0, 70) + '...' : bun)); continue; }
     const ng = a.mi ? a.mi(bun) : null;
     if (ng) reasons.push(ng + ' → ' + bun.slice(0, 70));
   }

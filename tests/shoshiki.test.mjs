@@ -125,7 +125,7 @@ T('★★和暦と 経過時間は 実Excel の 答え★★（2026-10-02 に �
   ];
   for (const [v, f, 期待] of 組) {
     const 出 = S.字にする(v, f);
-    if (出 !== 期待) throw new Error(f + ' … ' + JSON.stringify(出) + '（実Excel ' + 期待 + '）');
+    if (出 !== 期待) throw new Error(f + ' ... ' + JSON.stringify(出) + '（実Excel ' + 期待 + '）');
   }
   /* ★負で 単位が 2つ 以上は 出せない★（TEXT は #VALUE! ／ マスは ####） */
   if (S.字にする(-1.5, '[h]:mm') !== null) throw new Error('負の [h]:mm は 出せない はず');
