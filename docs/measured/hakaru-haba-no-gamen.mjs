@@ -69,17 +69,26 @@ async function 本を描く(本の道, 先) {
             const m = this.getTransform(); const d = m.a || 1;
             const X = (m.a * x + m.e) / d, Y = (m.d * y + m.f) / d;
             if (X > window.HDR_W && Y > window.HDR_H) {
-              const k = window.yToR(Y) + ',' + window.xToC(X);
+              let k = window.yToR(Y) + ',' + window.xToC(X);
+              /* ★結合の 中で 描かれた 字は 結合の 頭に 付ける★（中央揃えは 中の マスから 描き始める＝10-04 夕 経営者の 分母の 外 167） */
+              if (頭へ && 頭へ[k]) k = 頭へ[k];
               描いた[k] = (描いた[k] || '') + String(t);
             }
           }
         } catch (e) { /* 取れない 物は 取らない */ }
         return 元.apply(this, arguments);
       };
+      let 頭へ = null;
       try {
         for (let i = 0; i < window.sheets.length; i++) {
           window.switchSheet(i);
           const sh = window.sheets[i];
+          頭へ = {};
+          for (const k of Object.keys(sh.data || {})) {
+            const me = sh.data[k] && sh.data[k].mergeEnd; if (!me) continue;
+            const [r0, c0] = k.split(',').map(Number);
+            for (let rr = r0; rr <= me.r; rr++) for (let cc = c0; cc <= me.c; cc++) 頭へ[rr + ',' + cc] = k;
+          }
           let 最行 = 0, 最列 = 0;
           for (const k of Object.keys(sh.data || {})) { const [r, c] = k.split(',').map(Number); if (r > 最行) 最行 = r; if (c > 最列) 最列 = c; }
           const 全 = {};

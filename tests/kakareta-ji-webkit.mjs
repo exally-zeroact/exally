@@ -57,6 +57,18 @@ function 作る() {
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, 作る(), 'かくす');
 XLSX.utils.book_append_sheet(wb, 作る(), 'みせる');
+/* ★⑷ 結合した マス★（10-04 夕・経営者の「① の 描く 版」で 結合の 頭に ★同じ 字が 2回★／★#### ★ が 出た）
+     狭い 列 3本（各 5字）を 結合し 日付（yyyy"年"m"月"）＝1マス分 では 入らない・結合した 幅 なら 入る
+     ⇒★結合の 頭に 1回 だけ「2026年1月」★（1周目の 1マス分の 「####」や 2回目を 描かない） */
+{
+  const ws = {};
+  ws.A1 = { t: 'n', v: 46023, z: 'yyyy"年"m"月"' };
+  ws.B1 = { t: 'z' }; ws.C1 = { t: 'z' };
+  ws['!ref'] = 'A1:C1';
+  ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
+  ws['!cols'] = [{ wch: 5 }, { wch: 5 }, { wch: 5 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'けつごう');
+}
 const 材料 = path.join(os.tmpdir(), 'exally-kakareta-ji.xlsx');
 fs.writeFileSync(材料, XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' }));
 {
@@ -97,6 +109,15 @@ try {
     for (let i = 0; i < window.sheets.length; i++) {
       window.switchSheet(i);
       const 描いた = {};
+      const 回 = {};
+      /* ★結合の 中で 描かれた 字は 結合の 頭に 付ける★（中央揃えの 字は 中の マスの 座標から 描き始める） */
+      const 頭へ = {};
+      const dt = window.sheets[i].data || {};
+      for (const k of Object.keys(dt)) {
+        const me = dt[k] && dt[k].mergeEnd; if (!me) continue;
+        const [r0, c0] = k.split(',').map(Number);
+        for (let rr = r0; rr <= me.r; rr++) for (let cc = c0; cc <= me.c; cc++) 頭へ[rr + ',' + cc] = k;
+      }
       const 型 = window.CanvasRenderingContext2D.prototype;
       const 元 = 型.fillText;
       型.fillText = function (t, x, y) {
@@ -105,8 +126,10 @@ try {
             const m = this.getTransform(); const d = m.a || 1;
             const X = (m.a * x + m.e) / d, Y = (m.d * y + m.f) / d;
             if (X > window.HDR_W && Y > window.HDR_H) {
-              const k = window.yToR(Y) + ',' + window.xToC(X);
+              let k = window.yToR(Y) + ',' + window.xToC(X);
+              if (頭へ[k]) k = 頭へ[k];
               描いた[k] = (描いた[k] || '') + String(t);
+              回[k] = (回[k] || 0) + 1;
             }
           }
         } catch (e) { /* 取れない 物は 取らない */ }
@@ -114,13 +137,17 @@ try {
       };
       try { window.render(); await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))); }
       finally { 型.fillText = 元; }
-      出[window.sheets[i].name] = { 隠す: !!window.sheets[i].ゼロを隠す, 字: Array.from({ length: n }, (_, k) => 描いた[(k * 2) + ',0'] || '') };
+      出[window.sheets[i].name] = { 隠す: !!window.sheets[i].ゼロを隠す, 字: Array.from({ length: n }, (_, k) => 描いた[(k * 2) + ',0'] || ''),
+        頭: { 字: 描いた['0,0'] || '', 回: 回['0,0'] || 0 } };
     }
     return 出;
   }, 組.length);
   console.log('      ── 実測 ── みせる（隠す ' + 板の字['みせる'].隠す + '）' + JSON.stringify(板の字['みせる'].字)
     + ' ／ かくす（隠す ' + 板の字['かくす'].隠す + '）' + JSON.stringify(板の字['かくす'].字));
   T('★材料の 段★ 「かくす」は ゼロを 隠す 板／「みせる」は 隠さない', 板の字['かくす'].隠す && !板の字['みせる'].隠す);
+  const 結 = 板の字['けつごう'].頭;
+  console.log('      ── 実測 ── 結合の 頭 … 描いた ' + JSON.stringify(結.字) + ' ／ fillText ' + 結.回 + '回');
+  T('⑷ 結合の 頭は 結合した 幅で 1回 だけ 描く（2026年1月）', 結.字 === '2026年1月' && 結.回 === 1, JSON.stringify(結));
   組.forEach((x, k) => {
     T('⑴ 隠さない 板の 書式付き 0 を 描く ' + x.書 + ' ⇒ ' + x.字, 板の字['みせる'].字[k] === x.字, '描いた=' + JSON.stringify(板の字['みせる'].字[k]));
     T('⑵ 隠す 板の 書式付き 0 は 描かない ' + x.書, 板の字['かくす'].字[k] === '', '描いた=' + JSON.stringify(板の字['かくす'].字[k]));
