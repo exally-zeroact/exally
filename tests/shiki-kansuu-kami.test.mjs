@@ -1190,7 +1190,8 @@ for (const d of [path.join(ROOT, 'docs/measured'), path.join(ROOT, 'docs/measure
            `# ★この紙は 式の 答えの 紙では ありません★`
          ★読まない 紙は 名前を 出します★＝★黙って 減らさない★ */
     const 頭 = fs.readFileSync(path.join(d, f), 'utf8').slice(0, 4000);
-    if (頭.indexOf('この紙は 式の 答えの 紙では ありません') >= 0) { 読まない紙.push(f); continue; }
+    /* ★空きを 除いて 読む★（2026-10-04 夜＝道具134 が「この 紙は」と 空きを 入れて 書いた。字の 空き 1つで 門が 割れない様に） */
+    if (頭.replace(/[ 　]/g, '').indexOf('この紙は式の答えの紙ではありません') >= 0) { 読まない紙.push(f); continue; }
     紙たち.push(path.join(d, f));
   }
 }

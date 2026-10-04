@@ -34,6 +34,11 @@ if (本) { await 本を描く(本, 出す先); process.exit(0); }
 const 幅 = Number(取る('幅', '8.44'));
 const 紙 = path.join(ROOT, 取る('紙', 'docs/measured/golden-sel-shoshiki-haba-hyoujun-2026-10-04.tsv'));
 const 壊す = 引数.includes('--壊す');
+/* ★--倍★ 画面の 細かさ（物差しは 200% の Excel＝--倍 2 で 揃える）
+   ★--境目 <tsv>★ 経営者の 境目の 紙（道具134）。組ごとに 列（Excel の 点）が 境目から 1px 以内か を 決め、
+     「遠い 組の 違う」と「近い 組の 違う」を 分けて 出す（kakareta ⑶＝遠いは 全部 合う／近いは 記録より 増えたら 赤） */
+const 倍 = Number(取る('倍', '1'));
+const 境目の紙 = 取る('境目', null);
 
 async function 本を描く(本の道, 先) {
   if (!fs.existsSync(本の道)) { console.log('★本が 在りません★'); process.exit(2); }
@@ -142,7 +147,15 @@ console.log('[幅の 画面] 幅 ' + 幅 + ' ／ 紙 ' + path.basename(紙) + ' 
 
 /* ★敷き詰め★＝列 N 本・行は 1つ 空けて（はみ出しや 重なりを 隣の 組と 混ぜない＝★隣の 列も 1つ 空ける★） */
 const 画面幅 = 2400, 画面高 = 2400;
-const 列の点 = Math.max(10, 幅 * 7.5 + 5);   /* ★見積り（敷き詰めの 列数を 決める だけ）★ */
+/* ★見積り（敷き詰めの 列数を 決める だけ）★
+   ★★2026-10-04 夜 直し★★ 前は「幅×7.5＋5」。★Linux の WebKit では 1字 約10点＝列が 93点★（Windows 74点）で、
+     敷き詰めが 画面（2400）から はみ出し ★22組が 描かれず★「字が違う」に 混ざった（経営者も 私も 別の 不具合と 読み違えた）。
+   ⇒★1字 12点で 見積もる★（広め）＋★描いた後に 本番の colX/cW/rowY で 画面に 入ったかを 確かめ、入らなければ 止める★ */
+const 列の点 = Math.max(10, 幅 * 12 + 5);
+/* ★実Excel の 列の 点★（游ゴシック 11）＝ ★(字 × 8 ＋ 4.5) を 0.5点に 丸める★
+   出どころ ･･･ 経営者の ㋑（8.43/8.44→72・1→12.5・10→84.5）と hashira-haba の 9列（2→20.5 ... 30→244.5）、
+   司さんの 本 516列（9→76.5・6.81→59・20.06→165）＝全部 この 式に 合う（★4 と 60 は 式からの 見立て・未測定★） */
+const Excelの点 = Math.round((幅 * 8 + 4.5) * 2) / 2;
 const 列数 = Math.max(1, Math.floor((画面幅 - 120) / (列の点 * 2)) - 1);
 const ws = {};
 const 置き場 = [];
@@ -169,7 +182,7 @@ const s = http.createServer((q, r) => {
 await new Promise((x) => s.listen(0, '127.0.0.1', x));
 const wk = await borrow('haba-no-gamen', 'webkit');
 const br = await launch('haba-no-gamen', wk, {}, 'webkit');
-const p = await br.newPage({ viewport: { width: 画面幅, height: 画面高 } });
+const p = await br.newPage({ viewport: { width: 画面幅, height: 画面高 }, deviceScaleFactor: 倍 });
 let 終わり値 = 0;
 try {
   await p.goto('http://127.0.0.1:' + s.address().port + '/book.html', { waitUntil: 'load', timeout: 120000 });
@@ -181,8 +194,20 @@ try {
     .filter((x) => typeof window[x] !== 'function').concat(window.ctx ? [] : ['ctx']));
   if (無い.length) { console.log('★道が 無い★ ' + 無い.join(' / ')); process.exit(8); }
   /* ★本番の render() を 呼び、fillText を 覗く★（取る だけ・描く 物は 変えない） */
-  const 出 = await p.evaluate(async ([n置, 壊]) => {
+  const 出 = await p.evaluate(async ([n置, 壊, 置き場, Excelの点]) => {
     window.switchSheet(0);
+    /* ★★物差しの 本と 条件を 揃える★★（2026-10-04 夜）
+         物差し（経営者の 道具132）は ★既定 游ゴシック 11 の 本★で 取った。SheetJS が 書く 材料は ★既定 Calibri 12★、
+         列の width も SheetJS が wch から 作る（8.44 → 9.27＝うち 74点・Linux 93点）＝★物差しと 別の 本★だった。
+         Windows で 緑だったのは ★たまたま★（Calibri 12 の「0」が 8 で、74点が 72点に 近かった）。
+       ⇒ 板の 既定を 游ゴシック 11 に し、マスの 字体を 外し、★列は 実Excel の 点を 直に 置く★ */
+    {
+      const sh = window.sheets[window.activeSheet];
+      sh.既定の字体名 = '游ゴシック'; sh.既定の字大 = 11;
+      for (const k of Object.keys(sh.data)) { delete sh.data[k].fontName; delete sh.data[k].fontSize; }
+      const 右 = Math.max(...置き場.map((q) => q.c));
+      for (let c = 0; c <= 右 + 1; c++) sh.colW[c] = Excelの点;
+    }
     if (壊) window._数が入らないか = function () { return false; };
     const 描いた = [];
     /* ★全部の 筆が 通る 所で 覗く★（描く 所が どの 筆を 使っても 拾える） */
@@ -206,26 +231,50 @@ try {
     try { window.render(); await 二回待つ(); } finally { 型.fillText = 元; }
     const 字 = {};
     for (const d of 描いた) { const k = d.r + ',' + d.c; (字[k] = 字[k] || []).push(d.t); }
-    return { 字, 描いた数: 描いた.length, 列の点: window.cW(0) };
-  }, [置き場.length, 壊す]);
-  console.log('  列の 幅（cW）' + 出.列の点 + ' ／ fillText ' + 出.描いた数 + '回');
+    /* ★本番の 道で 一番 右下の マスの 端を 出す★（画面に 入ったかを 外で 判じる） */
+    const 右 = Math.max(...置き場.map((q) => q.c)), 下 = Math.max(...置き場.map((q) => q.r));
+    return { 字, 描いた数: 描いた.length, 列の点: window.cW(0),
+      右端: window.colX(右) + window.cW(右), 下端: window.rowY(下) + 20, 画面: [window.innerWidth, window.innerHeight] };
+  }, [置き場.length, 壊す, 置き場, Excelの点]);
+  console.log('  列の 幅（cW）' + 出.列の点 + ' ／ fillText ' + 出.描いた数 + '回 ／ 敷き詰めの 右端 ' + Math.round(出.右端) + '・下端 ' + Math.round(出.下端)
+    + '（画面 ' + 出.画面.join('×') + '）');
+  /* ★画面に 入って いなければ 測って いない★＝合う／違う を 出さずに 止める */
+  if (!(出.右端 <= 出.画面[0] && 出.下端 <= 出.画面[1])) { console.log('★敷き詰めが 画面に 入らない＝測って いない（道具の 誤り）★'); await p.close(); await br.close(); s.close(); process.exit(8); }
   let 合 = 0, 描かれない = 0; const 違 = {};
+  /* ★境目の 紙★＝組・値の式・書式 で 突き合わせる（1組でも 引けなければ 止める＝黙って 遠いに しない） */
+  let 境 = null;
+  if (境目の紙) {
+    const B = fs.readFileSync(path.join(ROOT, 境目の紙), 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
+    const bh = B.shift().split('\t');
+    const bi = (n) => bh.indexOf(n);
+    境 = new Map(B.map((l) => l.split('\t')).map((c) => [c[bi('組')] + '|' + c[bi('値の式')] + '|' + c[bi('書式')],
+      { 判: c[bi('判じ')], 入: Number(c[bi('入る一番狭い(px)')]), 出: Number(c[bi('入らない一番広い(px)')]) }]));
+    const 引けない = 組.filter((x) => !境.has(x.組 + '|' + x.式 + '|' + x.書));
+    if (引けない.length) { console.log('★境目の 紙に 無い 組 ' + 引けない.length + '★ 例 ' + 引けない.slice(0, 3).map((x) => x.組 + ' ' + x.式 + ' ' + x.書).join(' ／ ')); await p.close(); await br.close(); s.close(); process.exit(8); }
+  }
+  const 近いか = (x) => { if (!境) return false; const b = 境.get(x.組 + '|' + x.式 + '|' + x.書); return b.判 === '境目' && Excelの点 >= b.出 - 1 && Excelの点 <= b.入 + 1; };
+  let 近い違う = 0, 遠い違う = 0, 近い数 = 0;
+  組.forEach((x) => { if (近いか(x)) 近い数++; });
   組.forEach((x, i) => {
     const pl = 置き場[i];
     /* ★そのマスの 左端から 描かれた 字★（はみ出した 字は 左の マスの 座標で 拾える） */
     const 並び = 出.字[pl.r + ',' + pl.c] || [];
     const g = 並び.join('');
-    if (!並び.length) 描かれない++;
+    /* ★描かれなかった 組は「違う」に 混ぜない★（別の 型＝道具か 描く 所の どちらか。1組でも 赤） */
+    if (!並び.length) { 描かれない++; (違['★描かれなかった★'] = 違['★描かれなかった★'] || []).push(x.組 + ' ' + x.式 + ' ' + x.書 + ' 実Excel=' + JSON.stringify(x.字)); return; }
     const ok = (/^#+$/.test(x.字) && /^#+$/.test(g)) || g === x.字;
     if (ok) { 合++; return; }
-    const 型名 = /^#+$/.test(x.字) ? 'Excel# うち字' : (/^#+$/.test(g) ? 'Excel字 うち#' : '字が違う');
+    if (近いか(x)) 近い違う++; else 遠い違う++;
+    const 型名 = (境 ? (近いか(x) ? '［境目から1px 以内］' : '［遠い］') : '') + (/^#+$/.test(x.字) ? 'Excel# うち字' : (/^#+$/.test(g) ? 'Excel字 うち#' : '字が違う'));
     (違[型名] = 違[型名] || []).push(x.組 + ' ' + x.式 + ' ' + x.書 + ' 画面=' + JSON.stringify(g) + ' 実Excel=' + JSON.stringify(x.字));
   });
-  console.log('  ★見た ' + 組.length + ' ／ 合った ' + 合 + ' ／ 違う ' + (組.length - 合) + '★（描かれなかった ' + 描かれない + '）');
+  console.log('  ★見た ' + 組.length + ' ／ 合った ' + 合 + ' ／ 違う ' + (組.length - 合) + '★（描かれなかった ' + 描かれない + '）'
+    + ' ／ 倍 ' + 倍 + ' ／ 列 ' + Excelの点 + '点');
+  if (境) console.log('  ★境目から 1px 以内 ' + 近い数 + '組 ／ 遠い 違う ' + 遠い違う + ' ／ 近い 違う ' + 近い違う + '★');
   for (const k of Object.keys(違)) {
     console.log('  ── ' + k + ' ' + 違[k].length + '組');
-    違[k].slice(0, 12).forEach((t) => console.log('     ' + t));
+    違[k].forEach((t) => console.log('     ' + t));
   }
-  終わり値 = (組.length - 合) ? 1 : 0;
+  終わり値 = (組.length - 合 || 描かれない) ? 1 : 0;
 } finally { await p.close(); await br.close(); s.close(); }
 process.exit(終わり値);

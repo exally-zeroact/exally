@@ -32,6 +32,15 @@ console.log('[kakareta-ji] ★画面に 描かれた 字が 実Excel と 同じ�
 
 const 道具 = path.join(ROOT, 'docs/measured/hakaru-haba-no-gamen.mjs');
 const 紙 = 'docs/measured/golden-sel-shoshiki-haba-hyoujun-2026-10-04.tsv';
+/* ★⑶ の 条件★（2026-10-04 夜・経営者と 決めた）
+     ・物差しは ★200% の 画面の Excel★（経営者の 機械）＝★--倍 2★ で 揃える
+     ・★境目の 紙★（道具134・游ゴシック 11）で 組ごとに「列が 境目から 1px 以内か」を 分ける
+     ・★遠い 組は 全部 合う★（違う 0）
+     ・★近い 組の 違いは OS ごとの 記録まで★＝字の 幅を Excel と 同じに できない（±0.6px）ので 0 は 約束しない。
+       ★増えたら 赤★。下がったら 記録を 下げる（★上げない★）。記録の 無い OS は 未測定＝赤 */
+const 境目 = 'docs/measured/golden-ji-wo-dasu-ichiban-semai-haba-2026-10-04.tsv';
+const 三の引数 = ['--幅', '8.44', '--紙', 紙, '--倍', '2', '--境目', 境目];
+const 近いの記録 = { win32: 2, linux: 2 };   /* ★2026-10-04 夜 実測★ win32＝手元 WebKit・linux＝CI（使い捨ての枝 run 37192014268） */
 
 if (壊す) {
   /* ★先に 借りる★（10-04 夜・CI で 赤）＝毎回の CI（ci.yml）には webkit が 無い。
@@ -40,10 +49,10 @@ if (壊す) {
        （手元には webkit が 在るので 総なめでは 見えなかった） */
   await borrow('kakareta-ji', 'webkit');
   /* ★わざと 壊す★＝`_数が入らないか` を いつも 偽 ⇒ Excel の # が うちで 字に なる ⇒ 赤 で なければ 見張りは 死んで いる */
-  const r = spawnSync(process.execPath, [道具, '--幅', '8.44', '--紙', 紙, '--壊す'], { cwd: ROOT, encoding: 'utf8' });
-  const 違 = /違う (\d+)/.exec(r.stdout || '');
-  console.log('      ── 壊した 時 ── exit ' + r.status + ' ／ ' + (違 ? '違う ' + 違[1] : '出しが 読めない'));
-  T('★わざと 壊すと 赤（exit 1・違う 1 以上）★', r.status === 1 && 違 && Number(違[1]) > 0, (r.stdout || '').slice(-300));
+  const r = spawnSync(process.execPath, [道具, ...三の引数, '--壊す'], { cwd: ROOT, encoding: 'utf8' });
+  const 違 = /遠い 違う (\d+)/.exec(r.stdout || '');
+  console.log('      ── 壊した 時 ── exit ' + r.status + ' ／ ' + (違 ? '遠い 違う ' + 違[1] : '出しが 読めない'));
+  T('★わざと 壊すと 赤（遠い 違う 1 以上）★', 違 && Number(違[1]) > 0, (r.stdout || '') + (r.stderr || ''));
   console.log('\nkakareta-ji --self-test: ' + pass + ' 緑 / ' + fail + ' 赤');
   process.exit(fail ? 1 : 0);
 }
@@ -161,10 +170,17 @@ try {
 
 /* ══ ⑶ 幅 8.44 の 166組（経営者の 物差し）＝描かれた 字で ══ */
 {
-  const r = spawnSync(process.execPath, [道具, '--幅', '8.44', '--紙', 紙], { cwd: ROOT, encoding: 'utf8' });
-  const m = /見た (\d+) ／ 合った (\d+) ／ 違う (\d+)/.exec(r.stdout || '');
-  console.log('      ── 実測 ── 幅 8.44 ... ' + (m ? '見た ' + m[1] + ' ／ 合った ' + m[2] + ' ／ 違う ' + m[3] : '出しが 読めない'));
-  T('⑶ 幅 8.44 の 物差し 166組が 描かれた 字で 全部 合う', r.status === 0 && m && m[1] === '166' && m[3] === '0', (r.stdout || '').slice(-400));
+  const r = spawnSync(process.execPath, [道具, ...三の引数], { cwd: ROOT, encoding: 'utf8' });
+  const m = /見た (\d+) ／ 合った (\d+) ／ 違う (\d+)★（描かれなかった (\d+)）/.exec(r.stdout || '');
+  const k = /遠い 違う (\d+) ／ 近い 違う (\d+)/.exec(r.stdout || '');
+  const 記録 = Object.prototype.hasOwnProperty.call(近いの記録, process.platform) ? 近いの記録[process.platform] : null;
+  console.log('      ── 実測 ── 幅 8.44（倍2）... ' + (m ? '見た ' + m[1] + ' ／ 合った ' + m[2] + ' ／ 違う ' + m[3] + ' ／ 描かれなかった ' + m[4] : '出しが 読めない')
+    + ' ／ ' + (k ? '遠い 違う ' + k[1] + ' ／ 近い 違う ' + k[2] : '境目の 数が 読めない') + ' ／ ' + process.platform + ' の 記録 ' + 記録);
+  /* ★出しを 切らない★（10-04 夜＝末尾 400字で 切って 29組の 内訳が 見えなかった） */
+  const 出し = (r.stdout || '') + (r.stderr || '');
+  T('⑶ 幅 8.44 の 166組が 全部 描かれ、境目から 1px より 遠い 組は 全部 合う', !!(m && m[1] === '166' && m[4] === '0' && k && k[1] === '0'), 出し);
+  T('⑶ 境目から 1px 以内の 違いが ' + process.platform + ' の 記録（' + 記録 + '）より 増えて いない', !!(記録 !== null && k && Number(k[2]) <= 記録),
+    記録 === null ? '★' + process.platform + ' の 記録が 無い＝未測定（緑に しない）★\n' + 出し : 出し);
 }
 
 console.log('\nkakareta-ji: ' + pass + ' 緑 / ' + fail + ' 赤');
