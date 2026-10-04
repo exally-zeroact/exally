@@ -68,7 +68,17 @@ try {
     if ($字 -match '^#+$') { $隠れ++ }
     $us = [string]$c.NumberFormat
     $lo = [string]$c.NumberFormatLocal
-    [void]$行.Add(($q[0] + "`t" + $q[1] + "`t" + $q[2] + "`t" + $字 + "`t" + $us + "`t" + $lo + "`t" + $誤))
+    # ★★0 を 2つの 窓で 見る★★（2026-10-04・tests/monosashi-mado.test.mjs）
+    #   ★2つ目の 窓★ ... 隣の マスに `=(式)=0` を 打ち ★本当に 0 か★ の 真偽を 取る
+    #   ★3つ目の 窓★ ... .Value2 の 型（String / Double / 他）
+    $v = $c.Value2
+    $型 = '他'
+    if ($v -is [string]) { $型 = 'String' } elseif ($v -is [double]) { $型 = 'Double' }
+    $c2 = $ws.Cells.Item($r, 2)
+    $c2.Formula = ('=(' + ([string]$q[1]).Substring(1) + ')=0')
+    $真 = [string]$c2.Value2
+    $c2 = $null
+    [void]$行.Add(($q[0] + "`t" + $q[1] + "`t" + $q[2] + "`t" + $字 + "`t" + $us + "`t" + $lo + "`t" + $誤 + "`t" + $型 + "`t" + $真))
     $c = $null
     $r++
   }
@@ -82,7 +92,7 @@ try {
 $書 = New-Object System.IO.StreamWriter($出す先, $false, (New-Object System.Text.UTF8Encoding($false)))
 $書.NewLine = "`n"
 $書.WriteLine('# 132 実Excel のマスの書式としての .Text（和暦・経過時間）／Excel ' + $版xl + '／頼んだ ' + $頼.Count + '／書いた ' + $行.Count)
-$書.WriteLine("組`t値の式`t渡した書式(Local)`t画面の字(.Text)`t読み戻し(.NumberFormat US)`t読み戻し(.NumberFormatLocal)`t誤り")
+$書.WriteLine("組`t値の式`t渡した書式(Local)`t画面の字(.Text)`t読み戻し(.NumberFormat US)`t読み戻し(.NumberFormatLocal)`t誤り`t値の型(.Value2)`t本当に0か(=(式)=0)")
 foreach ($l in $行) { $書.WriteLine($l) }
 $書.Close()
 
