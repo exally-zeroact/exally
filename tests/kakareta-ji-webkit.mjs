@@ -1,0 +1,139 @@
+/* kakareta-ji-webkit.mjs ･･･ ★画面に 実際に 描かれた 字（render() の fillText）が 実Excel と 同じか★ 2026-10-04
+ *
+ *  ★★なぜ 要るか★★
+ *    画面の 関数を 並べて 呼ぶ 測りは、★描く 段の 抜け★を 見ない（経営者の 叩き⑴）。
+ *    ⇒ render() を 呼び fillText を 覗いて 初めて ★書式付きの 値 0 が 描かれて いない★（`if(!raw) return;`）が 見えた。
+ *  ★★見る 物★★
+ *    ⑴ ★ゼロを 隠さない 板★の 書式付き 0 は 描く（[h]:mm → 0:00 ／ [s] → 0 ／ ge.m.d;@ → M33.1.0 ／ 0.00E+00 → 0.00E+00）
+ *       ＝実Excel の 真値（経営者 道具132・幅 60・組 K／S／X）
+ *    ⑵ ★ゼロを 隠す 板★（showZeros="0"）の 書式付き 0 は 描かない（司さんの 本の 3マス＝DisplayZeros False・実Excel も 空）
+ *    ⑶ 幅 8.44 の 166組（経営者の 物差し）を 描かれた 字で 突き合わせる＝`docs/measured/hakaru-haba-no-gamen.mjs` を 走らせる
+ *  ★--self-test★ ... `_数が入らないか` を いつも 偽に して ⑶ が 赤に なるか（経営者の 叩き⑷）
+ *  ★走らせ方★: node tests/kakareta-ji-webkit.mjs [--self-test]
+ */
+import path from 'node:path'; import http from 'node:http'; import fs from 'node:fs'; import os from 'node:os';
+import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { borrow, launch } from '../scripts/_borrow-playwright.mjs';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
+const XLSX = require_(path.join(ROOT, 'lib/xlsx.full.min.js'));
+const ZipSurgeon = require_(path.join(ROOT, 'lib/zip-surgeon.js'));
+const 壊す = process.argv.includes('--self-test');
+
+let pass = 0, fail = 0;
+const T = (n, ok, m) => {
+  if (ok) { pass++; console.log('  ok   ' + n); }
+  else { fail++; console.log('  NG   ' + n + (m ? '\n       ' + m : '')); }
+};
+console.log('[kakareta-ji] ★画面に 描かれた 字が 実Excel と 同じか★' + (壊す ? '（--self-test＝わざと 壊す）' : ''));
+
+const 道具 = path.join(ROOT, 'docs/measured/hakaru-haba-no-gamen.mjs');
+const 紙 = 'docs/measured/golden-sel-shoshiki-haba-hyoujun-2026-10-04.tsv';
+
+if (壊す) {
+  /* ★わざと 壊す★＝`_数が入らないか` を いつも 偽 ⇒ Excel の # が うちで 字に なる ⇒ 赤 で なければ 見張りは 死んで いる */
+  const r = spawnSync(process.execPath, [道具, '--幅', '8.44', '--紙', 紙, '--壊す'], { cwd: ROOT, encoding: 'utf8' });
+  const 違 = /違う (\d+)/.exec(r.stdout || '');
+  console.log('      ── 壊した 時 ── exit ' + r.status + ' ／ ' + (違 ? '違う ' + 違[1] : '出しが 読めない'));
+  T('★わざと 壊すと 赤（exit 1・違う 1 以上）★', r.status === 1 && 違 && Number(違[1]) > 0, (r.stdout || '').slice(-300));
+  console.log('\nkakareta-ji --self-test: ' + pass + ' 緑 / ' + fail + ' 赤');
+  process.exit(fail ? 1 : 0);
+}
+
+/* ══ ⑴⑵ ★材料★ 板「みせる」（隠さない）と 板「かくす」（showZeros="0"）に 同じ 書式付き 0 ══ */
+const 組 = [
+  { 書: '[h]:mm', 字: '0:00' }, { 書: '[s]', 字: '0' }, { 書: 'ge.m.d;@', 字: 'M33.1.0' }, { 書: '0.00E+00', 字: '0.00E+00' },
+];
+function 作る() {
+  const ws = {};
+  組.forEach((x, i) => { ws[XLSX.utils.encode_cell({ r: i * 2, c: 0 })] = { t: 'n', v: 0, z: x.書 }; });
+  ws['!ref'] = 'A1:A' + (組.length * 2);
+  ws['!cols'] = [{ wch: 30 }];
+  return ws;
+}
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, 作る(), 'かくす');
+XLSX.utils.book_append_sheet(wb, 作る(), 'みせる');
+const 材料 = path.join(os.tmpdir(), 'exally-kakareta-ji.xlsx');
+fs.writeFileSync(材料, XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' }));
+{
+  /* ★借り物は showZeros を 書かない★＝包みを 開けて 書く（材料作り・zero-wo-kakusu-webkit と 同じ 手） */
+  const z = ZipSurgeon.read(new Uint8Array(fs.readFileSync(材料)));
+  const 名 = z.names().filter((n) => /^xl\/worksheets\/sheet1\.xml$/.test(n));
+  if (!名.length) { console.log('★板1が 見つかりません★'); process.exit(8); }
+  let xml = await z.text(名[0]);
+  xml = xml.indexOf('<sheetViews>') < 0
+    ? xml.replace('<sheetData>', '<sheetViews><sheetView showZeros="0" workbookViewId="0"/></sheetViews><sheetData>')
+    : xml.replace('<sheetView ', '<sheetView showZeros="0" ');
+  if (!/showZeros="0"/.test(xml)) { console.log('★showZeros を 書けない＝空振り★'); process.exit(8); }
+  z.replaceText(名[0], xml);
+  fs.writeFileSync(材料, Buffer.from((await z.build()).bytes));
+}
+
+const 型 = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+const s = http.createServer((q, r) => {
+  const f = path.join(ROOT, decodeURIComponent(String(q.url).split('?')[0]).replace(/^\/+/, ''));
+  if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.statusCode = 404; return r.end('no'); }
+  r.setHeader('content-type', 型[path.extname(f).toLowerCase()] || 'application/octet-stream');
+  fs.createReadStream(f).pipe(r);
+});
+await new Promise((x) => s.listen(0, '127.0.0.1', x));
+const wk = await borrow('kakareta-ji', 'webkit');
+const br = await launch('kakareta-ji', wk, {}, 'webkit');
+const p = await br.newPage({ viewport: { width: 1280, height: 900 } });
+try {
+  await p.goto('http://127.0.0.1:' + s.address().port + '/book.html', { waitUntil: 'load', timeout: 120000 });
+  await p.evaluate(() => { document.body.classList.remove('exally-locked'); const o = document.getElementById('loginOv'); if (o) o.style.display = 'none'; });
+  await p.setInputFiles('#bookFileInput', 材料);
+  await p.waitForFunction(() => (window.sheets || []).some((x) => Object.keys(x.data || {}).length), null, { timeout: 120000 });
+  await p.waitForTimeout(800);
+  /* ★描かれた 字を 板ごとに 取る★（render() を 呼び fillText を 覗く・取る だけ） */
+  const 板の字 = await p.evaluate(async (n) => {
+    const 出 = {};
+    for (let i = 0; i < window.sheets.length; i++) {
+      window.switchSheet(i);
+      const 描いた = {};
+      const 型 = window.CanvasRenderingContext2D.prototype;
+      const 元 = 型.fillText;
+      型.fillText = function (t, x, y) {
+        try {
+          if (this.canvas === window.ctx.canvas) {
+            const m = this.getTransform(); const d = m.a || 1;
+            const X = (m.a * x + m.e) / d, Y = (m.d * y + m.f) / d;
+            if (X > window.HDR_W && Y > window.HDR_H) {
+              const k = window.yToR(Y) + ',' + window.xToC(X);
+              描いた[k] = (描いた[k] || '') + String(t);
+            }
+          }
+        } catch (e) { /* 取れない 物は 取らない */ }
+        return 元.apply(this, arguments);
+      };
+      try { window.render(); await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))); }
+      finally { 型.fillText = 元; }
+      出[window.sheets[i].name] = { 隠す: !!window.sheets[i].ゼロを隠す, 字: Array.from({ length: n }, (_, k) => 描いた[(k * 2) + ',0'] || '') };
+    }
+    return 出;
+  }, 組.length);
+  console.log('      ── 実測 ── みせる（隠す ' + 板の字['みせる'].隠す + '）' + JSON.stringify(板の字['みせる'].字)
+    + ' ／ かくす（隠す ' + 板の字['かくす'].隠す + '）' + JSON.stringify(板の字['かくす'].字));
+  T('★材料の 段★ 「かくす」は ゼロを 隠す 板／「みせる」は 隠さない', 板の字['かくす'].隠す && !板の字['みせる'].隠す);
+  組.forEach((x, k) => {
+    T('⑴ 隠さない 板の 書式付き 0 を 描く ' + x.書 + ' ⇒ ' + x.字, 板の字['みせる'].字[k] === x.字, '描いた=' + JSON.stringify(板の字['みせる'].字[k]));
+    T('⑵ 隠す 板の 書式付き 0 は 描かない ' + x.書, 板の字['かくす'].字[k] === '', '描いた=' + JSON.stringify(板の字['かくす'].字[k]));
+  });
+} finally { await p.close(); await br.close(); s.close(); }
+
+/* ══ ⑶ 幅 8.44 の 166組（経営者の 物差し）＝描かれた 字で ══ */
+{
+  const r = spawnSync(process.execPath, [道具, '--幅', '8.44', '--紙', 紙], { cwd: ROOT, encoding: 'utf8' });
+  const m = /見た (\d+) ／ 合った (\d+) ／ 違う (\d+)/.exec(r.stdout || '');
+  console.log('      ── 実測 ── 幅 8.44 ... ' + (m ? '見た ' + m[1] + ' ／ 合った ' + m[2] + ' ／ 違う ' + m[3] : '出しが 読めない'));
+  T('⑶ 幅 8.44 の 物差し 166組が 描かれた 字で 全部 合う', r.status === 0 && m && m[1] === '166' && m[3] === '0', (r.stdout || '').slice(-400));
+}
+
+console.log('\nkakareta-ji: ' + pass + ' 緑 / ' + fail + ' 赤');
+process.exit(fail ? 1 : 0);
