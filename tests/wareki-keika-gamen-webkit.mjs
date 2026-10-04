@@ -48,7 +48,9 @@ function 立てる(root) {
 }
 
 /* ══ ★物差し★ ══（1列目＝組・2列目＝値の式・3列目＝書式・4列目＝画面の字） */
-const 紙 = path.join(ROOT, 'docs/measured/golden-sel-shoshiki-wareki-keika-2026-10-02.tsv');
+/* ★10-04 に 指数の 形の 値 16組（組 E：1E-7・-5.55E-17・1E+21・0.1+0.2-0.3）を 足した 171組の 紙へ★
+     （前の 155組は 1行も 変わって いない＝同じ 道具・同じ Excel） */
+const 紙 = path.join(ROOT, 'docs/measured/golden-sel-shoshiki-shisuu-2026-10-04.tsv');
 const 行 = fs.readFileSync(紙, 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
 const 頭 = 行.shift().split('\t');
 const 列 = (名) => 頭.indexOf(名);
@@ -64,19 +66,22 @@ function 通し(式) {
     if (n < 61) n -= 1;
     return n;
   }
-  if (!/^[-0-9.*/ ]+$/.test(s)) return null;
+  if (!/^[-0-9.*/ eE+()]+$/.test(s)) return null;   /* ★指数（1E-7）と 足し算（0.1+0.2-0.3）も★ */
   return Function('return (' + s + ')')();
 }
 const 組 = 行.map((l) => l.split('\t')).map((c) => ({ 式: c[c式], 書: c[c書], 字: c[c字], 値: 通し(c[c式]) }));
 const 読めない = 組.filter((x) => x.値 === null || !isFinite(x.値));
 console.log('[wareki-keika-gamen] ★和暦・経過時間の マスが 画面で 実Excel と 同じ 字か★');
 console.log('  ★物差し★ ' + path.basename(紙) + ' … ' + 組.length + '組（値を 読めない ' + 読めない.length + '）');
-if (組.length < 150 || 読めない.length) { console.log('★物差しが 足りない／読めない＝空振り★'); process.exit(8); }
+if (組.length < 171 || 読めない.length) { console.log('★物差しが 足りない／読めない＝空振り★'); process.exit(8); }
 
 /* ══ ★材料★ ══（1行1組・A列・列は 広く） */
 const ws = {};
 組.forEach((x, i) => { ws[XLSX.utils.encode_cell({ r: i, c: 0 })] = { t: 'n', v: x.値, z: x.書 }; });
-ws['!ref'] = 'A1:A' + 組.length;
+/* ★字の "1e-7" の マス★（経営者の 叩き⑴）＝★台の 道に 乗らない★ こと（乗れば `[s]` で "0" に なる） */
+const 字の行 = 組.length;
+ws[XLSX.utils.encode_cell({ r: 字の行, c: 0 })] = { t: 's', v: '1e-7', z: '[s]' };
+ws['!ref'] = 'A1:A' + (組.length + 1);
 ws['!cols'] = [{ wch: 60 }];
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, 'あ');
@@ -131,6 +136,16 @@ try {
   違.slice(0, 8).forEach((s) => console.log('         ' + s));
   T('★★和暦・経過時間の 書式の マスが 実Excel の 画面の 字と 同じ★★（' + 合 + '/' + 組.length + '）', 違.length === 0,
     違.length + '組 違う');
+  /* ★字の "1e-7" は 台の 道に 乗らない★（★今の 画面の 字が 実Excel と 同じかは 未測定＝別の 話★） */
+  const 字の出 = await page.evaluate((r) => {
+    const sh = window.sheets[window.activeSheet];
+    const cell = sh.data[r + ',0'];
+    const raw = window._字の元(cell);
+    return { 型: typeof raw, 画面: String(window.fmtForDisplay(raw, cell.numFmt, 30)) };
+  }, 字の行);
+  console.log('      ── 実測 ── 字の "1e-7"（[s]）... 型 ' + 字の出.型 + ' ／ 画面 ' + JSON.stringify(字の出.画面));
+  T('★字の "1e-7" は 台の 道に 乗らない★（台なら "0"）', 字の出.型 === 'string' && 字の出.画面 !== '0',
+    JSON.stringify(字の出));
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});

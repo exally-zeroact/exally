@@ -12,12 +12,12 @@
 
 | 判定 | 件数 |
 |---|---|
-| 一致 | 573 |
+| 一致 | 589 |
 | 不一致(既知) | 2 |
 | 不一致(新規) | 0 |
 | 未検証 | 0 |
 | 揮発性 | 2 |
-| **合計** | 577 |
+| **合計** | 593 |
 
 ※ 「未検証」は緑ではない。その版の真値がまだ無い、という意味。
 
@@ -71,7 +71,7 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 ## 経路の固定（将来 生HF に落ちたら気付くための錠）
 
 - 独自層(_jsComputeFormula)が答えたケース: **0件**
-- 生HFと本番経路で答えが違うケース: **350件** … この差が消えたら「素通りに落ちた」ということ
+- 生HFと本番経路で答えが違うケース: **366件** … この差が消えたら「素通りに落ちた」ということ
 - 独自層の入口: {"jsSetCount":1,"entryPoints":1,"pluginRegistered":true,"pluginCount":43}（1つだけであること）
 
 ## 全ケース
@@ -478,6 +478,22 @@ TODAY / NOW は毎回答えが変わるため **golden突合の対象外**。固
 | TEXT | TEXT_K_m1p5_f5 | `=TEXT(-1.5,"[s]")` | -129600 | -129600 | 未検証 | [0] | 一致 |  |
 | TEXT | TEXT_K_m1p5_f6 | `=TEXT(-1.5,"[h]")` | -36 | -36 | 未検証 | [-12] | 一致 |  |
 | TEXT | TEXT_K_m1p5_f7 | `=TEXT(-1.5,"[h]:mm:ss.00")` | #VALUE! | #VALUE! | 未検証 | [-12]:00:00 | 一致 |  |
+| TEXT | TEXT_E_1em7_f0 | `=TEXT(1E-7,"[h]:mm:ss")` | 0:00:00 | 0:00:00 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1em7_f1 | `=TEXT(1E-7,"[h]:mm:ss.00")` | 0:00:00.01 | 0:00:00.01 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1em7_f2 | `=TEXT(1E-7,"[s]")` | 0 | 0 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1em7_f3 | `=TEXT(1E-7,"ge.m.d")` | M33.1.0 | M33.1.0 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_m555em17_f0 | `=TEXT(-5.55E-17,"[h]:mm:ss")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_m555em17_f1 | `=TEXT(-5.55E-17,"[h]:mm:ss.00")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_m555em17_f2 | `=TEXT(-5.55E-17,"[s]")` | -0 | -0 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_m555em17_f3 | `=TEXT(-5.55E-17,"ge.m.d")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1ep21_f0 | `=TEXT(1E+21,"[h]:mm:ss")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1ep21_f1 | `=TEXT(1E+21,"[h]:mm:ss.00")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1ep21_f2 | `=TEXT(1E+21,"[s]")` | 86400000000000000000000000 | 86400000000000000000000000 | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_1ep21_f3 | `=TEXT(1E+21,"ge.m.d")` | #VALUE! | #VALUE! | 未検証 | #ERROR | 一致 |  |
+| TEXT | TEXT_E_hashuu_f0 | `=TEXT(0.1+0.2-0.3,"[h]:mm:ss")` | 0:00:00 | 0:00:00 | 未検証 | [0]:00:00 | 一致 |  |
+| TEXT | TEXT_E_hashuu_f1 | `=TEXT(0.1+0.2-0.3,"[h]:mm:ss.00")` | 0:00:00.00 | 0:00:00.00 | 未検証 | [0]:00:00 | 一致 |  |
+| TEXT | TEXT_E_hashuu_f2 | `=TEXT(0.1+0.2-0.3,"[s]")` | 0 | 0 | 未検証 | [0] | 一致 |  |
+| TEXT | TEXT_E_hashuu_f3 | `=TEXT(0.1+0.2-0.3,"ge.m.d")` | M33.1.0 | M33.1.0 | 未検証 | ge.12.30 | 一致 |  |
 | SORT | SORT_bare | `=SORT(E1:E6)` | 100 | 100 | 未検証 | 100 | 一致 |  |
 | UNIQUE | UNIQUE_bare | `=UNIQUE(D1:D6)` | A | A | 未検証 | A | 一致 |  |
 | FILTER | FILTER_bare | `=FILTER(E1:E6,D1:D6="A")` | 100 | 100 | 未検証 | 100 | 一致 |  |

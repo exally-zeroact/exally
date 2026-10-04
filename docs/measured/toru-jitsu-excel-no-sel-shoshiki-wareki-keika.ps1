@@ -18,11 +18,18 @@
 #  ★★門★★
 #    ①5.1（exit 8）／②走らせる 前の Excel が 0個（exit 3）★他の 席を 閉じません★
 #    ③★頼んだ 数 ≠ 書いた 数 なら 赤（exit 6）★
+#    ④★書式が 付かなかった 行が 在れば 赤（exit 9）★（2026-10-04）
+#
+#  ★★2026-10-04 追記 ── -幅 と -区切りも★★（Exally1 の 依頼・画面の「入らない ⇒ ####」と 区切り2つ以上の 書式）
+#    -幅 <数> ... 列の 幅（既定 60＝★今までと 同じ★）／-幅 標準 ... ★列の 幅を 触らない★（その 本の 標準の 幅）
+#    -区切りも ... ★区切りが 2つ以上 在る 書式★ と ★指数★ の 組を 足す（★渡さなければ 今までと 1行も 変わらない★）
+#    ⇒★出しの 頭に ★実際の 列の 幅★ を 書く★（★渡した 数で なく Excel が 読み戻した 数★）
+#    -指数も ... ★String に すると 指数の 形に なる 値★ × 和暦・経過の 書式（組 E・Exally1 の 依頼 10-04）
 #
 #  使い方:
-#    powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/measured/toru-jitsu-excel-no-sel-shoshiki-wareki-keika.ps1 -出す先 <tsv>
+#    powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/measured/toru-jitsu-excel-no-sel-shoshiki-wareki-keika.ps1 -出す先 <tsv> [-幅 60|標準|<数>] [-区切りも]
 
-param([string]$出す先 = '')
+param([string]$出す先 = '', [string]$幅 = '60', [switch]$区切りも, [switch]$指数も)
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
@@ -44,6 +51,20 @@ $経過の書式 = @('[h]:mm', '[hh]:mm', '[h]:mm:ss', '[m]:ss', '[mm]:ss', '[s]
 $頼 = New-Object System.Collections.ArrayList
 foreach ($d in $日付) { foreach ($f in $和暦の書式) { [void]$頼.Add(@('W', ('=DATE(' + $d + ')'), $f)) } }
 foreach ($v in $値) { foreach ($f in $経過の書式) { [void]$頼.Add(@('K', ('=' + $v), $f)) } }
+if ($指数も) {
+  # ★String に すると 指数に なる 数★（1e-7・-5.55e-17・1e+21・引き算の 端数 5.55e-17）
+  foreach ($v in @('=1E-7', '=-5.55E-17', '=1E+21', '=0.1+0.2-0.3')) {
+    foreach ($f in @('[h]:mm:ss', '[h]:mm:ss.00', '[s]', 'ge.m.d')) { [void]$頼.Add(@('E', $v, $f)) }
+  }
+}
+if ($区切りも) {
+  # ★区切りが 2つ以上★ ... 正・負・0・日付・字 の 5つの 値に 当てる
+  $区切りの値 = @('=1.5', '=-1.5', '=0', '=DATE(2026,1,31)', '="abc"')
+  $区切りの書式 = @('ge.m.d;@', '[h]:mm;[Red]-[h]:mm')
+  foreach ($v in $区切りの値) { foreach ($f in $区切りの書式) { [void]$頼.Add(@('S', $v, $f)) } }
+  # ★指数★（判じの 取り違えの 形）
+  foreach ($v in @('=1234.5', '=0', '=-0.000123')) { [void]$頼.Add(@('X', $v, '0.00E+00')) }
+}
 Write-Host ('★頼んだ 数★ ' + $頼.Count)
 
 $xl = New-Object -ComObject Excel.Application
@@ -51,19 +72,50 @@ $wb = $null; $ws = $null; $c = $null
 $行 = New-Object System.Collections.ArrayList
 $版xl = ''
 $隠れ = 0
+$付かず = 0
+$誤ら = New-Object System.Collections.ArrayList
 try {
   $xl.Visible = $false
   $xl.DisplayAlerts = $false
   $版xl = [string]$xl.Version + ' build ' + [string]$xl.Build
   $wb = $xl.Workbooks.Add()
   $ws = $wb.Worksheets.Item(1)
-  $ws.Columns.Item(1).ColumnWidth = 60
+  # ★★列の 幅は ★全部 入れた 後★ に 決める★★（2026-10-04）
+  #   ★なぜ★ ... 標準の 幅の 列に 日付・時刻の 書式の 値を 入れると ★Excel が 列を 勝手に 広げる★（8.44 → 15.19・実測）
+  #            ⇒★先に 幅を 読むと 「標準 8.44」と 書いて 広がった 幅の 字を 取る★（10-04 に 1回 やった）
   $r = 1
   foreach ($q in $頼) {
     $c = $ws.Cells.Item($r, 1)
     $c.Formula = [string]$q[1]
     $誤 = ''
     try { $c.NumberFormatLocal = [string]$q[2] } catch { $誤 = 'NumberFormatLocal が 投げた: ' + $_.Exception.Message }
+    # ★★2026-10-04 ── Local が 投げたら US の .NumberFormat で 付け直す★★
+    #   ★なぜ★ ... 日本語の Excel は Local に `[Red]` を 受けない（Local の 名は `[赤]`）
+    #            ⇒★投げた まま 書式が 付かず G/標準 の 字を 取って いた★（区切りの 5行・10-04 に 見つけた）
+    #   ★付け直しても 付かなければ 「付かなかった」に 数える★＝★その 行は 物差しに 使えない★
+    if ($誤 -ne '') {
+      try { $c.NumberFormat = [string]$q[2]; $誤 = $誤 + ' ⇒ ★US の NumberFormat で 付け直した★' }
+      catch {
+        # ★この 環境では .NumberFormat も 日本語の 名で 受ける★（読み戻しが `G/標準`）⇒★色の 名を 日本語に 換えて Local で 付ける★
+        $換 = ([string]$q[2]).Replace('[Red]', '[赤]')
+        if ($換 -ne [string]$q[2]) {
+          try { $c.NumberFormatLocal = $換; $誤 = $誤 + ' ⇒ US でも 投げた ⇒ ★[Red]→[赤] に 換えて Local で 付けた★' }
+          catch { $誤 = $誤 + ' ⇒ ★[赤] に 換えても 付かない★'; $付かず++ }
+        } else { $誤 = $誤 + ' ⇒ ★US でも 付かない★'; $付かず++ }
+      }
+    }
+    [void]$誤ら.Add($誤)
+    $c = $null
+    $r++
+  }
+  # ★★全部 入れた 後で 幅を 決める★★
+  if ($幅 -eq '標準') { $ws.Columns.Item(1).ColumnWidth = [double]$ws.StandardWidth } else { $ws.Columns.Item(1).ColumnWidth = [double]$幅 }
+  $実の幅 = [string]$ws.Columns.Item(1).ColumnWidth
+  Write-Host ('★列の 幅（読む 直前に 読み戻した）★ ' + $実の幅)
+  $r = 1
+  foreach ($q in $頼) {
+    $c = $ws.Cells.Item($r, 1)
+    $誤 = [string]$誤ら[$r - 1]
     $字 = [string]$c.Text
     if ($字 -match '^#+$') { $隠れ++ }
     $us = [string]$c.NumberFormat
@@ -91,11 +143,13 @@ try {
 
 $書 = New-Object System.IO.StreamWriter($出す先, $false, (New-Object System.Text.UTF8Encoding($false)))
 $書.NewLine = "`n"
-$書.WriteLine('# 132 実Excel のマスの書式としての .Text（和暦・経過時間）／Excel ' + $版xl + '／頼んだ ' + $頼.Count + '／書いた ' + $行.Count)
+$書.WriteLine('# 132 実Excel のマスの書式としての .Text（和暦・経過時間）／Excel ' + $版xl + '／列の幅 ' + $実の幅 + '（渡した -幅 ' + $幅 + '）／頼んだ ' + $頼.Count + '／書いた ' + $行.Count)
 $書.WriteLine("組`t値の式`t渡した書式(Local)`t画面の字(.Text)`t読み戻し(.NumberFormat US)`t読み戻し(.NumberFormatLocal)`t誤り`t値の型(.Value2)`t本当に0か(=(式)=0)")
 foreach ($l in $行) { $書.WriteLine($l) }
 $書.Close()
 
 Write-Host ('★Excel★ ' + $版xl)
 Write-Host ('★頼んだ ' + $頼.Count + ' ／ 書いた ' + $行.Count + ' ／ `####` で 隠れた ' + $隠れ + '★')
+Write-Host ('★書式が 付かなかった 行★ ' + $付かず + '（★0 で ないなら その 行は 物差しに 使えません★）')
 if ($頼.Count -ne $行.Count) { Write-Host '★★頼んだ 数と 書いた 数が 違います★★'; exit 6 }
+if ($付かず -ne 0) { exit 9 }

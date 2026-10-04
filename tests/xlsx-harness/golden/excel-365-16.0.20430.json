@@ -13,7 +13,7 @@
                  "listSep":  ",",
                  "date1904":  false,
                  "formulaProperty":  ".Formula (US-English) only; .FormulaLocal is NOT used",
-                 "caseCount":  575,
+                 "caseCount":  591,
                  "volatileSkipped":  [
                                          "TODAY_serial",
                                          "NOW_int_is_today"
@@ -2427,6 +2427,108 @@
                                          "code":  -2146826273,
                                          "text":  "#VALUE!"
                                      },
+                  "TEXT_E_1em7_f0":  {
+                                         "f":  "=TEXT(1E-7,\"[h]:mm:ss\")",
+                                         "t":  "s",
+                                         "v":  "0:00:00",
+                                         "text":  "0:00:00"
+                                     },
+                  "TEXT_E_1em7_f1":  {
+                                         "f":  "=TEXT(1E-7,\"[h]:mm:ss.00\")",
+                                         "t":  "s",
+                                         "v":  "0:00:00.01",
+                                         "text":  "0:00:00.01"
+                                     },
+                  "TEXT_E_1em7_f2":  {
+                                         "f":  "=TEXT(1E-7,\"[s]\")",
+                                         "t":  "s",
+                                         "v":  "0",
+                                         "text":  "0"
+                                     },
+                  "TEXT_E_1em7_f3":  {
+                                         "f":  "=TEXT(1E-7,\"ge.m.d\")",
+                                         "t":  "s",
+                                         "v":  "M33.1.0",
+                                         "text":  "M33.1.0"
+                                     },
+                  "TEXT_E_m555em17_f0":  {
+                                             "f":  "=TEXT(-5.55E-17,\"[h]:mm:ss\")",
+                                             "t":  "e",
+                                             "v":  "#VALUE!",
+                                             "code":  -2146826273,
+                                             "text":  "#VALUE!"
+                                         },
+                  "TEXT_E_m555em17_f1":  {
+                                             "f":  "=TEXT(-5.55E-17,\"[h]:mm:ss.00\")",
+                                             "t":  "e",
+                                             "v":  "#VALUE!",
+                                             "code":  -2146826273,
+                                             "text":  "#VALUE!"
+                                         },
+                  "TEXT_E_m555em17_f2":  {
+                                             "f":  "=TEXT(-5.55E-17,\"[s]\")",
+                                             "t":  "s",
+                                             "v":  "-0",
+                                             "text":  "-0"
+                                         },
+                  "TEXT_E_m555em17_f3":  {
+                                             "f":  "=TEXT(-5.55E-17,\"ge.m.d\")",
+                                             "t":  "e",
+                                             "v":  "#VALUE!",
+                                             "code":  -2146826273,
+                                             "text":  "#VALUE!"
+                                         },
+                  "TEXT_E_1ep21_f0":  {
+                                          "f":  "=TEXT(1E+21,\"[h]:mm:ss\")",
+                                          "t":  "e",
+                                          "v":  "#VALUE!",
+                                          "code":  -2146826273,
+                                          "text":  "#VALUE!"
+                                      },
+                  "TEXT_E_1ep21_f1":  {
+                                          "f":  "=TEXT(1E+21,\"[h]:mm:ss.00\")",
+                                          "t":  "e",
+                                          "v":  "#VALUE!",
+                                          "code":  -2146826273,
+                                          "text":  "#VALUE!"
+                                      },
+                  "TEXT_E_1ep21_f2":  {
+                                          "f":  "=TEXT(1E+21,\"[s]\")",
+                                          "t":  "s",
+                                          "v":  "86400000000000000000000000",
+                                          "text":  "86400000000000000000000000"
+                                      },
+                  "TEXT_E_1ep21_f3":  {
+                                          "f":  "=TEXT(1E+21,\"ge.m.d\")",
+                                          "t":  "e",
+                                          "v":  "#VALUE!",
+                                          "code":  -2146826273,
+                                          "text":  "#VALUE!"
+                                      },
+                  "TEXT_E_hashuu_f0":  {
+                                           "f":  "=TEXT(0.1+0.2-0.3,\"[h]:mm:ss\")",
+                                           "t":  "s",
+                                           "v":  "0:00:00",
+                                           "text":  "0:00:00"
+                                       },
+                  "TEXT_E_hashuu_f1":  {
+                                           "f":  "=TEXT(0.1+0.2-0.3,\"[h]:mm:ss.00\")",
+                                           "t":  "s",
+                                           "v":  "0:00:00.00",
+                                           "text":  "0:00:00.00"
+                                       },
+                  "TEXT_E_hashuu_f2":  {
+                                           "f":  "=TEXT(0.1+0.2-0.3,\"[s]\")",
+                                           "t":  "s",
+                                           "v":  "0",
+                                           "text":  "0"
+                                       },
+                  "TEXT_E_hashuu_f3":  {
+                                           "f":  "=TEXT(0.1+0.2-0.3,\"ge.m.d\")",
+                                           "t":  "s",
+                                           "v":  "M33.1.0",
+                                           "text":  "M33.1.0"
+                                       },
                   "SORT_bare":  {
                                     "f":  "=SORT(E1:E6)",
                                     "t":  "n",
