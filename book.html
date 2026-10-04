@@ -3943,6 +3943,16 @@ function _十五桁(n) {
   return isFinite(v) ? v : n;
 }
 
+/* ══ ★★和暦（g/e）と 経過時間（[h][m][s]）は 書式の 台（lib/shoshiki.js）で 作る★★ ══（2026-10-04）
+     ★下の XLSX.SSF は 和暦・経過を 知りません★
+       ⇒ 実Excel の マスの 字（経営者の ㋒ 155本）と ★48/155★ しか 合わなかった
+     ★台は 155/155★（TEXT と 同じ 台＝★2か所で 解かない★）
+     ★判じは 台の 1つだけ★（`Shoshiki.和暦か経過か`・引用符／逃がし／指数の E／[Red] 等は 当たらない）
+     ★出せない 時（負の 時刻 等）は 幅ぶんの #★（実Excel も ####）
+     ★司さんの 本で 判じが 真に なる マスは 0★（書式付き 19,198マス・15種・10-04 実測）＝★画面は 動かない★
+     ★幅に 入らない 時の #### は 描く 段（`_数が入らないか`）が 今まで 通り 見る★
+     ★この 注記は 関数の 外に 置く★＝`tests/smart-rounding.test.mjs` が 関数の 頭 900字に 下の 歯止めを 探す
+     ★見張り★ tests/wareki-keika-gamen-webkit.mjs */
 function fmtForDisplay(raw, fmt, 枠) {
   /* ★★`General` は 書式では ありません★★（2026-09-11）
      Excel の ファイルは 書式なしの マスに ★"General" と 書きます★（実測 … z:"General"）
@@ -3950,15 +3960,7 @@ function fmtForDisplay(raw, fmt, 枠) {
      ⇒★幅で 桁を 決める 道（forDisplay）を 通らず★、
        出る字が ★1.001193321★（実Excel は 1.001193）に なって いました */
   if (String(fmt) === 'General') fmt = '';
-  /* ══ ★★和暦（g/e）と 経過時間（[h][m][s]）は 書式の 台（lib/shoshiki.js）で 作る★★ ══（2026-10-04）
-       ★下の XLSX.SSF は 和暦・経過を 知りません★
-         ⇒ 実Excel の マスの 字（経営者の ㋒ 155本）と ★48/155★ しか 合わなかった
-       ★台は 155/155★（TEXT と 同じ 台＝★2か所で 解かない★）
-       ★判じは 台の 1つだけ★（`Shoshiki.和暦か経過か`・引用符／逃がし／指数の E／[Red] 等は 当たらない）
-       ★出せない 時（負の 時刻 等）は 幅ぶんの #★（実Excel も ####）
-       ★司さんの 本で 判じが 真に なる マスは 0★（書式付き 19,198マス・15種・10-04 実測）＝★画面は 動かない★
-       ★幅に 入らない 時の #### は 描く 段（`_数が入らないか`）が 今まで 通り 見る★
-       ★見張り★ tests/wareki-keika-gamen-webkit.mjs */
+  /* ★和暦・経過は 台へ★（訳は 関数の 上） */
   if (fmt && typeof Shoshiki !== 'undefined' && Shoshiki.和暦か経過か && Shoshiki.和暦か経過か(fmt)
       && raw !== '' && raw !== undefined && raw !== null && /^-?\d+(\.\d+)?$/.test(String(raw))) {
     return Shoshiki.画面の字(_十五桁(+raw), fmt, 枠 || 10).字;
