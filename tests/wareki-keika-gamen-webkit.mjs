@@ -50,12 +50,34 @@ function 立てる(root) {
 /* ══ ★物差し★ ══（1列目＝組・2列目＝値の式・3列目＝書式・4列目＝画面の字） */
 /* ★10-04 に 指数の 形の 値 16組（組 E：1E-7・-5.55E-17・1E+21・0.1+0.2-0.3）を 足した 171組の 紙へ★
      （前の 155組は 1行も 変わって いない＝同じ 道具・同じ Excel） */
-const 紙 = path.join(ROOT, 'docs/measured/golden-sel-shoshiki-shisuu-2026-10-04.tsv');
-const 行 = fs.readFileSync(紙, 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
-const 頭 = 行.shift().split('\t');
-const 列 = (名) => 頭.indexOf(名);
-const c式 = 列('値の式'), c書 = 列('渡した書式(Local)'), c字 = 列('画面の字(.Text)');
-if (c式 < 0 || c書 < 0 || c字 < 0) { console.log('★物差しの 列が 読めない★ ' + 頭.join('|')); process.exit(8); }
+/* ★10-04 夕★ 日付の 上限（通し 2958465〜2958466.5）の 紙 2枚も 重ねて 読む（同じ 道具・同じ Excel）
+     組 B ＝和暦・経過・yyyy/m/d の 境目 ／ 組 C ＝ほかの 日付・時刻の 書式 14 の 境目
+     ★組 J（字の "1e-7"）は 別の 1件★＝ここでは 読まない（下の 字の マスで 別に 見る）
+     ★同じ（値の式・書式）の 組は 1つに★ */
+const 紙たち = [
+  'docs/measured/golden-sel-shoshiki-shisuu-2026-10-04.tsv',
+  'docs/measured/golden-sel-shoshiki-ji-to-sakaime-2026-10-04.tsv',
+  'docs/measured/golden-sel-shoshiki-sakaime-hoka-2026-10-04.tsv',
+];
+const 紙 = 紙たち.map((p) => path.basename(p)).join(' ＋ ');
+const 行 = [];
+const 見た鍵 = new Set();
+for (const p of 紙たち) {
+  const L = fs.readFileSync(path.join(ROOT, p), 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
+  const 頭 = L.shift().split('\t');
+  const 列 = (名) => 頭.indexOf(名);
+  const c組 = 列('組'), c式 = 列('値の式'), c書 = 列('渡した書式(Local)'), c字 = 列('画面の字(.Text)');
+  if (c組 < 0 || c式 < 0 || c書 < 0 || c字 < 0) { console.log('★物差しの 列が 読めない★ ' + p); process.exit(8); }
+  for (const l of L) {
+    const c = l.split('\t');
+    if (c[c組] === 'J') continue;
+    const 鍵 = c[c式] + '\t' + c[c書];
+    if (見た鍵.has(鍵)) continue;
+    見た鍵.add(鍵);
+    行.push([c[c式], c[c書], c[c字]]);
+  }
+}
+const c式 = 0, c書 = 1, c字 = 2;
 
 /* ★値の式を 通し番号に★（DATE は 1900年の 起点 2つ＝通し 60 以前は 1日 前） */
 function 通し(式) {
@@ -69,11 +91,11 @@ function 通し(式) {
   if (!/^[-0-9.*/ eE+()]+$/.test(s)) return null;   /* ★指数（1E-7）と 足し算（0.1+0.2-0.3）も★ */
   return Function('return (' + s + ')')();
 }
-const 組 = 行.map((l) => l.split('\t')).map((c) => ({ 式: c[c式], 書: c[c書], 字: c[c字], 値: 通し(c[c式]) }));
+const 組 = 行.map((c) => ({ 式: c[c式], 書: c[c書], 字: c[c字], 値: 通し(c[c式]) }));
 const 読めない = 組.filter((x) => x.値 === null || !isFinite(x.値));
 console.log('[wareki-keika-gamen] ★和暦・経過時間の マスが 画面で 実Excel と 同じ 字か★');
 console.log('  ★物差し★ ' + path.basename(紙) + ' … ' + 組.length + '組（値を 読めない ' + 読めない.length + '）');
-if (組.length < 171 || 読めない.length) { console.log('★物差しが 足りない／読めない＝空振り★'); process.exit(8); }
+if (組.length < 171 + 24 + 56 || 読めない.length) { console.log('★物差しが 足りない／読めない＝空振り★'); process.exit(8); }
 
 /* ══ ★材料★ ══（1行1組・A列・列は 広く） */
 const ws = {};
@@ -133,7 +155,7 @@ try {
     if (ok) 合++; else 違.push(x.式 + ' ' + x.書 + ' 画面=' + JSON.stringify(got) + ' 実Excel=' + JSON.stringify(x.字));
   });
   console.log('      ── 実測 ── 見た ' + 組.length + '組 ／ 合った ' + 合 + ' ／ 違う ' + 違.length);
-  違.slice(0, 8).forEach((s) => console.log('         ' + s));
+  違.slice(0, 60).forEach((s) => console.log('         ' + s));   /* ★違いは 60件まで 全部 出す★（8件で 切ると 内訳が 割れない） */
   T('★★和暦・経過時間の 書式の マスが 実Excel の 画面の 字と 同じ★★（' + 合 + '/' + 組.length + '）', 違.length === 0,
     違.length + '組 違う');
   /* ★字の "1e-7" は 台の 道に 乗らない★（★今の 画面の 字が 実Excel と 同じかは 未測定＝別の 話★） */

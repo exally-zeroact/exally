@@ -25,11 +25,15 @@
 #    -区切りも ... ★区切りが 2つ以上 在る 書式★ と ★指数★ の 組を 足す（★渡さなければ 今までと 1行も 変わらない★）
 #    ⇒★出しの 頭に ★実際の 列の 幅★ を 書く★（★渡した 数で なく Excel が 読み戻した 数★）
 #    -指数も ... ★String に すると 指数の 形に なる 値★ × 和暦・経過の 書式（組 E・Exally1 の 依頼 10-04）
+#    -字も   ... ★字の "1e-7"★（'1e-7 と ="1e-7"）× 数・和暦・経過の 書式（組 J）
+#              ★字の マスでは 「本当に0か」の 窓は 意味を 持たない★（=(1e-7)=0 を 見て いる だけ）＝型の 窓（String）を 見る
+#    -境目も ... ★日付の 上限 9999/12/31（通し 2958465）の 前後★ × 和暦・経過・yyyy/m/d（組 B）
+#    -境目の他も ... 同じ 値 × ★経過で ない 時刻・曜日・月名・日だけ 等★（組 C・Exally1 の 案A の 前に 取る）
 #
 #  使い方:
 #    powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/measured/toru-jitsu-excel-no-sel-shoshiki-wareki-keika.ps1 -出す先 <tsv> [-幅 60|標準|<数>] [-区切りも]
 
-param([string]$出す先 = '', [string]$幅 = '60', [switch]$区切りも, [switch]$指数も)
+param([string]$出す先 = '', [string]$幅 = '60', [switch]$区切りも, [switch]$指数も, [switch]$字も, [switch]$境目も, [switch]$境目の他も)
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
@@ -55,6 +59,21 @@ if ($指数も) {
   # ★String に すると 指数に なる 数★（1e-7・-5.55e-17・1e+21・引き算の 端数 5.55e-17）
   foreach ($v in @('=1E-7', '=-5.55E-17', '=1E+21', '=0.1+0.2-0.3')) {
     foreach ($f in @('[h]:mm:ss', '[h]:mm:ss.00', '[s]', 'ge.m.d')) { [void]$頼.Add(@('E', $v, $f)) }
+  }
+}
+if ($字も) {
+  foreach ($v in @("'1e-7", '="1e-7"')) {
+    foreach ($f in @('[s]', '[h]:mm:ss', 'ge.m.d', '0.00', 'General')) { [void]$頼.Add(@('J', $v, $f)) }
+  }
+}
+if ($境目も) {
+  foreach ($v in @('=2958465', '=2958465.99999', '=2958466', '=2958466.5')) {
+    foreach ($f in @('ge.m.d', 'ggge年m月d日', '[h]:mm:ss', '[h]', '[s]', 'yyyy/m/d')) { [void]$頼.Add(@('B', $v, $f)) }
+  }
+}
+if ($境目の他も) {
+  foreach ($v in @('=2958465', '=2958465.99999', '=2958466', '=2958466.5')) {
+    foreach ($f in @('h:mm', 'hh:mm:ss', 'h:mm AM/PM', 'm/d', 'd', 'yyyy', 'mmm', 'mmmm', 'aaa', 'aaaa', 'ddd', 'mm:ss', '[m]:ss', 'yyyy/m/d h:mm')) { [void]$頼.Add(@('C', $v, $f)) }
   }
 }
 if ($区切りも) {
@@ -98,8 +117,9 @@ try {
       catch {
         # ★この 環境では .NumberFormat も 日本語の 名で 受ける★（読み戻しが `G/標準`）⇒★色の 名を 日本語に 換えて Local で 付ける★
         $換 = ([string]$q[2]).Replace('[Red]', '[赤]')
+        if ([string]$q[2] -eq 'General') { $換 = 'G/標準' }   # ★General の 日本語の 名★（10-04 に 付かなかった）
         if ($換 -ne [string]$q[2]) {
-          try { $c.NumberFormatLocal = $換; $誤 = $誤 + ' ⇒ US でも 投げた ⇒ ★[Red]→[赤] に 換えて Local で 付けた★' }
+          try { $c.NumberFormatLocal = $換; $誤 = $誤 + ' ⇒ US でも 投げた ⇒ ★日本語の 名（' + $換 + '）に 換えて Local で 付けた★' }
           catch { $誤 = $誤 + ' ⇒ ★[赤] に 換えても 付かない★'; $付かず++ }
         } else { $誤 = $誤 + ' ⇒ ★US でも 付かない★'; $付かず++ }
       }
@@ -127,7 +147,9 @@ try {
     $型 = '他'
     if ($v -is [string]) { $型 = 'String' } elseif ($v -is [double]) { $型 = 'Double' }
     $c2 = $ws.Cells.Item($r, 2)
-    $c2.Formula = ('=(' + ([string]$q[1]).Substring(1) + ')=0')
+    $式の中 = ([string]$q[1]).Substring(1)
+    if (([string]$q[1]).StartsWith("'")) { $式の中 = '"' + $式の中 + '"' }
+    $c2.Formula = ('=(' + $式の中 + ')=0')
     $真 = [string]$c2.Value2
     $c2 = $null
     [void]$行.Add(($q[0] + "`t" + $q[1] + "`t" + $q[2] + "`t" + $字 + "`t" + $us + "`t" + $lo + "`t" + $誤 + "`t" + $型 + "`t" + $真))

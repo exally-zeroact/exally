@@ -334,10 +334,15 @@ function _fmtNumber(num, fmt) {
      ★返り★ undefined＝和暦でも 経過でも ない（今まで通り）／null＝★出せない（#VALUE!）★／字＝答え
      ★判じは 台の 1つだけ★（2026-10-04・画面の fmtForDisplay も 同じ 判じを 呼ぶ）
        ★前は ここに 自前の 判じが 在り `0.00E+00` の 指数の E を 和暦と 取り違えて いた★
-       （⇒ 台へ 渡って #VALUE!。台の 判じは 指数の E・General・引用符・逃がし・[Red] 等を 外す） */
+       （⇒ 台へ 渡って #VALUE!。台の 判じは 指数の E・General・引用符・逃がし・[Red] 等を 外す）
+     ★★日付の 最後の 日（通し 2958465）から 先も 台へ★★（10-04 夕・画面の fmtForDisplay と 同じ 決まり）
+       この 層の _fmtDate は 上限を 知らず `=TEXT(2958466,"yyyy/m/d")` を ★10000/1/1★ に して いた（実Excel #VALUE!） */
 function _和暦か経過なら台へ(num, fmt) {
   if (typeof Shoshiki === 'undefined' || !Shoshiki || typeof Shoshiki.字にする !== 'function') return undefined;
-  if (typeof Shoshiki.和暦か経過か !== 'function' || !Shoshiki.和暦か経過か(String(fmt))) return undefined;
+  var 和経 = typeof Shoshiki.和暦か経過か === 'function' && Shoshiki.和暦か経過か(String(fmt));
+  var 上限 = typeof num === 'number' && num >= 2958465
+    && typeof Shoshiki.日付の書式か === 'function' && Shoshiki.日付の書式か(String(fmt));
+  if (!和経 && !上限) return undefined;
   return Shoshiki.字にする(num, String(fmt));
 }
 function _applyTextFormat(num, fmt) {

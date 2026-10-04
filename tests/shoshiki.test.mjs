@@ -122,6 +122,30 @@ T('★★判じが 偽の 形は 偽★★（指数の E・General・引用符�
   const 外 = 偽.filter((f) => S.和暦か経過か(f));
   if (外.length) throw new Error('★真に なった★ ' + 外.join(' / '));
 });
+/* ★★「日付の書式か」の 判じ★★（10-04 夕・画面の fmtForDisplay が 上限の 所で 呼ぶ・経営者の 叩き⑵） */
+T('★★日付の書式か：偽の 形は 偽★★（General・指数の E・引用符・逃がし・[Red]・[$-411]・[DBNum1] 等）', () => {
+  const 偽 = ['General', 'G/標準', '0.00E+00', '0e+0', '"d"0', '\\d0', '[Red]0', '[$-411]0', '#,##0"円"', '0%', '@',
+    '[>=100]0', '[DBNum1]0', '0.00', '#,##0'];
+  const 外 = 偽.filter((f) => S.日付の書式か(f));
+  if (外.length) throw new Error('★真に なった★ ' + 外.join(' / '));
+});
+T('★★日付の書式か：真の 形は 真★★（日付・時刻・経過・和暦・区切り 付き）', () => {
+  const 真 = ['yyyy/m/d', 'h:mm', 'hh:mm:ss', 'h:mm AM/PM', 'm/d', 'd', 'yyyy', 'mmm', 'mmmm', 'aaa', 'aaaa', 'ddd',
+    'mm:ss', '[m]:ss', 'yyyy/m/d h:mm', 'ge.m.d', '[h]:mm:ss', '[s]', 'm/d;@', '[$-411]yyyy/m/d'];
+  const 外 = 真.filter((f) => !S.日付の書式か(f));
+  if (外.length) throw new Error('★偽に なった★ ' + 外.join(' / '));
+});
+T('★★日付の 上限★★（実Excel：2958465.99999 まで 字・2958466 から ####・単位1つの [h][s] は 上限 なし）', () => {
+  const 組 = [[2958465.99999, 'yyyy/m/d', '9999/12/31'], [2958465.99999, 'h:mm AM/PM', '11:59 PM'], [2958465, 'mmm', 'Dec'],
+    [2958465, 'ddd', 'Fri'], [2958466, '[h]', '71003184'], [2958466, '[s]', '255611462400']];
+  for (const [v, f, 期待] of 組) {
+    const 出 = S.字にする(v, f);
+    if (出 !== 期待) throw new Error(f + ' ' + v + ' … ' + JSON.stringify(出) + '（実Excel ' + 期待 + '）');
+  }
+  for (const f of ['yyyy/m/d', 'h:mm', 'aaa', '[m]:ss', 'ge.m.d']) {
+    if (S.字にする(2958466, f) !== null) throw new Error(f + ' 2958466 は 出せない（####）はず');
+  }
+});
 T('★★判じが 真の 形は 真★★（和暦 g/e・経過 [h][m][s]・区切り 付き）', () => {
   const 真 = ['g', 'gg', 'ggg', 'e', 'ee', 'ge.m.d', 'ggge年m月d日', 'gggee年', '[$-ja-JP]ggge年', '[h]:mm', '[hh]:mm',
     '[m]:ss', '[s]', '[h]:mm:ss.00', 'ge.m.d;@', '[h]:mm;[Red]-[h]:mm'];
