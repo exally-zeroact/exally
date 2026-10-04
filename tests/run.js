@@ -392,6 +392,7 @@ const FILES = [
   ['machi-no-kime.test.mjs'],        // ★待ちの 決めが 効いて いるか★（2つ目は 引数・決めは 3つ目／2026-09-24）
   ['machi-no-kime.test.mjs', '--self-test'], //   ＝★30秒で 黙って 落ちる＝遅い本を「開けない本」と 言い間違える★
   ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
+  ['souname-matome.test.mjs'],       // ★束に 分けた 総なめの まとめが 赤を 出せるか★（途中で 切られた 束を 緑と 見間違えかけた・2026-10-04）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
