@@ -384,7 +384,8 @@ const FILES = [
   ['mado-no-kazu-to-kaita-kazu-webkit.mjs'],  // ★窓に 出る 数と 本当に 書き込まれた 数が 合うか★（1マス→窓3044の 実物・2026-09-25）
   ['naoshite-hozon-webkit.mjs'],  // ★お客さんが 入力値を 直して 書き出せるか★（記録8 で 1冊 出なかった・2026-09-25）
   ['akimasu-ni-utsu-webkit.mjs'],  // ★空いて いる マスに 打って 書き出せるか★（行ごと 無い 所で 1冊も 出なかった・2026-09-26）
-  ['hozon-no-ayamari-wo-yomu-webkit.mjs'],  // ★答えが 誤りで 保存された 式は 開いた だけで 誤りの 字★（実物 69個 #REF! が 数に 化けた・2026-10-02）
+  ['wareki-keika-gamen-webkit.mjs'],  // ★和暦・経過時間の 書式の マスが 画面で 実Excel と 同じ 字か★（SSF で 48/155 → 台で 155/155・2026-10-04）
+  ['hozon-no-ayamari-wo-yomu-webkit.mjs'],  //★答えが 誤りで 保存された 式は 開いた だけで 誤りの 字★（実物 69個 #REF! が 数に 化けた・2026-10-02）
   ['soto-wo-kiku-webkit.mjs'],  //★外へ つながる 式が 在る 本だけ お客さんに 訊く★（司さん 09-25「おすすめで 直せ」・2026-09-26）
   ['yomenakatta-webkit.mjs'],        // ★ファイルを 読めなかったら 読み直す★（OneDrive で 24回中 15回 断られる・2026-09-25）
   ['mikire-webkit.mjs'],             // ★字は 隣が 空なら はみ出す（実Excel と 同じ）★（★絵で 数える★・2026-09-24）

@@ -332,13 +332,12 @@ function _fmtNumber(num, fmt) {
      ★台は 実Excel 16.0.20430 の 真値 155本と 全部 一致★（tests/xlsx-harness/cases/61-text-wareki-keika.json）
      ⇒★台に 渡します★＝★2か所で 解かない★（画面と 自前の 台の TEXT も 台を 呼ぶ）
      ★返り★ undefined＝和暦でも 経過でも ない（今まで通り）／null＝★出せない（#VALUE!）★／字＝答え
-     ★`General` の G・e は 元号では ない★＝前後が 英字の g/e は 拾わない */
+     ★判じは 台の 1つだけ★（2026-10-04・画面の fmtForDisplay も 同じ 判じを 呼ぶ）
+       ★前は ここに 自前の 判じが 在り `0.00E+00` の 指数の E を 和暦と 取り違えて いた★
+       （⇒ 台へ 渡って #VALUE!。台の 判じは 指数の E・General・引用符・逃がし・[Red] 等を 外す） */
 function _和暦か経過なら台へ(num, fmt) {
   if (typeof Shoshiki === 'undefined' || !Shoshiki || typeof Shoshiki.字にする !== 'function') return undefined;
-  var f = _fmtStripLocale(String(fmt)).replace(/"[^"]*"/g, '');
-  var 経過 = /\[(h+|m+|s+)\]/i.test(f);
-  var 和暦 = /(^|[^a-z])g{1,3}e{0,2}(?![a-z])/i.test(f) || /(^|[^a-z])e{1,2}(?![a-z])/i.test(f);
-  if (!経過 && !和暦) return undefined;
+  if (typeof Shoshiki.和暦か経過か !== 'function' || !Shoshiki.和暦か経過か(String(fmt))) return undefined;
   return Shoshiki.字にする(num, String(fmt));
 }
 function _applyTextFormat(num, fmt) {
