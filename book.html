@@ -3000,12 +3000,59 @@ function _井桁で埋める(w) {
 
 /* ★このマスに 数が 入るか★＝入らなければ `#####` に する
    ★字（数で ない 物）は `#####` に しません★＝実Excel も しない（はみ出す） */
-function _数が入らないか(raw, display, w) {
+function _数が入らないか(raw, display, w, cell) {
   var n = (typeof raw === 'number') ? raw
         : ((typeof raw === 'string' && /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(raw) && !/^-?0\d/.test(raw))
             ? Number(raw) : null);
   if (n === null || !isFinite(n)) return false;   /* ★字は はみ出させる★ */
+  /* ★書式を 持つ マスは 実Excel の 余白で 判じる★（2026-10-04 夜・下の `_書式の入らないか`） */
+  if (cell && _書式を持つか(cell)) { var 判 = _書式の入らないか(display, w, cell); if (判 !== null) return 判; }
   try { return ctx.measureText(String(display)).width > (w - マスの余白); } catch (e) { return false; }
+}
+
+/* ══ ★★書式を 持つ マスが 列に 入るか＝実Excel の 余白で 判じる★★ ══（2026-10-04 夜）
+     ★★何が 在ったか（経営者が 実Excel で 取った 境目・10の 大きさ × 158組）★★
+       今までは どの 大きさでも「字の 幅 ＋ 3点」で 判じて いた。
+       ⇒ 10pt・12pt・13pt・16pt・18pt は 境目の ±1px 内が ★0/158★（Excel が # の 所で 字を 出して いた）
+     ★★実Excel の 決まり（境目と 列の 幅の 2つの 物差しで 確かめた）★★
+       余白（200% の 画面の 点）＝ 2 × ⌈ 0の幅（200% の 点）÷ 4 ⌉ ＋ 1
+         境目 ･･･ 10の 大きさ（6〜18pt）すべてで 段が 一致（3.5／4.5／5.5／6.5／7.5）
+         列の 幅 ･･･ 列幅 1・10・100 × 10の 大きさ ＝ 30/30 一致（経営者・表 d9e74ebd）
+       ★字は 丸めない 大きさで 測る★（描く 字は 11pt を 15px に 丸めて いる＝測る 時だけ 14.667px）
+     ★★言えない 事★★
+       ・物差しは ★200% の 画面の Excel★（経営者の 機械）。★100% の Excel は 未測定★
+         ⇒ お客さんの 画面の 倍に 依らず ★200% の Excel に 合わせる★（測って ある 唯一の 物）
+       ・0の幅が「マスの 字」か「本の 既定（Normal）」かは 未測定 ⇒ ★マスの 字★で 作った（見立て）
+       ・6pt・8pt は Excel の 字が うちより 細く（傾き 0.90・0.97）、±1px を 全部は 満たさない
+     ★★General は 触らない（既知の 差）★★ 桁を 減らす 所（`_入る字数`）と ここ（General の #）は 余白3 の まま。
+       General は 09-11 の 6点と 司さんの 本の 描く 版が 余白3 で 合って いる ⇒ 変えると 壊す 恐れ。
+       ★Excel は 同じ 余白の はず（見立て）＝別の 件で 測る★ */
+var _游ゴシックの0の幅 = { 6: 4.5, 8: 6, 9: 6.5, 10: 7.5, 11: 8, 12: 9, 13: 9.5, 14: 10.5, 16: 12, 18: 13.5 };   /* ★200% の Excel ÷2（経営者 表 d9e74ebd）★ */
+function _書式を持つか(cell) {
+  var f = cell && cell.numFmt;
+  return !!f && f !== 'General' && f !== 'G/標準';
+}
+var _測る筆 = null;
+function _書式の入らないか(display, w, cell) {
+  try {
+    var pt = (cell.fontSize ? cell.fontSize * 72 / 96 : null);
+    var 板 = sheets[activeSheet];
+    if (pt === null) pt = (板 && 板.既定の字大) ? 板.既定の字大 : 11;
+    /* ★丸めない 大きさで 測る★（11pt＝14.667px）
+       ★試して 外した 形★ ･･･ 200% の 整数の 点に 丸める（11pt＝14.5px）。11pt は 100→148 に 上がったが
+         13pt 150→113・14pt 153→133 に 下がり、10の 大きさの 合計は 1,420→1,412（±1px 内）＝決まりとして 勝たない。
+         ★丸め方を 大きさごとに 選ぶのは 当てる★ので 丸めない 形に した */
+    var 丸めない = pt * 96 / 72 * scale;
+    if (!_測る筆) _測る筆 = document.createElement('canvas').getContext('2d');
+    /* ★描く 筆と 同じ 字で、大きさ だけ 丸めない★ */
+    _測る筆.font = String(ctx.font).replace(/(\d+(\.\d+)?)px/, String(丸めない) + 'px');
+    var 字の幅 = _測る筆.measureText(String(display)).width;
+    var 名 = (cell.fontName || (板 && 板.既定の字体名) || '游ゴシック');
+    var 零 = (名 === '游ゴシック' && _游ゴシックの0の幅[pt] !== undefined) ? _游ゴシックの0の幅[pt]
+           : Math.round(_測る筆.measureText('0').width / scale * 2) / 2;   /* ★表に 無い 字体・大きさは 機械で 測る（未測定の 見立て）★ */
+    var 余白 = (2 * Math.ceil(零 * 2 / 4) + 1) / 2 * scale;
+    return 字の幅 + 余白 > w;
+  } catch (e) { return null; }
 }
 
 function _入る字数(w, raw, fmt) {
@@ -7346,7 +7393,7 @@ function _renderPass() {
       ctx.font=(cell.italic?'italic ':'')+( cell.bold?'bold ':'')+fs+'px '+_マスの書体(cell);
       var display=_答えは字か(cell) ? String(raw)
                 : fmtForDisplay(raw, cell.numFmt, _入る字数(w, raw, cell.numFmt));
-      if (!_答えは字か(cell) && _数が入らないか(raw, display, w)) display = _井桁で埋める(w);   /* ★書式付きも 同じ（2026-09-11）★ */
+      if (!_答えは字か(cell) && _数が入らないか(raw, display, w, cell)) display = _井桁で埋める(w);   /* ★書式付きも 同じ（2026-09-11）★ */
       ctx.fillStyle=cell.color||C_CELL_TXT;
       ctx.textBaseline='middle';
       var align=cell.align||_既定の横揃え(cell);   /* ★既定は 実Excel に 合わせる（数＝右）★ */
@@ -7612,7 +7659,7 @@ function drawText(r,c){
        前は `!cell.numFmt` の 時だけ 見て いた ⇒★書式付きは いつまでも #### に ならない★
        ★実Excel に 打って 確かめました★ … #,##0.00 の 1234567.891 を 幅5の 列に 置くと ★####★
        （`_数が入らないか` は 数の 時だけ 真＝★字は 今まで 通り はみ出します★） */
-  if (!_答えは字か(cell) && _数が入らないか(raw, display, w)) display = _井桁で埋める(w);   /* ★文字は はみ出す（実Excel と 同じ）★ */
+  if (!_答えは字か(cell) && _数が入らないか(raw, display, w, cell)) display = _井桁で埋める(w);   /* ★文字は はみ出す（実Excel と 同じ）★ */
   /* ★`General` は 幅で 桁を 減らせる★＝減らして 入るなら #### に しない
      （`_入る字数` が すでに 減らして いるので、ここに 来るのは ★1桁でも 入らない 時★） */
 
@@ -7638,7 +7685,7 @@ function drawText(r,c){
   /* ★★切り取る 四角は 「マス」では なく 「はみ出せる 範囲」★★（2026-09-24）
        ★入って いれば これまでと 1点も 変わりません★（同じ 四角が 返ります）。
        ★入らない 字だけ★ 右（左）の 空いた マスまで 伸びます。 */
-  var _数か = !_答えは字か(cell) && _数が入らないか(raw, display, w);
+  var _数か = !_答えは字か(cell) && _数が入らないか(raw, display, w, cell);
   var _箱 = _はみ出せる範囲(r, c, x, w, align, ctx.measureText(String(display)).width,
     (typeof raw === 'number') || _数か, cell);
   /* ★★`beginPath()` を 先に 呼びます★★（2026-09-24 ここで 1つ 見つけました）
