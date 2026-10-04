@@ -34,6 +34,11 @@ const 道具 = path.join(ROOT, 'docs/measured/hakaru-haba-no-gamen.mjs');
 const 紙 = 'docs/measured/golden-sel-shoshiki-haba-hyoujun-2026-10-04.tsv';
 
 if (壊す) {
+  /* ★先に 借りる★（10-04 夜・CI で 赤）＝毎回の CI（ci.yml）には webkit が 無い。
+       借りられない 時は `borrow` が ★未測定★ の 声を 出して 緑で 終わる 決まり（ほかの webkit の 見張りと 同じ）。
+       前は 子の 道具だけが 未測定で 0 を 返し、★「壊したのに 赤に ならない」と 自己試験が 赤★ に なって いた
+       （手元には webkit が 在るので 総なめでは 見えなかった） */
+  await borrow('kakareta-ji', 'webkit');
   /* ★わざと 壊す★＝`_数が入らないか` を いつも 偽 ⇒ Excel の # が うちで 字に なる ⇒ 赤 で なければ 見張りは 死んで いる */
   const r = spawnSync(process.execPath, [道具, '--幅', '8.44', '--紙', 紙, '--壊す'], { cwd: ROOT, encoding: 'utf8' });
   const 違 = /違う (\d+)/.exec(r.stdout || '');
