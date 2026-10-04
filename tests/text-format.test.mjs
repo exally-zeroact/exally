@@ -43,6 +43,13 @@ F.registerExallyFunctions(HF);
 const hf = HF.HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
 hf.addSheet('S');
 const SID = hf.getSheetId('S');
+/* ★真値は 1版だけ★＝ファイル名に 版が 入るので 名指し しない（2026-10-02 20228→20430 で 落ちた） */
+function 真値() {
+  const dir = path.join(ROOT, 'tests/xlsx-harness/golden');
+  const f = fs.readdirSync(dir).filter((x) => /^excel-.*[.]json$/.test(x));
+  if (f.length !== 1) throw new Error('★真値の 版が 1本で ない★ ' + f.join(','));
+  return JSON.parse(fs.readFileSync(path.join(dir, f[0]), 'utf8'));
+}
 function TEXT(v, fmt) {
   hf.setSheetContent(SID, [[v, '=TEXT(A1,"' + String(fmt).replace(/"/g, '""') + '")']]);
   const r = hf.getCellValue({ sheet: SID, row: 0, col: 1 });
@@ -161,7 +168,7 @@ T('★読めない書式でもシリアル値を答えにしない（46023 が�
 });
 
 T('★ハーネスに曜日の真値ケースが残っている（真値ごと消されない）', () => {
-  const g = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/xlsx-harness/golden/excel-365-16.0.20228.json'), 'utf8'));
+  const g = 真値();
   const need = ['TEXT_weekday_ja', 'TEXT_weekday_ja_long', 'TEXT_weekday_ja_locale',
     'TEXT_weekday_in_date', 'TEXT_weekday_section', 'TEXT_minute_vs_month'];
   const missing = need.filter((k) => !g.cases[k]);
