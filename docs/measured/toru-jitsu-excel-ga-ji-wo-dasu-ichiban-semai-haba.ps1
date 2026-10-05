@@ -22,10 +22,13 @@
 #    ①5.1（exit 8）／②物差しが 在る（exit 4）／③走らせる 前の Excel が 0個（exit 3）
 #    ④★頼んだ 数 ≠ 書いた 数 なら 赤（exit 6）★／⑤★書式が 付かなかった 行が 在れば 赤（exit 9）★
 #
+#  ★★2026-10-04 追記 ── -マスの大きさ★★（Exally1 の 問い「余白の 0の幅 は マスの 字か Normal か」）
+#    渡すと ★Normal は -大きさ の まま・マスの 字だけ その 大きさ★ に する（渡さなければ 今までと 1行も 変わらない）
+#
 #  使い方:
 #    powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/measured/toru-jitsu-excel-ga-ji-wo-dasu-ichiban-semai-haba.ps1 -物差し <tsv> -出す先 <tsv> [-字体 游ゴシック] [-大きさ 11]
 
-param([string]$物差し = '', [string]$出す先 = '', [string]$字体 = '游ゴシック', [double]$大きさ = 11)
+param([string]$物差し = '', [string]$出す先 = '', [string]$字体 = '游ゴシック', [double]$大きさ = 11, [double]$マスの大きさ = 0)
 
 $版 = $PSVersionTable.PSVersion
 Write-Host ('★走らせて いる 貝殻 ... PowerShell ' + $版.ToString() + '★')
@@ -77,6 +80,7 @@ try {
     $colI = 2 * $i - 1
     $c = $ws.Cells.Item(1, $colI)
     $c.Formula = [string]$q[1]
+    if ($マスの大きさ -gt 0) { $c.Font.Size = $マスの大きさ }
     $誤 = ''
     try { $c.NumberFormatLocal = [string]$q[2] } catch {
       $換 = ([string]$q[2]).Replace('[Red]', '[赤]')
@@ -133,7 +137,7 @@ try {
 $書 = New-Object System.IO.StreamWriter($出す先, $false, (New-Object System.Text.UTF8Encoding($false)))
 $書.NewLine = "`n"
 $書.WriteLine('# この 紙は 式の 答えの 紙では ありません（列の 幅の 境目の 物差し）')
-$書.WriteLine('# 134 実Excel が 字を 出す 一番 狭い 列／Excel ' + $版xl + '／本の 既定の 字体 ' + $実字体 + '／頼んだ ' + $頼.Count + '／書いた ' + $出.Count + '／px は 100% の 画面')
+$書.WriteLine('# 134 実Excel が 字を 出す 一番 狭い 列／Excel ' + $版xl + '／本の 既定の 字体 ' + $実字体 + '／マスの 大きさ ' + $(if ($マスの大きさ -gt 0) { [string]$マスの大きさ } else { '（Normal と 同じ）' }) + '／頼んだ ' + $頼.Count + '／書いた ' + $出.Count + '／px は 100% の 画面')
 $書.WriteLine("組`t値の式`t書式`t判じ`t入る一番狭い(字)`t入る一番狭い(px)`t入らない一番広い(字)`t入らない一番広い(px)`t幅60の字`t値の型(.Value2)`t本当に0か(=(式)=0)`t誤り")
 foreach ($l in $出) { $書.WriteLine($l) }
 $書.Close()
