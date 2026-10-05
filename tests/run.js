@@ -26,6 +26,8 @@ const FILES = [
   ['shiki-hyou-afure.test.mjs', '--self-test'],// ★材料を 変えたら 答えも 変わるか／紙に 無い 式を 押して いないか★
   ['shiki-hyou-omosa.test.mjs'],               // ★表が 大きく なっても N の 2乗に ならない（2026-09-14 に 2乗だった）★
   ['shiki-hyou-sakuin.test.mjs'],  // ★在る マスの 索引が いつも 合って いるか★（空の マスを 5,700万回 訊いて いた・2026-09-26）
+  ['shiki-hyou-matomete.test.mjs'],  // ★まとめて 打っても 1つずつ と 答えが 同じか★（1打ち目に 式を 58万回 計算して いた・2026-10-05）
+  ['shiki-hyou-matomete.test.mjs', '--self-test'],  // ★終わりを 呼び忘れると 古い 答えで 赤に なるか★
   ['hyou-no-kihon-no-ji-webkit.mjs'],  // ★General の 桁は 本の 既定の 字で 決める★（そのマスの 字で 決めて いた・2026-09-26）
   ['shiki-hyou-omosa.test.mjs', '--self-test'],// ★測りが 空振りして いないか（0本・0ミリ秒で 緑に しない）★
   ['shiki-hyou-hidzuke.test.mjs'],             // ★字の 日付・時刻を 数に する（実測 "12:30"→0.5208･･･）★
