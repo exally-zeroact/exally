@@ -1,5 +1,5 @@
 # この 紙は 式の 答えの 紙では ありません（溢れの 物差し）
-# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 57／書いた 57
+# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 67／書いた 67
 組	番地	式(Formula2)	画面の字(.Text)	値の型(.Value2)	本当に0か(=(マス)=0)	溢れの元か(HasSpill)	溢れる先
 A 範囲そのもの	E1	=A1:A3	1	Double	False	True	E1:E3
 A 範囲そのもの	E2		2	Double	False	True	
@@ -58,3 +58,13 @@ P 誤り #NAME?	E1	=NAIMONO(1)	#NAME?	Int32	-2146826259	False
 P 誤り #NUM!	E1	=SQRT(-1)	#NUM!	Int32	-2146826252	False	
 P 誤り #N/A	E1	=NA()	#N/A	Int32	-2146826246	False	
 P 誤り #CALC!（LAMBDA 呼ばず）	E1	=LAMBDA(x,x+1)	#CALC!	Int32	-2146826238	False	
+Q 交わり 2マス を SUM	E1	=SUM(A1:B2 B1:C2)	30	Double	False	False	
+Q 交わり 1マス を SUM	E1	=SUM(A1:C1 B1:B3)	10	Double	False	False	
+Q 交わり 無し を SUM	E1	=SUM(A1:A2 C1:C2)	#NULL!	Int32	-2146826288	False	
+Q 交わり 1マス そのまま	E1	=A2:C2 B1:B3	20	Double	False	False	
+Q 交わり 1マス そのまま	E2			空	True	False	
+Q 交わり 2マス そのまま（溢れる）	E1	=A1:B2 B1:C2	10	Double	False	True	E1:E2
+Q 交わり 2マス そのまま（溢れる）	E2		20	Double	False	True	
+Q 交わり 2マス そのまま（溢れる）	F1			空	True	False	
+Q 交わり 無し そのまま	E1	=A1 C3	#NULL!	Int32	-2146826288	False	
+Q 交わり 3つ	E1	=SUM(A1:C3 B1:C2 B2:B3)	20	Double	False	False	

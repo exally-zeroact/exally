@@ -8,7 +8,7 @@
  *  ★★既知の 違い★★（まだ 直して いない＝消えたら 名簿から 外す。★足すのは 測って 訳を 書いた 時だけ★）
  *    G・O の F1 ･･･ `=SUM(E1#)`（溢れを 丸ごと 見る # の 参照）を 台が 知らない
  *    P #NULL! ･･･ `=SUM(A1 B1)`（交わらない）が #VALUE!
- *  ★--self-test★ ･･･ 名簿を 空に すると 赤（既知の 違いが 本当に 出て いる＝道具が 空振りして いない）
+ *  ★--self-test★ ･･･ 道具の --壊す（#SPILL! を #スピル! に 換える 所を 素通し）で ★実Excel が #スピル! の 行の 数だけ★ 赤に なるか
  *  使い方: node tests/afure-no-gamen-webkit.mjs [--self-test]
  */
 import path from 'node:path';
@@ -18,17 +18,14 @@ import { borrow } from '../scripts/_borrow-playwright.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const 自己 = process.argv.includes('--self-test');
-const 既知 = 自己 ? [] : [
-  'G 溢れを丸ごと見る（#） F1',
-  'O 塞いだ 時に E1# を 見る F1',
-  'P 誤り #NULL!（交わらない） E1',
-];
+/* ★既知の 違い★＝★0★（2026-10-05 に G・O の E1# と P・Q の 交わりを 直して 67/67）。足すのは 測って 訳を 書いた 時だけ */
+const 既知 = [];
 
-console.log('[afure-no-gamen] ★溢れる 式の 画面の 字が 実Excel と 同じか★' + (自己 ? '（--self-test＝既知の 名簿を 空に）' : ''));
+console.log('[afure-no-gamen] ★溢れる 式の 画面の 字が 実Excel と 同じか★' + (自己 ? '（--self-test＝#スピル! に 換える 所を 壊す）' : ''));
 /* ★先に 借りる★＝毎回の CI（webkit 無し）では 借り方が 未測定の 声を 出して 緑で 終わる（ほかの webkit の 見張りと 同じ） */
 const wk = await borrow('afure-no-gamen', 'webkit');
 if (!wk) process.exit(0);
-const r = spawnSync(process.execPath, [path.join(ROOT, 'docs/measured/hakaru-afure-no-gamen.mjs'), '--台', 'webkit'], { cwd: ROOT, encoding: 'utf8' });
+const r = spawnSync(process.execPath, [path.join(ROOT, 'docs/measured/hakaru-afure-no-gamen.mjs'), '--台', 'webkit'].concat(自己 ? ['--壊す'] : []), { cwd: ROOT, encoding: 'utf8' });
 const 出 = (r.stdout || '') + (r.stderr || '');
 console.log(出.split('\n').map((l) => '    ' + l).join('\n'));
 const 数 = /★画面の 字 (\d+)\/(\d+) ／ 描いた 字 (\d+)\/(\d+)★/.exec(出);
@@ -45,6 +42,13 @@ T('★描いた 字の 違いの 数＝画面の 字の 違いの 数★', !!数
 if (消えた既知.length) console.log('  ★既知の 違いが 消えた（名簿から 外して ください）★ ' + 消えた既知.join(' ／ '));
 T('★既知の 違いが 全部 まだ 出て いる（直ったら 名簿を 減らす）★', 消えた既知.length === 0, 消えた既知.join(' ／ '));
 console.log('\nafure-no-gamen' + (自己 ? ' --self-test' : '') + ': ' + (赤 ? '赤 ' + 赤 : '緑'));
-/* ★自己試験は 赤に なる のが 正しい★（既知を 空に すると 名簿外が 出る） */
-if (自己) process.exit(赤 > 0 && 名簿外.length === 既知.length + 3 ? 0 : 1);
+/* ★自己試験は 赤に なる のが 正しい★＝違いの 数が ★紙で 実Excel が #スピル! の 行の 数★と 同じか（壊した 数と 赤の 数を 並べる） */
+if (自己) {
+  const fs = await import('node:fs');
+  const 紙 = fs.readFileSync(path.join(ROOT, 'docs/measured/golden-jitsu-excel-no-afure-2026-10-05.tsv'), 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
+  const 頭 = 紙.shift().split('\t'), i字 = 頭.indexOf('画面の字(.Text)');
+  const 欲しい = 紙.filter((l) => l.split('\t')[i字] === '#スピル!').length;
+  console.log('  壊した 時の 違い ' + 名簿外.length + ' ／ 紙で #スピル! の 行 ' + 欲しい);
+  process.exit(欲しい > 0 && 名簿外.length === 欲しい ? 0 : 1);
+}
 process.exit(赤 ? 1 : 0);
