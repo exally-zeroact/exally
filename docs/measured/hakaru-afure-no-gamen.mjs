@@ -16,6 +16,8 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const 引数 = process.argv.slice(2);
 const 取る = (名, 既定) => { const i = 引数.indexOf('--' + 名); return i >= 0 ? 引数[i + 1] : 既定; };
 const 台 = 取る('台', 'chromium');
+/* ★--壊す★ 画面の `_画面の誤りの字` を 素通しに する（#SPILL! を #スピル! に 換えない）＝見張りの 自己試験 用 */
+const 壊す = 引数.includes('--壊す');
 const 紙 = path.join(ROOT, 取る('紙', 'docs/measured/golden-jitsu-excel-no-afure-2026-10-05.tsv'));
 
 const L = fs.readFileSync(紙, 'utf8').split(/\r?\n/).filter((l) => l && l.charAt(0) !== '#');
@@ -62,8 +64,9 @@ try {
     await p.goto('http://127.0.0.1:' + s.address().port + '/book.html', { waitUntil: 'load', timeout: 120000 });
     await p.evaluate(() => { document.body.classList.remove('exally-locked'); const o = document.getElementById('loginOv'); if (o) o.style.display = 'none'; });
     await p.waitForFunction(() => typeof window.setCell === 'function' && (window.sheets || []).length > 0, null, { timeout: 60000 });
-    const 出 = await p.evaluate(async ([順, 見る]) => {
+    const 出 = await p.evaluate(async ([順, 見る, 壊す]) => {
       window.switchSheet(0);
+      if (壊す) window._画面の誤りの字 = function (t) { return t; };
       /* ★★条件で 待つ★★（2026-10-05・経営者の 叩き）＝打った 後の 計算し直し（_scheduleRecalc→recalcSheet）は 150ms 後に 走る。
            決まった 時間では 待たない＝★打ち終わった 後に 始まった recalcSheet が 終わるまで★ 待つ（上限 30秒）*/
       const 元の再計算 = window.recalcSheet; const 終わり時刻 = [];
@@ -83,7 +86,7 @@ try {
       };
       try { window.render(); await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))); } finally { 型.fillText = 元; }
       return { 待った, 条件, 行: 見る.map(([a, r, c]) => ({ 番: a, 字: (function (t) { return typeof window._画面の誤りの字 === 'function' ? window._画面の誤りの字(t) : t; })(d[r + ',' + c] ? String(d[r + ',' + c].d === undefined ? '' : d[r + ',' + c].d) : ''),   /* ★中の 値は #SPILL! の まま＝見える 字に 換えて 比べる（画面の 関数を 呼ぶ）★ */ 描: 描[r + ',' + c] || '' })) };
-    }, [順, 見る]);
+    }, [順, 見る, 壊す]);
     待ち.push(組.slice(0, 1) + ' ' + 出.待った + 'ms' + (出.条件 ? '' : '★条件 立たず★'));
     if (!出.条件) 待ちが立たない++;
     for (const x of 組の行) {
