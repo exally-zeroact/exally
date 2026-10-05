@@ -38,7 +38,15 @@ try {
     await p.waitForFunction(() => typeof window.setCell === 'function' && (window.sheets || []).length > 0, null, { timeout: 60000 });
     const 出 = await p.evaluate(async (順) => {
       window.switchSheet(0);
+      /* ★★条件で 待つ★★（2026-10-05・経営者の 叩き）＝打った 後の 計算し直し（_scheduleRecalc→recalcSheet）は 150ms 後に 走る。
+           決まった 時間では 待たない＝★打ち終わった 後に 始まった recalcSheet が 終わるまで★ 待つ（上限 30秒）*/
+      const 元の再計算 = window.recalcSheet; const 終わり時刻 = [];
+      window.recalcSheet = function () { const t0 = performance.now(); try { return 元の再計算.apply(this, arguments); } finally { 終わり時刻.push([t0, performance.now()]); } };
       for (const [r, c, v] of 順) window.setCell(r, c, v);
+      const 打ち終わり = performance.now();
+      while (!終わり時刻.some(([t0]) => t0 >= 打ち終わり) && performance.now() - 打ち終わり < 30000) await new Promise((ok) => setTimeout(ok, 20));
+      const 待った = Math.round(performance.now() - 打ち終わり), 条件 = 終わり時刻.some(([t0]) => t0 >= 打ち終わり);
+      window.recalcSheet = 元の再計算;
       await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok)));
       const d = window.sheets[0].data;
       const 字 = (k) => (d[k] ? String(d[k].d === undefined ? '' : d[k].d) : '（無い）');
@@ -50,10 +58,10 @@ try {
         return 元.apply(this, arguments);
       };
       try { window.render(); await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))); } finally { 型.fillText = 元; }
-      return { E1: 字('0,4'), E2: 字('1,4'), E3: 字('2,4'), F1: 字('0,5'), 描いたF1: 描['0,5'] || '', 描いたE2: 描['1,4'] || '' };
+      return { 待った, 条件, E1: 字('0,4'), E2: 字('1,4'), E3: 字('2,4'), F1: 字('0,5'), 描いたF1: 描['0,5'] || '', 描いたE2: 描['1,4'] || '' };
     }, 順);
-    console.log('  ' + 名 + ' ... 画面の 字 E1=' + 出.E1 + ' E2=' + 出.E2 + ' E3=' + 出.E3 + ' ★F1=' + 出.F1 + '★ ／ 描いた F1=' + JSON.stringify(出.描いたF1) + ' E2=' + JSON.stringify(出.描いたE2) + '（実Excel F1=5）');
-    if (出.F1 !== '5' || 出.描いたF1 !== '5') 終わり値 = 1;
+    console.log('  ' + 名 + ' ... 画面の 字 E1=' + 出.E1 + ' E2=' + 出.E2 + ' E3=' + 出.E3 + ' ★F1=' + 出.F1 + '★ ／ 描いた F1=' + JSON.stringify(出.描いたF1) + ' E2=' + JSON.stringify(出.描いたE2) + '（実Excel F1=5）／ 待った ' + 出.待った + 'ms' + (出.条件 ? '' : ' ★条件 立たず＝測って いない★'));
+    if (出.F1 !== '5' || 出.描いたF1 !== '5' || !出.条件) 終わり値 = 1;
     await p.close();
   }
 } finally { await br.close(); s.close(); }
