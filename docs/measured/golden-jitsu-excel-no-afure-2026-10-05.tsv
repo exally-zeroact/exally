@@ -1,5 +1,5 @@
 # この 紙は 式の 答えの 紙では ありません（溢れの 物差し）
-# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 67／書いた 67
+# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 79／書いた 79
 組	番地	式(Formula2)	画面の字(.Text)	値の型(.Value2)	本当に0か(=(マス)=0)	溢れの元か(HasSpill)	溢れる先
 A 範囲そのもの	E1	=A1:A3	1	Double	False	True	E1:E3
 A 範囲そのもの	E2		2	Double	False	True	
@@ -68,3 +68,15 @@ Q 交わり 2マス そのまま（溢れる）	E2		20	Double	False	True
 Q 交わり 2マス そのまま（溢れる）	F1			空	True	False	
 Q 交わり 無し そのまま	E1	=A1 C3	#NULL!	Int32	-2146826288	False	
 Q 交わり 3つ	E1	=SUM(A1:C3 B1:C2 B2:B3)	20	Double	False	False	
+R 空白 =A1 + B1	E1	=A1 + B1	11	Double	False	False	
+R 空白 =A1 +B1	E1	=A1 +B1	11	Double	False	False	
+R 空白 =A1 - B1	E1	=A1 - B1	-9	Double	False	False	
+R 空白 =A1 -B1	E1	=A1 -B1	-9	Double	False	False	
+R 空白 =A1 * 2 + B1	E1	=A1 * 2 + B1	12	Double	False	False	
+R 空白 =A1 & B1	E1	=A1 & B1	110	String	False	False	
+R 空白 =(A1) (B1)	E1	=(A1) (B1)	#NULL!	Int32	-2146826288	False	
+R 空白 =(A1) + (B1)	E1	=(A1) + (B1)	11	Double	False	False	
+R 空白 2つの 交わり	E1	=SUM(A1:A3  B1:B3)	#NULL!	Int32	-2146826288	False	
+R タブ 1つの 交わり	E1		★Excel が 式を 受けない★ HRESULT からの例外:0x800A03EC	空	True	False	
+R 改行 入りの 交わり	E1	=SUM(A1:A3⏎                                                                                                                                                                                                                                                                B1:B3)	#NULL!	Int32	-2146826288	False	
+R 改行 入りの 引数	E1	=SUM(A1,⏎B1)	11	Double	False	False	

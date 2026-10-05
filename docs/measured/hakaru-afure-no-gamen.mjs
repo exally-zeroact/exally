@@ -31,7 +31,9 @@ const 道具の順 = new Map();
 for (const l of fs.readFileSync(path.join(ROOT, 'docs/measured/toru-jitsu-excel-no-afure.ps1'), 'utf8').split(/\r?\n/)) {
   const m = /@\{\s*名\s*=\s*'([^']+)';\s*打つ\s*=\s*@\((.*)\);\s*読む/.exec(l);
   if (!m) continue;
-  道具の順.set(m[1], [...m[2].matchAll(/@\('([A-Z]+\d+)',\s*'((?:[^']|'')*)'\)/g)].map((x) => [x[1], x[2].replace(/''/g, "'")]));
+  /* ★一重引用符 '...' と 二重引用符 "..."（PowerShell の `n＝改行・`t＝タブ）の 両方を 読む★（2026-10-05・組 R） */
+  道具の順.set(m[1], [...m[2].matchAll(/@\('([A-Z]+\d+)',\s*(?:'((?:[^']|'')*)'|"((?:[^"`]|`.)*)")\)/g)]
+    .map((x) => [x[1], x[2] !== undefined ? x[2].replace(/''/g, "'") : x[3].replace(/`n/g, '\n').replace(/`t/g, '\t').replace(/`r/g, '\r').replace(/``/g, '`')]));
 }
 if (道具の順.size !== 組たち.length) { console.log('★道具137 の 組 ' + 道具の順.size + ' ／ 紙の 組 ' + 組たち.length + '＝数が 合わない★'); process.exit(2); }
 const 番を = (a) => { const m = /^([A-Z]+)(\d+)$/.exec(a); let c = 0; for (const ch of m[1]) c = c * 26 + ch.charCodeAt(0) - 64; return [Number(m[2]) - 1, c - 1]; };
@@ -48,7 +50,7 @@ await new Promise((x) => s.listen(0, '127.0.0.1', x));
 console.log('[溢れの 画面] 紙 ' + path.basename(紙) + ' ／ ' + 行.length + '行・' + 組たち.length + '組 ／ 台 ' + 台);
 const wk = await borrow('afure-no-gamen', 台);
 const br = await launch('afure-no-gamen', wk, {}, 台);
-let 合 = 0, 違 = 0, 描合 = 0, 待ちが立たない = 0;
+let 合 = 0, 違 = 0, 描合 = 0, 待ちが立たない = 0, 受けない = 0;
 const 待ち = [];
 const 違い = [];
 try {
@@ -90,6 +92,8 @@ try {
     待ち.push(組.slice(0, 1) + ' ' + 出.待った + 'ms' + (出.条件 ? '' : '★条件 立たず★'));
     if (!出.条件) 待ちが立たない++;
     for (const x of 組の行) {
+      /* ★実Excel が 式を 受けなかった 行は 比べない★（タブ 入りの 式など・合う／違う に 数えない） */
+      if (x.字.indexOf('Excel が 式を 受けない') >= 0) { 受けない++; continue; }
       const g = 出.行.find((o) => o.番 === x.番);
       if (g.字 === x.字) 合++; else { 違++; 違い.push(組 + ' ' + x.番 + ' 画面=' + JSON.stringify(g.字) + ' 実Excel=' + JSON.stringify(x.字)); }
       if (g.描 === x.字) 描合++;
@@ -99,6 +103,7 @@ try {
 } finally { await br.close(); s.close(); }
 console.log('  待った（打ち終わり → 打った 後の 計算し直しが 終わる まで）' + 待ち.join(' ／ '));
 if (待ちが立たない) console.log('  ★' + 待ちが立たない + '組で 計算し直しが 終わらない まま 数えた＝その 組は 測って いない★');
-console.log('  ★画面の 字 ' + 合 + '/' + 行.length + ' ／ 描いた 字 ' + 描合 + '/' + 行.length + '★');
+const 分母 = 行.length - 受けない;
+console.log('  ★画面の 字 ' + 合 + '/' + 分母 + ' ／ 描いた 字 ' + 描合 + '/' + 分母 + '★' + (受けない ? '（実Excel が 式を 受けない ' + 受けない + '行は 比べない）' : ''));
 違い.forEach((t) => console.log('     ' + t));
 process.exit((違 || 待ちが立たない) ? 1 : 0);
