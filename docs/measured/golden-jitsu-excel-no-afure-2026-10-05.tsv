@@ -1,0 +1,34 @@
+# この 紙は 式の 答えの 紙では ありません（溢れの 物差し）
+# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 31／書いた 31
+組	番地	式(Formula2)	画面の字(.Text)	値の型(.Value2)	本当に0か(=(マス)=0)	溢れの元か(HasSpill)	溢れる先
+A 範囲そのもの	E1	=A1:A3	1	Double	False	True	E1:E3
+A 範囲そのもの	E2		2	Double	False	True	
+A 範囲そのもの	E3		3	Double	False	True	
+A 範囲そのもの	E4			空	True	False	
+B SEQUENCE	E1	=SEQUENCE(3)	1	Double	False	True	E1:E3
+B SEQUENCE	E2		2	Double	False	True	
+B SEQUENCE	E3		3	Double	False	True	
+B SEQUENCE	E4			空	True	False	
+C FILTER	E1	=FILTER(A1:A3,A1:A3>1)	2	Double	False	True	E1:E2
+C FILTER	E2		3	Double	False	True	
+C FILTER	E3			空	True	False	
+D SORT 逆	E1	=SORT(A1:A3,1,-1)	3	Double	False	True	E1:E3
+D SORT 逆	E2		2	Double	False	True	
+D SORT 逆	E3		1	Double	False	True	
+E 溢れが先・見る式が後	E1	=A1:A3	1	Double	False	True	E1:E3
+E 溢れが先・見る式が後	E2		2	Double	False	True	
+E 溢れが先・見る式が後	E3		3	Double	False	True	
+E 溢れが先・見る式が後	F1	=E2+E3	5	Double	False	False	
+F 見る式が先・溢れが後	E1	=A1:A3	1	Double	False	True	E1:E3
+F 見る式が先・溢れが後	E2		2	Double	False	True	
+F 見る式が先・溢れが後	E3		3	Double	False	True	
+F 見る式が先・溢れが後	F1	=E2+E3	5	Double	False	False	
+G 溢れを丸ごと見る（#）	E1	=A1:A3	1	Double	False	True	E1:E3
+G 溢れを丸ごと見る（#）	F1	=SUM(E1#)	6	Double	False	False	
+H 溢れ先が埋まっている	E1	=A1:A3	#スピル!	Int32	-2146826243	False	
+H 溢れ先が埋まっている	E2	9	9	Double	False	False	
+H 溢れ先が埋まっている	E3			空	True	False	
+I 横に溢れる	E1	=TRANSPOSE(A1:A3)	1	Double	False	True	E1:G1
+I 横に溢れる	F1		2	Double	False	True	
+I 横に溢れる	G1		3	Double	False	True	
+I 横に溢れる	H1			空	True	False	
