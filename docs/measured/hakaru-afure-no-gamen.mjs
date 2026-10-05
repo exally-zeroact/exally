@@ -24,6 +24,14 @@ const ix = (n) => { const i = 頭.indexOf(n); if (i < 0) { console.log('★紙�
 const i組 = ix('組'), i番 = ix('番地'), i式 = ix('式(Formula2)'), i字 = ix('画面の字(.Text)');
 const 行 = L.map((l) => l.split('\t')).map((c) => ({ 組: c[i組], 番: c[i番], 式: c[i式] || '', 字: c[i字] || '' }));
 const 組たち = [...new Set(行.map((x) => x.組))];
+/* ★道具137 の 組の 定義★ `@{ 名 = '名前'; 打つ = @(@('E2', '9'), ...); 読む = ... }` から 名 と 打つ 順を 拾う */
+const 道具の順 = new Map();
+for (const l of fs.readFileSync(path.join(ROOT, 'docs/measured/toru-jitsu-excel-no-afure.ps1'), 'utf8').split(/\r?\n/)) {
+  const m = /@\{\s*名\s*=\s*'([^']+)';\s*打つ\s*=\s*@\((.*)\);\s*読む/.exec(l);
+  if (!m) continue;
+  道具の順.set(m[1], [...m[2].matchAll(/@\('([A-Z]+\d+)',\s*'((?:[^']|'')*)'\)/g)].map((x) => [x[1], x[2].replace(/''/g, "'")]));
+}
+if (道具の順.size !== 組たち.length) { console.log('★道具137 の 組 ' + 道具の順.size + ' ／ 紙の 組 ' + 組たち.length + '＝数が 合わない★'); process.exit(2); }
 const 番を = (a) => { const m = /^([A-Z]+)(\d+)$/.exec(a); let c = 0; for (const ch of m[1]) c = c * 26 + ch.charCodeAt(0) - 64; return [Number(m[2]) - 1, c - 1]; };
 
 const 型 = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -44,8 +52,10 @@ const 違い = [];
 try {
   for (const 組 of 組たち) {
     const 組の行 = 行.filter((x) => x.組 === 組);
-    let 打つ = 組の行.filter((x) => x.式 !== '').map((x) => [x.番, x.式]);
-    if (組.indexOf('見る式が先') >= 0) 打つ = 打つ.filter((x) => x[0] === 'F1').concat(打つ.filter((x) => x[0] !== 'F1'));
+    /* ★打つ 順は 物差しを 取った 道具137 の 組の 定義を そのまま 読む★（2026-10-05）
+         紙には 最後の 形しか 無い（J「9 を 打って 消す」の 消す が 紙に 出ない）＝自分で 順を 決めると 素通りで 合う */
+    const 打つ = 道具の順.get(組);
+    if (!打つ) { console.log('★道具137 に 組 ' + 組 + ' の 打つ 順が 無い★'); process.exit(2); }
     const 順 = [['A1', '1'], ['A2', '2'], ['A3', '3']].concat(打つ).map(([a, v]) => [...番を(a), v]);
     const 見る = 組の行.map((x) => [x.番, ...番を(x.番)]);
     const p = await br.newPage({ viewport: { width: 1280, height: 800 } });
@@ -72,7 +82,7 @@ try {
         return 元.apply(this, arguments);
       };
       try { window.render(); await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))); } finally { 型.fillText = 元; }
-      return { 待った, 条件, 行: 見る.map(([a, r, c]) => ({ 番: a, 字: d[r + ',' + c] ? String(d[r + ',' + c].d === undefined ? '' : d[r + ',' + c].d) : '', 描: 描[r + ',' + c] || '' })) };
+      return { 待った, 条件, 行: 見る.map(([a, r, c]) => ({ 番: a, 字: (function (t) { return typeof window._画面の誤りの字 === 'function' ? window._画面の誤りの字(t) : t; })(d[r + ',' + c] ? String(d[r + ',' + c].d === undefined ? '' : d[r + ',' + c].d) : ''),   /* ★中の 値は #SPILL! の まま＝見える 字に 換えて 比べる（画面の 関数を 呼ぶ）★ */ 描: 描[r + ',' + c] || '' })) };
     }, [順, 見る]);
     待ち.push(組.slice(0, 1) + ' ' + 出.待った + 'ms' + (出.条件 ? '' : '★条件 立たず★'));
     if (!出.条件) 待ちが立たない++;

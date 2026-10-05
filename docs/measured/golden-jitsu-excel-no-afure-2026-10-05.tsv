@@ -1,5 +1,5 @@
 # この 紙は 式の 答えの 紙では ありません（溢れの 物差し）
-# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 31／書いた 31
+# 137 実Excel の 溢れ（新しい 本・A1:A3＝1,2,3・.Formula2）／Excel 16.0 build 20430／頼んだ 57／書いた 57
 組	番地	式(Formula2)	画面の字(.Text)	値の型(.Value2)	本当に0か(=(マス)=0)	溢れの元か(HasSpill)	溢れる先
 A 範囲そのもの	E1	=A1:A3	1	Double	False	True	E1:E3
 A 範囲そのもの	E2		2	Double	False	True	
@@ -32,3 +32,29 @@ I 横に溢れる	E1	=TRANSPOSE(A1:A3)	1	Double	False	True	E1:G1
 I 横に溢れる	F1		2	Double	False	True	
 I 横に溢れる	G1		3	Double	False	True	
 I 横に溢れる	H1			空	True	False	
+J 塞いだ 9 を 消す	E1	=A1:A3	1	Double	False	True	E1:E3
+J 塞いだ 9 を 消す	E2		2	Double	False	True	
+J 塞いだ 9 を 消す	E3		3	Double	False	True	
+K 塞いだ 9 を 字 x に 打ち直す	E1	=A1:A3	#スピル!	Int32	-2146826243	False	
+K 塞いだ 9 を 字 x に 打ち直す	E2	x	x	String	False	False	
+K 塞いだ 9 を 字 x に 打ち直す	E3			空	True	False	
+L E3 だけ 塞ぐ	E1	=A1:A3	#スピル!	Int32	-2146826243	False	
+L E3 だけ 塞ぐ	E2			空	True	False	
+L E3 だけ 塞ぐ	E3	9	9	Double	False	False	
+M 溢れた 後に E2 に 打つ	E1	=A1:A3	#スピル!	Int32	-2146826243	False	
+M 溢れた 後に E2 に 打つ	E2	9	9	Double	False	False	
+M 溢れた 後に E2 に 打つ	E3			空	True	False	
+N 溢れた 後に E2 に 打って 消す	E1	=A1:A3	1	Double	False	True	E1:E3
+N 溢れた 後に E2 に 打って 消す	E2		2	Double	False	True	
+N 溢れた 後に E2 に 打って 消す	E3		3	Double	False	True	
+O 塞いだ 時に E1# を 見る	E1	=A1:A3	#スピル!	Int32	-2146826243	False	
+O 塞いだ 時に E1# を 見る	F1	=SUM(E1#)	#スピル!	Int32	-2146826243	False	
+P 誤り #CALC!（空の FILTER）	E1	=FILTER(A1:A3,A1:A3>99)	#CALC!	Int32	-2146826238	False	
+P 誤り #NULL!（交わらない）	E1	=SUM(A1 B1)	#NULL!	Int32	-2146826288	False	
+P 誤り #DIV/0!	E1	=1/0	#DIV/0!	Int32	-2146826281	False	
+P 誤り #VALUE!	E1	="a"+1	#VALUE!	Int32	-2146826273	False	
+P 誤り #REF!	E1	=INDEX(A1:A3,9)	#REF!	Int32	-2146826265	False	
+P 誤り #NAME?	E1	=NAIMONO(1)	#NAME?	Int32	-2146826259	False	
+P 誤り #NUM!	E1	=SQRT(-1)	#NUM!	Int32	-2146826252	False	
+P 誤り #N/A	E1	=NA()	#N/A	Int32	-2146826246	False	
+P 誤り #CALC!（LAMBDA 呼ばず）	E1	=LAMBDA(x,x+1)	#CALC!	Int32	-2146826238	False	
