@@ -69,7 +69,7 @@ console.log('  ★どこ★ ... ' + 配信.url + '/book.html');
 
 const 返 = await p.goto(配信.url + '/book.html', { waitUntil: 'load', timeout: 60000 });
 console.log('  ★返事★ ... ' + (返 ? 返.status() : '(無し)'));
-await p.waitForFunction(() => typeof window.setCell === 'function', { timeout: 30000 });
+await p.waitForFunction(() => typeof window.setCell === 'function', null, { timeout: 30000 });
 
 const 出 = await p.evaluate(async () => {
   /* ★包みを 外す★＝外さないと 画布が 0x0 で 何も 打てません */

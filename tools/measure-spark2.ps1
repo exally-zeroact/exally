@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)
 $ws.Range('A1').Value2=10; $ws.Range('B1').Value2=-5; $ws.Range('C1').Value2=30; $ws.Range('D1').Value2=20

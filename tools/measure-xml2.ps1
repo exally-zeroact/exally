@@ -1,4 +1,4 @@
-# measure-xml2.ps1 — ★XML の 読み込み（XmlImport）を きちんと 測る★ 2026-08-30
+﻿# measure-xml2.ps1 — ★XML の 読み込み（XmlImport）を きちんと 測る★ 2026-08-30
 #   ★読むだけ★。走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-xml2.ps1
 $ErrorActionPreference = 'Continue'
 $xl = New-Object -ComObject Excel.Application

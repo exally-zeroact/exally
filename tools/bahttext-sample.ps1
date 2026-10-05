@@ -1,4 +1,4 @@
-# ★BAHTTEXT の 見本を 実Excel に 作らせる★（式のまま 保存＝うちで 計算し直せる）
+﻿# ★BAHTTEXT の 見本を 実Excel に 作らせる★（式のまま 保存＝うちで 計算し直せる）
 param([string]$Out)
 $ErrorActionPreference='Stop'
 $数 = @(123.45, -1234.56, 1.005, 0, 1000000, 0.5, 21)

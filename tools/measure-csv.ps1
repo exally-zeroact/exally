@@ -1,4 +1,4 @@
-# CSV の 読み方を 実Excel で 測る（読むだけ・保存しない）
+﻿# CSV の 読み方を 実Excel で 測る（読むだけ・保存しない）
 $ErrorActionPreference='Stop'
 $dir = Join-Path $env:TEMP 'exally-csv-measure'
 New-Item -ItemType Directory -Force -Path $dir | Out-Null

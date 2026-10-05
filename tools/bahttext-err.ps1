@@ -1,4 +1,4 @@
-# ★変な物を 渡した時に 実Excel が 何を 返すか★（読むだけ・保存しない）
+﻿# ★変な物を 渡した時に 実Excel が 何を 返すか★（読むだけ・保存しない）
 param([string]$Out)
 $ErrorActionPreference='Stop'
 $xl=$null

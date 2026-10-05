@@ -1,4 +1,4 @@
-# 拡大縮小印刷／配置（整列・グループ化・回転）の 真値を 実Excel で 測る（読むだけ）
+﻿# 拡大縮小印刷／配置（整列・グループ化・回転）の 真値を 実Excel で 測る（読むだけ）
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1); $ps=$ws.PageSetup

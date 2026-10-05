@@ -1,4 +1,4 @@
-# measure-data3.ps1 — ★データタブ（接続・データの種類・詳細な絞り込み・データモデル）★ 2026-08-30
+﻿# measure-data3.ps1 — ★データタブ（接続・データの種類・詳細な絞り込み・データモデル）★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。★外の 世界へは つながない★
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-data3.ps1
 

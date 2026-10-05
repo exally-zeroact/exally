@@ -327,6 +327,24 @@ function _fmtNumber(num, fmt) {
   if(grp) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return sign + _fmtLit(pre) + parts.join('.') + pct + _fmtLit(suf);
 }
+/* ══ ★★和暦（g・e）と 経過時間（[h] [m] [s]）は 書式の 台（lib/shoshiki.js）に 渡す★★ ══（2026-10-02）
+     ★この 層の 書式器は 和暦・経過時間を 知りません★（実測 `[h]:mm` → [12]:00 ／ `ge.m.d` → ge.1.31）
+     ★台は 実Excel 16.0.20430 の 真値 155本と 全部 一致★（tests/xlsx-harness/cases/61-text-wareki-keika.json）
+     ⇒★台に 渡します★＝★2か所で 解かない★（画面と 自前の 台の TEXT も 台を 呼ぶ）
+     ★返り★ undefined＝和暦でも 経過でも ない（今まで通り）／null＝★出せない（#VALUE!）★／字＝答え
+     ★判じは 台の 1つだけ★（2026-10-04・画面の fmtForDisplay も 同じ 判じを 呼ぶ）
+       ★前は ここに 自前の 判じが 在り `0.00E+00` の 指数の E を 和暦と 取り違えて いた★
+       （⇒ 台へ 渡って #VALUE!。台の 判じは 指数の E・General・引用符・逃がし・[Red] 等を 外す）
+     ★★日付の 最後の 日（通し 2958465）から 先も 台へ★★（10-04 夕・画面の fmtForDisplay と 同じ 決まり）
+       この 層の _fmtDate は 上限を 知らず `=TEXT(2958466,"yyyy/m/d")` を ★10000/1/1★ に して いた（実Excel #VALUE!） */
+function _和暦か経過なら台へ(num, fmt) {
+  if (typeof Shoshiki === 'undefined' || !Shoshiki || typeof Shoshiki.字にする !== 'function') return undefined;
+  var 和経 = typeof Shoshiki.和暦か経過か === 'function' && Shoshiki.和暦か経過か(String(fmt));
+  var 上限 = typeof num === 'number' && num >= 2958465
+    && typeof Shoshiki.日付の書式か === 'function' && Shoshiki.日付の書式か(String(fmt));
+  if (!和経 && !上限) return undefined;
+  return Shoshiki.字にする(num, String(fmt));
+}
 function _applyTextFormat(num, fmt) {
   var f = _fmtStripLocale(fmt);
   //  ★日付の書式は「正;負;ゼロ;文字」の1区画目だけを使う（実測 TEXT(46053,"aaa;@")="土"）
@@ -2107,6 +2125,9 @@ function registerExallyFunctions(HFns) {
       if(typeof raw === 'boolean') return raw ? 'TRUE' : 'FALSE';
       var n = toNum(raw);
       if(n===null) return raw==='' ? '' : String(raw);
+      /* ★和暦・経過時間は 書式の 台へ★（出せない＝#VALUE!・実測 -1.5 の `[h]:mm`） */
+      var 台r = _和暦か経過なら台へ(n, String(fmt));
+      if(台r !== undefined) return 台r === null ? err(ErrorType.VALUE) : 台r;
       var r = _applyTextFormat(n, String(fmt));
       return r===null ? String(n) : r;
     });

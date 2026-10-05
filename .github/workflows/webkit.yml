@@ -18,6 +18,16 @@ name: WebKit（本物のブラウザで 描いた物を 測る）
 #   ★測れない時は 赤にせず「未測定」と はっきり言う★（0件と 未測定を 混ぜない）
 #   ＝ scripts/_borrow-playwright.mjs（★判定は 1か所★・yml に 書き足さない）
 
+# ★★2026-09-21 ── 司さん「★お金かからんようにしろや★」★★
+#   ＝押し直すと ★前の 回が 止まらず 走り続けて いました★
+#   ＝2026-09-20 の 1日で ★15分 ぶんが 丸ごと 無駄★（実測）
+#   ⇒★同じ 枝の 古い 回は 止める★
+#   ★main は 止めません★（`github.ref` を 群れの 名に 入れる ので
+#     main の 回と 枝の 回は 別の 群れ＝main は 最後まで 走ります）
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   schedule:
     # ★週1（日曜 22:00 UTC＝月曜 07:00 JST）★ … 誰も 押さなくても 週に 1回は 必ず 測る
@@ -41,6 +51,14 @@ on:
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
       - '.github/workflows/webkit.yml'
+      # ★名簿の webkit の 見張りと その 物差し★（2026-10-04 夜）
+      - 'tests/*-webkit.mjs'
+      - 'tests/run.js'
+      - 'tests/fixtures/**'
+      - 'scripts/run-webkit-tests.mjs'
+      - 'docs/measured/*.tsv'
+      - 'docs/measured/hakaru-haba-no-gamen.mjs'
+      - 'docs/measured/_gamen-no-michi.mjs'
   push:
     branches: [main]
     paths:
@@ -54,6 +72,9 @@ on:
       - 'lib/yakusoku-daicho.js'
       - 'scripts/_borrow-playwright.mjs'
       - '.github/workflows/webkit.yml'
+      - 'tests/*-webkit.mjs'
+      - 'tests/run.js'
+      - 'scripts/run-webkit-tests.mjs'
   workflow_dispatch:
 
 jobs:
@@ -115,3 +136,11 @@ jobs:
         run: node tests/ribbon-kasanari-webkit.mjs
       - name: ★同 わざと 直しを 剥がすと 赤に なるか（物差しの 自己確認）
         run: node tests/ribbon-kasanari-webkit.mjs --self-test
+      # ★★名簿（tests/run.js）の webkit の 見張り 全部★★（2026-10-04 夜・経営者が 見つけた 穴）
+      #   ★前は ここに 名簿の 見張りが 1本も 無かった★＝名簿の 15本は ★CI の どこでも 本当に 走って いなかった★
+      #   （毎回の CI では webkit が 無いので 未測定・緑。本人は「ここで 本当に 測る」と 言って いた）
+      #   ⇒★1本ずつ 並べず 名簿から 拾う 道具を 1段で 呼ぶ★＝名簿に 足せば 勝手に 走る
+      #   ★上の 4本（comment-mark・hyou-no-soto・bahttext・ribbon-kasanari）は 名簿に 無い＝ここに 書いた まま★
+      #   ★門★ tests/webkit-hashiru.test.mjs（毎回の CI）＝この 段が 在るか・どの *-webkit.mjs も どこかで 走るか
+      - name: ★名簿の webkit の 見張り 全部（tests/run.js から 拾う）
+        run: node scripts/run-webkit-tests.mjs

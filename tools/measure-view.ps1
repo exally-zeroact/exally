@@ -1,4 +1,4 @@
-# measure-view.ps1 — ★表示タブ（ブックの表示・ウィンドウ）を 実Excel 16.0 で 測る★ 2026-08-30
+﻿# measure-view.ps1 — ★表示タブ（ブックの表示・ウィンドウ）を 実Excel 16.0 で 測る★ 2026-08-30
 #   ★読むだけ★＝新しいブックを 作って 測り、保存せずに 閉じる。客の実物には 触らない。
 #   走らせ方: powershell -ExecutionPolicy Bypass -File tools\measure-view.ps1
 

@@ -1,4 +1,4 @@
-# measure-charts.ps1 - 実Excel(COM)で ★グラフの種類ごとの 既定★ を 測る
+﻿# measure-charts.ps1 - 実Excel(COM)で ★グラフの種類ごとの 既定★ を 測る
 #   pwsh -File tools/measure-charts.ps1
 #   ★読むだけ★（開いたブックは 保存せずに 閉じる）
 $ErrorActionPreference = 'Stop'

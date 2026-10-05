@@ -56,6 +56,21 @@ const 道具 = {
   知らせる: (文) => { 知らせ.push(文); },
 };
 const 積 = P.つなぐ(H, F, 道具);
+/* ══ ★★門が 1つ 増えました＝ここで 明示して 開けます★★ ══（2026-09-26）
+     ★★何が 変わったか★★
+       前 ･･･ ★開いた だけで 外へ 出て いました★
+       今 ･･･ ★お客さんが 「つないで よい」と 言った 本だけ 出します★
+       ＝`lib/formula-soto.js` の 頭「もらった `.xlsx` の 式は ★式のまま★ 入る＝★開いた だけで 走る★」
+       ＝司さん 09-25「★おすすめで 直せ★」／経営者1 の 推し ⑶
+     ★★この 見張りは 「出した 後の 振る舞い」を 見る 物です★★
+       ⇒★だから ここで 1回 開けます★（★門が 在る事は 別の 見張りが 見ます★）
+       ⇒`tests/soto-wo-kiku-webkit.mjs` ＝★門そのものを 見る 見張り★
+     ★開け忘れたら 全部 `#N/A` に なります★＝★だから ここに 書いて おきます★ */
+if (typeof P.外へ出す !== 'function') {
+  console.log('  ★★測れません★★ `外へ出す` が 在りません＝門の 口が 消えて います');
+  process.exit(8);
+}
+P.外へ出す(true);
 
 const hf = HF0.buildEmpty({ licenseKey: 'gpl-v3', useArrayArithmetic: true, smartRounding: false });
 const SID = hf.getSheetId(hf.addSheet('S'));

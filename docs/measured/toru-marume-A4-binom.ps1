@@ -1,4 +1,4 @@
-# toru-marume-A4-binom.ps1 — ★A群の 4か所目★ BINOM.DIST.RANGE の 4桁丸めを 実Excel と 突き合わせる（2026-09-08）
+﻿# toru-marume-A4-binom.ps1 — ★A群の 4か所目★ BINOM.DIST.RANGE の 4桁丸めを 実Excel と 突き合わせる（2026-09-08）
 #
 #  ★★なぜ この 紙が 要るか★★
 #    `exally-formula.js:1301`

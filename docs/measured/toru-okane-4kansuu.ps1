@@ -1,4 +1,4 @@
-# toru-okane-4kansuu.ps1 — ★IRR / MIRR / NPV / XNPV の 境目を 実Excel に 聞く★（2026-09-09）
+﻿# toru-okane-4kansuu.ps1 — ★IRR / MIRR / NPV / XNPV の 境目を 実Excel に 聞く★（2026-09-09）
 #
 #  ★★なぜ★★
 #    XIRR が ★実Excel の #NUM! を 数で 返して いました★

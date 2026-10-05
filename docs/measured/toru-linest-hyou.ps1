@@ -1,4 +1,4 @@
-# toru-linest-hyou.ps1 — ★LINEST が ★何を 返すか★を 実Excel に 全部 聞く★（2026-09-09）
+﻿# toru-linest-hyou.ps1 — ★LINEST が ★何を 返すか★を 実Excel に 全部 聞く★（2026-09-09）
 #
 #  ★★なぜ★★（2件目）
 #    うちは `=LINEST(範囲,範囲)` の ★裸の 形だけ★を JS層で 拾い、★傾き 1つ★を 返して います。

@@ -1,4 +1,4 @@
-# measure-python.ps1 — ★数式タブ Python (プレビュー) の 4個★ 2026-08-30
+﻿# measure-python.ps1 — ★数式タブ Python (プレビュー) の 4個★ 2026-08-30
 #   ★読むだけ★＝新しいブックで 測り、保存せずに 閉じる。
 #   走らせ方: pwsh -NoProfile -ExecutionPolicy Bypass -File tools\measure-python.ps1
 

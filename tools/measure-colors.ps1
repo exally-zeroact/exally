@@ -1,4 +1,4 @@
-# ★色を 16進で 測り直す★（10進の 数字を そのまま 16進と 読み違えていないかの 確かめ）
+﻿# ★色を 16進で 測り直す★（10進の 数字を そのまま 16進と 読み違えていないかの 確かめ）
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)

@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)
 # ① 1行目が 字（見出しらしい）

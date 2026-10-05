@@ -1,4 +1,4 @@
-# 数式タブの 真値を 実Excel で 測る（読むだけ・保存しない）
+﻿# 数式タブの 真値を 実Excel で 測る（読むだけ・保存しない）
 $ErrorActionPreference='Stop'
 $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
 $wb=$xl.Workbooks.Add(); $ws=$wb.Worksheets.Item(1)
