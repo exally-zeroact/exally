@@ -3567,7 +3567,7 @@ function AIの表をシートに入れる(番){
   /* この 知らせの 約束は ★実際に 押して★ 確かめている
      （lib/yakusoku-daicho.js に 1行／tests/yakusoku.test.mjs が 入れて→1回 戻す） */
   notify('' + 表.length + '行 × ' + (表[0] ? 表[0].length : 0) + '列 入れました'  /* data-yakusoku="hyou-ireru-undo" */
-    + '（違ったら ★↩（元に戻す）で 1押しで 戻ります★）');
+    + '（違ったら ↩（元に戻す）で 1押しで 戻ります）');
   return 表.length;
 }
 function extractWriteAction(text){
@@ -4678,7 +4678,7 @@ function 三次元を置く(){
   選んだ物 = o; えらんだ物たち = [o];
   render();
   notify('3D を 置きました（' + 三次元の決め.名 + '／点 ' + o.形.点.length
-    + '・面 ' + o.形.面.length + '）★線だけで 出します★');
+    + '・面 ' + o.形.面.length + '）線だけで 出します');
   return o.形.点.length;
 }
 function 三次元を回す(横, 縦){
@@ -5068,7 +5068,7 @@ function マップを作る(){
   if (!出た) { notify('都道府県の 名前が 1つも 見つかりません'); return 0; }
   地図の窓を開く();
   notify('' + 出た + '県 に 色を 付けました'
-    + (r.見つからない.length ? ('／★' + r.見つからない.length + '個は 県の 名前では ありません★') : ''));
+    + (r.見つからない.length ? ('／' + r.見つからない.length + '個は 県の 名前では ありません') : ''));
   return 出た;
 }
 function 地図の窓を開く(){
@@ -6004,7 +6004,7 @@ function すべて更新(){
   var 残 = つなぎたち.length - 数;
   接続の帯を出す();
   notify(数 + '件を 数え直しました'
-    + (残 ? ('／★残り ' + 残 + '件は ファイルを もう一度 選んでください★') : ''));
+    + (残 ? ('／残り ' + 残 + '件は ファイルを もう一度 選んでください') : ''));
   return 数;
 }
 function 接続のプロパティ(){
@@ -6231,7 +6231,7 @@ function チェックボックスを入れる(){
   }
   render();
   notify(n + '個の セルを TRUE / FALSE に しました'
-    + '（★実Excel の 新しい チェック ボックスも セルの 中の TRUE / FALSE です★）');
+    + '（実Excel の 新しい チェック ボックスも セルの 中の TRUE / FALSE です）');
   return n;
 }
 
@@ -6731,7 +6731,7 @@ function ふりがなを切り替え(){
   ふりがなを出す = !ふりがなを出す;
   render();
   notify(ふりがなを出す
-    ? 'ふりがなを 出します（★読み方は 打ち込んだ 物だけ 出ます★）'
+    ? 'ふりがなを 出します（読み方は 打ち込んだ 物だけ 出ます）'
     : 'ふりがなを しまいました');
   return ふりがなを出す ? 1 : 0;
 }
@@ -8661,7 +8661,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <label style="display:block;font-size:12px;color:#333333;"><input id="findCase" type="checkbox"> 大文字と小文字を区別する</label>
       <label style="display:block;font-size:12px;color:#333333;"><input id="findWhole" type="checkbox"> セル全体が同じ物だけ</label>
       <div style="font-size:12px;color:#333333;margin-top:8px;line-height:1.6;">
-        ★式のセルは 式の字を探します★（Excelと同じ）。<code>*</code> はいくつでも・<code>?</code> は1文字。
+        式のセルは 式の字を探します（Excelと同じ）。<code>*</code> はいくつでも・<code>?</code> は1文字。
         <code>~*</code> と書くと <code>*</code> そのものを探します。
       </div>
       <div id="findMsg" style="font-size:12px;color:#333333;margin-top:8px;min-height:1.6em;line-height:1.6;"></div>
@@ -8784,7 +8784,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:16px 18px 10px;border-bottom:1px solid #D4EDE1;">
       <div style="font-size:16px;font-weight:700;color:#2E7D54;">マクロの 中身（コード）を 見る</div>
       <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;">
-        ★読むだけです。ここでは マクロを 動かしません★（書き換えも しません）。
+        読むだけです。ここでは マクロを 動かしません（書き換えも しません）。
       </div>
       <div style="font-size:13px;color:#333333;margin-top:6px;line-height:1.8;" id="vbBody"></div>
     </div>
@@ -8936,8 +8936,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <div id="fcWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
       <div id="fcPreview" style="font-size:12px;font-family:monospace;white-space:pre;overflow:auto;max-height:26vh;border:1px solid #D4EDE1;border-radius:8px;padding:6px;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
-        ★まっすぐの 線で 伸ばします★（実Excelの FORECAST.LINEAR と 同じ 出し方）。<br>
-        ★実Excelの「予測シート」は 季節の くり返しも 見ます（ETS）。うちは まだ 直線だけです。★
+        まっすぐの 線で 伸ばします（実Excelの FORECAST.LINEAR と 同じ 出し方）。<br>
+        実Excelの「予測シート」は 季節の くり返しも 見ます（ETS）。うちは まだ 直線だけです。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -8995,7 +8995,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     </div>
     <div id="shapeBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;"></div>
     <div style="padding:0 18px 12px;font-size:12px;color:#7A9A87;line-height:1.6;">
-      ★色は 実Excel の 物を 写さず うちの 緑を 使います★（形と 働きは 同じ）。
+      色は 実Excel の 物を 写さず うちの 緑を 使います（形と 働きは 同じ）。
     </div>
     <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
       <button onclick="図形の窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
@@ -9032,8 +9032,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="fitWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★実Excelと 同じで 10％〜400％まで★（既定は 100％・横1・縦1）。<br>
-        ★ページに 合わせる★を 選ぶと 倍率は 使いません（実Excel も 同じ）。
+        実Excelと 同じで 10％〜400％まで（既定は 100％・横1・縦1）。<br>
+        ページに 合わせるを 選ぶと 倍率は 使いません（実Excel も 同じ）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9073,7 +9073,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
   align-items:center;gap:10px;padding:8px 14px;background:#E8F5EE;border-top:1px solid #C8ECD8;
   font-size:12px;color:#333333;">
   <span id="paperBarText" style="flex:1 1 auto;min-width:0;">—</span>
-  <span style="flex:0 0 auto;color:#7A9A87;">★1ページに 入る 数は 印刷する 機械で 変わります★</span>
+  <span style="flex:0 0 auto;color:#7A9A87;">1ページに 入る 数は 印刷する 機械で 変わります</span>
   <button type="button" onclick="標準の表示にする()" style="flex:0 0 auto;min-height:32px;padding:0 12px;
     border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;
     font-family:inherit;cursor:pointer;">標準に 戻す</button>
@@ -9142,9 +9142,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <div style="font-size:12px;color:#7A9A87;">出来上がりの 形（見本）</div>
       <div id="pvPreview" style="font-size:12px;color:#333333;font-family:monospace;white-space:pre;overflow:auto;max-height:30vh;border:1px solid #D4EDE1;border-radius:8px;padding:6px;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
-        ★実Excelを 測って 形を 合わせています★（左上は「合計 / 金」・総計は 行も 列も 出す）。<br>
-        ★違う所★＝実Excel は 日本語を ★読み★で 並べます（にし→ひがし）。
-        うちは 読みの 辞書を 持っていないので ★字の 順★で 並べます。
+        実Excelを 測って 形を 合わせています（左上は「合計 / 金」・総計は 行も 列も 出す）。<br>
+        違う所＝実Excel は 日本語を 読みで 並べます（にし→ひがし）。
+        うちは 読みの 辞書を 持っていないので 字の 順で 並べます。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9161,8 +9161,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     </div>
     <div id="fontBody" style="padding:10px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;"></div>
     <div style="padding:0 18px 10px;font-size:12px;color:#7A9A87;line-height:1.6;">
-      ★実Excelの 既定は 游ゴシック 11★（測った値）。<br>
-      ★機械に 入っていない フォントは 出しません★＝出しても 別の 字で 出るだけなので。
+      実Excelの 既定は 游ゴシック 11（測った値）。<br>
+      機械に 入っていない フォントは 出しません＝出しても 別の 字で 出るだけなので。
     </div>
     <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
       <button onclick="フォントの窓を閉じる()" style="min-height:44px;padding:0 18px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">閉じる</button>
@@ -9177,7 +9177,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
       <div id="orientBody" style="display:flex;flex-direction:column;gap:6px;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:8px;">
-        ★実Excelの 数と 同じに しています★（0／45／-45／90／-90／縦書き）。
+        実Excelの 数と 同じに しています（0／45／-45／90／-90／縦書き）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9216,9 +9216,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
           <label style="display:flex;align-items:center;gap:4px;">右<input id="pmRight" type="number" step="0.1" min="0" max="10" style="width:70px;font-size:16px;padding:6px;border:1px solid #C8ECD8;border-radius:8px;"></label>
         </div>
         <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:4px;">
-          ★標準は 実Excelから 測った値★＝上下 1.905cm・左右 1.778cm。<br>
-          ★実Excelの「広い／狭い」の 数は 外から 読めませんでした★ので 出していません
-          （★測っていない数を 並べない★）。
+          標準は 実Excelから 測った値＝上下 1.905cm・左右 1.778cm。<br>
+          実Excelの「広い／狭い」の 数は 外から 読めませんでしたので 出していません
+          （測っていない数を 並べない）。
         </div>
       </div>
       <div id="pmSize" style="margin-top:10px;">
@@ -9240,7 +9240,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         </div>
       </div>
       <div id="pmOpt" style="margin-top:10px;">
-        <div style="font-size:12px;color:#7A9A87;">シートの オプション（★実Excel実測＝表示は する・印刷は しない★）</div>
+        <div style="font-size:12px;color:#7A9A87;">シートの オプション（実Excel実測＝表示は する・印刷は しない）</div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
           <div>
             <div style="font-size:12px;">枠線</div>
@@ -9285,8 +9285,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <div id="gsWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
       <div id="gsOut" style="font-size:12px;color:#2E7D54;min-height:1.4em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★実Excelと 同じ 決め★＝多くて 100回 試し、変化が 0.001 より 小さく なったら 止めます。
-        ★見つからなければ 何も 直しません★（近い所で 止めたと 出します）。
+        実Excelと 同じ 決め＝多くて 100回 試し、変化が 0.001 より 小さく なったら 止めます。
+        見つからなければ 何も 直しません（近い所で 止めたと 出します）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9309,7 +9309,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="zoomWhy" style="font-size:12px;color:#C0392B;min-height:1.4em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★実Excelと 同じで 10％〜400％まで★（それより 外は 入りません）。
+        実Excelと 同じで 10％〜400％まで（それより 外は 入りません）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9329,13 +9329,13 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
         <input type="checkbox" id="bookProtOn" style="width:20px;height:20px;">
-        <span>シートの ★足す・消す・名前を変える★ を できなくする</span>
+        <span>シートの 足す・消す・名前を変える を できなくする</span>
       </label>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
-        ★実Excelを 測った通り★＝守ると シートが 足せなくなります。
+        実Excelを 測った通り＝守ると シートが 足せなくなります。
         セルの 中身は これでは 守れません（それは「シートの保護」です）。<br>
-        ★合い言葉（パスワード）は 付けられません★＝ブラウザの 中だけの 守りなので、
-        付けても ★守れているふり★に なるためです。
+        合い言葉（パスワード）は 付けられません＝ブラウザの 中だけの 守りなので、
+        付けても 守れているふりに なるためです。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9350,7 +9350,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
   <div style="background:#ffffff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;">
     <div style="padding:14px 18px 10px;border-bottom:1px solid #D4EDE1;">
       <div style="font-size:16px;font-weight:700;color:#2E7D54;">範囲の 編集を 許可する</div>
-      <div style="font-size:12px;color:#333333;margin-top:4px;">シートを 守っていても ★ここだけは 書ける★ 所を 決めます</div>
+      <div style="font-size:12px;color:#333333;margin-top:4px;">シートを 守っていても ここだけは 書ける 所を 決めます</div>
     </div>
     <div style="padding:12px 18px;font-size:13px;color:#333333;overflow:auto;flex:1;">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
@@ -9412,15 +9412,15 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     </div>
     <div style="padding:12px 18px;font-size:13px;color:#333333;line-height:1.9;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="radio" name="calcMode" value="auto" style="width:18px;height:18px;"><span>自動（★実Excelの 既定★）</span>
+        <input type="radio" name="calcMode" value="auto" style="width:18px;height:18px;"><span>自動（実Excelの 既定）</span>
       </label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
         <input type="radio" name="calcMode" value="manual" style="width:18px;height:18px;"><span>手動（F9 で 計算する）</span>
       </label>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;margin-top:6px;">
-        手動に すると ★打った後 すぐには 計算しません★。
-        画面には <b>「計算していません」</b>と 出します（★黙って 古い数を 見せない★）。<br>
-        ★実Excelの「データ テーブル以外 自動」は 出していません★＝うちに データテーブルが 無いためです。
+        手動に すると 打った後 すぐには 計算しません。
+        画面には <b>「計算していません」</b>と 出します（黙って 古い数を 見せない）。<br>
+        実Excelの「データ テーブル以外 自動」は 出していません＝うちに データテーブルが 無いためです。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9481,7 +9481,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <button onclick="フォームで消す()" style="min-height:44px;padding:0 14px;border:1px solid #C8ECD8;background:#ffffff;color:#C0392B;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">この行を 消す</button>
     </div>
     <div style="padding:0 18px 12px;font-size:12px;color:#7A9A87;line-height:1.6;">
-      打った字は ★前へ／次へ／閉じる の 時に 入ります★。
+      打った字は 前へ／次へ／閉じる の 時に 入ります。
     </div>
     <div style="padding:0 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;padding-top:10px;">
       <button onclick="フォームを閉じる()" style="min-height:44px;padding:0 18px;border:0;background:#3D9E72;color:#ffffff;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">閉じて 入れる</button>
@@ -9521,7 +9521,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       <button onclick="見出しから並べ替え('desc')" style="flex:1;min-height:44px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer;">降順</button>
     </div>
     <div style="padding:10px 18px 4px;font-size:12px;color:#7A9A87;">
-      見せる 物に ✓ を 付けます（★行は 消えません。隠れるだけ★）
+      見せる 物に ✓ を 付けます（行は 消えません。隠れるだけ）
     </div>
     <div style="padding:0 18px;display:flex;gap:8px;">
       <button onclick="見出しの絞りを全部(true)" style="min-height:36px;padding:0 10px;border:1px solid #C8ECD8;background:#ffffff;color:#333333;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;">すべて</button>
@@ -9557,14 +9557,14 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </label>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
         <input type="checkbox" id="tblTotals" style="width:20px;height:20px;">
-        <span>集計行を 出す（★一番 右の列だけ 合計＝実Excelと 同じ★）</span>
+        <span>集計行を 出す（一番 右の列だけ 合計＝実Excelと 同じ）</span>
       </label>
       <div id="tblWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★実Excelを 測って 合わせています★＝名前は テーブル1／見出し行あり／
-        しま（1つおきの帯）あり／★見出しの ▼ から 並べ替えと 絞り込み★が 出来ます。<br>
-        ★違う所★＝集計の 式を 実Excel は「[列名]」で 書きます。
-        うちの 計算は まだ それを 読めないので ★A1の 形★で 書きます（出る数は 同じ）。
+        実Excelを 測って 合わせています＝名前は テーブル1／見出し行あり／
+        しま（1つおきの帯）あり／見出しの ▼ から 並べ替えと 絞り込みが 出来ます。<br>
+        違う所＝集計の 式を 実Excel は「[列名]」で 書きます。
+        うちの 計算は まだ それを 読めないので A1の 形で 書きます（出る数は 同じ）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9599,9 +9599,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="sparkWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★実Excelと 同じに しています★＝飾り（高い点・低い点・印）は 出さない／
-        ★勝敗だけ マイナスを 別の色★／★縦の 目盛は その1本の 中だけ★／
-        ★空いている所は 隙間に する★。
+        実Excelと 同じに しています＝飾り（高い点・低い点・印）は 出さない／
+        勝敗だけ マイナスを 別の色／縦の 目盛は その1本の 中だけ／
+        空いている所は 隙間に する。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9632,8 +9632,8 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="linkWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
       <div style="font-size:12px;color:#7A9A87;line-height:1.6;">
-        ★javascript: と data: は 入れられません★（危ないので）。<br>
-        押すと ★別の窓★で 開きます。
+        javascript: と data: は 入れられません（危ないので）。<br>
+        押すと 別の窓で 開きます。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9670,7 +9670,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         <span>1行目は 見出し（動かさない）</span>
       </label>
       <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
-        ★同じ値の 行は 2つ目の 列で 決まります★（実Excelと 同じ）。空白は いつも 最後です。
+        同じ値の 行は 2つ目の 列で 決まります（実Excelと 同じ）。空白は いつも 最後です。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9809,7 +9809,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         <div class="pg-prev" id="hfPreviewF"></div>
         <div id="hfCustom" hidden>
           <div class="pg-grp">自分で書く（左・中央・右）</div>
-          <div class="pg-hint">★印★ <span id="hfCodes"></span></div>
+          <div class="pg-hint">印 <span id="hfCodes"></span></div>
           <div class="pg-row"><span class="pg-lbl">ヘッダー</span>
             <input id="hfHL" placeholder="左" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
             <input id="hfHC" placeholder="中央" style="flex:1;min-width:0;font-size:13px;padding:5px 7px;border:1px solid #C8ECD8;border-radius:6px;">
@@ -9858,7 +9858,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
     <div style="padding:14px 18px;font-size:13px;color:#333333;overflow:auto;">
       <textarea id="commentText" rows="4" placeholder="ここに 書きます" style="width:100%;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
       <div data-yakusoku="comment-mark" style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
-        コメントが 付いたセルには ★右上に 赤い印★ が 出ます（実Excelと 同じ）。
+        コメントが 付いたセルには 右上に 赤い印 が 出ます（実Excelと 同じ）。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9903,7 +9903,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <canvas id="chartCanvas" style="width:360px;height:216px;max-width:100%;border-radius:10px;"></canvas>
       <div style="font-size:12px;color:#7A9A87;margin-top:8px;line-height:1.6;">
-        凡例の 出る/出ないは ★種類ごとに 実Excelを 測って 合わせています★
+        凡例の 出る/出ないは 種類ごとに 実Excelを 測って 合わせています
         （ツリーマップは 1本でも 出る・ヒストグラムや 箱ひげは 出さない）。<br>
         <span id="chartNote"></span>
       </div>
@@ -9939,7 +9939,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="splitWarn" style="font-size:12px;color:#333333;min-height:1.8em;"></div>
       <div data-yakusoku="flash-overwrite" style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
-        ★元の列は 上書きされます★（実Excelと 同じ）。足りない所は 空のままです。
+        元の列は 上書きされます（実Excelと 同じ）。足りない所は 空のままです。
       </div>
     </div>
     <div style="padding:10px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #D4EDE1;">
@@ -9966,7 +9966,7 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
       </div>
       <div id="nameWhy" style="font-size:12px;color:#C0392B;min-height:1.6em;"></div>
       <div style="font-size:12px;color:#7A9A87;margin-top:6px;line-height:1.6;">
-        ★A1 のような 番地の形と、数で 始まる名前は 使えません★（実Excelも 断ります）
+        A1 のような 番地の形と、数で 始まる名前は 使えません（実Excelも 断ります）
       </div>
       <div id="nameList" style="margin-top:12px;border-top:1px solid #D4EDE1;padding-top:10px;font-size:12px;"></div>
     </div>
@@ -10003,9 +10003,9 @@ body.exally-locked > *:not(#loginOv){display:none!important;}
         <input id="validMax" type="text" inputmode="numeric" placeholder="10" style="width:5.5em;font-size:16px;padding:6px 8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;color:#333333;">
       </div>
       <div style="font-size:12px;color:#333333;margin-top:8px;line-height:1.6;">
-        ★止めるのは「打った時」だけ★です。貼り付けや ファイルの読み込みでは 止まりません（実物のExcelも同じ）。
+        止めるのは「打った時」だけです。貼り付けや ファイルの読み込みでは 止まりません（実物のExcelも同じ）。
         空のマスは 決まりに合っている扱いです。
-        ★先に入っていた 合わない値は 消しません★（消さずに 何個 在るかを 数えて出します）。
+        先に入っていた 合わない値は 消しません（消さずに 何個 在るかを 数えて出します）。
       </div>
       <div id="validMsg" style="font-size:12px;color:#B3261E;margin-top:8px;min-height:1.6em;line-height:1.6;"></div>
     </div>
@@ -15413,7 +15413,7 @@ function CSVを入れる(字, ファイル名, 字の種類){
   var 区 = (r.区切り === '\t') ? 'タブ' : (r.区切り === ';' ? 'セミコロン' : 'カンマ');
   notify('「' + (ファイル名 || 'CSV') + '」を 読みました（' + r.行 + '行 × ' + r.列 + '列／'
     + 区 + '区切り／' + 字の種類 + '）'
-    + (字の種類 === 'よく分からない字' ? '★字が 化けているかもしれません★' : ''));
+    + (字の種類 === 'よく分からない字' ? '字が 化けているかもしれません' : ''));
   return r.行;
 }
 
@@ -17065,7 +17065,7 @@ function 範囲から名前を作る(){
   すべて再計算();
   /* ★とばした物を 黙らない★ */
   notify(作った + '個 作りました' + (とばした.length ? '（' + とばした.length + '個は 名前に 出来ません：'
-    + とばした.join('・') + '★）' : ''));
+    + とばした.join('・') + '）' : ''));
   return 作った;
 }
 /* ★数式で使用★＝名前を 式に 入れる */
