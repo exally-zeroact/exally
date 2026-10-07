@@ -1,4 +1,4 @@
-/* hoshi-kazoeru.mjs — ★お客さんの 画面に 出る 字に ★ が 混じっていないか 数える★（2026-09-06）
+/* hoshi-kazoeru.mjs — ★お客さんの 画面に 出る 字に ★ が 混じっていないか 数える★（2026-09-06・2026-10-08 に 広げた）
  *
  *  ★★なぜ★★
  *    ★ は ★私たちの 便りの 印★（司さん・指示役・私の やりとり）。
@@ -6,53 +6,142 @@
  *    2026-09-06 に 指示役から 指摘され、書き出しの 窓の 字から 12個以上 抜いた。
  *    同じ日に Rakunally も ★23件★ 直している（会社ぜんぶの 決まり）。
  *
- *  ★★数える 前に「どこが お客さんの 画面か」を 決める★★（指示役の 条件）
- *    ★repo 全体で ★ を 数えたら 何千件★ 出る。
- *    コメント・書類・私たちの 便り・記憶は ★★ を 使ってよい 所★。
- *    ⇒★口を 名指しして、その 口に 渡る 字だけ 数える★
+ *  ★★2026-10-08 に 広げた 訳（Rakunally の 引き継ぎ＝司さん 指示・対立役が 叩いた）★★
+ *    前の 門は「口の 第1引数の ★同じ行★の 文字列」だけを 見て、★HTML の 本文は 見ていなかった★。
+ *    ⇒ 門は 0本で 緑なのに、お客さんの 画面に ★ が 出て いた（数えた）：
+ *       ・book.html の 窓の 説明の 本文 ･･･ 41節（例「★読むだけです。ここでは マクロを 動かしません★」）
+ *       ・口の 引数が 行を またぐ／三項演算子の 形 ･･･ 8本（口の 呼び出し 380か所の うち 門が 拾えて いたのは 370）
+ *    また ★逃がし（逆斜線 u 2605）と 実体参照（&#9733; など）★を 読み解かず、書かれたら 素通りする 形だった。
  *
- *  ★★口＝3種類（名指し）★★
- *    ①`showToast(...)` … 画面の 上に 出る 知らせ
- *    ②`notify(...)`    … 同上（book.html の 別名）
- *    ③`窓の副題(...)`   … 窓の 下の 説明（#funcSub）
- *    ⇒★どれも「第1引数が お客さんに 出る 字」★
+ *  ★★見る 物（2026-10-08 から）★★
+ *    ①口（showToast ／ notify ／ 窓の副題）の ★第1引数 まるごと★（括弧の 対を 数えて 取る＝行を またいでも 三項でも）
+ *      ・中の 文字列（'...' "..." `...` の 地の 字）を ★JS の 逃がしを 解いて★ から 見る（逆斜線が 奇数個の 時だけ 逃がし）
+ *      ・notify ／ showToast は ★innerHTML に 入れる★（book.html の notify）＝★実体参照も 解く★
+ *        窓の副題 は ★textContent★＝実体参照は ★解かない★（そのまま 字で 出る）
+ *    ②HTML の 見える 字（repo 直下の *.html ★全部★＝名前で 選ばない）
+ *      ・本文（タグの 外の 字）と 属性の 字（style／class／id／href／src／on... は 除く）
+ *      ・★隠れて いる 所（hidden・display:none）も 数える★＝窓は JS が 開くので お客さんに 見える
+ *        （41節は ★全部 最初は 隠れた 窓の 中★だった＝除くと 0本に なる）
+ *      ・除くのは script ／ style ／ HTML の 注記 だけ
+ *      ・HTML の 読み方は jsdom（実体参照の 読み解きを 正しく 1回だけ＝&amp;#9733; は ★ に しない）
  *
- *  ★★数えない 物（はっきり 書く）★★
- *    ・コメント（// と 星印つき 注記）… ★私たちの 便り＝★ でよい★
- *    ・HTML の 中の 字（ボタンの 札・見出し）… ★口が 決められない★ので この 回は 見ない
- *    ・lib が 返して 画面が 出す 字（例 lib/hairanai.js）… ★口では 拾えない★
- *      ⇒★この 3つは 別に 数える 必要が 在る＝★半分しか 見ていない★★
+ *  ★★まだ 見て いない 物（半分＝数を 書く・2026-10-08 に 対立役が 数えた）★★
+ *    ・JS が 画面へ 直に 書く 字 ･･･ `.textContent =` の ★ 入り 34 ／ `.innerHTML =` の ★ 入り 13（全部 book.html）
+ *    ・lib が 返して 画面が 出す 字 ･･･ ★ 入り 8（lib/pivot.js 4 は ピボットの 見本欄に 出る＝辿った／lib/shiki-kiru.js 4 は 未辿り）
+ *    ・★ 入りの 文字列 リテラル 全体 ･･･ 238（客に 出ない 物も 混じる・lib/ribbon-spec.js の icon '★' は わざとの 印に 見える）
+ *    ・AI に 渡す 字（prompt/*.md の ★ 466・api/claude.js の 倉庫の 誤りの 字）＝AI が 真似る 道（見立て）
+ *    ・CSS の content ･･･ 今 0
+ *    ⇒★「この 門が 0本」≠「お客さんの 画面に ★ が 無い」★
  *
- *  使い方: node scripts/hoshi-kazoeru.mjs
- *          node scripts/hoshi-kazoeru.mjs --self-test
+ *  使い方: node scripts/hoshi-kazoeru.mjs           ... 数える（直さない）
+ *          node scripts/hoshi-kazoeru.mjs --外す    ... 見つけた ★ を その 場で 外す（字は 残す）
+ *  ★見張り★ tests/hoshi-nashi.test.mjs（--self-test の 歯も そちら）
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { 注記を外す } = await import(pathToFileURL(path.join(ROOT, 'scripts/lib/chuki.mjs')).href);
+const require_ = createRequire(path.join(ROOT, 'package.json'));
+const { JSDOM } = require_('jsdom');
 
-/** ★純関数★＝字の 中から「口に 渡る 文字列」を 拾う
- *  ★注記は 先に 外して 渡す★（コメントの ★ を 数えない） */
-export function 口に渡る字(注記なしの字) {
-  const 口 = ['showToast', 'notify', '窓の副題'];
+/* ★口★＝名前と 出し方（innerHTML か textContent か）
+     book.html の notify は `t.innerHTML = msg`・showToast は その 別名・窓の副題 は `e.textContent` */
+export const 口の出し方 = { showToast: 'html', notify: 'html', 窓の副題: 'text' };
+
+/* ══ JS の 字の 読み方 ══════════════════════════════════════ */
+/** ★JS の 逃がしを 解く★（★ ／ \u{2605} ／ \x41 ／ \n など。逆斜線が 奇数個の 時だけ 逃がし） */
+export function JSの逃がしを解く(生) {
+  let 出 = '';
+  for (let i = 0; i < 生.length; i++) {
+    const c = 生[i];
+    if (c !== '\\') { 出 += c; continue; }
+    const d = 生[i + 1];
+    if (d === undefined) { 出 += c; continue; }
+    if (d === 'u' && 生[i + 2] === '{') {
+      const j = 生.indexOf('}', i + 3);
+      if (j > 0) { 出 += String.fromCodePoint(parseInt(生.slice(i + 3, j), 16)); i = j; continue; }
+    }
+    if (d === 'u' && /^[0-9a-fA-F]{4}$/.test(生.slice(i + 2, i + 6))) { 出 += String.fromCharCode(parseInt(生.slice(i + 2, i + 6), 16)); i += 5; continue; }
+    if (d === 'x' && /^[0-9a-fA-F]{2}$/.test(生.slice(i + 2, i + 4))) { 出 += String.fromCharCode(parseInt(生.slice(i + 2, i + 4), 16)); i += 3; continue; }
+    const 一 = { n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', 0: '\0' };
+    出 += Object.prototype.hasOwnProperty.call(一, d) ? 一[d] : d;   /* \\ は \ ／ \' は ' */
+    i++;
+  }
+  return 出;
+}
+
+let _道具 = null;
+/** ★実体参照を 解く★（ブラウザと 同じ 読み方＝jsdom。&amp;#9733; は 1回だけ 解いて 「&#9733;」の 字） */
+export function 実体参照を解く(s) {
+  if (!_道具) _道具 = new JSDOM('<!DOCTYPE html><div></div>').window.document.querySelector('div');
+  _道具.innerHTML = String(s);
+  return _道具.textContent;
+}
+
+/** ★文字列の 塊を 読み進める★＝i は 引用符の 位置。{ 終わり, 地 } を 返す（地＝テンプレートの ${...} を 除いた 字） */
+function 文字列を読む(src, i) {
+  const q = src[i];
+  let j = i + 1, 地 = '';
+  while (j < src.length) {
+    const c = src[j];
+    if (c === '\\') { 地 += c + (src[j + 1] || ''); j += 2; continue; }
+    if (c === q) return { 終わり: j + 1, 地 };
+    if (q === '`' && c === '$' && src[j + 1] === '{') {
+      /* ${ ... } を 飛ばす（中の 文字列や 括弧も 数える） */
+      let 深 = 1; j += 2;
+      while (j < src.length && 深 > 0) {
+        const e = src[j];
+        if (e === "'" || e === '"' || e === '`') { j = 文字列を読む(src, j).終わり; continue; }
+        if (e === '{') 深++;
+        else if (e === '}') 深--;
+        j++;
+      }
+      continue;
+    }
+    地 += c; j++;
+  }
+  return { 終わり: j, 地 };
+}
+
+/** ★口の 第1引数 まるごと★＝括弧の 対を 数えて 取る。中の 文字列の 塊を 返す [{ 開始, 終わり, 地 }] */
+export function 第1引数の文字列(src, 開き) {
+  const 塊 = [];
+  let j = 開き + 1, 深 = 0;
+  while (j < src.length) {
+    const c = src[j];
+    if (c === "'" || c === '"' || c === '`') {
+      const r = 文字列を読む(src, j);
+      塊.push({ 開始: j, 終わり: r.終わり, 地: r.地 });
+      j = r.終わり; continue;
+    }
+    if (c === '(' || c === '[' || c === '{') 深++;
+    else if (c === ')' || c === ']' || c === '}') { if (深 === 0) break; 深--; }
+    else if (c === ',' && 深 === 0) break;
+    j++;
+  }
+  return 塊;
+}
+
+/** ★口に 渡る 字★（注記を 外した 字を 渡す＝位置は 元の 字と 同じ）
+ *  @param {{復号?: boolean}} opt  復号＝false は 歯の 比べ 用（逃がしも 実体参照も 解かない） */
+export function 口に渡る字(注記なしの字, opt = {}) {
+  const 復号 = opt.復号 !== false;
   const 出 = [];
-  for (const k of 口) {
-    /* `口(` の 後ろから ★同じ行に 在る 文字列リテラル★を 拾う
-       （行をまたぐ 連結は 1本目だけ＝★拾えない分は 下で 正直に 書く★） */
-    /* ★`\b` は ASCII の 区切りしか 見ない★＝日本語の 名前（窓の副題）の 前では 効かない
-       ⇒★2026-09-06 の self-test が 掴んだ★（自分の 道具が 先に 赤に なった）
-       ⇒ 名前が ASCII で 始まる 時だけ 付ける */
+  for (const k of Object.keys(口の出し方)) {
+    /* ★`\b` は ASCII の 区切りしか 見ない★＝日本語の 名前（窓の副題）の 前では 効かない ⇒ ASCII の 時だけ */
     const 頭 = /^[A-Za-z_$]/.test(k) ? '\\b' : '';
     const re = new RegExp(頭 + k + '\\s*\\(', 'g');
     let m;
     while ((m = re.exec(注記なしの字))) {
-      const 後ろ = 注記なしの字.slice(m.index, m.index + 400);
-      const 行 = 後ろ.split('\n')[0];
-      const 字 = [...行.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g)]
-        .map((x) => (x[1] !== undefined ? x[1] : x[2]));
-      if (字.length) 出.push({ 口: k, 字: 字.join('') });
+      const 開き = m.index + m[0].length - 1;
+      const 塊 = 第1引数の文字列(注記なしの字, 開き);
+      if (!塊.length) continue;
+      let 字 = 塊.map((x) => (復号 ? JSの逃がしを解く(x.地) : x.地)).join('');
+      if (復号 && 口の出し方[k] === 'html') 字 = 実体参照を解く(字);
+      出.push({ 口: k, 字, 塊 });
     }
   }
   return 出;
@@ -63,79 +152,113 @@ export function 星入り(渡る字) {
   return 渡る字.filter((x) => x.字.indexOf('★') >= 0);
 }
 
-/* ★★取り込まれた 時は 走らない★★（2026-09-06 実測で 踏んだ）
-   ★★会社の 決まりが 3日前から 在りました★★
-     記憶 `feedback_global_tool_must_not_judge_itself_by_argv.md`（2026-09-02 Rakunally）
-     「全プロセスに 読ませる 道具は ★argv で 自分を 判定するな★
-       ＝同じ `--self-test` の 見張りを 丸ごと 乗っ取り ★走らずに 緑★ ★74本★」
-   ⇒★私は それを 読まずに 同じ 穴を 踏み、自分で 見つけて 直しました★
-   ⇒★決まりを 書くのは 直しでは ない★の 実例（決まりは 在ったが 効かなかった）
-   tests/hoshi-nashi.test.mjs が この ファイルを import した所、
-   ★向こうの --self-test を こちらが 食べて 先に 終了した★
-   ⇒★向こうの self-test が 1本も 走らないのに 緑に 見えた★
-   ⇒★自分が 直に 走らされた 時だけ 動く★ */
-const 直に走った = process.argv[1]
-  && pathToFileURL(process.argv[1]).href === import.meta.url;
-
-if (直に走った && process.argv.includes('--self-test')) {
-  let pass = 0, fail = 0;
-  const T = (n, c, 添) => { if (c) { pass++; console.log('  ok   ' + n); } else { fail++; console.log('  ★NG★ ' + n + (添 ? ' … ' + 添 : '')); } };
-  console.log('\n[hoshi-kazoeru --self-test] わざと壊して赤になるか');
-  T('★口に 渡る 字を 拾える', 口に渡る字("showToast('あ');").length === 1);
-  T('★★ が 混じっていれば 見つける', 星入り(口に渡る字("notify('★あ★');")).length === 1);
-  T('★混じっていなければ 出さない', 星入り(口に渡る字("notify('あ');")).length === 0);
-  T('★口で ない 所は 拾わない', 口に渡る字("console.log('★あ★');").length === 0);
-  T('★窓の副題も 口', 口に渡る字("窓の副題('あ', 'name-insert');").length === 1);
-  console.log('\n' + pass + ' passed, ' + fail + ' failed');
-  process.exit(fail ? 1 : 0);
+/* ══ HTML の 見える 字 ══════════════════════════════════════ */
+const 見えない属性 = /^(style|class|id|href|src)$|^on/i;
+/** ★HTML の 見える 字★＝本文（script／style の 外）と 属性（style／class／id／href／src／on... を 除く）
+ *  ★隠れて いる 所も 数える★（窓は JS が 開く）。返す 形 [{ 種, 字, 開始, 終わり }]（位置は 元の 字）
+ *  @param {{復号?: boolean}} opt  復号＝false は 歯の 比べ 用（元の 字の まま＝実体参照を 解かない） */
+export function HTMLの見える字(html, opt = {}) {
+  const 復号 = opt.復号 !== false;
+  const dom = new JSDOM(html, { includeNodeLocations: true });
+  const doc = dom.window.document;
+  const 出 = [];
+  const 歩く = (n) => {
+    if (n.nodeType === 3) {
+      const p = n.parentNode && n.parentNode.nodeName;
+      if (p === 'SCRIPT' || p === 'STYLE') return;
+      const 位 = dom.nodeLocation(n);
+      if (!位) return;
+      出.push({ 種: '本文', 字: 復号 ? n.data : html.slice(位.startOffset, 位.endOffset), 開始: 位.startOffset, 終わり: 位.endOffset });
+      return;
+    }
+    if (n.nodeType === 1) {
+      const 位 = dom.nodeLocation(n);
+      for (const a of Array.from(n.attributes || [])) {
+        if (見えない属性.test(a.name)) continue;
+        const 属位 = 位 && 位.attrs && 位.attrs[a.name];
+        const 生 = 属位 ? html.slice(属位.startOffset, 属位.endOffset) : a.value;
+        出.push({ 種: '属性 ' + a.name, 字: 復号 ? a.value : 生, 開始: 属位 ? 属位.startOffset : -1, 終わり: 属位 ? 属位.endOffset : -1 });
+      }
+    }
+    for (const c of Array.from(n.childNodes || [])) 歩く(c);
+  };
+  歩く(doc);
+  dom.window.close();
+  return 出;
 }
 
-/* ══ 数える（★直さない★） ═══════════════════════════════════ */
+/* ══ 見る ファイル（★名前で 選ばない★） ═══════════════════════ */
+export function 見るファイル(根 = ROOT) {
+  const 出 = { html: [], js: [] };
+  for (const f of fs.readdirSync(根).sort()) {
+    const p = path.join(根, f);
+    if (!fs.statSync(p).isFile()) continue;
+    if (/\.html$/i.test(f)) 出.html.push(p);
+    else if (/\.(js|mjs)$/.test(f) && !/\.min\./.test(f)) 出.js.push(p);
+  }
+  const 潜る = (d) => {
+    if (!fs.existsSync(d)) return;
+    for (const f of fs.readdirSync(d).sort()) {
+      const p = path.join(d, f);
+      if (fs.statSync(p).isDirectory()) 潜る(p);
+      else if (/\.(js|mjs)$/.test(f) && !/\.min\./.test(f)) 出.js.push(p);
+    }
+  };
+  潜る(path.join(根, 'js'));
+  潜る(path.join(根, 'lib'));
+  return 出;
+}
+
+/** ★全部 数える★＝[{ 名, 置き場, 種, 字, 開始, 終わり }]（★ 入りだけ）と 数 */
+export function 全部数える(根 = ROOT) {
+  const 名簿 = 見るファイル(根);
+  const 赤 = [];
+  const 数 = { 口の字: 0, 本文: {}, 属性: 0, ファイル: 名簿.html.length + 名簿.js.length };
+  const 名 = (p) => path.relative(根, p).split(path.sep).join('/');
+  for (const p of 名簿.html.concat(名簿.js)) {
+    const 生 = fs.readFileSync(p, 'utf8');
+    const 外した = 注記を外す(生);
+    const 渡る = 口に渡る字(外した);
+    数.口の字 += 渡る.length;
+    /* ★口の 塊は「字」で 持つ★（2026-10-08）＝注記を 外すと 4バイトの 字（絵文字）で 長さが 変わる 事が ある（book.html は 7字 短い）
+         ⇒ 位置は 元の 字と 合わない。外す 時は 字で 探す */
+    for (const x of 星入り(渡る)) 赤.push({ 名: 名(p), 置き場: '口 ' + x.口, 字: x.字, 文字列: x.塊.map((b) => 外した.slice(b.開始, b.終わり)) });
+    if (/\.html$/i.test(p)) {
+      const 見える = HTMLの見える字(生);
+      数.本文[名(p)] = 見える.filter((x) => x.種 === '本文').length;
+      数.属性 += 見える.filter((x) => x.種 !== '本文').length;
+      for (const x of 見える) if (x.字.indexOf('★') >= 0) 赤.push({ 名: 名(p), 置き場: x.種, 字: x.字, 塊: [{ 開始: x.開始, 終わり: x.終わり }] });
+    }
+  }
+  return { 赤, 数 };
+}
+
+/* ★★取り込まれた 時は 走らない★★（2026-09-06 実測で 踏んだ・記憶 feedback_global_tool_must_not_judge_itself_by_argv）
+     tests/hoshi-nashi.test.mjs が この ファイルを import する ＝★自分が 直に 走らされた 時だけ 動く★ */
+const 直に走った = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+
 if (直に走った) {
-const 見る = [];
-const 積む = (p) => { if (fs.existsSync(p)) 見る.push(p); };
-積む(path.join(ROOT, 'book.html'));
-積む(path.join(ROOT, 'hub.html'));
-for (const d of ['js', 'lib']) {
-  const dir = path.join(ROOT, d);
-  if (!fs.existsSync(dir)) continue;
-  for (const f of fs.readdirSync(dir)) {
-    if (/\.(js|mjs)$/.test(f) && !/\.min\./.test(f)) 積む(path.join(dir, f));
+  const { 赤, 数 } = 全部数える();
+  console.log('\n[hoshi-kazoeru] お客さんの 画面に 出る 字の ★ を 数える');
+  console.log('  見た ファイル ' + 数.ファイル + '本 ／ 口の 字 ' + 数.口の字 + '本 ／ HTML の 本文 ' + JSON.stringify(数.本文) + ' ／ 属性 ' + 数.属性);
+  console.log('  ★ が 混じっている 物 ･･･ ★' + 赤.length + '★');
+  for (const x of 赤.slice(0, 60)) console.log('    ' + x.名 + ' [' + x.置き場 + '] ' + x.字.replace(/\s+/g, ' ').trim().slice(0, 70));
+  if (process.argv.includes('--外す')) {
+    /* ★見つけた ★ を その 場で 外す★（字は 残す）。位置は 元の 字＝後ろから 消す */
+    /* ①HTML の 見える 字＝jsdom が 元の 字で 読んだ 位置（後ろから）②口の 文字列＝字で 探す（位置は 使わない） */
+    const 名ら = [...new Set(赤.map((x) => x.名))];
+    for (const f of 名ら) {
+      const p = path.join(ROOT, f);
+      let s = fs.readFileSync(p, 'utf8');
+      const 前の長さ = s.length;
+      const 範囲 = 赤.filter((x) => x.名 === f && x.塊).flatMap((x) => x.塊).filter((b) => b.開始 >= 0).sort((a, b) => b.開始 - a.開始);
+      for (const b of 範囲) s = s.slice(0, b.開始) + s.slice(b.開始, b.終わり).split('★').join('') + s.slice(b.終わり);
+      for (const x of 赤.filter((y) => y.名 === f && y.文字列)) {
+        for (const 元 of x.文字列) { if (元.indexOf('★') >= 0) s = s.split(元).join(元.split('★').join('')); }
+      }
+      fs.writeFileSync(p, s);
+      console.log('  外した ' + f + ' ･･･ ★ ' + (前の長さ - s.length) + '個');
+    }
   }
-}
-
-let 字の数 = 0, 星の数 = 0;
-const ファイルごと = [];
-const 見本 = [];
-for (const p of 見る) {
-  const 生 = fs.readFileSync(p, 'utf8');
-  const 渡る = 口に渡る字(注記を外す(生));
-  const 星 = 星入り(渡る);
-  字の数 += 渡る.length;
-  星の数 += 星.length;
-  if (星.length) {
-    ファイルごと.push({ 名: path.relative(ROOT, p).split(path.sep).join('/'), 数: 星.length });
-    for (const x of 星.slice(0, 2)) 見本.push({ 名: path.relative(ROOT, p).split(path.sep).join('/'), 口: x.口, 字: x.字.slice(0, 70) });
-  }
-}
-ファイルごと.sort((a, b) => b.数 - a.数);
-
-console.log('\n[hoshi-kazoeru] お客さんの 画面に 出る 字の ★ を 数える（★直していません★）');
-console.log('');
-console.log('  口 ……………………………… 3種類（showToast ／ notify ／ 窓の副題）');
-console.log('  その 口に 渡る 字 ………… ' + 字の数 + '本');
-console.log('  ★ が 混じっている 物 …… ★' + 星の数 + '本★');
-console.log('');
-console.log('  一番 多い ファイル 3つ');
-for (const f of ファイルごと.slice(0, 3)) console.log('    ' + f.名.padEnd(28) + f.数 + '本');
-if (見本.length) {
-  console.log('');
-  console.log('  見本（先頭 5本）');
-  for (const x of 見本.slice(0, 5)) console.log('    [' + x.口 + '] ' + x.字);
-}
-console.log('');
-console.log('  ★この 数は 半分です（隠さず 書く）★');
-console.log('    ・HTML の 中の 字（ボタンの 札・見出し）… 口が 決められないので 見ていない');
-console.log('    ・lib が 返して 画面が 出す 字（例 lib/hairanai.js）… 口では 拾えない');
-console.log('    ・行を またぐ 連結 … 1行目だけ 拾っている');
+  console.log('\n  ★この 門が 見て いない 置き場が 在ります★（上の 注記の「まだ 見て いない 物」）');
 }
