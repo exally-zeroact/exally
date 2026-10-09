@@ -46,6 +46,11 @@
  *    ・api/ の 下 ･･･ 見る ファイルの 外（★入りは 頼み文 6 だけ・客へ 返す 誤りの 字に ★ 0＝res.json 11か所）
  *    ・倉庫（Supabase）の 中身・画像 ･･･ 見て いない（見立て）
  *    ・似た 字 ☆（9）※（20）･･･ ★の 役が 移っても 見ない
+ *    ・★2026-10-09 叩き直しの 対立役が 作った 残りの 抜け道（どれも 前から 緑・今の repo に 当てはまる 物 0）★
+ *      A innerHTML に 入れた 属性の 中の 実体参照（title="&#9733;"）／B 割った 実体参照（'&#97' + '33;'）／
+ *      C on 属性の 中の 2段の 実体参照（&amp;#9733;）／J CSS 変数を 通した content（--zz:"\2605"）／
+ *      K JS が 書く CSS の 字（st.textContent='.a:after{content:...}'）／M 字の 決め打ちで ない fromCharCode（0x02605・9732+1・apply）／
+ *      L manifest.json で ない 名前の 札（app.webmanifest）／D・E import './x.js'・export * from（module の script は 今 0本）
  *    ⇒★「この 門が 0本」≠「お客さんの 画面に ★ が 無い」★
  *
  *  使い方: node scripts/hoshi-kazoeru.mjs           ... 数える（直さない）
@@ -260,12 +265,15 @@ export function 読み込まれる物(根 = ROOT) {
   const 名簿 = 見るファイル(根);
   for (const p of 名簿.html.concat(名簿.js)) {
     const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
-    const re = /(?:\bsrc\s*=\s*|_loadScript\(\s*|\bimport\s*\(\s*|\bimport\s+[^'"`;]*?from\s*|\bnew\s+Worker\(\s*|importScripts\(\s*)["'`]([^"'`?#]+\.m?js)/g;
+    /* 頭は「名前の 字で ない 字」か 行頭（X.import(...)・my_loadScript(...) を 読み込みと 取らない）。★後読みは 使わない★ */
+    const re = /(?:^|[^\w$.])(?:src\s*=\s*|_loadScript\s*\(\s*|import\s*\(\s*|import\s+[^'"`;]*?from\s*|new\s+Worker\s*\(\s*|importScripts\s*\(\s*)["'`]([^"'`?#]+\.m?js)/g;
     let m;
     while ((m = re.exec(s))) {
       if (/^(https?:)?\/\//.test(m[1])) continue;
-      const 基 = /\.html$/i.test(p) || !/^\.\.?\//.test(m[1]) ? 根 : path.dirname(p);
-      出.add(path.relative(根, path.resolve(基, m[1])).split(path.sep).join('/'));
+      /* 頭が / の 物は 頁の 根から（Windows の 道として 解かない＝2026-10-09 対立役） */
+      const 字 = m[1].replace(/^\/+/, '');
+      const 基 = /\.html$/i.test(p) || !/^\.\.?\//.test(字) ? 根 : path.dirname(p);
+      出.add(path.relative(根, path.resolve(基, 字)).split(path.sep).join('/'));
     }
   }
   return 出;
@@ -276,12 +284,17 @@ export function 字で無い読み込み(根 = ROOT) {
   const 出 = [];
   const 名簿 = 見るファイル(根);
   for (const p of 名簿.html.concat(名簿.js)) {
-    const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
-    const re = /(?:_loadScript|\bimport|\bnew\s+Worker|importScripts)\s*\(\s*(?!["'`])([^)\s]{1,40})/g;
+    /* ★字の 中身を 空けて から 見る★（'import(x)' の 様な 字の 中を 読み込みと 取らない＝2026-10-09 対立役） */
+    const 生 = fs.readFileSync(p, 'utf8');
+    const html = /\.html$/i.test(p);
+    let 空けた = 生;
+    for (const x of 字の塊を拾う(生, { html }).塊.reverse()) 空けた = 空けた.slice(0, x.開始 + 1) + x.生.slice(1, -1).replace(/[^\n]/g, ' ') + 空けた.slice(x.終わり - 1);
+    const s = 注記を外す(空けた, { html });
+    const re = /(?:^|[^\w$.])(?:_loadScript|import|new\s+Worker|importScripts)\s*\(\s*(?!["'`])([^)\s]{1,40})/g;
     let m;
     while ((m = re.exec(s))) {
       /* 定義（function _loadScript(src)）は 読み込みで ない。★後読み (?<!) は 使わない★（tests/no-lookbehind） */
-      if (/function\s+$/.test(s.slice(Math.max(0, m.index - 20), m.index))) continue;
+      if (/\bfunction\s*$/.test(s.slice(Math.max(0, m.index - 20), m.index + 1))) continue;
       if (/^function\b|^\)/.test(m[1])) continue;
       出.push({ 名: path.relative(根, p).split(path.sep).join('/'), 字: m[0].slice(0, 60), 行: s.slice(0, m.index).split('\n').length });
     }
@@ -372,11 +385,23 @@ export function 全部数える(根 = ROOT) {
     }
   }
   /* ★CSS の content★（html の <style>・style 属性・*.css）と ★manifest.json の 字★（入れた 時の 名前に 出る）＝今 0 */
-  const CSSの星 = (s) => (s.match(/content\s*:[^;}]*/gi) || []).filter((c) => c.indexOf('★') >= 0 || /\\0*2605/i.test(c));
+  /* ★注記を 外して から★・★名前の 頭で 切って★ 見る（justify-content: や 注記の textContent: で 赤に なった＝2026-10-09 対立役） */
+  const CSSの星 = (s, html) => (注記を外す(s, { html }).match(/(?:^|[^\w-])content\s*:[^;}]*/gi) || []).filter((c) => c.indexOf('★') >= 0 || /\\0*2605/i.test(c));
   const css置き場 = [];
+  /* 見る 所は 配られる 置き場（直下・css/・js/・lib/）だけ＝tests の 下の 見本や 手元の 報告の css を 拾わない */
   const 潜るcss = (d) => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) { if (f !== 'node_modules' && f[0] !== '.') 潜るcss(q); } else if (/\.css$/i.test(f)) css置き場.push(q); } };
-  潜るcss(根);
-  for (const p of css置き場.concat(名簿.html)) for (const c of CSSの星(fs.readFileSync(p, 'utf8'))) 赤.push({ 名: 名(p), 置き場: 'CSS の content', 字: c.slice(0, 60) });
+  for (const f of fs.readdirSync(根)) if (/\.css$/i.test(f) && fs.statSync(path.join(根, f)).isFile()) css置き場.push(path.join(根, f));
+  for (const d of ['css', 'js', 'lib']) 潜るcss(path.join(根, d));
+  for (const p of css置き場.concat(名簿.html)) for (const c of CSSの星(fs.readFileSync(p, 'utf8'), /\.html$/i.test(p))) 赤.push({ 名: 名(p), 置き場: 'CSS の content', 字: c.slice(0, 60) });
+  /* ★白名簿の「読み込まれていない」は 名前の 側から 引く★＝その 名前（拡張子 無し）が 注記の 外に 1つでも 出たら 赤
+       （拾い方を 足し続けても _loadScript('lib/' + 名)・src=名・_loadScript (名) が 抜けた＝2026-10-09 対立役） */
+  for (const w of 白名簿.filter((x) => x.種 === '読み込まれていない')) {
+    const 素 = path.basename(w.名).replace(/\.m?js$/, '');
+    for (const p of 名簿.html.concat(名簿.js)) {
+      if (名(p) === w.名) continue;
+      if (注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) }).indexOf(素) >= 0) 赤.push({ 名: 名(p), 置き場: '読み込まれていない 筈の 名前が 出ている', 字: 素 + '（' + w.名 + '）' });
+    }
+  }
   const 札 = path.join(根, 'manifest.json');
   if (fs.existsSync(札)) {
     const 歩く = (v) => { if (typeof v === 'string') { if (v.indexOf('★') >= 0) 赤.push({ 名: 'manifest.json', 置き場: 'manifest の 字', 字: v }); } else if (v && typeof v === 'object') for (const k of Object.keys(v)) 歩く(v[k]); };

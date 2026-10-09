@@ -109,7 +109,16 @@ if (process.argv.includes('--self-test')) {
   赤('W5 myconsole.log(\'★\') は console で ない', JSの赤({ 'book.html': 頁("myconsole.log('★あ');") }, 'JS の 字'));
   赤('W6 CSS の content:"★"（<style>）', JSの赤({ 'book.html': '<!DOCTYPE html><style>.a:after{content:"★"}</style><body><p>い</p></body>' }, 'CSS の content'));
   赤('W6 CSS の content:"\\2605"（*.css）', JSの赤({ 'book.html': 頁(''), 'css/a.css': '.a::before { content: "\\2605"; }' }, 'CSS の content'));
-  赤('W7 manifest.json の 名前', JSの赤({ 'book.html': 頁(''), 'manifest.json': '{"name":"★Exally"}' }, 'manifest の 字'));
+  /* ── 2026-10-09 叩き直しの 対立役：止めすぎ 4形（緑の 歯）と 名前の 側から 引く 3形（赤の 歯） ── */
+  緑('止めすぎ：justify-content の 行の 注記の ★', JSの赤({ 'book.html': '<!DOCTYPE html><style>.z{justify-content:center /* ★中央 */;}</style><body><p>い</p></body>' }, 'CSS の content'));
+  緑('止めすぎ：script の 注記の textContent: ★', JSの赤({ 'book.html': 頁('/* el.textContent: ★ここ */ var a = 1;') }, 'CSS の content'));
+  緑('止めすぎ：X.import(d)・my_loadScript(x)・字の 中の import(x)', JSの赤({ 'book.html': 頁("X.import(d); my_loadScript(x); var t = 'imp' + 'ort(x)'; var u = 'a import(x) b';") }, '字で 無い 読み込み'));
+  緑('止めすぎ：頭が / の src="/lib/p.js" は 見て いる js', JSの赤({ 'book.html': '<!DOCTYPE html><body><p>い</p><script src="/lib/p.js"></script></body>', 'lib/p.js': "var a = 'あ';" }, '読み込まれるのに 見て いない'));
+  赤('F 名前を 足して 読む _loadScript(\'lib/\' + \'yakusoku-daicho.js\')', JSの赤({ 'book.html': 頁("_loadScript('lib/' + 'yakusoku-daicho.js' + v);"), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, '読み込まれていない 筈の'));
+  赤('P 空白の 在る _loadScript (\'lib/yakusoku-daicho.js\')', JSの赤({ 'book.html': 頁("_loadScript ('lib/yakusoku-daicho.js');"), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
+  赤('H 引用符の 無い <script src=lib/yakusoku-daicho.js>', JSの赤({ 'book.html': '<!DOCTYPE html><body><p>い</p><script src=lib/yakusoku-daicho.js></script></body>', 'lib/yakusoku-daicho.js': "var a = '★あ';" }, '読み込まれていない 筈の'));
+  緑('名前が 注記に 在るだけ なら 赤に しない', JSの赤({ 'book.html': 頁('/* lib/yakusoku-daicho.js は 試験だけが 読む */ var a = 1;'), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, '読み込まれていない 筈の'));
+  赤('W7 manifest.json の 名前',JSの赤({ 'book.html': 頁(''), 'manifest.json': '{"name":"★Exally"}' }, 'manifest の 字'));
   T('★W4 白名簿の 物を 1つ 消して 客の 字を 1つ 足すと 赤（数は 同じでも 指紋で 止める）★', () => {
     const d = fs.mkdtempSync(path.join(os.tmpdir(), 'hoshi-'));
     try {
