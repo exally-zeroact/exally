@@ -51,6 +51,21 @@
  *      C on 属性の 中の 2段の 実体参照（&amp;#9733;）／J CSS 変数を 通した content（--zz:"\2605"）／
  *      K JS が 書く CSS の 字（st.textContent='.a:after{content:...}'）／M 字の 決め打ちで ない fromCharCode（0x02605・9732+1・apply）／
  *      L manifest.json で ない 名前の 札（app.webmanifest）／D・E import './x.js'・export * from（module の script は 今 0本）
+ *    ・★4回目の 対立役が 数えた 残り（今の repo に 当てはまる 物 どれも 0件）★
+ *      M1 css の 中の @import で 読む css／M2 JS が 足す link（l.href='a.css'）＝読む css を 探すのは 置き場の 名と <link href> だけ
+ *      M9 setAttribute('src', ...)／M10 new window.Worker(...)・new self.Worker(v)＝読み込みとして 拾わない
+ *      止めすぎ M18 名前の 頭が 日本語（var 元src = 'x.js'）／M23 メソッドの 定義 { _loadScript(src){} }
+ *    ・★5回目の 対立役が 数えた 残り（今の repo に 当てはまる 物 どれも 0件）★
+ *      C1 content:"a;★"・content:"}★"（字の 中の ; } で 切れる）／C6 css の 逃がしで 書いた 名前 cont\65nt
+ *      止めすぎ M8・O3〜O5 テンプレートの 字の 中の 'import(x)'・'_loadScript(v)'（テンプレートは 丸ごと 空けない＝わざと）／
+ *      O1・O2 html の 注記や script の 注記の 中に 書いた <style>...★...</style>（<style> の 中身を 生で 拾う ため）
+ *    ・★6回目の 対立役が 数えた 残り（今の repo に 当てはまる 物 どれも 0件）★
+ *      S1・S2 テンプレートの ${...} の 中に ` が 在る（${"`"}・/`/g）と chuki が テンプレートの 終わりを 読み違え、
+ *        後ろの " ' の 組が 入れ替わって import(v) を 空ける（★を 見る 道は 抜けない・引用符が 奇数なら「読めない 字」で 赤）。
+ *        直すには chuki の 字の終わり に ${ の 深さが 要る＝自前の 深さ読みで 3回 抜けたので 今は 名指しだけ（${ を 含む テンプレートは 今 0本）
+ *      読み込みの 形で 拾わない 物：_loadScript?.(v)・_loadScript.call(null, v)・別名（var L = _loadScript; L(v)）・
+ *        置き場の 字＋変数で 名前を 作る _loadScript('extra/' + n + '.js')（白名簿に 無い 置き場の js を 読める 唯一の 素通り）。
+ *        2026-10-09 に grep で 0件（_loadScript('...' + の 11件は 全部 'lib/x.js' + v＝名前は 字で 全部 見える）
  *    ⇒★「この 門が 0本」≠「お客さんの 画面に ★ が 無い」★
  *
  *  使い方: node scripts/hoshi-kazoeru.mjs           ... 数える（直さない）
@@ -265,8 +280,10 @@ export function 読み込まれる物(根 = ROOT) {
   const 名簿 = 見るファイル(根);
   for (const p of 名簿.html.concat(名簿.js)) {
     const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
-    /* 頭は「名前の 字で ない 字」か 行頭（X.import(...)・my_loadScript(...) を 読み込みと 取らない）。★後読みは 使わない★ */
-    const re = /(?:^|[^\w$.])(?:src\s*=\s*|_loadScript\s*\(\s*|import\s*\(\s*|import\s+[^'"`;]*?from\s*|new\s+Worker\s*\(\s*|importScripts\s*\(\s*)["'`]([^"'`?#]+\.m?js)/g;
+    /* 頭は「名前の 字で ない 字」か 行頭（my_loadScript(...) を 読み込みと 取らない）。★後読みは 使わない★
+       「.」を 許さないのは import だけ（X.import(d)）。el.src= ・window._loadScript ・self.importScripts は 普通の 形
+       （「.」を 全部 外したら この 3形が 緑に なった＝2026-10-09 3回目の 対立役） */
+    const re = /(?:(?:^|[^\w$])(?:src\s*=\s*|_loadScript\s*\(\s*|new\s+Worker\s*\(\s*|importScripts\s*\(\s*)|(?:^|[^\w$.])(?:import\s*\(\s*|import\s+[^'"`;]*?from\s*))["'`]([^"'`?#]+\.m?js)/g;
     let m;
     while ((m = re.exec(s))) {
       if (/^(https?:)?\/\//.test(m[1])) continue;
@@ -279,6 +296,7 @@ export function 読み込まれる物(根 = ROOT) {
   return 出;
 }
 
+
 /** ★名前で 読み込む 所が 字で ない★（_loadScript(名) の 様に 変数で 渡す）＝何を 読むか 字から 決まらない＝赤（今 0） */
 export function 字で無い読み込み(根 = ROOT) {
   const 出 = [];
@@ -288,9 +306,15 @@ export function 字で無い読み込み(根 = ROOT) {
     const 生 = fs.readFileSync(p, 'utf8');
     const html = /\.html$/i.test(p);
     let 空けた = 生;
-    for (const x of 字の塊を拾う(生, { html }).塊.reverse()) 空けた = 空けた.slice(0, x.開始 + 1) + x.生.slice(1, -1).replace(/[^\n]/g, ' ') + 空けた.slice(x.終わり - 1);
+    /* ★空けるのは ' と " の 字だけ★。テンプレート（`...`）は ${...} の 中が 動く コードなので ★丸ごと 残す★
+         （${...} を 自前の 読み方で 分けたら 字・注記・正規表現の 中の { } " / で 3回 続けて 抜け道を 作った＝2026-10-09 3〜5回目の 対立役。
+           repo の テンプレートは 4本・全部 1行＝止めすぎ（テンプレートの 地の 字の 'import(x)'）に 倒れる 方を 選ぶ） */
+    for (const x of 字の塊を拾う(生, { html }).塊.reverse()) {
+      if (x.生[0] === '`') continue;
+      空けた = 空けた.slice(0, x.開始 + 1) + x.生.slice(1, -1).replace(/[^\n]/g, ' ') + 空けた.slice(x.終わり - 1);
+    }
     const s = 注記を外す(空けた, { html });
-    const re = /(?:^|[^\w$.])(?:_loadScript|import|new\s+Worker|importScripts)\s*\(\s*(?!["'`])([^)\s]{1,40})/g;
+    const re = /(?:(?:^|[^\w$])(?:_loadScript|new\s+Worker|importScripts)|(?:^|[^\w$.])import)\s*\(\s*(?!["'`])([^)\s]{1,40})/g;
     let m;
     while ((m = re.exec(s))) {
       /* 定義（function _loadScript(src)）は 読み込みで ない。★後読み (?<!) は 使わない★（tests/no-lookbehind） */
@@ -386,12 +410,30 @@ export function 全部数える(根 = ROOT) {
   }
   /* ★CSS の content★（html の <style>・style 属性・*.css）と ★manifest.json の 字★（入れた 時の 名前に 出る）＝今 0 */
   /* ★注記を 外して から★・★名前の 頭で 切って★ 見る（justify-content: や 注記の textContent: で 赤に なった＝2026-10-09 対立役） */
-  const CSSの星 = (s, html) => (注記を外す(s, { html }).match(/(?:^|[^\w-])content\s*:[^;}]*/gi) || []).filter((c) => c.indexOf('★') >= 0 || /\\0*2605/i.test(c));
+  /* *.css は ★ブロックの 注記 だけ★ が 注記（// は url(//...) の 中に 在る＝JS の 読み方で 外すと 行の 残りが 消えた＝2026-10-09 3回目の 対立役）
+       ⇒ chuki の <style> の 読み方（ブロックの 注記だけ）を 借りる */
+  /* ★<!-- と --> は css では 捨てられる 印 だけ＝間の 決まりは 生きる★（chuki の html の 読み方は <style> の 中の <!-- --> も 空けて
+       *.css と <style> の 間の ★ を 見落とした＝2026-10-09 4回目の 対立役）⇒ css は ブロックの 注記だけを 自分で 外す。
+       html は 今まで 通り（属性・script の 字の 中の css も 見る）に 加えて <style> の 中身を 生の まま css として 見る */
+  /* 字（' "）は 飛ばして から ブロックの 注記を 外す（content:"/*" の 字の 中を 注記と 取り、間の ★ を 消した＝2026-10-09 5回目の 対立役） */
+  const css注記を外す = (s) => s.replace(/("(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*')|\/\*[\s\S]*?\*\//g, (m, 字) => 字 || m.replace(/[^\n]/g, ' '));
+  const CSSの字 = (s, html) => html
+    ? 注記を外す(s, { html: true }) + '\n' + [...s.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => css注記を外す(m[1])).join('\n')
+    : css注記を外す(s);
+  const CSSの星 = (s, html) => (CSSの字(s, html).match(/(?:^|[^\w-])content\s*:[^;}]*/gi) || []).filter((c) => c.indexOf('★') >= 0 || /\\0*2605/i.test(c));
   const css置き場 = [];
   /* 見る 所は 配られる 置き場（直下・css/・js/・lib/）だけ＝tests の 下の 見本や 手元の 報告の css を 拾わない */
   const 潜るcss = (d) => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) { if (f !== 'node_modules' && f[0] !== '.') 潜るcss(q); } else if (/\.css$/i.test(f)) css置き場.push(q); } };
   for (const f of fs.readdirSync(根)) if (/\.css$/i.test(f) && fs.statSync(path.join(根, f)).isFile()) css置き場.push(path.join(根, f));
   for (const d of ['css', 'js', 'lib']) 潜るcss(path.join(根, d));
+  /* ★html の <link href> が 読む css も★（置き場の 名で 決めない＝assets/a.css が 緑に なった＝2026-10-09 3回目の 対立役） */
+  for (const p of 名簿.html) {
+    for (const m of 注記を外す(fs.readFileSync(p, 'utf8'), { html: true }).matchAll(/<link\b[^>]*\bhref\s*=\s*["']?([^"'\s>?#]+\.css)/gi)) {
+      if (/^(https?:)?\/\//.test(m[1])) continue;
+      const q = path.resolve(根, m[1].replace(/^\/+/, ''));
+      if (fs.existsSync(q) && css置き場.indexOf(q) < 0) css置き場.push(q);
+    }
+  }
   for (const p of css置き場.concat(名簿.html)) for (const c of CSSの星(fs.readFileSync(p, 'utf8'), /\.html$/i.test(p))) 赤.push({ 名: 名(p), 置き場: 'CSS の content', 字: c.slice(0, 60) });
   /* ★白名簿の「読み込まれていない」は 名前の 側から 引く★＝その 名前（拡張子 無し）が 注記の 外に 1つでも 出たら 赤
        （拾い方を 足し続けても _loadScript('lib/' + 名)・src=名・_loadScript (名) が 抜けた＝2026-10-09 対立役） */

@@ -118,6 +118,27 @@ if (process.argv.includes('--self-test')) {
   赤('P 空白の 在る _loadScript (\'lib/yakusoku-daicho.js\')', JSの赤({ 'book.html': 頁("_loadScript ('lib/yakusoku-daicho.js');"), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
   赤('H 引用符の 無い <script src=lib/yakusoku-daicho.js>', JSの赤({ 'book.html': '<!DOCTYPE html><body><p>い</p><script src=lib/yakusoku-daicho.js></script></body>', 'lib/yakusoku-daicho.js': "var a = '★あ';" }, '読み込まれていない 筈の'));
   緑('名前が 注記に 在るだけ なら 赤に しない', JSの赤({ 'book.html': 頁('/* lib/yakusoku-daicho.js は 試験だけが 読む */ var a = 1;'), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, '読み込まれていない 筈の'));
+  /* ── 2026-10-09 3回目の 対立役：止めすぎを 直した 時に 開けた 抜け道（4d50d18 で 緑・c6f2d98 で 赤だった） ── */
+  赤('A el.src = \'extra/x.js\'（読み込みの 一番 普通の 形）', JSの赤({ 'book.html': 頁("var el = document.createElement('script'); el.src = 'extra/x.js';"), 'extra/x.js': "var a='あ';" }, '読み込まれるのに 見て いない'));
+  赤('A window._loadScript(\'extra/x.js\')', JSの赤({ 'book.html': 頁("window._loadScript('extra/x.js');"), 'extra/x.js': "var a='あ';" }, '読み込まれるのに 見て いない'));
+  赤('A self.importScripts(\'extra/x.js\')', JSの赤({ 'book.html': 頁('', ['lib/w.js']), 'lib/w.js': "self.importScripts('extra/x.js');", 'extra/x.js': "var a='あ';" }, '読み込まれるのに 見て いない'));
+  赤('A window._loadScript(v)', JSの赤({ 'book.html': 頁('window._loadScript(v);') }, '字で 無い 読み込み'));
+  赤('A self.importScripts(v)', JSの赤({ 'book.html': 頁('self.importScripts(v);') }, '字で 無い 読み込み'));
+  赤('B テンプレートの ${import(v)} は 動く コード', JSの赤({ 'book.html': 頁('var t = `${imp' + 'ort(v)}`;') }, '字で 無い 読み込み'));
+  赤('B テンプレートの a${_loadScript(v)}b', JSの赤({ 'book.html': 頁('var t = `a${_loadScript(v)}b`;') }, '字で 無い 読み込み'));
+  赤('C <link href="assets/a.css"> が 読む css', JSの赤({ 'book.html': '<!DOCTYPE html><link rel="stylesheet" href="assets/a.css"><body><p>い</p></body>', 'assets/a.css': '.a:after{content:"★"}' }, 'CSS の content'));
+  赤('D css の url(//...) の 後ろの content（// は css の 注記で ない）', JSの赤({ 'book.html': 頁(''), 'css/a.css': '.a{background:url(//cdn.example/a.png)} .b:after{content:"★"}' }, 'CSS の content'));
+  /* ── 4回目の 対立役：css の <!-- --> は 注記で ない（間の 決まりは 生きる）／テンプレートの ${...} の 中の 字と 注記の } ── */
+  赤('M4 *.css の <!-- ... --> の 間の content', JSの赤({ 'book.html': 頁(''), 'css/a.css': '<!-- .a:after{content:"★"} -->' }, 'CSS の content'));
+  赤('M3 <style> の 中の <!-- ... --> の 間の content', JSの赤({ 'book.html': '<!DOCTYPE html><style><!-- .a:after{content:"★"} --></style><body><p>い</p></body>' }, 'CSS の content'));
+  赤("M6 ${...} の 中の 字の '}' で 深さを 数え違えない", JSの赤({ 'book.html': 頁("var t = `${f('}') + imp" + "ort(v)}`;") }, '字で 無い 読み込み'));
+  赤('M6b ${...} の 中の 注記の } で 深さを 数え違えない', JSの赤({ 'book.html': 頁('var t = `${ /* } */ imp' + 'ort(v) }`;') }, '字で 無い 読み込み'));
+  /* M8（テンプレートの 中の 字の 'import(x)' を 拾う 止めすぎ）は ★わざと 残す★＝テンプレートは 丸ごと 空けない（道具の 注記） */
+  赤('M5 css の 字の 中の /* と */ で 間の ★ を 消さない', JSの赤({ 'book.html': 頁(''), 'css/a.css': '.q:after{content:"/*"} .b:after{content:"★"} .z:after{content:"*/"}' }, 'CSS の content'));
+  赤('N2 ${...} の 中の 正規表現の " の 後ろの import(v)', JSの赤({ 'book.html': 頁('var t = `${ s.replace(/"/g, 1) + imp' + 'ort(v) }`;') }, '字で 無い 読み込み'));
+  赤("N2b ${...} の 中の 正規表現の ' の 後ろの _loadScript(v)", JSの赤({ 'book.html': 頁("var t = `${ /'/.test(a) ? _loadScript(v) : 0 }`;") }, '字で 無い 読み込み'));
+  赤('N3 ${...} の 中の 正規表現の // の 後ろの import(v)', JSの赤({ 'book.html': 頁('var t = `${ u.replace(/\\/\\//g, 1) + imp' + 'ort(v) }`;') }, '字で 無い 読み込み'));
+  緑('D css の /* */ の 中の content は 見ない', JSの赤({ 'book.html': 頁(''), 'css/a.css': '/* .b:after{content:"★"} */ .c{color:red}' }, 'CSS の content'));
   赤('W7 manifest.json の 名前',JSの赤({ 'book.html': 頁(''), 'manifest.json': '{"name":"★Exally"}' }, 'manifest の 字'));
   T('★W4 白名簿の 物を 1つ 消して 客の 字を 1つ 足すと 赤（数は 同じでも 指紋で 止める）★', () => {
     const d = fs.mkdtempSync(path.join(os.tmpdir(), 'hoshi-'));
