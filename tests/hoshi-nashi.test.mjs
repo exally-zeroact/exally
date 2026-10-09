@@ -22,16 +22,27 @@
  *          node tests/hoshi-nashi.test.mjs --list   ... ★赤の 一覧★
  */
 import fs from 'node:fs';
+import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { 注記を外す } = await import(pathToFileURL(path.join(ROOT, 'scripts/lib/chuki.mjs')).href);
 const 道具 = await import(pathToFileURL(path.join(ROOT, 'scripts/hoshi-kazoeru.mjs')).href);
-const { 口に渡る字, 星入り, HTMLの見える字, 全部数える, 見るファイル } = 道具;
+const { 口に渡る字, 星入り, HTMLの見える字, 全部数える, 見るファイル, 白名簿 } = 道具;
 
 let pass = 0, fail = 0;
 const T = (n, fn) => { try { fn(); pass++; console.log('  ✓ ' + n); } catch (e) { fail++; console.log('  ✗ ' + n + ' — ' + (e && e.message)); } };
+
+/* ★JS の 字の 歯★＝仮の repo（html ＋ lib）を 作って ★本物の 全部数える★ に 通す（2026-10-09）
+     返す＝赤の 置き場の 頭（「JS の 字」「読めない 字」...）の 数。白名簿の「数が 違う」は 仮の repo では 必ず 出るので 除く */
+const 仮のrepo = (files) => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'hoshi-'));
+  for (const [f, s] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(d, f)), { recursive: true }); fs.writeFileSync(path.join(d, f), s); }
+  try { return 全部数える(d).赤.filter((x) => x.置き場 !== '白名簿の 数'); } finally { fs.rmSync(d, { recursive: true, force: true }); }
+};
+const 頁 = (js, 読む = []) => '<!DOCTYPE html><html><body><p>あ</p>' + 読む.map((f) => '<script src="' + f + '?v=1"></script>').join('') + '<script>' + js + '</script></body></html>';
+const JSの赤 = (files, 頭) => 仮のrepo(files).filter((x) => x.置き場.indexOf(頭) === 0).length;
 
 /* ★歯★＝本物の 抽出の 道（口に渡る字・HTMLの見える字）を 通して 星が 在るか */
 const 口の星 = (src, opt) => 星入り(口に渡る字(注記を外す(src), opt)).length;
@@ -80,13 +91,47 @@ if (process.argv.includes('--self-test')) {
     const 解 = HTMLの星('<div>&#9733;</div>'), 素 = HTMLの星('<div>&#9733;</div>', { 復号: false });
     if (!(解 === 1 && 素 === 0)) throw new Error('解く ' + 解 + ' ／ 解かない ' + 素);
   });
+  /* ── JS の 字 まるごと（2026-10-09）＝仮の repo を 本物の 全部数える に 通す ── */
+  赤('textContent の 右側', JSの赤({ 'book.html': 頁("el.textContent = '★あ';") }, 'JS の 字'));
+  赤('innerHTML の 右側が 行を またぐ', JSの赤({ 'book.html': 頁("el.innerHTML = '<b>'\n  + '★あ</b>';") }, 'JS の 字'));
+  赤('lib が 返す 訳（読み込まれて いる）', JSの赤({ 'book.html': 頁('', ['lib/p.js']), 'lib/p.js': "function f(){ return { なぜ: '★あ' }; }" }, 'JS の 字'));
+  緑('lib が 返す 訳（どの html も 読み込まない）', JSの赤({ 'book.html': 頁(''), 'lib/p.js': "function f(){ return { なぜ: '★あ' }; }" }, 'JS の 字'));
+  緑('console の 第1引数', JSの赤({ 'book.html': 頁("console.log('★あ');") }, 'JS の 字'));
+  緑('注記の 中の ★', JSの赤({ 'book.html': 頁("/* el.textContent = '★' */ // '★'\nvar a = 'い';") }, 'JS の 字'));
+  赤('JS の 逃がし \\u2605', JSの赤({ 'book.html': 頁("el.textContent = '\\u2605あ';") }, 'JS の 字'));
+  赤('throw の 字', JSの赤({ 'book.html': 頁("throw new Error('★あ');") }, 'JS の 字'));
+  赤('★正規表現の 中の ` の 何十行も 先の ★（book.html:3516 と 同じ 形＝自前の 切り方が 3,600行 飲み込んだ）★',
+    JSの赤({ 'book.html': 頁("t = t.replace(/`([^`]+)`/g, '<i>$1</i>');\n" + 'var x = 1;\n'.repeat(40) + "el.textContent = '★あ';") }, 'JS の 字'));
+  緑('正規表現の 中の ` で 読み損ねない（読めない 0）', JSの赤({ 'book.html': 頁("t = t.replace(/`([^`]+)`/g, 'a'); var b = /\"/g; var c = /'/g;") }, '読めない 字'));
+  赤('閉じない 引用符は 読めない 字＝赤', JSの赤({ 'book.html': 頁("var a = 'あ\nvar b = 1;") }, '読めない 字'));
+  赤('行を またぐ テンプレート＝飲み込みの 疑い で 赤', JSの赤({ 'book.html': 頁('var a = `あ\nい`;') }, '行を またぐ テンプレート'));
+  赤('on 属性の 中の JS', JSの赤({ 'book.html': '<!DOCTYPE html><body><button onclick="this.textContent=\'★\'">あ</button><p>い</p></body>' }, 'on 属性'));
+  赤('<template> の 中身', 仮のrepo({ 'book.html': '<!DOCTYPE html><body><p>い</p><template><div>★あ</div></template></body>' }).filter((x) => x.置き場 === '本文').length);
+  赤('読み込まれるのに 見て いない 置き場（parts/）', JSの赤({ 'book.html': 頁('', ['parts/x.js']), 'parts/x.js': "var a='あ';" }, '読み込まれるのに 見て いない'));
+  赤('名前が .min. でも 借り物で なければ 見る', JSの赤({ 'book.html': 頁('', ['lib/a.min.js']), 'lib/a.min.js': "el.textContent='★';" }, 'JS の 字'));
+  T('★白名簿の 物の 数が 変わると 赤（symbols.js に ★ を もう1つ 足す）★', () => {
+    const 赤ら = (() => {
+      const d = fs.mkdtempSync(path.join(os.tmpdir(), 'hoshi-'));
+      try {
+        fs.mkdirSync(path.join(d, 'lib'));
+        fs.writeFileSync(path.join(d, 'book.html'), 頁('', ['lib/symbols.js']));
+        fs.writeFileSync(path.join(d, 'lib/symbols.js'), "var a = ['★', '★'];");
+        return 全部数える(d).赤;
+      } finally { fs.rmSync(d, { recursive: true, force: true }); }
+    })();
+    const 白 = 赤ら.find((x) => x.名 === 'lib/symbols.js' && x.置き場 === '白名簿の 数');
+    if (!白 || !/今 2/.test(白.字)) throw new Error('見つけて いない ' + JSON.stringify(赤ら.map((x) => x.置き場)));
+  });
+  T('★白名簿は 1件ずつ 名・種・数・訳 を 持つ（訳の 無い 除外を 作らない）★', () => {
+    for (const w of 白名簿) if (!(w.名 && w.種 && w.数 > 0 && w.訳 && w.訳.length >= 10)) throw new Error(JSON.stringify(w));
+  });
   T('★★上限を 持っていない（0本しか 通らない）★★', () => {
     const 素 = 注記を外す(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8'));
     if (/赤\.length\s*[<>]=?\s*[1-9]/.test(素)) throw new Error('★上限を 作っています★');
   });
   T('★守る 範囲を 書いてある（まだ 見て いない 置き場と 数を 名乗る）', () => {
     const 本文 = fs.readFileSync(path.join(ROOT, 'scripts/hoshi-kazoeru.mjs'), 'utf8');
-    for (const 要る of ['まだ 見て いない 物', 'JS が 画面へ 直に 書く 字', 'lib が 返して 画面が 出す 字', '隠れて いる 所']) {
+    for (const 要る of ['まだ 見て いない 物', 'JS が 画面へ 直に 書く 字', 'lib が 返して 画面が 出す 字', '隠れて いる 所', 'AI に 渡す 字']) {
       if (本文.indexOf(要る) < 0) throw new Error('書いていない: ' + 要る);
     }
   });
@@ -112,6 +157,13 @@ T('★見る ファイルを 名前で 選んで いない（repo 直下の HTML
 T('★検査が 空振りしていない（口を 通る 字 と HTML の 本文を 実際に 読んでいる）', () => {
   if (数.口の字 < 100) throw new Error('口を 通る 字が 少なすぎます: ' + 数.口の字);
   for (const [f, n] of Object.entries(数.本文)) if (!(n > 0)) throw new Error(f + ' の 本文が 読めて いない（' + n + '節）');
+  /* ★JS の 字の塊を 実際に 読んで いる★（2026-10-09 の 数＝塊 21,859・html が 読み込む js 122） */
+  if (!(数.字の塊 > 10000)) throw new Error('JS の 字の塊が 少なすぎます: ' + 数.字の塊);
+  if (!(数.読み込まれる > 50)) throw new Error('html が 読み込む js が 少なすぎます: ' + 数.読み込まれる);
+});
+T('★白名簿の 物が 今も その 数だけ 在る（無く なった 除外を 残さない）★', () => {
+  const 違う = 数.白の数.filter((w) => w.今 !== w.数);
+  if (違う.length) throw new Error(違う.map((w) => w.名 + ' ' + w.種 + ' 名指し ' + w.数 + ' ／ 今 ' + w.今).join('／'));
 });
 T('★★お客さんの 画面に 出る 字に ★ が 0本★★', () => {
   if (赤.length) {
@@ -123,6 +175,7 @@ T('★★お客さんの 画面に 出る 字に ★ が 0本★★', () => {
 });
 console.log('\n── 実測 ──');
 console.log('  見た ファイル ' + 数.ファイル + '本 ／ 口を 通る 字 ' + 数.口の字 + '本 ／ HTML の 本文 ' + JSON.stringify(数.本文) + ' ／ 属性 ' + 数.属性);
+console.log('  JS の 字の塊 ' + 数.字の塊 + '個 ／ ★入り ' + 数.JSの字の星 + '個 ' + JSON.stringify(数.JSの種) + ' ／ html が 読み込む js ' + 数.読み込まれる + '本');
 console.log('  ★ が 混じっている ... ' + 赤.length + '本');
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

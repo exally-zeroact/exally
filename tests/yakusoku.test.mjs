@@ -282,7 +282,7 @@ if (process.argv.includes('--self-test')) {
       (s) => s.replace("  setCell(selR1, selC1, '=' + 名 + '(');", '  /* 入れない */')],
     /* ★上限の ラチェット★＝★印を 付けて 未点検が 減ったのに 上限を 下げない★ と 赤 */
     ['★印を 1つ 増やして 上限を 下げない（戻れる 形に する）★',
-      (s) => s.replace("（★式でした＝答えが変わります★）", "（★式でした＝答えが変わります★）<!-- data-yakusoku=\"tsuika-test\" -->")],
+      (s) => s.replace("（式でした＝答えが変わります）", "（式でした＝答えが変わります）<!-- data-yakusoku=\"tsuika-test\" -->")],
   ];
   const 元 = fs.readFileSync(path.join(ROOT, 'book.html'), 'utf8');
   const tmp = path.join(ROOT, 'tests', '_yakusoku_broken.html');
