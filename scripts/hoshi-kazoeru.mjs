@@ -32,9 +32,12 @@
  *        ★2026-10-09 に 構文解析器（acorn 8.16.0・repo には 入れて いない）と 突き合わせて ★入り 269／269 一致★
  *        自前で 切ると 正規表現の 中の ` で 3,600行を 1つの 字と 飲み込み 88個が 1個に 化けた（対立役が 数えた）
  *      ・★読めない 字（引用符が 閉じない）／行を またぐ テンプレート（飲み込みの 疑い・今 4本 全部 1行）は 赤★
- *      ・除く 物＝★機械が 毎回 確かめる★ 2種（console の 第1引数／html が 1本も 読み込まない js）と 白名簿（下・数が 違えば 赤）
- *      ・html が 読み込むのに 見て いない js が 在れば 赤（見る 範囲を 置き場の 名で 決めて いる 穴）
- *    ④on 属性の 中の JS・<template> の 中身（どちらも 今 0）
+ *      ・除く 物＝console の 第1引数（機械が 毎回 確かめる）と 白名簿（下・数か 指紋が 違えば 赤）だけ
+ *        「どの html も js も 読み込まない js」も ★白名簿に 名指しした 物だけ★ 除く（読み込まれたら 赤）
+ *      ・逃がし（★）も 実体参照（&#9733;）も 解いて 見る
+ *      ・読み込まれるのに 見て いない js／字で 無い 読み込み（_loadScript(名) の 変数）が 在れば 赤
+ *    ④on 属性の 中の JS・<template> の 中身・CSS の content・manifest.json・fromCharCode(9733)（どれも 今 0）
+ *    ★2026-10-09 本番前の 対立役が W1〜W7 の 7つの 穴を 作って 見せた（どれも 緑で 通った）＝全部 自己試験の 歯に した
  *
  *  ★★まだ 見て いない 物（2026-10-09 に 数えた）★★
  *    ・★AI に 渡す 字★ ･･･ api/claude.js が 読む prompt/ 6本の ★ 396・lib/formula-extra.js の 説明 41（make-prompt で prompt/kansuu.md へ）・
@@ -43,7 +46,6 @@
  *    ・api/ の 下 ･･･ 見る ファイルの 外（★入りは 頼み文 6 だけ・客へ 返す 誤りの 字に ★ 0＝res.json 11か所）
  *    ・倉庫（Supabase）の 中身・画像 ･･･ 見て いない（見立て）
  *    ・似た 字 ☆（9）※（20）･･･ ★の 役が 移っても 見ない
- *    ・CSS の content ･･･ 今 0
  *    ⇒★「この 門が 0本」≠「お客さんの 画面に ★ が 無い」★
  *
  *  使い方: node scripts/hoshi-kazoeru.mjs           ... 数える（直さない）
@@ -52,6 +54,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -232,26 +235,56 @@ export function 見るファイル(根 = ROOT) {
 /* ★口ごとに 足す 形（黒名簿）は 終わらない★＝textContent・innerHTML・lib が 返す 訳・throw の 字...
      ⇒ ★注記の 外の 字の塊（'...' "..." `...`）は 全部 見る★。客に 出ないと ★機械が 毎回 確かめた★ 物と、
        白名簿に 名指しした 物だけ 除く。
-   ★白名簿★＝1件ずつ「置き場・種・数・訳」。★数が 合わなければ 赤★（足されても 消えても 黙らない） */
+   ★白名簿★＝1件ずつ「置き場・種・数・指紋・訳」。★数か 指紋が 合わなければ 赤★（足されても 消えても 入れ替えても 黙らない）
+     指紋＝その 置き場・種の ★入りの 字の塊を 並びの 順に つないだ sha256 の 頭16字
+     （数だけ だと「AI への 字を 1つ 消して 客の 字を 1つ 足す」が 緑で 通った＝2026-10-09 対立役が 作った） */
 export const 白名簿 = [
-  { 名: 'lib/symbols.js', 種: '字そのもの', 生: "'★'", 数: 1,
+  { 名: 'lib/symbols.js', 種: '字そのもの', 数: 1, 指紋: '6dc562f4adea13d4',
     訳: '記号を 入れる 窓の 並び＝★ は 記号 そのもの（お客さんが 選んで 入れる 字）' },
-  { 名: 'lib/ribbon-spec.js', 種: '字そのもの', 生: "'★'", 数: 1,
+  { 名: 'lib/ribbon-spec.js', 種: '字そのもの', 数: 1, 指紋: '6dc562f4adea13d4',
     訳: '表示 タブ「ユーザー設定のビュー」の 印（lib/ribbon.js が rb-ico に 描く）。★実Excel の 印の 形は 未測定★' },
-  { 名: 'lib/formula-extra.js', 種: 'AIへ', 数: 41,
+  { 名: 'lib/formula-extra.js', 種: 'AIへ', 数: 41, 指紋: '5f62a90ab6a429a7',
     訳: '形で動く の 説明＝scripts/make-prompt.mjs が prompt/kansuu.md に 入れて ★AI に 渡す★（画面へ 直に 出す 口は 0＝2026-10-09 対立役が 辿った）。AI の 道は 別件（下の「まだ 見て いない 物」）' },
-  { 名: 'lib/formula-soto.js', 種: 'AIへ', 数: 2,
+  { 名: 'lib/formula-soto.js', 種: 'AIへ', 数: 2, 指紋: '323a019940d31c52',
     訳: 'AI への 頼み文（訳して／何語か）。AI の 道は 別件' },
+  { 名: 'lib/yakusoku-daicho.js', 種: '読み込まれていない', 数: 9, 指紋: '499fb5051e20c777',
+    訳: '約束の 台帳＝tests/yakusoku.test.mjs だけが 読む（どの html も js も 読み込まない＝機械が 毎回 確かめる）' },
 ];
+export const 白の指紋 = (塊ら) => crypto.createHash('sha256').update(塊ら.map((x) => x.生).join('\u0000')).digest('hex').slice(0, 16);
 
-/** ★html が 読み込む js★（src= と _loadScript('...')）＝repo の 中の 物を 相対の 名で */
+/** ★読み込まれる js★（src= ・ _loadScript(...) ・ import ・ new Worker ・ importScripts）＝repo の 中の 物を 相対の 名で
+ *  ★html だけで なく js も 見る★（js が js を 読む 道＝2026-10-09 対立役が 作った 穴。今 0本）
+ *  引用符は ' " ` の どれでも（テンプレートの _loadScript(`...`) が 素通り した＝同じ 日） */
 export function 読み込まれる物(根 = ROOT) {
   const 出 = new Set();
-  for (const p of 見るファイル(根).html) {
-    const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: true });
-    const re = /(?:\bsrc\s*=\s*["']|_loadScript\(\s*["'])([^"'?#]+\.m?js)/g;
+  const 名簿 = 見るファイル(根);
+  for (const p of 名簿.html.concat(名簿.js)) {
+    const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
+    const re = /(?:\bsrc\s*=\s*|_loadScript\(\s*|\bimport\s*\(\s*|\bimport\s+[^'"`;]*?from\s*|\bnew\s+Worker\(\s*|importScripts\(\s*)["'`]([^"'`?#]+\.m?js)/g;
     let m;
-    while ((m = re.exec(s))) { if (!/^(https?:)?\/\//.test(m[1])) 出.add(m[1].replace(/^\.?\//, '')); }
+    while ((m = re.exec(s))) {
+      if (/^(https?:)?\/\//.test(m[1])) continue;
+      const 基 = /\.html$/i.test(p) || !/^\.\.?\//.test(m[1]) ? 根 : path.dirname(p);
+      出.add(path.relative(根, path.resolve(基, m[1])).split(path.sep).join('/'));
+    }
+  }
+  return 出;
+}
+
+/** ★名前で 読み込む 所が 字で ない★（_loadScript(名) の 様に 変数で 渡す）＝何を 読むか 字から 決まらない＝赤（今 0） */
+export function 字で無い読み込み(根 = ROOT) {
+  const 出 = [];
+  const 名簿 = 見るファイル(根);
+  for (const p of 名簿.html.concat(名簿.js)) {
+    const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
+    const re = /(?:_loadScript|\bimport|\bnew\s+Worker|importScripts)\s*\(\s*(?!["'`])([^)\s]{1,40})/g;
+    let m;
+    while ((m = re.exec(s))) {
+      /* 定義（function _loadScript(src)）は 読み込みで ない。★後読み (?<!) は 使わない★（tests/no-lookbehind） */
+      if (/function\s+$/.test(s.slice(Math.max(0, m.index - 20), m.index))) continue;
+      if (/^function\b|^\)/.test(m[1])) continue;
+      出.push({ 名: path.relative(根, p).split(path.sep).join('/'), 字: m[0].slice(0, 60), 行: s.slice(0, m.index).split('\n').length });
+    }
   }
   return 出;
 }
@@ -273,18 +306,25 @@ export function JSの字の星(根 = ROOT) {
       /* ★テンプレートが 行を またいだら 赤★＝正規表現の 中の ` を 字の 始まりと 取り違えて 何千行も 飲み込んだ 疑い
            （今 テンプレートは 4本・全部 1行＝2026-10-09 に 数えた。飲み込みは「閉じない」には 出ない） */
       if (x.生[0] === '`' && x.生.indexOf('\n') >= 0) 行またぎ.push({ 名: 名(p), 行: 生.slice(0, x.開始).split('\n').length });
-      if (JSの逃がしを解く(x.生).indexOf('★') < 0) continue;
+      /* ★逃がし（★）も 実体参照（&#9733;・&starf;）も 解いて 見る★＝innerHTML に 入れば ★ に なる
+           （実体参照を 解かず &#9733; が 緑で 通った＝2026-10-09 対立役が 作った。& の 在る 字だけ 解く） */
+      const 解いた = JSの逃がしを解く(x.生);
+      if (解いた.indexOf('★') < 0 && !(解いた.indexOf('&') >= 0 && 実体参照を解く(解いた).indexOf('★') >= 0)) continue;
       let 種 = '赤';
-      const 白 = 白名簿.find((w) => w.名 === 名(p) && (!w.生 || w.生 === x.生));
-      /* 前の 字は ★元の 字★で 見る（注記を 外すと 絵文字で 長さが 変わり 位置が ずれる） */
-      if (/console\.\w+\s*\(\s*$/.test(生.slice(Math.max(0, x.開始 - 40), x.開始))) 種 = 'console';
-      else if (!html && !読まれる.has(名(p))) 種 = '読み込まれていない';
+      const 読まれない = !html && !読まれる.has(名(p));
+      const 白 = 白名簿.find((w) => w.名 === 名(p) && (w.種 !== '読み込まれていない' || 読まれない));
+      /* 前の 字は ★元の 字★で 見る（注記を 外すと 絵文字で 長さが 変わり 位置が ずれる）。
+         console の 前は 名前の 字で ない 事（myconsole.log が 通った＝2026-10-09） */
+      if (/(?:^|[^\w$.])console\.\w+\s*\(\s*$/.test(生.slice(Math.max(0, x.開始 - 40), x.開始))) 種 = 'console';
       else if (白) 種 = 白.種;
       出.push({ 名: 名(p), 種, 生: x.生, 開始: x.開始, 終わり: x.終わり, 行: 生.slice(0, x.開始).split('\n').length });
     }
   }
   /* ★白名簿の 数★＝名指しの 数と 今の 数が 違えば 腐って いる */
-  const 白の数 = 白名簿.map((w) => ({ ...w, 今: 出.filter((x) => x.名 === w.名 && x.種 === w.種 && (!w.生 || w.生 === x.生)).length }));
+  const 白の数 = 白名簿.map((w) => {
+    const 塊ら = 出.filter((x) => x.名 === w.名 && x.種 === w.種);
+    return { ...w, 今: 塊ら.length, 今の指紋: 白の指紋(塊ら) };
+  });
   return { 出, 読めない, 行またぎ, 白の数, 読まれる, 塊の数 };
 }
 
@@ -321,7 +361,28 @@ export function 全部数える(根 = ROOT) {
   for (const x of J.出) if (x.種 === '赤') 赤.push({ 名: x.名, 置き場: 'JS の 字 ' + x.行 + '行', 字: x.生, 塊: [{ 開始: x.開始, 終わり: x.終わり }] });
   for (const x of J.読めない) 赤.push({ 名: x.名, 置き場: '読めない 字 ' + x.行 + '行', 字: '（引用符が 閉じない＝正規表現と 取り違えた 疑い）' });
   for (const x of J.行またぎ) 赤.push({ 名: x.名, 置き場: '行を またぐ テンプレート ' + x.行 + '行', 字: '（飲み込みの 疑い）' });
-  for (const w of J.白の数) if (w.今 !== w.数) 赤.push({ 名: w.名, 置き場: '白名簿の 数', 字: w.種 + '＝名指し ' + w.数 + ' ／ 今 ' + w.今 });
+  for (const w of J.白の数) if (w.今 !== w.数 || w.今の指紋 !== w.指紋) 赤.push({ 名: w.名, 置き場: '白名簿の 数', 字: w.種 + '＝名指し ' + w.数 + '（' + w.指紋 + '） ／ 今 ' + w.今 + '（' + w.今の指紋 + '）' });
+  for (const x of 字で無い読み込み(根)) 赤.push({ 名: x.名, 置き場: '字で 無い 読み込み ' + x.行 + '行', 字: x.字 });
+  /* ★字の 形で ない ★★（String.fromCharCode(9733) ・ fromCodePoint(0x2605)）＝字の塊に 出ない（今 0） */
+  for (const p of 名簿.html.concat(名簿.js)) {
+    const s = 注記を外す(fs.readFileSync(p, 'utf8'), { html: /\.html$/i.test(p) });
+    for (const m of s.matchAll(/fromCharCode|fromCodePoint/g)) {
+      const 引数 = s.slice(m.index, m.index + 80);
+      if (/\(\s*(9733|0x2605|0X2605)\b/.test(引数)) 赤.push({ 名: 名(p), 置き場: '字の 形で ない ★', 字: 引数.slice(0, 40) });
+    }
+  }
+  /* ★CSS の content★（html の <style>・style 属性・*.css）と ★manifest.json の 字★（入れた 時の 名前に 出る）＝今 0 */
+  const CSSの星 = (s) => (s.match(/content\s*:[^;}]*/gi) || []).filter((c) => c.indexOf('★') >= 0 || /\\0*2605/i.test(c));
+  const css置き場 = [];
+  const 潜るcss = (d) => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) { if (f !== 'node_modules' && f[0] !== '.') 潜るcss(q); } else if (/\.css$/i.test(f)) css置き場.push(q); } };
+  潜るcss(根);
+  for (const p of css置き場.concat(名簿.html)) for (const c of CSSの星(fs.readFileSync(p, 'utf8'))) 赤.push({ 名: 名(p), 置き場: 'CSS の content', 字: c.slice(0, 60) });
+  const 札 = path.join(根, 'manifest.json');
+  if (fs.existsSync(札)) {
+    const 歩く = (v) => { if (typeof v === 'string') { if (v.indexOf('★') >= 0) 赤.push({ 名: 'manifest.json', 置き場: 'manifest の 字', 字: v }); } else if (v && typeof v === 'object') for (const k of Object.keys(v)) 歩く(v[k]); };
+    歩く(JSON.parse(fs.readFileSync(札, 'utf8')));
+  }
+  数.css = css置き場.length;
   /* ★読み込まれるのに 見て いない js★＝置き場の 名で 見る 範囲を 決めて いるので、新しい 置き場は 黙って 外れる */
   const 見る名 = new Set(見るファイル(根).js.map(名));
   for (const f of J.読まれる) if (!見る名.has(f) && 借り物.indexOf(f) < 0) 赤.push({ 名: f, 置き場: '読み込まれるのに 見て いない', 字: '' });

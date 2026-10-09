@@ -95,7 +95,32 @@ if (process.argv.includes('--self-test')) {
   赤('textContent の 右側', JSの赤({ 'book.html': 頁("el.textContent = '★あ';") }, 'JS の 字'));
   赤('innerHTML の 右側が 行を またぐ', JSの赤({ 'book.html': 頁("el.innerHTML = '<b>'\n  + '★あ</b>';") }, 'JS の 字'));
   赤('lib が 返す 訳（読み込まれて いる）', JSの赤({ 'book.html': 頁('', ['lib/p.js']), 'lib/p.js': "function f(){ return { なぜ: '★あ' }; }" }, 'JS の 字'));
-  緑('lib が 返す 訳（どの html も 読み込まない）', JSの赤({ 'book.html': 頁(''), 'lib/p.js': "function f(){ return { なぜ: '★あ' }; }" }, 'JS の 字'));
+  赤('どの html も 読み込まない js でも 白名簿に 無ければ 赤（黙って 除かない）', JSの赤({ 'book.html': 頁(''), 'lib/p.js': "function f(){ return { なぜ: '★あ' }; }" }, 'JS の 字'));
+  緑('白名簿の「読み込まれていない」（約束の 台帳）は 読み込まれない 間は 除く', JSの赤({ 'book.html': 頁(''), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
+  赤('白名簿の「読み込まれていない」でも 読み込まれたら 赤', JSの赤({ 'book.html': 頁('', ['lib/yakusoku-daicho.js']), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
+  /* ── 2026-10-09 本番前の 対立役が 作った 穴（W1〜W7）＝どれも 前は 緑で 通った ── */
+  赤('W1 実体参照 &#9733; の 字（innerHTML に 入れば ★）', JSの赤({ 'book.html': 頁("el.innerHTML = '&#9733;あ';") }, 'JS の 字'));
+  緑('W1 &amp;#9733; は ★ に ならない', JSの赤({ 'book.html': 頁("el.innerHTML = '&amp;#9733;';") }, 'JS の 字'));
+  赤('W1b String.fromCharCode(9733)', JSの赤({ 'book.html': 頁('el.textContent = String.fromCharCode(9733);') }, '字の 形で ない'));
+  赤('W2 テンプレートの _loadScript(`lib/yakusoku-daicho.js`)', JSの赤({ 'book.html': 頁('_loadScript(`lib/yakusoku-daicho.js`);'), 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
+  赤('W2b 変数で 渡す _loadScript(n)', JSの赤({ 'book.html': 頁("var n = 'lib/x.js'; _loadScript(n);") }, '字で 無い 読み込み'));
+  緑('W2b _loadScript の 定義（function _loadScript(src)）は 読み込みで ない', JSの赤({ 'book.html': 頁('function _loadScript(src){ return src; }') }, '字で 無い 読み込み'));
+  赤('W3 js が js を 読む（import(\'./q.js\')）', JSの赤({ 'book.html': 頁('', ['lib/p.js']), 'lib/p.js': 'imp' + "ort('./yakusoku-daicho.js');" /* ★字を 割る★＝tests/refs-resolve が 本物の import と 読む */, 'lib/yakusoku-daicho.js': "var a = '★あ';" }, 'JS の 字'));
+  赤('W5 myconsole.log(\'★\') は console で ない', JSの赤({ 'book.html': 頁("myconsole.log('★あ');") }, 'JS の 字'));
+  赤('W6 CSS の content:"★"（<style>）', JSの赤({ 'book.html': '<!DOCTYPE html><style>.a:after{content:"★"}</style><body><p>い</p></body>' }, 'CSS の content'));
+  赤('W6 CSS の content:"\\2605"（*.css）', JSの赤({ 'book.html': 頁(''), 'css/a.css': '.a::before { content: "\\2605"; }' }, 'CSS の content'));
+  赤('W7 manifest.json の 名前', JSの赤({ 'book.html': 頁(''), 'manifest.json': '{"name":"★Exally"}' }, 'manifest の 字'));
+  T('★W4 白名簿の 物を 1つ 消して 客の 字を 1つ 足すと 赤（数は 同じでも 指紋で 止める）★', () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'hoshi-'));
+    try {
+      fs.mkdirSync(path.join(d, 'lib'));
+      fs.writeFileSync(path.join(d, 'book.html'), 頁('', ['lib/formula-soto.js']));
+      fs.writeFileSync(path.join(d, 'lib/formula-soto.js'), "var a = '★訳した 文だけ'; document.title = '★客';");
+      const 赤ら = 全部数える(d).赤;
+      const 白 = 赤ら.find((x) => x.名 === 'lib/formula-soto.js' && x.置き場 === '白名簿の 数');
+      if (!白 || !/今 2/.test(白.字)) throw new Error('見つけて いない ' + JSON.stringify(赤ら.map((x) => x.置き場 + ' ' + x.字)));
+    } finally { fs.rmSync(d, { recursive: true, force: true }); }
+  });
   緑('console の 第1引数', JSの赤({ 'book.html': 頁("console.log('★あ');") }, 'JS の 字'));
   緑('注記の 中の ★', JSの赤({ 'book.html': 頁("/* el.textContent = '★' */ // '★'\nvar a = 'い';") }, 'JS の 字'));
   赤('JS の 逃がし \\u2605', JSの赤({ 'book.html': 頁("el.textContent = '\\u2605あ';") }, 'JS の 字'));
