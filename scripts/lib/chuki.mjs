@@ -72,7 +72,8 @@ function 素で外す(src, o) {
             ★ずっと字の中に居るつもり★になって 注記を落とし損ねるのを 防ぐ。
             （2026-08-26 実際に踏んだ：book.html の注記の中の1行が 残った） */
       const 端 = 字の終わり(s, i);
-      if (端 > i) { out += s.slice(i, 端); i = 端; continue; }
+      if (端 > i) { if (o.拾う) o.拾う.push({ 開始: i, 終わり: 端 }); out += s.slice(i, 端); i = 端; continue; }
+      if (o.拾う) o.拾う.読めない.push(i);
       /* 閉じていない＝字ではない。1文字として そのまま通す */
       out += c; i++;
       continue;
@@ -160,6 +161,31 @@ function 空にする(部分, 埋める) {
   let out = '';
   for (const ch of 部分) out += (ch === '\n' || ch === '\r') ? ch : ' ';
   return out;
+}
+
+/** ★字の塊（'...' "..." `...`）の 位置を 拾う★（2026-10-09・★の門 scripts/hoshi-kazoeru.mjs が 使う）
+ *  ★注記を外すのと 同じ 1文字ずつの 読み方★（正規表現を 知っている）で 拾う＝切り方を 1か所に。
+ *  自前で 切ると 正規表現の中の バッククォートで 3,600行を 1つの字と 飲み込んだ（2026-10-09 に 数えた）。
+ *  @param {string} src  JS の字（html なら html: true＝<script> の中だけ）
+ *  @returns {{塊: {開始:number, 終わり:number, 生:string}[], 読めない: number[]}}
+ *    位置は ★元の字の 位置★。読めない＝' " ` で 始まったのに 閉じない 所（正規表現と 取り違えた 疑い） */
+export function 字の塊を拾う(src, opt) {
+  opt = opt || {};
+  const s = String(src == null ? '' : src);
+  const 塊 = [], 読めない = [];
+  const 区間 = [];
+  if (opt.html) {
+    const re = /(<script\b[^>]*>)([\s\S]*?)<\/script>/gi;
+    let m;
+    while ((m = re.exec(s))) { const 始 = m.index + m[1].length; 区間.push([始, 始 + m[2].length]); }
+  } else 区間.push([0, s.length]);
+  for (const [a, b] of 区間) {
+    const 拾う = []; 拾う.読めない = [];
+    素で外す(s.slice(a, b), { 拾う });
+    for (const x of 拾う) 塊.push({ 開始: a + x.開始, 終わり: a + x.終わり, 生: s.slice(a + x.開始, a + x.終わり) });
+    for (const k of 拾う.読めない) 読めない.push(a + k);
+  }
+  return { 塊, 読めない };
 }
 
 /** ★その字が 注記の外に 在るか★（いちばん よく使う形） */
