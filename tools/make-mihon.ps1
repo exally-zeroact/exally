@@ -11,6 +11,7 @@ function 作者を見本に([string]$p){
   try{
     $e=$z.GetEntry('docProps/core.xml'); $r=New-Object System.IO.StreamReader($e.Open()); $x=$r.ReadToEnd(); $r.Close()
     $x=$x -replace '<dc:creator>[^<]*</dc:creator>','<dc:creator>見本</dc:creator>' -replace '<cp:lastModifiedBy>[^<]*</cp:lastModifiedBy>','<cp:lastModifiedBy>見本</cp:lastModifiedBy>'
+    if($x -notmatch '<dc:creator>見本</dc:creator>' -or $x -notmatch '<cp:lastModifiedBy>見本</cp:lastModifiedBy>'){ throw '★作者の欄を 見本に 替えられない（core.xml の 書き方が 変わった？）★ ' + $p }
     $e.Delete(); $n=$z.CreateEntry('docProps/core.xml'); $w=New-Object System.IO.StreamWriter($n.Open(), (New-Object System.Text.UTF8Encoding($false))); $w.Write($x); $w.Close()
   } finally { $z.Dispose() }
   "作者を 見本に … $p"
