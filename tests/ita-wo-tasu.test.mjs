@@ -63,7 +63,7 @@ console.log('[ita-wo-tasu] ★足した 板が 書き出す 先に 入るか★'
 await 待('★材料が 在る（空振りして いない）★', async () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
+  if (h !== 'affd42e9f5c6de9d5565c8ffd623ffd2e37a7ba5ca8820fdd5c971b15ff93053') {
     throw new Error('★材料が 入れ替わって います★ ' + h);
   }
 });

@@ -79,8 +79,37 @@ export function 作者を読む(buf) {
     const t = a ? a.toString('utf8') : '';
     for (const m of t.matchAll(/<(?:[\w.-]+:)?(Company|Manager)\b[^>]*?(?:\/>|>([\s\S]*?)<\/(?:[\w.-]+:)?\1\s*>)/gi)) 会社.push(中身の字(m[2]));
   }
-  return { 値, 残り: /creator|lastModifiedBy/i.test(残りの字), 会社 };
+  return { 値, 残り: /creator|lastModifiedBy/i.test(残りの字), 会社, 道: 道を読む(b) };
 }
+
+/* ★保存した PC の 道★（xl/workbook.xml の x15ac:absPath の url＝利用者の フォルダ名が 入る・10-11 禁止の 字の 見張り） */
+const 道の形 = /(<(?:[\w.-]+:)?absPath\b[^>]*?\burl=")([^"]*)(")/gi;
+export function 道を読む(buf) {
+  const b = Buffer.from(buf);
+  const d = 目録を読む(b);
+  const x = 部品を探す(d, 'xl/workbook.xml');
+  if (!x) return [];
+  const 中 = 部品の中身(b, x).中;
+  if (!中) throw new Error('workbook.xml の 圧縮の 方式が 読めない');
+  return [...中.toString('utf8').matchAll(道の形)].map((m) => m[2]);
+}
+/** 保存した PC の 道を 空に ⇒ 新しい Buffer（無ければ 同じ物） */
+export function 道を消す(buf) {
+  const b = Buffer.from(buf);
+  const d = 目録を読む(b);
+  const x = 部品を探す(d, 'xl/workbook.xml');
+  if (!x) return b;
+  const 中 = 部品の中身(b, x).中;
+  if (!中) throw new Error('workbook.xml の 圧縮の 方式が 読めない');
+  const 前 = 中.toString('utf8');
+  const 後 = 前.replace(道の形, '$1$3');
+  if (後 === 前) return b;
+  const out = 部品を差し替える(b, d, x, Buffer.from(後, 'utf8'));
+  if (道を読む(out).some((v) => v !== '')) throw new Error('道を 空に できない');
+  return out;
+}
+/** 作者の 欄を 見本に し、保存した PC の 道を 空に する */
+export function 見本にする(buf) { return 道を消す(作者を見本に(buf)); }
 
 /** 判じ：見本 か 欄なし だけを 通す（拾えない 書き方・空で ない 会社は その他＝赤） */
 export function 欄の判じ(r) {
@@ -88,29 +117,17 @@ export function 欄の判じ(r) {
   if (r.残り) return 'その他';
   if (r.値.some((v) => v !== '' && v !== 見本)) return 'その他';
   if ((r.会社 || []).some((v) => v !== '')) return 'その他';
+  if ((r.道 || []).some((v) => v !== '')) return 'その他';
   return r.値.some((v) => v === 見本) ? '見本' : '欄なし';
 }
 
-/** 作者の 欄を「見本」に ⇒ 新しい Buffer（替える 物が 無ければ 同じ物） */
-export function 作者を見本に(buf) {
-  const b = Buffer.from(buf);
-  const d = 目録を読む(b);
-  const x = 部品を探す(d, CORE);
-  if (!x) return b;
-  const { 頭, raw, 中 } = 部品の中身(b, x);
-  if (!中) throw new Error('core.xml の 圧縮の 方式が 読めない');
-  const { 字: 前, utf16 } = 字にする(中);
-  if (utf16) throw new Error('core.xml が UTF-16（替えない＝赤）');
-  const 後 = 前.replace(欄の形, (m, 名, 内) => (内 === undefined ? m : m.replace('>' + 内 + '<', '>' + 見本 + '<')));
-  if (後 === 前) {
-    if (欄の判じ(作者を読む(b)) === 'その他') throw new Error('作者の 欄を 替えられない（書き方が 拾えない か 会社の 欄に 字）');
-    return b;
-  }
-  const 生 = Buffer.from(後, 'utf8');
+/** 部品 x の 中身を 生 に 差し替えた zip を 作る（ほかの 部品は 圧縮の バイトまで そのまま・後ろの 位置だけ ずらす） */
+function 部品を差し替える(b, d, x, 生) {
+  const { 頭, raw } = 部品の中身(b, x);
   const 新raw = x.方式 === 8 ? zlib.deflateRawSync(生, { level: 9 }) : 生;
   const crc = zlib.crc32(生) >>> 0;
   const 差 = 新raw.length - raw.length;
-  /* 部品を 位置の 順に 並べ、core.xml だけ 差し替えて つなぐ（すき間が 在れば 止める） */
+  /* 部品を 位置の 順に 並べ、x だけ 差し替えて つなぐ（すき間が 在れば 止める） */
   const 順 = d.部品.slice().sort((a, c) => a.位置 - c.位置);
   const 片 = [];
   let 次 = 0;
@@ -135,7 +152,26 @@ export function 作者を見本に(buf) {
   const 終わり = Buffer.from(b.subarray(d.終わり));
   終わり.writeUInt32LE(d.目録の位置 + 差, 16);
   const out = Buffer.concat([...片, 目録, b.subarray(d.目録の位置 + d.目録の大きさ, d.終わり), 終わり]);
-  if (欄の判じ(作者を読む(out)) !== '見本') throw new Error('替えた 後も 作者の 欄が「見本」に ならない');
+  return out;
+}
+
+/** 作者の 欄を「見本」に ⇒ 新しい Buffer（替える 物が 無ければ 同じ物） */
+export function 作者を見本に(buf) {
+  const b = Buffer.from(buf);
+  const d = 目録を読む(b);
+  const x = 部品を探す(d, CORE);
+  if (!x) return b;
+  const { 頭, raw, 中 } = 部品の中身(b, x);
+  if (!中) throw new Error('core.xml の 圧縮の 方式が 読めない');
+  const { 字: 前, utf16 } = 字にする(中);
+  if (utf16) throw new Error('core.xml が UTF-16（替えない＝赤）');
+  const 後 = 前.replace(欄の形, (m, 名, 内) => (内 === undefined ? m : m.replace('>' + 内 + '<', '>' + 見本 + '<')));
+  if (後 === 前) {
+    if (欄の判じ(Object.assign(作者を読む(b), { 道: [] })) === 'その他') throw new Error('作者の 欄を 替えられない（書き方が 拾えない か 会社の 欄に 字）');
+    return b;
+  }
+  const out = 部品を差し替える(b, d, x, Buffer.from(後, 'utf8'));
+  if (欄の判じ(Object.assign(作者を読む(out), { 道: [] })) !== '見本') throw new Error('替えた 後も 作者の 欄が「見本」に ならない');
   return out;
 }
 
@@ -163,7 +199,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     else {
       for (const f of 引数) {
         const 前 = fs.readFileSync(f);
-        const 後 = 作者を見本に(前);
+        const 後 = 見本にする(前);
         if (後 !== 前 && !後.equals(前)) { fs.writeFileSync(f, 後); console.log('見本に 替えた … ' + f + '（' + 前.length + ' → ' + 後.length + ' バイト）'); }
         else console.log('替える 物 無し … ' + f);
       }

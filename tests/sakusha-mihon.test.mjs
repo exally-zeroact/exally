@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { 作者を読む, 作者を見本に, 欄の判じ, Officeファイル, 見本 } from '../scripts/sakusha-mihon.mjs';
+import { 作者を読む, 作者を見本に, 見本にする, 欄の判じ, Officeファイル, 見本 } from '../scripts/sakusha-mihon.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 let 緑 = 0, 赤 = 0;
@@ -48,6 +48,13 @@ if (process.argv.includes('--self-test')) {
       : t.indexOf('<Company>') >= 0 ? t.replace(/<Company>[^<]*<\/Company>/, '<Company>' + 名 + '</Company>')
       : t.replace('</Properties>', '<Company>' + 名 + '</Company></Properties>'));
     T('★app.xml の Company に 字 は 赤★', 判じる(会社) === 'その他', 判じる(会社));
+    /* ⑤保存した PC の 道（workbook.xml の absPath）に 字 ⇒ 赤（10-11 禁止の 字の 見張りで 見つけた） */
+    const 作り物の道 = 'C:/試験/見本/';
+    const 道 = 書き換え(元, '', 'xl/workbook.xml', (t) => /absPath\b[^>]*\burl="/.test(t)
+      ? t.replace(/(absPath\b[^>]*?\burl=")[^"]*"/, '$1' + 作り物の道 + '"')
+      : t.replace('</workbook>', '<x15ac:absPath xmlns:x15ac="http://schemas.microsoft.com/office/spreadsheetml/2010/11/ac" url="' + 作り物の道 + '"/></workbook>'));
+    T('★保存した PC の 道に 字 は 赤★', 判じる(道) === 'その他', 判じる(道));
+    T('★その 写しを 道具に 通すと 道が 空に 戻る★', 判じる(見本にする(道)) === '見本');
     /* ②読めない zip ⇒ 読めない（赤） */
     T('★読めない zip は「読めない」（赤）★', 判じる(Buffer.from('PK\u0003\u0004 こわれ')) === '読めない');
     /* ③データ記述子の 印を 立てた zip ⇒ 読めない（赤） */

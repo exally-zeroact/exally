@@ -1,19 +1,6 @@
 ﻿# ★自分の表の「同じ行」を、表の 外の 行から 見る★ 見本（★診断に 出ない 型★の 確かめ）
 param([string]$Out)
 $ErrorActionPreference='Stop'
-# ★作者の欄に 本物の 名前を 残さない（10-10 司さんの決め）★＝Excel が 保存した 後に docProps/core.xml の 2つの 欄だけを「見本」に 替える
-#   （Application.UserName を 替えても サインインした アカウントの 名前が 入った＝10-10 に 測った）
-function 作者を見本に([string]$p){
-  Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
-  $z=[System.IO.Compression.ZipFile]::Open($p,'Update')
-  try{
-    $e=$z.GetEntry('docProps/core.xml'); $r=New-Object System.IO.StreamReader($e.Open()); $x=$r.ReadToEnd(); $r.Close()
-    $x=$x -replace '<dc:creator>[^<]*</dc:creator>','<dc:creator>見本</dc:creator>' -replace '<cp:lastModifiedBy>[^<]*</cp:lastModifiedBy>','<cp:lastModifiedBy>見本</cp:lastModifiedBy>'
-    if($x -notmatch '<dc:creator>見本</dc:creator>' -or $x -notmatch '<cp:lastModifiedBy>見本</cp:lastModifiedBy>'){ throw '★作者の欄を 見本に 替えられない（core.xml の 書き方が 変わった？）★ ' + $p }
-    $e.Delete(); $n=$z.CreateEntry('docProps/core.xml'); $w=New-Object System.IO.StreamWriter($n.Open(), (New-Object System.Text.UTF8Encoding($false))); $w.Write($x); $w.Close()
-  } finally { $z.Dispose() }
-  "作者を 見本に … $p"
-}
 $xl=$null
 try{
   $xl=New-Object -ComObject Excel.Application; $xl.Visible=$false; $xl.DisplayAlerts=$false
@@ -29,4 +16,7 @@ try{
   "保存した … $Out"
 }catch{ "★落ちた★ $($_.Exception.Message)" }
 finally{ if($xl){ try{foreach($z in @($xl.Workbooks)){$z.Close($false)}}catch{}; try{$xl.Quit()}catch{} } }
-作者を見本に ($Out)
+# ★作者の 欄を「見本」に・保存した PC の 道を 空に（10-10・10-11 司さんの 決め）★
+#   Excel は サインインの 名前と 保存した 道を 入れるので、閉じた 後に repo の 道具 scripts/sakusha-mihon.mjs で 替える（判じは 1か所）
+& node (Join-Path $PSScriptRoot '../scripts/sakusha-mihon.mjs') $Out
+if ($LASTEXITCODE -ne 0) { throw '★作者の 欄・保存した 道を 替えられない★' }

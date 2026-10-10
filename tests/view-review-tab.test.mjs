@@ -15,6 +15,7 @@
  *  走らせ方: node tests/view-review-tab.test.mjs [--self-test]
  */
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
@@ -44,8 +45,18 @@ function 抜く(名) {
 console.log('\n[① 測った 道具が 残っている]');
 ok('tools/measure-view-tab.ps1 が 在る', fs.existsSync(path.join(ROOT, 'tools/measure-view-tab.ps1')));
 ok('tools/measure-review-tab.ps1 が 在る', fs.existsSync(path.join(ROOT, 'tools/measure-review-tab.ps1')));
-ok('★測った 中に 人の 名前を 残していない★',
-  !/矢野/.test(book) && !/矢野/.test(fs.readFileSync(path.join(ROOT, 'tools/measure-review-tab.ps1'), 'utf8')));
+/* ★人の 名前は ここに 書かない★（締め出す 字を 書くと 公開 repo に 名前を もう一度 出す・10-11）
+   ⇒ 名前が 戻らないかは 禁止の 字の 見張り（tests/kinshi-ji.test.mjs・一覧は repo の 外）が 全部の ファイルで 見る */
+{
+  /* 一覧は repo の 外（CI＝secret KINSHI_JI・手元＝~/.tsukurimono/kinshi-ji.txt）。無い 時は 未測定（緑に 数えない） */
+  let 一覧 = (process.env.KINSHI_JI || '').split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  if (!一覧.length) { try { 一覧 = fs.readFileSync(path.join(os.homedir(), '.tsukurimono', 'kinshi-ji.txt'), 'utf8').split(/\r?\n/).map((s) => s.trim()).filter((s) => s && !s.startsWith('#')); } catch (e) { 一覧 = []; } }
+  if (!一覧.length) console.log('  ★未測定★ 禁止の 字の 一覧が 無い（測った 中の 人の 名前は 見ていない）');
+  else {
+    const 道具 = fs.readFileSync(path.join(ROOT, 'tools/measure-review-tab.ps1'), 'utf8');
+    ok('★測った 中に 人の 名前を 残していない（一覧 ' + 一覧.length + '語・字は 出さない）★', 一覧.every((w) => book.indexOf(w) < 0 && 道具.indexOf(w) < 0));
+  }
+}
 
 console.log('\n[② ズーム（実測＝10〜400）]');
 for (const n of ['ズームの窓を開く', 'ズームを決めて閉じる', '選択範囲に合わせる']) ok(n + ' が 在る', !!抜く(n));

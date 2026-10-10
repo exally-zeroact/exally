@@ -7,7 +7,7 @@
  *    因 ＝ ★`xl/drawings/drawing1.xml` を 読む 所が 1つも 在りません★。
  *
  *  ★★物差し★★
- *    ①`tests/fixtures/kazari-hiraku3.xlsx`（11705B・実Excel 16.0 build 20326 が COM で 作った 物。10-10 に 作者の 欄だけ「見本」に 替えた＝元 11725B）
+ *    ①`tests/fixtures/kazari-hiraku3.xlsx`（11639B・実Excel 16.0 build 20326 が COM で 作った 物。10-10 に 作者の 欄・10-11 に 保存した PC の 道を 空に した＝元 11725B）
  *    ②実Excel が その ファイルを 開いて 言った 数（経営者1 の 実測・2026-09-21）
  *       `docs/measured/golden-moto-no-katachi-excel-2026-09-21.tsv`
  *         図形 Left ★449.375★ ／ Top ★20★ ／ Width ★60★ ／ Height ★60★（ポイント）
@@ -94,7 +94,7 @@ console.log('[xlsx-zukei] ★図形（判子）を 自前で 読めて いるか
 T('★材料が 在る（空振りして いない）★', () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
+  if (h !== 'affd42e9f5c6de9d5565c8ffd623ffd2e37a7ba5ca8820fdd5c971b15ff93053') {
     throw new Error('★材料が 入れ替わって います★ sha256=' + h);
   }
 });
