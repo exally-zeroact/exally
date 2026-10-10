@@ -3,8 +3,8 @@
  *  道具＝scripts/ci-mitodoke.mjs（判じは scripts/lib/ci-mitodoke.mjs の 見届ける）。
  *  作り物の ログは 本物の gh ログ（49d56dc の CI 37905233170・WebKit 37905233158）の 行の 形を 写した：
  *    「job\t段の名前\t(BOM)時刻 本文」・段の 頭は「##[group]Run <命令>」。
- *  緑の 形 3つ・赤の 形 32（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
- *  --self-test ... 判じを 12通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
+ *  緑の 形 4つ・赤の 形 35（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
+ *  --self-test ... 判じを 16通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -43,7 +43,7 @@ function WKログ(頼, 走, 緑, o) {
   const 見出し = (o.名前 || ['webkit-a.mjs']).map((n) => 行('webkit', WK段, '=== ' + n + ' ==='));
   const L = [行('webkit', '★借り物', '##[group]Run node tests/karimono.test.mjs', true),
     行('webkit', '★借り物', '★webkit の 見張り ... 頼んだ 9本 ／ 走らせた 9本 ／ 緑 9本★'),
-    行('webkit', WK段, '##[group]Run node scripts/run-webkit-tests.mjs', true),
+    行('webkit', WK段, o.頭 || '##[group]Run node scripts/run-webkit-tests.mjs', true),
     ...見出し];
   if (o.未測定) L.push(行('webkit', WK段, '  ★未測定★ 借りられません（作り物）'));
   if (!o.切れ) L.push(行('webkit', WK段, '★webkit の 見張り ... 頼んだ ' + 頼 + '本 ／ 走らせた ' + 走 + '本 ／ 緑 ' + 緑 + '本★'));
@@ -102,6 +102,10 @@ async function 試す(libの道, 黙る) {
   赤に('WebKit の 3つが 揃わない', { wk: [1, 1, 0] });
   赤に('WebKit の 見出しが 期待と 違う 名前（数は 揃う）', { wkLog: WKログ(1, 1, 1, { 名前: ['other.mjs'] }) });
   赤に('WebKit の 見出しが 0本（数だけ 1/1/1）', { wkLog: WKログ(1, 1, 1, { 名前: [] }) });
+  赤に('WebKit の ログが 取れない（null）', { wkLog: null });
+  赤に('run-webkit-tests の 段が 無い（命令が 変わった）', { wkLog: WKログ(1, 1, 1, { 頭: '##[group]Run node scripts/zenbu-webkit.mjs' }) });
+  緑に('★WebKit 2本・期待の 順に 見出し★', { webkit期待: ['webkit-a.mjs', 'webkit-b.mjs --self-test'], wkLog: WKログ(2, 2, 2, { 名前: ['webkit-a.mjs', 'webkit-b.mjs --self-test'] }) });
+  赤に('WebKit の 見出しの 順が 期待と 逆（数は 揃う）', { webkit期待: ['webkit-a.mjs', 'webkit-b.mjs --self-test'], wkLog: WKログ(2, 2, 2, { 名前: ['webkit-b.mjs --self-test', 'webkit-a.mjs'] }) });
   赤に('WebKit の 段に ★未測定 の 行（数は 揃う）', { wkLog: WKログ(1, 1, 1, { 未測定: true }) });
   赤に('status だけが まだ（conclusion は success）', { ciRuns: [回(1, { status: 'in_progress' })] });
   赤に('sha だけが 全桁で ない（回の headSha も 同じ 短い sha）', { sha: 'abc1234', ciRuns: [回(1, { headSha: 'abc1234' })], wkRuns: [回(2, { headSha: 'abc1234' })] });
@@ -123,10 +127,15 @@ async function 試す(libの道, 黙る) {
      ★走らせる 側が 黙って 試験を 落とすと ここが 赤★（10-10 本番前の 対立役＝.slice(0, 5) で 13本 消えても 全部の 門が 緑だった） */
   {
     const { FILES } = createRequire(import.meta.url)(path.join(ROOT, 'tests', 'run.js'));
-    const 期待 = lib.webkitの期待(FILES, (n) => fs.readFileSync(path.join(ROOT, 'tests', n), 'utf8'), 相手('.github/workflows/webkit.yml')).length;
+    const 期待名 = lib.webkitの期待(FILES, (n) => fs.readFileSync(path.join(ROOT, 'tests', n), 'utf8'), 相手('.github/workflows/webkit.yml'));
     const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'run-webkit-tests.mjs'), '--名簿だけ'], { encoding: 'utf8', cwd: ROOT });
-    const m = /★webkit の 見張り (\d+)本★/.exec(r.stdout || '');
-    T('★WebKit の 期待（独りで 数えた ' + 期待 + '）＝走らせる 側の 名簿（' + (m && m[1]) + '）・1本 以上★', !!m && +m[1] === 期待 && 期待 >= 1, r.stdout);
+    const 出し = String(r.stdout || '').split('\n').map((s) => s.replace(/\r$/, '')).filter((s) => s);
+    const m = /★webkit の 見張り (\d+)本★/.exec(出し[出し.length - 1] || '');
+    const 走名 = 出し.slice(0, -1);
+    /* ★数で なく 名前の 並び そのもの★（引数を 落とす・個別の 段を 除かない 等の 壊しは 数では 見えない・10-10 3回目の 対立役） */
+    T('★WebKit の 期待（独りで 数えた ' + 期待名.length + '本）＝走らせる 側の 名簿（' + (m && m[1]) + '本）の 名前の 並び そのもの・1本 以上★',
+      !!m && +m[1] === 走名.length && JSON.stringify(走名) === JSON.stringify(期待名) && 期待名.length >= 1 && 期待名.some((n) => / /.test(n)),
+      JSON.stringify(期待名) + ' / ' + JSON.stringify(走名));
   }
 
   /* 直に 走らせる 口：既定は exit 1 */
@@ -153,6 +162,10 @@ const 壊し方 = [
   ['cancelled を 除く', "if (r.conclusion === 'cancelled') { 赤.push", "if (r.conclusion === 'cancelled') { continue; 赤.push"],
   ['WebKit の 見出しを 見ない', 'if (欠け.length) 赤.push(\'WebKit', 'if (false) 赤.push(\'WebKit'],
   ['未測定を 見ない', 'if (未測定) 赤.push', 'if (false) 赤.push'],
+  ['WebKit の ログ無しを 見ない', "if (!生) { 赤.push('WebKit ' + r.databaseId", "if (!生) { continue; 赤.push('WebKit ' + r.databaseId"],
+  ['WebKit の 段無しを 見ない', "if (!段) { 赤.push('WebKit ' + id", "if (!段) { return; 赤.push('WebKit ' + id"],
+  ['WebKit の 順を 見ない', "while (j < 本文.length && 本文[j] !== '=== ' + n + ' ===') j++;", "j = 本文.indexOf('=== ' + n + ' ==='); if (j < 0) j = 本文.length;"],
+  ['期待の 名前から 引数を 落とす', "出.push(a.join(' '))", '出.push(名)'],
 ];
 
 if (process.argv.includes('--self-test')) {
