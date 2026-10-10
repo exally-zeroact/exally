@@ -20,6 +20,14 @@
  *    ・中の 試験が 名簿と 同じ 名前の「=== 名前 ===」を 出すと、名簿の 順に 当たる 限り 走ったと 数える。
  *    ・ci.yml の run.js 以外の 段の 中身は 見ない（その 段の 色は 回の conclusion に 入る）。
  *    ・出しは 数と run id だけ。ログの 全文・gh の 鍵は 出さない／書かない。
+ *    ・WebKit の 期待は「借りる 試験か」の 決まりを ここに 写して 数える。決まり その物が 間違って いる
+ *      （借りる 試験を 借りないと 読む）時は 両方 揃って 間違える＝それは tests/webkit-hashiru.test.mjs の 仕事。
+ *
+ *  ★★わざと 赤に 倒して いる 形（手で 見届ける 事に なる）★★
+ *    ・★1回目が cancelled で 走らせ直して 緑★の 回は 赤。GitHub は 時間切れも cancelled と 付けるので、
+ *      固まった 試験を 走らせ直しで 隠さない。前の 本番 dc78b2e の WebKit（Install WebKit で 固まって
+ *      走らせ直した）が この 形。次に 同じ 固まり方を したら、道具は 赤 ⇒ 固まった 段を ログで 見て 手で 見届ける。
+ *    ・同じ sha の 回が 100 以上、tests/run.js に 名簿だけを 読む 守りが 無い 古い sha も 赤。
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -27,10 +35,28 @@ import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { 段で走らせる名簿 } from '../run-webkit-tests.mjs';
 
 export const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const 時刻 = /^﻿?\d{4}-\d\d-\d\dT[\d:.]+Z ?/;
+
+/** ★WebKit の 期待の 本数★＝ブラウザを 借りる 試験から webkit.yml に 個別の 段が 在る 物を 除いた 数。
+ *  ★わざと scripts/run-webkit-tests.mjs を import しない★（10-10 本番前の 対立役）：同じ 関数から
+ *  期待と 頼んだを 出すと、その 関数が 黙って 試験を 落とした 時に 両方 減って 緑に なる。
+ *  決まりは 同じ（import して いる 物だけ・注記の 字では 拾わない）。字が ずれれば 赤（閉じる 側）。 */
+export function webkitの期待(FILES, 読む, yml) {
+  const 借りる = (s) => /^\s*import\s[^;\n]*['"][^'"]*_borrow-playwright\.mjs['"]/m.test(String(s))
+    || /import\(\s*[^)]*_borrow-playwright\.mjs/.test(String(s));
+  const 個別 = new Set();
+  for (const m of String(yml || '').matchAll(/run:\s*node\s+tests\/([A-Za-z0-9_.\/-]+\.mjs)/g)) 個別.add(m[1]);
+  let n = 0;
+  for (const f of FILES) {
+    const 名 = String(Array.isArray(f) ? f[0] : f);
+    let s = '';
+    try { s = 読む(名); } catch (e) { continue; }
+    if (借りる(s) && !個別.has(名)) n++;
+  }
+  return n;
+}
 
 /** run.js と 同じ 組み立て（file + ' ' + args.join(' ')） */
 export function 名簿の名前(FILES) {
@@ -67,12 +93,14 @@ function 回を見る(名, runs, sha, 赤, 行) {
     const id = r.databaseId + (r.attempt > 1 ? ' attempt ' + r.attempt : '');
     if (r.headSha !== sha) { 赤.push(名 + ' ' + id + ' の headSha が 違う（' + String(r.headSha).slice(0, 7) + '）'); continue; }
     if (r.status !== 'completed') { 赤.push(名 + ' ' + id + ' が まだ ' + r.status); continue; }
-    if (r.conclusion === 'cancelled') continue;
-    if (r.conclusion !== 'success') { 赤.push(名 + ' ' + id + ' が ' + r.conclusion); continue; }
+    if (!(Number.isInteger(r.attempt) && r.attempt >= 1)) { 赤.push(名 + ' ' + r.databaseId + ' の attempt が 読めない'); continue; }
+    /* ★前の 回は cancelled の 回でも 見る★（取り消した 回の 中に 前の failure が 隠れる・10-10 本番前の 対立役） */
     const 前 = r.前の回 || [];
     if (r.attempt > 1 && 前.length !== r.attempt - 1) { 赤.push(名 + ' ' + id + ' の 前の 回が 取れない'); continue; }
     const 前の赤 = 前.filter((c) => c !== 'success');
-    if (前の赤.length) { 赤.push(名 + ' ' + id + ' は 再実行で 緑（前の 回 ' + 前の赤.join('/') + '）'); continue; }
+    if (前の赤.length) { 赤.push(名 + ' ' + id + ' は 再実行の 回（前の 回 ' + 前の赤.join('/') + '）'); continue; }
+    if (r.conclusion === 'cancelled') continue;
+    if (r.conclusion !== 'success') { 赤.push(名 + ' ' + id + ' が ' + r.conclusion); continue; }
     良い.push(r);
   }
   if (!良い.length && !赤.some((s) => s.startsWith(名))) 赤.push(名 + ' に success の 回が 無い（cancelled ' + 取消 + '）');
@@ -144,18 +172,23 @@ export function shaの名簿(sha) {
   const 置き場 = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-mitodoke-'));
   try {
     const f = path.join(置き場, 'run.js');
-    fs.writeFileSync(f, 叩く('git', ['show', sha + ':tests/run.js']));
+    const 生 = 叩く('git', ['show', sha + ':tests/run.js']);
+    /* 守りの 無い 古い run.js は require した 途端に 全部を 走らせる（e6698b4 で 実測）＝読まずに 赤 */
+    if (!生.includes('require.main !== module')) throw new Error('この sha の tests/run.js は 名簿だけを 読む 守りが 無い（古い）');
+    fs.writeFileSync(f, 生);
     const { FILES } = createRequire(pathToFileURL(f))(f);
     const 読む = (n) => 叩く('git', ['show', sha + ':tests/' + n]);
     let yml = '';
     try { yml = 叩く('git', ['show', sha + ':.github/workflows/webkit.yml']); } catch (e) { yml = ''; }
-    return { FILES, webkit期待: 段で走らせる名簿(FILES, 読む, yml).length };
+    return { FILES, webkit期待: webkitの期待(FILES, 読む, yml) };
   } finally { fs.rmSync(置き場, { recursive: true, force: true }); }
 }
 
 function 回を引く(ファイル, sha) {
-  const runs = JSON.parse(叩く('gh', ['run', 'list', '--repo', REPO, '--workflow', ファイル, '--commit', sha,
+  const 上限 = 100;
+  const runs = JSON.parse(叩く('gh', ['run', 'list', '--repo', REPO, '--workflow', ファイル, '--commit', sha, '--limit', String(上限),
     '--json', 'databaseId,status,conclusion,headSha,attempt']));
+  if (runs.length >= 上限) throw new Error(ファイル + ' の 回が ' + 上限 + ' 以上（取りこぼすかも 知れない）');
   const ログ = {};
   for (const r of runs) {
     r.前の回 = [];
@@ -186,7 +219,7 @@ export function 走らせる(引数) {
     const { FILES, webkit期待 } = shaの名簿(sha);
     結果 = 見届ける({ sha, ci: 回を引く('ci.yml', sha), wk: 回を引く('webkit.yml', sha), 名簿: FILES, webkit期待 });
   } catch (e) {
-    console.log('★赤（見届けられない）★ gh か git が 通らない：' + String((e && e.message) || e).split('\n')[0].slice(0, 120));
+    console.log('★赤（見届けられない）★ 途中で 止まった（gh・git・古い sha）：' + String((e && e.message) || e).split('\n')[0].slice(0, 120));
     return;
   }
   for (const l of 結果.行) console.log(l);

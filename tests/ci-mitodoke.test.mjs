@@ -3,14 +3,15 @@
  *  道具＝scripts/ci-mitodoke.mjs（判じは scripts/lib/ci-mitodoke.mjs の 見届ける）。
  *  作り物の ログは 本物の gh ログ（49d56dc の CI 37905233170・WebKit 37905233158）の 行の 形を 写した：
  *    「job\t段の名前\t(BOM)時刻 本文」・段の 頭は「##[group]Run <命令>」。
- *  緑の 形 3つ・赤の 形 21（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
- *  --self-test ... 判じを 5通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
+ *  緑の 形 4つ・赤の 形 26（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
+ *  --self-test ... 判じを 7通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
  */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LIB = path.join(ROOT, 'scripts', 'lib', 'ci-mitodoke.mjs');
@@ -80,6 +81,8 @@ async function 試す(libの道, 黙る) {
   赤に('② CI の conclusion が null（completed なのに）', { ciRuns: [回(1, { conclusion: null })] });
   赤に('③ attempt 2 で 1回目が failure', { ciRuns: [回(1, { attempt: 2, 前の回: ['failure'] })] });
   赤に('③ attempt 2 なのに 前の 回が 取れない', { ciRuns: [回(1, { attempt: 2, 前の回: [] })] });
+  赤に('③ 別の 回が success でも、取り消した 回の 前の 回が failure', { ciRuns: [回(1), 回(3, { conclusion: 'cancelled', attempt: 2, 前の回: ['failure'] })] });
+  赤に('③ attempt が 無い（読めない）', { ciRuns: [回(1, { attempt: undefined })] });
   赤に('④ headSha が 頭と 違う', { wkRuns: [回(2, { headSha: 違うSHA })] });
   赤に('⑤ 名簿 4 ／ ログに 3 しか 出ない', { ci: { 名前: 名前.slice(0, 3) } });
 
@@ -109,6 +112,16 @@ async function 試す(libの道, 黙る) {
   T('★ci.yml に run.js の 段・webkit.yml に run-webkit-tests の 段★', /run:\s*node tests\/run\.js\s*$/m.test(相手('.github/workflows/ci.yml'))
     && /run:\s*node scripts\/run-webkit-tests\.mjs\s*$/m.test(相手('.github/workflows/webkit.yml')));
 
+  /* WebKit の 期待を 独りで 数える＝走らせる 側（run-webkit-tests の 名簿）と 今の 木で 同じ 数か
+     ★走らせる 側が 黙って 試験を 落とすと ここが 赤★（10-10 本番前の 対立役＝.slice(0, 5) で 13本 消えても 全部の 門が 緑だった） */
+  {
+    const { FILES } = createRequire(import.meta.url)(path.join(ROOT, 'tests', 'run.js'));
+    const 期待 = lib.webkitの期待(FILES, (n) => fs.readFileSync(path.join(ROOT, 'tests', n), 'utf8'), 相手('.github/workflows/webkit.yml'));
+    const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'run-webkit-tests.mjs'), '--名簿だけ'], { encoding: 'utf8', cwd: ROOT });
+    const m = /★webkit の 見張り (\d+)本★/.exec(r.stdout || '');
+    T('★WebKit の 期待（独りで 数えた ' + 期待 + '）＝走らせる 側の 名簿（' + (m && m[1]) + '）・1本 以上★', !!m && +m[1] === 期待 && 期待 >= 1, r.stdout);
+  }
+
   /* 直に 走らせる 口：既定は exit 1 */
   if (!黙る) {
     const 口 = (a) => spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'ci-mitodoke.mjs')].concat(a), { encoding: 'utf8', cwd: ROOT });
@@ -126,6 +139,8 @@ const 壊し方 = [
   ['headSha を 見ない', 'if (r.headSha !== sha)', 'if (false)'],
   ['名簿の 順を 見ない', 'while (j < 本文.length && 本文[j] !== 見出し) j++;', 'j = 本文.indexOf(見出し); if (j < 0) j = 本文.length;'],
   ['前の 回を 見ない', 'if (前の赤.length)', 'if (false)'],
+  ['attempt を 見ない', '!(Number.isInteger(r.attempt) && r.attempt >= 1)', 'false'],
+  ['期待を 借りる 試験の 数で 出さない', 'if (借りる(s) && !個別.has(名)) n++;', 'n++;'],
 ];
 
 if (process.argv.includes('--self-test')) {
@@ -137,7 +152,7 @@ if (process.argv.includes('--self-test')) {
     for (const [名, 前, 後] of 壊し方) {
       if (!元.includes(前)) { 赤++; console.log('  NG   壊す 所が 見つからない: ' + 名); continue; }
       const 写し = path.join(置き場, 'lib-' + 壊し方.findIndex((x) => x[0] === 名) + '.mjs');
-      fs.writeFileSync(写し, 元.replace(前, 後).replace("'../run-webkit-tests.mjs'", JSON.stringify(pathToFileURL(path.join(ROOT, 'scripts', 'run-webkit-tests.mjs')).href)));
+      fs.writeFileSync(写し, 元.replace(前, 後));
       const r = await 試す(写し, true);
       if (r.赤 > 0) console.log('  ok   壊すと 赤が 出る: ' + 名 + '（赤 ' + r.赤 + '）');
       else { 赤++; console.log('  NG   ★壊しても 全部 緑★: ' + 名); }
