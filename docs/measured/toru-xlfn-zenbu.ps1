@@ -83,3 +83,8 @@ try {
   Write-Host ('★Excel が 消えるまで ' + [math]::Round($t.Elapsed.TotalSeconds, 1) + '秒 ／ 残り ' +
     @(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count + '個★')
 }
+
+# ★作者の 欄を「見本」に（10-10 司さんの 決め＝実在の 名前は 架空に）★
+#   Excel は サインインの アカウント名を 入れるので、Excel を 閉じた 後に scripts/sakusha-mihon.mjs で 替える
+& node (Join-Path $PSScriptRoot '../../scripts/sakusha-mihon.mjs') $出ファイル
+if ($LASTEXITCODE -ne 0) { throw '★作者の 欄を 見本に 替えられない★' }

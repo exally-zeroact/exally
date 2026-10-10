@@ -55,7 +55,7 @@ console.log('[zip-tasu] ★包みに 部品を 足せるか★');
 T('★材料が 在る（空振りして いない）★', () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== 'cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b') {
+  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
     throw new Error('★材料が 入れ替わって います★ ' + h);
   }
 });

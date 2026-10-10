@@ -63,7 +63,7 @@ console.log('[ita-wo-tasu] ★足した 板が 書き出す 先に 入るか★'
 await 待('★材料が 在る（空振りして いない）★', async () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== 'cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b') {
+  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
     throw new Error('★材料が 入れ替わって います★ ' + h);
   }
 });
@@ -178,7 +178,7 @@ const b中 = fs.existsSync(b材料道) ? fs.readFileSync(b材料道) : null;
 await 待('★.xlsb の 材料が 在る★', async () => {
   if (!b中) throw new Error('★材料が 無い★ ' + b材料道);
   const h = crypto.createHash('sha256').update(b中).digest('hex');
-  if (h !== 'b21b67cac5c53ae7653e4a03c138ccca11c5abd360d9668dc10f381a20942430') {
+  if (h !== '72ad4954b29a6567a091bd34f732e98ad4aa1ad17dc92dec3aa2d2904f9f435b') {
     throw new Error('★材料が 入れ替わって います★ ' + h);
   }
 });

@@ -7,7 +7,7 @@
  *    因 ＝ ★`xl/drawings/drawing1.xml` を 読む 所が 1つも 在りません★。
  *
  *  ★★物差し★★
- *    ①`tests/fixtures/kazari-hiraku3.xlsx`（11725B・実Excel 16.0 build 20326 が COM で 作った 物）
+ *    ①`tests/fixtures/kazari-hiraku3.xlsx`（11705B・実Excel 16.0 build 20326 が COM で 作った 物。10-10 に 作者の 欄だけ「見本」に 替えた＝元 11725B）
  *    ②実Excel が その ファイルを 開いて 言った 数（経営者1 の 実測・2026-09-21）
  *       `docs/measured/golden-moto-no-katachi-excel-2026-09-21.tsv`
  *         図形 Left ★449.375★ ／ Top ★20★ ／ Width ★60★ ／ Height ★60★（ポイント）
@@ -94,7 +94,7 @@ console.log('[xlsx-zukei] ★図形（判子）を 自前で 読めて いるか
 T('★材料が 在る（空振りして いない）★', () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== 'cef5657d3c521e377a9803681d7c0b97d1d95b4dff4b102bbd35bc2f56ff615b') {
+  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
     throw new Error('★材料が 入れ替わって います★ sha256=' + h);
   }
 });
@@ -244,7 +244,7 @@ const b中 = fs.existsSync(b材料道) ? fs.readFileSync(b材料道) : null;
 T('★.xlsb の 材料が 在る（空振りして いない）★', () => {
   if (!b中) throw new Error('★材料が 無い★ ' + b材料道);
   const h = crypto.createHash('sha256').update(b中).digest('hex');
-  if (h !== 'b21b67cac5c53ae7653e4a03c138ccca11c5abd360d9668dc10f381a20942430') {
+  if (h !== '72ad4954b29a6567a091bd34f732e98ad4aa1ad17dc92dec3aa2d2904f9f435b') {
     throw new Error('★材料が 入れ替わって います★ sha256=' + h);
   }
 });
@@ -308,12 +308,12 @@ T('★★`r:id` の 道でも 型の 道でも 同じ 答え★★（★.xlsx �
        `ita2mai-irekae.xlsb` ★1枚目 Ita2 ／ 2枚目 Ita1★（並びを 入れ替えた 物） */
 const XE = require_(path.join(ROOT, 'lib/xlsb-edit.js'));
 const 二枚 = [
-  { 名: 'ita2mai.xlsb', 大: 10866,
-    sha: '366f296220b9ce885a72fdfc74a08ec1140cb37d6d60427976cec421ff9fc87a',
+  { 名: 'ita2mai.xlsb', 大: 10846,
+    sha: 'bed578440cecb936298142ffe819314dbfdee1b29226a3ba7a7a22a17bf29dcb',
     待つ: [{ 名: 'Ita1', rId: 'rId1', 部品: 'xl/worksheets/sheet1.bin', 判子: 'hanko1', 形: '四角' },
            { 名: 'Ita2', rId: 'rId2', 部品: 'xl/worksheets/sheet2.bin', 判子: 'hanko2', 形: '丸' }] },
-  { 名: 'ita2mai-irekae.xlsb', 大: 10870,
-    sha: 'c1551aea4e9c2414ad498233c7d284df7393df3bc914659612178e6362eadd48',
+  { 名: 'ita2mai-irekae.xlsb', 大: 10850,
+    sha: 'a59f6091ef70833e48f2aaea83680c46f8b029f32672502538dfb5db8c55670d',
     待つ: [{ 名: 'Ita2', rId: 'rId1', 部品: 'xl/worksheets/sheet1.bin', 判子: 'hanko2', 形: '丸' },
            { 名: 'Ita1', rId: 'rId2', 部品: 'xl/worksheets/sheet2.bin', 判子: 'hanko1', 形: '四角' }] },
 ];
