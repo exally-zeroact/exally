@@ -30,6 +30,24 @@ if (process.argv.includes('--self-test')) {
     const 写し = 書き換え(元, '試験太郎');
     T('★作者が 作り物の 名前の 写しは「その他」（赤）★', 判じる(写し) === 'その他', 判じる(写し));
     T('★その 写しを 道具に 通すと「見本」に 戻る★', 判じる(作者を見本に(写し)) === '見本');
+    /* ④拾い損ねる 書き方（10-10 本番前の 対立役＝前の 判じでは 全部 緑だった）⇒ どれも その他（赤） */
+    const 名 = '試験太郎';
+    const 形 = [
+      ['閉じタグに 空白', (t) => t.replace('>' + 見本 + '</dc:creator>', '>' + 名 + '</dc:creator >')],
+      ['CDATA', (t) => t.replace('<dc:creator>' + 見本 + '</dc:creator>', '<dc:creator><![CDATA[' + 名 + ']]></dc:creator>')],
+      ['2つ目の creator', (t) => t.replace('</cp:coreProperties>', '<dc:creator>' + 名 + '</dc:creator></cp:coreProperties>')],
+      ['接頭辞 違い', (t) => t.replace('</cp:coreProperties>', '<ns0:creator xmlns:ns0="http://purl.org/dc/elements/1.1/">' + 名 + '</ns0:creator></cp:coreProperties>')],
+      ['既定の 名前空間', (t) => t.replace('</cp:coreProperties>', '<creator xmlns="http://purl.org/dc/elements/1.1/">' + 名 + '</creator></cp:coreProperties>')],
+      ['拾えない 形（属性の 中に >）', (t) => t.replace('</cp:coreProperties>', '<dc:creator a=">">' + 名 + '</dc:creator></cp:coreProperties>')],
+    ];
+    for (const [n, fn] of 形) {
+      const w = 書き換え(元, '', 'docProps/core.xml', fn);
+      T('★' + n + ' は 赤★', 判じる(w) !== '見本' && 判じる(w) !== '欄なし', 判じる(w));
+    }
+    const 会社 = 書き換え(元, '', 'docProps/app.xml', (t) => t.indexOf('<Company/>') >= 0 ? t.replace('<Company/>', '<Company>' + 名 + '</Company>')
+      : t.indexOf('<Company>') >= 0 ? t.replace(/<Company>[^<]*<\/Company>/, '<Company>' + 名 + '</Company>')
+      : t.replace('</Properties>', '<Company>' + 名 + '</Company></Properties>'));
+    T('★app.xml の Company に 字 は 赤★', 判じる(会社) === 'その他', 判じる(会社));
     /* ②読めない zip ⇒ 読めない（赤） */
     T('★読めない zip は「読めない」（赤）★', 判じる(Buffer.from('PK\u0003\u0004 こわれ')) === '読めない');
     /* ③データ記述子の 印を 立てた zip ⇒ 読めない（赤） */
@@ -44,7 +62,7 @@ if (process.argv.includes('--self-test')) {
 }
 
 /** 作者の 2欄を 字に 替えた 写し（道具の 書き方を 使い、最後に 字だけ 差し替える） */
-function 書き換え(buf, 字) {
+function 書き換え(buf, 字, 部品名, 替え) {
   /* 道具は「見本」に しか 替えない ので、core.xml を 開いて 字を 入れ、同じ 方式で 詰め直す */
   const b = Buffer.from(buf);
   const e = b.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
@@ -56,11 +74,12 @@ function 書き換え(buf, 字) {
     部品.push({ 目録: p, 名: b.toString('utf8', p + 46, p + 46 + nl), 位置: b.readUInt32LE(p + 42), 圧縮: b.readUInt32LE(p + 20), 方式: b.readUInt16LE(p + 10) });
     p += 46 + nl + xl + cl;
   }
-  const x = 部品.find((q) => q.名 === 'docProps/core.xml');
+  const x = 部品.find((q) => q.名 === (部品名 || 'docProps/core.xml'));
   const lnl = b.readUInt16LE(x.位置 + 26), lxl = b.readUInt16LE(x.位置 + 28), 頭 = 30 + lnl + lxl;
   const raw = b.subarray(x.位置 + 頭, x.位置 + 頭 + x.圧縮);
-  const 中 = (x.方式 === 8 ? zlib.inflateRawSync(raw) : raw).toString('utf8').split(見本).join(字);
-  const 生 = Buffer.from(中, 'utf8');
+  const 中 = (x.方式 === 8 ? zlib.inflateRawSync(raw) : raw).toString('utf8');
+  const 中2 = 替え ? 替え(中) : 中.split(見本).join(字);
+  const 生 = Buffer.from(中2, 'utf8');
   const 新 = x.方式 === 8 ? zlib.deflateRawSync(生) : 生;
   const 差 = 新.length - raw.length;
   const h = Buffer.from(b.subarray(x.位置, x.位置 + 頭));
