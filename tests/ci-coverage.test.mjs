@@ -41,7 +41,8 @@ const EXCLUDED = {
 const NOT_TESTS = {
   'tests/run.js': 'ランナー本体',
   'tests/fake-supa.js': 'テスト用のSupabaseモック（他テストが読む部品）',
-  'tests/repo-supa.mjs': 'このリポジトリの接続先(js/supa-config.js)を返す部品。実DBに触る道具が読む（テストではない）',
+  'tests/_tsukurimono.mjs': '★実物の 本の 字を 作り物に 替える 部品★（2026-10-10）。実物を 開く 試験（kiridashi-jitsubutsu・kirikae ⑤）が 読む（テストではない）。対応表は repo の 外',
+  'tests/repo-supa.mjs':'このリポジトリの接続先(js/supa-config.js)を返す部品。実DBに触る道具が読む（テストではない）',
   'tests/zairyou.mjs': '★紙の 材料（#材料 の 行）を 読んで 表に 置く 部品★。突き合わせの 道具と 試験が 読む（テストではない）。★材料の 読み方を 道具ごとに 書くと、材料の 無い 紙で 空の 表を 押して ★偽の 負け★が 出る★（2026-09-14 に 実際に PRODUCT で 起きた）ので 1か所に 切り出した',
   'tests/betsu-atsukai.mjs': '★実Excel と 同じに しない と 決めた 物の 名簿★（今は INFO 1つ）。formula-yosoku.test.mjs と 借り物を外す皮の突き合わせが 読む（テストではない）。★同じ 名簿を 2つ 持つと「合っている」の 意味が ずれる★ので 切り出した（2026-09-14）',
   'tests/monosashi.mjs': '★式のほどき方と 答えの見方（1e-9の許し・誤りの比べ方）の 部品★。formula-kane.test.mjs と 借り物を外す皮の突き合わせが 読む（テストではない）。★物差しを 2本に しない為に 切り出した★（2026-09-14）',
