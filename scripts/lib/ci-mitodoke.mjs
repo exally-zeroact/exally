@@ -8,10 +8,11 @@
  *  ★★緑と 言う 時（全部 そろった 時だけ）★★
  *    ・CI（ci.yml）と WebKit（webkit.yml）の 回が その sha に 在り、全部 completed
  *    ・回の headSha が 頼んだ sha と 同じ
- *    ・cancelled を 除いた 回が 全部 success（1回以上）。再実行した 回は ★前の 回も 全部 success★
+ *    ・回が 全部 success（cancelled も 赤）。再実行した 回は ★前の 回も 全部 success★
  *    ・CI の ログ：`Run node tests/run.js` の 段の 行だけを 見て、★その sha の★ 名簿の 全部が
  *      名簿の 順に「=== 名前 ===」で 出て、「★落ちた★」0、最後の 見出しの 後に「全テストファイル 緑」
- *    ・WebKit の ログ：最後の 行の 頼んだ＝走らせた＝緑、かつ 頼んだ＝その sha の 名簿から 出した 期待（1本以上）
+ *    ・WebKit の ログ：その sha の 名簿から 出した 期待（1本以上）の 全部が 順に「=== 名前 ===」で 出て、
+ *      ★未測定 の 行が 0、最後の 行の 頼んだ＝走らせた＝緑＝期待の 本数
  *
  *  ★★言えない 事（書いて おく）★★
  *    ・PR の CI は refs/pull/N/merge（土台と 混ぜた 物）を 走らせる ⇒ 混ぜた 側の 名簿は sha の 名簿 以上。
@@ -24,7 +25,7 @@
  *      （借りる 試験を 借りないと 読む）時は 両方 揃って 間違える＝それは tests/webkit-hashiru.test.mjs の 仕事。
  *
  *  ★★わざと 赤に 倒して いる 形（手で 見届ける 事に なる）★★
- *    ・★1回目が cancelled で 走らせ直して 緑★の 回は 赤。GitHub は 時間切れも cancelled と 付けるので、
+ *    ・★cancelled の 回が 1つでも 在れば 赤★（走らせ直しの 前の 回でも、別の 回でも）。GitHub は 時間切れも cancelled と 付けるので、
  *      固まった 試験を 走らせ直しで 隠さない。前の 本番 dc78b2e の WebKit（Install WebKit で 固まって
  *      走らせ直した）が この 形。次に 同じ 固まり方を したら、道具は 赤 ⇒ 固まった 段を ログで 見て 手で 見届ける。
  *    ・同じ sha の 回が 100 以上、tests/run.js に 名簿だけを 読む 守りが 無い 古い sha も 赤。
@@ -37,9 +38,9 @@ import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const 時刻 = /^﻿?\d{4}-\d\d-\d\dT[\d:.]+Z ?/;
+const 時刻 = /^\uFEFF?\d{4}-\d\d-\d\dT[\d:.]+Z ?/;
 
-/** ★WebKit の 期待の 本数★＝ブラウザを 借りる 試験から webkit.yml に 個別の 段が 在る 物を 除いた 数。
+/** ★WebKit の 期待の 名簿（見出しの 名前）★＝ブラウザを 借りる 試験から webkit.yml に 個別の 段が 在る 物を 除いた 数。
  *  ★わざと scripts/run-webkit-tests.mjs を import しない★（10-10 本番前の 対立役）：同じ 関数から
  *  期待と 頼んだを 出すと、その 関数が 黙って 試験を 落とした 時に 両方 減って 緑に なる。
  *  決まりは 同じ（import して いる 物だけ・注記の 字では 拾わない）。字が ずれれば 赤（閉じる 側）。 */
@@ -48,14 +49,15 @@ export function webkitの期待(FILES, 読む, yml) {
     || /import\(\s*[^)]*_borrow-playwright\.mjs/.test(String(s));
   const 個別 = new Set();
   for (const m of String(yml || '').matchAll(/run:\s*node\s+tests\/([A-Za-z0-9_.\/-]+\.mjs)/g)) 個別.add(m[1]);
-  let n = 0;
+  const 出 = [];
   for (const f of FILES) {
-    const 名 = String(Array.isArray(f) ? f[0] : f);
+    const a = (Array.isArray(f) ? f : [f]).filter((x) => x !== null && x !== undefined);
+    const 名 = String(a[0]);
     let s = '';
     try { s = 読む(名); } catch (e) { continue; }
-    if (借りる(s) && !個別.has(名)) n++;
+    if (借りる(s) && !個別.has(名)) 出.push(a.join(' '));
   }
-  return n;
+  return 出;
 }
 
 /** run.js と 同じ 組み立て（file + ' ' + args.join(' ')） */
@@ -99,7 +101,8 @@ function 回を見る(名, runs, sha, 赤, 行) {
     if (r.attempt > 1 && 前.length !== r.attempt - 1) { 赤.push(名 + ' ' + id + ' の 前の 回が 取れない'); continue; }
     const 前の赤 = 前.filter((c) => c !== 'success');
     if (前の赤.length) { 赤.push(名 + ' ' + id + ' は 再実行の 回（前の 回 ' + 前の赤.join('/') + '）'); continue; }
-    if (r.conclusion === 'cancelled') continue;
+    /* ★別の 回の cancelled も 赤★（時間切れも cancelled＝定時の 回が 固まり push の 回が 緑、を 隠さない・10-10 叩き直し） */
+    if (r.conclusion === 'cancelled') { 赤.push(名 + ' ' + id + ' が cancelled（時間切れも cancelled と 付く）'); continue; }
     if (r.conclusion !== 'success') { 赤.push(名 + ' ' + id + ' が ' + r.conclusion); continue; }
     良い.push(r);
   }
@@ -132,14 +135,28 @@ export function CIログを見る(生, 名前, 赤, 行, id) {
 }
 
 /** WebKit の ログの 中身 */
-export function WebKitログを見る(生, 期待, 赤, 行, id) {
+export function WebKitログを見る(生, 期待名, 赤, 行, id) {
   const 段 = 段の行(ログを読む(生), 'node scripts/run-webkit-tests.mjs');
   if (!段) { 赤.push('WebKit ' + id + '：run-webkit-tests の 段が ログに 無い'); return; }
+  const 期待 = (期待名 || []).length;
+  /* ★数だけで なく 見出しの 名前と 順★・★未測定★ の 行（10-10 叩き直し＝全部 未測定でも 18/18/18 で 緑だった） */
+  const 本文 = 段.map((x) => x.本文);
+  let i = 0;
+  const 欠け = [];
+  for (const n of 期待名 || []) {
+    let j = i;
+    while (j < 本文.length && 本文[j] !== '=== ' + n + ' ===') j++;
+    if (j >= 本文.length) { 欠け.push(n); continue; }
+    i = j + 1;
+  }
+  const 未測定 = 本文.filter((s) => s.includes('★未測定')).length;
+  if (欠け.length) 赤.push('WebKit ' + id + '：期待の ' + 欠け.length + '本が 走って いない（' + 欠け.slice(0, 3).join(', ') + '）');
+  if (未測定) 赤.push('WebKit ' + id + '：★未測定 の 行が ' + 未測定);
   let m = null;
   for (const x of 段) { const t = /^★webkit の 見張り \.\.\. 頼んだ (\d+)本 ／ 走らせた (\d+)本 ／ 緑 (\d+)本★$/.exec(x.本文); if (t) m = t; }
   if (!m) { 赤.push('WebKit ' + id + '：最後の 行が 無い（途中で 切れた）'); return; }
   const [頼, 走, 緑] = [+m[1], +m[2], +m[3]];
-  行.push('WebKit ' + id + '：期待 ' + 期待 + ' ／ 頼んだ ' + 頼 + ' ／ 走らせた ' + 走 + ' ／ 緑 ' + 緑);
+  行.push('WebKit ' + id + '：期待 ' + 期待 + ' ／ 頼んだ ' + 頼 + ' ／ 走らせた ' + 走 + ' ／ 緑 ' + 緑 + ' ／ 見出しの 欠け ' + 欠け.length + ' ／ 未測定 ' + 未測定);
   if (!(頼 === 走 && 走 === 緑)) 赤.push('WebKit ' + id + '：3つの 数が 揃わない');
   if (!(期待 >= 1)) 赤.push('WebKit ' + id + '：期待の 本数が 0（名簿を 読み損じた）');
   if (頼 !== 期待) 赤.push('WebKit ' + id + '：頼んだ ' + 頼 + ' が 期待 ' + 期待 + ' と 違う');
