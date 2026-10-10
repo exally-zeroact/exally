@@ -406,6 +406,7 @@ const FILES = [
   ['sakusha-mihon.test.mjs'],        // ★Office ファイルの 作者の 欄に 名前が 戻って いないか★（作り直すと Excel が サインインの 名前を 入れる・2026-10-10）
   ['sakusha-mihon.test.mjs', '--self-test'], //   ＝作り物の 名前を 入れた 写し・読めない zip で 赤に なるか
   ['shiken-no-kuchi.test.mjs'],      // ★実の 倉庫に 触る 道具の 門＝試験用の 口（+タグ が 白名簿）以外を 止めるか★（受信箱の メールを repo の 外へ・2026-10-10）
+  ['pre-push-noreply.test.mjs'],     // ★押す 前の 作者の 門＝noreply で ない メールの commit を 止めるか★（司さん「アドレスが分からんようにしろや」・2026-10-11）
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない
