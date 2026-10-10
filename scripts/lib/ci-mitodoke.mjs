@@ -155,8 +155,11 @@ export function WebKitログを見る(生, 期待名, 赤, 行, id) {
   if (欠け.length) 赤.push('WebKit ' + id + '：期待の ' + 欠け.length + '本が 走って いない（' + 欠け.slice(0, 3).join(', ') + '）');
   if (未測定) 赤.push('WebKit ' + id + '：★未測定 の 行が ' + 未測定);
   let m = null;
-  for (const x of 段) { const t = /^★webkit の 見張り \.\.\. 頼んだ (\d+)本 ／ 走らせた (\d+)本 ／ 緑 (\d+)本★$/.exec(x.本文); if (t) m = t; }
+  let 数の行 = 0;
+  for (const x of 段) { const t = /^★webkit の 見張り \.\.\. 頼んだ (\d+)本 ／ 走らせた (\d+)本 ／ 緑 (\d+)本★$/.exec(x.本文); if (t) { m = t; 数の行++; } }
   if (!m) { 赤.push('WebKit ' + id + '：最後の 行が 無い（途中で 切れた）'); return; }
+  /* ★数の 行は ちょうど 1本★（2本 在ると どちらを 信じるか 決まらない・10-10 4回目の 対立役） */
+  if (数の行 !== 1) 赤.push('WebKit ' + id + '：数の 行が ' + 数の行 + '本（1本で ない）');
   const [頼, 走, 緑] = [+m[1], +m[2], +m[3]];
   行.push('WebKit ' + id + '：期待 ' + 期待 + ' ／ 頼んだ ' + 頼 + ' ／ 走らせた ' + 走 + ' ／ 緑 ' + 緑 + ' ／ 見出しの 欠け ' + 欠け.length + ' ／ 未測定 ' + 未測定);
   if (!(頼 === 走 && 走 === 緑)) 赤.push('WebKit ' + id + '：3つの 数が 揃わない');

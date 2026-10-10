@@ -3,8 +3,8 @@
  *  道具＝scripts/ci-mitodoke.mjs（判じは scripts/lib/ci-mitodoke.mjs の 見届ける）。
  *  作り物の ログは 本物の gh ログ（49d56dc の CI 37905233170・WebKit 37905233158）の 行の 形を 写した：
  *    「job\t段の名前\t(BOM)時刻 本文」・段の 頭は「##[group]Run <命令>」。
- *  緑の 形 4つ・赤の 形 35（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
- *  --self-test ... 判じを 16通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
+ *  緑の 形 5つ・赤の 形 38（経営者の 受け入れ 5形と 対立役の 8形を 含む）を 当てる。
+ *  --self-test ... 判じを 19通り 壊した 写しに 同じ 試験を 当て、★どれも 赤が 出る★のを 見る
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -27,6 +27,7 @@ function CIログ(o) {
   o = o || {};
   const 出 = names => names.map((n) => 行('test', CI段, '=== ' + n + ' ==='));
   const L = [行('test', 'Install test deps', '##[group]Run npm install', true), 行('test', 'Install test deps', 'added 10 packages')];
+  if (o.別段) L.push(...名前.map((n) => 行('test', 'Install test deps', '=== ' + n + ' ===')));
   L.push(行('test', o.段名 || CI段, o.頭 || '##[group]Run node tests/run.js', true));
   L.push(...(o.前 || []).map((s) => 行('test', CI段, s)));
   L.push(...出(o.名前 || 名前).map((s) => o.段名 ? s.replace(CI段, o.段名) : s));
@@ -41,11 +42,17 @@ const WK段 = '★名簿の webkit の 見張り 全部（tests/run.js から �
 function WKログ(頼, 走, 緑, o) {
   o = o || {};
   const 見出し = (o.名前 || ['webkit-a.mjs']).map((n) => 行('webkit', WK段, '=== ' + n + ' ==='));
-  const L = [行('webkit', '★借り物', '##[group]Run node tests/karimono.test.mjs', true),
-    行('webkit', '★借り物', '★webkit の 見張り ... 頼んだ 9本 ／ 走らせた 9本 ／ 緑 9本★'),
+  const L = [];
+  if (o.echo) L.push(行('webkit', 'echo の 段', '##[group]Run echo node scripts/run-webkit-tests.mjs', true), 行('webkit', 'echo の 段', 'node scripts/run-webkit-tests.mjs'));
+  L.push(行('webkit', '★借り物', '##[group]Run node tests/karimono.test.mjs', true),
+    行('webkit', '★借り物', '★webkit の 見張り ... 頼んだ 9本 ／ 走らせた 9本 ／ 緑 9本★'));
+  if (o.別段見出し) L.push(行('webkit', '★借り物', '=== webkit-a.mjs ==='));
+  L.push(
     行('webkit', WK段, o.頭 || '##[group]Run node scripts/run-webkit-tests.mjs', true),
-    ...見出し];
+    ...見出し);
   if (o.未測定) L.push(行('webkit', WK段, '  ★未測定★ 借りられません（作り物）'));
+  /* 崩れた 数の 行を ★先に★ 置く（最後の 行だけ 信じる 判じでは 緑に なる 形） */
+  if (o.二本目) L.push(行('webkit', WK段, '★webkit の 見張り ... 頼んだ 1本 ／ 走らせた 1本 ／ 緑 0本★'));
   if (!o.切れ) L.push(行('webkit', WK段, '★webkit の 見張り ... 頼んだ ' + 頼 + '本 ／ 走らせた ' + 走 + '本 ／ 緑 ' + 緑 + '本★'));
   return L.join('\n');
 }
@@ -103,6 +110,10 @@ async function 試す(libの道, 黙る) {
   赤に('WebKit の 見出しが 期待と 違う 名前（数は 揃う）', { wkLog: WKログ(1, 1, 1, { 名前: ['other.mjs'] }) });
   赤に('WebKit の 見出しが 0本（数だけ 1/1/1）', { wkLog: WKログ(1, 1, 1, { 名前: [] }) });
   赤に('WebKit の ログが 取れない（null）', { wkLog: null });
+  赤に('WebKit の 見出しが 別の 段（karimono）にだけ 在る', { wkLog: WKログ(1, 1, 1, { 名前: [], 別段見出し: true }) });
+  赤に('CI の 見出しが 別の 段にだけ 在る', { ci: { 名前: [], 別段: true } });
+  緑に('★命令の 字を 含む 別の 段（echo）が 先に 在っても 本物の 段を 拾う★', { wkLog: WKログ(1, 1, 1, { echo: true }) });
+  赤に('WebKit の 数の 行が 2本（1本目 崩れ・2本目 1/1/1）', { wkLog: WKログ(1, 1, 1, { 二本目: true }) });
   赤に('run-webkit-tests の 段が 無い（命令が 変わった）', { wkLog: WKログ(1, 1, 1, { 頭: '##[group]Run node scripts/zenbu-webkit.mjs' }) });
   緑に('★WebKit 2本・期待の 順に 見出し★', { webkit期待: ['webkit-a.mjs', 'webkit-b.mjs --self-test'], wkLog: WKログ(2, 2, 2, { 名前: ['webkit-a.mjs', 'webkit-b.mjs --self-test'] }) });
   赤に('WebKit の 見出しの 順が 期待と 逆（数は 揃う）', { webkit期待: ['webkit-a.mjs', 'webkit-b.mjs --self-test'], wkLog: WKログ(2, 2, 2, { 名前: ['webkit-b.mjs --self-test', 'webkit-a.mjs'] }) });
@@ -165,6 +176,9 @@ const 壊し方 = [
   ['WebKit の ログ無しを 見ない', "if (!生) { 赤.push('WebKit ' + r.databaseId", "if (!生) { continue; 赤.push('WebKit ' + r.databaseId"],
   ['WebKit の 段無しを 見ない', "if (!段) { 赤.push('WebKit ' + id", "if (!段) { return; 赤.push('WebKit ' + id"],
   ['WebKit の 順を 見ない', "while (j < 本文.length && 本文[j] !== '=== ' + n + ' ===') j++;", "j = 本文.indexOf('=== ' + n + ' ==='); if (j < 0) j = 本文.length;"],
+  ['段で 絞らない', 'return 頭 ? 行.filter((x) => x.段 === 頭.段) : null;', 'return 頭 ? 行 : null;'],
+  ['段の 頭を 字の 一部で 照らす', "x.本文 === '##[group]Run ' + 命令", 'x.本文.includes(命令)'],
+  ['数の 行の 本数を 見ない', 'if (数の行 !== 1) 赤.push', 'if (false) 赤.push'],
   ['期待の 名前から 引数を 落とす', "出.push(a.join(' '))", '出.push(名)'],
 ];
 
