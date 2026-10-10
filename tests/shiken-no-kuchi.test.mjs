@@ -2,6 +2,10 @@
  *  門＝メールの +タグ が 白名簿（e0test）に 在る 時だけ 通す（tests/shiken-no-kuchi.mjs）。
  *  作り物の 箱だけで 当てる（本物の メールは ここにも 書かない）。
  */
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { 試験の口か, 許すタグ } from './shiken-no-kuchi.mjs';
 
 let 緑 = 0, 赤 = 0;
@@ -22,5 +26,26 @@ const 止める = [
   ['undefined', undefined],
 ];
 for (const [n, e] of 止める) T('止める：' + n, !試験の口か(e));
+
+/* ★メールが repo に 戻って いないか★＝git ls-files の 字の ファイルの メールの ドメインは 作り物の 白名簿 だけ
+ *  （10-10 本番前の 対立役＝戻っても 赤に なる 試験が 無かった。sha256 は 置かない＝白名簿で 見る） */
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const 許すドメイン = new Set(['example.com', 'test.com']);
+const 字の本 = execFileSync('git', ['-C', ROOT, 'ls-files'], { encoding: 'utf8' }).split('\n')
+  .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f));
+const 外 = [];
+for (const f of 字の本) {
+  let s; try { s = fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { continue; }
+  for (const m of s.matchAll(/[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})\b/g)) {
+    if (!許すドメイン.has(m[1].toLowerCase())) 外.push(f + '（ドメイン ' + m[1].length + '字）');
+  }
+}
+T('★メールの ドメインは 作り物（example.com・test.com）だけ（' + 字の本.length + '本を 見た）★', 外.length === 0 && 字の本.length >= 500, 外.slice(0, 5).join(' / '));
+
+/* ★実の 倉庫に 触る 道具が 門を 呼んで いるか★（呼ぶ 行を 消しても 赤に なる 試験が 無かった） */
+for (const f of ['tests/live-seed.mjs', 'tests/live-roundtrip.mjs']) {
+  const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
+  T('★' + f + ' が 試験の口を読む と 試験の口か を 呼ぶ★', /from '\.\/shiken-no-kuchi\.mjs'/.test(s) && /試験の口を読む\(\)/.test(s) && /試験の口か\(/.test(s));
+}
 console.log('\nshiken-no-kuchi: ' + 緑 + ' 緑 / ' + 赤 + ' 赤');
 process.exit(赤 ? 1 : 0);
