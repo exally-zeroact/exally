@@ -401,6 +401,8 @@ const FILES = [
   ['machi-no-kime.test.mjs', '--self-test'], //   ＝★30秒で 黙って 落ちる＝遅い本を「開けない本」と 言い間違える★
   ['kinji-ji.test.mjs'],             // ★禁じられた 字が 増えて いないか★（上限の 門）
   ['souname-matome.test.mjs'],       // ★束に 分けた 総なめの まとめが 赤を 出せるか★（途中で 切られた 束を 緑と 見間違えかけた・2026-10-04）
+  ['ci-mitodoke.test.mjs'],          // ★CI の 見届けの 道具が 偽の 緑を 返さないか★（scratchpad の 写しで 4回 見届けて いた・2026-10-10）
+  ['ci-mitodoke.test.mjs', '--self-test'], //   ＝判じを 5通り 壊すと 赤が 出るか
   ['bessel.test.mjs'],               // BESSELI/J/K/Y
   ['jitsuexcel-ga-machigai.test.mjs'], // 実Excel が 間違って いるの 逃げ道を 塞ぐ
   ['gomi-file.test.mjs'],            // 書き損じで 出来た ゴミを repo に 置かない

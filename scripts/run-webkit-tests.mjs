@@ -34,15 +34,20 @@ export function webkitの名簿(FILES, 読む) {
     .filter((f) => { try { return 借りる試験か(読み(String(f[0]))); } catch (e) { return false; } });
 }
 
+/** ★この 段で 走らせる 名簿★＝借りる 試験から webkit.yml に 個別の 段が 在る 物を 除く
+ *  （karimono 等＝2回 走らせない）。見届けの 道具（scripts/lib/ci-mitodoke.mjs）も ★同じ 判じ★で 期待の 本数を 出す */
+export function 段で走らせる名簿(FILES, 読む, yml) {
+  const 個別 = new Set((String(yml || '').match(/run:\s*node\s+tests\/([A-Za-z0-9_.\/-]+\.mjs)/g) || [])
+    .map((s) => /tests\/([A-Za-z0-9_.\/-]+\.mjs)/.exec(s)[1]));
+  return webkitの名簿(FILES, 読む).filter((f) => !個別.has(f[0]));
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
   const { FILES } = require_(path.join(ROOT, 'tests/run.js'));
-  /* ★webkit.yml に 個別の 段が 在る 物は ここで 走らせない★（karimono 等＝2回 走らせない） */
   let yml = '';
   try { yml = fs.readFileSync(path.join(ROOT, '.github/workflows/webkit.yml'), 'utf8'); } catch (e) { yml = ''; }
-  const 個別 = new Set((yml.match(/run:\s*node\s+tests\/([A-Za-z0-9_.\/-]+\.mjs)/g) || [])
-    .map((s) => /tests\/([A-Za-z0-9_.\/-]+\.mjs)/.exec(s)[1]));
-  const 名簿 = webkitの名簿(FILES).filter((f) => !個別.has(f[0]));
+  const 名簿 = 段で走らせる名簿(FILES, null, yml);
   if (process.argv.includes('--名簿だけ')) {
     for (const f of 名簿) console.log(f.join(' '));
     console.log('★webkit の 見張り ' + 名簿.length + '本★（tests/run.js 本人から 拾った）');
