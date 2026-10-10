@@ -9,8 +9,8 @@
  *    ⇒`lib/xlsx-kazari.js` で ★生の `xl/styles.xml` を 自前で 読みます★
  *
  *  ★★物差し★★
- *    `tests/fixtures/kazari-hiraku3.xlsx`（11705B＝10-10 に 作者の 欄だけ「見本」に 替えた・元 11725B）
- *    sha256 80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909
+ *    `tests/fixtures/kazari-hiraku3.xlsx`（11639B＝10-10 に 作者の 欄・10-11 に 保存した PC の 道を 空に した・元 11725B）
+ *    sha256 affd42e9f5c6de9d5565c8ffd623ffd2e37a7ba5ca8820fdd5c971b15ff93053
  *    ★実Excel（16.0 build 20326）が COM で 作った 物★
  *    作り方 `docs/measured/tsukuru-tameshi-hiraku3-kazari-to-kobore3.ps1`
  *    ★入って いるのは 作り物の 数だけ★（3 / 1 / 0.25 / abc / kazari no tame no musubi）
@@ -73,9 +73,9 @@ console.log('[xlsx-kazari] ★マスの 飾りを 自前で 読めて いるか�
 
 T('★材料が 在る（空振りして いない）★', () => {
   if (!中) throw new Error('★材料が 無い★ ' + 材料道);
-  if (中.length !== 11705) throw new Error('★大きさが 違う★ ' + 中.length + 'B（11705B の はず）');
+  if (中.length !== 11639) throw new Error('★大きさが 違う★ ' + 中.length + 'B（11639B の はず）');
   const h = crypto.createHash('sha256').update(中).digest('hex');
-  if (h !== '80369ed3c35497d48a9b402caaead46883010eddd1b9a6025ef7a27af5e15909') {
+  if (h !== 'affd42e9f5c6de9d5565c8ffd623ffd2e37a7ba5ca8820fdd5c971b15ff93053') {
     throw new Error('★材料が 入れ替わって います★ sha256=' + h);
   }
 });

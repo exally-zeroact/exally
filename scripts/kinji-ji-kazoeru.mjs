@@ -21,6 +21,7 @@
  *  使い方: node scripts/kinji-ji-kazoeru.mjs
  */
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -64,6 +65,13 @@ const 見ない名 = [
   { 名: 'xlsx.full.min.js', 訳: '★借り物（SheetJS・Apache-2.0）★' },
   { 名: 'symbols.js', 訳: '★字そのものが データ（43〜46行）★' },
 ];
+/* ★逐語の 写し★＝他の 席の 物を そのまま 写した 物は、★道と 中身（git の blob の id）が 両方 同じ 時だけ★ 数えない
+   （2026-10-11 本番前の 対立役＝名前だけで 外すと、同じ 名前の 別の 物が 素通りした）。中身が 変われば 数える＝見直して id を 書き換える */
+const 写しの物 = [
+  { 道: 'tests/kinshi-ji.test.mjs', blob: '14a1fecc3cd14e7c8574849e80728d58aa205965', 訳: '★禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（2026-10-11・指示役）。字を 替えると 他の 席と 揃わない★' },
+];
+function blobのid(p) { const b = fs.readFileSync(p); return crypto.createHash('sha1').update('blob ' + b.length + '\0').update(b).digest('hex'); }
+
 /* ★★正規表現を やめました★★（2026-09-18）
      ★`[\/]` と 書いた のに `[\/]` に 落ちて いました★
      ＝★逆斜線の 逃がしが 落ちる★（★記憶に 在る 罠★・今日 2回目）
@@ -122,6 +130,8 @@ function 集める(道, 拡, 再帰) {
     }
     if (!拡.includes(path.extname(f))) continue;
     if (見ない名.some((x) => x.名 === f)) continue;   /* ★名前で 外す（逆斜線を 使わない）★ */
+    const 相対 = path.join(道, f).split(path.sep).join('/');
+    if (写しの物.some((x) => x.道 === 相対 && x.blob === blobのid(p))) continue;
     出.push(p);
   }
   return 出;

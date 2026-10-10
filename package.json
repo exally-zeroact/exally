@@ -7,6 +7,7 @@
     "stamp": "node scripts/stamp-build.mjs",
     "stamp:check": "node scripts/stamp-build.mjs --check",
     "test:stamp": "node tests/stamp.test.mjs",
+    "kinshi": "node tests/kinshi-ji.test.mjs",
     "test:all": "node scripts/stamp-build.mjs --check && node tests/run.js && node tests/ci-coverage.test.mjs"
   },
   "dependencies": {

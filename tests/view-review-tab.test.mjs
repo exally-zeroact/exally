@@ -44,8 +44,9 @@ function 抜く(名) {
 console.log('\n[① 測った 道具が 残っている]');
 ok('tools/measure-view-tab.ps1 が 在る', fs.existsSync(path.join(ROOT, 'tools/measure-view-tab.ps1')));
 ok('tools/measure-review-tab.ps1 が 在る', fs.existsSync(path.join(ROOT, 'tools/measure-review-tab.ps1')));
-ok('★測った 中に 人の 名前を 残していない★',
-  !/矢野/.test(book) && !/矢野/.test(fs.readFileSync(path.join(ROOT, 'tools/measure-review-tab.ps1'), 'utf8')));
+/* ★人の 名前は ここに 書かない★（締め出す 字を 書くと 公開 repo に 名前を もう一度 出す・10-11）
+   ⇒ 測った 中（book.html・tools/measure-review-tab.ps1 を 含む 全部の ファイル）に 名前が 戻らないかは、
+     CI の 段「実在の字が戻っていないか（一覧は secret）」＝tests/kinshi-ji.test.mjs が 見る（一覧は repo の 外） */
 
 console.log('\n[② ズーム（実測＝10〜400）]');
 for (const n of ['ズームの窓を開く', 'ズームを決めて閉じる', '選択範囲に合わせる']) ok(n + ' が 在る', !!抜く(n));

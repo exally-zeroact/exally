@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { 作者を読む, 作者を見本に, 欄の判じ, Officeファイル, 見本 } from '../scripts/sakusha-mihon.mjs';
+import { 作者を読む, 作者を見本に, 見本にする, 欄の判じ, Officeファイル, 見本 } from '../scripts/sakusha-mihon.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 let 緑 = 0, 赤 = 0;
@@ -48,6 +48,25 @@ if (process.argv.includes('--self-test')) {
       : t.indexOf('<Company>') >= 0 ? t.replace(/<Company>[^<]*<\/Company>/, '<Company>' + 名 + '</Company>')
       : t.replace('</Properties>', '<Company>' + 名 + '</Company></Properties>'));
     T('★app.xml の Company に 字 は 赤★', 判じる(会社) === 'その他', 判じる(会社));
+    /* ⑤保存した PC の 道（workbook.xml の absPath）に 字 ⇒ 赤（10-11 禁止の 字の 見張りで 見つけた） */
+    const 作り物の道 = 'C:/試験/見本/';
+    const 道 = 書き換え(元, '', 'xl/workbook.xml', (t) => /absPath\b[^>]*\burl="/.test(t)
+      ? t.replace(/(absPath\b[^>]*?\burl=")[^"]*"/, '$1' + 作り物の道 + '"')
+      : t.replace('</workbook>', '<x15ac:absPath xmlns:x15ac="http://schemas.microsoft.com/office/spreadsheetml/2010/11/ac" url="' + 作り物の道 + '"/></workbook>'));
+    T('★保存した PC の 道に 字 は 赤★', 判じる(道) === 'その他', 判じる(道));
+    T('★その 写しを 道具に 通すと 道が 空に 戻る★', 判じる(見本にする(道)) === '見本');
+    /* ⑥道の 書き方の 揺れ（10-11 本番前の 対立役＝前の 判じでは 緑） */
+    const 空白 = 書き換え(元, '', 'xl/workbook.xml', (t) => t.replace(/(absPath\b[^>]*?\burl)="[^"]*"/, '$1 = "' + 作り物の道 + '"'));
+    T('★url = "道"（= の 前後に 空白）の 道 は 赤★', 判じる(空白) === 'その他', 判じる(空白));
+    const 単 = 書き換え(元, '', 'xl/workbook.xml', (t) => t.replace(/(absPath\b[^>]*?\burl)="[^"]*"/, "$1='" + 作り物の道 + "'"));
+    T("★url='道'（単引用符）の 道 は 赤★", 判じる(単) === 'その他', 判じる(単));
+    T('★単引用符の 道も 道具で 空に 戻る★', 判じる(見本にする(単)) === '見本');
+    /* ⑦xlsb の 道（workbook.bin の 記録 0x817） */
+    const xlsb本 = Officeファイル(ROOT).find((p) => /\.xlsb$/i.test(p));
+    T('★xlsb の 見本が 在る★', !!xlsb本);
+    const xb = xlsbに道を入れる(fs.readFileSync(path.join(ROOT, xlsb本)), 作り物の道);
+    T('★xlsb の 道の 記録に 字 は 赤★', 判じる(xb) === 'その他', 判じる(xb));
+    T('★xlsb の 道も 道具で 空に 戻る★', 判じる(見本にする(xb)) === '見本');
     /* ②読めない zip ⇒ 読めない（赤） */
     T('★読めない zip は「読めない」（赤）★', 判じる(Buffer.from('PK\u0003\u0004 こわれ')) === '読めない');
     /* ③データ記述子の 印を 立てた zip ⇒ 読めない（赤） */
@@ -61,8 +80,33 @@ if (process.argv.includes('--self-test')) {
   process.exit(赤 ? 1 : 0);
 }
 
+/** xlsb の workbook.bin の 道の 記録（0x817）に 字を 入れた 写し（自己試験用） */
+function xlsbに道を入れる(buf, 道) {
+  return 書き換えbin(buf, 'xl/workbook.bin', (bin) => {
+    const 片 = []; let p = 0; let 入れた = false;
+    while (p < bin.length) {
+      const 頭 = p; let t = 0, k = 0, c;
+      do { c = bin[p++]; t |= (c & 0x7f) << (7 * k++); } while ((c & 0x80) && k < 2);
+      const 種の終 = p; let l = 0; k = 0;
+      do { c = bin[p++]; l += (c & 0x7f) * Math.pow(2, 7 * k++); } while ((c & 0x80) && k < 4);
+      if (t === 0x817) {
+        const 字 = Buffer.from(道, 'utf16le'); const 中 = Buffer.alloc(4 + 字.length); 中.writeUInt32LE(道.length, 0); 字.copy(中, 4);
+        const 長 = []; let n = 中.length; do { let x = n % 128; n = Math.floor(n / 128); if (n) x |= 0x80; 長.push(x); } while (n);
+        片.push(bin.subarray(頭, 種の終), Buffer.from(長), 中); 入れた = true;
+      } else 片.push(bin.subarray(頭, p + l));
+      p += l;
+    }
+    if (!入れた) throw new Error('xlsb に 道の 記録が 無い');
+    return Buffer.concat(片);
+  });
+}
+/** 部品を 生の バイトで 差し替えた 写し */
+function 書き換えbin(buf, 部品名, 替え) {
+  return 書き換え(buf, '', 部品名, null, 替え);
+}
+
 /** 作者の 2欄を 字に 替えた 写し（道具の 書き方を 使い、最後に 字だけ 差し替える） */
-function 書き換え(buf, 字, 部品名, 替え) {
+function 書き換え(buf, 字, 部品名, 替え, バイトの替え) {
   /* 道具は「見本」に しか 替えない ので、core.xml を 開いて 字を 入れ、同じ 方式で 詰め直す */
   const b = Buffer.from(buf);
   const e = b.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
@@ -79,7 +123,7 @@ function 書き換え(buf, 字, 部品名, 替え) {
   const raw = b.subarray(x.位置 + 頭, x.位置 + 頭 + x.圧縮);
   const 中 = (x.方式 === 8 ? zlib.inflateRawSync(raw) : raw).toString('utf8');
   const 中2 = 替え ? 替え(中) : 中.split(見本).join(字);
-  const 生 = Buffer.from(中2, 'utf8');
+  const 生 = バイトの替え ? バイトの替え(x.方式 === 8 ? zlib.inflateRawSync(raw) : Buffer.from(raw)) : Buffer.from(中2, 'utf8');
   const 新 = x.方式 === 8 ? zlib.deflateRawSync(生) : 生;
   const 差 = 新.length - raw.length;
   const h = Buffer.from(b.subarray(x.位置, x.位置 + 頭));
