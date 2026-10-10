@@ -30,9 +30,9 @@ for (const [n, e] of 止める) T('止める：' + n, !試験の口か(e));
 /* ★メールが repo に 戻って いないか★＝git ls-files の 字の ファイルの メールの ドメインは 作り物の 白名簿 だけ
  *  （10-10 本番前の 対立役＝戻っても 赤に なる 試験が 無かった。sha256 は 置かない＝白名簿で 見る） */
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-/* users.noreply.github.com＝GitHub の 表に 出さない 用（受信箱で ない）・noreply@github.com＝GitHub 自身（10-11） */
+/* users.noreply.github.com＝GitHub の 表に 出さない 用（受信箱で ない）・noreply@github.com＝GitHub 自身・noreply@anthropic.com＝Claude の 共作の 印（10-11） */
 const 許すドメイン = new Set(['example.com', 'test.com', 'users.noreply.github.com']);
-const 許す宛先 = new Set(['noreply@github.com']);
+const 許す宛先 = new Set(['noreply@github.com', 'noreply@anthropic.com']);
 const 字の本 = execFileSync('git', ['-C', ROOT, 'ls-files'], { encoding: 'utf8' }).split('\n')
   .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f));
 const 外 = [];
