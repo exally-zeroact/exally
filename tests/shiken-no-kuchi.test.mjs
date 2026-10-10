@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
+const blobのid = (p) => { const b = fs.readFileSync(p); return crypto.createHash('sha1').update('blob ' + b.length + '\0').update(b).digest('hex'); };
 import { 試験の口か, 許すタグ } from './shiken-no-kuchi.mjs';
 
 let 緑 = 0, 赤 = 0;
@@ -36,8 +38,8 @@ const 許す宛先 = new Set(['noreply@github.com', 'noreply@anthropic.com']);
 const 字の本 = execFileSync('git', ['-C', ROOT, 'ls-files'], { encoding: 'utf8' }).split('\n')
   .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f)
     /* 禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（10-11）。自己確認の 作り物の メール（架空の ドメイン）を 持つ。
-       この 1本だけ 外す（字を 替えると 他の 席と blob が 揃わない。中身の 実在の 字は その 見張り 自身が 見る） */
-    && f !== 'tests/kinshi-ji.test.mjs');
+       この 1本だけ、★道と 中身（blob の id）が 写した 版と 同じ 時だけ★ 外す（中身が 変われば 見る・10-11 本番前の 対立役） */
+    && !(f === 'tests/kinshi-ji.test.mjs' && blobのid(path.join(ROOT, f)) === '14a1fecc3cd14e7c8574849e80728d58aa205965'));
 const 外 = [];
 for (const f of 字の本) {
   let s; try { s = fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { continue; }
