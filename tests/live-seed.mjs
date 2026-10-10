@@ -14,17 +14,18 @@ import fs from 'fs'; import path from 'path';
 import { repoSupa } from './repo-supa.mjs';
 const { url: URL, key: ANON } = repoSupa();
 console.log('接続先(このリポジトリの js/supa-config.js 由来): ' + URL);
-const TEST_EMAIL = 'exally.supoort+e0test@gmail.com';
-const CRED_FILE = process.env.EXALLY_TEST_CRED || path.join(process.env.TEMP || '/tmp', 'exally-e0-test-cred.json');
+// ★試験用の 口の メールは repo に 置かない★（cred ファイルだけ・門は +タグ の 白名簿＝tests/shiken-no-kuchi.mjs・2026-10-10）
+import { 試験の口を読む, 試験の口か } from './shiken-no-kuchi.mjs';
 
 const mode = process.argv[2] || 'seed';
-const cred = JSON.parse(fs.readFileSync(CRED_FILE, 'utf8'));
+let cred;
+try { cred = 試験の口を読む(); } catch (e) { console.error(e.message); process.exit(2); }
 const sb = createClient(URL, ANON);
 const { data: auth, error } = await sb.auth.signInWithPassword({ email: cred.email, password: cred.password });
 if (error || !auth.session) { console.error('ログインできません: ' + (error && error.message)); process.exit(2); }
-if (cred.email !== TEST_EMAIL) { console.error('中止: テスト専用アカウント以外では走らせません: ' + cred.email); process.exit(2); }
+if (!試験の口か(auth.user && auth.user.email)) { console.error('中止: ログインした口が 試験用の 口で ない'); process.exit(2); }
 const uid = auth.user.id;
-console.log('ログイン: ' + cred.email);
+console.log('ログイン: 試験用の 口');
 
 // 今月の日付を作る(実機で「今月」を押した時に中身が出るように)
 const now = new Date();
