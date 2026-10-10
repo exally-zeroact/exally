@@ -34,7 +34,10 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const 許すドメイン = new Set(['example.com', 'test.com', 'users.noreply.github.com']);
 const 許す宛先 = new Set(['noreply@github.com', 'noreply@anthropic.com']);
 const 字の本 = execFileSync('git', ['-C', ROOT, 'ls-files'], { encoding: 'utf8' }).split('\n')
-  .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f));
+  .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f)
+    /* 禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（10-11）。自己確認の 作り物の メール（架空の ドメイン）を 持つ。
+       この 1本だけ 外す（字を 替えると 他の 席と blob が 揃わない。中身の 実在の 字は その 見張り 自身が 見る） */
+    && f !== 'tests/kinshi-ji.test.mjs');
 const 外 = [];
 for (const f of 字の本) {
   let s; try { s = fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { continue; }
