@@ -72,3 +72,8 @@ try{
   Write-Host ('★書いた … ' + $出 + '★')
   $bk.Close($false)
 } finally { $xl.Quit(); [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($xl) }
+
+# ★作者の 欄を「見本」に（10-10 司さんの 決め＝実在の 名前は 架空に）★
+#   Excel は サインインの アカウント名を 入れるので、Excel を 閉じた 後に scripts/sakusha-mihon.mjs で 替える
+& node (Join-Path $PSScriptRoot '../../scripts/sakusha-mihon.mjs') $ファイル
+if ($LASTEXITCODE -ne 0) { throw '★作者の 欄を 見本に 替えられない★' }
