@@ -68,7 +68,7 @@ const 見ない名 = [
 /* ★逐語の 写し★＝他の 席の 物を そのまま 写した 物は、★道と 中身（git の blob の id）が 両方 同じ 時だけ★ 数えない
    （2026-10-11 本番前の 対立役＝名前だけで 外すと、同じ 名前の 別の 物が 素通りした）。中身が 変われば 数える＝見直して id を 書き換える */
 const 写しの物 = [
-  { 道: 'tests/kinshi-ji.test.mjs', blob: '14a1fecc3cd14e7c8574849e80728d58aa205965', 訳: '★禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（2026-10-11・指示役）。字を 替えると 他の 席と 揃わない★' },
+  { 道: 'tests/kinshi-ji.test.mjs', blob: 'f4aa3cebe77f8783d9cc991f905f02409310d65e', 訳: '★禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（2026-10-11・指示役）。字を 替えると 他の 席と 揃わない★' },
 ];
 function blobのid(p) { const b = fs.readFileSync(p); return crypto.createHash('sha1').update('blob ' + b.length + '\0').update(b).digest('hex'); }
 

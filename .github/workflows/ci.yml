@@ -68,11 +68,34 @@ jobs:
 
       - name: 実在の字の見張りの自己確認
         timeout-minutes: 10
-        # 全部 通って、しかも 26 本 以上 走った 時だけ 緑（0/0・本数が 減った を 止める）
+        # 全部 通って、しかも 29 組 以上・確かめた 回数 239 以上の 時だけ 緑（組の 中の 歯を 消しても 割れる）
         shell: bash
         run: |
           node tests/kinshi-ji.test.mjs --self-test | tee kinshi-self.out
-          awk -F'[ /]' '/^自己確認: /{ if ($2 == $3 && $2 + 0 >= 26) ok = 1 } END { exit !ok }' kinshi-self.out
+          sh scripts/ci-yuka.sh kinshi-self.out 29 239
+
+      # ★commit の メールを 公開 repo に 出さない 門（.githooks/pre-push）の 自己確認★（2026-10-11）
+      #   門は 手元の push で 走る（git config --local core.hooksPath .githooks）。ここでは 門 自身が 壊れていないかを 見る。
+      - name: commit のメールの門の自己確認
+        shell: bash
+        run: |
+          node .githooks/pre-push-author.mjs --self-test | tee mail-self.out
+          sh scripts/ci-yuka.sh mail-self.out 7
+
+      # ★押す commit の 中身の 門（.githooks/pre-push-kinshi.mjs）の 自己確認★（2026-10-11）
+      #   門 自身は 手元の push で 走る。ここでは 門が 壊れていないか（入れて 消した 字を 赤に する 等）を 見る。
+      - name: 押す commit の 中身の 門の自己確認
+        shell: bash
+        run: |
+          node .githooks/pre-push-kinshi.mjs --self-test | tee push-self.out
+          sh scripts/ci-yuka.sh push-self.out 16 43
+
+      # ★床の 物差し（scripts/ci-yuka.sh）の 自己確認＝ubuntu の awk で 233・234x 等が 赤に なるか★（2026-10-11）
+      - name: 床の物差しの自己確認
+        shell: bash
+        run: |
+          sh scripts/ci-yuka.sh --self-test | tee yuka-self.out
+          sh scripts/ci-yuka.sh yuka-self.out 20
       - name: ★重複ガード (同じ物が2箇所に無いか・法定データは例外なし)
         run: node tests/no-duplicate-libs.test.mjs
       - name: ★参照ガード (require/importの先が実在するか・api/が実際に読み込めるか)
@@ -103,3 +126,42 @@ jobs:
         run: node tests/ci-coverage.test.mjs
 
       # ── 給与(kyuyo/) 由来（据置） ──
+
+  # ★実在の字の見張りを node 24（ubuntu）でも 回す★（2026-10-11）
+  #   node 24.21 の ubuntu で、奇数の 長さの Buffer を toString("utf16le") すると「double free」で process ごと 落ちた
+  #   （素の node の 1行で 再現・node 20 は 通る）。見張りは u16le() で 偶数に 揃えて 読む。
+  #   本体の 試験は node 20 の まま。ここは 見張りが node 24 でも 落ちない 事だけを 見る（後戻りを 捕まえる）。
+  kinshi-node24:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # ★床の 物差し（scripts/ci-yuka.sh）の 自己確認＝ubuntu の awk で 233・234x 等が 赤に なるか★（2026-10-11）
+      - name: 床の物差しの自己確認（node 24 の job）
+        shell: bash
+        run: |
+          sh scripts/ci-yuka.sh --self-test | tee yuka-self.out
+          sh scripts/ci-yuka.sh yuka-self.out 20
+
+      - name: 実在の字が戻っていないか（node 24）
+        shell: bash
+        run: |
+          node tests/kinshi-ji.test.mjs | tee kinshi24.out
+          grep -q "^✓ 実在の 字 0 件" kinshi24.out
+        env:
+          KINSHI_JI: ${{ secrets.KINSHI_JI }}
+          KINSHI_JI_FINGER: ${{ vars.KINSHI_JI_FINGER }}
+      - name: 実在の字の見張りの自己確認（node 24）
+        shell: bash
+        run: |
+          node tests/kinshi-ji.test.mjs --self-test | tee kinshi24-self.out
+          sh scripts/ci-yuka.sh kinshi24-self.out 29 239
+      # 押す commit の 中身の 門も node 24 で（手元の 機械の node は 24・2026-10-11）
+      - name: 押す commit の 中身の 門の自己確認（node 24）
+        shell: bash
+        run: |
+          node .githooks/pre-push-kinshi.mjs --self-test | tee push24-self.out
+          sh scripts/ci-yuka.sh push24-self.out 16 43
