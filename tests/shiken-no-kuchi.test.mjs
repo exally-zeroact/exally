@@ -35,11 +35,16 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 /* users.noreply.github.com＝GitHub の 表に 出さない 用（受信箱で ない）・noreply@github.com＝GitHub 自身・noreply@anthropic.com＝Claude の 共作の 印（10-11） */
 const 許すドメイン = new Set(['example.com', 'test.com', 'users.noreply.github.com']);
 const 許す宛先 = new Set(['noreply@github.com', 'noreply@anthropic.com']);
+/* 全席 共通の 物を 逐語で 写した 物＝自己確認の 作り物の メール（架空の ドメイン）を 持つ。
+   ★道と 中身（blob の id）が 写した 版と 同じ 時だけ★ 外す（中身が 変われば 見る・10-11 本番前の 対立役）
+   禁止の 字の 見張り（10-11）・commit の メールの 門（10-20 の 6回目＝.githooks/ を 追跡に した 時に 赤に なる と 対立役が 測った） */
+const 逐語の写し = {
+  'tests/kinshi-ji.test.mjs': 'f4aa3cebe77f8783d9cc991f905f02409310d65e',
+  '.githooks/pre-push-author.mjs': '669910aae9202ea128ea356ef7bc8fd34085091b',
+};
 const 字の本 = execFileSync('git', ['-C', ROOT, 'ls-files'], { encoding: 'utf8' }).split('\n')
   .filter((f) => f && !/\.(png|jpe?g|gif|ico|xlsx|xlsb|xlsm|pdf|woff2?|ttf)$/i.test(f) && !/\.min\.js$/.test(f)
-    /* 禁止の 字の 見張り＝全席 共通の 物を 逐語で 写した（10-11）。自己確認の 作り物の メール（架空の ドメイン）を 持つ。
-       この 1本だけ、★道と 中身（blob の id）が 写した 版と 同じ 時だけ★ 外す（中身が 変われば 見る・10-11 本番前の 対立役） */
-    && !(f === 'tests/kinshi-ji.test.mjs' && blobのid(path.join(ROOT, f)) === '14a1fecc3cd14e7c8574849e80728d58aa205965'));
+    && !(Object.hasOwn(逐語の写し, f) && blobのid(path.join(ROOT, f)) === 逐語の写し[f]));
 const 外 = [];
 for (const f of 字の本) {
   let s; try { s = fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { continue; }
