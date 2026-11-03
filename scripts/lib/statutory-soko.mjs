@@ -28,7 +28,7 @@ export function 倉庫の口() {
        素朴な 正規表現は 字の中の // や 正規表現の中の /* で 壊れる） */
     const src = 注記を外す(fs.readFileSync(path.join(ROOT, 'js/supa-config.js'), 'utf8'));
     const u = /https:\/\/[a-z0-9]+\.supabase\.co/.exec(src);
-    const k = /['"](ey[A-Za-z0-9_.-]{40,})['"]/.exec(src);
+    const k = /['"](ey[A-Za-z0-9_.-]{40,}|sb_publishable_[A-Za-z0-9_-]{20,})['"]/.exec(src);
     return (u && k) ? { url: u[0], key: k[1] } : null;
   } catch (e) { return null; }
 }
