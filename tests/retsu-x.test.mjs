@@ -142,6 +142,20 @@ console.log('[retsu-x] ★設計前 taiketsu（2026-11-04）の 反例★');
   T('止め2 SUMIF 帯どうし → 120', h.字('D3') === '120', h.字('D3'));
 }
 {
+  /* テスト線前 taiketsu（2回目）＝帯が 2列 以上 */
+  const h = 材料(); for (let i = 1; i <= 5; i++) h.打つ('C' + i, String(i * 100));
+  const 止め = ['=SUMIF(A:A,">2",B:C)', '=SUMIF(A:B,">2",C:C)', '=XLOOKUP(3,A:A,B:C)'];
+  止め.forEach((f, i) => { h.打つ('F' + (i + 1), f); T('2列の 帯 → #REF!（黙った 数に しない）... ' + f, h.字('F' + (i + 1)) === '#REF!', h.字('F' + (i + 1))); });
+  /* 2列の 帯を 受ける 物は ★書いた 範囲（A1:C5 等＝尻尾の 空を 多めに 足した 形）と 同じ 答え★ */
+  const 対 = [['=SUMIFS(B:C,A:B,">2")', '=SUMIFS(B1:C9,A1:B9,">2")'], ['=COUNTIFS(A:B,">2")', '=COUNTIFS(A1:B9,">2")'],
+    ['=SUMPRODUCT(A:B,B:C)', '=SUMPRODUCT(A1:B9,B1:C9)'], ['=VLOOKUP(3,A:C,3,FALSE)', '=VLOOKUP(3,A1:C9,3,FALSE)'],
+    ['=INDEX(A:C,4,3)', '=INDEX(A1:C9,4,3)'], ['=SUM(A:C)', '=SUM(A1:C9)'], ['=COUNTBLANK(A:B)-2097142', '=COUNTBLANK(A1:B9)-8']];
+  対.forEach(([帯f, 書f], i) => {
+    h.打つ('G' + (i + 1), 帯f); h.打つ('H' + (i + 1), 書f);
+    T('2列の 帯 ＝ 書いた 範囲 ... ' + 帯f + ' = ' + h.字('H' + (i + 1)), h.字('G' + (i + 1)) === h.字('H' + (i + 1)), h.字('G' + (i + 1)));
+  });
+}
+{
   /* 止め3＝打ってから 直した 答えと 作り直した 答えが 同じ（端は 帯の 列の 中身だけで 決まる） */
   const 式ら = ['=MATCH(12,A:A,1)', '=MATCH(4,A:A,1)', '=SUM(A:A)', '=COUNTBLANK(A:A)', '=INDEX(A:A,12)', '=MATCH(10,A:A,0)'];
   const h = 材料(); h.打つ('A10', '10');
