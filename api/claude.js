@@ -194,7 +194,7 @@ function 共有の口() {
   try {
     const src = supaConfigの中身();
     const u = /https:\/\/[a-z0-9]+\.supabase\.co/.exec(src);
-    const k = /['"](ey[A-Za-z0-9_.-]{40,})['"]/.exec(src);
+    const k = /['"](ey[A-Za-z0-9_.-]{40,}|sb_publishable_[A-Za-z0-9_-]{20,})['"]/.exec(src);
     if (u && k) _共有の口 = { url: u[0], key: k[1] };
   } catch (e) { _共有の口 = null; }
   return _共有の口;
