@@ -187,6 +187,55 @@ console.log('[retsu-x] ★設計前 taiketsu（2026-11-04）の 反例★');
   T('止め4 1打ちが 書いた 範囲の 5倍＋200ms 以内', 帯.ms <= 書.ms * 5 + 200, 帯.ms + 'ms / ' + 書.ms + 'ms');
 }
 
+/* ★本番前の 確かめ②（2026-11-07・実Excel 16.0 build 20527）★＝tests/fixtures/retsu-x-mae4-excel.json（16式）
+   材料は 紙の「材料」と 同じ・式は 板 CALC の A3,A6,…（Excel と 同じ 置き方）
+   ★まだ★＝帯の 12式は 台が #REF! で 止める（黙った 数で ない）／ふつうの 四角の SUMIF の 形違いは 前から の 黙った 数（別の 件） */
+const まだ4 = {
+  '=MATCH(3,Sheet1!D:D,1)': ['#REF!', '帯の 近い方の MATCH＝止めて ある'],
+  '=MATCH(9,Sheet1!D:D,1)': ['#REF!', '同じ'],
+  '=MATCH(4.5,Sheet1!D:D,1)': ['#REF!', '同じ'],
+  '=MATCH(9999,Sheet1!1:1,1)': ['#REF!', '同じ（行の 帯）'],
+  '=MATCH(150,Sheet1!1:1,1)': ['#REF!', '同じ（行の 帯）'],
+  '=SUMIF(Sheet1!A:A,">2",Sheet1!B:C)': ['#REF!', '帯の SUMIF の 形違い＝止めて ある'],
+  '=SUMIF(Sheet1!A:B,">2",Sheet1!C:C)': ['#REF!', '同じ'],
+  '=SUMIF(Sheet1!A1:A5,">2",Sheet1!B1:C5)': ['250', '★前から 本番に 在る 黙った 数★（足す 範囲を 条件の 形に 縮めない・帯で ない・別の 件）'],
+  '=XLOOKUP(3,Sheet1!A:A,Sheet1!B:C)': ['#REF!', '帯の XLOOKUP の 形違い＝止めて ある'],
+};
+console.log('');
+console.log('[retsu-x] ★本番前の 確かめ②＝空を 挟む MATCH・SUMIF・XLOOKUP・INDEX の 板またぎ（実Excel 16式）★');
+{
+  const j = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/retsu-x-mae4-excel.json'), 'utf8'));
+  const h = H.表();
+  h.板を足す('SHEET1'); h.板を足す('S2'); h.板を足す('CALC');
+  for (let i = 1; i <= 5; i++) { h.打つ('SHEET1!A' + i, String(i)); h.打つ('SHEET1!B' + i, String(i * 10)); h.打つ('SHEET1!C' + i, String(i * 100)); }
+  h.打つ('SHEET1!D1', '1'); h.打つ('SHEET1!D2', '2'); h.打つ('SHEET1!D4', '4'); h.打つ('SHEET1!D5', '5'); h.打つ('SHEET1!F1', '200');
+  h.打つ('S2!A1', '7'); h.打つ('S2!A2', '8'); h.打つ('S2!A3', '9');
+  h.板('CALC');
+  T('紙が 16式', j.行.length === 16, j.行.length);
+  j.行.forEach((r, i) => h.打つ('CALC!A' + ((i + 1) * 3), r.式));
+  j.行.forEach((r, i) => {
+    const v = h.字('CALC!A' + ((i + 1) * 3));
+    if (まだ4[r.式]) T('まだ（' + まだ4[r.式][1] + '）... ' + r.式, v === まだ4[r.式][0], '字=' + v + ' Excel=' + r.Excel);
+    else T('実Excel と 同じ ... ' + r.式 + ' = ' + r.Excel, v === r.Excel, '字=' + v);
+  });
+}
+{
+  /* ★INDEX が 返す 参照は 元の 板を 持つ★＝板が 同じ なら 足す・違えば #VALUE!（端の対） */
+  const h = H.表(); h.板を足す('S2');
+  for (let i = 1; i <= 5; i++) h.打つ('A' + i, String(i));
+  h.打つ('S2!A1', '7'); h.打つ('S2!A2', '8'); h.打つ('S2!A3', '9');
+  const 見る = [
+    ['=SUM(INDEX(S2!A1:A9,2):A3)', '#VALUE!'], ['=INDEX(S2!A1:A9,2):A3', '#VALUE!'], ['=SUM(A1:INDEX(S2!A1:A9,3))', '#VALUE!'],
+    ['=SUM(INDEX(S2!A1:A9,2):S2!A3)', '17'], ['=SUM(S2!A1:INDEX(S2!A1:A9,3))', '24'],
+    ['=SUM(INDEX(S2!A1:A9,1):INDEX(S2!A1:A9,2))', '15'], ['=SUM(INDEX(A1:A5,2):A5)', '14'], ['=SUM(A1:INDEX(A1:A5,3))', '6'],
+    /* ★1マス・入れ子の INDEX も 板を 持つ★（本番前 taiketsu 止め1・S2 に A4 A5 は 無い＝空） */
+    ['=SUM(INDEX(S2!A3,1):S2!A1)', '24'], ['=SUM(INDEX(INDEX(S2!A1:A9,0),2):S2!A3)', '17'],
+    ['=SUM(INDEX(S2!A3,1):A1)', '#VALUE!'], ['=SUM(INDEX(INDEX(S2!A1:A9,0),2):A3)', '#VALUE!'],
+    ['=SUM(INDEX(A5,1):A3)', '12'], ['=SUM(INDEX(INDEX(A1:A9,0),2):A3)', '5'],
+  ];
+  for (const [f, e] of 見る) { h.打つ('H1', f); T('板またぎの 端 ... ' + f + ' = ' + e, h.字('H1') === e, '字=' + h.字('H1')); }
+}
+
 console.log('');
 console.log('[retsu-x] pass ' + pass + ' / fail ' + fail);
 process.exit(fail ? 1 : 0);
