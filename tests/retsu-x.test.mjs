@@ -326,6 +326,23 @@ console.log('[retsu-x] ★本番前の 確かめ②＝空を 挟む MATCH・SUMI
   }
 }
 
+{
+  /* ★列の 帯と 行の 帯が 両端★＝答えは 板の どこにでも 広がり得る（2026-11-07・taiketsu 叩き直し 止め1）
+     ＝前は 列A と 行1 の 帯だけ 見て B3・C4 を 打ち直しても 1665 の まま */
+  const 作る = (b3, c4) => {
+    const g = H.表();
+    for (let i = 1; i <= 5; i++) { g.打つ('A' + i, String(i)); g.打つ('B' + i, String(i * 10)); g.打つ('C' + i, String(i * 100)); }
+    if (b3 !== undefined) { g.打つ('B3', b3); g.打つ('C4', c4); }
+    g.打つ('H3', '=SUM(INDEX(A:A,5):INDEX(1:1,3))');
+    return g;
+  };
+  const h = 作る();
+  T('INDEX(A:A,5):INDEX(1:1,3) = 1665', h.字('H3') === '1665', h.字('H3'));
+  h.打つ('B3', '7'); h.打つ('C4', '9');
+  const 一から = 作る('7', '9').字('H3');
+  T('B3=7・C4=9 → 一から 作った 数（' + 一から + '）と 同じ', h.字('H3') === 一から && 一から === '1251', h.字('H3') + ' / 一から ' + 一から);
+}
+
 console.log('');
 console.log('[retsu-x] pass ' + pass + ' / fail ' + fail);
 process.exit(fail ? 1 : 0);
