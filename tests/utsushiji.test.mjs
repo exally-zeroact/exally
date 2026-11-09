@@ -1,0 +1,165 @@
+/* ★条件の 写し字（* ? ~）★＝COUNTIF／SUMIF／AVERAGEIF／COUNTIFS が 型紙で 当てるか
+   物差し（実Excel 16.0 build 20527・2026-11-07）
+     紙1 docs/measured/utsushiji-excel-2026-11-07.tsv（27本）盤 A1:A8=apple,Apple,ab,a*b,5(数),空,a?c,15(数)／B1:B8=1..8
+     紙2 docs/measured/utsushiji-excel-2-2026-11-07.tsv（39本・設計前 taiketsu 止め1 の 測り足し）
+         盤2 A1:A10=apple,#N/A,TRUE,="",a~b," x",x,5(数),#DIV/0!,空／B1:B10=1..10
+         盤3（retsu-x の 盤）H1:H5=1..5・I1:I5=10..50・L1="*"
+     紙3 docs/measured/utsushiji-excel-3-2026-11-07.tsv（39本・叩き直し 止め1＝数の 形と D系）
+     紙4 docs/measured/utsushiji-excel-4-2026-11-07.tsv（9本・字の マスを 数と 読む 範囲）
+     紙5 docs/measured/utsushiji-excel-5-2026-11-07.tsv（19本・千の カンマ・> < は 同じ 型だけ）
+   ★紙を 読んで 押す＝紙に 無い 式は 押さない★ */
+import { createRequire } from 'module';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const require = createRequire(import.meta.url);
+const 根 = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+require(path.join(根, 'lib/shiki-tsunagi.js'));
+require(path.join(根, 'lib/shiki-kansuu.js'));
+const H = require(path.join(根, 'lib/shiki-hyou.js'));
+/* ★紙の 行の 後ろ 2欄 = 2つ目の 窓★（monosashi-mado の 決まり）＝ z0=（=(式)=0 の 真偽）・kata=（Value2 の 型）
+   ★窓が 無い 行・窓と 値が 食い違う 行（"0" なのに z0=False 等）は 紙の 崩れ＝落とす★ */
+let 窓の崩れ = 0;
+function 読む(名) {
+  return fs.readFileSync(path.join(根, 'docs/measured', 名), 'utf8')
+    .split(/\r?\n/).filter((l) => l && l[0] !== '#').map((l) => {
+      const 欄 = l.split('\t');
+      const z0 = 欄.find((c) => c.startsWith('z0=')), 型 = 欄.find((c) => c.startsWith('kata='));
+      const 残 = 欄.filter((c) => !/^(z0|kata)=/.test(c));
+      const 値 = 残[残.length - 1];
+      if (!z0 || !型 || (型 === 'kata=Double' && (値 === '0') !== (z0 === 'z0=True'))) { 窓の崩れ++; console.log('✗ ' + 名 + ' 窓の 崩れ ' + l); }
+      return 残;
+    });
+}
+const 盤1 = (h) => ['apple', 'Apple', 'ab', 'a*b', 5, null, 'a?c', 15].forEach((v, i) => { if (v !== null) h.打つ('A' + (i + 1), v); h.打つ('B' + (i + 1), i + 1); });
+const 盤2 = (h) => {
+  ['apple', '=NA()', '=TRUE', '=""', 'a~b', ' x', 'x', 5, '=1/0', null].forEach((v, i) => { if (v !== null) h.打つ('A' + (i + 1), v); h.打つ('B' + (i + 1), i + 1); });
+  for (let i = 1; i <= 5; i++) { h.打つ('H' + i, i); h.打つ('I' + i, i * 10); }
+  h.打つ('L1', '*');
+};
+/* 盤4・盤5（紙3）... ★字の '5' は ="5" で 置く（台の 打つ('5') は 数に なる）★
+   D系の 行は 3列（式・J2=条件・値）＝J2 に ="条件" を 置く */
+const 盤3 = (h, 条) => {
+  ['0', '=" "', '16', 'x', '5', '="5"'].forEach((v, i) => h.打つ('A' + (i + 1), v));
+  h.打つ('F1', '名'); h.打つ('G1', '数');
+  ['apple', '=NA()', '=TRUE', '=""', 'a~b', ' x', 'x', 5, '=1/0', null].forEach((v, i) => { if (v !== null) h.打つ('F' + (i + 2), v); h.打つ('G' + (i + 2), i + 1); });
+  h.打つ('J1', '名');
+  if (条 !== undefined) h.打つ('J2', '="' + 条 + '"');
+};
+/* 盤8（紙6）A1:A6=0," ",16,x,5(数),'5(字)・B1:B6=1..6・Z1=5・Z2=TRUE／C1:C3=45000,46000,0.5／E1:E10=盤2 の A と 同じ／F1='a~b */
+const 盤8 = (h) => {
+  ['0', '=" "', '16', 'x', 5, '="5"'].forEach((v, i) => { h.打つ('A' + (i + 1), v); h.打つ('B' + (i + 1), i + 1); });
+  h.打つ('Z1', 5); h.打つ('Z2', '=TRUE');
+  [45000, 46000, 0.5].forEach((v, i) => { h.打つ('C' + (i + 1), v); h.打つ('D' + (i + 1), i + 1); });
+  ['apple', '=NA()', '=TRUE', '=""', 'a~b', ' x', 'x', 5, '=1/0', null].forEach((v, i) => { if (v !== null) h.打つ('E' + (i + 1), v); });
+  h.打つ('F1', 'a~b');
+};
+/* 盤6（紙4）A1:A7='5,' 5','5.','1E3','1,000',5(数),'-0・B1:B7=1..7（紙4 の 頭の '5, は 区切りの 書き違い＝道具では '5）
+   盤7（紙5・千の カンマと > < の 型）A1:A10='1,00,'1,2,3,',5,'1,000.5,'-1,000,'1,0000,TRUE,5(数),'b,'5,・B1:B10=1..10 */
+const 字に = (v) => (typeof v === 'string' && v[0] !== '=' ? '="' + v + '"' : v);
+const 盤6 = (h) => ['5', ' 5', '5.', '1E3', '1,000', 5, '-0'].forEach((v, i) => { h.打つ('A' + (i + 1), 字に(v)); h.打つ('B' + (i + 1), i + 1); });
+const 盤7 = (h) => ['1,00', '1,2,3', ',5', '1,000.5', '-1,000', '1,0000', '=TRUE', 5, 'b', '5,'].forEach((v, i) => { h.打つ('A' + (i + 1), 字に(v)); h.打つ('B' + (i + 1), i + 1); });
+/* 盤11（紙7）G1:G10=45658,'2025/1/1,0.5,'12:00,'50%,0,=25/24,=1/24,'25:00,0.05・H1:H10=1,2,4,...,512（SUMIF で どの マスか 分かる） */
+const 盤11 = (h) => [45658, '2025/1/1', 0.5, '12:00', '50%', 0, '=25/24', '=1/24', '25:00', 0.05].forEach((v, i) => { h.打つ('G' + (i + 1), 字に(v)); h.打つ('H' + (i + 1), 2 ** i); });
+/* 盤13（紙10・範囲の 引数に #REF!）A1:A5=1..5・B1:B5=10..50 */
+const 盤13 = (h) => [1, 2, 3, 4, 5].forEach((v, i) => { h.打つ('A' + (i + 1), v); h.打つ('B' + (i + 1), v * 10); });
+/* 盤14（紙11・読めない 参照）A1:A5=1..5・B1:B5=10,20,1,1,50（retsu-x の 材料＋B3=1・B4=1） */
+const 盤14 = (h) => [10, 20, 1, 1, 50].forEach((v, i) => { h.打つ('A' + (i + 1), i + 1); h.打つ('B' + (i + 1), v); });
+/* 盤15（紙13・関数が 返す 参照）＝盤14＋E1 ="5"（式の 字）・E2=7・C2=TRUE（★台の 打つ('TRUE') は 字＝=TRUE で 置く★） */
+const 盤15 = (h) => { 盤14(h); h.打つ('E1', '="5"'); h.打つ('E2', 7); h.打つ('C2', '=TRUE'); };
+const 紙たち = [['utsushiji-excel-2026-11-07.tsv', 27, 盤1], ['utsushiji-excel-2-2026-11-07.tsv', 39, 盤2], ['utsushiji-excel-3-2026-11-07.tsv', 39, 盤3],
+  ['utsushiji-excel-4-2026-11-07.tsv', 9, 盤6], ['utsushiji-excel-5-2026-11-07.tsv', 19, 盤7], ['utsushiji-excel-6-2026-11-07.tsv', 18, 盤8], ['utsushiji-excel-7-2026-11-07.tsv', 48, 盤11], ['utsushiji-excel-8-2026-11-07.tsv', 14, 盤11],
+  ['utsushiji-excel-10-2026-11-07.tsv', 16, 盤13], ['utsushiji-excel-11-2026-11-07.tsv', 14, 盤14],
+  ['utsushiji-excel-12-2026-11-08.tsv', 22, 盤14], ['utsushiji-excel-13-2026-11-08.tsv', 103, 盤15],
+  ['utsushiji-excel-14-2026-11-08.tsv', 35, 盤15], ['utsushiji-excel-15-2026-11-08.tsv', 27, 盤15], ['utsushiji-excel-16-2026-11-08.tsv', 23, 盤15],
+  /* ★件4c（2026-11-08）＝束（とびとび）・端の外枠・帯の交わり・INDEX の区・束の門の名簿★ */
+  ['utsushiji-excel-17-2026-11-08.tsv', 30, 盤15], ['utsushiji-excel-18-2026-11-08.tsv', 46, 盤15],
+  ['utsushiji-excel-19-2026-11-08.tsv', 124, 盤15], ['utsushiji-excel-20-2026-11-08.tsv', 58, 盤15],
+  /* ★叩き直し2（2026-11-08）＝束の 関数の 残り（GCD・IM系・COVAR・SUMX系は #VALUE!／FREQUENCY・ZTEST・HSTACK・VSTACK・TOCOL・TOROW は 受ける）・束と 帯の 交わり★ */
+  ['utsushiji-excel-21-2026-11-08.tsv', 30, 盤15],
+  /* ★叩き直し3（2026-11-08）＝TOCOL/TOROW の 列の 順・区が 1つ 残る 交わり（22）／束の 交わりを MATCH・XLOOKUP・VLOOKUP・HLOOKUP・INDEX・SUMIF に（23）★ */
+  ['utsushiji-excel-22-2026-11-08.tsv', 33, 盤15], ['utsushiji-excel-23-2026-11-08.tsv', 48, 盤15],
+  /* ★叩き直し3 の 後（2026-11-08）＝TOCOL/TOROW の 3つ目の 字（「TRUE」だけ 真・他の 字は #VALUE!）／IF・CHOOSE・IFS・SWITCH を 通る 帯（件4d）★ */
+  ['utsushiji-excel-24-2026-11-08.tsv', 19, 盤15]];
+/* ★「まだ」の 口は 残す（直して いない 行を 黙って 外さず 数えて 出す 為）★ */
+const まだ = /^$^/;   /* ★紙6 の 日付・%・時刻の 右 7本と MATCH("a~b") 1本は 直した（11-07）＝まだ 0★ */
+/* ★紙11 の まだ★（2026-11-07）＝参照を 返す IF・CHOOSE・LET を 足す 範囲に 置く 形＝Excel 52
+     ★IF・CHOOSE は 値の直し4 件4a（2026-11-08）で 直した★＝残りは LET（件4b＝LET・ラムダの 名が 参照を 持つ） */
+const まだ11 = new Set([]);   /* ★LET は 件4b（2026-11-08）で 直した★ */
+/* ★紙13 の まだ★（2026-11-08・件4a の 後）＝名指しで 件を 書く（黙って 外さず 数えて 出す）
+     件4b＝LET・ラムダの 名が 参照を 持たない（値に 詰める）／件4c＝XLOOKUP が 参照を 返さない
+     件5＝式が 作った 表を IF が 1つに 詰める（Formula2 の 溢れ）／件6＝帯を AVERAGEIF(S)・MAXIFS・MINIFS に 置くと #REF! */
+const まだ13 = new Map([
+  ['=SUMIF(A1:A5,">2",XLOOKUP(10,B1:B5,B1:B5))', '件4c'], ['=SUM(XLOOKUP(10,B1:B5,A1:A5):A3)', '件4c'], ['=SUM(XLOOKUP(20,B1:B5,A1:A5):A5)', '件4c'],
+  ['=SUM(IF(TRUE,{1,2,3}))', '件5'], ['=ROWS(IF(TRUE,{1;2;3}))', '件5'],
+  ['=AVERAGEIF(A:A,">2",B:B)', '件6'], ['=MAXIFS(B:B,A:A,">2")', '件6'], ['=MINIFS(B:B,A:A,">2")', '件6'], ['=AVERAGEIFS(B:B,A:A,">2")', '件6'],
+]);
+/* ★紙14 の まだ★（2026-11-08 件4b の 後）＝番号が 並び（{1,2}）の CHOOSE は 並びの 数だけ 選んで 溢れる＝件5 */
+const まだ14 = new Map([['=SUM(CHOOSE({1,2},B1,B2))', '件5']]);
+/* ★紙17・紙19 の まだ★（2026-11-08 件4c の 後）＝CHOOSE({1,2},B1,B2) は 件5・CELL("address",束) は Excel が "$A$1,$B$1"（台は #VALUE! に 止めて ある＝黙って 1つ目を 出さない） */
+const まだ17 = new Map([['=SUM(CHOOSE({1,2},B1,B2))', '件5']]);
+const まだ19 = new Map([['=CELL("address",(A1,B1))', '束の 番地の 字']]);
+/* ★紙22・紙23 の まだ★＝★素の 帯でも 外れる 形★（MEDIAN(A:A)・SUM(INDEX(B:B,0))・近似の VLOOKUP(3,A:B,2) も 台は #REF!/#VALUE!）＝帯の 置き場（案X）の 外・件4c で ない */
+const まだ22 = new Map([['=MEDIAN((A:A,B:B) A:A)', '案X MEDIAN の 帯']]);
+const まだ23 = new Map([['=SUM(INDEX((A:A,B:B) B:B,0))', '案X INDEX の 0'], ['=VLOOKUP(3,(A:B,D:D) A:B,2)', '案X 近似の VLOOKUP'],
+  ['=SUM(INDEX((A:A,B:B),0,1,2))', '案X INDEX の 0'], ['=MEDIAN((A:A,B:B) A:B)', '案X MEDIAN の 帯'], ['=INDEX((A:A,B:B) A:A,0)', '案X INDEX の 0（溢れ）']]);
+/* ★紙24 の まだ★＝★帯が IF・CHOOSE・IFS・SWITCH を 通ると COUNT 等が 黙って 0★（ff1aef5 から 在る・件4c の 叩き直し3 で 見つけた）＝件4d */
+const まだ24 = new Map(['=COUNT(IF(TRUE,A:A))', '=COUNT(CHOOSE(1,A:A))', '=AGGREGATE(2,6,IF(TRUE,A:A))', '=COUNTA(IF(TRUE,A:A))', '=SUM(IF(TRUE,A:A))',
+  '=COUNT(IF(TRUE,(A:A,B:B)))', '=COUNT(IF(TRUE,(A:A,B:B) A:B))', '=COUNT(IFS(TRUE,A:A))', '=COUNT(SWITCH(1,1,A:A))', '=MAX(IF(TRUE,A:A))'].map(function (f) { return [f, '件4d IF 等を 通る 帯']; }));
+let まだの数 = 0;
+let pass = 0, fail = 0;
+for (const [名, 本数, 盤] of 紙たち) {
+  const 紙 = 読む(名);
+  if (紙.length !== 本数) { console.log('✗ ' + 名 + ' の 行が ' + 本数 + '本で ない: ' + 紙.length); fail++; }
+  for (const 行 of 紙) {
+    if (名 === 'utsushiji-excel-6-2026-11-07.tsv' && まだ.test(行[0])) { まだの数++; continue; }
+    if (名 === 'utsushiji-excel-11-2026-11-07.tsv' && まだ11.has(行[0])) { まだの数++; console.log('… まだ ' + 名 + ' ' + 行[0] + ' Excel ' + 行[1]); continue; }
+    if (名 === 'utsushiji-excel-13-2026-11-08.tsv' && まだ13.has(行[0])) { まだの数++; console.log('... まだ（' + まだ13.get(行[0]) + '） ' + 名 + ' ' + 行[0] + ' Excel ' + 行[1]); continue; }
+    for (const [紙名, ま] of [['utsushiji-excel-17-2026-11-08.tsv', まだ17], ['utsushiji-excel-19-2026-11-08.tsv', まだ19], ['utsushiji-excel-22-2026-11-08.tsv', まだ22], ['utsushiji-excel-23-2026-11-08.tsv', まだ23], ['utsushiji-excel-24-2026-11-08.tsv', まだ24]]) {
+      if (名 === 紙名 && ま.has(行[0])) { まだの数++; console.log('... まだ（' + ま.get(行[0]) + '） ' + 名 + ' ' + 行[0] + ' Excel ' + 行[1]); 行.まだ = true; }
+    }
+    if (行.まだ) continue;
+    if (名 === 'utsushiji-excel-14-2026-11-08.tsv' && まだ14.has(行[0])) { まだの数++; console.log('... まだ（' + まだ14.get(行[0]) + '） ' + 名 + ' ' + 行[0] + ' Excel ' + 行[1]); continue; }
+    const 式 = 行[0], 条 = 行.length === 3 ? 行[1].replace(/^J2=/, '') : undefined;
+    /* ★Excel の 真偽は Value2 の 字で True／False（紙13 から）＝台の TRUE／FALSE と 揃えて 比べる★ */
+    const 見 = ({ True: 'TRUE', False: 'FALSE' })[行[行.length - 1]] || 行[行.length - 1];
+    const h = new H.表(); 盤(h, 条); h.打つ('BZ1', 式);
+    const 出 = String(h.字('BZ1'));
+    const ok = 出 === 見 || (出 !== '' && isFinite(+出) && Math.abs(+出 - +見) < 1e-9);
+    if (ok) pass++; else { fail++; console.log('✗ ' + 名 + ' ' + 式 + (条 !== undefined ? ' J2=' + 条 : '') + ' 台 ' + 出 + ' Excel ' + 見); }
+  }
+}
+/* ★盤の 置き方が 効いて いるか★（打つ が 字や 真偽を 別の 型に 変えて いれば 紙と 比べても 意味が 無い）
+   ★台の 打つ('TRUE') は 字の まま＝真偽の マスは =TRUE で 置く★（値は Excel の 盤と 同じ 真偽） */
+{
+  const h = new H.表(); 盤2(h);
+  const 型 = ['A2', 'A3', 'A4', 'A6', 'A9'].map((a) => String(h.字(a)));
+  const 見 = ['#N/A', 'TRUE', '', ' x', '#DIV/0!'];
+  if (JSON.stringify(型) === JSON.stringify(見)) pass++; else { fail++; console.log('✗ 盤2 の 置き方 ' + JSON.stringify(型)); }
+}
+/* ★MATCH も 同じ 型紙＝`*` を 字より 先に 見る（前は "a*" が "a*b" に 当たらなかった）★ */
+{
+  const h = new H.表(); h.打つ('A1', 'a*b'); h.打つ('BZ1', '=MATCH("a*",A1:A1,0)');
+  if (String(h.字('BZ1')) === '1') pass++; else { fail++; console.log('✗ MATCH("a*",{"a*b"},0) 台 ' + h.字('BZ1') + ' 見 1'); }
+}
+/* ★★「# (F to F2 ga chigau)」の 行も 数える★★（件4c 叩き直し2・止め1＝紙19 の FREQUENCY((A1:A2,B1:B2),{2}) が 2→#VALUE! に 崩れたのに 「#」の 行は 飛ばして いた）
+     ＝溢れる 答え（F2 は 左上）。台の 字('BZ1') は 左上なので F2 と 比べる。★紙17〜21 だけ★（紙13 以前の F/F2 は 演算子の 溢れ＝件5） */
+{
+  let 見た = 0;
+  for (const k of [17, 18, 19, 20, 21, 22, 23]) {
+    const 名 = 'utsushiji-excel-' + k + '-2026-11-08.tsv';
+    for (const l of fs.readFileSync(path.join(根, 'docs/measured', 名), 'utf8').split(/\r?\n/)) {
+      const m = /^# \(F to F2 ga chigau\) (=.*) F=(.*) F2=(.*)$/.exec(l);
+      if (!m) continue;
+      見た++;
+      if (k === 23 && まだ23.has(m[1])) { まだの数++; console.log('... まだ（' + まだ23.get(m[1]) + '） ' + 名 + ' ' + m[1]); continue; }
+      const h = new H.表(); 盤15(h); h.打つ('BZ1', m[1]);
+      const 出 = String(h.字('BZ1'));
+      if (出 === m[3] || (出 !== '' && isFinite(+出) && Math.abs(+出 - +m[3]) < 1e-9)) pass++; else { fail++; console.log('✗ ' + 名 + ' ' + m[1] + '（溢れの 左上） 台 ' + 出 + ' Excel F2 ' + m[3]); }
+    }
+  }
+  if (見た !== 5) { fail++; console.log('✗ 紙17〜23 の F/F2 の 行が 5本で ない: ' + 見た); }
+}
+fail += 窓の崩れ;
+console.log('[utsushiji] pass ' + pass + ' / fail ' + fail + '（窓の 崩れ ' + 窓の崩れ + '・まだ ' + まだの数 + '本）');
+process.exit(fail ? 1 : 0);
