@@ -126,7 +126,34 @@ T('⑶ xlsb板を作る：記録485 を 134 の 後・145 の 前 に 写す（�
   ok(ws.F7 && ws.F7.v === 7 && ws.A7 && ws.A7.v === 8, 'F7/A7 ' + JSON.stringify([ws.F7, ws.A7]));
 });
 
-/* ⑸ ★壊し★＝前の 形・取り違えの 形を 作って ★形を見る が 赤に する★ か */
+/* ⑹ ★新しい 板に「書いて いない 行を 隠す」（記録485 u16@8 の 0x02）を 写さない★（2026-11-13 本番前 taiketsu 止め）
+     ＝見本の 1枚目が 隠す 板だと、足した 板も 数を 打った 行しか 見えなく なった
+     ★高さを 手で 決めた 印（0x01）は 残す★＝高さ（u16@6）を 写す 以上、印も 揃える */
+const 隠す見本 = path.join(ROOT, 'tests/fixtures/zero-height-gap-2026-11-08.xlsb');
+T('⑹ 見本が 隠す 板でも、新しい 板は 隠さない（0x02 を 落とす・0x01 は 残す）', () => {
+  const 見recs = XE.parse(板を読む(隠す見本), XE.SHAPE.sheet).recs;
+  const 元 = 見recs.find((x) => x.id === 485).data;
+  const 元印 = 元[8] | (元[9] << 8);
+  ok(元印 & 0x02, '見本の 485 に 0x02 が 立って いない（' + 元印 + '）＝壊しが 空振り');
+  const recs = XE.parse(XE.xlsb板を作る(見recs, { A1: { v: 1 }, A5: { v: 2 } }), XE.SHAPE.sheet).recs;
+  const 今 = recs.find((x) => x.id === 485).data;
+  const 今印 = 今[8] | (今[9] << 8);
+  ok((今印 & 0x02) === 0, '新しい 板に 隠す 印が 写った（' + 今印 + '）');
+  ok((今印 & ~0x02) === (元印 & ~0x02), '0x02 の 外の 印が 変わった（元 ' + 元印 + ' 今 ' + 今印 + '）');
+  ok(Buffer.from(今.subarray(0, 8)).equals(Buffer.from(元.subarray(0, 8))), '485 の 高さ 等が 写って いない');
+});
+/* ⑹b ★0x01（高さを 手で 決めた 印）は 残る★＝見本 e-all30（600 twips＋0x01）／印を 全部 落とす 壊しを ここで 赤に する */
+const 手の見本 = path.join(ROOT, 'tests/fixtures/kitei-gyoudaka-e-all30-2026-11-07.xlsb');
+T('⑹b 見本が 高さを 手で 決めた 板なら、新しい 板にも 0x01 と 高さが 残る', () => {
+  const 見recs = XE.parse(板を読む(手の見本), XE.SHAPE.sheet).recs;
+  const 元 = 見recs.find((x) => x.id === 485).data;
+  ok(元[8] & 0x01, '見本の 485 に 0x01 が 立って いない（' + 元[8] + '）＝壊しが 空振り');
+  const 今 = XE.parse(XE.xlsb板を作る(見recs, { A1: { v: 1 } }), XE.SHAPE.sheet).recs.find((x) => x.id === 485).data;
+  ok(今[8] & 0x01, '新しい 板で 0x01 が 落ちた（' + 今[8] + '）');
+  ok((今[6] | (今[7] << 8)) === (元[6] | (元[7] << 8)), '高さが 変わった');
+});
+
+/* ⑸★壊し★＝前の 形・取り違えの 形を 作って ★形を見る が 赤に する★ か */
 const 赤か = (名, d, r, 列ら) => T('⑸ 壊し「' + 名 + '」は 赤', () => {
   let 赤 = false;
   try { 形を見る(d, r, 列ら, 353); } catch (e) { 赤 = true; }
