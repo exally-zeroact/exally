@@ -12447,6 +12447,10 @@ function onTE(e){
 // キー
 function onKD(e){
   if(editingCell) return;
+  /* ★フォームを 開いている間は 板の 短縮キーを 通さない★（2026-11-14・穴4 の叩き直しの止め）＝前は フォームの 入力欄で
+     Ctrl+PageDown を 押すと 板が 移り、閉じる時に 字を 別の板へ 書いた（Ctrl+D なども 入力欄から 板を 書き換えた）。
+     実Excel の データフォームは 閉じるまで 板へ 戻れない。preventDefault しない＝入力欄の 中の 元に戻す 等は ブラウザに 任せる */
+  if(typeof _フォーム!=="undefined" && _フォーム) return;
   var ek = e.key.toLowerCase();
   /* ★F9＝すべて再計算／Shift+F9＝このシートだけ★（実Excelと 同じ割り当て）
      ★手動に した時に F9 が 無いと 一生 計算できない★ので ここで 受ける。 */

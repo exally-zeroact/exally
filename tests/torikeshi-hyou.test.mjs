@@ -76,6 +76,13 @@ if (SELF) {
     if (抜いた === 元) { console.log('★--self-test: ' + 名 + ' の 控えの 行が 見つからない（空振り）'); process.exit(1); }
     win.eval(抜いた);
   }
+  /* onKD は addEventListener で 掴まれている＝外して 守りを 抜いた 物を 付け直す */
+  const 元KD = String(win.onKD); const 抜いたKD = 元KD.replace('if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
+  if (抜いたKD === 元KD) { console.log('★--self-test: onKD の 守りが 見つからない（空振り）'); process.exit(1); }
+  doc.removeEventListener('keydown', win.onKD); win.eval(抜いたKD); doc.addEventListener('keydown', win.onKD);
+  const 元R = String(win.doRedo); const 抜いたR = 元R.replace('if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
+  if (抜いたR === 元R) { console.log('★--self-test: doRedo の 守りが 見つからない（空振り）'); process.exit(1); }
+  win.eval(抜いたR);
 }
 const 新しい本 = () => { win.eval("sheets.length=1; sheets[0]={name:'Sheet1',data:{},colW:{},rowH:{}}; activeSheet=0; undoStack.length=0; redoStack.length=0;"); if (typeof win.rebuildSheetTabs === 'function') win.rebuildSheetTabs(); };
 const 選ぶ = (r, c) => { win.sel(r, c, r, c); };
@@ -129,6 +136,21 @@ win.フォームを閉じる();
 await T('★→閉じても 行が 古い字で 上書きされない★', () => { eq(字(1, 0), 'r1', 'A2'); eq(字(2, 0), 'r3', 'A3'); eq(字(3, 0), '', 'A4'); });
 win.doUndo();
 await T('★→Ctrl+Z で 消した 行が 戻る★', () => { eq(字(1, 0), 'r1', 'A2'); eq(字(2, 0), 'r2', 'A3'); eq(字(3, 0), 'r3', 'A4'); });
+
+/* フォームの 入力欄で 板の 短縮キー（Ctrl+PageDown・Ctrl+D・Ctrl+Y）＝前は 板が 移って 閉じる時に 別の板へ 書いた */
+新しい本(); win.eval("sheets.push({name:'Sheet2',data:{'1,0':{v:'s2a'}},colW:{},rowH:{}})"); if (typeof win.rebuildSheetTabs === 'function') win.rebuildSheetTabs();
+win.setCell(0, 0, '名'); for (let r = 1; r <= 3; r++) win.setCell(r, 0, 'r' + r);
+win.undoStack.length = 0; win.redoStack.length = 0; win.setCell(5, 5, 'z'); win.doUndo();
+eq(win.redoStack.length, 1, 'やり直しが 1つ 在る');
+選ぶ(1, 0); eq(win.フォームの窓を開く(), 1, 'フォームが 開いた');
+const 入力欄 = doc.querySelector('#formBody .form-v'); 入力欄.focus();
+const Ctrl = (k) => 入力欄.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, ctrlKey: true, bubbles: true }));
+Ctrl('PageDown'); Ctrl('d'); Ctrl('y');
+await T('★フォームの 入力欄で Ctrl+PageDown・Ctrl+D・Ctrl+Y＝板は 動かない★', () => {
+  eq(win.activeSheet, 0, '板'); eq(字(2, 0), 'r2', 'A3'); eq(win.redoStack.length, 1, 'やり直し'); eq(字(5, 5), '', 'F6');
+});
+win.フォームを閉じる();
+await T('★→閉じても 別の板へ 書かない★', () => { eq(String(win.sheets[1].data['1,0'].v), 's2a', 'Sheet2 A2'); eq(字(1, 0), 'r1', 'A2'); });
 
 /* 穴5＝隠す→全部出す→集計行→Ctrl+Z。前は 集計行の 控えが 無く 全部出す が 戻って 行が 隠れ、集計行は 残った */
 新しい本(); 名と数(); 選ぶ(0, 0); 窓で決める('A1:B3', '表1', true, false);
