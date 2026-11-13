@@ -14639,9 +14639,36 @@ function フォームを動かす(向き){
   render();
   return 1;
 }
+/* ★足す 先（下の 1行）が 空か★（穴10・2026-11-14）＝前は 確かめずに 下の 行へ 書き、
+   集計行（SUBTOTAL）や 表の 下の 客の 字を 上書きした。
+   ①集計行は ★字でなく 形で 判じる★（客が 集計行を 空にしても 集計行は 集計行）
+   ②下の 行に 字か 式が あれば 断る（ctxInsertRow の 断りと 同じ 式＝書式だけは 空）
+   ③下に 別の 表が 在れば 断る ④板の 外へは 出ない */
+function _フォームで足せない訳(f){
+  var 下 = f.r2 + 1;
+  var 表たち = 表の箱();
+  for (var i = 0; i < 表たち.length; i++) {
+    var t = 表たち[i];
+    if (t.c1 === f.c1 && t.r1 === f.r1 && t.集計行 && 下 === t.r2)
+      return '集計行が ある 表では 足せません（集計行を いったん しまうと 足せます）';
+  }
+  if (下 >= ROWS) return 'シートの 一番 下なので 足せません';
+  var ほか = 表たち.filter(function (t) { return !(t.c1 === f.c1 && t.r1 === f.r1); });
+  var ぶつかる = Table.重なる(ほか, 下, f.c1, 下, f.c2);
+  if (ぶつかる) return '下に 表「' + ぶつかる.名 + '」が あるので 足せません';
+  var d = sheets[activeSheet].data;
+  for (var c = f.c1; c <= f.c2; c++) {
+    var x = d[下 + ',' + c];
+    if (x && ((x.v !== undefined && x.v !== null && x.v !== '') || !!x.f))
+      return '下の 行（' + (下 + 1) + '行目）が 空で ないので 足せません';
+  }
+  return '';
+}
 function フォームで足す(){
   var f = _フォーム; if (!f) return 0;
   if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return 0; }
+  var 断り = _フォームで足せない訳(f);
+  if (断り) { document.getElementById('formWhy').textContent = 断り; return 0; }
   if (フォームを書き込む() < 0) return 0;
   f.r2 = f.r2 + 1;
   f.今の行 = f.r2;
