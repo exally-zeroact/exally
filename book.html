@@ -10790,6 +10790,9 @@ window.addEventListener('load', function() {
         if (_rbEl) {
           var _リボンキー = function (ev) {
             if (!window.Ribbon || !window.RibbonSpec) return;
+            /* ★フォームを 開いている間は Alt の キーチップも 通さない★（2026-11-14・穴4）＝onKD とは 別の 受け口。
+               前は 入力欄で Alt→H→D（行を削除）等が 板を 書き換え、閉じる時に 詰めた 別の行へ 古い字を 書いた */
+            if (typeof _フォーム !== 'undefined' && _フォーム) return;
             if (ev.ctrlKey || ev.metaKey) return;      /* Ctrl 系は 別の層 */
             var 使った = window.Ribbon.キーを受ける(_rbEl, window.RibbonSpec, ev);
             if (!使った) return;
@@ -14504,7 +14507,8 @@ function フォームの窓を開く(){
     notify('中身の 行が ありません（見出しの 下に 1行 以上 要ります）');
     return 0;
   }
-  _フォーム = { r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2, 見出し: 見出し, 今の行: 中身の上 };
+  _フォーム = { r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2, 見出し: 見出し, 今の行: 中身の上,
+    板: sheets[activeSheet], 元: {} };   /* 板＝開いた時の 板の 物・元＝描いた時の 欄の 字（書き込む で 下が 変わったかを 見る） */
   フォームを描く();
   ov.style.display = 'flex';
   return 1;
@@ -14516,7 +14520,8 @@ function フォームを描く(){
   for (var i = 0; i < f.見出し.length; i++) {
     var c = f.c1 + i;
     var cell = sheets[activeSheet].data[f.今の行 + ',' + c];
-    var v = cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
+    var v = _フォームの字(cell);
+    f.元[c] = v;
     h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
       + '<span style="min-width:6em;font-size:12px;color:#7A9A87;">' + String(f.見出し[i]).replace(/</g, '&lt;') + '</span>'
       + '<input type="text" class="form-v" data-c="' + c + '" value="' + String(v).replace(/"/g, '&quot;') + '"'
@@ -14529,20 +14534,40 @@ function フォームを描く(){
   document.getElementById('formWhy').textContent = '';
 }
 /* ★打った字を セルに 入れる★（前へ／次へ／閉じる の 時） */
+function _フォームの字(cell){
+  return cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
+}
+/* ★客が 直した 欄だけ 入れる・下が 変わっていれば 入れない★（2026-11-14・穴4）
+   前は「欄 ≠ 今の セル」の 欄を 全部 書いた＝開いている間に 板・行・本が 変わると、別の所へ 古い字を 書いた
+   （Ctrl+Z・板を移る・本を落とす・Alt の 行を削除 で 叩きの 止め4つ）。入り口も 閉じてあるが、ここが 最後の 守り。 */
 function フォームを書き込む(){
   var f = _フォーム; if (!f) return 0;
   var 箱 = document.querySelectorAll('#formBody .form-v');
-  var 直した = 0;
+  var 直した = 0, 入れない = [];
   for (var i = 0; i < 箱.length; i++) {
     var c = parseInt(箱[i].getAttribute('data-c'), 10);
-    var cell = sheets[activeSheet].data[f.今の行 + ',' + c];
-    var 今 = cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
-    if (箱[i].value !== 今) { setCell(f.今の行, c, 箱[i].value); 直した++; }
+    var 元 = f.元[c] === undefined ? '' : f.元[c];
+    if (箱[i].value === 元) continue;                 /* 客は 直していない＝書かない */
+    var 今 = _フォームの字(sheets[activeSheet].data[f.今の行 + ',' + c]);
+    if (sheets[activeSheet] !== f.板 || 今 !== 元) {   /* 開いた後に 板か 下の 字が 変わった＝別の所へ 書かない */
+      入れない.push(String(f.見出し[c - f.c1]) + '：' + 箱[i].value);
+      continue;
+    }
+    setCell(f.今の行, c, 箱[i].value); 直した++;
+    f.元[c] = _フォームの字(sheets[activeSheet].data[f.今の行 + ',' + c]);
   }
+  if (入れない.length) notify('開いている 間に 表が 変わったので 入れませんでした（' + 入れない.join('、') + '）');
   return 直した;
+}
+/* 開いた時と 板の 物が 違えば 窓を 閉じる（書き込む が 字を 捨てて 知らせる） */
+function _フォームの板が違えば閉じる(){
+  var f = _フォーム; if (!f || sheets[activeSheet] === f.板) return false;
+  フォームを閉じる();
+  return true;
 }
 function フォームを動かす(向き){
   var f = _フォーム; if (!f) return 0;
+  if (_フォームの板が違えば閉じる()) return 0;
   フォームを書き込む();
   var 次 = f.今の行 + 向き;
   if (次 < f.r1 + 1 || 次 > f.r2) {
@@ -14557,6 +14582,7 @@ function フォームを動かす(向き){
 }
 function フォームで足す(){
   var f = _フォーム; if (!f) return 0;
+  if (_フォームの板が違えば閉じる()) return 0;
   フォームを書き込む();
   f.r2 = f.r2 + 1;
   f.今の行 = f.r2;
@@ -14571,6 +14597,7 @@ function フォームで足す(){
 }
 function フォームで消す(){
   var f = _フォーム; if (!f) return 0;
+  if (_フォームの板が違えば閉じる()) return 0;
   if (f.r2 <= f.r1 + 1) {
     document.getElementById('formWhy').textContent = '最後の 1行は 消せません';
     return 0;
@@ -14599,10 +14626,13 @@ function フォームで消す(){
   return 1;
 }
 function フォームを閉じる(){
-  フォームを書き込む();
-  _フォーム = null;
-  var ov = document.getElementById('formOverlay');
-  if (ov) ov.style.display = 'none';
+  /* 書き込みが 投げても 窓と _フォーム は 必ず 片づける（残ると 全部の キーが 死ぬ） */
+  try { フォームを書き込む(); }
+  finally {
+    _フォーム = null;
+    var ov = document.getElementById('formOverlay');
+    if (ov) ov.style.display = 'none';
+  }
   render(); updateBar();
   return 1;
 }
@@ -20830,7 +20860,15 @@ function rebuildSheetTabs(){
 function onPickBookFile(el){
   var f = el && el.files && el.files[0];
   el.value = '';                      // 同じファイルをもう一度選べるようにする
+  if (f && _フォームが開いていれば断る()) return;
   if (f) openBookFile(f);
+}
+/* ★フォームを 開いている間は 本を 開かない★（2026-11-14・穴4）＝前は 開いたまま 本を 落とすと、閉じる時に 前の本の 字を 新しい本へ 書いた。
+   実Excel の データフォームは 閉じるまで 本へ 戻れない */
+function _フォームが開いていれば断る(){
+  if (typeof _フォーム === 'undefined' || !_フォーム) return false;
+  notify('フォームを 閉じてから 本を 開いてください');
+  return true;
 }
 /* ══ ★★ファイルを 読めなかった 時（2026-09-25）★★ ══
      ★★実測（お客さんの 道・実物）★★
@@ -20993,6 +21031,7 @@ function openBookFile(file){
   });
   window.addEventListener('drop', function(e){
     var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f && _フォームが開いていれば断る()) return;
     if (f) openBookFile(f);
   }, false);
 })();

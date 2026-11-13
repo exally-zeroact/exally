@@ -83,6 +83,12 @@ if (SELF) {
   const 元R = String(win.doRedo); const 抜いたR = 元R.replace('if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
   if (抜いたR === 元R) { console.log('★--self-test: doRedo の 守りが 見つからない（空振り）'); process.exit(1); }
   win.eval(抜いたR);
+  /* 本を 開く 入り口の 守りと、書き込む の「直した 欄だけ・下が 変わったら 書かない」を 抜く */
+  win.eval('_フォームが開いていれば断る = function(){ return false; };');
+  const 元W = String(win.フォームを書き込む);
+  const 抜いたW = 元W.replace('if (箱[i].value === 元) continue;', '').replace('if (sheets[activeSheet] !== f.板 || 今 !== 元) {', 'if (false) {');
+  if (抜いたW === 元W || 抜いたW.includes('今 !== 元)')) { console.log('★--self-test: 書き込む の 守りが 見つからない（空振り）'); process.exit(1); }
+  win.eval(抜いたW);
 }
 const 新しい本 = () => { win.eval("sheets.length=1; sheets[0]={name:'Sheet1',data:{},colW:{},rowH:{}}; activeSheet=0; undoStack.length=0; redoStack.length=0;"); if (typeof win.rebuildSheetTabs === 'function') win.rebuildSheetTabs(); };
 const 選ぶ = (r, c) => { win.sel(r, c, r, c); };
@@ -151,6 +157,41 @@ await T('★フォームの 入力欄で Ctrl+PageDown・Ctrl+D・Ctrl+Y＝板�
 });
 win.フォームを閉じる();
 await T('★→閉じても 別の板へ 書かない★', () => { eq(String(win.sheets[1].data['1,0'].v), 's2a', 'Sheet2 A2'); eq(字(1, 0), 'r1', 'A2'); });
+
+/* Alt の キーチップ（onKD とは 別の 受け口）＝前は 入力欄で Alt→H→D が 行を 消し、閉じると 詰めた 行へ 古い字（名|r1|r3＝r2 が 消えた） */
+新しい本(); win.setCell(0, 0, '名'); for (let r = 1; r <= 3; r++) win.setCell(r, 0, 'r' + r); win.undoStack.length = 0;
+選ぶ(1, 0); win.フォームの窓を開く();
+const 欄A = doc.querySelector('#formBody .form-v'); 欄A.focus();
+const キー = (t, k, alt) => 欄A.dispatchEvent(new win.KeyboardEvent(t, { key: k, altKey: !!alt, bubbles: true }));
+キー('keydown', 'Alt', true); キー('keyup', 'Alt', false); キー('keydown', 'h'); キー('keyup', 'h'); キー('keydown', 'd'); キー('keyup', 'd');
+await T('★フォームの 入力欄で Alt→H→D（行を削除）＝板は 動かない★', () => { eq([0, 1, 2, 3].map((r) => 字(r, 0)).join('|'), '名|r1|r2|r3', 'A列'); });
+win.フォームを閉じる();
+await T('★→閉じても 行が 消えない・古い字で 上書きされない★', () => { eq([0, 1, 2, 3].map((r) => 字(r, 0)).join('|'), '名|r1|r2|r3', 'A列'); });
+
+/* 本を 開く 入り口（ファイルを 落とす・選ぶ）＝前は 開いたまま 本を 落とすと、閉じる時に 前の本の 字を 新しい本へ 書いた */
+新しい本(); win.setCell(0, 0, '名'); win.setCell(1, 0, 'r1'); 選ぶ(1, 0); win.フォームの窓を開く();
+const 元の開く = win.openBookFile; let 開いた = 0; win.openBookFile = () => { 開いた++; };
+const 落とす = new win.Event('drop', { bubbles: true, cancelable: true });
+Object.defineProperty(落とす, 'dataTransfer', { value: { files: [{ name: 'b.xlsx' }] } });
+win.dispatchEvent(落とす);
+win.onPickBookFile({ files: [{ name: 'b.xlsx' }], value: 'b.xlsx' });
+await T('★フォームを 開いたまま 本を 落とす・選ぶ＝開かない★', () => { eq(開いた, 0, '本を 開いた 回数'); });
+win.フォームを閉じる();
+win.onPickBookFile({ files: [{ name: 'b.xlsx' }], value: 'b.xlsx' });
+await T('★→閉じた後は 開ける（守りが 残って 開けなく ならない）★', () => { eq(開いた, 1, '本を 開いた 回数'); });
+win.openBookFile = 元の開く;
+
+/* 最後の 守り＝客が 直した 欄だけ 入れる・開いた後に 下の 字が 変わった 欄は 入れない */
+新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, '数'); win.setCell(0, 2, '備考');
+win.setCell(1, 0, 'a'); win.setCell(1, 1, 1); win.setCell(1, 2, 'x'); win.undoStack.length = 0;
+選ぶ(1, 0); win.フォームの窓を開く();
+const 欄 = [...doc.querySelectorAll('#formBody .form-v')];
+win.setCell(1, 0, '下で変えた'); win.setCell(1, 2, '下で変えた2');   /* 開いている 間に 下が 変わった（守りを 抜けた 道の 代わり） */
+欄[1].value = '9'; 欄[2].value = '客が打った';
+win.フォームを閉じる();
+await T('★客が 直していない 欄は 書かない（下で 変わった 字を 古い字で 戻さない）★', () => { eq(字(1, 0), '下で変えた', 'A2'); });
+await T('★客が 直した 欄で 下が 同じなら 入れる★', () => { eq(字(1, 1), '9', 'B2'); });
+await T('★客が 直した 欄でも 下が 変わっていれば 入れない★', () => { eq(字(1, 2), '下で変えた2', 'C2'); });
 
 /* 穴5＝隠す→全部出す→集計行→Ctrl+Z。前は 集計行の 控えが 無く 全部出す が 戻って 行が 隠れ、集計行は 残った */
 新しい本(); 名と数(); 選ぶ(0, 0); 窓で決める('A1:B3', '表1', true, false);

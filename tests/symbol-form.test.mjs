@@ -119,17 +119,19 @@ ok('★alert / prompt / confirm を 使っていない★', !/\balert\(|\bprompt
 console.log('\n[⑥ フォームの 中身（本当に 動くか）]');
 {
   /* 書き込みの 中身だけ 取り出して 走らせる */
-  const f = new Function('sheets', 'activeSheet', '_フォーム', 'document', 'setCell',
-    抜く('フォームを書き込む') + '\nreturn フォームを書き込む;');
+  const f = new Function('sheets', 'activeSheet', '_フォーム', 'document', 'setCell', 'notify',
+    抜く('_フォームの字') + '\n' + 抜く('フォームを書き込む') + '\nreturn フォームを書き込む;');
   const データ = { '0,0': { v: '月', f: '月' }, '1,0': { v: '1月', f: '1月' }, '1,1': { v: 100, f: '100' } };
   const 入れた = [];
   const 箱 = [
     { getAttribute: () => '0', value: '2月' },
     { getAttribute: () => '1', value: '100' },
   ];
-  const n = f([{ data: データ }], 0, { r1: 0, c1: 0, r2: 1, c2: 1, 見出し: ['月', '売上'], 今の行: 1 },
+  /* 板＝開いた時の 板の 物・元＝描いた時の 欄の 字（穴4・2026-11-14＝客が 直した 欄だけ・下が 変わっていない 時だけ 入れる） */
+  const 板 = { data: データ };
+  const n = f([板], 0, { r1: 0, c1: 0, r2: 1, c2: 1, 見出し: ['月', '売上'], 今の行: 1, 板, 元: { 0: '1月', 1: '100' } },
     { querySelectorAll: () => 箱 },
-    (r, c, v) => { 入れた.push(r + ',' + c + '=' + v); })();
+    (r, c, v) => { 入れた.push(r + ',' + c + '=' + v); }, () => {})();
   ok('★変えた所だけ 入れる★', n === 1, String(n));
   ok('  入れた所', JSON.stringify(入れた) === '["1,0=2月"]', JSON.stringify(入れた));
 }
