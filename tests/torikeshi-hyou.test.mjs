@@ -61,9 +61,16 @@ try { win.dispatchEvent(new win.Event('load')); } catch (e) { /* 続ける */ }
 
 
 const SELF = process.argv.includes('--self-test');
+const SELF2 = process.argv.includes('--self-test-futatsu');
+if (SELF2) {
+  /* 見出し無しで 作る時も 表を決める が 積む 形＝控えが 2つ（2回 押さないと 戻らない）で 赤に なるか */
+  const 元 = String(win.表を決める); const 抜いた = 元.replace('if (見出し行 || 今) _pushRowColUndo();', '_pushRowColUndo();');
+  if (抜いた === 元) { console.log('★--self-test-futatsu: 条件の 行が 見つからない（空振り）'); process.exit(1); }
+  win.eval(抜いた);
+}
 if (SELF) {
   /* 直す前の 形＝表を決める・フォームで消す から 控えを 積む 行を 抜く（抜けなければ 試験が 空振り＝止める） */
-  for (const [名, 行] of [['表を決める', /if \(見出し行 \|\| 今\) _pushRowColUndo\(\);/], ['フォームで消す', /_pushRowColUndo\(\);/]]) {
+  for (const [名, 行] of [['表を決める', /if \(見出し行 \|\| 今\) _pushRowColUndo\(\);/], ['フォームで消す', /_pushRowColUndo\(\);/], ['doUndo', /if\(typeof _フォーム!=="undefined" && _フォーム\) return;/]]) {
     const 元 = String(win[名]);
     const 抜いた = 元.replace(行, '');
     if (抜いた === 元) { console.log('★--self-test: ' + 名 + ' の 控えの 行が 見つからない（空振り）'); process.exit(1); }
@@ -116,7 +123,11 @@ await T('★→Ctrl+Z 1回で 足した 行も 表も 戻る★', () => { eq(表
 win.フォームを動かす(1);
 eq(win.フォームで消す(), 1, '消せた');
 await T('★フォームで 1行 消す→控えが 1つ★', () => { eq(win.undoStack.length, 1, '控え'); eq(字(2, 0), 'r3', 'A3'); eq(字(3, 0), '', 'A4'); });
-win.フォームを閉じる(); win.doUndo();
+win.doUndo();
+await T('★フォームを 開いたまま Ctrl+Z は 断る（実Excel の フォームは 閉じるまで 板へ 戻れない）★', () => { eq(win.undoStack.length, 1, '控え'); eq(字(2, 0), 'r3', 'A3'); });
+win.フォームを閉じる();
+await T('★→閉じても 行が 古い字で 上書きされない★', () => { eq(字(1, 0), 'r1', 'A2'); eq(字(2, 0), 'r3', 'A3'); eq(字(3, 0), '', 'A4'); });
+win.doUndo();
 await T('★→Ctrl+Z で 消した 行が 戻る★', () => { eq(字(1, 0), 'r1', 'A2'); eq(字(2, 0), 'r2', 'A3'); eq(字(3, 0), 'r3', 'A4'); });
 
 /* 穴5＝隠す→全部出す→集計行→Ctrl+Z。前は 集計行の 控えが 無く 全部出す が 戻って 行が 隠れ、集計行は 残った */
@@ -131,5 +142,6 @@ await T('★穴5：再表示→集計行→Ctrl+Z＝集計行だけ 戻り 行�
 });
 
 console.log('\ntorikeshi-hyou: ' + pass + ' 緑 / ' + fail + ' 赤');
+if (SELF2) { if (fail === 0) { console.log('★--self-test-futatsu なのに 赤が 0＝空振り'); process.exit(1); } console.log('★--self-test-futatsu: 控えを 2つ 積む 形で 赤 ' + fail + '＝見張りは 効いている'); process.exit(0); }
 if (SELF) { if (fail === 0) { console.log('★--self-test なのに 赤が 0＝見張りが 効いていない'); process.exit(1); } console.log('★--self-test: 直す前の 形で 赤 ' + fail + '＝見張りは 効いている'); process.exit(0); }
 process.exit(fail ? 1 : 0);
