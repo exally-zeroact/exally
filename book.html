@@ -11683,6 +11683,8 @@ function bindEvents(){
     fkbShow();
   });
   fi.addEventListener('blur',function(){
+    /* ★別の窓・別のタブへ 移っただけ（ページが focus を 失った）は 確定も 捨てもしない★＝実Excel と 同じ・戻れば 続きから 打てる（件⑦(2) 叩き） */
+    if(typeof document.hasFocus==='function' && !document.hasFocus()) return;
     // カスタムKBモードでなければ確定
     var kb=document.getElementById('formula-kb');
     if(kb.style.display==='none'||!kb.style.display){
@@ -18184,7 +18186,8 @@ function _帯を確定(){
   var stored=getCell(selR1,selC1).f||'';
   var actual=fi.value.replace(/ ↵ /g,'\n');
   if(actual===stored) return;
-  if(!validGate(selR1,selC1,actual)){ fi.value=stored; return; }
+  /* 式（= で始まる）は 今は 字で 判じて 必ず 断られる＝答えで 判じる 直しは 別の件・それまでは 前と 同じく 通す */
+  if(!(actual.charAt(0)==='='||actual.charAt(0)==='＝') && !validGate(selR1,selC1,actual)){ fi.value=stored.replace(/\n/g,' ↵ '); return; }
   setCell(selR1,selC1,actual);
 }
 /* ★別のマスを 押す 前に PC の帯を 確定★＝onMD は 既定を 止めるので 帯の blur は sel の 後に 来る＝

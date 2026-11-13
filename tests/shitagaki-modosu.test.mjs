@@ -46,6 +46,8 @@ const dom = new JSDOM(html.replace(/<script[\s\S]*?<\/script>/g, ''), {
   },
 });
 const win = dom.window, doc = win.document;
+// jsdom の document.hasFocus() は blur の中で偽を返す。本物のページは同じページの中で focus が動く時 真＝そう揃える（別の窓へ移る試験だけ偽に差し替える）
+doc.hasFocus = () => true;
 const inject = (code) => { const el = doc.createElement('script'); el.textContent = code; doc.body.appendChild(el); };
 for (const src of [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1].split('?')[0]).filter((s) => !/^https?:/.test(s))) {
   const p = path.join(ROOT, src);
@@ -197,6 +199,14 @@ const 確定した = () => { eq(String(物(0, '0,0').v), '7', 'A1 v'); eq(String
   await T('決まりに 合う 7→抜ける＝入る・知らせは 出ない', () => { eq(String(物(0, '0,0').v), '7', 'A1 v'); eq(win.undoStack.length, 2, '控え'); eq(出た.length, 0, '知らせ'); });
   決まり付き(); 帯で打つ('9'); 帯で打つ('5'); 出た = 知らせを数える(() => fi.blur());
   await T('打ち戻して 同じ 5 のまま 抜ける＝何も 書かず 知らせも 出ない', () => { eq(win.undoStack.length, 1, '控え'); eq(出た.length, 0, '知らせ'); });
+  決まり付き(); 帯で打つ('99'); { const 元 = doc.hasFocus; doc.hasFocus = () => false; try { 出た = 知らせを数える(() => fi.blur()); } finally { doc.hasFocus = 元; } }
+  await T('★決まりの マスで 99 を 打ったまま 別の窓へ（ページが focus を 失う）＝捨てず 知らせず 打ちかけの まま★', () => { eq(出た.length, 0, '知らせ'); eq(fi.value, '99', '帯'); eq(String(物(0, '0,0').v), '5', 'A1 v'); eq(win.undoStack.length, 1, '控え'); });
+  fi.focus(); 出た = 知らせを数える(() => fi.blur());
+  await T('戻って そのまま 抜ける＝その時に 決まりで 断る', () => 元のまま(出た));
+  決まり付き(); win.setCell(0, 1, 3); 帯で打つ('=B1'); 出た = 知らせを数える(() => fi.blur());
+  await T('★決まりの マスに 式 =B1 を 打って 抜ける＝前と 同じく 入る（式を 字で 判じて 断らない）★', () => { eq(物(0, '0,0').f, '=B1', 'A1 式'); eq(出た.length, 0, '知らせ'); });
+  決まり付き(); win.setCell(0, 0, 'a\nb'); 選ぶ(0, 0); PCの帯(); 帯で打つ('a ↵ bz'); win.eval("sheets[0].validations={'0,0':{kind:'list',items:['x']}};"); 出た = 知らせを数える(() => fi.blur());
+  await T('改行の 在る マスで 断った 時＝帯は ↵ の 書き方で 戻す', () => { eq(fi.value, 'a ↵ b', '帯'); });
   決まり付き(); 帯で打つ('99'); 出た = 知らせを数える(() => Enter());
   await T('（前から）Enter で 99＝入らない・知らせる', () => { eq(String(物(0, '0,0').v), '5', 'A1 v'); ok(出た.length >= 1, '知らせ'); });
   Esc(); fi.blur();
