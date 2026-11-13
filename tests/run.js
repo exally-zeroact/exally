@@ -284,7 +284,7 @@ const FILES = [
   'mado-esc.test.mjs',                    // ★Esc で 一番上の 窓を 閉じる・閉じたら 的を セルの 欄へ（実Excel と 同じ・2026-11-15）
   ['mado-esc.test.mjs', '--self-test'],   // ★守りを 1本ずつ 抜いて 赤に なるか
   'hf-ita-soroe.test.mjs',                // ★計算の板（HF）と 画面の板の 名を 揃える（名替え・足す・切り出し・つなげて出す・2026-11-13）
-  ['hf-ita-soroe.test.mjs', '--self-test'],// ★直しを 1つずつ 壊すと 赤に なるか（5通り）
+  ['hf-ita-soroe.test.mjs', '--self-test'],// ★直しを 1つずつ 壊すと 赤に なるか（6通り）
   'shift-keeps-everything.test.mjs',      // ★行・列を 足しても 消しても 棚が 置いていかれない・選んだ 数だけ 入る（押し0b・2026-11-07）
   ['shift-keeps-everything.test.mjs', '--self-test'],// ★直す前の 形に 戻すと 赤に なるか
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
