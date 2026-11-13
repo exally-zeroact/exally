@@ -267,6 +267,8 @@ const FILES = [
   ['torikeshi-uchikake.test.mjs', '--self-test'],// ★打ちかけでも 戻す・ボタンで 入力欄から 抜ける 形で 赤に なるか
   'shitagaki-modosu.test.mjs',            // ★数式の帯の 下書きは 確定しなければ 戻す・別のマスを 押したら 確定・計算し直した 答えは 戻さない（2026-11-14・件⑥）
   ['shitagaki-modosu.test.mjs', '--self-test'],// ★戻さない・先に 確定しない 形で 赤に なるか
+  'torikeshi-hyou.test.mjs',              // ★表を作る・集計行の付け外し・フォームで消す も Ctrl+Z 1回で 戻る（2026-11-14・穴4＋5）
+  ['torikeshi-hyou.test.mjs', '--self-test'],// ★控えを 積まない 形（直す前）で 赤に なるか
   'shift-keeps-everything.test.mjs',      // ★行・列を 足しても 消しても 棚が 置いていかれない・選んだ 数だけ 入る（押し0b・2026-11-07）
   ['shift-keeps-everything.test.mjs', '--self-test'],// ★直す前の 形に 戻すと 赤に なるか
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
