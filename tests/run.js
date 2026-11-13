@@ -61,10 +61,14 @@ const FILES = [
   ['shoshiki.test.mjs'],                       // ★書式の台＝TEXT も 画面も 同じ 台（実Excel 192行と 一致）★
   ['shoshiki.test.mjs', '--self-test'],        // ★時の隣の m は 分／-0 を 出さない／1900年の起点 2つ／曜日は 割り算★
   ['xlsb-jitai.test.mjs'],                     // ★.xlsb の マスごとの 字体を 自分で 読む（借り物は くれない）★
+  ['xlsb-gyou-atama.test.mjs'],                // ★.xlsb の 新しい 行の 頭を 0 から 作る★（丸写しで 打った 行が 隠れた・2026-11-07）
   ['ketsugou-yomu.test.mjs'],                  // ★Excel の 結合した マスを 読む（前は 1組も 読んで いなかった）★
   ['migi-ni-ugokasu.test.mjs'],                // ★右へ動かすと画面が真っ白（幅の広い列が在ると当たりが行き過ぎる）★
   ['tashi-hikae.test.mjs'],                    // ★書いた幅・高さの足し算の控え＝控えあり/なしで colX・rowY・境目が全部同じ（2026-11-07）★
   ['tashi-hikae.test.mjs', '--self-test'],     // ★和・隠し・二分探索・捨て忘れを壊すと赤★
+  ['kitei-gyoudaka-mon.test.mjs'],             // ★既定の 行の 高さを 知るのは 1か所＝ROW_H は 3行だけ・図形の 置き場も 同じ 数（自己確認つき・2026-11-07）★
+  ['zero-height.test.mjs'],                    // ★書いて いない 行を 隠す 本（zeroHeight）＝再表示は 実Excel の 7通り・下の 上限・矢印・行の 足し消し（2026-11-08）★
+  ['zero-height.test.mjs', '--self-test'],     // ★隠し・再表示・二重数え・上限・矢印・足し消しを 壊すと 赤★
   ['kakushi-shirushi.test.mjs'],               // ★隠した行・列の並びの覚え＝{1,4}→{2,3} でも古い並びを使わない（2026-11-07）★
   ['kakushi-shirushi.test.mjs', '--self-test'], // ★前の数と和の印に戻すと赤★
   ['kumikomi-shoshiki.test.mjs'],              // ★国で 変わる 書式番号38／15桁に 丸めてから 出す（実物で 見つけた）★
