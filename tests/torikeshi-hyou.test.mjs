@@ -60,35 +60,54 @@ try { win.dispatchEvent(new win.Event('load')); } catch (e) { /* 続ける */ }
 /* ★保存の 道具は 本番でも 初めての 保存で 後から 読む（_ensureXlsx と 同じ 順）★ */
 
 
-const SELF = process.argv.includes('--self-test');
 const SELF2 = process.argv.includes('--self-test-futatsu');
-if (SELF2) {
-  /* 見出し無しで 作る時も 表を決める が 積む 形＝控えが 2つ（2回 押さないと 戻らない）で 赤に なるか */
-  const 元 = String(win.表を決める); const 抜いた = 元.replace('if (見出し行 || 今) _pushRowColUndo();', '_pushRowColUndo();');
-  if (抜いた === 元) { console.log('★--self-test-futatsu: 条件の 行が 見つからない（空振り）'); process.exit(1); }
+/* ★--self-test は 守りを 1つずつ 抜いて 回す★（2026-11-14・設計5版）＝前は 全部を 一度に 抜き、Alt の 守りが 抜けても 赤に ならなかった
+   --self-test＝下の 守り ごとに 自分を --self-test=<名> で 回し、どれも 赤が 1以上で なければ exit1 */
+const 守り = {
+  '表を決める': () => 抜く('表を決める', 'if (見出し行 || 今) _pushRowColUndo();', ''),
+  'フォームで消す': () => 抜く('フォームで消す', /_pushRowColUndo\(\);/, ''),
+  'doUndo': () => 抜く('doUndo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''),
+  'doRedo': () => 抜く('doRedo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''),
+  'onKD': () => {
+    /* onKD は addEventListener で 掴まれている＝外して 守りを 抜いた 物を 付け直す */
+    doc.removeEventListener('keydown', win.onKD);
+    抜く('onKD', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
+    doc.addEventListener('keydown', win.onKD);
+  },
+  'リボンキー': () => win.eval('_リボンキーをフォームが止める = function(){ return false; };'),
+  '本を開く': () => win.eval('_フォームが開いていれば断る = function(){ return false; };'),
+  '閉じ込め': () => win.eval('_窓を閉じ込める = function(){};'),
+  '写しの比べ': () => win.eval('_フォームの下が同じ = function(){ return true; };'),
+  '改行の欄': () => 抜く('フォームを描く', "/[\\r\\n]/.test(v) ? 'textarea' : 'input'", "'input'"),
+  '打ちかけの確定': () => 抜く('フォームの窓を開く', 'if (editingCell) { commitEdit(); if (editingCell) return 0; }', ''),
+};
+function 抜く(名, 行, 代わり) {
+  const 元 = String(win[名]); const 抜いた = 元.replace(行, 代わり);
+  if (抜いた === 元) { console.log('★--self-test: ' + 名 + ' の 守りが 見つからない（空振り）'); process.exit(1); }
   win.eval(抜いた);
 }
-if (SELF) {
-  /* 直す前の 形＝表を決める・フォームで消す から 控えを 積む 行を 抜く（抜けなければ 試験が 空振り＝止める） */
-  for (const [名, 行] of [['表を決める', /if \(見出し行 \|\| 今\) _pushRowColUndo\(\);/], ['フォームで消す', /_pushRowColUndo\(\);/], ['doUndo', /if\(typeof _フォーム!=="undefined" && _フォーム\) return;/]]) {
-    const 元 = String(win[名]);
-    const 抜いた = 元.replace(行, '');
-    if (抜いた === 元) { console.log('★--self-test: ' + 名 + ' の 控えの 行が 見つからない（空振り）'); process.exit(1); }
-    win.eval(抜いた);
+const SELF_ARG = process.argv.find((a) => a.startsWith('--self-test='));
+const SELF = !!SELF_ARG;
+if (process.argv.includes('--self-test')) {
+  const { spawnSync } = await import('node:child_process');
+  let 空振り = 0;
+  for (const 名 of Object.keys(守り)) {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--self-test=' + 名], { encoding: 'utf8' });
+    const 行 = (r.stdout || '').split('\n').filter((s) => s.includes('★--self-test')).join(' ');
+    console.log('  ' + (r.status === 0 ? 'ok ' : 'NG ') + 名 + '：' + (行 || (r.stderr || '').slice(0, 200)));
+    if (r.status !== 0) 空振り++;
   }
-  /* onKD は addEventListener で 掴まれている＝外して 守りを 抜いた 物を 付け直す */
-  const 元KD = String(win.onKD); const 抜いたKD = 元KD.replace('if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
-  if (抜いたKD === 元KD) { console.log('★--self-test: onKD の 守りが 見つからない（空振り）'); process.exit(1); }
-  doc.removeEventListener('keydown', win.onKD); win.eval(抜いたKD); doc.addEventListener('keydown', win.onKD);
-  const 元R = String(win.doRedo); const 抜いたR = 元R.replace('if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
-  if (抜いたR === 元R) { console.log('★--self-test: doRedo の 守りが 見つからない（空振り）'); process.exit(1); }
-  win.eval(抜いたR);
-  /* 本を 開く 入り口の 守りと、書き込む の「直した 欄だけ・下が 変わったら 書かない」を 抜く */
-  win.eval('_フォームが開いていれば断る = function(){ return false; };');
-  const 元W = String(win.フォームを書き込む);
-  const 抜いたW = 元W.replace('if (箱[i].value === 元) continue;', '').replace('if (sheets[activeSheet] !== f.板 || 今 !== 元) {', 'if (false) {');
-  if (抜いたW === 元W || 抜いたW.includes('今 !== 元)')) { console.log('★--self-test: 書き込む の 守りが 見つからない（空振り）'); process.exit(1); }
-  win.eval(抜いたW);
+  console.log(空振り ? '★--self-test: 赤に ならない 守りが ' + 空振り + ' 本' : '★--self-test: 守り ' + Object.keys(守り).length + ' 本 全部 抜くと 赤');
+  process.exit(空振り ? 1 : 0);
+}
+if (SELF2) {
+  /* 見出し無しで 作る時も 表を決める が 積む 形＝控えが 2つ（2回 押さないと 戻らない）で 赤に なるか */
+  抜く('表を決める', 'if (見出し行 || 今) _pushRowColUndo();', '_pushRowColUndo();');
+}
+if (SELF) {
+  const 名 = SELF_ARG.slice('--self-test='.length);
+  if (!守り[名]) { console.log('★--self-test: 知らない 守り ' + 名); process.exit(1); }
+  守り[名]();
 }
 const 新しい本 = () => { win.eval("sheets.length=1; sheets[0]={name:'Sheet1',data:{},colW:{},rowH:{}}; activeSheet=0; undoStack.length=0; redoStack.length=0;"); if (typeof win.rebuildSheetTabs === 'function') win.rebuildSheetTabs(); };
 const 選ぶ = (r, c) => { win.sel(r, c, r, c); };
@@ -181,17 +200,68 @@ win.onPickBookFile({ files: [{ name: 'b.xlsx' }], value: 'b.xlsx' });
 await T('★→閉じた後は 開ける（守りが 残って 開けなく ならない）★', () => { eq(開いた, 1, '本を 開いた 回数'); });
 win.openBookFile = 元の開く;
 
-/* 最後の 守り＝客が 直した 欄だけ 入れる・開いた後に 下の 字が 変わった 欄は 入れない */
-新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, '数'); win.setCell(0, 2, '備考');
-win.setCell(1, 0, 'a'); win.setCell(1, 1, 1); win.setCell(1, 2, 'x'); win.undoStack.length = 0;
+/* やり直し（doRedo）も 開いている 間は 断る＝前は 全部の 守りを 一度に 抜いて 回し、この 守りだけ 抜けても 赤に ならなかった */
+新しい本(); win.setCell(0, 0, '名'); win.setCell(1, 0, 'r1'); win.setCell(1, 0, '直した'); win.doUndo();
 選ぶ(1, 0); win.フォームの窓を開く();
-const 欄 = [...doc.querySelectorAll('#formBody .form-v')];
-win.setCell(1, 0, '下で変えた'); win.setCell(1, 2, '下で変えた2');   /* 開いている 間に 下が 変わった（守りを 抜けた 道の 代わり） */
-欄[1].value = '9'; 欄[2].value = '客が打った';
+win.doRedo();
+await T('★フォームを 開いたまま やり直し は 断る★', () => { eq(字(1, 0), 'r1', 'A2'); eq(win.redoStack.length, 1, 'やり直しの 控え'); });
 win.フォームを閉じる();
-await T('★客が 直していない 欄は 書かない（下で 変わった 字を 古い字で 戻さない）★', () => { eq(字(1, 0), '下で変えた', 'A2'); });
-await T('★客が 直した 欄で 下が 同じなら 入れる★', () => { eq(字(1, 1), '9', 'B2'); });
-await T('★客が 直した 欄でも 下が 変わっていれば 入れない★', () => { eq(字(1, 2), '下で変えた2', 'C2'); });
+
+/* 最後の 守り（層B）＝客が 直した 欄だけ 入れる・表の 範囲が 開いた 時と 違えば どの 欄も 入れない */
+const 三列 = () => { 新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, '数'); win.setCell(0, 2, '備考');
+  win.setCell(1, 0, 'a'); win.setCell(1, 1, 1); win.setCell(1, 2, 'x'); win.undoStack.length = 0; };
+const 欄 = () => [...doc.querySelectorAll('#formBody .form-v')];
+三列(); 選ぶ(1, 0); win.フォームの窓を開く();
+欄()[1].value = '9';
+win.フォームを閉じる();
+await T('★下が 変わらなければ 客が 直した 欄だけ 入れる★', () => { eq(字(1, 1), '9', 'B2'); eq(字(1, 0), 'a', 'A2'); eq(字(1, 2), 'x', 'C2'); eq(win.undoStack.length, 1, '控え'); });
+
+三列(); 選ぶ(1, 0); win.フォームの窓を開く();
+win.setCell(1, 0, '下で変えた');   /* 開いている 間に 下が 変わった（inert を 抜けた 道の 代わり） */
+欄()[1].value = '9'; 欄()[2].value = '客が打った';
+win.フォームを閉じる();
+await T('★下が 変わったら どの 欄も 入れない（下の 字も 古い字で 戻さない）★', () => { eq(字(1, 0), '下で変えた', 'A2'); eq(字(1, 1), '1', 'B2'); eq(字(1, 2), 'x', 'C2'); });
+
+/* 止め1 の 再現＝A列 名/r1/r2/r3・B列 空。2行目で 開いて B に 打つ→行を削除（inert を 飛ばした 道）→閉じる。
+   前は 下が 空どうしで 字の 比べを 抜け、r2 の 行へ「r1の備考」を 書いた */
+新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, '備考'); for (let r = 1; r <= 3; r++) win.setCell(r, 0, 'r' + r); win.undoStack.length = 0;
+選ぶ(1, 0); win.フォームの窓を開く();
+欄()[1].value = 'r1の備考';
+win.sel(1, 0, 1, 0); win.ctxDeleteRow();
+win.フォームを閉じる();
+await T('★開いたまま 行を 消す→閉じても 別の 行へ 書かない★', () => { eq([1, 2].map((r) => 字(r, 0) + '/' + 字(r, 1)).join('|'), 'r2/|r3/', 'A2:B3'); });
+await T('★→窓は 閉じて 閉じ込めも 解ける★', () => { eq(win._フォーム, null, '_フォーム'); eq(doc.querySelectorAll('[inert]').length, 0, 'inert の 数'); });
+
+/* 層A＝開くと 外の 子へ inert・focus は 窓の 中・閉じると 外れる・前から inert の 物は 残す */
+三列(); const 前から = doc.body.children[0]; 前から.setAttribute('inert', '');
+選ぶ(1, 0); win.フォームの窓を開く();
+const ov = doc.getElementById('formOverlay');
+await T('★開くと 窓の 外の body 直下の 子が 全部 inert★', () => {
+  const 外 = [...doc.body.children].filter((e) => e !== ov);
+  eq(外.filter((e) => !e.hasAttribute('inert')).length, 0, 'inert の 無い 外の 子'); eq(ov.hasAttribute('inert'), false, '窓');
+});
+await T('★focus は 窓の 中の 最初の 欄★', () => { eq(doc.activeElement === 欄()[0], true, 'activeElement'); });
+eq(win.フォームの窓を開く(), 0, '2回目は 開かない');
+win.フォームを閉じる();
+await T('★閉じると 自分が 付けた inert だけ 外れる★', () => { eq(doc.querySelectorAll('[inert]').length, 1, 'inert の 数'); eq(前から.hasAttribute('inert'), true, '前から'); });
+前から.removeAttribute('inert');
+
+/* 止め2＝改行と & の マス。触らず 閉じても 字も 控えも 変わらない・改行の マスを 直すと 改行が 残る */
+新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, 'メモ'); win.setCell(0, 2, '社');
+win.setCell(1, 0, 'a'); win.setCell(1, 1, '1行目\n2行目'); win.setCell(1, 2, 'A&amp;B'); win.undoStack.length = 0;
+選ぶ(1, 0); win.フォームの窓を開く(); win.フォームを閉じる();
+await T('★改行と & の マスは 開いて 閉じるだけで 変わらない★', () => { eq(字(1, 1), '1行目\n2行目', 'B2'); eq(字(1, 2), 'A&amp;B', 'C2'); eq(win.undoStack.length, 0, '控え'); });
+選ぶ(1, 0); win.フォームの窓を開く(); 欄()[1].value = '1行目\n3行目'; win.フォームを閉じる();
+await T('★改行の マスを 直すと 改行が 残る★', () => { eq(字(1, 1), '1行目\n3行目', 'B2'); });
+
+/* 設計前の 叩きの 止め1＝打ちかけの マスで 開く。前は 開いた 後の blur（100ms）で 確定が 入り、写しと 食い違って 打った 字を 全部 捨てた */
+三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 20); win.undoStack.length = 0;
+win.sel(2, 1, 2, 1); win.startEdit(2, 1); doc.getElementById('cell-input').value = '99';
+win.フォームの窓を開く();   /* 選び直さない（選び直すと そこで 確定する） */
+await new Promise((ok) => setTimeout(ok, 250));
+欄()[2].value = '打った';
+win.フォームを閉じる();
+await T('★打ちかけの マスで 開く→先に 決まり、フォームの 字も 入る★', () => { eq(字(2, 1), '99', 'B3'); eq(字(1, 2), '打った', 'C2'); });
 
 /* 穴5＝隠す→全部出す→集計行→Ctrl+Z。前は 集計行の 控えが 無く 全部出す が 戻って 行が 隠れ、集計行は 残った */
 新しい本(); 名と数(); 選ぶ(0, 0); 窓で決める('A1:B3', '表1', true, false);

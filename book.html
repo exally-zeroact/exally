@@ -10792,7 +10792,7 @@ window.addEventListener('load', function() {
             if (!window.Ribbon || !window.RibbonSpec) return;
             /* ★フォームを 開いている間は Alt の キーチップも 通さない★（2026-11-14・穴4）＝onKD とは 別の 受け口。
                前は 入力欄で Alt→H→D（行を削除）等が 板を 書き換え、閉じる時に 詰めた 別の行へ 古い字を 書いた */
-            if (typeof _フォーム !== 'undefined' && _フォーム) return;
+            if (typeof _リボンキーをフォームが止める === 'function' && _リボンキーをフォームが止める()) return;
             if (ev.ctrlKey || ev.metaKey) return;      /* Ctrl 系は 別の層 */
             var 使った = window.Ribbon.キーを受ける(_rbEl, window.RibbonSpec, ev);
             if (!使った) return;
@@ -14482,12 +14482,45 @@ function 見出しから並べ替え(dir){
  *     （A2 を 選んで CurrentRegion = A1:B3＝見出しも 入る）。うちも 同じ 見立て。
  *   ★未測定★ 窓の 中の 並び方・列の 上限は COM から 読めない。
  *   ★alert / prompt / confirm は 使わない★ */
-var _フォーム = null;   /* { r1,c1,r2,c2, 見出し[], 今の行 } */
+var _フォーム = null;   /* { r1,c1,r2,c2, 見出し[], 今の行, 板, data, 写し, 元{} } */
+
+/* ★窓を 本当の 閉じ込めに する★（2026-11-14・穴4 設計5版）
+ *   前は 入り口（onKD・Alt・Ctrl+Z・本を落とす）を 1本ずつ 塞いだが、窓の 外へ focus が 残る／抜ける 道
+ *   （裏の マスで 打って Enter・貼り付け・帯へ Tab・リボンの ボタン）が 4本 残り、叩きの 止めが 4回 続いた。
+ *   body 直下の 他の 子へ inert を 付ける＝focus・click・打鍵・貼り付けが 外の 要素へ 届かない（ブラウザの 決まり）。
+ *   ★前から inert の 物は 覚えて 外さない・2回 呼ばれても 二重に 掛けない★
+ *   閉じ込めた 後に body へ 足された 物は inert に ならない＝フォームの 層B（写しの 比べ）が 最後の 守り。 */
+var _閉じ込め = null;
+function _窓を閉じ込める(ov){
+  if (_閉じ込め || !ov) return;
+  var 付けた = [], 子 = document.body.children;
+  for (var i = 0; i < 子.length; i++) {
+    var e = 子[i];
+    if (e === ov || e.contains(ov) || e.hasAttribute('inert')) continue;
+    e.setAttribute('inert', ''); 付けた.push(e);
+  }
+  _閉じ込め = { ov: ov, 付けた: 付けた, 前: document.activeElement };
+  var 最初 = ov.querySelector('input,textarea,select,button');
+  if (最初) 最初.focus();
+}
+function _窓の閉じ込めを解く(ov){
+  var z = _閉じ込め; if (!z || z.ov !== ov) return;
+  _閉じ込め = null;
+  for (var i = 0; i < z.付けた.length; i++) z.付けた[i].removeAttribute('inert');
+  var 戻す = (z.前 && z.前 !== document.body && document.body.contains(z.前)) ? z.前 : document.getElementById('cell-input');
+  try { if (戻す) 戻す.focus(); } catch (e) {}
+}
+/* Alt の キーチップ（_リボンキー）は 閉じた 中の 関数＝守りを 外から 見える 名に 出す（自己確認で 抜ける） */
+function _リボンキーをフォームが止める(){ return !!_フォーム; }
 
 function フォームの窓を開く(){
+  if (_フォーム) return 0;                     /* 2回 開かない（閉じ込めを 二重に 掛けない） */
   hideCtxMenu();
   var ov = document.getElementById('formOverlay');
   if (!ov) return 0;
+  /* ★打ちかけの マスを 先に 決める★＝前は 開いた 後に ci の blur（100ms 後）で 確定が 入り、
+     写しと 下が 食い違って 打った 字を 全部 捨てた（設計前の 叩きの 止め1） */
+  if (editingCell) { commitEdit(); if (editingCell) return 0; }   /* 入力の 決まりで 断られた＝開かない */
   var t = 今いる表();
   var 場所, 見出し;
   if (t) {
@@ -14508,27 +14541,58 @@ function フォームの窓を開く(){
     return 0;
   }
   _フォーム = { r1: 場所.r1, c1: 場所.c1, r2: 場所.r2, c2: 場所.c2, 見出し: 見出し, 今の行: 中身の上,
-    板: sheets[activeSheet], 元: {} };   /* 板＝開いた時の 板の 物・元＝描いた時の 欄の 字（書き込む で 下が 変わったかを 見る） */
-  フォームを描く();
+    板: sheets[activeSheet], 元: {} };
+  try {
+    _フォームの写しを撮る(_フォーム);
+    フォームを描く();
+  } catch (e) { _フォーム = null; throw e; }   /* 描けなければ 開かない（_フォーム が 残ると 全部の キーが 死ぬ） */
   ov.style.display = 'flex';
+  _窓を閉じ込める(ov);                         /* 最後に 掛ける（途中で 投げて 掛けっぱなしに しない） */
   return 1;
+}
+/* ★層B＝表の 範囲ごと 比べる★ 開いた 時（＋フォーム 自身が 書いた 後）の 板の 物・data の 物・範囲の 全マスの 字。
+   行の 削除・挿入で ずれれば 範囲の 字が 動く。空どうしで ずれて 写しが 同じなら 中身は 見分けが つかない＝書いても 害が 無い。 */
+function _フォームの写し(f){
+  var d = f.板.data, a = [];
+  for (var r = f.r1; r <= f.r2; r++) for (var c = f.c1; c <= f.c2; c++) a.push(_フォームの字(d[r + ',' + c]));
+  return JSON.stringify(a);
+}
+function _フォームの写しを撮る(f){ f.data = f.板.data; f.写し = _フォームの写し(f); }
+function _フォームの下が同じ(f, 物だけ){
+  if (sheets[activeSheet] !== f.板 || f.板.data !== f.data) return false;
+  return 物だけ ? true : _フォームの写し(f) === f.写し;
+}
+/* 下が 変わっていれば どの 欄も 書かずに 捨てて 知らせ、窓を 閉じる */
+function _フォームを捨てて閉じる(){
+  var 体 = document.getElementById('formBody');
+  if (体) 体.innerHTML = '';                  /* 欄を 空に＝閉じる の 書き込みが 何も 書かない */
+  notify('開いている 間に 表が 変わったので、フォームで 打った 字は 入れませんでした');
+  フォームを閉じる();
 }
 function フォームを描く(){
   var f = _フォーム; if (!f) return;
   var 体 = document.getElementById('formBody');
-  var h = '';
+  体.innerHTML = '';
+  f.元 = {};
   for (var i = 0; i < f.見出し.length; i++) {
     var c = f.c1 + i;
-    var cell = sheets[activeSheet].data[f.今の行 + ',' + c];
-    var v = _フォームの字(cell);
-    f.元[c] = v;
-    h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
-      + '<span style="min-width:6em;font-size:12px;color:#7A9A87;">' + String(f.見出し[i]).replace(/</g, '&lt;') + '</span>'
-      + '<input type="text" class="form-v" data-c="' + c + '" value="' + String(v).replace(/"/g, '&quot;') + '"'
-      + ' style="flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;">'
-      + '</div>';
+    var v = _フォームの字(f.板.data[f.今の行 + ',' + c]);
+    var 行 = document.createElement('div');
+    行.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    var 名 = document.createElement('span');
+    名.style.cssText = 'min-width:6em;font-size:12px;color:#7A9A87;';
+    名.textContent = String(f.見出し[i]);
+    /* ★欄は DOM で 作り .value に 入れる★＝前は 属性を 字で 連結し、改行と &amp; が 化けて 触らず 閉じても 字が 壊れた。
+       改行の 在る マスは textarea（input は 改行を 落とす） */
+    var 箱 = document.createElement(/[\r\n]/.test(v) ? 'textarea' : 'input');
+    if (箱.tagName === 'INPUT') 箱.type = 'text'; else 箱.rows = 2;
+    箱.className = 'form-v';
+    箱.setAttribute('data-c', String(c));
+    箱.style.cssText = 'flex:1;min-width:120px;font-size:16px;padding:8px;border:1px solid #C8ECD8;border-radius:8px;font-family:inherit;';
+    箱.value = v;
+    f.元[c] = 箱.value;                        /* 元は 欄から 取る＝触らなければ 必ず 同じ */
+    行.appendChild(名); 行.appendChild(箱); 体.appendChild(行);
   }
-  体.innerHTML = h;
   document.getElementById('formCount').textContent =
     (f.今の行 - f.r1) + ' / ' + (f.r2 - f.r1);
   document.getElementById('formWhy').textContent = '';
@@ -14537,38 +14601,30 @@ function フォームを描く(){
 function _フォームの字(cell){
   return cell ? String(cell.f !== undefined && cell.f !== '' ? cell.f : (cell.v === undefined || cell.v === null ? '' : cell.v)) : '';
 }
-/* ★客が 直した 欄だけ 入れる・下が 変わっていれば 入れない★（2026-11-14・穴4）
-   前は「欄 ≠ 今の セル」の 欄を 全部 書いた＝開いている間に 板・行・本が 変わると、別の所へ 古い字を 書いた
-   （Ctrl+Z・板を移る・本を落とす・Alt の 行を削除 で 叩きの 止め4つ）。入り口も 閉じてあるが、ここが 最後の 守り。 */
+/* ★客が 直した 欄だけ 入れる・表の 範囲が 開いた 時と 違えば どれも 入れない★（2026-11-14・穴4 設計5版）
+   返す数＝入れた 欄の 数。-1＝下が 変わって 捨てた（窓は 閉じた） */
 function フォームを書き込む(){
   var f = _フォーム; if (!f) return 0;
   var 箱 = document.querySelectorAll('#formBody .form-v');
-  var 直した = 0, 入れない = [];
+  var 直す = [];
   for (var i = 0; i < 箱.length; i++) {
     var c = parseInt(箱[i].getAttribute('data-c'), 10);
-    var 元 = f.元[c] === undefined ? '' : f.元[c];
-    if (箱[i].value === 元) continue;                 /* 客は 直していない＝書かない */
-    var 今 = _フォームの字(sheets[activeSheet].data[f.今の行 + ',' + c]);
-    if (sheets[activeSheet] !== f.板 || 今 !== 元) {   /* 開いた後に 板か 下の 字が 変わった＝別の所へ 書かない */
-      入れない.push(String(f.見出し[c - f.c1]) + '：' + 箱[i].value);
-      continue;
-    }
-    setCell(f.今の行, c, 箱[i].value); 直した++;
-    f.元[c] = _フォームの字(sheets[activeSheet].data[f.今の行 + ',' + c]);
+    if (箱[i].value === f.元[c]) continue;              /* 客は 直していない＝書かない */
+    直す.push([c, 箱[i].value]);
   }
-  if (入れない.length) notify('開いている 間に 表が 変わったので 入れませんでした（' + 入れない.join('、') + '）');
-  return 直した;
-}
-/* 開いた時と 板の 物が 違えば 窓を 閉じる（書き込む が 字を 捨てて 知らせる） */
-function _フォームの板が違えば閉じる(){
-  var f = _フォーム; if (!f || sheets[activeSheet] === f.板) return false;
-  フォームを閉じる();
-  return true;
+  if (!直す.length) return 0;
+  if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return -1; }
+  for (var j = 0; j < 直す.length; j++) {
+    setCell(f.今の行, 直す[j][0], 直す[j][1]);
+    f.元[直す[j][0]] = 直す[j][1];
+  }
+  _フォームの写しを撮る(f);                    /* 自分で 書いた 分は 撮り直す */
+  return 直す.length;
 }
 function フォームを動かす(向き){
   var f = _フォーム; if (!f) return 0;
-  if (_フォームの板が違えば閉じる()) return 0;
-  フォームを書き込む();
+  if (!_フォームの下が同じ(f, true)) { _フォームを捨てて閉じる(); return 0; }
+  if (フォームを書き込む() < 0) return 0;
   var 次 = f.今の行 + 向き;
   if (次 < f.r1 + 1 || 次 > f.r2) {
     document.getElementById('formWhy').textContent =
@@ -14582,8 +14638,8 @@ function フォームを動かす(向き){
 }
 function フォームで足す(){
   var f = _フォーム; if (!f) return 0;
-  if (_フォームの板が違えば閉じる()) return 0;
-  フォームを書き込む();
+  if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return 0; }
+  if (フォームを書き込む() < 0) return 0;
   f.r2 = f.r2 + 1;
   f.今の行 = f.r2;
   /* ★表が 在れば 表の 下の端も 伸ばす★（表と 中身が ずれない） */
@@ -14591,13 +14647,14 @@ function フォームで足す(){
   for (var i = 0; i < t.length; i++) {
     if (t[i].c1 === f.c1 && t[i].r1 === f.r1) t[i].r2 = t[i].r2 + 1;
   }
+  _フォームの写しを撮る(f);
   フォームを描く();
   render();
   return 1;
 }
 function フォームで消す(){
   var f = _フォーム; if (!f) return 0;
-  if (_フォームの板が違えば閉じる()) return 0;
+  if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return 0; }
   if (f.r2 <= f.r1 + 1) {
     document.getElementById('formWhy').textContent = '最後の 1行は 消せません';
     return 0;
@@ -14620,18 +14677,20 @@ function フォームで消す(){
     if (t2[j].c1 === f.c1 && t2[j].r1 === f.r1) t2[j].r2 = t2[j].r2 - 1;
   }
   if (f.今の行 > f.r2) f.今の行 = f.r2;
+  _フォームの写しを撮る(f);
   フォームを描く();
   render();
   notify('1行 消しました');
   return 1;
 }
 function フォームを閉じる(){
-  /* 書き込みが 投げても 窓と _フォーム は 必ず 片づける（残ると 全部の キーが 死ぬ） */
+  /* 書き込みが 投げても 窓・_フォーム・閉じ込めは 必ず 片づける（残ると 全部の キーが 死ぬ） */
+  var ov = document.getElementById('formOverlay');
   try { フォームを書き込む(); }
   finally {
     _フォーム = null;
-    var ov = document.getElementById('formOverlay');
     if (ov) ov.style.display = 'none';
+    _窓の閉じ込めを解く(ov);
   }
   render(); updateBar();
   return 1;
