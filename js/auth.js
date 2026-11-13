@@ -29,7 +29,7 @@
       app: 'ホーム',
       sb: sbForLogin,
       note: '売上管理・代行請求・給料明細も、同じメールとパスワードで入れます。',
-      onLogin: function (user) { afterLogin((user && user.email) || ''); }
+      onLogin: function (user) { afterLogin(user || null); }
     });
     ov = LOGIN.el;
     return LOGIN;
@@ -83,6 +83,19 @@
   mountLogin(sb);
   var APP = 'suite';
   var curEmail = '';
+  /* ★穴11（2026-11-14）★ このページの 本は 最初に 入った 人の 物＝今の人。
+     前は ログインが 切れた後に 別の人が 入ると、鍵が 外れて 前の人の 板・取り消しの 控えが そのまま 見えた
+     （本は 画面の 中だけに 在る＝作り直す 所が 無かった）。別の タブ・再設定の リンクで 切れずに 替わる 時も 同じ。
+     ⇒ ★違う人なら 鍵を 掛けたまま 読み直す★（まっさらの 本で 入り直す）。★人が 分からない 時も 違う人に 倒す★。
+     同じ人が 入り直した 時は 打った 物を 残す（切れただけで 仕事を 捨てない）。 */
+  var 今の人 = '';
+  function 人の印(u) { return (u && (u.id || u.email)) || ''; }
+  global.Auth.読み直す = function () { location.reload(); };
+  function 読み直す() {
+    show();                                   /* ★先に 鍵★＝読み直しが 終わるまで 前の人の 板を 見せない */
+    global.Auth.読み直す();                   /* ★呼ぶ時に 引く★（試験で 差し替える） */
+  }
+  function 違う人() { if (今の人) 読み直す(); else show(); }
 
   // 利用権ゲート: 停止なら使わせない。取れなかった時は"締めない"(誤ロックで締め出さない)
   function gateCheck(sd) {
@@ -112,8 +125,19 @@
     if (lo) lo.onclick = function () { sb.auth.signOut().then(function () { location.reload(); }); };
   }
 
-  function afterLogin(email) {
-    curEmail = email || curEmail;
+  function afterLogin(user) {
+    var 印 = 人の印(user);
+    if (!印) {
+      /* ★人が 分からない（再設定の 窓は ok(null)）＝倉庫に 引き直して 決める・分からなければ 違う人★ */
+      sb.auth.getSession().then(function (r) {
+        var u = r && r.data && r.data.session && r.data.session.user;
+        if (人の印(u)) afterLogin(u); else 違う人();
+      }).catch(function () { 違う人(); });
+      return;
+    }
+    if (今の人 && 印 !== 今の人) { 読み直す(); return; }
+    今の人 = 印;
+    curEmail = (user && user.email) || curEmail;
     if (!(global.Hub && global.Hub.attach)) { hide(); return; }
     global.Hub.attach(sb).then(function (sd) {
       return gateCheck(sd).then(function (gate) {
@@ -127,8 +151,13 @@
   // 起動時: セッションがあればそのまま、無ければログイン画面
   sb.auth.getSession().then(function (r) {
     var s = r && r.data && r.data.session;
-    if (s) afterLogin((s.user && s.user.email) || ''); else show();
+    if (s) afterLogin(s.user || null); else show();
   }).catch(function () { show(); });
-  sb.auth.onAuthStateChange(function (_e, s) { if (!s) show(); });
+  sb.auth.onAuthStateChange(function (_e, s) {
+    if (!s) { show(); return; }
+    /* ★切れずに 別の人へ 替わった（別の タブで 入った・再設定の リンク）＝鍵を 掛けて 読み直す★
+       今の人が まだ 無い 時は 何もしない（1人目は afterLogin で 決める） */
+    if (今の人 && 人の印(s.user) !== 今の人) 読み直す();
+  });
 
 })(window);
