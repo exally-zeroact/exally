@@ -212,6 +212,25 @@ const 確定した = () => { eq(String(物(0, '0,0').v), '7', 'A1 v'); eq(String
   Esc(); fi.blur();
 }
 
+/* ★帯の ↵ は 改行の 書き方（件⑦(6)）★＝input は 改行を 持てないので 帯は ' ↵ ' で 見せる。
+ *   前は Enter（fkbCommit）が ' ↵ ' の 字の まま 書き（客の 改行が 黙って「↵」の 字に 化けた）、
+ *   Esc（fkbCancel）は 改行の まま 帯へ 入れて input が 改行を 消し、抜けると 改行の 無い 字で 確定した。 */
+新しい本(); win.setCell(0, 0, 'a\nb'); 選ぶ(0, 0); PCの帯(); Enter(); 選ぶ(5, 5);
+await T('★改行の 在る マスで 帯を 触らず Enter＝改行の まま（↵ の 字に 化けない）★', () => { eq(物(0, '0,0').f, 'a\nb', 'A1 式'); });
+新しい本(); win.setCell(0, 0, 'a\nb'); 選ぶ(0, 0); PCの帯(); 帯で打つ('a ↵ bc'); Enter(); 選ぶ(5, 5);
+await T('★帯で a ↵ bc と 打って Enter＝改行の 入った a\\nbc★', () => { eq(物(0, '0,0').f, 'a\nbc', 'A1 式'); });
+新しい本(); win.setCell(0, 0, 'a\nb'); 選ぶ(0, 0); PCの帯(); 帯で打つ('a ↵ bz'); Esc();
+await T('★改行の 在る マスで 打つ→Esc＝帯は ↵ の 書き方で 元へ★', () => { eq(fi.value, 'a ↵ b', '帯'); });
+fi.blur(); 選ぶ(5, 5);
+await T('★その後 抜けても 改行は 消えない・何も 書かない★', () => { eq(物(0, '0,0').f, 'a\nb', 'A1 式'); eq(win.undoStack.length, 1, '控え'); });
+新しい本(); win.setCell(0, 0, 'a\nb'); 選ぶ(0, 0); 自前の帯(); 帯で打つ('a ↵ bz'); win.fkbCancel();
+await T('自前キーボードで やめる＝帯は ↵ の 書き方で 元へ', () => { eq(fi.value, 'a ↵ b', '帯'); });
+{
+  新しい本(); 選ぶ(2, 2); fi.blur(); const ci = doc.getElementById('cell-input'); ci.focus(); ci.value = '=A1+\nB1'; ci.dispatchEvent(new win.Event('input'));
+  await T('★マスで 改行の 在る 式を 打つ＝帯にも ↵ の 書き方で 写す（改行を 消さない）★', () => { eq(fi.value, '=A1+ ↵ B1', '帯'); });
+  ci.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+}
+
 /* ★下書きの 間に 計算し直された 答えを 古い 答えで 上書きしない★（F9・外のデータ・150ms 後の 計算は 同じ 物の d を 直に 書く） */
 新しい本(); win.setCell(0, 0, 1); win.setCell(0, 1, '=A1*2');
 win.eval("計算方法='manual'"); win.setCell(0, 0, 7);

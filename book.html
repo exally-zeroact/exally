@@ -11751,7 +11751,7 @@ function bindEvents(){
       }
       // 数式バーにも同期表示（読み取り専用的に）
       if(fi && document.activeElement!==fi){
-        fi.value=v;
+        fi.value=v.replace(/\n/g,' ↵ ');   /* input は 改行を 消す＝帯は ↵ の 書き方で 見せる（updateBar と 同じ・件⑦(6)） */
       }
       // トースト：初回のみ（数式は cell/formula 両方OK）
       if(v==='='||v==='＝'){
@@ -18146,8 +18146,10 @@ function fkbDelete(){
   render();
 }
 function fkbCommit(){
-  if(!validGate(selR1,selC1,document.getElementById('formula-input').value)) return;
-  setCell(selR1,selC1,document.getElementById('formula-input').value);
+  /* ★帯の ↵ は 改行の 書き方（input は 改行を 持てない）＝字の「↵」の まま 書かない★（件⑦(6)・_帯を確定 と 同じ 戻し方） */
+  var actual=document.getElementById('formula-input').value.replace(/ ↵ /g,'\n');
+  if(!validGate(selR1,selC1,actual)) return;
+  setCell(selR1,selC1,actual);
   _下書きを戻す();
   fkbHide();
   updateBar(); render();
@@ -18155,7 +18157,7 @@ function fkbCommit(){
 // 数式バー × ボタン：削除済み（Esc キーに一本化）
 function fkbCancel(){
   _下書きを戻す();
-  var stored=getCell(selR1,selC1).f||'';
+  var stored=(getCell(selR1,selC1).f||'').replace(/\n/g,' ↵ ');   /* 改行は ↵ で 見せる＝そのまま 入れると input が 改行を 消し、抜けた時に 改行の 無い 字で 確定した（件⑦(6)） */
   document.getElementById('formula-input').value=stored;
   _fiCursorPos=stored.length;
   fkbHide();
