@@ -554,7 +554,7 @@ if (SELF) {
     ['book.html', '★A1 でも固定してしまう★（真似ても合わない物を真似る）', (s) => s.replace("  if(selR1 === 0 && selC1 === 0){\n    showToast('A1 では固定できません（固定したい行の1つ下・列の1つ右を選んでね）');\n    return;\n  }", '')],
     ['book.html', '固定する行を 1つ ずらす', (s) => s.replace('  sh.freezeRow = selR1;                    /* 選んだセルの ★上の行★ を固定 */', '  sh.freezeRow = selR1 + 1;')],
     ['book.html', '固定する列を 1つ ずらす', (s) => s.replace('  sh.freezeCol = selC1;                    /* 選んだセルの ★左の列★ を固定 */', '  sh.freezeCol = selC1 + 1;')],
-    ['book.html', '取り消しの控えを取らない', (s) => s.replace('  _pushRowColUndo();                       /* ★取り消し1回で戻る★ */', '')],
+    ['book.html', '取り消しの控えを取らない', (s) => s.replace('  _pushRowColUndo(true);                   /* ★取り消し1回で戻る★（見た目だけ＝見た目の鍵を控える・押し0a） */', '')],
     ['book.html', '★押した所の読み取りが 帯を見ない★（固定した行を押せない）', (s) => s.replace('  var fz = 帯を見ない ? 0 : (sheets[activeSheet].freezeRow||0);\n  if(fz > 0){', '  var fz = 0;\n  if(fz > 0){')],
     ['book.html', '★左の帯の読み取りが 効かない★', (s) => s.replace('  var fzc = 帯を見ない ? 0 : (sheets[activeSheet].freezeCol||0);\n  if(fzc > 0){', '  var fzc = 0;\n  if(fzc > 0){')],
     ['book.html', '★帯をもう一度 描かない★（固定しても画面が変わらない）', (s) => s.replace('  _renderPass();                                       /* ① 流れる所（今までどおり） */', '  _renderPass(); return;')],

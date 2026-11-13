@@ -2010,6 +2010,7 @@ function autoSum(){
  *  ・★式は 移った先の行に読み替える★＝相対参照だけの式は各行で正しいまま。
  *    $付きは動かない＝Excel と同じく ★指す先が変わる★ので その時だけ 一言 知らせる。 */
 function sortRange(dir){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('sortRange');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   hideCtxMenu();
   var s = sheets[activeSheet], data = s.data;
   var 一つだけ = (selR1===selR2 && selC1===selC2);
@@ -2535,6 +2536,7 @@ function replaceOne(){
   findNextCell();
 }
 function replaceAll(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('replaceAll');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var what = document.getElementById('findWhat').value;
   var to = document.getElementById('findTo').value;
   if(!what){ _findMsg('探す言葉を入れてね'); return; }
@@ -2576,7 +2578,7 @@ function freezePanes(){
     showToast('A1 では固定できません（固定したい行の1つ下・列の1つ右を選んでね）');
     return;
   }
-  _pushRowColUndo();                       /* ★取り消し1回で戻る★ */
+  _pushRowColUndo(true);                   /* ★取り消し1回で戻る★（見た目だけ＝見た目の鍵を控える・押し0a） */
   sh.freezeRow = selR1;                    /* 選んだセルの ★上の行★ を固定 */
   sh.freezeCol = selC1;                    /* 選んだセルの ★左の列★ を固定 */
   scrollTop = 0; scrollLeft = 0;           /* 固定した所が隠れないように 先頭へ戻す */
@@ -2589,7 +2591,7 @@ function unfreezePanes(){
   hideCtxMenu();
   var sh = sheets[activeSheet];
   if(!sh.freezeRow && !sh.freezeCol){ showToast('固定はしていません'); return; }
-  _pushRowColUndo();
+  _pushRowColUndo(true);
   sh.freezeRow = 0; sh.freezeCol = 0;
   var ctl = document.getElementById('ctx-unfreeze'); if(ctl) ctl.style.display = 'none';
   render();
@@ -3558,6 +3560,7 @@ function _字を安全に(s){
  *  ★1押しで 元に戻る★＝入れる前に ★シートを 1回だけ 控える★。
  *  ★1セルずつ 積むと N回 押さないと 戻らない★＝それでは「元に戻せる」と 言えない。 */
 function AIの表をシートに入れる(番){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('AIの表をシートに入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var 表 = _AIの表たち[番];
   if(!表 || !表.length){ notify('その 表は もう ありません'); return 0; }
   /* ★typeof で 守らない★＝無ければ ★黙って 戻せない 表を 入れる★事に なる */
@@ -4809,6 +4812,7 @@ function Webの字から入れる(){
   return _表を入れる(表, '貼った 字');
 }
 function _表を入れる(表, どこから){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('_表を入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   /* ★1押しで 元に戻す★（2026-09-06）
      ★前は 1セルずつ 積んでいた★＝10行5列を 入れたら ★50回 押さないと 戻らない★
      ⇒ 客から 見れば ★戻せない★のと 同じ（司さん「ボタン1つで 元に戻せるよな？」）
@@ -10936,37 +10940,8 @@ function setCell(r,c,v,noUndo){
          ＝★計算し直しは しない★
          ⇒その 後で 旗を 下ろす ので ★打った マスの つられる 所は いつも通り 直ります★
        ★見張り★ tests/hiraita-toki-keisan-webkit.mjs（★1マス 打つと 999 → 20★） */
-  if (!_baselineTaken && typeof BookOpen !== 'undefined' && BookOpen.isOpened()) {
-    _baselineTaken = true;
-    for (var _bi = 0; _bi < sheets.length; _bi++) loadSheetIntoEngine(_bi);
-    /* ══ ★★ここで 1回だけ 台を 合わせて 全部 計算し 控えを 取り直します★★ ══（2026-09-25）
-         ★★なぜ 要るか（★実物で 出ました★）★★
-           控えは ★「うちの 台から 見た 今の ファイル」★ で なければ なりません。
-           開いた 直後に 計算しなく なった ので 控えが ★「本に 保存された 値」★ に なり、
-           ⇒1打ち目の 後に 計算すると ★うちの 答えが 全部 「客が 変えた」に 数えられました★
-           ⇒★窓に 「この3044か所を直して 書き出す」と 出ました★（実際に 書くのは 1個）
-           ⇒`.xlsx` では ★本当に 81個 書き込まれました★（見張りで 実測）
-         ★★「計算の 後で 毎回 取り直す」では 駄目です★★
-           ＝★つられて 変わった 分まで 消えます★
-           ＝別の 板の 合計が ★古いまま 保存されます★（`tests/diff-preview.test.mjs` が 捕まえました）
-         ⇒★★だから 「打つ 前に 1回」だけ 取り直します★★
-           ＝★ここは まだ 旗が 立って いて お客さんは 1マスも 打って いません★
-           ＝この 後 `_計算を始める('打った')` で 旗が 下ります
-         ★★台を 合わせるのは 1回だけ★★＝★225回 → 1回（21秒の 正体）★
-         ★見張り★ tests/mado-no-kazu-to-kaita-kazu-webkit.mjs ／ tests/diff-preview.test.mjs */
-    var _合わせた = false;
-    try {
-      if (typeof ShikiItaAwase !== 'undefined' && typeof _台の板を得る === 'function') {
-        var _先板 = _台の板を得る();
-        if (_先板) { _台を全部合わせる(_先板); _合わせた = true; }
-      }
-    } catch (e) { _合わせた = false; }
-    for (var _bj = 0; _bj < sheets.length; _bj++) {
-      if (typeof recalcSheet === 'function' && sheets[_bj]) recalcSheet(_bj, sheets[_bj].data, _合わせた);
-    }
-    _控えを取り直す();
-  }
-  _計算を始める('打った');
+  /* ★最初の 人の 操作の 前に 1回だけ 控えを 取る★＝中身は _人の操作の前（押し0a で 関数に 出した・行や列の 操作も 呼ぶ） */
+  _人の操作の前('打った');
   // 全角→半角正規化（日本語IMEキーボード対応）
   if(v && typeof v==='string'){
     v = v.replace(/[！-～]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
@@ -11085,11 +11060,9 @@ function doUndo(){
     if(!sheets[op.sheet]){ undoStack.push(op); notify('戻す板が 見つかりません（取り消しを 止めました）'); return; }
     switchSheet(op.sheet);
   }
-  redoStack.push({type:op.type, snap:op.type==='rowcol'?JSON.parse(JSON.stringify(sheets[activeSheet])):op.snap, kind:op.kind, sheet:op.sheet, idx:op.idx, old:op.old, nw:op.nw, key:op.key, new_:op.new_});
-  // 行列操作Undo（スナップショット復元）
-  if(op.type==='rowcol'){
-    sheets[activeSheet]=op.snap; render(); updateBar(); return;
-  }
+  /* ★行列は 鏡で 積む★（見た目の 印を 落とさない・押し0a） */
+  if(op.type==='rowcol'){ redoStack.push(_rowcolの鏡(op)); _rowcolを戻す(op); return; }
+  redoStack.push({type:op.type, snap:op.snap, kind:op.kind, sheet:op.sheet, idx:op.idx, old:op.old, nw:op.nw, key:op.key, new_:op.new_});
   // リサイズUndo
   if(op.type==='resize'){
     if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.old;
@@ -11139,11 +11112,9 @@ function doRedo(){
     if(!sheets[op.sheet]){ notify('戻す板が 見つかりません（取り消しを 止めました）'); return; }
     switchSheet(op.sheet);
   }
+  /* ★行列は 鏡で 積む★（前は op を そのまま 積んで 2回目の Z が 空振りした・押し0a） */
+  if(op.type==='rowcol'){ undoStack.push(_rowcolの鏡(op)); _rowcolを戻す(op); return; }
   undoStack.push(op);
-  // 行列操作Redo
-  if(op.type==='rowcol'){
-    sheets[activeSheet]=op.snap; render(); updateBar(); return;
-  }
   // リサイズRedo
   if(op.type==='resize'){
     if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.nw;
@@ -12954,6 +12925,7 @@ function ズーム100(){ ズームを決める(1); }
  *   ★選んだ範囲の 行★を 見て、中身が そっくり同じ行を 1つだけ 残す。
  *   ★消した数を 必ず 出す★（黙って 減らさない）。*/
 function 重複を削除(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('重複を削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var 見た = {}, 消す = [];
   for(var r=selR1;r<=selR2;r++){
     var 鍵 = [];
@@ -13070,6 +13042,7 @@ function 上書きする数(最大){
   return 数;
 }
 function 区切りで分ける(印){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('区切りで分ける');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var s = sheets[activeSheet];
   var 最大 = 何列に分かれるか(印);
   if (最大 <= 1) { notify('「' + 印 + '」で 分かれる所が ありませんでした'); return 0; }
@@ -13738,6 +13711,7 @@ function 枠線の表示を切り替える(){
  *   ⇒ 行や列を まるごと 動かす物とは 別（あちらは ctxInsertRow など）
  */
 function セルを挿入(向き){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('セルを挿入');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   var s = sheets[activeSheet];
   _pushRowColUndo();
@@ -13862,6 +13836,7 @@ function 詰める向きを決める(){
 }
 
 function セルを削除(向き){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('セルを削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   var s = sheets[activeSheet];
   _pushRowColUndo();
@@ -14029,6 +14004,7 @@ function 並べ替えの範囲(){
   return GridSort.region(中身がある, selR1, selC1, ROWS - 1, COLS - 1);
 }
 function 並べ替えの窓を開く(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('並べ替えの窓を開く');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   hideCtxMenu();
   var ov = document.getElementById('sortOverlay');
   if (!ov) return;
@@ -14062,6 +14038,7 @@ function 並べ替えの窓を閉じる(){
   if (ov) ov.style.display = 'none';
 }
 function 並べ替えを決める(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('並べ替えを決める');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var rng = window._並べ替えの範囲;
   if (!rng) return 0;
   var data = sheets[activeSheet].data;
@@ -17757,11 +17734,134 @@ function ctxDelete(){
   updateBar(); render(); hideCtxMenu();
 }
 
-function _snapRowCol(){
-  return JSON.parse(JSON.stringify(sheets[activeSheet]));
+/* ══ ★★押し0a（2026-11-14・設計 4〜6版 exally-hyou-dougu/oshi-0a-sekkei-*.md）★★ ══
+     ★人の 操作の 前に 1回だけ★＝開いた本で 最初に 打つ・行を足す・並べ替える 時に
+       全部を 台へ 流し 計算し 控えを 取る（前は setCell の 中に だけ 在った＝行の 操作が 先だと
+       その後の 1打ちで 控えが 取り直され ★行の 挿入が 書き出しから 消えた★）
+     ★データを 変える 操作だけ が 呼ぶ★＝見た目だけ（固定・隠す）は 呼ばない（呼ぶと 開いた本の
+       保存された 答えが うちの 答えに 変わる）
+     ★値を 読む 前に 呼ぶ★＝並べ替え・重複の削除は 計算し直した 後の 値で 決める
+     ★見張り★ tests/torikeshi-rowcol.test.mjs */
+function _人の操作の前(なぜ){
+  if (!_baselineTaken && typeof BookOpen !== 'undefined' && BookOpen.isOpened()) {
+    _baselineTaken = true;
+    for (var _bi = 0; _bi < sheets.length; _bi++) loadSheetIntoEngine(_bi);
+    /* ══ ★★ここで 1回だけ 台を 合わせて 全部 計算し 控えを 取り直します★★ ══（2026-09-25）
+         ★★なぜ 要るか（★実物で 出ました★）★★
+           控えは ★「うちの 台から 見た 今の ファイル」★ で なければ なりません。
+           開いた 直後に 計算しなく なった ので 控えが ★「本に 保存された 値」★ に なり、
+           ⇒1打ち目の 後に 計算すると ★うちの 答えが 全部 「客が 変えた」に 数えられました★
+           ⇒★窓に 「この3044か所を直して 書き出す」と 出ました★（実際に 書くのは 1個）
+           ⇒`.xlsx` では ★本当に 81個 書き込まれました★（見張りで 実測）
+         ★★「計算の 後で 毎回 取り直す」では 駄目です★★
+           ＝★つられて 変わった 分まで 消えます★
+           ＝別の 板の 合計が ★古いまま 保存されます★（`tests/diff-preview.test.mjs` が 捕まえました）
+         ⇒★★だから 「打つ 前に 1回」だけ 取り直します★★
+           ＝★ここは まだ 旗が 立って いて お客さんは 1マスも 打って いません★
+           ＝この 後 `_計算を始める('打った')` で 旗が 下ります
+         ★★台を 合わせるのは 1回だけ★★＝★225回 → 1回（21秒の 正体）★
+         ★見張り★ tests/mado-no-kazu-to-kaita-kazu-webkit.mjs ／ tests/diff-preview.test.mjs */
+    var _合わせた = false;
+    try {
+      if (typeof ShikiItaAwase !== 'undefined' && typeof _台の板を得る === 'function') {
+        var _先板 = _台の板を得る();
+        if (_先板) { _台を全部合わせる(_先板); _合わせた = true; }
+      }
+    } catch (e) { _合わせた = false; }
+    for (var _bj = 0; _bj < sheets.length; _bj++) {
+      if (typeof recalcSheet === 'function' && sheets[_bj]) recalcSheet(_bj, sheets[_bj].data, _合わせた);
+    }
+    _控えを取り直す();
+  }
+  _計算を始める(なぜ || '打った');
 }
-function _pushRowColUndo(){
-  undoStack.push({type:'rowcol', sheet:activeSheet, snap:_snapRowCol()});
+/* ★板を 写す★＝objects 以外は JSON で 深く・objects は ふつうの 物と 並びだけ 深く 写し
+     それ以外（画像＝HTMLImageElement 等）は そのまま 渡す（前は JSON で ★画像が {} に なった★） */
+function _物を写す(x){
+  if (x === null || typeof x !== 'object') return x;
+  if (Array.isArray(x)) return x.map(_物を写す);
+  var 元 = Object.getPrototypeOf(x);
+  if (元 !== Object.prototype && 元 !== null) return x;
+  var o = {};
+  for (var k in x) if (Object.prototype.hasOwnProperty.call(x, k)) o[k] = _物を写す(x[k]);
+  return o;
+}
+function _板を写す(sh){
+  var 外 = {};
+  for (var k in sh) if (Object.prototype.hasOwnProperty.call(sh, k) && k !== 'objects') 外[k] = sh[k];
+  var 写し = JSON.parse(JSON.stringify(外));
+  if (sh.objects !== undefined) 写し.objects = _物を写す(sh.objects);
+  return 写し;
+}
+/* ★板の 中身を 置く★＝sheets[idx] の 物は 替えない（画面・他の 所が 持っている）
+     控えは 写して 置く（控えと 板を 共有しない） */
+function _板の中身を置く(idx, snap){
+  var sh = sheets[idx], 写し = _板を写す(snap), k;
+  for (k in sh) if (Object.prototype.hasOwnProperty.call(sh, k) && !Object.prototype.hasOwnProperty.call(写し, k)) delete sh[k];
+  for (k in 写し) if (Object.prototype.hasOwnProperty.call(写し, k)) sh[k] = 写し[k];
+}
+/* ★見た目の 鍵★＝固定・隠す の 6か所が 書くのは これだけ（6版 taiketsu で 数えた）
+     ★見た目の 控えは この 鍵だけ★＝戻しても データを 置き戻さない（置き戻すと 控えを 積まずに
+       変えた データ（集計行など）が 消え 計算側と 食い違う）
+     ★SUBTOTAL(109) を 作る日は ここが 割れる★（隠すが 計算に 効く＝データ側に なる） */
+var _見た目の鍵 = ['freezeRow', 'freezeCol', 'hiddenRows', 'hiddenCols', '下を隠す', '書いていない間'];
+function _見た目を写す(sh){
+  var o = {};
+  for (var i = 0; i < _見た目の鍵.length; i++) {
+    var k = _見た目の鍵[i];
+    if (Object.prototype.hasOwnProperty.call(sh, k)) o[k] = JSON.parse(JSON.stringify(sh[k] === undefined ? null : sh[k]));
+  }
+  return o;
+}
+function _見た目を置く(idx, snap){
+  var sh = sheets[idx];
+  for (var i = 0; i < _見た目の鍵.length; i++) {
+    var k = _見た目の鍵[i];
+    if (Object.prototype.hasOwnProperty.call(snap, k)) sh[k] = JSON.parse(JSON.stringify(snap[k]));
+    else delete sh[k];
+  }
+}
+/* ★板を 計算側へ 流し直す★＝流す→台を 全部 合わせる（1回）→全部の 板を 計算し直す
+     ★旗も _baselineTaken も 見ない★（データの 控えを 積む 前に _人の操作の前 が 済ませている）
+     ★控えの 取り直し（rebaseSheet）は しない★＝戻しも 人の 操作＝書き出しの 差分に 出す */
+function _板を流し直す(idx){
+  if (typeof hf === 'undefined' || !hf) return;
+  _pushGrid(idx, sheets[idx]);
+  var 合わせた = false;
+  try {
+    if (typeof ShikiItaAwase !== 'undefined' && typeof _台の板を得る === 'function') {
+      var 先板 = _台の板を得る();
+      if (先板) { _台を全部合わせる(先板); 合わせた = true; }
+    }
+  } catch (e) { 合わせた = false; }
+  for (var j = 0; j < sheets.length; j++) {
+    if (typeof recalcSheet === 'function' && sheets[j]) recalcSheet(j, sheets[j].data, 合わせた);
+  }
+}
+/* ★戻し・やり直しの 鏡★＝今の 板を 同じ 形（見た目か 丸ごとか）で 写す
+     ★doUndo・doRedo の 両方が これで 積む★（前は 鍵を 名前で 並べ直して 見た目の 印が 落ちた・
+       やり直しは op を そのまま 積んで 2回目が 空振りした） */
+function _rowcolの鏡(op){
+  var sh = sheets[activeSheet];
+  var 板の番号 = (op.sheet != null) ? op.sheet : activeSheet;
+  if (op.見た目) return {type:'rowcol', sheet:板の番号, 見た目:true, snap:_見た目を写す(sh)};
+  return {type:'rowcol', sheet:板の番号, snap:_板を写す(sh)};
+}
+function _rowcolを戻す(op){
+  if (op.見た目) _見た目を置く(activeSheet, op.snap);
+  else { _板の中身を置く(activeSheet, op.snap); _板を流し直す(activeSheet); }
+  /* ★前の 選びを 持ち越さない★（物が 入れ替わった＝残すと 嘘の 「N個」や 二重の まとめ） */
+  選んだ物 = null; えらんだ物たち = [];
+  if (touchState && (touchState.type === 'objmove' || touchState.type === 'objsize')) touchState = null;
+  render(); updateBar();
+}
+function _snapRowCol(){
+  return _板を写す(sheets[activeSheet]);
+}
+/* ★見た目＝true の 時は 見た目の 鍵だけ 控える★（固定・隠す の 6か所） */
+function _pushRowColUndo(見た目){
+  if (見た目) undoStack.push({type:'rowcol', sheet:activeSheet, 見た目:true, snap:_見た目を写す(sheets[activeSheet])});
+  else undoStack.push({type:'rowcol', sheet:activeSheet, snap:_snapRowCol()});
   redoStack=[];
 }
 /* ★行や列を 入れたり消したりした時、入力の決まりも 一緒に動かす★
@@ -18053,6 +18153,7 @@ function _外へ押し出すなら断る(縦, 上, 幅){
 }
 /* ★選んだ 行（列）の 数だけ 入れる★（実Excel＝B2:B4 を 選んで 行の 挿入＝3行。前は 何行 選んでも 1行＝押し0b） */
 function ctxInsertRow(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxInsertRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   if (_外へ押し出すなら断る(true, selR1, selR2-selR1+1)) { hideCtxMenu(); return false; }
   _pushRowColUndo();
@@ -18079,6 +18180,7 @@ function ctxInsertRow(){
   render(); hideCtxMenu();
 }
 function ctxInsertCol(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxInsertCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   if (_外へ押し出すなら断る(false, selC1, selC2-selC1+1)) { hideCtxMenu(); return false; }
   _pushRowColUndo();
@@ -18105,6 +18207,7 @@ function ctxInsertCol(){
   render(); hideCtxMenu();
 }
 function ctxDeleteRow(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxDeleteRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   _pushRowColUndo();
   var 写す=_座標の写しを作る(true, false);
@@ -18134,6 +18237,7 @@ function ctxDeleteRow(){
   render(); hideCtxMenu();
 }
 function ctxDeleteCol(){
+  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxDeleteCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   _pushRowColUndo();
   var 写す=_座標の写しを作る(false, false);
@@ -18164,21 +18268,21 @@ function ctxDeleteCol(){
 }
 function ctxHideRow(){
   _選びを揃える();
-  _pushRowColUndo();
+  _pushRowColUndo(true);
   if(!sheets[activeSheet].hiddenRows) sheets[activeSheet].hiddenRows={};
   for(var r=selR1;r<=selR2;r++) sheets[activeSheet].hiddenRows[r]=true;
   render(); hideCtxMenu();
 }
 function ctxHideCol(){
   _選びを揃える();
-  _pushRowColUndo();
+  _pushRowColUndo(true);
   if(!sheets[activeSheet].hiddenCols) sheets[activeSheet].hiddenCols={};
   for(var c=selC1;c<=selC2;c++) sheets[activeSheet].hiddenCols[c]=true;
   render(); hideCtxMenu();
 }
 function ctxUnhideRow(){
   _選びを揃える();
-  _pushRowColUndo();
+  _pushRowColUndo(true);
   var hr=sheets[activeSheet].hiddenRows||{};
   for(var r=Math.max(0,selR1-1);r<=Math.min(ROWS-1,selR2+1);r++) delete hr[r];
   _書いていない行を出す(sheets[activeSheet], selR1, selR2);
@@ -18209,7 +18313,7 @@ function _書いていない行が掛かるか(s, r1, r2){
 }
 function ctxUnhideCol(){
   _選びを揃える();
-  _pushRowColUndo();
+  _pushRowColUndo(true);
   var hc=sheets[activeSheet].hiddenCols||{};
   for(var c=Math.max(0,selC1-1);c<=Math.min(COLS-1,selC2+1);c++) delete hc[c];
   render(); hideCtxMenu();
