@@ -244,6 +244,7 @@ await T('★focus は 窓の 中の 最初の 欄★', () => { eq(doc.activeElem
 eq(win.フォームの窓を開く(), 0, '2回目は 開かない');
 win.フォームを閉じる();
 await T('★閉じると 自分が 付けた inert だけ 外れる★', () => { eq(doc.querySelectorAll('[inert]').length, 1, 'inert の 数'); eq(前から.hasAttribute('inert'), true, '前から'); });
+await T('★閉じると focus は マスの 入力欄（開いた ボタンへ 戻さない）★', () => { eq(doc.activeElement && doc.activeElement.id, 'cell-input', 'activeElement'); });
 前から.removeAttribute('inert');
 
 /* 止め2＝改行と & の マス。触らず 閉じても 字も 控えも 変わらない・改行の マスを 直すと 改行が 残る */

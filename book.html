@@ -14499,7 +14499,7 @@ function _窓を閉じ込める(ov){
     if (e === ov || e.contains(ov) || e.hasAttribute('inert')) continue;
     e.setAttribute('inert', ''); 付けた.push(e);
   }
-  _閉じ込め = { ov: ov, 付けた: 付けた, 前: document.activeElement };
+  _閉じ込め = { ov: ov, 付けた: 付けた };
   var 最初 = ov.querySelector('input,textarea,select,button');
   if (最初) 最初.focus();
 }
@@ -14507,7 +14507,8 @@ function _窓の閉じ込めを解く(ov){
   var z = _閉じ込め; if (!z || z.ov !== ov) return;
   _閉じ込め = null;
   for (var i = 0; i < z.付けた.length; i++) z.付けた[i].removeAttribute('inert');
-  var 戻す = (z.前 && z.前 !== document.body && document.body.contains(z.前)) ? z.前 : document.getElementById('cell-input');
+  /* 戻し先は 常に マスの 入力欄＝開いた 時の 物（リボンの ボタン）へ 戻すと、Enter で フォームが 開き直し 字が マスへ 入らない */
+  var 戻す = document.getElementById('cell-input');
   try { if (戻す) 戻す.focus(); } catch (e) {}
 }
 /* Alt の キーチップ（_リボンキー）は 閉じた 中の 関数＝守りを 外から 見える 名に 出す（自己確認で 抜ける） */
