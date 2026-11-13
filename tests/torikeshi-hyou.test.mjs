@@ -77,6 +77,7 @@ const 守り = {
   'リボンキー': () => win.eval('_リボンキーをフォームが止める = function(){ return false; };'),
   '本を開く': () => win.eval('_フォームが開いていれば断る = function(){ return false; };'),
   '閉じ込め': () => win.eval('_窓を閉じ込める = function(){};'),
+  'ログインの窓': () => 抜く('_窓を閉じ込める', " || e.id === 'loginOv'", ''),
   '写しの比べ': () => win.eval('_フォームの下が同じ = function(){ return true; };'),
   '改行の欄': () => 抜く('フォームを描く', "/[\\r\\n]/.test(v) ? 'textarea' : 'input'", "'input'"),
   '打ちかけの確定': () => 抜く('フォームの窓を開く', 'if (editingCell) { commitEdit(); if (editingCell) return 0; }', ''),
@@ -237,7 +238,7 @@ await T('★→窓は 閉じて 閉じ込めも 解ける★', () => { eq(win._�
 選ぶ(1, 0); win.フォームの窓を開く();
 const ov = doc.getElementById('formOverlay');
 await T('★開くと 窓の 外の body 直下の 子が 全部 inert★', () => {
-  const 外 = [...doc.body.children].filter((e) => e !== ov);
+  const 外 = [...doc.body.children].filter((e) => e !== ov && e.id !== 'loginOv');   /* ログインの窓は 閉じ込めない（下の 試験） */
   eq(外.filter((e) => !e.hasAttribute('inert')).length, 0, 'inert の 無い 外の 子'); eq(ov.hasAttribute('inert'), false, '窓');
 });
 await T('★focus は 窓の 中の 最初の 欄★', () => { eq(doc.activeElement === 欄()[0], true, 'activeElement'); });
@@ -246,6 +247,14 @@ win.フォームを閉じる();
 await T('★閉じると 自分が 付けた inert だけ 外れる★', () => { eq(doc.querySelectorAll('[inert]').length, 1, 'inert の 数'); eq(前から.hasAttribute('inert'), true, '前から'); });
 await T('★閉じると focus は マスの 入力欄（開いた ボタンへ 戻さない）★', () => { eq(doc.activeElement && doc.activeElement.id, 'cell-input', 'activeElement'); });
 前から.removeAttribute('inert');
+
+/* ★ログインの窓は 閉じ込めない★＝フォームを 開いたまま ログインが 切れても ログインの 欄が 打てる（穴9 の 叩きの 止め1） */
+{ const 在った = doc.getElementById('loginOv');   /* js/exally-login.js が 読み込みで 足す 物を 使う・無ければ 同じ 形で 足す */
+  const lo = 在った || doc.body.appendChild(Object.assign(doc.createElement('div'), { id: 'loginOv' }));
+  三列(); 選ぶ(1, 0); win.フォームの窓を開く();
+  doc.body.classList.add('exally-locked');
+  await T('★フォームを 開いたまま ロック→ログインの窓に inert が 無い★', () => { eq(lo.hasAttribute('inert'), false, '#loginOv の inert'); eq(lo.closest('[inert]'), null, '祖先の inert'); eq(!!在った, true, 'ログインの窓は 読み込みで 在る'); });
+  doc.body.classList.remove('exally-locked'); win.フォームを閉じる(); if (!在った) lo.remove(); }
 
 /* 止め2＝改行と & の マス。触らず 閉じても 字も 控えも 変わらない・改行の マスを 直すと 改行が 残る */
 新しい本(); win.setCell(0, 0, '名'); win.setCell(0, 1, 'メモ'); win.setCell(0, 2, '社');

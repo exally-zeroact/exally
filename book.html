@@ -14496,7 +14496,9 @@ function _窓を閉じ込める(ov){
   var 付けた = [], 子 = document.body.children;
   for (var i = 0; i < 子.length; i++) {
     var e = 子[i];
-    if (e === ov || e.contains(ov) || e.hasAttribute('inert')) continue;
+    /* ★ログインの窓（#loginOv・js/exally-login.js が body 直下に足す）は 閉じ込めない★＝使っている 途中で ログインが 切れると
+       auth.js が ロックして ログインの窓だけを 見せる。inert のままだと 打てず、読み込み直すしか なく 打った 分が 消えた（穴9 の 叩きの 止め1） */
+    if (e === ov || e.contains(ov) || e.hasAttribute('inert') || e.id === 'loginOv') continue;
     e.setAttribute('inert', ''); 付けた.push(e);
   }
   _閉じ込め = { ov: ov, 付けた: 付けた };
