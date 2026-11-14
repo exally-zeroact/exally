@@ -57,24 +57,29 @@ for (const src of [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m
 for (const m of html.matchAll(/<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/g)) { try { inject(m[1]); } catch (e) { /* 続ける */ } }
 try { doc.dispatchEvent(new win.Event('DOMContentLoaded', { bubbles: true })); } catch (e) { /* 続ける */ }
 try { win.dispatchEvent(new win.Event('load')); } catch (e) { /* 続ける */ }
+doc.body.classList.remove('exally-locked');   /* ★ログインが 済んだ 形で 試す★（試験は 倉庫を 読まない＝auth.js が 鍵を 掛ける。鍵の 間は 門が キー・押しを 止める＝穴9）。前は 鍵の 門が Ctrl・Alt を 止め、フォームの 守りを 抜いても 緑のまま（self 赤0） */
 /* ★保存の 道具は 本番でも 初めての 保存で 後から 読む（_ensureXlsx と 同じ 順）★ */
 
 
 const SELF2 = process.argv.includes('--self-test-futatsu');
 /* ★--self-test は 守りを 1つずつ 抜いて 回す★（2026-11-14・設計5版）＝前は 全部を 一度に 抜き、Alt の 守りが 抜けても 赤に ならなかった
    --self-test＝下の 守り ごとに 自分を --self-test=<名> で 回し、どれも 赤が 1以上で なければ exit1 */
+/* ★窓（覆い）の 守り（穴9 層W）を 丸ごと 切る★＝フォームの 覆いも 窓なので、層W が 在ると フォームの 守りを 抜いても
+   onKD・doUndo・doRedo・キーチップで 先に 止まり 赤が 0（11-14 u9 で 空振り）。
+   層W の 守りは ana9-oi.test.mjs が 自分で 1つずつ 抜いて 見る＝ここは フォームの 守り 1つだけを 試す */
+const 層Wを切る = () => win.eval('_覆いが開いている = function(){ return null; };');
 const 守り = {
   '表を決める': () => 抜く('表を決める', 'if (見出し行 || 今) _pushRowColUndo();', ''),
   'フォームで消す': () => 抜く('フォームで消す', /_pushRowColUndo\(\);/, ''),
-  'doUndo': () => 抜く('doUndo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''),
-  'doRedo': () => 抜く('doRedo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''),
+  'doUndo': () => { 抜く('doUndo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''); 層Wを切る(); },
+  'doRedo': () => { 抜く('doRedo', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''); 層Wを切る(); },
   'onKD': () => {
     /* onKD は addEventListener で 掴まれている＝外して 守りを 抜いた 物を 付け直す */
     doc.removeEventListener('keydown', win.onKD);
-    抜く('onKD', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', '');
+    抜く('onKD', 'if(typeof _フォーム!=="undefined" && _フォーム) return;', ''); 層Wを切る();
     doc.addEventListener('keydown', win.onKD);
   },
-  'リボンキー': () => win.eval('_リボンキーをフォームが止める = function(){ return false; };'),
+  'リボンキー': () => { win.eval('_リボンキーをフォームが止める = function(){ return false; };'); 層Wを切る(); },
   '本を開く': () => win.eval('_フォームが開いていれば断る = function(){ return false; };'),
   '閉じ込め': () => win.eval('_窓を閉じ込める = function(){};'),
   'ログインの窓': () => 抜く('_窓を閉じ込める', " || e.id === 'loginOv'", ''),
