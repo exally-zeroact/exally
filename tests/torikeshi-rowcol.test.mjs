@@ -227,14 +227,27 @@ await T('開いた 直後に 行を足す→1マス 打つ：行の 挿入が �
   ok(c['2,1'] !== undefined || c['1,1'] !== undefined, '★行の 挿入が 差分から 消えた★ ' + JSON.stringify(c));
 });
 
-await 本を開く(食い違う本);
+/* setCell の 頭の _人の操作の前('打った')＝別の 板も 台に 流してから 控え（前から 在る 守り・押し0a で 関数に 出した）。
+   開いていない 板の 表示（.d）は 後で 描く 時に 直る＝ここは 台の 答えを 見る */
+await 本を開く([['Sheet1', { B2: { t: 'n', v: 7 } }], ['Sheet2', { A1: { t: 'n', v: 14, f: 'Sheet1!B2*2' } }]]);
 win.setCell(1, 1, '100');
-win.sel(0, 0, 0, 0); win.ctxInsertRow();
-await T('開いた本：B2=100→行を足す→Z で B2 が 差分に 在る・Y の後 ずれた 所', () => {
-  win.doUndo();
-  eq(String(win.BookOpen.changedCells(板(0))['1,1']), '100', 'Z の後 B2');
-  win.doRedo();
-  eq(String(win.BookOpen.changedCells(板(0))['2,1']), '100', 'Y の後 B3');
+await T('開いた 直後に 最初に 1マス 打つ：別の 板も 先に 台へ 流してある（Sheet2!A1 の 台の 答え＝200）', () => {
+  eq(String(win.BookOpen.changedCells(板(0))['1,1']), '100', 'Sheet1!B2');
+  eq(String(台の値(1, 0, 0)), '200', '★別の 板が 台に 無いまま 打った＝つられる 答えが 古い★');
+});
+
+/* ── 表の 道（Exally 穴4 の 2行・押し0a）：開いた 直後の 最初の 操作でも 先に 控え・計算 ──
+ *   フォームで消す＝字の 並び（下の 15か所）で 守る（消した 所は changedCells が もともと 数えない＝差分では 見えない）
+ *   表を決める＝見出しの 字を 計算し直す 前に 読むと 保存された 古い 答え（999）が 列名に なる */
+await 本を開く([['Sheet1', { A1: { t: 'n', v: 999, f: 'E1*2' }, B1: { t: 's', v: '数' }, A2: { t: 'n', v: 1 }, B2: { t: 'n', v: 2 }, E1: { t: 'n', v: 10 } }]]);
+win.sel(0, 0, 0, 0); win.表の窓を開く();
+doc.getElementById('tblRange').value = 'A1:B2'; doc.getElementById('tblName').value = '表9';
+doc.getElementById('tblHeader').checked = true; doc.getElementById('tblTotals').checked = false;
+eq(win.表を決める(), 1, '前提：表が 出来た');
+await T('開いた 直後に 表を作る（見出し つき）：列名は 計算し直した 答え（20）', () => {
+  const t = (板(0).tables || [])[0];
+  ok(t, '前提：表が 無い');
+  eq(String(t.列名[0]), '20', '★保存された 古い 答え で 列名を 決めた★');
 });
 
 /* ── ⑦ 値を 読む 前に 計算（開いた本） ── */
@@ -252,9 +265,10 @@ await T('開いた本で 重複の削除：計算し直した 後の 値（20 �
 
 /* ── 字で 守る 所（作りが 崩れたら 赤） ── */
 const 中身 = (名) => { const f = win[名]; ok(typeof f === 'function', 名 + ' が無い'); return f.toString(); };
-await T('データを 変える 13か所は 控えを 積む 前に _人の操作の前 を 呼ぶ', () => {
+await T('データを 変える 15か所は 控えを 積む 前に _人の操作の前 を 呼ぶ', () => {
   const 名たち = ['sortRange', 'replaceAll', 'AIの表をシートに入れる', '_表を入れる', '重複を削除', '区切りで分ける',
-    'セルを挿入', 'セルを削除', '並べ替えを決める', 'ctxInsertRow', 'ctxInsertCol', 'ctxDeleteRow', 'ctxDeleteCol'];
+    'セルを挿入', 'セルを削除', '並べ替えを決める', 'ctxInsertRow', 'ctxInsertCol', 'ctxDeleteRow', 'ctxDeleteCol',
+    '表を決める', 'フォームで消す'];   /* ★Exally 穴4 の 2行（typeof なし）★ */
   const 抜け = 名たち.filter((n) => { const s = 中身(n); const a = s.indexOf('_人の操作の前('), b = s.indexOf('_pushRowColUndo('); return a < 0 || b < 0 || a > b; });
   eq(抜け.join(','), '', '抜け');
 });

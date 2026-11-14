@@ -92,6 +92,8 @@ const 新しい本 = () => { win.eval("sheets.length=1; sheets[0]={name:'Sheet1'
 const 上から = (r) => win.rowY(r) - win.rowY(0);
 const 左から = (c) => win.colX(c) - win.colX(0);
 const 鍵 = (o) => Object.keys(o || {}).sort();
+/* ★鍵の 並びに 頼らずに 比べる★（押し0a＝戻す 時に 計算し直す＝溢れの マスは 後ろに 付き直る） */
+const 並べて = (x) => JSON.stringify(x, (k, v) => (v && typeof v === 'object' && !Array.isArray(v)) ? Object.keys(v).sort().reduce((o, kk) => { o[kk] = v[kk]; return o; }, {}) : v);
 
 /* ── 1 見張り：板の 鍵 全部に 行き先が 書いてあるか（字で 数える） ── */
 await T('板の 鍵は 全部 板の鍵の行き先 に 書いてある（book.html と js/*.js を 字で 数える）', () => {
@@ -112,11 +114,12 @@ await T('板の 鍵は 全部 板の鍵の行き先 に 書いてある（book.h
 const 決まり = { kind: 'int', min: '1', max: '9' };
 const 決まり2 = { kind: 'list', items: ['a', 'b'] };
 win.setCell(0, 0, '見出し', true); win.setCell(4, 0, '5行目', true); win.setCell(5, 1, '結合', true);
+/* ★溢れは 本物の 式から 出して 1回 計算する★（押し0a＝戻す 時は 計算し直す＝元の 式が 無い 溢れの 印は 残らない） */
+win.setCell(7, 3, '=SEQUENCE(2)', true); win.recalcSheet(0, 板().data);
 {
   const s = 板();
   s.data['5,1'].mergeEnd = { r: 6, c: 2 };
   for (const k of ['5,2', '6,1', '6,2']) s.data[k] = Object.assign(s.data[k] || { v: '', f: '', d: '' }, { merged: { r: 5, c: 1 } });
-  s.data['8,3'] = { v: '', f: '', d: 3, _溢れ元: '7,3', _台溢れ元: '7,3' };
   s.rowH = { 0: 30, 4: 40 };
   s.hiddenRows = { 4: true };
   s.filterHidden = { 5: true };
@@ -133,8 +136,9 @@ win.setCell(0, 0, '見出し', true); win.setCell(4, 0, '5行目', true); win.se
   s.freezeRow = 2;
 }
 const 図形の上 = 上から(4), 図形の高さ = 上から(6) - 上から(4);
-板().objects = [{ 種類: '四角', 名: 'Rectangle 1', x: 10, y: 図形の上, w: 50, h: 図形の高さ, z: 1 }];
-板().ink = [{ 色: '#000000', 太さ: 1.32, 透け: 1, 点: [{ x: 5, y: 図形の上 }, { x: 6, y: 1 }], 名: 'ペン（黒）' }];
+/* ★図形と 線は 窓の 側で 作る★（画面の 中で 出来た 物と 同じ＝_物を写す は 窓の Object.prototype の 物だけ 写す） */
+板().objects = win.JSON.parse(JSON.stringify([{ 種類: '四角', 名: 'Rectangle 1', x: 10, y: 図形の上, w: 50, h: 図形の高さ, z: 1 }]));
+板().ink = win.JSON.parse(JSON.stringify([{ 色: '#000000', 太さ: 1.32, 透け: 1, 点: [{ x: 5, y: 図形の上 }, { x: 6, y: 1 }], 名: 'ペン（黒）' }]));
 const 前の板 = JSON.stringify(板());
 win.sel(1, 1, 3, 1); win.ctxInsertRow();
 const s = 板();
@@ -158,7 +162,7 @@ await T('結合 B6:C7 → B9:C10（印も 付け直す・元の 場所に 残さ
 await T('溢れの 印（元の 場所）も 3つ 下', () => { eq(s.data['11,3']._溢れ元, '10,3'); eq(s.data['11,3']._台溢れ元, '10,3'); });
 await T('図形は 行と 一緒に 下へ（大きさは そのまま）', () => { eq(s.objects[0].y, 上から(7)); eq(s.objects[0].h, 図形の高さ); eq(s.objects[0].x, 10); });
 await T('手書きの 線も 下へ（上の 点は そのまま）', () => { eq(s.ink[0].点[0].y, 上から(7)); eq(s.ink[0].点[1].y, 1); });
-await T('Ctrl+Z で 全部 元へ', () => { win.doUndo(); eq(JSON.stringify(板()), 前の板); });
+await T('Ctrl+Z で 全部 元へ', () => { win.doUndo(); eq(並べて(板()), 並べて(JSON.parse(前の板))); });
 
 /* ── 3 消す側（実Excel の 測り） ── */
 await T('3行 選んで 行の削除＝3行 消える（全部の 棚が 3つ 上へ）', () => {
