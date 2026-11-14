@@ -82,7 +82,8 @@ const 守り = {
   '改行の欄': () => 抜く('フォームを描く', "/[\\r\\n]/.test(v) ? 'textarea' : 'input'", "'input'"),
   '打ちかけの確定': () => 抜く('フォームの窓を開く', 'if (editingCell) { commitEdit(); if (editingCell) return 0; }', ''),
   '帯の打ちかけ': () => 抜く('フォームの窓を開く', 'if (帯 && document.activeElement === 帯 &&', 'if (false &&'),
-  '帯の断り': () => 抜く('フォームの窓を開く', 'if (!帯が通った) return 0;', ''),
+  '帯を揃える': () => 抜く('フォームの窓を開く', "帯.value = (getCell(selR1, selC1).f || '').replace(/\\n/g, ' ↵ ');", ''),
+  '帯の断り':() => 抜く('フォームの窓を開く', 'if (!帯が通った) return 0;', ''),
   '足す先の確かめ':() => 抜く('フォームで足す', 'if (断り) {', 'if (false) {'),
   'はみ出す表': () => 抜く('_フォームで足せない訳', '(h.c1 < f.c1 || h.c2 > f.c2)', 'false'),
   '開くの集計': () => 抜く('フォームの窓を開く', 'if (Table.重なる(表の箱().filter(function (x) { return x.集計行; }), 場所.r1, 場所.c1, 場所.r2, 場所.c2)) {', 'if (false) {'),
@@ -288,6 +289,14 @@ await T('★打ちかけの マスで 開く→先に 決まり、フォーム�
   await new Promise((ok) => setTimeout(ok, 250));
   if (開いた帯) { 欄()[2].value = '帯から'; win.フォームを閉じる(); }
   await T('★帯で 打ちかけの まま 開く→帯の 字が 先に 決まり、フォームの 字も 入る★', () => { eq(開いた帯, 1, '開いた'); eq(字(2, 1), '77', 'B3'); eq(字(1, 2), '帯から', 'C2'); });
+
+  /* 全角で 打つ＝setCell は 半角に 直す。前は 帯の 字が 全角の まま 残り、開いた 後の blur で もう一度 書いて 空の 控えが 2本 積まれた（叩き直しの 任意1） */
+  三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 20); win.undoStack.length = 0;
+  win.sel(2, 1, 2, 1); kb.style.display = 'none'; fi.focus(); fi.value = '７７'; fi.dispatchEvent(new win.Event('input'));
+  const 開いた全角 = win.フォームの窓を開く();
+  await new Promise((ok) => setTimeout(ok, 250));
+  if (開いた全角) win.フォームを閉じる();
+  await T('★帯で 全角を 打って 開く→控えは 1本だけ★', () => { eq(開いた全角, 1, '開いた'); eq(字(2, 1), '77', 'B3'); eq(win.undoStack.length, 1, '控え'); });
 
   /* 帯の 字が 入力の 決まりで 断られた＝開かない（マスの 打ちかけと 同じ）。帯の 字は マスの 字へ 戻る */
   三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 5); win.undoStack.length = 0;
