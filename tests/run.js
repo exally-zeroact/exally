@@ -281,6 +281,8 @@ const FILES = [
   'torikeshi-rowcol.test.mjs',            // ★行・列の 取り消し／やり直し＝空振り・板の差し替え・計算側へ流す・画像・見た目だけ・開いた本の控え（押し0a・2026-11-14）
   'torikeshi-dji.test.mjs',               // ★値の取り消しで ファイルの字の マス（d字）が 数に 化けない・0 が 消えない・f は 字（2026-11-14 件f）
   ['torikeshi-dji.test.mjs', '--self-test'],// ★直しを 1つずつ 外して 9通り 全部 赤に なるか
+  'mado-esc.test.mjs',                    // ★Esc で 一番上の 窓を 閉じる・閉じたら 的を セルの 欄へ（実Excel と 同じ・2026-11-15）
+  ['mado-esc.test.mjs', '--self-test'],   // ★守りを 1本ずつ 抜いて 赤に なるか
   'shift-keeps-everything.test.mjs',      // ★行・列を 足しても 消しても 棚が 置いていかれない・選んだ 数だけ 入る（押し0b・2026-11-07）
   ['shift-keeps-everything.test.mjs', '--self-test'],// ★直す前の 形に 戻すと 赤に なるか
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
