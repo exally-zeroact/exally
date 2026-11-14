@@ -58,11 +58,13 @@ console.log('\n[② 実際に 通して 落ちないか]');
   ok('★v は 数の まま★', typeof 作る(10).v === 'number', typeof 作る(10).v);
 }
 
+const 比べる形 = /if\(actual!==stored\)|if\(actual===stored\)\s*return/;
 console.log('\n[③ 打った字を 読み返す所も 字で 比べている]');
 {
   /* 数式バーで 直した時、stored と 比べて 同じなら 入れ直さない。
      stored が 数だと ★いつも 違う★に なって 毎回 入れ直していた。 */
-  ok('比べている所が 在る', /if\(actual!==stored\)/.test(book));
+  /* ★同じなら 書かない★の 形は 2つ（11-14 帯の確定は「同じなら return」に 替わった） */
+  ok('比べている所が 在る', 比べる形.test(book));
   ok('★f が 字なので 比べられる★（①で String を 通している）', /String\(v\)/.test(book));
 }
 
@@ -76,6 +78,8 @@ if (壊す) {
   try { (昔.f || '').replace(/\n/g, ' '); } catch (e) { 落ちた = true; console.log('  ok   直す前の 持ち方は ちゃんと 落ちる … ' + e.message); }
   if (!落ちた) { 素通り++; console.log('  ★素通り★ 数を f に 入れても 落ちなかった＝この試験は 何も 見ていない'); }
   if (!/String\(v\)/.test(book)) { 素通り++; console.log('  ★素通り★ String() が 消えている'); }
+  if (比べる形.test(book.replace(new RegExp(比べる形.source, 'g'), ''))) { 素通り++; console.log('  ★素通り★ 比べる所を 消しても ③ が 緑のまま'); }
+  else console.log('  ok   比べる所を 消すと ③ は 赤に なる');
   if (素通り) { console.log('★抜け道 ' + 素通り + '件★'); process.exit(1); }
   console.log('  ok   抜け道 0件');
 }

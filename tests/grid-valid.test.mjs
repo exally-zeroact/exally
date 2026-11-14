@@ -414,7 +414,7 @@ if (SELF) {
     ['book.html', '打った時に 決まりを見ない（何でも入る）',
       (s) => s.replace('  if(!validGate(editingCell.r,editingCell.c,el.value)) return;\n', '')],
     ['book.html', '数式バーで 決まりを見ない',
-      (s) => s.replace("  if(!validGate(selR1,selC1,document.getElementById('formula-input').value)) return;\n", '')],
+      (s) => s.replace('  if(!validGate(selR1,selC1,actual)) return;\n', '')],
     ['book.html', '★合っていない値の数を 出さない（黙る）★',
       (s) => s.replace("    + (bad.count ? '／<b>合っていない値が ' + bad.count + '個 在ります（消していません）</b>' : ''));", '  );')],
     ['book.html', '★決まりが無いのに「0個」と言う（未検査を安全と言う）★',
