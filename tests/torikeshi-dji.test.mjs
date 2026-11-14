@@ -80,6 +80,8 @@ const dom = new JSDOM(html.replace(/<script[\s\S]*?<\/script>/g, ''), {
   },
 });
 const win = dom.window, doc = win.document;
+// jsdom の document.hasFocus() は blur の中で偽を返す。本物のページは同じページの中で focus が動く時 真＝そう揃える（本番の帯の blur は「別の窓へ移っただけ」なら確定しない・shitagaki-modosu と同じ）
+doc.hasFocus = () => true;
 const inject = (code) => { const el = doc.createElement('script'); el.textContent = code; doc.body.appendChild(el); };
 for (const src of [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1].split('?')[0]).filter((s) => !/^https?:/.test(s))) {
   const p = path.join(ROOT, src);
