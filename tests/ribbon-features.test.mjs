@@ -17,6 +17,9 @@ import { createRequire } from 'node:module';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require_ = createRequire(pathToFileURL(path.join(ROOT, 'package.json')));
 const 壊す = process.argv.includes('--self-test');
+/* ★押し0a★ 抜き出した関数は _人の操作の前 を 素で 呼ぶ（typeof の 包みは 無い＝no-silent-optional の決め）。本物は book.html の中・ここは 呼ばれた 名を 取るだけ */
+const 操作の前に呼んだ = [];
+globalThis._人の操作の前 = function (なぜ) { 操作の前に呼んだ.push(なぜ); };
 let 緑 = 0, 赤 = 0;
 const ok = (名, 条件, 添え) => {
   if (条件) { 緑++; console.log('  ok   ' + 名); }
@@ -147,6 +150,7 @@ for (const [名, 行き先] of [['数式の表示', '数式の表示を切り替
   ok('「' + 名 + '」→ ' + 行き先, 受け === 行き先, String(受け));
 }
 
+ok('★値を 変える 前に _人の操作の前 を 呼んでいる★（押し0a）', 操作の前に呼んだ.length > 0, JSON.stringify(操作の前に呼んだ));
 console.log('\nribbon-features: ' + 緑 + '/' + (緑 + 赤) + ' passed');
 
 if (壊す) {

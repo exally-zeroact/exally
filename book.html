@@ -2010,7 +2010,7 @@ function autoSum(){
  *  ・★式は 移った先の行に読み替える★＝相対参照だけの式は各行で正しいまま。
  *    $付きは動かない＝Excel と同じく ★指す先が変わる★ので その時だけ 一言 知らせる。 */
 function sortRange(dir){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('sortRange');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('sortRange');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   hideCtxMenu();
   var s = sheets[activeSheet], data = s.data;
   var 一つだけ = (selR1===selR2 && selC1===selC2);
@@ -2536,7 +2536,7 @@ function replaceOne(){
   findNextCell();
 }
 function replaceAll(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('replaceAll');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('replaceAll');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var what = document.getElementById('findWhat').value;
   var to = document.getElementById('findTo').value;
   if(!what){ _findMsg('探す言葉を入れてね'); return; }
@@ -3560,7 +3560,7 @@ function _字を安全に(s){
  *  ★1押しで 元に戻る★＝入れる前に ★シートを 1回だけ 控える★。
  *  ★1セルずつ 積むと N回 押さないと 戻らない★＝それでは「元に戻せる」と 言えない。 */
 function AIの表をシートに入れる(番){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('AIの表をシートに入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('AIの表をシートに入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var 表 = _AIの表たち[番];
   if(!表 || !表.length){ notify('その 表は もう ありません'); return 0; }
   /* ★typeof で 守らない★＝無ければ ★黙って 戻せない 表を 入れる★事に なる */
@@ -4812,7 +4812,7 @@ function Webの字から入れる(){
   return _表を入れる(表, '貼った 字');
 }
 function _表を入れる(表, どこから){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('_表を入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('_表を入れる');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   /* ★1押しで 元に戻す★（2026-09-06）
      ★前は 1セルずつ 積んでいた★＝10行5列を 入れたら ★50回 押さないと 戻らない★
      ⇒ 客から 見れば ★戻せない★のと 同じ（司さん「ボタン1つで 元に戻せるよな？」）
@@ -12925,7 +12925,7 @@ function ズーム100(){ ズームを決める(1); }
  *   ★選んだ範囲の 行★を 見て、中身が そっくり同じ行を 1つだけ 残す。
  *   ★消した数を 必ず 出す★（黙って 減らさない）。*/
 function 重複を削除(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('重複を削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('重複を削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var 見た = {}, 消す = [];
   for(var r=selR1;r<=selR2;r++){
     var 鍵 = [];
@@ -13042,7 +13042,7 @@ function 上書きする数(最大){
   return 数;
 }
 function 区切りで分ける(印){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('区切りで分ける');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('区切りで分ける');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var s = sheets[activeSheet];
   var 最大 = 何列に分かれるか(印);
   if (最大 <= 1) { notify('「' + 印 + '」で 分かれる所が ありませんでした'); return 0; }
@@ -13711,7 +13711,7 @@ function 枠線の表示を切り替える(){
  *   ⇒ 行や列を まるごと 動かす物とは 別（あちらは ctxInsertRow など）
  */
 function セルを挿入(向き){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('セルを挿入');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('セルを挿入');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   var s = sheets[activeSheet];
   _pushRowColUndo();
@@ -13836,7 +13836,7 @@ function 詰める向きを決める(){
 }
 
 function セルを削除(向き){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('セルを削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('セルを削除');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   var s = sheets[activeSheet];
   _pushRowColUndo();
@@ -14004,7 +14004,7 @@ function 並べ替えの範囲(){
   return GridSort.region(中身がある, selR1, selC1, ROWS - 1, COLS - 1);
 }
 function 並べ替えの窓を開く(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('並べ替えの窓を開く');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('並べ替えの窓を開く');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   hideCtxMenu();
   var ov = document.getElementById('sortOverlay');
   if (!ov) return;
@@ -14038,7 +14038,7 @@ function 並べ替えの窓を閉じる(){
   if (ov) ov.style.display = 'none';
 }
 function 並べ替えを決める(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('並べ替えを決める');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('並べ替えを決める');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   var rng = window._並べ替えの範囲;
   if (!rng) return 0;
   var data = sheets[activeSheet].data;
@@ -18153,7 +18153,7 @@ function _外へ押し出すなら断る(縦, 上, 幅){
 }
 /* ★選んだ 行（列）の 数だけ 入れる★（実Excel＝B2:B4 を 選んで 行の 挿入＝3行。前は 何行 選んでも 1行＝押し0b） */
 function ctxInsertRow(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxInsertRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('ctxInsertRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   if (_外へ押し出すなら断る(true, selR1, selR2-selR1+1)) { hideCtxMenu(); return false; }
   _pushRowColUndo();
@@ -18180,7 +18180,7 @@ function ctxInsertRow(){
   render(); hideCtxMenu();
 }
 function ctxInsertCol(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxInsertCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('ctxInsertCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   if (_外へ押し出すなら断る(false, selC1, selC2-selC1+1)) { hideCtxMenu(); return false; }
   _pushRowColUndo();
@@ -18207,7 +18207,7 @@ function ctxInsertCol(){
   render(); hideCtxMenu();
 }
 function ctxDeleteRow(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxDeleteRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('ctxDeleteRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   _pushRowColUndo();
   var 写す=_座標の写しを作る(true, false);
@@ -18237,7 +18237,7 @@ function ctxDeleteRow(){
   render(); hideCtxMenu();
 }
 function ctxDeleteCol(){
-  if (typeof _人の操作の前 === 'function') _人の操作の前('ctxDeleteCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
+  _人の操作の前('ctxDeleteCol');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
   _pushRowColUndo();
   var 写す=_座標の写しを作る(false, false);
