@@ -81,7 +81,9 @@ const 守り = {
   '写しの比べ': () => win.eval('_フォームの下が同じ = function(){ return true; };'),
   '改行の欄': () => 抜く('フォームを描く', "/[\\r\\n]/.test(v) ? 'textarea' : 'input'", "'input'"),
   '打ちかけの確定': () => 抜く('フォームの窓を開く', 'if (editingCell) { commitEdit(); if (editingCell) return 0; }', ''),
-  '足す先の確かめ': () => 抜く('フォームで足す', 'if (断り) {', 'if (false) {'),
+  '帯の打ちかけ': () => 抜く('フォームの窓を開く', 'if (帯 && document.activeElement === 帯 &&', 'if (false &&'),
+  '帯の断り': () => 抜く('フォームの窓を開く', 'if (!帯が通った) return 0;', ''),
+  '足す先の確かめ':() => 抜く('フォームで足す', 'if (断り) {', 'if (false) {'),
   'はみ出す表': () => 抜く('_フォームで足せない訳', '(h.c1 < f.c1 || h.c2 > f.c2)', 'false'),
   '開くの集計': () => 抜く('フォームの窓を開く', 'if (Table.重なる(表の箱().filter(function (x) { return x.集計行; }), 場所.r1, 場所.c1, 場所.r2, 場所.c2)) {', 'if (false) {'),
   '伸ばす表': () => 抜く('フォームで足す', 't[i].r2 === f.r2 - 1 && t[i].c1 >= f.c1 && t[i].c2 <= f.c2', 't[i].c1 === f.c1 && t[i].r1 === f.r1'),
@@ -276,6 +278,25 @@ await new Promise((ok) => setTimeout(ok, 250));
 欄()[2].value = '打った';
 win.フォームを閉じる();
 await T('★打ちかけの マスで 開く→先に 決まり、フォームの 字も 入る★', () => { eq(字(2, 1), '99', 'B3'); eq(字(1, 2), '打った', 'C2'); });
+
+/* 本番前の 叩きの 止め1＝数式の 帯で 打ちかけの まま キーチップ（Alt→N→F→R）で 開く。
+   前は 写しを 撮った 後に 帯の blur が 確定し、閉じる 時「開いている間に 表が 変わった」で フォームの 字を 全部 捨てた */
+{ const fi = doc.getElementById('formula-input'), kb = doc.getElementById('formula-kb');
+  三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 20); win.undoStack.length = 0;
+  win.sel(2, 1, 2, 1); kb.style.display = 'none'; fi.focus(); fi.value = '77'; fi.dispatchEvent(new win.Event('input'));
+  const 開いた帯 = win.フォームの窓を開く();
+  await new Promise((ok) => setTimeout(ok, 250));
+  if (開いた帯) { 欄()[2].value = '帯から'; win.フォームを閉じる(); }
+  await T('★帯で 打ちかけの まま 開く→帯の 字が 先に 決まり、フォームの 字も 入る★', () => { eq(開いた帯, 1, '開いた'); eq(字(2, 1), '77', 'B3'); eq(字(1, 2), '帯から', 'C2'); });
+
+  /* 帯の 字が 入力の 決まりで 断られた＝開かない（マスの 打ちかけと 同じ）。帯の 字は マスの 字へ 戻る */
+  三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 5); win.undoStack.length = 0;
+  win.eval("sheets[0].validations={'2,1':{kind:'int',min:1,max:10}};");
+  win.sel(2, 1, 2, 1); kb.style.display = 'none'; fi.focus(); fi.value = '99'; fi.dispatchEvent(new win.Event('input'));
+  const 開いた断り = win.フォームの窓を開く();
+  if (開いた断り) win.フォームを閉じる();
+  await T('★帯の 字が 決まりで 断られた→開かない・マスは 前の まま★', () => { eq(開いた断り, 0, '開かない'); eq(字(2, 1), '5', 'B3'); eq(fi.value, '5', '帯の 字'); });
+  win.eval('delete sheets[0].validations;'); fi.blur(); }
 
 /* 穴10＝フォームで 足す の 下の 行。前は 確かめずに 書き、集計行（SUBTOTAL）や 表の 下の 字を 上書きした */
 const 足す断り = () => doc.getElementById('formWhy').textContent;
