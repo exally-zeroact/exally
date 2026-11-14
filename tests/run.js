@@ -272,6 +272,8 @@ const FILES = [
   ['torikeshi-hyou.test.mjs', '--self-test-futatsu'],// ★見出し無しで 作る時に 控えを 2つ 積む 形で 赤に なるか
   'ana11-hito-kawari.test.mjs',          // ★別の人で 入り直すと 前の人の 本が 見えた＝違う人・分からない人は 鍵の まま 読み直す（2026-11-14・穴11）
   ['ana11-hito-kawari.test.mjs', '--self-test'],// ★守りを 1本ずつ 抜いて 赤に なるか
+  'zero-gyou-keshi.test.mjs',            // ★消しが 0行でも「削除しました」と 出た＝書けた 行を 数え 0 なら not-found・鍵切れは no-user（2026-11-14）
+  ['zero-gyou-keshi.test.mjs', '--self-test'],// ★守りを 1本ずつ 抜いて 赤に なるか
   'shift-keeps-everything.test.mjs',      // ★行・列を 足しても 消しても 棚が 置いていかれない・選んだ 数だけ 入る（押し0b・2026-11-07）
   ['shift-keeps-everything.test.mjs', '--self-test'],// ★直す前の 形に 戻すと 赤に なるか
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
