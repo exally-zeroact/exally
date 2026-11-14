@@ -290,6 +290,22 @@ await T('★打ちかけの マスで 開く→先に 決まり、フォーム�
   if (開いた帯) { 欄()[2].value = '帯から'; win.フォームを閉じる(); }
   await T('★帯で 打ちかけの まま 開く→帯の 字が 先に 決まり、フォームの 字も 入る★', () => { eq(開いた帯, 1, '開いた'); eq(字(2, 1), '77', 'B3'); eq(字(1, 2), '帯から', 'C2'); });
 
+  /* お客さんの 道＝関数を 直に 呼ばず、帯の 上で 本当に Alt→N→F→R を 打つ（キーチップの 受け口は document の capture） */
+  三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 20); win.undoStack.length = 0;
+  win.sel(2, 1, 2, 1); kb.style.display = 'none'; fi.focus(); fi.value = '66'; fi.dispatchEvent(new win.Event('input'));
+  const 打つ = (key, type) => fi.dispatchEvent(new win.KeyboardEvent(type, { key, code: key.length === 1 ? 'Key' + key.toUpperCase() : key, altKey: key === 'Alt' && type === 'keydown', bubbles: true, cancelable: true }));
+  /* この 試験の 土台は load を 自分でも 投げる＝jsdom の load と 合わせて キーチップの 受け口が 2つ 付く（測った：1つの キーで 2回 呼ばれる）。
+     本物の 画面は load 1回＝受け口 1つ。同じ キーの 2回目は 1回目の 答えを 返して 本物と 揃える */
+  const 元受け = win.Ribbon.キーを受ける; let 前の事 = null, 前の答え = false;
+  win.Ribbon.キーを受ける = function (el, sp, e) { if (e === 前の事) return 前の答え; 前の事 = e; 前の答え = 元受け(el, sp, e); return 前の答え; };
+  win.Ribbon.キーをやめる(doc.getElementById('ribbon'));
+  for (const k of ['Alt', 'n', 'f', 'r']) { 打つ(k, 'keydown'); 打つ(k, 'keyup'); }
+  win.Ribbon.キーを受ける = 元受け;
+  const キーで開いた = !!win.eval('_フォーム');
+  await new Promise((ok) => setTimeout(ok, 250));
+  if (キーで開いた) { 欄()[2].value = 'キーから'; win.フォームを閉じる(); }
+  await T('★帯で 打ちかけの まま 本当に Alt→N→F→R を 打つ→帯の 字も フォームの 字も 入る★', () => { eq(キーで開いた, true, 'キーで 開いた'); eq(字(2, 1), '66', 'B3'); eq(字(1, 2), 'キーから', 'C2'); });
+
   /* 全角で 打つ＝setCell は 半角に 直す。前は 帯の 字が 全角の まま 残り、開いた 後の blur で もう一度 書いて 空の 控えが 2本 積まれた（叩き直しの 任意1） */
   三列(); win.setCell(2, 0, 'b'); win.setCell(2, 1, 20); win.undoStack.length = 0;
   win.sel(2, 1, 2, 1); kb.style.display = 'none'; fi.focus(); fi.value = '７７'; fi.dispatchEvent(new win.Event('input'));
