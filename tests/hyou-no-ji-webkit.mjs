@@ -145,6 +145,18 @@ try {
     window.setCell(0, 0, '=SUM(T1[b])', true);
   });
   T('止め4★別の板「4月」から T1[b] を足す＝35★', (await 読む(0, 0)) === '35', await 読む(0, 0));
+
+  /* 止め5：新しい板に表を作る口を 2回 続けても 全部の板で 名前が重ならない */
+  const 名たち = await page.evaluate(() => {
+    window.switchSheet(0);
+    window.sel(0, 0, 3, 1); window.サブテーブルを作る();
+    window.switchSheet(0);
+    window.sel(0, 0, 3, 1); window.サブテーブルを作る();
+    const 名 = [];
+    window.sheets.forEach((s) => (s.tables || []).forEach((t) => 名.push(String(t.名).toLowerCase())));
+    return 名;
+  });
+  T('止め5★サブテーブルを2回作っても 全部の板で 名前が重ならない★', new Set(名たち).size === 名たち.length, JSON.stringify(名たち));
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});

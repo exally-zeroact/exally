@@ -16019,7 +16019,7 @@ function サブテーブルを作る(){
   /* ★テーブルに する★（見出しの 見立ては 実Excelの 測り方と 同じ） */
   var 一行目 = 表[0].map(function (x) { return (x === null || x === undefined) ? '' : x; });
   var 見出し行 = Table.見出しか(一行目);
-  var 名 = Table.名前を決める(表の箱().map(function (t) { return t.名; }));
+  var 名 = Table.名前を決める(_全板の表の名());
   var 列名 = Table.列名を作る(一行目, 表[0].length, 見出し行);
   表の箱().push({ 名: 名, r1: 0, c1: 0, r2: 表.length - 1, c2: 表[0].length - 1,
     見出し行: 見出し行, 列名: 列名, 集計行: false });
@@ -17742,6 +17742,15 @@ function 記号のコードを入れる(){
   return 記号を入れる(字);
 }
 
+/* ★全部の板の 表の名（大小は 無視して 比べるので 小文字に 揃えた 物も 足す）★＝名前を 決める側に 渡す（止め5・サブテーブルを 2回 作ると 別の板に 同じ「テーブル1」） */
+function _全板の表の名(){
+  var 出 = [];
+  for (var i = 0; i < sheets.length; i++) {
+    var ts = (sheets[i] && sheets[i].tables) || [];
+    for (var j = 0; j < ts.length; j++) { var n = String(ts[j].名); 出.push(n); }
+  }
+  return 出;
+}
 function 表の箱(){
   var s = sheets[activeSheet];
   if (!s.tables) s.tables = [];
@@ -17769,7 +17778,7 @@ function 表の窓を開く(){
   }
   document.getElementById('tblRange').value = cellAddr(r1, c1) + ':' + cellAddr(r2, c2);
   document.getElementById('tblName').value = 今 ? 今.名 :
-    Table.名前を決める(表の箱().map(function (t) { return t.名; }));
+    Table.名前を決める(_全板の表の名());
   var 一行目 = [];
   for (var c = c1; c <= c2; c++) {
     var cell = sheets[activeSheet].data[r1 + ',' + c];
