@@ -458,6 +458,8 @@ const FILES = [
   ['tsunagu-mon.test.mjs'],          // ★台を 画面に 繋ぐ 手を 止める 門（★繋ぐ 前から 赤★）
   ['ita-awase.test.mjs'],           // ★板の 写しの 門（★わざと 1マス ずらして 赤に なるのを 見せます★）
   ['table-open-gate.test.mjs'],     // ★式が台へ入る口は全部 表の字を開く入口①を通る門（口を中身で数える・配線を外すと赤）★
+  ['table-open.test.mjs', '--self-test'],   // ★表の字を開く入口①の中身（関所・書き換え・旗）★
+  ['hyou-no-ji-webkit.mjs'],        // ★表の字 Tbl[列] を打つと計算される・未知は #REF!・行を足すと追従（本物の WebKit）★
   ['oddf-susumi.test.mjs'],         // ★保留の 4個（ODDF / ODDL）の 進みを 数で 押さえる★
   ['oddf-susumi.test.mjs', '--self-test'],   // ★自分で 壊して 赤に なるか★
   ['oddf-nokori.test.mjs'],         // ★ODDF / ODDL の 残りを 実Excel の 50本で 押す★
