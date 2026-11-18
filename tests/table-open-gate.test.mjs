@@ -16,7 +16,8 @@ const 通す = /表の字を開く\(|TableOpen\.開く\(|開く\(/;
 const ALLOW = {
   '_jsComputeFormula': '定義そのもの',
   'setCell': '時刻・日付の値を HF へ入れる口（式でない・11050/11057）',
-  'doUndo': '字のまま戻す口（式でない値・_式 でない時だけ）',
+  'ゴールシークをやる': '変えるセルは式でない値だけ（式なら入口の前で断る）・控えを戻す口',
+  'doUndo':'字のまま戻す口（式でない値・_式 でない時だけ）',
 };
 function 口を数える(file, text) {
   const lines = text.split('\n'); const 出 = [];
@@ -37,6 +38,7 @@ const lib = fs.readFileSync(path.join(ROOT, 'lib', 'shiki-ita-awase.js'), 'utf8'
 const 口 = [...口を数える('book.html', book), ...口を数える('lib/shiki-ita-awase.js', lib)];
 console.log('口の数 ' + 口.length);
 for (const x of 口) ok(`${x.file}:${x.line} (${x.fn}) が入口を通る`, x.通る || ALLOW[x.fn] !== undefined);
+ok('book.html の 合わせる( 呼びは 表の字を開く を第4引数で渡す', /ShikiItaAwase\.合わせる\([^\n]*表の字を開く\(/.test(book));
 ok('入口の関数が book.html に在る', /function 表の字を開く\(/.test(book));
 ok('lib/table-open.js を book.html が読む', /lib\/table-open\.js/.test(book));
 ok('台の 合わせる は 開く関数を引数で受ける', /function 合わせる\(板, data, 板名, 開く\)/.test(lib));
