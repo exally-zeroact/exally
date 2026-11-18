@@ -87,6 +87,64 @@ try {
   T('★行を足すと 表が 1行 伸びる（r2=5）★', /"r2":5/.test(後), 後);
   await page.evaluate(() => { window.setCell(2, 1, '5', true); });
   T('★行を足して 値を入れる＝SUM(T1[b])＝105（追従する）★', (await 読む(合計の行, 0)) === '105', await 読む(合計の行, 0));
+
+  /* ══ 本番前 taiketsu 止め1〜4 ══ */
+  await page.evaluate(() => {
+    const s = window.sheets[window.activeSheet];
+    s.tables = [{ 名: 'K1', r1: 10, c1: 10, r2: 13, c2: 11, 見出し行: true, 列名: ['x', 'y'], 集計行: true }];
+    window.setCell(10, 10, 'x', true); window.setCell(10, 11, 'y', true);
+    window.setCell(11, 10, '1', true); window.setCell(11, 11, '10', true);
+    window.setCell(12, 10, '2', true); window.setCell(12, 11, '20', true);
+    window.setCell(13, 10, '集計', true);
+    window.setCell(16, 10, '=SUM(K1[y])', true);
+    window.sel(13, 10, 13, 10); window.ctxDeleteRow();
+  });
+  const 後1 = await page.evaluate(() => JSON.stringify(window.sheets[window.activeSheet].tables.filter(t => t.名 === 'K1')[0] || null));
+  T('止め1★集計行の行を消す＝表の集計行の旗も外れる（r2=12・集計行 false）★', /"r2":12/.test(後1) && /"集計行":false/.test(後1), 後1);
+  T('止め1★集計行を消した後 SUM(K1[y])＝30★', (await 読む(15, 10)) === '30', await 読む(15, 10));
+  await page.evaluate(() => { window.sel(10, 10, 10, 10); window.ctxDeleteRow(); });
+  const 後1b = await page.evaluate(() => JSON.stringify((window.sheets[window.activeSheet].tables || []).filter(t => t.名 === 'K1')));
+  T('止め1b★見出し行を消すと表も無くなる★', 後1b === '[]', 後1b);
+  T('止め1b★表が無くなったら SUM(K1[y])＝#REF!★', /REF/.test(await 読む(14, 10)), await 読む(14, 10));
+
+  await page.evaluate(() => {
+    window.sheets.push({ name: '4月', data: {}, tables: [{ 名: 'T9', r1: 0, c1: 0, r2: 2, c2: 1, 見出し行: true, 列名: ['a', 'b'], 集計行: false }] });
+  });
+  const 名重なり = await page.evaluate(() => {
+    const 結果 = {};
+    document.getElementById('tblRange').value = 'A20:B22';
+    document.getElementById('tblHeader').checked = true; document.getElementById('tblTotals').checked = false;
+    document.getElementById('tblName').value = 't9';
+    結果.戻り = window.表を決める();
+    結果.理由 = document.getElementById('tblWhy').textContent;
+    結果.数 = window.sheets.reduce((n, s) => n + (s.tables || []).filter(t => String(t.名).toLowerCase() === 't9').length, 0);
+    return 結果;
+  });
+  T('止め2★別の板に同じ名前（大小違い）の表は作れない★', 名重なり.戻り === 0 && 名重なり.数 === 1, JSON.stringify(名重なり));
+  await page.evaluate(() => { window.sheets.pop(); });
+
+  await page.evaluate(() => {
+    window.sheets[window.activeSheet].tables = [{ 名: 'T1', r1: 0, c1: 0, r2: 3, c2: 1, 見出し行: true, 列名: ['a', 'b'], 集計行: false }];
+    window.setCell(18, 0, '=SUM(T1[[#データ],[b]])', true);
+    window.setCell(18, 1, '=COUNTA(T1[[#見出し],[a]])', true);
+    window.setCell(18, 2, '=SUM(T1[B])', true);
+    window.setCell(18, 3, '=ROWS(T1[#すべて])', true);
+    window.setCell(0, 5, '=T1[@b]', true);
+  });
+  T('止め3★[#データ] 日本語＝35（行を足した後の範囲 r1..r3）★', (await 読む(18, 0)) === '35', await 読む(18, 0));
+  T('止め3★[#見出し] 日本語＝1★', (await 読む(18, 1)) === '1', await 読む(18, 1));
+  T('止め3★T1[B]（列名の大小違い）＝35★', (await 読む(18, 2)) === '35', await 読む(18, 2));
+  T('止め3★[#すべて] 日本語＝4行★', (await 読む(18, 3)) === '4', await 読む(18, 3));
+  T('止め3★見出し行の [@b]＝#VALUE!★', /VALUE/.test(await 読む(0, 5)), await 読む(0, 5));
+
+  await page.evaluate(() => {
+    window.addSheet();
+    const i = window.sheets.length - 1;
+    window.sheets[i].name = '4月'; window.板を揃える();
+    window.switchSheet(i);
+    window.setCell(0, 0, '=SUM(T1[b])', true);
+  });
+  T('止め4★別の板「4月」から T1[b] を足す＝35★', (await 読む(0, 0)) === '35', await 読む(0, 0));
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});
