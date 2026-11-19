@@ -2726,6 +2726,59 @@ function _表の式を流し直す(){
     }
   } catch (e) { if (window.console) console.warn('[Exally] 表の式を流し直せませんでした', e); }
 }
+/* ★見出しの 打ち替えで 列名を 替える（β2b・設計 exally-hyou-dougu/sekkei-2b-2.md）★
+   Excel と同じ（実測 com-midashi-out.txt）＝空→空いている一番小さい「列N」・他の列と同じ名（大小無視）→後ろに 2 から 順に 数（セルの字も 直す）。
+   列名が 替われば 全板の 式の字（表名[旧]・自分の表の中の [@旧]）を 新 に書き換える＝前は 列名が 古いまま Tbl[新] が #REF! だった。
+   ★人が 打った時（setCell の !noUndo）と やり直しの時だけ★ 呼ぶ＝noUndo の口（貼り付け・置換 等）は 控えが 今の板だけなので 改名しない（β2e）。
+   戻りは 取り消しの 控え（替えなければ null） */
+function _見出しの改名(板, r, c){
+  var s = sheets[板]; if (!s || !s.tables || typeof TableOpen === 'undefined' || !TableOpen.列名を替える) return null;
+  var t = null;
+  for (var ti = 0; ti < s.tables.length; ti++) { var x = s.tables[ti]; if (x.見出し行 && r === x.r1 && c >= x.c1 && c <= x.c2) { t = x; break; } }
+  if (!t || !t.列名) return null;
+  var i = c - t.c1, 旧 = t.列名[i];
+  if (旧 === undefined) return null;
+  var 鍵 = r + ',' + c, cell = s.data[鍵];
+  var 表示 = cell ? ((cell.d !== undefined && cell.d !== null && cell.d !== '') ? String(cell.d) : ((cell.v === undefined || cell.v === null) ? '' : String(cell.v))) : '';
+  var ほか = {};
+  for (var k = 0; k < t.列名.length; k++) if (k !== i) ほか[String(t.列名[k]).toLowerCase()] = true;
+  var 新 = 表示;
+  if (新 === '') { for (var n = 1; ; n++) { if (!ほか[('列' + n).toLowerCase()]) { 新 = '列' + n; break; } } }
+  else if (ほか[新.toLowerCase()]) { for (var m = 2; ; m++) { if (!ほか[(表示 + m).toLowerCase()]) { 新 = 表示 + m; break; } } }
+  if (新 !== 表示) {   /* ★セルの字も 名に 揃える（setCell は 通さない＝控えを 重ねない）★ */
+    var 直 = Object.assign({}, cell || {}, { v: 新, f: 新, d: 新 }); delete 直.d字;
+    s.data[鍵] = 直;
+    try { if (hf) hf.setCellContents({ sheet: _hfSid(板), row: r, col: c }, 表の字を開く(新, 板, r, c)); } catch (e) {}
+  }
+  if (新 === 旧) return null;
+  t.列名[i] = 新;
+  var 書き換え = [];
+  for (var si = 0; si < sheets.length; si++) {
+    var d = sheets[si] && sheets[si].data; if (!d) continue;
+    for (var key in d) {
+      var y = d[key];
+      if (!y || typeof y.f !== 'string' || y.f.charAt(0) !== '=' || y.f.indexOf('[') < 0) continue;
+      var p = key.split(','), yr = +p[0], yc = +p[1];
+      var 自分 = (si === 板 && yr >= t.r1 && yr <= t.r2 && yc >= t.c1 && yc <= t.c2);
+      var 後 = TableOpen.列名を替える(y.f, t.名, 旧, 新, 自分);
+      if (後 !== y.f) { 書き換え.push({ 板: si, 鍵: key, 前: y.f, 後: 後 }); y.f = 後; y.v = 後; }
+    }
+  }
+  _表の式を流し直す();
+  return { 板: 板, 表: t, i: i, 前: 旧, 後: 新, 書き換え: 書き換え };
+}
+/* ★改名の 取り消し★＝fail-closed：今の字が 後 の まま の 所だけ 前へ戻す（その後 直された 所は 上書きしない・数えて 知らせる） */
+function _見出しの改名を戻す(改){
+  if (!改) return;
+  var 残り = 0, t = 改.表, s = sheets[改.板];
+  if (s && s.tables && s.tables.indexOf(t) >= 0 && t.列名 && t.列名[改.i] === 改.後) t.列名[改.i] = 改.前; else 残り++;
+  for (var w = 0; w < 改.書き換え.length; w++) {
+    var x = 改.書き換え[w], d = sheets[x.板] && sheets[x.板].data, y = d && d[x.鍵];
+    if (y && y.f === x.後) { y.f = x.前; y.v = x.前; } else 残り++;
+  }
+  _表の式を流し直す();
+  if (残り) notify(残り + ' か所は その後 直されていたので 列名の 取り消しで 戻していません');
+}
 function toHFVal(v){
   if(v===''||v===null||v===undefined) return null;
   if(typeof v==='string'&&v[0]==='=') return v; // 数式はそのまま
@@ -11186,6 +11239,12 @@ function setCell(r,c,v,noUndo){
       _scheduleRecalc(_s,_d);
     }
   }
+  /* ★人が 見出しを 打ち替えた＝列名と 全板の 式の字を 追従させ 控えを 今の op に 載せる（β2b・1打ち＝1 op）★ */
+  if(!noUndo){
+    var _改 = _見出しの改名(activeSheet, r, c);
+    var _op = undoStack[undoStack.length-1];
+    if(_改 && _op && !_op.type && _op.key===key && _op.sheet===activeSheet) _op.列名替え = _改;
+  }
 }
 function doUndo(){
   /* ★セルや数式の帯を 打っている間は 戻さない★（2026-11-13・穴⑤）＝実Excel は 編集中 元に戻す・やり直しが 押せない。
@@ -11212,7 +11271,7 @@ function doUndo(){
   }
   /* ★行列は 鏡で 積む★（見た目の 印を 落とさない・押し0a） */
   if(op.type==='rowcol'){ redoStack.push(_rowcolの鏡(op)); _rowcolを戻す(op); return; }
-  redoStack.push({type:op.type, snap:op.snap, kind:op.kind, sheet:op.sheet, idx:op.idx, old:op.old, nw:op.nw, key:op.key, new_:op.new_, oldD:op.oldD, oldD字:op.oldD字});   /* ★印も 載せる★＝doRedo は この op を そのまま undoStack へ 積む（↩↪↩ でも 字のまま） */
+  redoStack.push({type:op.type, snap:op.snap, kind:op.kind, sheet:op.sheet, idx:op.idx, old:op.old, nw:op.nw, key:op.key, new_:op.new_, oldD:op.oldD, oldD字:op.oldD字, 列名替え:op.列名替え});   /* ★印も 載せる★（列名替え も＝落とすと Z→Y→Z で 改名が 戻らない・β2b）＝doRedo は この op を そのまま undoStack へ 積む（↩↪↩ でも 字のまま） */
   // リサイズUndo
   if(op.type==='resize'){
     if(op.kind==='col') sheets[op.sheet].colW[op.idx]=op.old;
@@ -11263,6 +11322,7 @@ function doUndo(){
     else delete _戻す.d字;
     sheets[op.sheet].data[op.key] = _戻す;
   }
+  if(op.列名替え) _見出しの改名を戻す(op.列名替え);   /* ★見出しの 改名も 戻す（β2b・全板）★ */
   /* ★戻した後も つられた マスを 計算し直す★（2026-11-17・実測＝A1 を 7→取り消し で B1 が 26 の まま残った）
      ＝打つ 側（setCell）と 同じ 決まり：手動なら 印だけ・それ以外は 150ms 後に 引き直す */
   if(typeof 計算方法 !== 'undefined' && 計算方法 === 'manual'){
@@ -11311,6 +11371,7 @@ function doRedo(){
   }
   var parts = op.key.split(',');
   setCell(parseInt(parts[0]), parseInt(parts[1]), op.new_, true);
+  op.列名替え = _見出しの改名(activeSheet, parseInt(parts[0]), parseInt(parts[1])) || undefined;   /* ★改名は その場で 引き直す（古い 一覧を 使い回さない・β2b）★ */
   render(); updateBar();
 }
 

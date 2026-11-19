@@ -17,7 +17,7 @@ const ROOT = path.join(__dirname, '..');
 /* ★直しを 1つずつ 外す 壊し★（字が 当たらなければ「置換できず」＝赤と 数えない） */
 const 壊し = [
   ['字の マスを 字のまま HF へ 入れない', "  var _字のまま = !!op.oldD字 && !_式 && !_空へ;", "  var _字のまま = false;"],
-  ['やり直しに 印を 載せない', ", oldD:op.oldD, oldD字:op.oldD字});", "});"],
+  ['やり直しに 印を 載せない', ", oldD:op.oldD, oldD字:op.oldD字, 列名替え:op.列名替え});", ", 列名替え:op.列名替え});"],
   ['0 を 空と 見る（前の !op.old）', "  var _空へ = (op.old === '' || op.old === null || op.old === undefined);", "  var _空へ = !op.old;"],
   ['f に 数を 入れる', "{v:op.old, f:String(op.old), d:String(", "{v:op.old, f:op.old, d:String("],
   ['前の 見た目に 戻さない', "    if(!_式 && op.oldD !== undefined && op.oldD !== null) d = op.oldD;", ""],

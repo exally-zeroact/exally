@@ -155,7 +155,7 @@ T('★★setCell を実際に動かす（打つたびに例外が出ないこと
   /* ★`_計算を始める` を 足した（2026-09-25）★
        ＝開いた 直後の 計算を 止めた ので、★最初の 1打ちで 計算を 始め直します★
        ＝★偽物を 置かずに 本物を 取り出します★（置くと 消えた 日に 気づけない） */
-  const names = ['dateSerial', 'parseDateStr', 'parseDate', 'dateFmtForFormula', '_typedNumFmt', 'toHFVal', '_計算を始める', '_人の操作の前', 'setCell'];
+  const names = ['dateSerial', 'parseDateStr', 'parseDate', 'dateFmtForFormula', '_typedNumFmt', 'toHFVal', '_計算を始める', '_人の操作の前', '_表の式を流し直す', '_見出しの改名', 'setCell'];
   const body = names.map(n => grab(n)).join('\n');
   // setCell が触る外の物だけを最小限そろえる（HFやcanvasは使わない）
   const harness = `
