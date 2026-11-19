@@ -154,6 +154,23 @@ try {
   await 戻す();
   T('I★後で 直された 式は 戻さない（前の字で 上書きしない）・他は 戻る★', (await 字(1, 2, 0)) === '=SUM(T1[a])' && (await 字(0, 6, 0)) === '=SUM(T1[b])' && (await 列名()) === '["a","b"]',
     [await 字(1, 2, 0), await 字(0, 6, 0), await 列名()].join(' '));
+  /* J 改名→表の外に行を足す→Z Z→Y Y（行の取り消しが 表を 写しに 置き換えても 戻る・taiketsu 本番前 止め1） */
+  await 置く();
+  await 打つ(0, 1, 'bb');
+  await page.evaluate(() => { window.switchSheet(0); window.sel(10, 0, 10, 0); window.ctxInsertRow(); }); await page.waitForTimeout(400);
+  await 戻す(); await 戻す();
+  T('J★改名→行を足す→Z Z＝列名 [a,b]・両方の板 =SUM(T1[b])＝60★', (await 列名()) === '["a","b"]' && (await 字(0, 6, 0)) === '=SUM(T1[b])' && (await 読む(0, 6, 0)) === '60' && (await 読む(1, 2, 0)) === '60',
+    [await 列名(), await 字(0, 6, 0), await 読む(0, 6, 0), await 読む(1, 2, 0)].join(' '));
+  await 進む(); await 進む();
+  T('J★続けて Y Y＝[a,bb]・両方の板 60★', (await 列名()) === '["a","bb"]' && (await 字(1, 2, 0)) === '=SUM(T1[bb])' && (await 読む(0, 6, 0)) === '60' && (await 読む(1, 2, 0)) === '60',
+    [await 列名(), await 字(1, 2, 0), await 読む(0, 6, 0), await 読む(1, 2, 0)].join(' '));
+  /* K 特別な字（: , 前後の空白）の見出し＝外も [[ ]] で囲み 答えは 60 のまま（止め2） */
+  for (const 名 of ['9:00', 'p,q', '  b2 ', 'x+y']) {
+    await 置く();
+    await 打つ(0, 1, 名);
+    T('K★見出し「' + 名 + '」＝両方の板 60・[@] 形も★', (await 読む(0, 6, 0)) === '60' && (await 読む(1, 2, 0)) === '60' && !/^ERR/.test(await 読む(0, 6, 2)),
+      [await 字(0, 6, 0), await 読む(0, 6, 0), await 読む(1, 2, 0), await 読む(0, 6, 2)].join(' | '));
+  }
 } finally {
   await page.close().catch(() => {});
   await browser.close().catch(() => {});
