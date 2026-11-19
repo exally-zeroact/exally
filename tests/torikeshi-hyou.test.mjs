@@ -152,7 +152,7 @@ await T('★→Ctrl+Z で 集計行だけ 外れる（表は 残る）★', () =
 
 新しい本(); 名と数(); 選ぶ(0, 0); 窓で決める('A1:B3', '表1', true, true); win.undoStack.length = 0;
 選ぶ(1, 0); 窓で決める(null, null, true, false);
-/* 外した後の 表の 形は 穴8（表を決める が 集計行=false を 先に 書く＝集計行を しまえない）＝別件。ここは 控えだけ 見る */
+/* 外した後の 表の 形と 台は tests/hyou-shukei-webkit.mjs（β2h で 穴8 を 直した）。ここは 控えだけ 見る */
 await T('★集計行を 外す→控えが 1つ★', () => { eq(win.undoStack.length, 1, '控え'); });
 win.doUndo();
 await T('★→Ctrl+Z で 集計行が 戻る★', () => { eq(表(), '表1:0-3+集計', '表'); eq(字(3, 0), '集計', 'A4'); });
