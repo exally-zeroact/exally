@@ -287,6 +287,8 @@ const FILES = [
   ['hf-ita-soroe.test.mjs', '--self-test'],// ★直しを 1つずつ 壊すと 赤に なるか（6通り）
   'hf-val-narabekae.test.mjs',            // ★並べ替えで 流し直しても 打った 値は 計算側で 数のまま（=SORT の 先頭が 字に 化けた・2026-11-13）
   ['hf-val-narabekae.test.mjs', '--self-test'],// ★直しを 1つずつ 壊すと 赤に なるか（3通り）
+  'ji-no-masu-zero.test.mjs',             // ★字の マス '007 の 頭の 0 を 落とさない（台・HF の 3口・手打ちの ' は 答えに 入らない・2026-11-19）
+  ['ji-no-masu-zero.test.mjs', '--self-test'],// ★直しを 1つずつ 壊すと 赤に なるか（6通り）
   'shift-keeps-everything.test.mjs',      // ★行・列を 足しても 消しても 棚が 置いていかれない・選んだ 数だけ 入る（押し0b・2026-11-07）
   ['shift-keeps-everything.test.mjs', '--self-test'],// ★直す前の 形に 戻すと 赤に なるか
   'formula-nokori.test.mjs',              // ★2026-09-06に作った14個＝答えは全部★実Excelの実測★
