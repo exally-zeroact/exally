@@ -465,6 +465,7 @@ const FILES = [
   ['hyou-no-retsu-webkit.mjs'],       // ★表の中で列を足し消し＝列名が追従する（β2a・本物の WebKit）★
   ['hyou-no-midashi-webkit.mjs'],     // ★見出しを打ち替える＝列名と全板の式の字が追従する（β2b・本物の WebKit）★
   ['hyou-no-namae-webkit.mjs'],       // ★表の名前を替える＝全板の式の字が追従する（β2c・本物の WebKit）★
+  ['hyou-midashidake-webkit.mjs'],   // ★見出しだけの 表は 空の 1行を 持つ・行の削除で 1行目を 空で 残す・2表の 行の削除は 断る（β2d・本物の WebKit）★
   ['hyou-no-ji-webkit.mjs'],        // ★表の字 Tbl[列] を打つと計算される・未知は #REF!・行を足すと追従（本物の WebKit）★
   ['oddf-susumi.test.mjs'],         // ★保留の 4個（ODDF / ODDL）の 進みを 数で 押さえる★
   ['oddf-susumi.test.mjs', '--self-test'],   // ★自分で 壊して 赤に なるか★

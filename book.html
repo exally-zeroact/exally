@@ -16127,7 +16127,8 @@ function サブテーブルを作る(){
   var 見出し行 = Table.見出しか(一行目);
   var 名 = Table.名前を決める(_全板の表の名());
   var 列名 = Table.列名を作る(一行目, 表[0].length, 見出し行);
-  表の箱().push({ 名: 名, r1: 0, c1: 0, r2: 表.length - 1, c2: 表[0].length - 1,
+  /* ★見出しだけ（1行）なら 空の 1行を 持つ（β2d）★＝新しい 板なので 下は 必ず 空 */
+  表の箱().push({ 名: 名, r1: 0, c1: 0, r2: (見出し行 && 表.length === 1) ? 1 : 表.length - 1, c2: 表[0].length - 1,
     見出し行: 見出し行, 列名: 列名, 集計行: false });
   render(); updateBar();
   notify('「' + 名 + '」を 新しい シートに 作りました（' + 表.length + '行）');
@@ -18008,6 +18009,39 @@ function 表を決める(){
   }
   var ぶつかる = Table.重なる(ほか, 場所.r1, 場所.c1, 場所.r2, 場所.c2);
   if (ぶつかる) { 欄.textContent = '「' + ぶつかる.名 + '」と 重なっています'; return 0; }
+  /* ★見出しだけの 表は 作らない＝中身の 空の 1行を 本当に 持つ（β2d・設計 exally-hyou-dougu/sekkei-2d-2.md）★
+     前は 範囲が 1行で 見出しあり＝r1==r2 で SUM(T[b]) が #REF!（実Excel は A1:C2・空の1行・0）。
+     見出しに なるのは チェック か 前から在る表（見出しを 外しても 見出し扱い＝下で 見出し行=true）。
+     ・前から 在る表を 1行に 直す＝実Excel も 断る（「1 行以上のデータが含まれている必要があります」）
+     ・すぐ下の 行（表の列）が 空＝そのまま 1行 伸ばす（実Excel も ずらさない）
+     ・中身が ある＝★断る★（実Excel は 表の列だけ 下へ ずらし 式も 追従＝うちは まだ 式を 追従できない＝β2g）。黙って #REF! を 作らない */
+  var _見出しだけ = (見出し行 || !!今) && 場所.r1 === 場所.r2;
+  var _伸ばす = false;
+  if (_見出しだけ) {
+    /* ★前の版で 作り 保存済みの 見出しだけの 表（r1==r2）は 断らない（naoshi 止め1）★＝断ると 名替え・集計の出し入れが 出来なくなる。
+       下が 空なら 伸ばし、伸ばせない（下に 中身・別の表・一番下）時は 今まで通りの 形で 通す */
+    var _前から1行 = !!今 && 今.r1 === 今.r2;
+    if (今 && !_前から1行) { 欄.textContent = '表には 1行以上の データが 要ります（実Excelも 断ります）'; return 0; }
+    var _下 = 場所.r1 + 1, _下のなぜ = null;
+    if (_下 >= ROWS) _下のなぜ = 'シートの 一番下なので 表の 中身の 行が 作れません';
+    else if (Table.重なる(ほか, _下, 場所.c1, _下, 場所.c2)) _下のなぜ = 'すぐ下の 行が 別の 表なので 作れません';
+    else if (_行に中身(_下, 場所.c1, 場所.c2)) _下のなぜ = 'すぐ下の 行に 中身が あります。Excel は その中身を 1行 下へ ずらしますが、うちでは まだ 式を 追従させられないので、1行 空けてから 作ってください';
+    if (!_下のなぜ) _伸ばす = true;
+    else if (!_前から1行) { 欄.textContent = _下のなぜ; return 0; }
+  }
+  /* ★集計行は 下の 中身を 上書き しない（β2d・止め4）★＝集計行を出す は 下の行を 確かめずに 書いていた（実Excel は 表の列だけ 下へ ずらす）。
+     中身が あれば 断る（ずらしは β2g）。前から 集計行の ある表は 今まで通り（範囲に 集計行が 入っている） */
+  if (集計行 && !(今 && 今.集計行)) {
+    /* 見る行は 今の 番地で＝見出しを 足す 道（行ごと 1行 下へ）でも 今 場所.r2+1 に 在る物が 集計行の 所へ 来る */
+    var _集 = _伸ばす ? 場所.r1 + 2 : 場所.r2 + 1;
+    var _集の後 = (!見出し行 && !今) ? _集 + 1 : _集;
+    if (_集の後 >= ROWS) { 欄.textContent = 'シートの 一番下なので 集計行が 出せません'; return 0; }
+    if (Table.重なる(ほか, _集, 場所.c1, _集, 場所.c2)) { 欄.textContent = 'すぐ下の 行が 別の 表なので 集計行が 出せません'; return 0; }
+    if (_行に中身(_集, 場所.c1, 場所.c2)) {
+      欄.textContent = '表の すぐ下の 行に 中身が あるので 集計行を 出せません（Excel は 下へ ずらします・1行 空けてください）';
+      return 0;
+    }
+  }
 
   /* ★控えを 積んでから 書く（穴4・2026-11-14）★＝前は 表・見出し・集計行を 書いても 控えが 無く、
      Ctrl+Z が 1つ前の 操作を 戻した（全部再表示→集計行→Ctrl+Z で 集計行が 隠れた＝穴5）。
@@ -18039,6 +18073,7 @@ function 表を決める(){
     列名 = Table.列名を作る(一行目, 場所.c2 - 場所.c1 + 1, true);
   }
 
+  if (_伸ばす) r2 = r1 + 1;   /* ★中身の 空の 1行（上で 空と 確かめた）★ */
   var 表 = 今 || {};
   var 旧名 = 今 ? String(今.名) : null;
   表.名 = 名; 表.r1 = r1; 表.c1 = 場所.c1; 表.r2 = r2; 表.c2 = 場所.c2;
@@ -18057,6 +18092,15 @@ function 表を決める(){
   render(); updateBar();
   notify('「' + 名 + '」を 作りました');
   return 1;
+}
+/* ★その行の c1..c2 に 値か 式が 在るか★（β2d）＝塗りだけの マスは 中身に 数えない */
+function _行に中身(r, c1, c2){
+  var d = sheets[activeSheet].data;
+  for (var c = c1; c <= c2; c++) {
+    var x = d[r + ',' + c];
+    if (x && ((x.v !== undefined && x.v !== null && x.v !== '') || (x.f !== undefined && x.f !== ''))) return true;
+  }
+  return false;
 }
 /* ★集計行★＝実測どおり 左端は '集計'・★一番 右の列だけ★ SUBTOTAL(109,…)・間は 空 */
 function 集計行を出す(表){
@@ -18618,7 +18662,38 @@ function ctxInsertCol(){
 function ctxDeleteRow(){
   _人の操作の前('ctxDeleteRow');   /* ★値を 読む 前に 1回だけ 控え★（押し0a） */
   _選びを揃える();
+  /* ★表が 2つ以上 かかり どれかが 一部だけ かかる 行は 消さない（β2d・止め2）★＝実Excel は 横に 並ぶ 2表・縦に 並ぶ 2表を またぐ 行の削除を 断る
+     （COM 実測 exally-hyou-dougu/com-midashidake4-out.txt・scratchpad p2 Q2）。1つだけ かかるなら 通る。
+     ★かかる表が 全部 丸ごと 消える 範囲なら 通す★（COM 実測 com-midashidake5-out.txt＝縦2表 1:7・横2表 1:3 は 通る・片方でも 一部なら 断る） */
+  var _かかる表 = (sheets[activeSheet].tables || []).filter(function(t){ return t.r1 <= selR2 && t.r2 >= selR1; });
+  var _一部だけ = _かかる表.filter(function(t){ return !(selR1 <= t.r1 && selR2 >= t.r2); });
+  if (_かかる表.length >= 2 && _一部だけ.length > 0) {
+    notify('表が 2つ以上 かかる 行は 消せません（実Excelも 断ります）');
+    hideCtxMenu(); return false;
+  }
+  /* ★表の 中身の行を 全部 消す 時は 1行目を 空の行として 残す（β2d・止め1）★＝実Excel は 見出しだけの 表を 作らない。
+     消す 範囲の 最初の 行（＝中身の 1行目）を 残し、その行の 表の列の 値・式・リンクだけ 消す（塗り・高さ・入力の決まり・メモ・表の外の セルは 残る）。
+     残りの 行（selR1+1..selR2・集計行 含む）は 今まで通り 消す（COM 実測 com-midashidake4 と p2 Q1/Q5/Q6） */
+  var _空の行 = null;
+  if (_かかる表.length === 1) {
+    var _t = _かかる表[0];
+    var _中頭 = _t.r1 + (_t.見出し行 ? 1 : 0), _中尻 = _t.r2 - (_t.集計行 ? 1 : 0);
+    if (_t.見出し行 && _t.r1 < selR1 && _中頭 <= _中尻 && selR1 <= _中頭 && selR2 >= _中尻) _空の行 = _t;
+  }
   _pushRowColUndo();
+  if (_空の行) {
+    var _残す = selR1;
+    for (var _c = _空の行.c1; _c <= _空の行.c2; _c++) {
+      if (sheets[activeSheet].data[_残す + ',' + _c]) setCell(_残す, _c, '', true);
+      if (sheets[activeSheet].links) delete sheets[activeSheet].links[_残す + ',' + _c];
+    }
+    if (selR2 === selR1) {          /* ★中身 1行だけを 消した＝行は 消さず 空に するだけ★ */
+      _表の式を流し直す();
+      render(); hideCtxMenu();
+      return true;
+    }
+    selR1 = selR1 + 1;
+  }
   var 写す=_座標の写しを作る(true, false);
   var s=sheets[activeSheet], nd={}, nrh={};
   var 結合=_結合を外して集める(s.data);
@@ -18643,7 +18718,8 @@ function ctxDeleteRow(){
   _結合を付け直す(s.data, 結合, true, false, selR1, selR2);
   _表の式を流し直す();
   _浮かぶ物を動かす(s, true, 写す);
-  sel(Math.max(0,selR1),selC1,Math.max(0,selR1),selC2);
+  var _選ぶ行 = _空の行 ? selR1 - 1 : selR1;   /* ★残した 空の行を 選ぶ★ */
+  sel(Math.max(0,_選ぶ行),selC1,Math.max(0,_選ぶ行),selC2);
   render(); hideCtxMenu();
 }
 function ctxDeleteCol(){
