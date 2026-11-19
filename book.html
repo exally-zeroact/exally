@@ -17978,12 +17978,17 @@ function 表を決める(){
   var 名 = String(document.getElementById('tblName').value || '').trim();
   if (!名) { 欄.textContent = '名前を 入れてください'; return 0; }
   /* ★表の名の 字の決まり（β2c・設計前 taiketsu 止め1）★＝A-B・My T・1表 は 式の中で 別の語に 割れて 黙って 別の表を 指す。
-     Excel と同じ決まり（番地の形・R/C・数で 始まる）は 名前の定義と 同じ物を 使う */
+     見るのは 番地の形・R/C・数で 始まる・長さ＋走査が 1語として 読める形（TableOpen.表名の形か）だけ。
+     ★名前の定義の 字の決まり（named-ranges.js 名前の字）は 使わない★＝佐々木表・テーブル１・表① 等 今まで 作れて 式でも 効いた 名を 断ってしまう（本番前 taiketsu で 測った） */
   /* ★名を 替える時・新しく作る時だけ 見る★＝前から 在る 表（読み込んだ本・前の版で 作った T1 等）の 範囲だけを 直すのは 断らない */
   var 今の名 = (今いる表() || {}).名;
   if (今の名 === undefined || String(今の名) !== 名) {
-    var 名のなぜ = (typeof NamedRanges !== 'undefined') ? NamedRanges.名前を確かめる(名) : null;
-    if (!名のなぜ && typeof TableOpen !== 'undefined' && TableOpen.表名の形か && !TableOpen.表名の形か(名)) 名のなぜ = 'その 字は 表の 名前に 使えません';
+    var 名のなぜ = null;
+    if (名.length > 255) 名のなぜ = '名前が 長すぎます（255文字まで）';
+    else if (/^[0-9]/.test(名)) 名のなぜ = '数で 始まる名前は 使えません（実Excelも 断ります）';
+    else if (/^\$?[A-Za-z]{1,3}\$?[0-9]{1,7}$/.test(名)) 名のなぜ = 'A1 のような 番地の形は 使えません（実Excelも 断ります）';
+    else if (/^[RrCc][0-9]*$/.test(名)) 名のなぜ = 'R や C だけの名前は 使えません';
+    else if (typeof TableOpen !== 'undefined' && TableOpen.表名の形か && !TableOpen.表名の形か(名)) 名のなぜ = 'その 字は 表の 名前に 使えません（- や 空白 等で 式の中の 名が 割れます）';
     if (名のなぜ) { 欄.textContent = 名のなぜ; return 0; }
   }
   var 見出し行 = document.getElementById('tblHeader').checked;

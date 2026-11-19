@@ -123,31 +123,37 @@ try {
 
   /* A T1→T9 */
   const rA = await 名を決める('Uriage9');
-  T('A★名前が T9 に替わる★', rA.戻り === 1 && (await 表名()) === 'Uriage9,Shiire,Uriagex', JSON.stringify(rA) + ' ' + (await 表名()));
-  T('A★全板の 字が T9 へ（板名付き・指定子・大小違いも）★', (await 新の字()) === "=SUM(Uriage9[b]) | =SUM(Uriage9[[#データ],[b]]) | =SUM(Uriage9[b]) | =SUM(あ!Uriage9[b]) | =SUM(Uriage9[b])+LEN('い'!A1)", await 新の字());
+  T('A★名前が Uriage9 に替わる★', rA.戻り === 1 && (await 表名()) === 'Uriage9,Shiire,Uriagex', JSON.stringify(rA) + ' ' + (await 表名()));
+  T('A★全板の 字が Uriage9 へ（板名付き・指定子・大小違いも）★', (await 新の字()) === "=SUM(Uriage9[b]) | =SUM(Uriage9[[#データ],[b]]) | =SUM(Uriage9[b]) | =SUM(あ!Uriage9[b]) | =SUM(Uriage9[b])+LEN('い'!A1)", await 新の字());
   T('A★答えは 全部 60 のまま（前は #REF!）★', await 答え60(), await 答え());
   T('A★文字列・T2・Uriagex は 替わらない★', (await 字(0, 6, 2)) === '="Uriage1[b]"' && (await 字(0, 6, 3)) === '=SUM(Shiire[b])' && (await 字(0, 6, 4)) === '=SUM(Uriagex[b])' && (await 字(0, 6, 5)) === '=LEN("Uriage1[b]")&Uriage9[[#見出し],[b]]' && (await 読む(0, 6, 4)) === '300',
     [await 字(0, 6, 2), await 字(0, 6, 3), await 字(0, 6, 4), await 字(0, 6, 5)].join(' | '));
   /* B 取り消し・やり直し */
   await 戻す();
-  T('B★Z で 名前 T1・全板の字 T1・60★', (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage1[b])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 字(0, 6, 0)) === '=SUM(Uriage1[b])' && (await 答え60()),
+  T('B★Z で 名前 Uriage1・全板の字 Uriage1・60★', (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage1[b])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 字(0, 6, 0)) === '=SUM(Uriage1[b])' && (await 答え60()),
     (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
   await 進む();
-  T('B★Y で また T9・全板 60★', (await 表名()) === 'Uriage9,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage9[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
+  T('B★Y で また Uriage9・全板 60★', (await 表名()) === 'Uriage9,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage9[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
   await 戻す();
-  T('B★Z→Y→Z でも 全板 T1 に戻る（止め2）★', (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage1[b])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
+  T('B★Z→Y→Z でも 全板 Uriage1 に戻る（止め2）★', (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(Uriage1[b])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
   await 進む();
-  T('B★Z→Y→Z→Y でも T9・60★', (await 表名()) === 'Uriage9,Shiire,Uriagex' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage9[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
+  T('B★Z→Y→Z→Y でも Uriage9・60★', (await 表名()) === 'Uriage9,Shiire,Uriagex' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage9[b])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()) + ' ' + (await 答え()));
   /* C 大小だけ */
   await 置く();
   await 名を決める('uriage1');
-  T('C★大小だけ（T1→t1）でも 字が t1 へ・60★', (await 表名()) === 'uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(uriage1[b])' && (await 字(0, 6, 1)) === '=SUM(uriage1[[#データ],[b]])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()));
+  T('C★大小だけ（Uriage1→uriage1）でも 字が uriage1 へ・60★', (await 表名()) === 'uriage1,Shiire,Uriagex' && (await 字(1, 2, 0)) === '=SUM(uriage1[b])' && (await 字(0, 6, 1)) === '=SUM(uriage1[[#データ],[b]])' && (await 答え60()), (await 表名()) + ' ' + (await 新の字()));
   /* G 字の決まりに合わない名は断る（止め1）＝名も字も そのまま */
   for (const 名 of ['A-B', 'My T', '1表', 'A1', 'T9', 'R', 'Uriage1+2']) {
     await 置く();
     const 前 = await 全部の字();
     const r = await 名を決める(名);
-    T('G★「' + 名 + '」は 断る・名 T1・字 0本 替わる・60★', r.戻り === 0 && r.理由 !== '' && (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 全部の字()) === 前 && (await 答え60()), JSON.stringify(r) + ' ' + (await 表名()));
+    T('G★「' + 名 + '」は 断る・名 Uriage1・字 0本 替わる・60★', r.戻り === 0 && r.理由 !== '' && (await 表名()) === 'Uriage1,Shiire,Uriagex' && (await 全部の字()) === 前 && (await 答え60()), JSON.stringify(r) + ' ' + (await 表名()));
+  }
+  /* H 今まで 作れた 名（々・全角英数・①・〆・𠮷・テーブル1）は 通る＝式も 追従・60（本番前 taiketsu 任意→直した） */
+  for (const 名 of ['佐々木表', 'テーブル１', 'Ｔ１', '表①', '〆表', '𠮷野', 'テーブル1']) {
+    await 置く();
+    const r = await 名を決める(名);
+    T('H★「' + 名 + '」は 通る・式も 追従・60★', r.戻り === 1 && (await 字(1, 2, 0)) === '=SUM(' + 名 + '[b])' && (await 答え60()), JSON.stringify(r) + ' ' + (await 字(1, 2, 0)) + ' ' + (await 答え()));
   }
   /* F 名前を替えない（範囲だけ）＝字 0本 */
   await 置く();
@@ -159,7 +165,7 @@ try {
   await 名を決める('Uriage9');
   await page.evaluate(() => { const y = window.sheets[1].data['2,0']; y.f = y.v = '=SUM(Uriage9[a])'; });
   await 戻す();
-  T('D★後で 直された 式は 前の字で 上書きしない・他は T1 に戻る★', (await 字(1, 2, 0)) === '=SUM(Uriage9[a])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 字(0, 6, 0)) === '=SUM(Uriage1[b])' && (await 表名()) === 'Uriage1,Shiire,Uriagex',
+  T('D★後で 直された 式は 前の字で 上書きしない・他は Uriage1 に戻る★', (await 字(1, 2, 0)) === '=SUM(Uriage9[a])' && (await 字(1, 2, 1)) === '=SUM(あ!Uriage1[b])' && (await 字(0, 6, 0)) === '=SUM(Uriage1[b])' && (await 表名()) === 'Uriage1,Shiire,Uriagex',
     (await 新の字()) + ' ' + (await 表名()));
 } finally {
   await page.close().catch(() => {});
