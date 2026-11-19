@@ -11278,6 +11278,17 @@ function setCell(r,c,v,noUndo){
     if(_改 && _op && !_op.type && _op.key===key && _op.sheet===activeSheet) _op.列名替え = _改;
   }
 }
+/* ★保護中は 取り消し・やり直しで 表を 変えない（β2j 2版）★＝前は 表を 作る→Ctrl+Z→保護→Ctrl+Y で 保護中に 表と 集計行が でき、
+   ロックした マスに「集計」が 書かれた（表を 作る→保護→Ctrl+Z でも 保護中に 表が 消えた）。
+   実Excel が 保護で 控えを 捨てるかは 測れていない（UIA の 打鍵が 断られた）＝どちらでも 保護中に 表が 変わらない 形＝表の 操作の 控えだけ 断る */
+/* ★表の 操作の 控え（印 表の操作）だけ 断る（本番前 taiketsu 止め1）★＝前は 表の 一覧を 比べて、保護中の 行の挿入→Ctrl+Z
+   （挿入で 表の 四角が ずれる）まで 断り、戻らなく なった（本番 a18c7163 は 戻る） */
+var _表の取り消しの字 = 'この 取り消しは 表を 変えるので、保護中は できません（直すには 校閲→シートの保護を やめる）';
+function _控えは保護で表を変える(op){
+  if (!op || op.type !== 'rowcol' || !op.表の操作) return false;
+  var i = (op.sheet != null) ? op.sheet : activeSheet, sh = sheets[i];
+  return !!(sh && sh.protect);
+}
 function doUndo(){
   /* ★セルや数式の帯を 打っている間は 戻さない★（2026-11-13・穴⑤）＝実Excel は 編集中 元に戻す・やり直しが 押せない。
      前は ↩ ボタンが blur の確定より先に走り、打ちかけのまま 前の操作を 戻した（帯の自前キーボードでは 打った式が 黙って消えた） */
@@ -11287,6 +11298,7 @@ function doUndo(){
   if(typeof _フォーム!=="undefined" && _フォーム) return;
   if(_覆いが開いている()) return;   /* ★窓（覆い）が 開いている間は 板へ 書かない★（2026-11-14・穴9 層W） */
   if(!undoStack.length) return;
+  if(_控えは保護で表を変える(undoStack[undoStack.length-1])){ notify(_表の取り消しの字); return; }
   var op = undoStack.pop();
   /* ★控えを取った板へ移ってから戻す★（2026-11-07・前は 開いている板へ 書き戻した＝別の板で Ctrl+Z すると
      その板が 前の板の控えで 上書きされ 中身が消えた・書式は 別の板に 空のマスを 作った）＝実Excel も 戻す板へ 移る */
@@ -11378,6 +11390,7 @@ function doRedo(){
   if(typeof _フォーム!=="undefined" && _フォーム) return;
   if(_覆いが開いている()) return;   /* ★窓（覆い）が 開いている間は 板へ 書かない★（2026-11-14・穴9 層W） */
   if(!redoStack.length) return;
+  if(_控えは保護で表を変える(redoStack[redoStack.length-1])){ notify(_表の取り消しの字); return; }
   var op = redoStack.pop();
   /* ★控えを取った板へ移ってから戻す★（2026-11-07・前は 開いている板へ 書き戻した＝別の板で Ctrl+Z すると
      その板が 前の板の控えで 上書きされ 中身が消えた・書式は 別の板に 空のマスを 作った）＝実Excel も 戻す板へ 移る */
@@ -14979,9 +14992,22 @@ function _フォームで足せない訳(f){
   }
   return '';
 }
+/* ★保護中は フォームで 行を 足す・消す を 断る（β2j 2版・設計 exally-hyou-dougu/sekkei-2j-2.md）★
+   実Excel COM（exally-hyou-dougu/com-hogo-gyou-out.txt）＝保護中は 表の 行の 足し（ListRows.Add）・消し（ListRow.Delete）を
+   ★ロックを 外した マスでも★ 断る。前は 消す が data を 直に delete して ロックした マスが 黙って 消え、表も 縮んだ／足す は 表が 伸びた。
+   表の 外の 塊も 消す は setCell を 通らないので 同じく 断る（安全側） */
+function _フォームは保護で断る(f){
+  if (!このシートは保護中()) return false;
+  var 欄 = document.getElementById('formWhy');
+  var 表に掛かる = 表の箱().some(function (t) { return Table.重なる([t], f.r1, f.c1, f.r2 + 1, f.c2); });
+  var 字 = 表に掛かる ? _表の保護の字 : 'シートが 保護されているため、行を 足す・消す は できません（直すには 校閲→シートの保護を やめる）';
+  if (欄) 欄.textContent = 字; else notify(字);
+  return true;
+}
 function フォームで足す(){
   var f = _フォーム; if (!f) return 0;
   if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return 0; }
+  if (_フォームは保護で断る(f)) return 0;   /* ★保護中は 足さない（β2j 2版）★ */
   var 断り = _フォームで足せない訳(f);
   if (断り) { document.getElementById('formWhy').textContent = 断り; return 0; }
   if (フォームを書き込む() < 0) return 0;
@@ -15001,13 +15027,17 @@ function フォームで足す(){
 function フォームで消す(){
   var f = _フォーム; if (!f) return 0;
   if (!_フォームの下が同じ(f)) { _フォームを捨てて閉じる(); return 0; }
+  if (_フォームは保護で断る(f)) return 0;   /* ★保護中は 消さない（β2j 2版）★ */
   if (f.r2 <= f.r1 + 1) {
     document.getElementById('formWhy').textContent = '最後の 1行は 消せません';
     return 0;
   }
   /* ★控えを 積んでから 消す（穴4・2026-11-14）★＝前は 控えが 無く Ctrl+Z で 消した 行が 戻らなかった */
   _人の操作の前('フォームで消す');   /* ★先に 1回だけ 控え★（押し0a）＝下が 空の マスは setCell より 先に delete する＝後で 取ると 消した 所が 書き出しから 落ちた */
+  var _積む前F = undoStack.length;
   _pushRowColUndo();
+  /* ★表の 行を 消した 控えだけ 印（β2j）＝保護中は 戻さない・積めなかった 時と 表の 外は 付けない★ */
+  if (undoStack.length > _積む前F && 表の箱().some(function (t) { return Table.重なる([t], f.r1, f.c1, f.r2, f.c2); })) undoStack[undoStack.length - 1].表の操作 = true;
   /* 下の行を 1つずつ 上へ 詰める（★表の 外は 触らない★） */
   for (var r = f.今の行; r < f.r2; r++) {
     for (var c = f.c1; c <= f.c2; c++) {
@@ -17906,8 +17936,19 @@ function 今いる表(){
   }
   return null;
 }
+/* ★保護した シートでは 表の 機能を 断る（β2j・設計 exally-hyou-dougu/sekkei-2j-1.md）★
+   実Excel COM（exally-hyou-dougu/com-hogo-out.txt）＝作る・集計行の 出し入れ・名替え・サイズ変更は ★ロックを 外した マスでも★ 断る
+   「シートが保護されているため、テーブルの機能は使用できません。」・範囲に変換（表を やめる）は 通す。
+   前は 門が 無く、集計行を しまう と 表は 縮むのに setCell が 断った 集計の マスが 残った（台と 表が 食い違う） */
+var _表の保護の字 = 'シートが 保護されているため、テーブルの 機能は 使えません（直すには 校閲→シートの保護を やめる）';
+function _表は保護で断る(欄){
+  if (!このシートは保護中()) return false;
+  if (欄) 欄.textContent = _表の保護の字; else notify(_表の保護の字);
+  return true;
+}
 function 表の窓を開く(){
   hideCtxMenu();
+  if (_表は保護で断る()) return 0;
   var ov = document.getElementById('tableOverlay');
   if (!ov) return;
   var 今 = 今いる表();
@@ -17975,6 +18016,7 @@ function 表の範囲を読む(字){
 }
 function 表を決める(){
   var 欄 = document.getElementById('tblWhy');
+  if (_表は保護で断る(欄)) return 0;   /* ★窓を 開いた 後に 保護した 時も（β2j）★ */
   var 場所 = 表の範囲を読む(document.getElementById('tblRange').value);
   if (!場所) { 欄.textContent = '範囲は A1:C4 の 形で 入れてください'; return 0; }
   var 名 = String(document.getElementById('tblName').value || '').trim();
@@ -18057,6 +18099,7 @@ function 表を決める(){
   /* ★控えを 積んでから 書く（穴4・2026-11-14）★＝前は 表・見出し・集計行を 書いても 控えが 無く、
      Ctrl+Z が 1つ前の 操作を 戻した（全部再表示→集計行→Ctrl+Z で 集計行が 隠れた＝穴5）。
      見出しを 1行 足す 時は ctxInsertRow が 同じ 前の形で 1つ 積む＝ここでは 積まない（2つ 積むと 2回 押さないと 戻らない） */
+  var _積む前 = undoStack.length;   /* ★この 操作で 積んだ 控えに 表の操作 の 印を 付ける（β2j）★ */
   _人の操作の前('表を決める');   /* ★見出しの 字を 読む 前に 1回だけ 控え・計算★（押し0a）＝前は 開いた本で 保存された 古い 答えが 列名に なった */
   if (見出し行 || 今) _pushRowColUndo();
 
@@ -18120,6 +18163,7 @@ function 表を決める(){
   _表の式を流し直す();
   render(); updateBar();
   notify('「' + 名 + '」を 作りました');
+  if (undoStack.length > _積む前 && undoStack[undoStack.length - 1].type === 'rowcol') undoStack[undoStack.length - 1].表の操作 = true;
   return 1;
 }
 /* ★その行の c1..c2 に 値か 式が 在るか★（β2d）＝塗りだけの マスは 中身に 数えない */
@@ -18300,7 +18344,9 @@ function _rowcolの鏡(op){
   var sh = sheets[activeSheet];
   var 板の番号 = (op.sheet != null) ? op.sheet : activeSheet;
   if (op.見た目) return {type:'rowcol', sheet:板の番号, 見た目:true, snap:_見た目を写す(sh)};
-  return {type:'rowcol', sheet:板の番号, snap:_板を写す(sh)};
+  var 鏡 = {type:'rowcol', sheet:板の番号, snap:_板を写す(sh)};
+  if (op.表の操作) 鏡.表の操作 = true;   /* ★表の 操作の 印も 写す（β2j）＝落とすと Z の 後の Y が 保護中に 通る★ */
+  return 鏡;
 }
 function _rowcolを戻す(op){
   if (op.見た目) _見た目を置く(activeSheet, op.snap);
@@ -18347,7 +18393,7 @@ var 板の鍵の行き先 = {
   validations: '動かす（番地・足した 所は 上／左の 決まりを 継ぐ）',
   links: '動かす（番地）', sparklines: '動かす（番地・元の 範囲の 字は 押し0c）', comments: '動かす（番地）',
   ruby: '動かす（番地）',
-  tables: '動かす（四角）', condFormats: '動かす（範囲の 四角・真下に 足すと 広がる・式の 字は 押し0c）',
+  protect: '動かさない（板 全体の 保護の 旗・行や列では 動かない）', tables: '動かす（四角）', condFormats: '動かす（範囲の 四角・真下に 足すと 広がる・式の 字は 押し0c）',
   allowEdit: '動かす（四角と 範囲の 字・丸ごと 消えたら #REF!＝実Excel も 残す）',
   freezeRow: '動かす（固定の 行数）', freezeCol: '動かす（固定の 列数）',
   objects: '動かす（画面の 座標・セルに 合わせて 移動と サイズ変更）', ink: '動かす（線の 点の 座標）',

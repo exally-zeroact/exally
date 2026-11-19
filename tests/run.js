@@ -468,6 +468,7 @@ const FILES = [
   ['hyou-midashidake-webkit.mjs'],   // ★見出しだけの 表は 空の 1行を 持つ・行の削除で 1行目を 空で 残す・2表の 行の削除は 断る（β2d・本物の WebKit）★
   ['hyou-shukei-webkit.mjs'],   // ★集計行の 在る 表で 窓の OK を 押しても 集計行を 二重に 書かない・外したら 台ごと しまう・範囲替えは 断る（β2h・本物の WebKit）★
   ['hyou-midashi-hazushi-webkit.mjs'],   // ★前から在る表で 見出しの チェックを 外しても 列名が 列1.. に 化けない・見出しの 無い表は 1行目を 見出しに しない（β2i・本物の WebKit）★
+  ['hyou-hogo-webkit.mjs'],   // ★保護した シートでは 表の 機能（作る・集計行・名替え・範囲替え・窓）を 断る・範囲に変換は 通す（β2j・本物の WebKit・真値 com-hogo-out.txt）★
   ['hyou-no-ji-webkit.mjs'],        // ★表の字 Tbl[列] を打つと計算される・未知は #REF!・行を足すと追従（本物の WebKit）★
   ['oddf-susumi.test.mjs'],         // ★保留の 4個（ODDF / ODDL）の 進みを 数で 押さえる★
   ['oddf-susumi.test.mjs', '--self-test'],   // ★自分で 壊して 赤に なるか★
